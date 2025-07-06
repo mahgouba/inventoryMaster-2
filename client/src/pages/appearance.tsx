@@ -182,6 +182,8 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
   // Update manufacturer logo mutation
   const updateManufacturerLogoMutation = useMutation({
     mutationFn: async ({ id, logo }: { id: number; logo: string }) => {
+      console.log('Updating manufacturer logo for ID:', id, 'Logo length:', logo.length);
+      
       const response = await fetch(`/api/manufacturers/${id}/logo`, {
         method: "PUT",
         headers: {
@@ -189,22 +191,31 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
         },
         body: JSON.stringify({ logo }),
       });
+      
       if (!response.ok) {
-        throw new Error("Failed to update manufacturer logo");
+        const errorData = await response.text();
+        console.error('Logo update failed:', response.status, errorData);
+        throw new Error(`Failed to update manufacturer logo: ${response.status}`);
       }
-      return response.json();
+      
+      const result = await response.json();
+      console.log('Logo update successful:', result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Mutation onSuccess called:', data);
       toast({
         title: "تم تحديث الشعار بنجاح",
         description: "تم تحديث شعار الشركة المصنعة",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/manufacturers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
     },
     onError: (error) => {
+      console.error('Mutation onError called:', error);
       toast({
         title: "خطأ في تحديث الشعار",
-        description: "حدث خطأ أثناء تحديث الشعار",
+        description: error.message || "حدث خطأ أثناء تحديث الشعار",
         variant: "destructive",
       });
     },
@@ -687,20 +698,48 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                   onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
+                                      console.log('File selected:', file.name, 'Size:', file.size);
+                                      
+                                      // Check file size (limit to 5MB)
+                                      if (file.size > 5 * 1024 * 1024) {
+                                        toast({
+                                          title: "خطأ في حجم الملف",
+                                          description: "حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت",
+                                          variant: "destructive",
+                                        });
+                                        return;
+                                      }
+
                                       const reader = new FileReader();
-                                      reader.onload = () => {
-                                        updateManufacturerLogoMutation.mutate({
-                                          id: manufacturer.id,
-                                          logo: reader.result as string,
+                                      reader.onload = (event) => {
+                                        const result = event.target?.result as string;
+                                        if (result) {
+                                          console.log('File read successfully, updating logo...');
+                                          updateManufacturerLogoMutation.mutate({
+                                            id: manufacturer.id,
+                                            logo: result,
+                                          });
+                                        }
+                                      };
+                                      reader.onerror = () => {
+                                        console.error('Error reading file');
+                                        toast({
+                                          title: "خطأ في قراءة الملف",
+                                          description: "حدث خطأ أثناء قراءة الصورة",
+                                          variant: "destructive",
                                         });
                                       };
                                       reader.readAsDataURL(file);
                                     }
                                   }}
                                 />
-                                <Button variant="outline" size="sm">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  disabled={updateManufacturerLogoMutation.isPending}
+                                >
                                   <Edit2 size={14} />
-                                  تغيير
+                                  {updateManufacturerLogoMutation.isPending ? "جاري التحديث..." : "تغيير"}
                                 </Button>
                               </label>
                               <Button 
@@ -732,20 +771,48 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                   onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
+                                      console.log('File selected:', file.name, 'Size:', file.size);
+                                      
+                                      // Check file size (limit to 5MB)
+                                      if (file.size > 5 * 1024 * 1024) {
+                                        toast({
+                                          title: "خطأ في حجم الملف",
+                                          description: "حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت",
+                                          variant: "destructive",
+                                        });
+                                        return;
+                                      }
+
                                       const reader = new FileReader();
-                                      reader.onload = () => {
-                                        updateManufacturerLogoMutation.mutate({
-                                          id: manufacturer.id,
-                                          logo: reader.result as string,
+                                      reader.onload = (event) => {
+                                        const result = event.target?.result as string;
+                                        if (result) {
+                                          console.log('File read successfully, updating logo...');
+                                          updateManufacturerLogoMutation.mutate({
+                                            id: manufacturer.id,
+                                            logo: result,
+                                          });
+                                        }
+                                      };
+                                      reader.onerror = () => {
+                                        console.error('Error reading file');
+                                        toast({
+                                          title: "خطأ في قراءة الملف",
+                                          description: "حدث خطأ أثناء قراءة الصورة",
+                                          variant: "destructive",
                                         });
                                       };
                                       reader.readAsDataURL(file);
                                     }
                                   }}
                                 />
-                                <Button variant="outline" size="sm">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  disabled={updateManufacturerLogoMutation.isPending}
+                                >
                                   <Upload size={14} />
-                                  رفع شعار
+                                  {updateManufacturerLogoMutation.isPending ? "جاري الرفع..." : "رفع شعار"}
                                 </Button>
                               </label>
                             </div>

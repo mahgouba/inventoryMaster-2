@@ -910,19 +910,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const { logo } = req.body;
       
-      if (!logo) {
+      console.log(`Updating logo for manufacturer ID: ${id}, Logo provided: ${!!logo}, Logo length: ${logo?.length || 0}`);
+      
+      if (logo === undefined) {
+        console.error("Logo data is missing from request body");
         return res.status(400).json({ message: "Logo data is required" });
       }
 
+      // Allow empty string to clear logo
       const manufacturer = await storage.updateManufacturerLogo(id, logo);
       if (manufacturer) {
+        console.log(`Successfully updated logo for manufacturer: ${manufacturer.name}`);
         res.json(manufacturer);
       } else {
+        console.error(`Manufacturer with ID ${id} not found`);
         res.status(404).json({ message: "Manufacturer not found" });
       }
     } catch (error) {
       console.error("Error updating manufacturer logo:", error);
-      res.status(500).json({ message: "Failed to update manufacturer logo" });
+      res.status(500).json({ message: "Failed to update manufacturer logo", error: error.message });
     }
   });
 

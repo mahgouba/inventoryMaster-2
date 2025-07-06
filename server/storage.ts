@@ -1045,13 +1045,26 @@ export class DatabaseStorage implements IStorage {
 
   async updateManufacturerLogo(id: number, logo: string): Promise<Manufacturer | undefined> {
     try {
+      console.log(`Storage: Updating manufacturer ${id} with logo length: ${logo?.length || 0}`);
+      
+      // First check if manufacturer exists
+      const existingManufacturer = await db.select().from(manufacturers).where(eq(manufacturers.id, id));
+      if (existingManufacturer.length === 0) {
+        console.error(`Storage: Manufacturer with ID ${id} not found`);
+        return undefined;
+      }
+      
+      console.log(`Storage: Found manufacturer: ${existingManufacturer[0].name}`);
+      
       const [manufacturer] = await db.update(manufacturers)
         .set({ logo })
         .where(eq(manufacturers.id, id))
         .returning();
+        
+      console.log(`Storage: Successfully updated manufacturer logo for ${manufacturer.name}`);
       return manufacturer;
     } catch (error) {
-      console.error('Update manufacturer logo error:', error);
+      console.error('Storage: Update manufacturer logo error:', error);
       return undefined;
     }
   }
