@@ -117,6 +117,32 @@ The application uses PostgreSQL for persistent data storage with proper database
 - Environment variable `DATABASE_URL` required for PostgreSQL connection
 - `npm run db:push` command for schema deployment
 
+## Deployment Strategy
+
+### Development
+- Uses Vite dev server with HMR for frontend
+- Express server with tsx for TypeScript execution
+- Concurrent development with both servers running
+
+### Production Build
+- Vite builds optimized static assets to `/dist/public`
+- esbuild bundles server code to `/dist/index.js`
+- Single Node.js process serves both API and static files
+
+### Database Setup
+- Drizzle migrations in `/migrations` directory
+- Environment variable `DATABASE_URL` required for PostgreSQL connection
+- `npm run db:push` command for schema deployment
+
+### Docker Deployment
+- **Dockerfile**: Multi-stage build with Node.js 20 Alpine
+- **docker-compose.yml**: Complete orchestration with PostgreSQL
+- **Production-ready**: Includes health checks, persistent volumes, and networking
+- **Database**: PostgreSQL 15 with persistent data storage
+- **Environment**: Supports OpenAI API key integration
+- **Setup Script**: `run-docker.sh` for automated deployment
+- **Documentation**: Complete setup guide in `DOCKER_SETUP.md`
+
 ## Changelog
 
 ```
@@ -168,6 +194,7 @@ Changelog:
 - July 05, 2025: Changed date system from Hijri to Gregorian calendar - updated all date displays and reservation date recording throughout the system, modified entry date display in card view from 'ar-SA' to 'en-US' locale, updated reservation date display and recording in both card view and inventory table, and changed print date format in utils.ts to use Gregorian calendar for consistency across the entire application
 - July 05, 2025: Enhanced voice assistant with dual input mode support - implemented comprehensive text and voice command interface using Tabs component, added text input field with Enter key support and Send button, integrated both voice recognition and text input processing through the same API endpoint, included example commands for user guidance, and improved accessibility with DialogTitle for screen readers
 - July 05, 2025: Implemented comprehensive database integration for voice assistant - added complete CRUD operations support including vehicle search, addition, editing, deletion, selling, reservation and cancellation, integrated OpenAI GPT-4o for intelligent command interpretation with Arabic language support, developed dedicated action handlers for all vehicle operations with proper error handling and user feedback, and enhanced system prompt with detailed examples for accurate command recognition
+- July 06, 2025: Implemented complete Docker containerization - created production-ready Dockerfile with Node.js 20 Alpine, comprehensive docker-compose.yml with PostgreSQL 15, health checks, persistent volumes, and networking, automated setup script (run-docker.sh) for one-command deployment, complete documentation (DOCKER_SETUP.md) with troubleshooting guide, and support for environment variable management including OpenAI API key integration
 ```
 
 ## User Preferences
