@@ -148,6 +148,8 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
   // Create new manufacturer mutation
   const createManufacturerMutation = useMutation({
     mutationFn: async (manufacturer: { name: string; logo?: string }) => {
+      console.log('Creating manufacturer:', manufacturer);
+      
       const response = await fetch("/api/manufacturers", {
         method: "POST",
         headers: {
@@ -155,27 +157,46 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
         },
         body: JSON.stringify(manufacturer),
       });
+      
       if (!response.ok) {
-        throw new Error("Failed to create manufacturer");
+        const errorData = await response.json();
+        console.error('Failed to create manufacturer:', response.status, errorData);
+        throw new Error(`Failed to create manufacturer: ${response.status} - ${errorData.message || 'Unknown error'}`);
       }
-      return response.json();
+      
+      const result = await response.json();
+      console.log('Manufacturer created successfully:', result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Create manufacturer mutation success:', data);
       toast({
         title: "تم إضافة الشركة المصنعة بنجاح",
-        description: "تم إضافة شركة مصنعة جديدة إلى القائمة",
+        description: `تم إضافة ${data.name} إلى القائمة`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/manufacturers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
       setShowNewManufacturerDialog(false);
       setNewManufacturerName("");
       setNewManufacturerLogo(null);
     },
     onError: (error) => {
-      toast({
-        title: "خطأ في إضافة الشركة المصنعة",
-        description: "حدث خطأ أثناء إضافة الشركة المصنعة",
-        variant: "destructive",
-      });
+      console.error('Create manufacturer mutation error:', error);
+      
+      // Check if it's a duplicate name error
+      if (error.message.includes("409")) {
+        toast({
+          title: "خطأ - اسم مكرر",
+          description: "الشركة المصنعة موجودة بالفعل! يرجى اختيار اسم آخر",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "خطأ في إضافة الشركة المصنعة",
+          description: error.message || "حدث خطأ أثناء إضافة الشركة المصنعة",
+          variant: "destructive",
+        });
+      }
     },
   });
 

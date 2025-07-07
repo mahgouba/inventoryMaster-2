@@ -932,6 +932,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/manufacturers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      console.log(`Deleting manufacturer with ID: ${id}`);
+      
+      const success = await storage.deleteManufacturer(id);
+      if (success) {
+        console.log(`Successfully deleted manufacturer with ID: ${id}`);
+        res.json({ message: "Manufacturer deleted successfully" });
+      } else {
+        console.error(`Manufacturer with ID ${id} not found`);
+        res.status(404).json({ message: "Manufacturer not found" });
+      }
+    } catch (error) {
+      console.error("Error deleting manufacturer:", error);
+      res.status(500).json({ message: "Failed to delete manufacturer", error: error.message });
+    }
+  });
+
   // Location endpoints
   app.get("/api/locations", async (req, res) => {
     try {
