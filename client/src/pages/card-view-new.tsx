@@ -26,7 +26,8 @@ import {
   Sun,
   Calendar,
   X,
-  Share2
+  Share2,
+  FileText
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,7 @@ import VoiceAssistant from "@/components/voice-assistant";
 import { CardViewFAB } from "@/components/animated-fab";
 import InventoryFormSimple from "@/components/inventory-form-simple";
 import VehicleShare from "@/components/vehicle-share";
+import SpecificationsManagement from "@/components/specifications-management";
 
 import type { InventoryItem } from "@shared/schema";
 
@@ -64,6 +66,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [showSoldCars, setShowSoldCars] = useState<boolean>(false);
   const [shareVehicle, setShareVehicle] = useState<InventoryItem | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [specificationsOpen, setSpecificationsOpen] = useState(false);
 
   const { data: inventoryData = [], isLoading } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory"],
@@ -373,6 +376,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         إدارة المستخدمين
                       </DropdownMenuItem>
                     </Link>
+                    <DropdownMenuItem onClick={() => setSpecificationsOpen(true)}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      إدارة المواصفات
+                    </DropdownMenuItem>
 
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -658,25 +665,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
                           {/* Action Buttons */}
                           <div className="pt-3 mt-3 border-t border-slate-200 space-y-2">
-                            {/* First row - Edit, Delete, and Share */}
+                            {/* Share and Reserve buttons only */}
                             <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="flex-1 h-9 text-xs text-slate-700 hover:text-slate-900 hover:bg-slate-50 border-slate-300"
-                                onClick={() => handleEditItem(item)}
-                              >
-                                <Edit3 size={14} className="ml-1" />
-                                تعديل
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="px-3 h-9 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300"
-                                onClick={() => handleDeleteItem(item)}
-                              >
-                                <Trash2 size={14} />
-                              </Button>
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -685,21 +675,35 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               >
                                 <Share2 size={14} />
                               </Button>
-                            </div>
-
-                            {/* Second row - Reserve/Cancel and Sell */}
-                            <div className="flex gap-2">
                               {item.status === "محجوز" ? (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1 h-9 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
-                                  onClick={() => handleCancelReservation(item)}
-                                  disabled={cancelingReservationId === item.id}
-                                >
-                                  <X size={14} className="ml-1" />
-                                  {cancelingReservationId === item.id ? "جاري الإلغاء..." : "إلغاء الحجز"}
-                                </Button>
+                                userRole === "admin" ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="flex-1 h-9 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
+                                    onClick={() => handleCancelReservation(item)}
+                                    disabled={cancelingReservationId === item.id}
+                                  >
+                                    <X size={14} className="ml-1" />
+                                    {cancelingReservationId === item.id ? "جاري الإلغاء..." : "إلغاء الحجز"}
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="flex-1 h-9 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
+                                    onClick={() => {
+                                      toast({
+                                        title: "غير مسموح",
+                                        description: "لا يمكنك إلغاء الحجز إلا إذا كنت مديرًا بكامل الصلاحيات.",
+                                        variant: "destructive",
+                                      });
+                                    }}
+                                  >
+                                    <X size={14} className="ml-1" />
+                                    إلغاء الحجز
+                                  </Button>
+                                )
                               ) : (
                                 <Button
                                   size="sm"
@@ -712,16 +716,6 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                   {reservingItemId === item.id ? "جاري الحجز..." : "حجز"}
                                 </Button>
                               )}
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="flex-1 h-9 text-xs text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
-                                onClick={() => handleSellItem(item)}
-                                disabled={sellingItemId === item.id}
-                              >
-                                <ShoppingCart size={14} className="ml-1" />
-                                {sellingItemId === item.id ? "جاري البيع..." : "بيع"}
-                              </Button>
                             </div>
                           </div>
                         </div>
@@ -822,6 +816,12 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           onOpenChange={setShareDialogOpen}
         />
       )}
+
+      {/* Specifications Management Dialog */}
+      <SpecificationsManagement
+        open={specificationsOpen}
+        onOpenChange={setSpecificationsOpen}
+      />
     </div>
   );
 }

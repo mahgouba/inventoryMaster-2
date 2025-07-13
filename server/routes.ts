@@ -1388,6 +1388,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get specification by vehicle parameters
+  app.get("/api/specifications/:manufacturer/:category/:trimLevel/:year/:engineCapacity", async (req, res) => {
+    try {
+      const { manufacturer, category, trimLevel, year, engineCapacity } = req.params;
+      
+      if (!manufacturer || !category || !year || !engineCapacity) {
+        return res.status(400).json({ message: "Invalid specification parameters" });
+      }
+      
+      const specification = await storage.getSpecificationByVehicleParams(
+        manufacturer, 
+        category, 
+        trimLevel === "null" ? null : trimLevel, 
+        parseInt(year), 
+        engineCapacity
+      );
+      
+      if (!specification) {
+        return res.status(404).json({ message: "Specification not found" });
+      }
+      
+      res.json(specification);
+    } catch (error) {
+      console.error("Error fetching specification by vehicle params:", error);
+      res.status(500).json({ message: "Failed to fetch specification" });
+    }
+  });
+
   // Trim Levels API Routes
   app.get("/api/trim-levels", async (req, res) => {
     try {

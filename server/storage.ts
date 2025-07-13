@@ -115,6 +115,7 @@ export interface IStorage {
   updateSpecification(id: number, specification: Partial<InsertSpecification>): Promise<Specification | undefined>;
   deleteSpecification(id: number): Promise<boolean>;
   getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<Specification[]>;
+  getSpecificationByVehicleParams(manufacturer: string, category: string, trimLevel: string | null, year: number, engineCapacity: string): Promise<Specification | undefined>;
   
   // Trim levels methods
   getAllTrimLevels(): Promise<TrimLevel[]>;
@@ -1286,6 +1287,109 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Get trim levels by category error:', error);
       return [];
+    }
+  }
+
+  // Specifications methods
+  async getAllSpecifications(): Promise<Specification[]> {
+    try {
+      return await db.select().from(specifications);
+    } catch (error) {
+      console.error('Get all specifications error:', error);
+      return [];
+    }
+  }
+
+  async getSpecification(id: number): Promise<Specification | undefined> {
+    try {
+      const results = await db.select().from(specifications).where(eq(specifications.id, id));
+      return results[0];
+    } catch (error) {
+      console.error('Get specification error:', error);
+      return undefined;
+    }
+  }
+
+  async createSpecification(specificationData: InsertSpecification): Promise<Specification> {
+    try {
+      const results = await db.insert(specifications).values({
+        ...specificationData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }).returning();
+      return results[0];
+    } catch (error) {
+      console.error('Create specification error:', error);
+      throw error;
+    }
+  }
+
+  async updateSpecification(id: number, specificationData: Partial<InsertSpecification>): Promise<Specification | undefined> {
+    try {
+      const results = await db.update(specifications)
+        .set({
+          ...specificationData,
+          updatedAt: new Date()
+        })
+        .where(eq(specifications.id, id))
+        .returning();
+      return results[0];
+    } catch (error) {
+      console.error('Update specification error:', error);
+      return undefined;
+    }
+  }
+
+  async deleteSpecification(id: number): Promise<boolean> {
+    try {
+      const results = await db.delete(specifications).where(eq(specifications.id, id)).returning();
+      return results.length > 0;
+    } catch (error) {
+      console.error('Delete specification error:', error);
+      return false;
+    }
+  }
+
+  async getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<Specification[]> {
+    try {
+      let query = db.select().from(specifications)
+        .where(eq(specifications.manufacturer, manufacturer))
+        .where(eq(specifications.category, category));
+      
+      if (trimLevel) {
+        query = query.where(eq(specifications.trimLevel, trimLevel));
+      }
+      
+      return await query;
+    } catch (error) {
+      console.error('Get specifications by vehicle error:', error);
+      return [];
+    }
+  }
+
+  async getSpecificationByVehicleParams(
+    manufacturer: string, 
+    category: string, 
+    trimLevel: string | null, 
+    year: number, 
+    engineCapacity: string
+  ): Promise<Specification | undefined> {
+    try {
+      let query = db.select().from(specifications)
+        .where(eq(specifications.manufacturer, manufacturer))
+        .where(eq(specifications.category, category))
+        .where(eq(specifications.year, year))
+        .where(eq(specifications.engineCapacity, engineCapacity));
+      
+      if (trimLevel) {
+        query = query.where(eq(specifications.trimLevel, trimLevel));
+      }
+      
+      const results = await query;
+      return results[0];
+    } catch (error) {
+      console.error('Get specification by vehicle params error:', error);
+      return undefined;
     }
   }
 }

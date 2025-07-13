@@ -73,9 +73,9 @@ export const specifications = pgTable("specifications", {
   manufacturer: text("manufacturer").notNull(), // الصانع
   category: text("category").notNull(), // الفئة
   trimLevel: text("trim_level").notNull(), // درجة التجهيز
-  engineCapacity: text("engine_capacity"), // سعة المحرك
-  modelYear: integer("model_year").notNull(), // الموديل
-  detailedSpecs: text("detailed_specs"), // المواصفات التفصيلية
+  year: integer("year").notNull(), // السنة
+  engineCapacity: text("engine_capacity").notNull(), // سعة المحرك
+  detailedDescription: text("detailed_description").notNull(), // الوصف التفصيلي
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -127,6 +127,21 @@ export const insertSpecificationSchema = createInsertSchema(specifications).omit
   createdAt: true,
   updatedAt: true,
 });
+
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof insertUserSchema._type;
+export type InventoryItem = typeof inventoryItems.$inferSelect;
+export type InsertInventoryItem = typeof insertInventoryItemSchema._type;
+export type Manufacturer = typeof manufacturers.$inferSelect;
+export type InsertManufacturer = typeof insertManufacturerSchema._type;
+export type Location = typeof locations.$inferSelect;
+export type InsertLocation = typeof insertLocationSchema._type;
+export type LocationTransfer = typeof locationTransfers.$inferSelect;
+export type InsertLocationTransfer = typeof insertLocationTransferSchema._type;
+export type Specification = typeof specifications.$inferSelect;
+export type InsertSpecification = typeof insertSpecificationSchema._type;
+export type TrimLevel = typeof trimLevels.$inferSelect;
+export type InsertTrimLevel = typeof insertTrimLevelSchema._type;
 
 export const insertTrimLevelSchema = createInsertSchema(trimLevels).omit({
   id: true,
