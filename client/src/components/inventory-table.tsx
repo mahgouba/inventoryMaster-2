@@ -240,6 +240,17 @@ export default function InventoryTable({ searchQuery, categoryFilter, manufactur
                   variant="ghost"
                   size="sm"
                   className="text-white hover:text-teal-100 hover:bg-teal-700 p-1"
+                  onClick={() => handleSort("trimLevel")}
+                >
+                  درجة التجهيز
+                  <ArrowUpDown className="mr-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead className="text-white text-right">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:text-teal-100 hover:bg-teal-700 p-1"
                   onClick={() => handleSort("engineCapacity")}
                 >
                   سعة المحرك
@@ -293,6 +304,7 @@ export default function InventoryTable({ searchQuery, categoryFilter, manufactur
                   <TableCell className="text-sm text-slate-800">{item.manufacturer}</TableCell>
 
                   <TableCell className="text-sm text-slate-800">{item.category}</TableCell>
+                  <TableCell className="text-sm text-slate-800">{item.trimLevel || '-'}</TableCell>
                   <TableCell className="text-sm text-slate-800 font-latin">{item.engineCapacity}</TableCell>
                   <TableCell className="text-sm text-slate-800 font-latin">{item.year}</TableCell>
                   <TableCell className="text-sm text-slate-800">{item.exteriorColor}</TableCell>

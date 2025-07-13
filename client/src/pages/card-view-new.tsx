@@ -91,6 +91,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         return (
           item.chassisNumber?.toLowerCase().includes(query) ||
           item.category?.toLowerCase().includes(query) ||
+          item.trimLevel?.toLowerCase().includes(query) ||
           item.exteriorColor?.toLowerCase().includes(query) ||
           item.interiorColor?.toLowerCase().includes(query) ||
           item.location?.toLowerCase().includes(query) ||
@@ -412,7 +413,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                 <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
                 <Input
                   type="text"
-                  placeholder="البحث في رقم الهيكل، الفئة، اللون، الموقع..."
+                  placeholder="البحث في رقم الهيكل، الفئة، درجة التجهيز، اللون، الموقع..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 pr-4 py-2 w-full border-slate-300 focus:border-teal-500 focus:ring-teal-500"
@@ -585,6 +586,12 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                       </CardHeader>
                       <CardContent className="pt-0">
                         <div className="space-y-2 text-sm">
+                          {item.trimLevel && (
+                            <div className="flex justify-between">
+                              <span className="text-slate-600 dark:text-slate-400 font-medium">درجة التجهيز:</span>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.trimLevel}</span>
+                            </div>
+                          )}
                           <div className="flex justify-between">
                             <span className="text-slate-600 dark:text-slate-400 font-medium">سعة المحرك:</span>
                             <span className="font-semibold font-latin text-slate-800 dark:text-slate-200">{item.engineCapacity}</span>

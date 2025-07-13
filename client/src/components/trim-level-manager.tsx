@@ -35,7 +35,7 @@ export default function TrimLevelManager({ manufacturer, category, disabled, onT
   );
 
   const createTrimLevelMutation = useMutation({
-    mutationFn: (data: InsertTrimLevel) => apiRequest("/api/trim-levels", "POST", data),
+    mutationFn: (data: InsertTrimLevel) => apiRequest("POST", "/api/trim-levels", data),
     onSuccess: (newTrimLevel) => {
       queryClient.invalidateQueries({ queryKey: ["/api/trim-levels"] });
       setNewTrimLevel("");
@@ -57,7 +57,7 @@ export default function TrimLevelManager({ manufacturer, category, disabled, onT
 
   const updateTrimLevelMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<InsertTrimLevel> }) =>
-      apiRequest(`/api/trim-levels/${id}`, "PUT", data),
+      apiRequest("PUT", `/api/trim-levels/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/trim-levels"] });
       setEditingTrimLevel(null);
@@ -77,7 +77,7 @@ export default function TrimLevelManager({ manufacturer, category, disabled, onT
   });
 
   const deleteTrimLevelMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/trim-levels/${id}`, "DELETE"),
+    mutationFn: (id: number) => apiRequest("DELETE", `/api/trim-levels/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/trim-levels"] });
       toast({
