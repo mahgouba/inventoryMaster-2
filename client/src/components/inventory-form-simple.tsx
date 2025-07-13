@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { insertInventoryItemSchema, type InsertInventoryItem, type InventoryItem } from "@shared/schema";
+import { insertInventoryItemSchema, type InsertInventoryItem, type InventoryItem, type TrimLevel } from "@shared/schema";
 import { CloudUpload, Settings, Camera } from "lucide-react";
 import ListManagerSimple from "@/components/list-manager-simple";
 import ManufacturerCategoriesButton from "@/components/manufacturer-categories-button";
 import ChassisNumberScanner from "@/components/chassis-number-scanner";
+import TrimLevelManager from "@/components/trim-level-manager";
 
 interface InventoryFormProps {
   open: boolean;
@@ -51,9 +52,11 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   const queryClient = useQueryClient();
   
   const [selectedManufacturer, setSelectedManufacturer] = useState(editItem?.manufacturer || "");
+  const [selectedCategory, setSelectedCategory] = useState(editItem?.category || "");
   const [availableCategories, setAvailableCategories] = useState<string[]>(
     editItem?.manufacturer ? manufacturerCategories[editItem.manufacturer] || [] : []
   );
+  const [availableTrimLevels, setAvailableTrimLevels] = useState<string[]>([]);
   
   // Local state for editable lists
   const [manufacturers, setManufacturers] = useState<string[]>(initialManufacturers);
@@ -78,6 +81,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
     defaultValues: editItem || {
       manufacturer: "",
       category: "",
+      trimLevel: "",
       engineCapacity: "",
       year: new Date().getFullYear(),
       exteriorColor: "",
@@ -93,11 +97,34 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
     },
   });
 
+  // Fetch trim levels for the selected manufacturer and category
+  const { data: trimLevels = [] } = useQuery({
+    queryKey: [`/api/trim-levels/category/${selectedManufacturer}/${selectedCategory}`],
+    enabled: Boolean(selectedManufacturer && selectedCategory),
+  });
+
   const handleManufacturerChange = (manufacturer: string) => {
     setSelectedManufacturer(manufacturer);
     setAvailableCategories(localManufacturerCategories[manufacturer] || []);
+    setSelectedCategory("");
+    setAvailableTrimLevels([]);
     form.setValue("category", "");
+    form.setValue("trimLevel", "");
   };
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setAvailableTrimLevels([]);
+    form.setValue("trimLevel", "");
+  };
+
+  // Update trim levels when data is fetched
+  useEffect(() => {
+    if (trimLevels.length > 0) {
+      const trimLevelNames = trimLevels.map((tl: TrimLevel) => tl.trimLevel);
+      setAvailableTrimLevels(trimLevelNames);
+    }
+  }, [trimLevels]);
 
   const createMutation = useMutation({
     mutationFn: (data: InsertInventoryItem) => apiRequest("POST", "/api/inventory", data),
@@ -225,6 +252,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
       form.reset({
         manufacturer: editItem.manufacturer,
         category: editItem.category,
+        trimLevel: editItem.trimLevel || "",
         engineCapacity: editItem.engineCapacity,
         year: editItem.year,
         exteriorColor: editItem.exteriorColor,
@@ -241,12 +269,14 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
 
       // Set manufacturer and available categories
       setSelectedManufacturer(editItem.manufacturer);
+      setSelectedCategory(editItem.category);
       setAvailableCategories(localManufacturerCategories[editItem.manufacturer] || []);
     } else if (!editItem && open) {
       // Reset form for new item
       form.reset({
         manufacturer: "",
         category: "",
+        trimLevel: "",
         engineCapacity: "",
         year: new Date().getFullYear(),
         exteriorColor: "",
@@ -261,7 +291,9 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
         isSold: false,
       });
       setSelectedManufacturer("");
+      setSelectedCategory("");
       setAvailableCategories([]);
+      setAvailableTrimLevels([]);
     }
   }, [editItem, open, form, localManufacturerCategories]);
 
@@ -328,7 +360,10 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                       <FormItem>
                         <FormLabel>الفئة</FormLabel>
                         <FormControl>
-                          <Select value={field.value} onValueChange={field.onChange} disabled={!selectedManufacturer}>
+                          <Select value={field.value} onValueChange={(value) => {
+                            handleCategoryChange(value);
+                            field.onChange(value);
+                          }} disabled={!selectedManufacturer}>
                             <SelectTrigger>
                               <SelectValue placeholder="اختر الفئة" />
                             </SelectTrigger>
@@ -357,6 +392,45 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                           [selectedManufacturer]: newCategories
                         }));
                         setAvailableCategories(newCategories);
+                      }}
+                    />
+                  )}
+                </div>
+
+                {/* Trim Level Field with Trim Level Manager */}
+                <div className="space-y-2">
+                  <FormField
+                    control={form.control}
+                    name="trimLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>درجة التجهيز</FormLabel>
+                        <FormControl>
+                          <Select value={field.value} onValueChange={field.onChange} disabled={!selectedManufacturer || !selectedCategory}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="اختر درجة التجهيز" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {availableTrimLevels.map((trimLevel) => (
+                                <SelectItem key={trimLevel} value={trimLevel}>
+                                  {trimLevel}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {/* Trim Level Management Button */}
+                  {selectedManufacturer && selectedCategory && (
+                    <TrimLevelManager
+                      manufacturer={selectedManufacturer}
+                      category={selectedCategory}
+                      onTrimLevelAdded={(newTrimLevel) => {
+                        setAvailableTrimLevels(prev => [...prev, newTrimLevel.trimLevel]);
                       }}
                     />
                   )}

@@ -1,6 +1,6 @@
 import { 
   users, inventoryItems, manufacturers, locations, locationTransfers, 
-  lowStockAlerts, stockSettings, appearanceSettings, specifications,
+  lowStockAlerts, stockSettings, appearanceSettings, specifications, trimLevels,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Manufacturer, type InsertManufacturer, 
@@ -9,7 +9,8 @@ import {
   type LowStockAlert, type InsertLowStockAlert,
   type StockSettings, type InsertStockSettings,
   type AppearanceSettings, type InsertAppearanceSettings,
-  type Specification, type InsertSpecification
+  type Specification, type InsertSpecification,
+  type TrimLevel, type InsertTrimLevel
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -114,6 +115,14 @@ export interface IStorage {
   updateSpecification(id: number, specification: Partial<InsertSpecification>): Promise<Specification | undefined>;
   deleteSpecification(id: number): Promise<boolean>;
   getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<Specification[]>;
+  
+  // Trim levels methods
+  getAllTrimLevels(): Promise<TrimLevel[]>;
+  getTrimLevel(id: number): Promise<TrimLevel | undefined>;
+  createTrimLevel(trimLevel: InsertTrimLevel): Promise<TrimLevel>;
+  updateTrimLevel(id: number, trimLevel: Partial<InsertTrimLevel>): Promise<TrimLevel | undefined>;
+  deleteTrimLevel(id: number): Promise<boolean>;
+  getTrimLevelsByCategory(manufacturer: string, category: string): Promise<TrimLevel[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -165,6 +174,12 @@ export class MemStorage implements IStorage {
   async updateSpecification(id: number, spec: any): Promise<any> { return spec; }
   async deleteSpecification(id: number): Promise<boolean> { return true; }
   async getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<any[]> { return []; }
+  async getAllTrimLevels(): Promise<any[]> { return []; }
+  async getTrimLevel(id: number): Promise<any> { return undefined; }
+  async createTrimLevel(trimLevel: any): Promise<any> { return trimLevel; }
+  async updateTrimLevel(id: number, trimLevel: any): Promise<any> { return trimLevel; }
+  async deleteTrimLevel(id: number): Promise<boolean> { return true; }
+  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<any[]> { return []; }
   async getAllUsers(): Promise<any[]> { return []; }
   async updateUser(id: number, user: any): Promise<any> { return user; }
   async deleteUser(id: number): Promise<boolean> { return true; }
@@ -1206,6 +1221,70 @@ export class DatabaseStorage implements IStorage {
       return await query;
     } catch (error) {
       console.error('Get specifications by vehicle error:', error);
+      return [];
+    }
+  }
+
+  // Trim levels methods
+  async getAllTrimLevels(): Promise<TrimLevel[]> {
+    try {
+      return await db.select().from(trimLevels);
+    } catch (error) {
+      console.error('Get all trim levels error:', error);
+      return [];
+    }
+  }
+
+  async getTrimLevel(id: number): Promise<TrimLevel | undefined> {
+    try {
+      const results = await db.select().from(trimLevels).where(eq(trimLevels.id, id));
+      return results[0];
+    } catch (error) {
+      console.error('Get trim level error:', error);
+      return undefined;
+    }
+  }
+
+  async createTrimLevel(trimLevelData: InsertTrimLevel): Promise<TrimLevel> {
+    try {
+      const results = await db.insert(trimLevels).values(trimLevelData).returning();
+      return results[0];
+    } catch (error) {
+      console.error('Create trim level error:', error);
+      throw error;
+    }
+  }
+
+  async updateTrimLevel(id: number, trimLevelData: Partial<InsertTrimLevel>): Promise<TrimLevel | undefined> {
+    try {
+      const results = await db.update(trimLevels)
+        .set(trimLevelData)
+        .where(eq(trimLevels.id, id))
+        .returning();
+      return results[0];
+    } catch (error) {
+      console.error('Update trim level error:', error);
+      return undefined;
+    }
+  }
+
+  async deleteTrimLevel(id: number): Promise<boolean> {
+    try {
+      const results = await db.delete(trimLevels).where(eq(trimLevels.id, id)).returning();
+      return results.length > 0;
+    } catch (error) {
+      console.error('Delete trim level error:', error);
+      return false;
+    }
+  }
+
+  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<TrimLevel[]> {
+    try {
+      return await db.select().from(trimLevels)
+        .where(eq(trimLevels.manufacturer, manufacturer))
+        .where(eq(trimLevels.category, category));
+    } catch (error) {
+      console.error('Get trim levels by category error:', error);
       return [];
     }
   }

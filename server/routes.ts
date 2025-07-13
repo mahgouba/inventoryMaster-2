@@ -7,7 +7,8 @@ import {
   insertLocationSchema,
   insertLocationTransferSchema,
   insertUserSchema,
-  insertSpecificationSchema
+  insertSpecificationSchema,
+  insertTrimLevelSchema
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -1384,6 +1385,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching specifications by vehicle:", error);
       res.status(500).json({ message: "Failed to fetch specifications" });
+    }
+  });
+
+  // Trim Levels API Routes
+  app.get("/api/trim-levels", async (req, res) => {
+    try {
+      const trimLevels = await storage.getAllTrimLevels();
+      res.json(trimLevels);
+    } catch (error) {
+      console.error("Error fetching trim levels:", error);
+      res.status(500).json({ message: "Failed to fetch trim levels" });
+    }
+  });
+
+  app.get("/api/trim-levels/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid trim level ID" });
+      }
+
+      const trimLevel = await storage.getTrimLevel(id);
+      if (!trimLevel) {
+        return res.status(404).json({ message: "Trim level not found" });
+      }
+
+      res.json(trimLevel);
+    } catch (error) {
+      console.error("Error fetching trim level:", error);
+      res.status(500).json({ message: "Failed to fetch trim level" });
+    }
+  });
+
+  app.post("/api/trim-levels", async (req, res) => {
+    try {
+      const trimLevelData = insertTrimLevelSchema.parse(req.body);
+      const trimLevel = await storage.createTrimLevel(trimLevelData);
+      res.status(201).json(trimLevel);
+    } catch (error) {
+      console.error("Error creating trim level:", error);
+      res.status(400).json({ message: "Invalid trim level data" });
+    }
+  });
+
+  app.put("/api/trim-levels/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid trim level ID" });
+      }
+
+      const trimLevelData = insertTrimLevelSchema.parse(req.body);
+      const trimLevel = await storage.updateTrimLevel(id, trimLevelData);
+      
+      if (!trimLevel) {
+        return res.status(404).json({ message: "Trim level not found" });
+      }
+
+      res.json(trimLevel);
+    } catch (error) {
+      console.error("Error updating trim level:", error);
+      res.status(400).json({ message: "Invalid trim level data" });
+    }
+  });
+
+  app.delete("/api/trim-levels/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid trim level ID" });
+      }
+
+      const deleted = await storage.deleteTrimLevel(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Trim level not found" });
+      }
+
+      res.json({ message: "Trim level deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting trim level:", error);
+      res.status(500).json({ message: "Failed to delete trim level" });
+    }
+  });
+
+  app.get("/api/trim-levels/category/:manufacturer/:category", async (req, res) => {
+    try {
+      const { manufacturer, category } = req.params;
+      
+      const trimLevels = await storage.getTrimLevelsByCategory(manufacturer, category);
+      res.json(trimLevels);
+    } catch (error) {
+      console.error("Error fetching trim levels by category:", error);
+      res.status(500).json({ message: "Failed to fetch trim levels" });
     }
   });
 

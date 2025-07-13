@@ -13,6 +13,7 @@ export const inventoryItems = pgTable("inventory_items", {
   id: serial("id").primaryKey(),
   manufacturer: text("manufacturer").notNull(), // الصانع (مرسيدس، بي ام دبليو، اودي)
   category: text("category").notNull(), // الفئة (E200, C200, C300, X5, A4)
+  trimLevel: text("trim_level"), // درجة التجهيز (فل كامل، ستاندرد، خاص)
   engineCapacity: text("engine_capacity").notNull(), // سعة المحرك
   year: integer("year").notNull(), // السنة
   exteriorColor: text("exterior_color").notNull(), // اللون الخارجي
@@ -79,6 +80,16 @@ export const specifications = pgTable("specifications", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Trim levels table for managing trim levels per manufacturer and category
+export const trimLevels = pgTable("trim_levels", {
+  id: serial("id").primaryKey(),
+  manufacturer: text("manufacturer").notNull(), // الصانع
+  category: text("category").notNull(), // الفئة
+  trimLevel: text("trim_level").notNull(), // درجة التجهيز
+  description: text("description"), // وصف درجة التجهيز
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -115,6 +126,11 @@ export const insertSpecificationSchema = createInsertSchema(specifications).omit
   id: true,
   createdAt: true,
   updatedAt: true,
+});
+
+export const insertTrimLevelSchema = createInsertSchema(trimLevels).omit({
+  id: true,
+  createdAt: true,
 });
 
 // User sessions table for tracking login/logout times
@@ -163,6 +179,8 @@ export type InsertLocationTransfer = z.infer<typeof insertLocationTransferSchema
 export type LocationTransfer = typeof locationTransfers.$inferSelect;
 export type InsertSpecification = z.infer<typeof insertSpecificationSchema>;
 export type Specification = typeof specifications.$inferSelect;
+export type InsertTrimLevel = z.infer<typeof insertTrimLevelSchema>;
+export type TrimLevel = typeof trimLevels.$inferSelect;
 export type InsertUserSession = z.infer<typeof insertUserSessionSchema>;
 export type UserSession = typeof userSessions.$inferSelect;
 export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
