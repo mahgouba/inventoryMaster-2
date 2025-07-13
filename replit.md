@@ -196,10 +196,12 @@ Changelog:
 - July 05, 2025: Implemented comprehensive database integration for voice assistant - added complete CRUD operations support including vehicle search, addition, editing, deletion, selling, reservation and cancellation, integrated OpenAI GPT-4o for intelligent command interpretation with Arabic language support, developed dedicated action handlers for all vehicle operations with proper error handling and user feedback, and enhanced system prompt with detailed examples for accurate command recognition
 - July 06, 2025: Implemented complete Docker containerization - created production-ready Dockerfile with Node.js 20 Alpine, comprehensive docker-compose.yml with PostgreSQL 15, health checks, persistent volumes, and networking, automated setup script (run-docker.sh) for one-command deployment, complete documentation (DOCKER_SETUP.md) with troubleshooting guide, and support for environment variable management including OpenAI API key integration
 - July 13, 2025: Added comprehensive trim level management system - created trim_levels database table with manufacturer, category, and trimLevel fields, implemented full CRUD API endpoints, added trim level dropdown to inventory form with category dependency, integrated trim level management button for easy administration, added trim level display to both card view and inventory table, updated search functionality to include trim level filtering, and populated test data for Mercedes (E200/E300, S500/S600) and BMW (xDrive30i/xDrive40i) models
+- July 13, 2025: Implemented comprehensive specifications management system - created specifications database table with manufacturer, category, trimLevel, year, and engineCapacity as primary keys, built full CRUD API endpoints for specifications management, added specifications share functionality with detailed vehicle information display, integrated specifications management button in both inventory table and card view admin dropdowns, created dedicated specifications management component with Arabic interface, and implemented vehicle sharing with comprehensive specifications lookup and display
 ```
 
 ## User Preferences
 
 ```
 Preferred communication style: Simple, everyday language.
+UI preferences: Add specifications management button next to "Add Item" button for easy access.
 ```

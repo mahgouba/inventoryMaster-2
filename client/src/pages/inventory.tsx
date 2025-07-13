@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun } from "lucide-react";
+import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/hooks/useTheme";
 import InventoryStats from "@/components/inventory-stats";
@@ -16,6 +16,7 @@ import ExcelImport from "@/components/excel-import";
 import VoiceAssistant from "@/components/voice-assistant";
 import { InventoryFAB } from "@/components/animated-fab";
 import SpecificationsManager from "@/components/specifications-manager";
+import SpecificationsManagement from "@/components/specifications-management";
 import { exportToCSV, exportToExcel, printTable } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
 
@@ -373,6 +374,13 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       إضافة عنصر
                     </Button>
                     <Button 
+                      onClick={() => setSpecificationsManagerOpen(true)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
+                    >
+                      <FileText className="w-4 h-4 ml-2" />
+                      إدارة المواصفات
+                    </Button>
+                    <Button 
                       onClick={() => setIsExcelImportOpen(true)}
                       variant="outline"
                       className="border-teal-600 text-teal-600 hover:bg-teal-50 w-full sm:w-auto"
@@ -528,6 +536,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
       {/* Specifications Manager Dialog */}
       <SpecificationsManager
+        open={specificationsManagerOpen}
+        onOpenChange={setSpecificationsManagerOpen}
+      />
+      
+      {/* Specifications Management Dialog */}
+      <SpecificationsManagement
         open={specificationsManagerOpen}
         onOpenChange={setSpecificationsManagerOpen}
       />
