@@ -24,19 +24,33 @@ interface InventoryFormProps {
 }
 
 const manufacturerCategories: Record<string, string[]> = {
-  "مرسيدس": ["E200", "C200", "C300", "S500", "GLE", "CLA", "A200"],
-  "بي ام دبليو": ["X5", "X3", "X6", "320i", "520i", "730i", "M3"],
-  "رولز رويز": ["Phantom", "Ghost", "Wraith", "Cullinan"],
-  "بنتلي": ["Continental", "Bentayga", "Flying Spur", "Mulsanne"],
-  "رنج روفر": ["Vogue", "Sport", "Evoque", "Velar"],
-  "دفندر": ["90", "110", "130"],
-  "بورش": ["911", "Cayenne", "Macan", "Panamera"],
-  "لكزس": ["LX", "GX", "RX", "ES", "LS"],
-  "لينكون": ["Navigator", "Aviator", "Corsair", "Continental"],
-  "شوفولية": ["Tahoe", "Suburban", "Silverado", "Camaro"],
-  "تويوتا": ["كامري", "كورولا", "لاند كروزر", "هايلاندر", "يارس", "أفالون"],
-  "تسلا": ["Model S", "Model 3", "Model X", "Model Y"],
-  "لوسيد": ["Air Dream", "Air Touring", "Air Pure"]
+  "مرسيدس": ["C-Class", "E-Class", "S-Class", "GLE"],
+  "بي ام دبليو": ["3 Series", "5 Series", "7 Series", "X5"],
+  "رولز رويز": ["جوست", "فانتوم", "كولينان"],
+  "فيراري": ["296", "SF90", "روما", "بوروسانجوي"],
+  "فورد": ["تورس", "إكسبلورر", "برونكو", "F-150"],
+  "شيفروليه": ["كابتيفا", "تاهو", "سيلفرادو"],
+  "جي إم سي": ["تيرين", "أكاديا", "يوكون", "سييرا"],
+  "هوندا": ["سيفيك", "أكورد", "HR-V", "CR-V"],
+  "هيونداي": ["إلنترا", "سوناتا", "توسان", "سنتافي", "باليسيد"],
+  "كيا": ["سيراتو", "K5", "سبورتاج", "تيلورايد"],
+  "جينيسيس": ["G70", "G80", "G90", "GV70", "GV80"],
+  "مازدا": ["Mazda6", "CX-5", "CX-9"],
+  "نيسان": ["صني", "ألتيما", "إكس-تريل", "باترول"],
+  "إم جي": ["MG5", "MG GT", "RX5", "HS"],
+  "جيب": ["رانجلر", "جراند شيروكي", "جراند واجونير"],
+  "دودج": ["تشارجر", "دورانجو"],
+  "مازيراتي": ["جيبلي", "ليفانتي", "جران توريزمو"],
+  "لاند روفر": ["ديفندر", "رنج روفر سبورت", "رنج روفر", "فيلار"],
+  "تويوتا": ["يارس", "كورولا", "كامري", "راف فور", "هايلاندر", "لاندكروزر", "هايلكس"],
+  "لكزس": ["IS", "ES", "LS", "LX"],
+  "فولكس فاجن": ["جيتا", "تيجوان", "تيرامونت"],
+  "أودي": ["A6", "A8", "Q5", "Q7", "Q8"],
+  "بورش": ["911", "كايين", "باناميرا"],
+  "بنتلي": ["كونتيننتال جي تي", "فلاينج سبير", "بينتايجا"],
+  "لامبورجيني": ["ريفويلتو", "هوراكان", "أوروس"],
+  "شانجان": ["UNI-V", "UNI-K", "CS95"],
+  "هافال": ["جوليان", "H6", "دارجو"]
 };
 
 const initialManufacturers = Object.keys(manufacturerCategories);
@@ -98,7 +112,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   });
 
   // Fetch trim levels for the selected manufacturer and category
-  const { data: trimLevels = [] } = useQuery({
+  const { data: trimLevels = [], refetch: refetchTrimLevels } = useQuery({
     queryKey: [`/api/trim-levels/category/${selectedManufacturer}/${selectedCategory}`],
     enabled: Boolean(selectedManufacturer && selectedCategory),
   });
@@ -431,6 +445,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                       category={selectedCategory}
                       onTrimLevelAdded={(newTrimLevel) => {
                         setAvailableTrimLevels(prev => [...prev, newTrimLevel.trimLevel]);
+                        refetchTrimLevels();
                       }}
                     />
                   )}
