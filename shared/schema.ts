@@ -66,6 +66,19 @@ export const locationTransfers = pgTable("location_transfers", {
   notes: text("notes"), // ملاحظات
 });
 
+// Specifications table for storing detailed vehicle specifications
+export const specifications = pgTable("specifications", {
+  id: serial("id").primaryKey(),
+  manufacturer: text("manufacturer").notNull(), // الصانع
+  category: text("category").notNull(), // الفئة
+  trimLevel: text("trim_level").notNull(), // درجة التجهيز
+  engineCapacity: text("engine_capacity"), // سعة المحرك
+  modelYear: integer("model_year").notNull(), // الموديل
+  detailedSpecs: text("detailed_specs"), // المواصفات التفصيلية
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -96,6 +109,12 @@ export const insertLocationSchema = createInsertSchema(locations).omit({
 export const insertLocationTransferSchema = createInsertSchema(locationTransfers).omit({
   id: true,
   transferDate: true,
+});
+
+export const insertSpecificationSchema = createInsertSchema(specifications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 // User sessions table for tracking login/logout times
@@ -142,6 +161,8 @@ export type InsertLocation = z.infer<typeof insertLocationSchema>;
 export type Location = typeof locations.$inferSelect;
 export type InsertLocationTransfer = z.infer<typeof insertLocationTransferSchema>;
 export type LocationTransfer = typeof locationTransfers.$inferSelect;
+export type InsertSpecification = z.infer<typeof insertSpecificationSchema>;
+export type Specification = typeof specifications.$inferSelect;
 export type InsertUserSession = z.infer<typeof insertUserSessionSchema>;
 export type UserSession = typeof userSessions.$inferSelect;
 export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;

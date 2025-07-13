@@ -15,6 +15,7 @@ import ExcelImport from "@/components/excel-import";
 
 import VoiceAssistant from "@/components/voice-assistant";
 import { InventoryFAB } from "@/components/animated-fab";
+import SpecificationsManager from "@/components/specifications-manager";
 import { exportToCSV, exportToExcel, printTable } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
 
@@ -38,6 +39,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [isExcelImportOpen, setIsExcelImportOpen] = useState(false);
 
   const [voiceChatOpen, setVoiceChatOpen] = useState(false);
+  const [specificationsManagerOpen, setSpecificationsManagerOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -226,6 +228,10 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         </DropdownMenuItem>
                       </Link>
 
+                      <DropdownMenuItem onClick={() => setSpecificationsManagerOpen(true)}>
+                        <Settings className="mr-2 h-4 w-4" />
+                        إدارة المواصفات
+                      </DropdownMenuItem>
 
                       <Link href="/user-management">
                         <DropdownMenuItem>
@@ -518,6 +524,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         onExtractChassisNumber={(file) => {
           console.log('Extracting chassis number from:', file);
         }}
+      />
+
+      {/* Specifications Manager Dialog */}
+      <SpecificationsManager
+        open={specificationsManagerOpen}
+        onOpenChange={setSpecificationsManagerOpen}
       />
     </div>
   );

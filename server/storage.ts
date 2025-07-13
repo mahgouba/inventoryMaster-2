@@ -1,6 +1,6 @@
 import { 
   users, inventoryItems, manufacturers, locations, locationTransfers, 
-  lowStockAlerts, stockSettings, appearanceSettings,
+  lowStockAlerts, stockSettings, appearanceSettings, specifications,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Manufacturer, type InsertManufacturer, 
@@ -8,7 +8,8 @@ import {
   type LocationTransfer, type InsertLocationTransfer,
   type LowStockAlert, type InsertLowStockAlert,
   type StockSettings, type InsertStockSettings,
-  type AppearanceSettings, type InsertAppearanceSettings
+  type AppearanceSettings, type InsertAppearanceSettings,
+  type Specification, type InsertSpecification
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -105,6 +106,14 @@ export interface IStorage {
   getAppearanceSettings(): Promise<AppearanceSettings | undefined>;
   updateAppearanceSettings(settings: Partial<InsertAppearanceSettings>): Promise<AppearanceSettings>;
   updateManufacturerLogo(id: number, logo: string): Promise<Manufacturer | undefined>;
+  
+  // Specifications methods
+  getAllSpecifications(): Promise<Specification[]>;
+  getSpecification(id: number): Promise<Specification | undefined>;
+  createSpecification(specification: InsertSpecification): Promise<Specification>;
+  updateSpecification(id: number, specification: Partial<InsertSpecification>): Promise<Specification | undefined>;
+  deleteSpecification(id: number): Promise<boolean>;
+  getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<Specification[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -134,6 +143,31 @@ export class MemStorage implements IStorage {
     // Initialize with some sample data
     this.initializeInventoryData();
   }
+
+  // Add missing implementations for MemStorage (placeholder methods)
+  async getLowStockAlerts(): Promise<any[]> { return []; }
+  async getUnreadLowStockAlerts(): Promise<any[]> { return []; }
+  async createLowStockAlert(alert: any): Promise<any> { return alert; }
+  async markAlertAsRead(id: number): Promise<boolean> { return true; }
+  async deleteAlert(id: number): Promise<boolean> { return true; }
+  async checkStockLevels(): Promise<void> { }
+  async getStockSettings(): Promise<any[]> { return []; }
+  async getStockSettingsByCategory(manufacturer: string, category: string): Promise<any> { return undefined; }
+  async createStockSettings(settings: any): Promise<any> { return settings; }
+  async updateStockSettings(id: number, settings: any): Promise<any> { return settings; }
+  async deleteStockSettings(id: number): Promise<boolean> { return true; }
+  async getAppearanceSettings(): Promise<any> { return undefined; }
+  async updateAppearanceSettings(settings: any): Promise<any> { return settings; }
+  async updateManufacturerLogo(id: number, logo: string): Promise<any> { return undefined; }
+  async getAllSpecifications(): Promise<any[]> { return []; }
+  async getSpecification(id: number): Promise<any> { return undefined; }
+  async createSpecification(spec: any): Promise<any> { return spec; }
+  async updateSpecification(id: number, spec: any): Promise<any> { return spec; }
+  async deleteSpecification(id: number): Promise<boolean> { return true; }
+  async getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<any[]> { return []; }
+  async getAllUsers(): Promise<any[]> { return []; }
+  async updateUser(id: number, user: any): Promise<any> { return user; }
+  async deleteUser(id: number): Promise<boolean> { return true; }
 
   private initializeInventoryData() {
     const sampleItems: InsertInventoryItem[] = [
@@ -1099,6 +1133,80 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Delete user error:', error);
       return false;
+    }
+  }
+
+  // Specifications methods
+  async getAllSpecifications(): Promise<Specification[]> {
+    try {
+      return await db.select().from(specifications).orderBy(specifications.manufacturer, specifications.category);
+    } catch (error) {
+      console.error('Get all specifications error:', error);
+      return [];
+    }
+  }
+
+  async getSpecification(id: number): Promise<Specification | undefined> {
+    try {
+      const [specification] = await db.select().from(specifications).where(eq(specifications.id, id));
+      return specification;
+    } catch (error) {
+      console.error('Get specification error:', error);
+      return undefined;
+    }
+  }
+
+  async createSpecification(specificationData: InsertSpecification): Promise<Specification> {
+    try {
+      const [specification] = await db.insert(specifications).values({
+        ...specificationData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }).returning();
+      return specification;
+    } catch (error) {
+      console.error('Create specification error:', error);
+      throw error;
+    }
+  }
+
+  async updateSpecification(id: number, specificationData: Partial<InsertSpecification>): Promise<Specification | undefined> {
+    try {
+      const [specification] = await db.update(specifications)
+        .set({ ...specificationData, updatedAt: new Date() })
+        .where(eq(specifications.id, id))
+        .returning();
+      return specification;
+    } catch (error) {
+      console.error('Update specification error:', error);
+      return undefined;
+    }
+  }
+
+  async deleteSpecification(id: number): Promise<boolean> {
+    try {
+      await db.delete(specifications).where(eq(specifications.id, id));
+      return true;
+    } catch (error) {
+      console.error('Delete specification error:', error);
+      return false;
+    }
+  }
+
+  async getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<Specification[]> {
+    try {
+      let query = db.select().from(specifications)
+        .where(eq(specifications.manufacturer, manufacturer))
+        .where(eq(specifications.category, category));
+      
+      if (trimLevel) {
+        query = query.where(eq(specifications.trimLevel, trimLevel));
+      }
+      
+      return await query;
+    } catch (error) {
+      console.error('Get specifications by vehicle error:', error);
+      return [];
     }
   }
 }

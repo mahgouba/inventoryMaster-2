@@ -25,7 +25,8 @@ import {
   Moon,
   Sun,
   Calendar,
-  X
+  X,
+  Share2
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -36,6 +37,7 @@ import { apiRequest } from "@/lib/queryClient";
 import VoiceAssistant from "@/components/voice-assistant";
 import { CardViewFAB } from "@/components/animated-fab";
 import InventoryFormSimple from "@/components/inventory-form-simple";
+import VehicleShare from "@/components/vehicle-share";
 
 import type { InventoryItem } from "@shared/schema";
 
@@ -60,6 +62,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [cancelingReservationId, setCancelingReservationId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showSoldCars, setShowSoldCars] = useState<boolean>(false);
+  const [shareVehicle, setShareVehicle] = useState<InventoryItem | null>(null);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   const { data: inventoryData = [], isLoading } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory"],
@@ -271,6 +275,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const handleEditItem = (item: InventoryItem) => {
     setEditingItem(item);
     setShowEditDialog(true);
+  };
+
+  const handleShareItem = (item: InventoryItem) => {
+    setShareVehicle(item);
+    setShareDialogOpen(true);
   };
 
   // Status color mapping
@@ -642,7 +651,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
                           {/* Action Buttons */}
                           <div className="pt-3 mt-3 border-t border-slate-200 space-y-2">
-                            {/* First row - Edit and Delete */}
+                            {/* First row - Edit, Delete, and Share */}
                             <div className="flex gap-2">
                               <Button
                                 size="sm"
@@ -660,6 +669,14 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 onClick={() => handleDeleteItem(item)}
                               >
                                 <Trash2 size={14} />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="px-3 h-9 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
+                                onClick={() => handleShareItem(item)}
+                              >
+                                <Share2 size={14} />
                               </Button>
                             </div>
 
@@ -789,6 +806,15 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         onOpenChange={setShowEditDialog}
         editItem={editingItem || undefined}
       />
+
+      {/* Vehicle Share Dialog */}
+      {shareVehicle && (
+        <VehicleShare
+          vehicle={shareVehicle}
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+        />
+      )}
     </div>
   );
 }

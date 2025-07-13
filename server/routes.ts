@@ -6,7 +6,8 @@ import {
   insertManufacturerSchema,
   insertLocationSchema,
   insertLocationTransferSchema,
-  insertUserSchema 
+  insertUserSchema,
+  insertSpecificationSchema
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -1284,6 +1285,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting user:", error);
       res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
+  // Specifications API Routes
+  app.get("/api/specifications", async (req, res) => {
+    try {
+      const specifications = await storage.getAllSpecifications();
+      res.json(specifications);
+    } catch (error) {
+      console.error("Error fetching specifications:", error);
+      res.status(500).json({ message: "Failed to fetch specifications" });
+    }
+  });
+
+  app.get("/api/specifications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid specification ID" });
+      }
+
+      const specification = await storage.getSpecification(id);
+      if (!specification) {
+        return res.status(404).json({ message: "Specification not found" });
+      }
+
+      res.json(specification);
+    } catch (error) {
+      console.error("Error fetching specification:", error);
+      res.status(500).json({ message: "Failed to fetch specification" });
+    }
+  });
+
+  app.post("/api/specifications", async (req, res) => {
+    try {
+      const specificationData = insertSpecificationSchema.parse(req.body);
+      const specification = await storage.createSpecification(specificationData);
+      res.status(201).json(specification);
+    } catch (error) {
+      console.error("Error creating specification:", error);
+      res.status(400).json({ message: "Invalid specification data" });
+    }
+  });
+
+  app.put("/api/specifications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid specification ID" });
+      }
+
+      const specificationData = insertSpecificationSchema.parse(req.body);
+      const specification = await storage.updateSpecification(id, specificationData);
+      
+      if (!specification) {
+        return res.status(404).json({ message: "Specification not found" });
+      }
+
+      res.json(specification);
+    } catch (error) {
+      console.error("Error updating specification:", error);
+      res.status(400).json({ message: "Invalid specification data" });
+    }
+  });
+
+  app.delete("/api/specifications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid specification ID" });
+      }
+
+      const deleted = await storage.deleteSpecification(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Specification not found" });
+      }
+
+      res.json({ message: "Specification deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting specification:", error);
+      res.status(500).json({ message: "Failed to delete specification" });
+    }
+  });
+
+  app.get("/api/specifications/vehicle/:manufacturer/:category", async (req, res) => {
+    try {
+      const { manufacturer, category } = req.params;
+      const { trimLevel } = req.query;
+      
+      const specifications = await storage.getSpecificationsByVehicle(
+        manufacturer, 
+        category, 
+        trimLevel as string
+      );
+      
+      res.json(specifications);
+    } catch (error) {
+      console.error("Error fetching specifications by vehicle:", error);
+      res.status(500).json({ message: "Failed to fetch specifications" });
     }
   });
 
