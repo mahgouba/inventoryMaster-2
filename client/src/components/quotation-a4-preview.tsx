@@ -98,8 +98,8 @@ export default function QuotationA4Preview({
         }} />
         
         <div className="h-full">
-          {/* Modern Header Section - Green theme from Albarimi template */}
-          <div className="relative bg-gradient-to-r from-green-600 to-green-800 text-white p-4 mb-3 rounded-lg">
+          {/* Modern Header Section - Custom brand colors */}
+          <div className="relative text-white p-4 mb-3 rounded-lg" style={{background: 'linear-gradient(to right, #00627F, #004B5C)'}}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 {selectedCompany?.logo && (
@@ -115,7 +115,7 @@ export default function QuotationA4Preview({
                   <h1 className="text-xl font-bold mb-1">
                     {selectedCompany?.name || "اسم الشركة"}
                   </h1>
-                  <p className="text-green-100 text-xs">
+                  <p className="text-blue-100 text-xs">
                     {selectedCompany?.address || "العنوان"}
                   </p>
                 </div>
@@ -124,16 +124,16 @@ export default function QuotationA4Preview({
               <div className="text-right text-sm">
                 <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3">
                   <h2 className="text-lg font-bold mb-1">عرض سعر</h2>
-                  <p className="text-green-100 text-xs">رقم: {quoteNumber}</p>
-                  <p className="text-green-100 text-xs">التاريخ: {new Date().toLocaleDateString('ar-SA')}</p>
-                  <p className="text-green-100 text-xs">صالح حتى: {validUntil.toLocaleDateString('ar-SA')}</p>
+                  <p className="text-blue-100 text-xs">رقم: {quoteNumber}</p>
+                  <p className="text-blue-100 text-xs">التاريخ: {new Date().toLocaleDateString('ar-SA')}</p>
+                  <p className="text-blue-100 text-xs">صالح حتى: {validUntil.toLocaleDateString('ar-SA')}</p>
                 </div>
               </div>
             </div>
             
             {/* Contact Info Strip */}
             <div className="absolute bottom-0 left-0 right-0 bg-black/20 backdrop-blur-sm p-2 rounded-b-lg">
-              <div className="flex justify-between items-center text-xs text-green-100">
+              <div className="flex justify-between items-center text-xs text-blue-100">
                 <div className="flex items-center gap-3">
                   {selectedCompany?.phone && (
                     <div className="flex items-center gap-1">
@@ -172,7 +172,7 @@ export default function QuotationA4Preview({
           <div className="grid grid-cols-2 gap-3 mb-3">
             {/* Customer Information */}
             <div className="border border-slate-200 rounded-lg p-3">
-              <h3 className="text-sm font-semibold mb-2 text-green-600">بيانات العميل</h3>
+              <h3 className="text-sm font-semibold mb-2" style={{color: '#00627F'}}>بيانات العميل</h3>
               <div className="space-y-1 text-xs">
                 <div>
                   <span className="font-medium">الاسم: </span>
@@ -191,7 +191,7 @@ export default function QuotationA4Preview({
 
             {/* Representative Information */}
             <div className="border border-slate-200 rounded-lg p-3">
-              <h3 className="text-sm font-semibold mb-2 text-green-600">بيانات المندوب</h3>
+              <h3 className="text-sm font-semibold mb-2" style={{color: '#00627F'}}>بيانات المندوب</h3>
               <div className="space-y-1 text-xs">
                 <div>
                   <span className="font-medium">الاسم: </span>
@@ -216,7 +216,7 @@ export default function QuotationA4Preview({
           {/* Vehicle Information */}
           {selectedVehicle && (
             <div className="border border-slate-200 rounded-lg p-3 mb-3">
-              <h3 className="text-sm font-semibold mb-2 text-gray-700">بيانات المركبة</h3>
+              <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>بيانات المركبة</h3>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <span className="font-medium">الصانع: </span>
@@ -257,7 +257,7 @@ export default function QuotationA4Preview({
               {/* Detailed Specifications */}
               {vehicleSpecs && (
                 <div className="mt-3 pt-3 border-t border-slate-200">
-              <h4 className="text-xs font-semibold mb-2 text-gray-600">المواصفات التفصيلية</h4>
+              <h4 className="text-xs font-semibold mb-2" style={{color: '#BF9231'}}>المواصفات التفصيلية</h4>
                   <div className="grid grid-cols-3 gap-2 text-xs">
                     <div>
                       <span className="font-medium">نوع المحرك: </span>
@@ -345,7 +345,7 @@ export default function QuotationA4Preview({
 
           {/* Price Breakdown Table - Following Albarimi style */}
           <div className="border border-slate-200 rounded-lg mb-3">
-            <div className="bg-green-600 text-white p-2 rounded-t-lg">
+            <div className="text-white p-2 rounded-t-lg" style={{backgroundColor: '#00627F'}}>
               <h3 className="text-sm font-semibold text-center">تفاصيل السعر</h3>
             </div>
             
@@ -366,7 +366,7 @@ export default function QuotationA4Preview({
               <div className="p-2 border-l border-gray-200">1</div>
               <div className="p-2 border-l border-gray-200 font-medium">{basePrice.toLocaleString()}</div>
               <div className="p-2 border-l border-gray-200 font-medium">{taxAmount.toLocaleString()}</div>
-              <div className="p-2 font-bold text-green-700">{grandTotal.toLocaleString()}</div>
+              <div className="p-2 font-bold" style={{color: '#00627F'}}>{grandTotal.toLocaleString()}</div>
             </div>
             
             {/* License Plate Row if included */}
@@ -383,9 +383,9 @@ export default function QuotationA4Preview({
             )}
             
             {/* Total Row */}
-            <div className="bg-green-50 p-3 rounded-b-lg">
+            <div className="p-3 rounded-b-lg" style={{backgroundColor: '#f8fafc', borderTop: '2px solid #00627F'}}>
               <div className="flex justify-center">
-                <div className="text-lg font-bold text-green-800">
+                <div className="text-lg font-bold" style={{color: '#00627F'}}>
                   المجموع: {grandTotal.toLocaleString()} ريال
                 </div>
               </div>
@@ -398,14 +398,14 @@ export default function QuotationA4Preview({
           {/* Notes Section */}
           {notes && (
             <div className="border border-slate-200 rounded-lg p-3 mb-3">
-              <h3 className="text-sm font-semibold mb-2 text-gray-600">ملاحظات</h3>
+              <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>ملاحظات</h3>
               <p className="text-xs text-gray-700 leading-relaxed">{notes}</p>
             </div>
           )}
 
           {/* Terms and Conditions - Following Albarimi style */}
           <div className="border border-slate-200 rounded-lg p-3 mb-3">
-            <h3 className="text-sm font-semibold mb-2 text-green-600">الشروط والأحكام</h3>
+            <h3 className="text-sm font-semibold mb-2" style={{color: '#00627F'}}>الشروط والأحكام</h3>
             <div className="space-y-1 text-xs text-gray-700">
               <p>• التسليم بمستودعاتنا</p>
               <p>• السيارة مضمونة لدى الوكيل العام بالمملكة العربية السعودية</p>
@@ -416,9 +416,9 @@ export default function QuotationA4Preview({
 
           {/* Footer - Albarimi style */}
           <div className="text-center pt-4">
-            <div className="border-t-2 border-green-600 pt-3">
+            <div className="pt-3" style={{borderTop: '2px solid #BF9231'}}>
               <p className="text-sm text-gray-600 mb-2">وتفضلوا بقبول فائق الاحترام،،،</p>
-              <p className="text-lg font-bold text-green-700">{selectedCompany?.name || "اسم الشركة"}</p>
+              <p className="text-lg font-bold" style={{color: '#00627F'}}>{selectedCompany?.name || "اسم الشركة"}</p>
             </div>
           </div>
         </div>

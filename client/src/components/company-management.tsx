@@ -53,16 +53,18 @@ export default function CompanyManagement() {
   // Fetch companies
   const { data: companies = [], isLoading } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
-    queryFn: () => apiRequest("/api/companies")
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/companies");
+      return response.json();
+    }
   });
 
   // Create company mutation
   const createCompany = useMutation({
-    mutationFn: (data: CompanyFormData) => 
-      apiRequest("/api/companies", {
-        method: "POST",
-        body: JSON.stringify(data)
-      }),
+    mutationFn: async (data: CompanyFormData) => {
+      const response = await apiRequest("POST", "/api/companies", data);
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
       setShowDialog(false);
@@ -83,11 +85,10 @@ export default function CompanyManagement() {
 
   // Update company mutation
   const updateCompany = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: CompanyFormData }) =>
-      apiRequest(`/api/companies/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(data)
-      }),
+    mutationFn: async ({ id, data }: { id: number; data: CompanyFormData }) => {
+      const response = await apiRequest("PUT", `/api/companies/${id}`, data);
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
       setShowDialog(false);
