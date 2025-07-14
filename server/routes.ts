@@ -1112,6 +1112,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/terms-conditions", async (req, res) => {
+    try {
+      const { content } = req.body;
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ message: "Content is required" });
+      }
+      
+      // Split content into individual terms and update the storage
+      const termsArray = content.split('\n').filter(term => term.trim()).map((term, index) => ({
+        id: index + 1,
+        term_text: term.trim(),
+        display_order: index + 1
+      }));
+      
+      // Save to storage
+      await storage.updateTermsConditions(termsArray);
+      
+      res.json({ message: "Terms and conditions saved successfully", terms: termsArray });
+    } catch (error) {
+      console.error("Error saving terms and conditions:", error);
+      res.status(500).json({ message: "Failed to save terms and conditions" });
+    }
+  });
+
   // Voice Assistant Routes
   app.post("/api/voice/process", async (req, res) => {
     try {

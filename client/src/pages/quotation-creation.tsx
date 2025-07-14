@@ -186,6 +186,20 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [showWhatsappDialog, setShowWhatsappDialog] = useState(false);
   const [showCompanyManagement, setShowCompanyManagement] = useState(false);
 
+  // Load existing terms and conditions
+  const { data: existingTerms = [] } = useQuery<Array<{ id: number; term_text: string; display_order: number }>>({
+    queryKey: ['/api/terms-conditions'],
+    queryFn: () => apiRequest('/api/terms-conditions')
+  });
+
+  // Update terms content when existing terms are loaded
+  useEffect(() => {
+    if (existingTerms.length > 0 && !termsContent) {
+      const termsText = existingTerms.map(term => term.term_text).join('\n');
+      setTermsContent(termsText);
+    }
+  }, [existingTerms, termsContent]);
+
   // Generate QR code data
   const generateQRData = () => {
     return `Quote: ${quoteNumber}\nCustomer: ${customerName}\nVehicle: ${selectedVehicle?.manufacturer} ${selectedVehicle?.category}\nDate: ${new Date().toLocaleDateString('en-US')}`;
@@ -303,6 +317,33 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
     const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     setShowWhatsappDialog(false);
+  };
+
+  // Handle saving terms and conditions
+  const handleSaveTerms = async () => {
+    try {
+      const response = await apiRequest('POST', '/api/terms-conditions', {
+        content: termsContent
+      });
+      
+      toast({
+        title: "تم بنجاح",
+        description: "تم حفظ الشروط والأحكام بنجاح",
+        variant: "default",
+      });
+      
+      setShowTermsDialog(false);
+      
+      // Refresh terms in the preview component
+      queryClient.invalidateQueries({ queryKey: ['/api/terms-conditions'] });
+    } catch (error) {
+      console.error("Error saving terms:", error);
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء حفظ الشروط والأحكام",
+        variant: "destructive",
+      });
+    }
   };
 
   // Get terms and conditions for selected company
@@ -1698,7 +1739,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               />
             </div>
             <div className="flex gap-3">
-              <Button onClick={() => setShowTermsDialog(false)} className="bg-orange-600 hover:bg-orange-700">
+              <Button onClick={handleSaveTerms} className="bg-orange-600 hover:bg-orange-700">
                 <Save size={16} className="ml-2" />
                 حفظ
               </Button>
