@@ -255,88 +255,11 @@ export default function QuotationA4Preview({
               </div>
               
               {/* Detailed Specifications */}
-              {vehicleSpecs && (
+              {vehicleSpecs && vehicleSpecs.detailedDescription && (
                 <div className="mt-3 pt-3 border-t border-slate-200">
-              <h4 className="text-xs font-semibold mb-2" style={{color: '#BF9231'}}>المواصفات التفصيلية</h4>
-                  <div className="grid grid-cols-3 gap-2 text-xs">
-                    <div>
-                      <span className="font-medium">نوع المحرك: </span>
-                      <span>{vehicleSpecs.engineType || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">القوة الحصانية: </span>
-                      <span>{vehicleSpecs.horsepower || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">ناقل الحركة: </span>
-                      <span>{vehicleSpecs.transmission || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">نوع الوقود: </span>
-                      <span>{vehicleSpecs.fuelType || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">استهلاك الوقود: </span>
-                      <span>{vehicleSpecs.fuelConsumption || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">نوع الدفع: </span>
-                      <span>{vehicleSpecs.drivetrain || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">نوع الإطارات: </span>
-                      <span>{vehicleSpecs.tireSize || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">الأبعاد: </span>
-                      <span>{vehicleSpecs.dimensions || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">الوزن: </span>
-                      <span>{vehicleSpecs.weight || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">سعة التحميل: </span>
-                      <span>{vehicleSpecs.loadCapacity || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">عدد المقاعد: </span>
-                      <span>{vehicleSpecs.seatingCapacity || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">نوع التعليق: </span>
-                      <span>{vehicleSpecs.suspension || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">التسارع: </span>
-                      <span>{vehicleSpecs.acceleration || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">السرعة القصوى: </span>
-                      <span>{vehicleSpecs.topSpeed || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">أنظمة الأمان: </span>
-                      <span>{vehicleSpecs.safetyFeatures || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">أنظمة الترفيه: </span>
-                      <span>{vehicleSpecs.infotainment || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">معدات إضافية: </span>
-                      <span>{vehicleSpecs.additionalEquipment || "غير محدد"}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">الضمان: </span>
-                      <span>{vehicleSpecs.warranty || "غير محدد"}</span>
-                    </div>
-                    {vehicleSpecs.notes && (
-                      <div className="col-span-2">
-                        <span className="font-medium">ملاحظات: </span>
-                        <span>{vehicleSpecs.notes}</span>
-                      </div>
-                    )}
+                  <h4 className="text-xs font-semibold mb-2" style={{color: '#BF9231'}}>📋 المواصفات التفصيلية:</h4>
+                  <div className="text-xs text-gray-700 whitespace-pre-wrap">
+                    {vehicleSpecs.detailedDescription}
                   </div>
                 </div>
               )}
