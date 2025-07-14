@@ -309,13 +309,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
     }
   }, [editItem, open, form, localManufacturerCategories]);
 
-  // Update available trim levels when trim levels data changes
-  useEffect(() => {
-    if (trimLevels) {
-      const trimLevelNames = trimLevels.map((tl: TrimLevel) => tl.trimLevel);
-      setAvailableTrimLevels(trimLevelNames);
-    }
-  }, [trimLevels]);
+  
 
   return (
     <>

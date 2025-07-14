@@ -330,16 +330,7 @@ export default function QuotationA4Preview({
             </div>
           )}
 
-          {/* Terms and Conditions - Aligned to left */}
-          <div className="border border-slate-200 rounded-lg p-3 mb-3 ml-[210px] mr-[210px]" style={{ textAlign: 'left' }}>
-            <h3 className="text-sm font-semibold mb-2" style={{color: '#00627F', textAlign: 'left'}}>الشروط والأحكام</h3>
-            <div className="space-y-1 text-xs text-gray-700" style={{ textAlign: 'left' }}>
-              {termsConditions.map((term) => (
-                <p key={term.id}>• {term.term_text}</p>
-              ))}
-              <p>• هذا العرض صالح حتى {validUntil.toLocaleDateString('ar-SA')}</p>
-            </div>
-          </div>
+          
 
           {/* Footer - Albarimi style */}
           <div className="text-center pt-4">
