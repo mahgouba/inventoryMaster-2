@@ -101,6 +101,10 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
   const [showNewManufacturerDialog, setShowNewManufacturerDialog] = useState(false);
   const [newManufacturerName, setNewManufacturerName] = useState("");
   const [newManufacturerLogo, setNewManufacturerLogo] = useState<string | null>(null);
+  
+  // State for editing manufacturer names
+  const [editingManufacturerId, setEditingManufacturerId] = useState<number | null>(null);
+  const [editingManufacturerName, setEditingManufacturerName] = useState("");
 
   const queryClient = useQueryClient();
 
@@ -239,6 +243,60 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
         description: error.message || "حدث خطأ أثناء تحديث الشعار",
         variant: "destructive",
       });
+    },
+  });
+
+  // Update manufacturer name mutation
+  const updateManufacturerNameMutation = useMutation({
+    mutationFn: async ({ id, name }: { id: number; name: string }) => {
+      console.log('Updating manufacturer name for ID:', id, 'New name:', name);
+      
+      const response = await fetch(`/api/manufacturers/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Name update failed:', response.status, errorData);
+        throw new Error(`Failed to update manufacturer name: ${response.status} - ${errorData.message || 'Unknown error'}`);
+      }
+      
+      const result = await response.json();
+      console.log('Name update successful:', result);
+      return result;
+    },
+    onSuccess: (data) => {
+      console.log('Name update mutation success:', data);
+      toast({
+        title: "تم تحديث اسم الشركة بنجاح",
+        description: `تم تحديث اسم الشركة إلى ${data.name}`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/manufacturers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
+      setEditingManufacturerId(null);
+      setEditingManufacturerName("");
+    },
+    onError: (error) => {
+      console.error('Name update mutation error:', error);
+      
+      // Check if it's a duplicate name error
+      if (error.message.includes("409")) {
+        toast({
+          title: "خطأ - اسم مكرر",
+          description: "الاسم موجود بالفعل! يرجى اختيار اسم آخر",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "خطأ في تحديث الاسم",
+          description: error.message || "حدث خطأ أثناء تحديث اسم الشركة",
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -698,7 +756,55 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                   {manufacturers.map((manufacturer) => (
                     <div key={manufacturer.id} className="border rounded-lg p-4 space-y-4">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-lg">{manufacturer.name}</h3>
+                        {editingManufacturerId === manufacturer.id ? (
+                          <div className="flex items-center gap-2 flex-1">
+                            <Input
+                              value={editingManufacturerName}
+                              onChange={(e) => setEditingManufacturerName(e.target.value)}
+                              className="flex-1"
+                              placeholder="اسم الشركة"
+                              autoFocus
+                            />
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                if (editingManufacturerName.trim()) {
+                                  updateManufacturerNameMutation.mutate({
+                                    id: manufacturer.id,
+                                    name: editingManufacturerName.trim(),
+                                  });
+                                }
+                              }}
+                              disabled={!editingManufacturerName.trim() || updateManufacturerNameMutation.isPending}
+                            >
+                              {updateManufacturerNameMutation.isPending ? "جاري الحفظ..." : "حفظ"}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setEditingManufacturerId(null);
+                                setEditingManufacturerName("");
+                              }}
+                            >
+                              إلغاء
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 flex-1">
+                            <h3 className="font-semibold text-lg">{manufacturer.name}</h3>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setEditingManufacturerId(manufacturer.id);
+                                setEditingManufacturerName(manufacturer.name);
+                              }}
+                            >
+                              <Edit2 size={14} />
+                            </Button>
+                          </div>
+                        )}
                         <Badge variant="outline">#{manufacturer.id}</Badge>
                       </div>
                       
