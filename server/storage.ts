@@ -142,6 +142,9 @@ export interface IStorage {
   deleteQuotation(id: number): Promise<boolean>;
   getQuotationsByStatus(status: string): Promise<Quotation[]>;
   getQuotationByNumber(quoteNumber: string): Promise<Quotation | undefined>;
+  
+  // Terms and Conditions methods
+  getAllTermsConditions(): Promise<Array<{ id: number; term_text: string; display_order: number }>>;
 }
 
 export class MemStorage implements IStorage {
@@ -1651,6 +1654,24 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Update terms error:', error);
       return undefined;
+    }
+  }
+
+  // Terms and conditions methods  
+  async getAllTermsConditions(): Promise<Array<{ id: number; term_text: string; display_order: number }>> {
+    try {
+      // For now, return static data to test the component
+      return [
+        { id: 1, term_text: "التسليم بمستودعاتنا", display_order: 1 },
+        { id: 2, term_text: "السيارة مضمونة لدى الوكيل العام بالمملكة العربية السعودية", display_order: 2 },
+        { id: 3, term_text: "السعر يشمل ضريبة القيمة المضافة واللوحات والاستمارة", display_order: 3 },
+        { id: 4, term_text: "الدفع عند الاستلام أو حسب الاتفاق", display_order: 4 },
+        { id: 5, term_text: "العرض قابل للتغيير دون إشعار مسبق", display_order: 5 },
+        { id: 6, term_text: "يسري العرض حسب التاريخ المحدد", display_order: 6 }
+      ];
+    } catch (error) {
+      console.error('Get all terms conditions error:', error);
+      return [];
     }
   }
 }

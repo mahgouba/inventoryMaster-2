@@ -1101,6 +1101,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Terms and Conditions Routes
+  app.get("/api/terms-conditions", async (req, res) => {
+    try {
+      const terms = await storage.getAllTermsConditions();
+      res.json(terms);
+    } catch (error) {
+      console.error("Error fetching terms and conditions:", error);
+      res.status(500).json({ message: "Failed to fetch terms and conditions" });
+    }
+  });
+
   // Voice Assistant Routes
   app.post("/api/voice/process", async (req, res) => {
     try {

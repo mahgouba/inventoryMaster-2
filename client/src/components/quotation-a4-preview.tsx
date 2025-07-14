@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -51,6 +51,24 @@ export default function QuotationA4Preview({
   representativePosition,
   notes
 }: QuotationA4PreviewProps) {
+  
+  const [termsConditions, setTermsConditions] = useState<Array<{ id: number; term_text: string; display_order: number }>>([]);
+
+  useEffect(() => {
+    const fetchTermsConditions = async () => {
+      try {
+        const response = await fetch('/api/terms-conditions');
+        if (response.ok) {
+          const terms = await response.json();
+          setTermsConditions(terms);
+        }
+      } catch (error) {
+        console.error('Error fetching terms and conditions:', error);
+      }
+    };
+    
+    fetchTermsConditions();
+  }, []);
   
   // Calculate tax amounts
   const vehicleSubtotal = basePrice;
@@ -326,13 +344,13 @@ export default function QuotationA4Preview({
             </div>
           )}
 
-          {/* Terms and Conditions - Following Albarimi style */}
-          <div className="border border-slate-200 rounded-lg p-3 mb-3">
-            <h3 className="text-sm font-semibold mb-2" style={{color: '#00627F'}}>الشروط والأحكام</h3>
-            <div className="space-y-1 text-xs text-gray-700">
-              <p>• التسليم بمستودعاتنا</p>
-              <p>• السيارة مضمونة لدى الوكيل العام بالمملكة العربية السعودية</p>
-              <p>• السعر يشمل ضريبة القيمة المضافة واللوحات والاستمارة</p>
+          {/* Terms and Conditions - Aligned to left */}
+          <div className="border border-slate-200 rounded-lg p-3 mb-3" style={{ textAlign: 'left' }}>
+            <h3 className="text-sm font-semibold mb-2" style={{color: '#00627F', textAlign: 'left'}}>الشروط والأحكام</h3>
+            <div className="space-y-1 text-xs text-gray-700" style={{ textAlign: 'left' }}>
+              {termsConditions.map((term) => (
+                <p key={term.id}>• {term.term_text}</p>
+              ))}
               <p>• هذا العرض صالح حتى {validUntil.toLocaleDateString('ar-SA')}</p>
             </div>
           </div>
