@@ -40,6 +40,8 @@ import { CardViewFAB } from "@/components/animated-fab";
 import InventoryFormSimple from "@/components/inventory-form-simple";
 import VehicleShare from "@/components/vehicle-share";
 import SpecificationsManagement from "@/components/specifications-management";
+import QuotationForm from "@/components/quotation-form";
+import QuotationManagement from "@/components/quotation-management";
 
 import type { InventoryItem } from "@shared/schema";
 
@@ -67,6 +69,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [shareVehicle, setShareVehicle] = useState<InventoryItem | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [specificationsOpen, setSpecificationsOpen] = useState(false);
+  const [quotationFormOpen, setQuotationFormOpen] = useState(false);
+  const [quotationManagementOpen, setQuotationManagementOpen] = useState(false);
+  const [selectedVehicleForQuote, setSelectedVehicleForQuote] = useState<InventoryItem | null>(null);
 
   const { data: inventoryData = [], isLoading } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory"],
@@ -286,6 +291,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     setShareDialogOpen(true);
   };
 
+  const handleCreateQuote = (item: InventoryItem) => {
+    setSelectedVehicleForQuote(item);
+    setQuotationFormOpen(true);
+  };
+
   // Status color mapping
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -379,6 +389,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     <DropdownMenuItem onClick={() => setSpecificationsOpen(true)}>
                       <FileText className="mr-2 h-4 w-4" />
                       إدارة المواصفات
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setQuotationManagementOpen(true)}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      إدارة عروض الأسعار
                     </DropdownMenuItem>
 
                   </DropdownMenuContent>
@@ -665,7 +679,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
                           {/* Action Buttons */}
                           <div className="pt-3 mt-3 border-t border-slate-200 space-y-2">
-                            {/* Share and Reserve buttons only */}
+                            {/* Share, Quote and Reserve buttons */}
                             <div className="flex gap-2">
                               <Button
                                 size="sm"
@@ -674,6 +688,15 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 onClick={() => handleShareItem(item)}
                               >
                                 <Share2 size={14} />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="px-3 h-9 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
+                                onClick={() => handleCreateQuote(item)}
+                                title="إنشاء عرض سعر"
+                              >
+                                <FileText size={14} />
                               </Button>
                               {item.status === "محجوز" ? (
                                 userRole === "admin" ? (
@@ -821,6 +844,21 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
       <SpecificationsManagement
         open={specificationsOpen}
         onOpenChange={setSpecificationsOpen}
+      />
+
+      {/* Quotation Form Dialog */}
+      {selectedVehicleForQuote && (
+        <QuotationForm
+          open={quotationFormOpen}
+          onOpenChange={setQuotationFormOpen}
+          vehicleData={selectedVehicleForQuote}
+        />
+      )}
+
+      {/* Quotation Management Dialog */}
+      <QuotationManagement
+        open={quotationManagementOpen}
+        onOpenChange={setQuotationManagementOpen}
       />
     </div>
   );

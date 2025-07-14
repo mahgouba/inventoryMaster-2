@@ -1,6 +1,6 @@
 import { 
   users, inventoryItems, manufacturers, locations, locationTransfers, 
-  lowStockAlerts, stockSettings, appearanceSettings, specifications, trimLevels,
+  lowStockAlerts, stockSettings, appearanceSettings, specifications, trimLevels, quotations,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Manufacturer, type InsertManufacturer, 
@@ -10,7 +10,8 @@ import {
   type StockSettings, type InsertStockSettings,
   type AppearanceSettings, type InsertAppearanceSettings,
   type Specification, type InsertSpecification,
-  type TrimLevel, type InsertTrimLevel
+  type TrimLevel, type InsertTrimLevel,
+  type Quotation, type InsertQuotation
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -124,6 +125,15 @@ export interface IStorage {
   updateTrimLevel(id: number, trimLevel: Partial<InsertTrimLevel>): Promise<TrimLevel | undefined>;
   deleteTrimLevel(id: number): Promise<boolean>;
   getTrimLevelsByCategory(manufacturer: string, category: string): Promise<TrimLevel[]>;
+  
+  // Quotations methods
+  getAllQuotations(): Promise<Quotation[]>;
+  getQuotation(id: number): Promise<Quotation | undefined>;
+  createQuotation(quotation: InsertQuotation): Promise<Quotation>;
+  updateQuotation(id: number, quotation: Partial<InsertQuotation>): Promise<Quotation | undefined>;
+  deleteQuotation(id: number): Promise<boolean>;
+  getQuotationsByStatus(status: string): Promise<Quotation[]>;
+  getQuotationByNumber(quoteNumber: string): Promise<Quotation | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -184,6 +194,15 @@ export class MemStorage implements IStorage {
   async getAllUsers(): Promise<any[]> { return []; }
   async updateUser(id: number, user: any): Promise<any> { return user; }
   async deleteUser(id: number): Promise<boolean> { return true; }
+  
+  // Quotation stub methods for MemStorage
+  async getAllQuotations(): Promise<any[]> { return []; }
+  async getQuotation(id: number): Promise<any> { return undefined; }
+  async createQuotation(quotation: any): Promise<any> { return quotation; }
+  async updateQuotation(id: number, quotation: any): Promise<any> { return quotation; }
+  async deleteQuotation(id: number): Promise<boolean> { return true; }
+  async getQuotationsByStatus(status: string): Promise<any[]> { return []; }
+  async getQuotationByNumber(quoteNumber: string): Promise<any> { return undefined; }
 
   private initializeInventoryData() {
     const sampleItems: InsertInventoryItem[] = [
@@ -1287,6 +1306,89 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Get trim levels by category error:', error);
       return [];
+    }
+  }
+
+  // Quotations methods
+  async getAllQuotations(): Promise<Quotation[]> {
+    try {
+      return await db.select().from(quotations).orderBy(quotations.createdAt);
+    } catch (error) {
+      console.error('Get all quotations error:', error);
+      return [];
+    }
+  }
+
+  async getQuotation(id: number): Promise<Quotation | undefined> {
+    try {
+      const [quotation] = await db.select().from(quotations).where(eq(quotations.id, id));
+      return quotation;
+    } catch (error) {
+      console.error('Get quotation error:', error);
+      return undefined;
+    }
+  }
+
+  async createQuotation(quotationData: InsertQuotation): Promise<Quotation> {
+    try {
+      // Generate quote number
+      const quoteNumber = `Q-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      
+      const [quotation] = await db.insert(quotations).values({
+        ...quotationData,
+        quoteNumber,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }).returning();
+      return quotation;
+    } catch (error) {
+      console.error('Create quotation error:', error);
+      throw error;
+    }
+  }
+
+  async updateQuotation(id: number, quotationData: Partial<InsertQuotation>): Promise<Quotation | undefined> {
+    try {
+      const [quotation] = await db.update(quotations)
+        .set({ ...quotationData, updatedAt: new Date() })
+        .where(eq(quotations.id, id))
+        .returning();
+      return quotation;
+    } catch (error) {
+      console.error('Update quotation error:', error);
+      return undefined;
+    }
+  }
+
+  async deleteQuotation(id: number): Promise<boolean> {
+    try {
+      await db.delete(quotations).where(eq(quotations.id, id));
+      return true;
+    } catch (error) {
+      console.error('Delete quotation error:', error);
+      return false;
+    }
+  }
+
+  async getQuotationsByStatus(status: string): Promise<Quotation[]> {
+    try {
+      return await db.select().from(quotations)
+        .where(eq(quotations.status, status))
+        .orderBy(quotations.createdAt);
+    } catch (error) {
+      console.error('Get quotations by status error:', error);
+      return [];
+    }
+  }
+
+  async getQuotationByNumber(quoteNumber: string): Promise<Quotation | undefined> {
+    try {
+      const [quotation] = await db.select().from(quotations)
+        .where(eq(quotations.quoteNumber, quoteNumber));
+      return quotation;
+    } catch (error) {
+      console.error('Get quotation by number error:', error);
+      return undefined;
     }
   }
 

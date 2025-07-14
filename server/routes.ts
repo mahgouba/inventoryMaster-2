@@ -8,7 +8,8 @@ import {
   insertLocationTransferSchema,
   insertUserSchema,
   insertSpecificationSchema,
-  insertTrimLevelSchema
+  insertTrimLevelSchema,
+  insertQuotationSchema
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -1506,6 +1507,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching trim levels by category:", error);
       res.status(500).json({ message: "Failed to fetch trim levels" });
+    }
+  });
+
+  // Quotations API Routes
+  app.get("/api/quotations", async (req, res) => {
+    try {
+      const quotations = await storage.getAllQuotations();
+      res.json(quotations);
+    } catch (error) {
+      console.error("Error fetching quotations:", error);
+      res.status(500).json({ message: "Failed to fetch quotations" });
+    }
+  });
+
+  app.get("/api/quotations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid quotation ID" });
+      }
+
+      const quotation = await storage.getQuotation(id);
+      if (!quotation) {
+        return res.status(404).json({ message: "Quotation not found" });
+      }
+
+      res.json(quotation);
+    } catch (error) {
+      console.error("Error fetching quotation:", error);
+      res.status(500).json({ message: "Failed to fetch quotation" });
+    }
+  });
+
+  app.post("/api/quotations", async (req, res) => {
+    try {
+      const quotationData = insertQuotationSchema.parse(req.body);
+      const quotation = await storage.createQuotation(quotationData);
+      res.status(201).json(quotation);
+    } catch (error) {
+      console.error("Error creating quotation:", error);
+      res.status(400).json({ message: "Invalid quotation data" });
+    }
+  });
+
+  app.put("/api/quotations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid quotation ID" });
+      }
+
+      const quotationData = insertQuotationSchema.parse(req.body);
+      const quotation = await storage.updateQuotation(id, quotationData);
+      
+      if (!quotation) {
+        return res.status(404).json({ message: "Quotation not found" });
+      }
+
+      res.json(quotation);
+    } catch (error) {
+      console.error("Error updating quotation:", error);
+      res.status(400).json({ message: "Invalid quotation data" });
+    }
+  });
+
+  app.delete("/api/quotations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid quotation ID" });
+      }
+
+      const deleted = await storage.deleteQuotation(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Quotation not found" });
+      }
+
+      res.json({ message: "Quotation deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting quotation:", error);
+      res.status(500).json({ message: "Failed to delete quotation" });
+    }
+  });
+
+  app.get("/api/quotations/status/:status", async (req, res) => {
+    try {
+      const { status } = req.params;
+      const quotations = await storage.getQuotationsByStatus(status);
+      res.json(quotations);
+    } catch (error) {
+      console.error("Error fetching quotations by status:", error);
+      res.status(500).json({ message: "Failed to fetch quotations" });
+    }
+  });
+
+  app.get("/api/quotations/number/:quoteNumber", async (req, res) => {
+    try {
+      const { quoteNumber } = req.params;
+      const quotation = await storage.getQuotationByNumber(quoteNumber);
+      
+      if (!quotation) {
+        return res.status(404).json({ message: "Quotation not found" });
+      }
+
+      res.json(quotation);
+    } catch (error) {
+      console.error("Error fetching quotation by number:", error);
+      res.status(500).json({ message: "Failed to fetch quotation" });
     }
   });
 

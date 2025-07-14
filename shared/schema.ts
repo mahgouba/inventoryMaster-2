@@ -90,6 +90,33 @@ export const trimLevels = pgTable("trim_levels", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Quotations table for managing price quotes
+export const quotations = pgTable("quotations", {
+  id: serial("id").primaryKey(),
+  quoteNumber: text("quote_number").notNull().unique(), // رقم العرض
+  inventoryItemId: integer("inventory_item_id").notNull(), // معرف المركبة
+  manufacturer: text("manufacturer").notNull(), // الصانع
+  category: text("category").notNull(), // الفئة
+  trimLevel: text("trim_level"), // درجة التجهيز
+  year: integer("year").notNull(), // الموديل
+  exteriorColor: text("exterior_color").notNull(), // اللون الخارجي
+  interiorColor: text("interior_color").notNull(), // اللون الداخلي
+  chassisNumber: text("chassis_number").notNull(), // رقم الهيكل
+  engineCapacity: text("engine_capacity").notNull(), // سعة المحرك
+  specifications: text("specifications"), // المواصفات التفصيلية
+  basePrice: decimal("base_price", { precision: 10, scale: 2 }).notNull(), // السعر الأساسي
+  finalPrice: decimal("final_price", { precision: 10, scale: 2 }).notNull(), // السعر النهائي
+  customerName: text("customer_name").notNull(), // اسم العميل
+  customerPhone: text("customer_phone"), // هاتف العميل
+  customerEmail: text("customer_email"), // بريد العميل
+  notes: text("notes"), // ملاحظات
+  validUntil: timestamp("valid_until").notNull(), // صالح حتى
+  status: text("status").notNull().default("مسودة"), // الحالة (مسودة، مرسل، مقبول، مرفوض)
+  createdBy: text("created_by").notNull(), // المُنشئ
+  createdAt: timestamp("created_at").defaultNow().notNull(), // تاريخ الإنشاء
+  updatedAt: timestamp("updated_at").defaultNow().notNull(), // تاريخ التحديث
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -128,6 +155,22 @@ export const insertSpecificationSchema = createInsertSchema(specifications).omit
   updatedAt: true,
 });
 
+export const insertTrimLevelSchema = createInsertSchema(trimLevels).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertQuotationSchema = createInsertSchema(quotations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  customerName: z.string().min(1, "اسم العميل مطلوب"),
+  basePrice: z.string().min(1, "السعر الأساسي مطلوب"),
+  finalPrice: z.string().min(1, "السعر النهائي مطلوب"),
+  validUntil: z.string().min(1, "تاريخ انتهاء الصلاحية مطلوب"),
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof insertUserSchema._type;
 export type InventoryItem = typeof inventoryItems.$inferSelect;
@@ -142,11 +185,8 @@ export type Specification = typeof specifications.$inferSelect;
 export type InsertSpecification = typeof insertSpecificationSchema._type;
 export type TrimLevel = typeof trimLevels.$inferSelect;
 export type InsertTrimLevel = typeof insertTrimLevelSchema._type;
-
-export const insertTrimLevelSchema = createInsertSchema(trimLevels).omit({
-  id: true,
-  createdAt: true,
-});
+export type Quotation = typeof quotations.$inferSelect;
+export type InsertQuotation = typeof insertQuotationSchema._type;
 
 // User sessions table for tracking login/logout times
 export const userSessions = pgTable("user_sessions", {
