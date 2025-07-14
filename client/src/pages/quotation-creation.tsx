@@ -963,14 +963,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 
                 
                 
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => setCompanyDataOpen(true)}
-                >
-                  <Building2 size={16} className="ml-2" />
-                  إدارة بيانات الشركة
-                </Button>
+                
                 
                 <Button
                   variant="outline"
