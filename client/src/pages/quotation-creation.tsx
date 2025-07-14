@@ -269,25 +269,74 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   };
 
   // Convert quotation to invoice
-  const convertToInvoice = () => {
-    const invoiceData = {
-      quoteNumber,
-      customerName,
-      customerPhone,
-      customerEmail,
-      selectedVehicle,
-      pricingDetails,
-      notes,
-      type: "invoice"
-    };
-    
-    // Store invoice data for future invoice generation
-    localStorage.setItem('invoiceData', JSON.stringify(invoiceData));
-    
-    toast({
-      title: "تم التحويل بنجاح",
-      description: "تم تحويل عرض السعر إلى فاتورة",
-    });
+  const convertToInvoice = async () => {
+    try {
+      // Validate required fields
+      if (!customerName || !selectedRepresentative || !selectedCompany || !selectedVehicle) {
+        toast({
+          title: "خطأ في التحويل",
+          description: "يرجى التأكد من إدخال جميع البيانات المطلوبة",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Generate invoice number
+      const invoiceNumber = `INV-${Date.now().toString().slice(-8)}`;
+      
+      // Calculate totals
+      const totals = calculateTotals();
+      
+      // Prepare invoice data
+      const invoiceData = {
+        invoiceNumber,
+        quoteNumber,
+        inventoryItemId: selectedVehicle.id,
+        manufacturer: selectedVehicle.manufacturer,
+        category: selectedVehicle.category,
+        trimLevel: selectedVehicle.trimLevel,
+        year: selectedVehicle.year,
+        exteriorColor: selectedVehicle.exteriorColor,
+        interiorColor: selectedVehicle.interiorColor,
+        chassisNumber: selectedVehicle.chassisNumber,
+        engineCapacity: selectedVehicle.engineCapacity,
+        specifications: vehicleSpecs?.detailedDescription || "",
+        basePrice: pricingDetails.basePrice.toString(),
+        finalPrice: totals.finalTotal.toString(),
+        customerName,
+        customerPhone,
+        customerEmail,
+        notes,
+        status: "مسودة",
+        paymentStatus: "غير مدفوع",
+        remainingAmount: totals.finalTotal.toString(),
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+        createdBy: "system", // Should be current user
+        companyData: JSON.stringify(selectedCompanyData),
+        representativeData: JSON.stringify(representatives.find(r => r.id === selectedRepresentative)),
+        pricingDetails: JSON.stringify(pricingDetails),
+        qrCodeData: JSON.stringify({ invoiceNumber, customerName, finalPrice: totals.finalTotal })
+      };
+
+      // Create invoice via API
+      const response = await apiRequest('POST', '/api/invoices', invoiceData);
+      
+      toast({
+        title: "تم التحويل بنجاح",
+        description: `تم إنشاء الفاتورة رقم ${invoiceNumber}`,
+      });
+
+      // Store invoice data for potential future use
+      localStorage.setItem('lastInvoiceData', JSON.stringify(response));
+      
+    } catch (error) {
+      console.error("Error converting to invoice:", error);
+      toast({
+        title: "خطأ في التحويل",
+        description: "حدث خطأ أثناء تحويل العرض إلى فاتورة",
+        variant: "destructive",
+      });
+    }
   };
 
   // Share via WhatsApp
@@ -632,6 +681,16 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 <FileUp size={16} className="ml-2" />
                 فاتورة
               </Button>
+              
+              <Link href="/invoice-management">
+                <Button
+                  variant="outline"
+                  className="border-cyan-500 text-cyan-600 hover:bg-cyan-50"
+                >
+                  <FileText size={16} className="ml-2" />
+                  الفواتير
+                </Button>
+              </Link>
               
               <Button
                 variant="outline"

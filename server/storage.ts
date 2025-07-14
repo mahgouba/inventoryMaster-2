@@ -1,6 +1,6 @@
 import { 
   users, inventoryItems, manufacturers, companies, locations, locationTransfers, 
-  lowStockAlerts, stockSettings, appearanceSettings, specifications, trimLevels, quotations,
+  lowStockAlerts, stockSettings, appearanceSettings, specifications, trimLevels, quotations, invoices,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Manufacturer, type InsertManufacturer, 
@@ -146,6 +146,15 @@ export interface IStorage {
   // Terms and Conditions methods
   getAllTermsConditions(): Promise<Array<{ id: number; term_text: string; display_order: number }>>;
   updateTermsConditions(terms: Array<{ id: number; term_text: string; display_order: number }>): Promise<void>;
+  
+  // Invoice methods
+  createInvoice(invoice: any): Promise<any>;
+  getInvoices(): Promise<any[]>;
+  getInvoiceById(id: number): Promise<any | undefined>;
+  updateInvoice(id: number, invoice: any): Promise<any>;
+  deleteInvoice(id: number): Promise<boolean>;
+  getInvoicesByStatus(status: string): Promise<any[]>;
+  getInvoiceByNumber(invoiceNumber: string): Promise<any | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -1683,6 +1692,75 @@ export class DatabaseStorage implements IStorage {
       this.storedTermsConditions = terms;
     } catch (error) {
       console.error('Update terms conditions error:', error);
+    }
+  }
+
+  // Invoice methods
+  async createInvoice(invoice: any): Promise<any> {
+    try {
+      const [createdInvoice] = await this.db.insert(invoices).values(invoice).returning();
+      return createdInvoice;
+    } catch (error) {
+      console.error('Create invoice error:', error);
+      throw error;
+    }
+  }
+
+  async getInvoices(): Promise<any[]> {
+    try {
+      return await this.db.select().from(invoices).orderBy(invoices.createdAt);
+    } catch (error) {
+      console.error('Get invoices error:', error);
+      return [];
+    }
+  }
+
+  async getInvoiceById(id: number): Promise<any | undefined> {
+    try {
+      const [invoice] = await this.db.select().from(invoices).where(eq(invoices.id, id));
+      return invoice;
+    } catch (error) {
+      console.error('Get invoice by ID error:', error);
+      return undefined;
+    }
+  }
+
+  async updateInvoice(id: number, invoice: any): Promise<any> {
+    try {
+      const [updatedInvoice] = await this.db.update(invoices).set(invoice).where(eq(invoices.id, id)).returning();
+      return updatedInvoice;
+    } catch (error) {
+      console.error('Update invoice error:', error);
+      throw error;
+    }
+  }
+
+  async deleteInvoice(id: number): Promise<boolean> {
+    try {
+      const result = await this.db.delete(invoices).where(eq(invoices.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error('Delete invoice error:', error);
+      return false;
+    }
+  }
+
+  async getInvoicesByStatus(status: string): Promise<any[]> {
+    try {
+      return await this.db.select().from(invoices).where(eq(invoices.status, status));
+    } catch (error) {
+      console.error('Get invoices by status error:', error);
+      return [];
+    }
+  }
+
+  async getInvoiceByNumber(invoiceNumber: string): Promise<any | undefined> {
+    try {
+      const [invoice] = await this.db.select().from(invoices).where(eq(invoices.invoiceNumber, invoiceNumber));
+      return invoice;
+    } catch (error) {
+      console.error('Get invoice by number error:', error);
+      return undefined;
     }
   }
 }

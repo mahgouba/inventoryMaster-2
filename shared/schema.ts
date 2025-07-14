@@ -183,6 +183,43 @@ export const quotations = pgTable("quotations", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(), // تاريخ التحديث
 });
 
+// Invoices table for managing sales invoices
+export const invoices = pgTable("invoices", {
+  id: serial("id").primaryKey(),
+  invoiceNumber: text("invoice_number").notNull().unique(), // رقم الفاتورة
+  quotationId: integer("quotation_id").references(() => quotations.id), // معرف العرض المرجعي
+  quoteNumber: text("quote_number"), // رقم العرض المرجعي
+  inventoryItemId: integer("inventory_item_id").notNull(), // معرف المركبة
+  manufacturer: text("manufacturer").notNull(), // الصانع
+  category: text("category").notNull(), // الفئة
+  trimLevel: text("trim_level"), // درجة التجهيز
+  year: integer("year").notNull(), // الموديل
+  exteriorColor: text("exterior_color").notNull(), // اللون الخارجي
+  interiorColor: text("interior_color").notNull(), // اللون الداخلي
+  chassisNumber: text("chassis_number").notNull(), // رقم الهيكل
+  engineCapacity: text("engine_capacity").notNull(), // سعة المحرك
+  specifications: text("specifications"), // المواصفات التفصيلية
+  basePrice: decimal("base_price", { precision: 10, scale: 2 }).notNull(), // السعر الأساسي
+  finalPrice: decimal("final_price", { precision: 10, scale: 2 }).notNull(), // السعر النهائي
+  customerName: text("customer_name").notNull(), // اسم العميل
+  customerPhone: text("customer_phone"), // هاتف العميل
+  customerEmail: text("customer_email"), // بريد العميل
+  notes: text("notes"), // ملاحظات
+  status: text("status").notNull().default("مسودة"), // الحالة (مسودة، مرسل، مدفوع، ملغى)
+  paymentStatus: text("payment_status").notNull().default("غير مدفوع"), // حالة الدفع (غير مدفوع، مدفوع جزئي، مدفوع كامل)
+  paymentMethod: text("payment_method"), // طريقة الدفع (نقدي، تحويل، شيك، بطاقة)
+  paidAmount: decimal("paid_amount", { precision: 10, scale: 2 }).default('0'), // المبلغ المدفوع
+  remainingAmount: decimal("remaining_amount", { precision: 10, scale: 2 }), // المبلغ المتبقي
+  dueDate: timestamp("due_date"), // تاريخ الاستحقاق
+  createdBy: text("created_by").notNull(), // المُنشئ
+  companyData: text("company_data"), // بيانات الشركة
+  representativeData: text("representative_data"), // بيانات المندوب
+  pricingDetails: text("pricing_details"), // تفاصيل التسعير
+  qrCodeData: text("qr_code_data"), // بيانات رمز QR
+  createdAt: timestamp("created_at").defaultNow().notNull(), // تاريخ الإنشاء
+  updatedAt: timestamp("updated_at").defaultNow().notNull(), // تاريخ التحديث
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -226,7 +263,11 @@ export const insertTrimLevelSchema = createInsertSchema(trimLevels).omit({
   createdAt: true,
 });
 
-
+export const insertInvoiceSchema = createInsertSchema(invoices).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 
 // Terms and conditions table
 export const termsAndConditions = pgTable("terms_and_conditions", {

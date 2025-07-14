@@ -1744,6 +1744,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Invoice management endpoints
+  app.get("/api/invoices", async (req, res) => {
+    try {
+      const invoices = await storage.getInvoices();
+      res.json(invoices);
+    } catch (error) {
+      console.error("Error getting invoices:", error);
+      res.status(500).json({ message: "Failed to fetch invoices" });
+    }
+  });
+
+  app.post("/api/invoices", async (req, res) => {
+    try {
+      const invoice = await storage.createInvoice(req.body);
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error creating invoice:", error);
+      res.status(500).json({ message: "Failed to create invoice" });
+    }
+  });
+
+  app.get("/api/invoices/:id", async (req, res) => {
+    try {
+      const invoice = await storage.getInvoiceById(parseInt(req.params.id));
+      if (!invoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error getting invoice:", error);
+      res.status(500).json({ message: "Failed to fetch invoice" });
+    }
+  });
+
+  app.put("/api/invoices/:id", async (req, res) => {
+    try {
+      const invoice = await storage.updateInvoice(parseInt(req.params.id), req.body);
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error updating invoice:", error);
+      res.status(500).json({ message: "Failed to update invoice" });
+    }
+  });
+
+  app.delete("/api/invoices/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteInvoice(parseInt(req.params.id));
+      if (success) {
+        res.json({ message: "Invoice deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Invoice not found" });
+      }
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      res.status(500).json({ message: "Failed to delete invoice" });
+    }
+  });
+
+  app.get("/api/invoices/number/:invoiceNumber", async (req, res) => {
+    try {
+      const invoice = await storage.getInvoiceByNumber(req.params.invoiceNumber);
+      if (!invoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error getting invoice by number:", error);
+      res.status(500).json({ message: "Failed to fetch invoice" });
+    }
+  });
+
+  app.get("/api/invoices/status/:status", async (req, res) => {
+    try {
+      const invoices = await storage.getInvoicesByStatus(req.params.status);
+      res.json(invoices);
+    } catch (error) {
+      console.error("Error getting invoices by status:", error);
+      res.status(500).json({ message: "Failed to fetch invoices" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

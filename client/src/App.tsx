@@ -15,6 +15,7 @@ import UserManagementPage from "@/pages/user-management-simple";
 import NotFound from "@/pages/not-found";
 import QuotationCreationPage from "@/pages/quotation-creation";
 import CompanyManagementPage from "@/pages/company-management";
+import InvoiceManagementPage from "@/pages/invoice-management";
 
 interface User {
   username: string;
@@ -36,6 +37,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
       <Route path="/card-view" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
       <Route path="/card-view-new" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
       <Route path="/quotation-creation" component={QuotationCreationPage} />
+      <Route path="/invoice-management" component={InvoiceManagementPage} />
       <Route path="/locations" component={() => <LocationPage userRole={user.role} onLogout={onLogout} />} />
       {/* صفحات الأدمن فقط */}
       {user.role === "admin" && (
