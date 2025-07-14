@@ -40,7 +40,6 @@ import { CardViewFAB } from "@/components/animated-fab";
 import InventoryFormSimple from "@/components/inventory-form-simple";
 import VehicleShare from "@/components/vehicle-share";
 import SpecificationsManagement from "@/components/specifications-management";
-import QuotationForm from "@/components/quotation-form";
 import QuotationManagement from "@/components/quotation-management";
 
 import type { InventoryItem } from "@shared/schema";
@@ -69,9 +68,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [shareVehicle, setShareVehicle] = useState<InventoryItem | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [specificationsOpen, setSpecificationsOpen] = useState(false);
-  const [quotationFormOpen, setQuotationFormOpen] = useState(false);
   const [quotationManagementOpen, setQuotationManagementOpen] = useState(false);
-  const [selectedVehicleForQuote, setSelectedVehicleForQuote] = useState<InventoryItem | null>(null);
 
   const { data: inventoryData = [], isLoading } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory"],
@@ -292,8 +289,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   };
 
   const handleCreateQuote = (item: InventoryItem) => {
-    setSelectedVehicleForQuote(item);
-    setQuotationFormOpen(true);
+    // Store vehicle data in localStorage for the quotation creation page
+    localStorage.setItem('selectedVehicleForQuote', JSON.stringify(item));
+    // Navigate to quotation creation page
+    window.location.href = '/quotation-creation';
   };
 
   // Status color mapping
@@ -845,15 +844,6 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         open={specificationsOpen}
         onOpenChange={setSpecificationsOpen}
       />
-
-      {/* Quotation Form Dialog */}
-      {selectedVehicleForQuote && (
-        <QuotationForm
-          open={quotationFormOpen}
-          onOpenChange={setQuotationFormOpen}
-          vehicleData={selectedVehicleForQuote}
-        />
-      )}
 
       {/* Quotation Management Dialog */}
       <QuotationManagement

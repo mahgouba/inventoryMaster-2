@@ -13,6 +13,7 @@ import LocationPage from "@/pages/locations";
 import LoginPage from "@/pages/login";
 import UserManagementPage from "@/pages/user-management-simple";
 import NotFound from "@/pages/not-found";
+import QuotationCreationPage from "@/pages/quotation-creation";
 
 interface User {
   username: string;
@@ -33,6 +34,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
       <Route path="/cards" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
       <Route path="/card-view" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
       <Route path="/card-view-new" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+      <Route path="/quotation-creation" component={QuotationCreationPage} />
       <Route path="/locations" component={() => <LocationPage userRole={user.role} onLogout={onLogout} />} />
       {/* صفحات الأدمن فقط */}
       {user.role === "admin" && (
