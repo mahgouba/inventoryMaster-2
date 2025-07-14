@@ -265,7 +265,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const manufacturerData = manufacturers.find(m => m.name === selectedVehicle?.manufacturer);
 
   // Get vehicle specifications for selected vehicle
-  const { data: vehicleSpecs } = useQuery<Specification>({
+  const { data: vehicleSpecs, isLoading: specsLoading } = useQuery<Specification>({
     queryKey: ['/api/specifications', editableVehicle?.manufacturer, editableVehicle?.category, editableVehicle?.trimLevel, editableVehicle?.year, editableVehicle?.engineCapacity],
     enabled: !!editableVehicle,
     queryFn: async () => {
@@ -963,36 +963,161 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
             <DialogTitle>إدارة مواصفات السيارة</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            {vehicleSpecs ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-slate-200 dark:border-slate-700 rounded-lg">
-                <div>
-                  <Label>القوة الحصانية</Label>
-                  <Input value={vehicleSpecs.horsepower || ""} readOnly />
+            {specsLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-slate-500">جاري تحميل المواصفات...</p>
+              </div>
+            ) : vehicleSpecs ? (
+              <div className="space-y-6">
+                {/* Engine & Performance */}
+                <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                  <h3 className="font-semibold text-lg mb-3 text-blue-600 dark:text-blue-400">الأداء والمحرك</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {vehicleSpecs.engine && (
+                      <div>
+                        <Label>المحرك</Label>
+                        <Input value={vehicleSpecs.engine} readOnly />
+                      </div>
+                    )}
+                    {vehicleSpecs.horsepower && (
+                      <div>
+                        <Label>القوة الحصانية</Label>
+                        <Input value={vehicleSpecs.horsepower} readOnly />
+                      </div>
+                    )}
+                    {vehicleSpecs.torque && (
+                      <div>
+                        <Label>عزم الدوران</Label>
+                        <Input value={vehicleSpecs.torque} readOnly />
+                      </div>
+                    )}
+                    {vehicleSpecs.transmission && (
+                      <div>
+                        <Label>ناقل الحركة</Label>
+                        <Input value={vehicleSpecs.transmission} readOnly />
+                      </div>
+                    )}
+                    {vehicleSpecs.fuelType && (
+                      <div>
+                        <Label>نوع الوقود</Label>
+                        <Input value={vehicleSpecs.fuelType} readOnly />
+                      </div>
+                    )}
+                    {vehicleSpecs.acceleration && (
+                      <div>
+                        <Label>التسارع 0-100 كم/س</Label>
+                        <Input value={vehicleSpecs.acceleration} readOnly />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <Label>عزم الدوران</Label>
-                  <Input value={vehicleSpecs.torque || ""} readOnly />
+
+                {/* Dimensions */}
+                <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                  <h3 className="font-semibold text-lg mb-3 text-green-600 dark:text-green-400">الأبعاد والوزن</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {vehicleSpecs.length && (
+                      <div>
+                        <Label>الطول</Label>
+                        <Input value={vehicleSpecs.length} readOnly />
+                      </div>
+                    )}
+                    {vehicleSpecs.width && (
+                      <div>
+                        <Label>العرض</Label>
+                        <Input value={vehicleSpecs.width} readOnly />
+                      </div>
+                    )}
+                    {vehicleSpecs.height && (
+                      <div>
+                        <Label>الارتفاع</Label>
+                        <Input value={vehicleSpecs.height} readOnly />
+                      </div>
+                    )}
+                    {vehicleSpecs.wheelbase && (
+                      <div>
+                        <Label>قاعدة العجلات</Label>
+                        <Input value={vehicleSpecs.wheelbase} readOnly />
+                      </div>
+                    )}
+                    {vehicleSpecs.curbWeight && (
+                      <div>
+                        <Label>الوزن الفارغ</Label>
+                        <Input value={vehicleSpecs.curbWeight} readOnly />
+                      </div>
+                    )}
+                    {vehicleSpecs.seatingCapacity && (
+                      <div>
+                        <Label>عدد المقاعد</Label>
+                        <Input value={vehicleSpecs.seatingCapacity} readOnly />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <Label>نوع الوقود</Label>
-                  <Input value={vehicleSpecs.fuelType || ""} readOnly />
+
+                {/* Features */}
+                <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                  <h3 className="font-semibold text-lg mb-3 text-purple-600 dark:text-purple-400">المميزات والتجهيزات</h3>
+                  <div className="grid grid-cols-1 gap-4">
+                    {vehicleSpecs.safetyFeatures && (
+                      <div>
+                        <Label>مميزات الأمان</Label>
+                        <Textarea value={vehicleSpecs.safetyFeatures} readOnly rows={2} />
+                      </div>
+                    )}
+                    {vehicleSpecs.comfortFeatures && (
+                      <div>
+                        <Label>مميزات الراحة</Label>
+                        <Textarea value={vehicleSpecs.comfortFeatures} readOnly rows={2} />
+                      </div>
+                    )}
+                    {vehicleSpecs.infotainment && (
+                      <div>
+                        <Label>نظام المعلومات والترفيه</Label>
+                        <Textarea value={vehicleSpecs.infotainment} readOnly rows={2} />
+                      </div>
+                    )}
+                    {vehicleSpecs.driverAssistance && (
+                      <div>
+                        <Label>مساعدة السائق</Label>
+                        <Textarea value={vehicleSpecs.driverAssistance} readOnly rows={2} />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <Label>نوع ناقل الحركة</Label>
-                  <Input value={vehicleSpecs.transmissionType || ""} readOnly />
-                </div>
-                <div className="md:col-span-2">
-                  <Label>المميزات</Label>
-                  <Textarea value={vehicleSpecs.features || ""} readOnly rows={3} />
-                </div>
+
+                {/* Warranty & Notes */}
+                {(vehicleSpecs.warranty || vehicleSpecs.notes) && (
+                  <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                    <h3 className="font-semibold text-lg mb-3 text-orange-600 dark:text-orange-400">الضمان والملاحظات</h3>
+                    <div className="grid grid-cols-1 gap-4">
+                      {vehicleSpecs.warranty && (
+                        <div>
+                          <Label>الضمان</Label>
+                          <Input value={vehicleSpecs.warranty} readOnly />
+                        </div>
+                      )}
+                      {vehicleSpecs.notes && (
+                        <div>
+                          <Label>ملاحظات</Label>
+                          <Textarea value={vehicleSpecs.notes} readOnly rows={3} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-center py-8">
                 <FileText size={48} className="mx-auto text-slate-400 mb-4" />
                 <p className="text-slate-500">لا توجد مواصفات مسجلة لهذه السيارة</p>
+                <p className="text-sm text-slate-400 mt-2">
+                  يتم جلب المواصفات من إدارة المواصفات بناءً على: {editableVehicle?.manufacturer} - {editableVehicle?.category} - {editableVehicle?.year}
+                </p>
                 <Button className="mt-4" onClick={() => setSpecificationsOpen(false)}>
                   <Plus size={16} className="ml-2" />
-                  إضافة مواصفات
+                  إضافة مواصفات جديدة
                 </Button>
               </div>
             )}
