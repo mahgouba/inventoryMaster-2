@@ -962,14 +962,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               </CardHeader>
               <CardContent className="space-y-3">
                 
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => setSpecificationsOpen(true)}
-                >
-                  <FileText size={16} className="ml-2" />
-                  إدارة المواصفات
-                </Button>
+                
                 
                 <Button
                   variant="outline"
