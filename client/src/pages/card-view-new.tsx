@@ -441,17 +441,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               </div>
             </div>
 
-            {/* Show Sold Cars Toggle - Admin Only */}
-            {userRole === "admin" && (
-              <Button 
-                onClick={() => setShowSoldCars(!showSoldCars)}
-                variant={showSoldCars ? "default" : "outline"}
-                className="text-sm"
-                size="sm"
-              >
-                {showSoldCars ? "إخفاء السيارات المباعة" : "إظهار السيارات المباعة"}
-              </Button>
-            )}
+            
 
             {/* Manufacturer Filter */}
             <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
