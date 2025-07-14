@@ -33,6 +33,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
 import type { InventoryItem, Specification, InsertQuotation } from "@shared/schema";
+import { numberToArabic } from "@/utils/number-to-arabic";
 
 interface QuotationCreationPageProps {
   vehicleData?: InventoryItem;
@@ -102,6 +103,24 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [validityDays, setValidityDays] = useState<number>(30);
   const [notes, setNotes] = useState<string>("");
+  
+  // Representative selection
+  const [selectedRepresentative, setSelectedRepresentative] = useState<string>("");
+  const [selectedCompany, setSelectedCompany] = useState<string>("");
+  
+  // Available representatives and companies
+  const representatives = [
+    { id: "1", name: "أحمد محمد", phone: "01234567890", email: "ahmed@company.com", position: "مندوب مبيعات أول" },
+    { id: "2", name: "محمد عبدالله", phone: "01234567891", email: "mohammed@company.com", position: "مندوب مبيعات" },
+    { id: "3", name: "سارة أحمد", phone: "01234567892", email: "sarah@company.com", position: "مديرة مبيعات" },
+    { id: "4", name: "عمر حسن", phone: "01234567893", email: "omar@company.com", position: "مستشار مبيعات" },
+  ];
+  
+  const companies = [
+    { id: "1", name: "شركة السيارات الفاخرة", address: "الرياض، المملكة العربية السعودية", phone: "0112345678", email: "info@luxurycars.com", taxNumber: "300012345600003" },
+    { id: "2", name: "مؤسسة الخليج للسيارات", address: "جدة، المملكة العربية السعودية", phone: "0126789012", email: "info@gulfauto.com", taxNumber: "300012345600004" },
+    { id: "3", name: "شركة الشرق الأوسط للسيارات", address: "الدمام، المملكة العربية السعودية", phone: "0138901234", email: "info@mideastcars.com", taxNumber: "300012345600005" },
+  ];
   
   // Management windows states
   const [specificationsOpen, setSpecificationsOpen] = useState(false);
@@ -259,16 +278,20 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   });
 
   const handleSaveQuotation = () => {
-    if (!editableVehicle || !customerName.trim()) {
+    if (!editableVehicle || !customerName.trim() || !selectedRepresentative || !selectedCompany) {
       toast({
         title: "بيانات ناقصة",
-        description: "يرجى التأكد من اختيار السيارة وإدخال اسم العميل",
+        description: "يرجى التأكد من اختيار السيارة وإدخال اسم العميل واختيار المندوب والشركة",
         variant: "destructive",
       });
       return;
     }
 
     const totals = calculateTotals();
+    
+    // Get selected representative and company data
+    const selectedRepData = representatives.find(rep => rep.id === selectedRepresentative);
+    const selectedCompanyData = companies.find(comp => comp.id === selectedCompany);
 
     const quotationData: InsertQuotation = {
       quoteNumber,
@@ -288,10 +311,16 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
       validityDays,
       status: "مسودة",
       notes: notes.trim(),
-      companyData: JSON.stringify(companyData),
-      representativeData: JSON.stringify(representativeData),
+      companyData: JSON.stringify(selectedCompanyData),
+      representativeData: JSON.stringify(selectedRepData),
       quoteAppearance: JSON.stringify(quoteAppearance),
-      pricingDetails: JSON.stringify(pricingDetails),
+      pricingDetails: JSON.stringify({
+        ...pricingDetails,
+        subtotal: totals.subtotal,
+        taxAmount: totals.taxAmount,
+        finalTotal: totals.finalTotal,
+        licensePlateTotal: totals.licensePlateTotal
+      }),
       qrCodeData: generateQRData()
     };
 
@@ -322,8 +351,10 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-black">
+
+      
       {/* Header */}
-      <header className="bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
+      <header className="bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50 no-print">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4 space-x-reverse">
@@ -511,6 +542,36 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
                       min={1}
                       max={365}
                     />
+                  </div>
+                  <div>
+                    <Label htmlFor="representativeSelect">المندوب *</Label>
+                    <Select value={selectedRepresentative} onValueChange={setSelectedRepresentative}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر المندوب" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {representatives.map((rep) => (
+                          <SelectItem key={rep.id} value={rep.id}>
+                            {rep.name} - {rep.position}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="companySelect">الشركة *</Label>
+                    <Select value={selectedCompany} onValueChange={setSelectedCompany}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الشركة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {companies.map((company) => (
+                          <SelectItem key={company.id} value={company.id}>
+                            {company.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 
@@ -1119,6 +1180,186 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Print Layout (hidden on screen, visible when printing) */}
+      <div className="hidden print:block print-page">
+        {/* Print Header */}
+        <div className="print-header">
+          <div className="print-header-logo">
+            {companyLogo ? (
+              <img src={companyLogo} alt="Company Logo" className="w-full h-full object-contain" />
+            ) : (
+              <div className="w-full h-full bg-gray-200 flex items-center justify-center text-4xl font-bold">
+                ش
+              </div>
+            )}
+          </div>
+          <div className="print-header-info">
+            <h1 className="text-2xl font-bold mb-2">
+              {companies.find(c => c.id === selectedCompany)?.name || "شركة السيارات"}
+            </h1>
+            <p className="text-sm mb-1">
+              {companies.find(c => c.id === selectedCompany)?.address || "العنوان"}
+            </p>
+            <p className="text-sm">
+              تاريخ العرض: {new Date().toLocaleDateString('ar-SA')}
+            </p>
+          </div>
+          <div className="print-header-qr">
+            <div className="text-center">
+              <div className="text-xs mb-1">QR Code</div>
+              <div className="text-xs">{quoteNumber}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Customer Information */}
+        <div className="print-section">
+          <h3>بيانات العميل</h3>
+          <div className="print-row">
+            <span className="print-label">اسم العميل:</span>
+            <span className="print-value">{customerName}</span>
+          </div>
+          <div className="print-row">
+            <span className="print-label">رقم الهاتف:</span>
+            <span className="print-value">{customerPhone}</span>
+          </div>
+          <div className="print-row">
+            <span className="print-label">البريد الإلكتروني:</span>
+            <span className="print-value">{customerEmail}</span>
+          </div>
+        </div>
+
+        {/* Representative Information */}
+        <div className="print-section">
+          <h3>بيانات المندوب</h3>
+          {(() => {
+            const rep = representatives.find(r => r.id === selectedRepresentative);
+            return rep ? (
+              <>
+                <div className="print-row">
+                  <span className="print-label">الاسم:</span>
+                  <span className="print-value">{rep.name}</span>
+                </div>
+                <div className="print-row">
+                  <span className="print-label">المنصب:</span>
+                  <span className="print-value">{rep.position}</span>
+                </div>
+                <div className="print-row">
+                  <span className="print-label">رقم الهاتف:</span>
+                  <span className="print-value">{rep.phone}</span>
+                </div>
+                <div className="print-row">
+                  <span className="print-label">البريد الإلكتروني:</span>
+                  <span className="print-value">{rep.email}</span>
+                </div>
+              </>
+            ) : null;
+          })()}
+        </div>
+
+        {/* Vehicle Information */}
+        <div className="print-section">
+          <h3>بيانات المركبة</h3>
+          <div className="flex items-center mb-3">
+            <div className="manufacturer-logo mr-3">
+              {manufacturerData?.logo ? (
+                <img src={manufacturerData.logo} alt={editableVehicle.manufacturer} className="w-full h-full object-contain" />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center text-2xl font-bold">
+                  {editableVehicle.manufacturer?.charAt(0)}
+                </div>
+              )}
+            </div>
+            <div>
+              <h4 className="text-lg font-bold">{editableVehicle.manufacturer} {editableVehicle.category}</h4>
+              <p className="text-sm text-gray-600">الموديل: {editableVehicle.year}</p>
+            </div>
+          </div>
+          <div className="print-row">
+            <span className="print-label">سعة المحرك:</span>
+            <span className="print-value">{editableVehicle.engineCapacity}</span>
+          </div>
+          <div className="print-row">
+            <span className="print-label">اللون الخارجي:</span>
+            <span className="print-value">{editableVehicle.exteriorColor}</span>
+          </div>
+          <div className="print-row">
+            <span className="print-label">اللون الداخلي:</span>
+            <span className="print-value">{editableVehicle.interiorColor}</span>
+          </div>
+          <div className="print-row">
+            <span className="print-label">رقم الهيكل:</span>
+            <span className="print-value">{editableVehicle.chassisNumber}</span>
+          </div>
+        </div>
+
+        {/* Price Details */}
+        <div className="print-section">
+          <h3>تفاصيل السعر</h3>
+          <table className="print-table">
+            <thead>
+              <tr>
+                <th>البيان</th>
+                <th>المبلغ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>السعر الأساسي</td>
+                <td>{pricingDetails.basePrice.toLocaleString()} ريال</td>
+              </tr>
+              {pricingDetails.includeLicensePlate && (
+                <tr>
+                  <td>اللوحات</td>
+                  <td>{pricingDetails.licensePlatePrice.toLocaleString()} ريال</td>
+                </tr>
+              )}
+              <tr>
+                <td>
+                  {pricingDetails.isVATInclusive ? 'السعر شامل الضريبة' : 'السعر + الضريبة'}
+                  {pricingDetails.isVATInclusive && pricingDetails.taxRate > 0 && (
+                    <span> (قيمة الضريبة: {calculateTotals().taxAmount.toLocaleString()} ريال)</span>
+                  )}
+                </td>
+                <td>{calculateTotals().subtotal.toLocaleString()} ريال</td>
+              </tr>
+              <tr className="print-total-row">
+                <td>الإجمالي</td>
+                <td>{calculateTotals().finalTotal.toLocaleString()} ريال</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          {/* Arabic Total */}
+          <div className="print-arabic-total">
+            <strong>المبلغ بالأحرف العربية:</strong><br />
+            {numberToArabic(calculateTotals().finalTotal)}
+          </div>
+        </div>
+
+        {/* Additional Notes */}
+        {notes && (
+          <div className="print-section">
+            <h3>ملاحظات إضافية</h3>
+            <p>{notes}</p>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="print-section mt-8">
+          <div className="print-row">
+            <span className="print-label">رقم عرض السعر:</span>
+            <span className="print-value">{quoteNumber}</span>
+          </div>
+          <div className="print-row">
+            <span className="print-label">صالح حتى:</span>
+            <span className="print-value">
+              {new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000).toLocaleDateString('ar-SA')}
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
