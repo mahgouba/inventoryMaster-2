@@ -69,9 +69,9 @@ export default function QuotationA4Preview({
         style={{
           width: '210mm',
           height: '297mm',
-          fontSize: '12pt',
+          fontSize: '11pt',
           fontFamily: '"Noto Sans Arabic", Arial, sans-serif',
-          padding: '20mm',
+          padding: '8mm',
           boxSizing: 'border-box',
           direction: 'rtl',
           transform: 'scale(0.7)',
@@ -97,124 +97,127 @@ export default function QuotationA4Preview({
           `
         }} />
         
-        <div className="p-8 h-full">
-          {/* Header Section */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-6">
-              {selectedCompany?.logo && (
-                <div className="w-20 h-20 flex items-center justify-center">
-                  <img 
-                    src={selectedCompany.logo} 
-                    alt={selectedCompany.name}
-                    className="max-w-full max-h-full object-contain"
-                  />
+        <div className="h-full">
+          {/* Modern Header Section */}
+          <div className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 mb-3 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {selectedCompany?.logo && (
+                  <div className="w-14 h-14 bg-white rounded-full p-2 flex items-center justify-center">
+                    <img 
+                      src={selectedCompany.logo} 
+                      alt={selectedCompany.name}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
+                )}
+                <div>
+                  <h1 className="text-xl font-bold mb-1">
+                    {selectedCompany?.name || "اسم الشركة"}
+                  </h1>
+                  <p className="text-blue-100 text-xs">
+                    {selectedCompany?.address || "العنوان"}
+                  </p>
                 </div>
-              )}
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  {selectedCompany?.name || "اسم الشركة"}
-                </h1>
-                <div className="text-sm text-gray-600 space-y-1">
-                  <p>س.ت: {selectedCompany?.registrationNumber || "غير محدد"}</p>
-                  <p>رخصة رقم: {selectedCompany?.licenseNumber || "غير محدد"}</p>
-                  <p>الرقم الضريبي: {selectedCompany?.taxNumber || "غير محدد"}</p>
+              </div>
+              
+              <div className="text-right text-sm">
+                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3">
+                  <h2 className="text-lg font-bold mb-1">عرض سعر</h2>
+                  <p className="text-blue-100 text-xs">رقم: {quoteNumber}</p>
+                  <p className="text-blue-100 text-xs">التاريخ: {new Date().toLocaleDateString('ar-SA')}</p>
+                  <p className="text-blue-100 text-xs">صالح حتى: {validUntil.toLocaleDateString('ar-SA')}</p>
                 </div>
               </div>
             </div>
             
-            <div className="text-right">
-              <div className="flex items-center gap-2 mb-2">
-                <QrCode className="w-6 h-6" />
-                <span className="text-lg font-semibold">عرض سعر رقم: {quoteNumber}</span>
-              </div>
-              <p className="text-sm text-gray-600">
-                التاريخ: {new Date().toLocaleDateString('ar-SA')}
-              </p>
-              <p className="text-sm text-gray-600">
-                صالح حتى: {validUntil.toLocaleDateString('ar-SA')}
-              </p>
-            </div>
-          </div>
-
-          <Separator className="my-6" />
-
-          {/* Company Contact Information */}
-          {selectedCompany && (
-            <div className="mb-6">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Building className="w-4 h-4" />
-                  <span>{selectedCompany.address || "العنوان غير محدد"}</span>
+            {/* Contact Info Strip */}
+            <div className="absolute bottom-0 left-0 right-0 bg-black/20 backdrop-blur-sm p-2 rounded-b-lg">
+              <div className="flex justify-between items-center text-xs text-blue-100">
+                <div className="flex items-center gap-3">
+                  {selectedCompany?.phone && (
+                    <div className="flex items-center gap-1">
+                      <Phone size={10} />
+                      <span>{selectedCompany.phone}</span>
+                    </div>
+                  )}
+                  {selectedCompany?.email && (
+                    <div className="flex items-center gap-1">
+                      <Mail size={10} />
+                      <span>{selectedCompany.email}</span>
+                    </div>
+                  )}
+                  {selectedCompany?.website && (
+                    <div className="flex items-center gap-1">
+                      <Globe size={10} />
+                      <span>{selectedCompany.website}</span>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  <span>{selectedCompany.phone || "الهاتف غير محدد"}</span>
+                <div className="flex items-center gap-3">
+                  {selectedCompany?.registrationNumber && (
+                    <span>س.ت: {selectedCompany.registrationNumber}</span>
+                  )}
+                  {selectedCompany?.taxNumber && (
+                    <span>الرقم الضريبي: {selectedCompany.taxNumber}</span>
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  <span>{selectedCompany.email || "البريد الإلكتروني غير محدد"}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4" />
-                  <span>{selectedCompany.website || "الموقع الإلكتروني غير محدد"}</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <Separator className="my-6" />
-
-          {/* Customer Information */}
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4">بيانات العميل</h2>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">الاسم: </span>
-                <span>{customerName || "غير محدد"}</span>
-              </div>
-              <div>
-                <span className="font-medium">الهاتف: </span>
-                <span>{customerPhone || "غير محدد"}</span>
-              </div>
-              <div className="col-span-2">
-                <span className="font-medium">البريد الإلكتروني: </span>
-                <span>{customerEmail || "غير محدد"}</span>
               </div>
             </div>
           </div>
 
-          <Separator className="my-6" />
 
-          {/* Representative Information */}
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4">بيانات المندوب</h2>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">الاسم: </span>
-                <span>{representativeName || "غير محدد"}</span>
+
+          {/* Customer & Representative Info Cards */}
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            {/* Customer Information */}
+            <div className="border border-slate-200 rounded-lg p-3">
+              <h3 className="text-sm font-semibold mb-2 text-blue-600">بيانات العميل</h3>
+              <div className="space-y-1 text-xs">
+                <div>
+                  <span className="font-medium">الاسم: </span>
+                  <span>{customerName || "غير محدد"}</span>
+                </div>
+                <div>
+                  <span className="font-medium">الهاتف: </span>
+                  <span>{customerPhone || "غير محدد"}</span>
+                </div>
+                <div>
+                  <span className="font-medium">البريد: </span>
+                  <span>{customerEmail || "غير محدد"}</span>
+                </div>
               </div>
-              <div>
-                <span className="font-medium">المنصب: </span>
-                <span>{representativePosition || "غير محدد"}</span>
-              </div>
-              <div>
-                <span className="font-medium">الهاتف: </span>
-                <span>{representativePhone || "غير محدد"}</span>
-              </div>
-              <div>
-                <span className="font-medium">البريد الإلكتروني: </span>
-                <span>{representativeEmail || "غير محدد"}</span>
+            </div>
+
+            {/* Representative Information */}
+            <div className="border border-slate-200 rounded-lg p-3">
+              <h3 className="text-sm font-semibold mb-2 text-green-600">بيانات المندوب</h3>
+              <div className="space-y-1 text-xs">
+                <div>
+                  <span className="font-medium">الاسم: </span>
+                  <span>{representativeName || "غير محدد"}</span>
+                </div>
+                <div>
+                  <span className="font-medium">المنصب: </span>
+                  <span>{representativePosition || "غير محدد"}</span>
+                </div>
+                <div>
+                  <span className="font-medium">الهاتف: </span>
+                  <span>{representativePhone || "غير محدد"}</span>
+                </div>
+                <div>
+                  <span className="font-medium">البريد: </span>
+                  <span>{representativeEmail || "غير محدد"}</span>
+                </div>
               </div>
             </div>
           </div>
-
-          <Separator className="my-6" />
 
           {/* Vehicle Information */}
           {selectedVehicle && (
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-4">بيانات المركبة</h2>
-              <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="border border-slate-200 rounded-lg p-3 mb-3">
+              <h3 className="text-sm font-semibold mb-2 text-purple-600">بيانات المركبة</h3>
+              <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <span className="font-medium">الصانع: </span>
                   <span>{selectedVehicle.manufacturer}</span>
@@ -253,9 +256,9 @@ export default function QuotationA4Preview({
               
               {/* Detailed Specifications */}
               {vehicleSpecs && (
-                <div className="mt-4">
-                  <h3 className="text-lg font-semibold mb-3">المواصفات التفصيلية</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="mt-3 pt-3 border-t border-slate-200">
+                  <h4 className="text-xs font-semibold mb-2 text-orange-600">المواصفات التفصيلية</h4>
+                  <div className="grid grid-cols-3 gap-2 text-xs">
                     <div>
                       <span className="font-medium">نوع المحرك: </span>
                       <span>{vehicleSpecs.engineType || "غير محدد"}</span>
@@ -340,61 +343,57 @@ export default function QuotationA4Preview({
             </div>
           )}
 
-          <Separator className="my-6" />
-
           {/* Price Breakdown */}
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4">تفاصيل السعر</h2>
-            <div className="space-y-3">
-              <div className="flex justify-between py-2">
+          <div className="border border-slate-200 rounded-lg p-3 mb-3">
+            <h3 className="text-sm font-semibold mb-2 text-red-600">تفاصيل السعر</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between py-1 text-xs">
                 <span>سعر المركبة الأساسي</span>
                 <span className="font-medium">{basePrice.toLocaleString()} ريال</span>
               </div>
               
               {includeLicensePlate && (
-                <div className="flex justify-between py-2">
+                <div className="flex justify-between py-1 text-xs">
                   <span>
                     لوحة الأرقام 
-                    {licensePlateSubjectToTax && <span className="text-sm text-gray-500"> (خاضعة للضريبة)</span>}
+                    {licensePlateSubjectToTax && <span className="text-xs text-gray-500"> (خاضعة للضريبة)</span>}
                   </span>
                   <span className="font-medium">{licensePlatePrice.toLocaleString()} ريال</span>
                 </div>
               )}
               
-              <Separator />
-              
-              <div className="flex justify-between py-2">
-                <span>المجموع الفرعي</span>
-                <span className="font-medium">{totalBeforeTax.toLocaleString()} ريال</span>
+              <div className="border-t border-slate-200 pt-2">
+                <div className="flex justify-between py-1 text-xs">
+                  <span>المجموع الفرعي</span>
+                  <span className="font-medium">{totalBeforeTax.toLocaleString()} ريال</span>
+                </div>
+                
+                <div className="flex justify-between py-1 text-xs">
+                  <span>ضريبة القيمة المضافة ({taxRate}%)</span>
+                  <span className="font-medium">{taxAmount.toLocaleString()} ريال</span>
+                </div>
               </div>
               
-              <div className="flex justify-between py-2">
-                <span>ضريبة القيمة المضافة ({taxRate}%)</span>
-                <span className="font-medium">{taxAmount.toLocaleString()} ريال</span>
-              </div>
-              
-              <Separator />
-              
-              <div className="flex justify-between py-3 text-lg font-bold">
-                <span>المجموع الكلي</span>
-                <span>{grandTotal.toLocaleString()} ريال</span>
-              </div>
-              
-              <div className="text-center text-sm text-gray-600 mt-2">
-                {numberToArabic(grandTotal)} ريال سعودي لا غير
+              <div className="border-t border-slate-200 pt-2">
+                <div className="flex justify-between py-2 text-sm font-bold bg-slate-100 px-2 rounded">
+                  <span>المجموع الكلي</span>
+                  <span>{grandTotal.toLocaleString()} ريال</span>
+                </div>
+                
+                <div className="text-center text-xs text-gray-600 mt-2">
+                  {numberToArabic(grandTotal)} ريال سعودي لا غير
+                </div>
               </div>
             </div>
           </div>
 
           {/* Notes Section */}
           {notes && (
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-4">ملاحظات</h2>
-              <p className="text-sm text-gray-700 leading-relaxed">{notes}</p>
+            <div className="border border-slate-200 rounded-lg p-3 mb-3">
+              <h3 className="text-sm font-semibold mb-2 text-gray-600">ملاحظات</h3>
+              <p className="text-xs text-gray-700 leading-relaxed">{notes}</p>
             </div>
           )}
-
-          <Separator className="my-6" />
 
           {/* Terms and Conditions */}
           <div className="mb-6">
