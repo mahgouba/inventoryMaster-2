@@ -315,7 +315,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
       // The trim levels query will automatically refetch when these change
       refetchTrimLevels();
     }
-  }, [selectedManufacturer, selectedCategory, refetchTrimLevels]);
+  }, [selectedManufacturer, selectedCategory]);
 
   // Update available trim levels when trim levels data changes
   useEffect(() => {
