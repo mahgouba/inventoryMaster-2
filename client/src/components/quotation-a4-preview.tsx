@@ -140,7 +140,7 @@ export default function QuotationA4Preview({
               </div>
               
               <div className="text-right text-sm">
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3">
+                <div className="backdrop-blur-sm rounded-lg p-3 bg-[#015a7400] mt-[-7px] mb-[-7px] pt-[11px] pb-[11px] pl-[20px] pr-[20px] text-right">
                   <h2 className="text-lg font-bold mb-1">عرض سعر</h2>
                   <p className="text-blue-100 text-xs">رقم: {quoteNumber}</p>
                   <p className="text-blue-100 text-xs">التاريخ: {new Date().toLocaleDateString('ar-SA')}</p>
