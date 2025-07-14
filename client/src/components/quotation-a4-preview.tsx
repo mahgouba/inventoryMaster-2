@@ -98,8 +98,8 @@ export default function QuotationA4Preview({
         }} />
         
         <div className="h-full">
-          {/* Modern Header Section */}
-          <div className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 mb-3 rounded-lg">
+          {/* Modern Header Section - Green theme from Albarimi template */}
+          <div className="relative bg-gradient-to-r from-green-600 to-green-800 text-white p-4 mb-3 rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 {selectedCompany?.logo && (
@@ -115,7 +115,7 @@ export default function QuotationA4Preview({
                   <h1 className="text-xl font-bold mb-1">
                     {selectedCompany?.name || "اسم الشركة"}
                   </h1>
-                  <p className="text-blue-100 text-xs">
+                  <p className="text-green-100 text-xs">
                     {selectedCompany?.address || "العنوان"}
                   </p>
                 </div>
@@ -124,16 +124,16 @@ export default function QuotationA4Preview({
               <div className="text-right text-sm">
                 <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3">
                   <h2 className="text-lg font-bold mb-1">عرض سعر</h2>
-                  <p className="text-blue-100 text-xs">رقم: {quoteNumber}</p>
-                  <p className="text-blue-100 text-xs">التاريخ: {new Date().toLocaleDateString('ar-SA')}</p>
-                  <p className="text-blue-100 text-xs">صالح حتى: {validUntil.toLocaleDateString('ar-SA')}</p>
+                  <p className="text-green-100 text-xs">رقم: {quoteNumber}</p>
+                  <p className="text-green-100 text-xs">التاريخ: {new Date().toLocaleDateString('ar-SA')}</p>
+                  <p className="text-green-100 text-xs">صالح حتى: {validUntil.toLocaleDateString('ar-SA')}</p>
                 </div>
               </div>
             </div>
             
             {/* Contact Info Strip */}
             <div className="absolute bottom-0 left-0 right-0 bg-black/20 backdrop-blur-sm p-2 rounded-b-lg">
-              <div className="flex justify-between items-center text-xs text-blue-100">
+              <div className="flex justify-between items-center text-xs text-green-100">
                 <div className="flex items-center gap-3">
                   {selectedCompany?.phone && (
                     <div className="flex items-center gap-1">
@@ -172,7 +172,7 @@ export default function QuotationA4Preview({
           <div className="grid grid-cols-2 gap-3 mb-3">
             {/* Customer Information */}
             <div className="border border-slate-200 rounded-lg p-3">
-              <h3 className="text-sm font-semibold mb-2 text-blue-600">بيانات العميل</h3>
+              <h3 className="text-sm font-semibold mb-2 text-green-600">بيانات العميل</h3>
               <div className="space-y-1 text-xs">
                 <div>
                   <span className="font-medium">الاسم: </span>
@@ -216,7 +216,7 @@ export default function QuotationA4Preview({
           {/* Vehicle Information */}
           {selectedVehicle && (
             <div className="border border-slate-200 rounded-lg p-3 mb-3">
-              <h3 className="text-sm font-semibold mb-2 text-purple-600">بيانات المركبة</h3>
+              <h3 className="text-sm font-semibold mb-2 text-gray-700">بيانات المركبة</h3>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <span className="font-medium">الصانع: </span>
@@ -257,7 +257,7 @@ export default function QuotationA4Preview({
               {/* Detailed Specifications */}
               {vehicleSpecs && (
                 <div className="mt-3 pt-3 border-t border-slate-200">
-                  <h4 className="text-xs font-semibold mb-2 text-orange-600">المواصفات التفصيلية</h4>
+              <h4 className="text-xs font-semibold mb-2 text-gray-600">المواصفات التفصيلية</h4>
                   <div className="grid grid-cols-3 gap-2 text-xs">
                     <div>
                       <span className="font-medium">نوع المحرك: </span>
@@ -343,46 +343,54 @@ export default function QuotationA4Preview({
             </div>
           )}
 
-          {/* Price Breakdown */}
-          <div className="border border-slate-200 rounded-lg p-3 mb-3">
-            <h3 className="text-sm font-semibold mb-2 text-red-600">تفاصيل السعر</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between py-1 text-xs">
-                <span>سعر المركبة الأساسي</span>
-                <span className="font-medium">{basePrice.toLocaleString()} ريال</span>
+          {/* Price Breakdown Table - Following Albarimi style */}
+          <div className="border border-slate-200 rounded-lg mb-3">
+            <div className="bg-green-600 text-white p-2 rounded-t-lg">
+              <h3 className="text-sm font-semibold text-center">تفاصيل السعر</h3>
+            </div>
+            
+            {/* Table Header */}
+            <div className="grid grid-cols-5 bg-gray-100 border-b border-gray-300 text-xs font-semibold text-center">
+              <div className="p-2 border-l border-gray-300">الموديل</div>
+              <div className="p-2 border-l border-gray-300">الكمية</div>
+              <div className="p-2 border-l border-gray-300">السعر الفردي</div>
+              <div className="p-2 border-l border-gray-300">الضريبة ({taxRate}%)</div>
+              <div className="p-2">الإجمالي</div>
+            </div>
+            
+            {/* Table Row */}
+            <div className="grid grid-cols-5 border-b border-gray-200 text-xs text-center">
+              <div className="p-2 border-l border-gray-200 font-medium">
+                {selectedVehicle ? `${selectedVehicle.year} ${selectedVehicle.manufacturer} ${selectedVehicle.category}` : "المركبة المحددة"}
               </div>
-              
-              {includeLicensePlate && (
-                <div className="flex justify-between py-1 text-xs">
-                  <span>
-                    لوحة الأرقام 
-                    {licensePlateSubjectToTax && <span className="text-xs text-gray-500"> (خاضعة للضريبة)</span>}
-                  </span>
-                  <span className="font-medium">{licensePlatePrice.toLocaleString()} ريال</span>
+              <div className="p-2 border-l border-gray-200">1</div>
+              <div className="p-2 border-l border-gray-200 font-medium">{basePrice.toLocaleString()}</div>
+              <div className="p-2 border-l border-gray-200 font-medium">{taxAmount.toLocaleString()}</div>
+              <div className="p-2 font-bold text-green-700">{grandTotal.toLocaleString()}</div>
+            </div>
+            
+            {/* License Plate Row if included */}
+            {includeLicensePlate && (
+              <div className="grid grid-cols-5 border-b border-gray-200 text-xs text-center">
+                <div className="p-2 border-l border-gray-200 font-medium">لوحة الأرقام</div>
+                <div className="p-2 border-l border-gray-200">1</div>
+                <div className="p-2 border-l border-gray-200 font-medium">{licensePlatePrice.toLocaleString()}</div>
+                <div className="p-2 border-l border-gray-200 font-medium">
+                  {licensePlateSubjectToTax ? Math.round(licensePlatePrice * taxRate / 100).toLocaleString() : "0"}
                 </div>
-              )}
-              
-              <div className="border-t border-slate-200 pt-2">
-                <div className="flex justify-between py-1 text-xs">
-                  <span>المجموع الفرعي</span>
-                  <span className="font-medium">{totalBeforeTax.toLocaleString()} ريال</span>
-                </div>
-                
-                <div className="flex justify-between py-1 text-xs">
-                  <span>ضريبة القيمة المضافة ({taxRate}%)</span>
-                  <span className="font-medium">{taxAmount.toLocaleString()} ريال</span>
+                <div className="p-2 font-medium">{(licensePlatePrice + (licensePlateSubjectToTax ? Math.round(licensePlatePrice * taxRate / 100) : 0)).toLocaleString()}</div>
+              </div>
+            )}
+            
+            {/* Total Row */}
+            <div className="bg-green-50 p-3 rounded-b-lg">
+              <div className="flex justify-center">
+                <div className="text-lg font-bold text-green-800">
+                  المجموع: {grandTotal.toLocaleString()} ريال
                 </div>
               </div>
-              
-              <div className="border-t border-slate-200 pt-2">
-                <div className="flex justify-between py-2 text-sm font-bold bg-slate-100 px-2 rounded">
-                  <span>المجموع الكلي</span>
-                  <span>{grandTotal.toLocaleString()} ريال</span>
-                </div>
-                
-                <div className="text-center text-xs text-gray-600 mt-2">
-                  {numberToArabic(grandTotal)} ريال سعودي لا غير
-                </div>
+              <div className="text-center text-xs text-gray-600 mt-2">
+                {numberToArabic(grandTotal)} ريال سعودي لا غير
               </div>
             </div>
           </div>
@@ -395,24 +403,23 @@ export default function QuotationA4Preview({
             </div>
           )}
 
-          {/* Terms and Conditions */}
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4">الشروط والأحكام</h2>
-            <ul className="text-sm text-gray-700 space-y-2">
-              <li>• هذا العرض صالح لمدة {Math.ceil((validUntil.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} يوم من تاريخ الإصدار</li>
-              <li>• الأسعار المذكورة شاملة لضريبة القيمة المضافة</li>
-              <li>• يجب تأكيد الطلب خلال فترة صلاحية العرض</li>
-              <li>• الشركة غير مسؤولة عن أي تأخير في التسليم خارج عن إرادتها</li>
-              <li>• جميع المواصفات والألوان متوفرة حسب المخزون</li>
-            </ul>
+          {/* Terms and Conditions - Following Albarimi style */}
+          <div className="border border-slate-200 rounded-lg p-3 mb-3">
+            <h3 className="text-sm font-semibold mb-2 text-green-600">الشروط والأحكام</h3>
+            <div className="space-y-1 text-xs text-gray-700">
+              <p>• التسليم بمستودعاتنا</p>
+              <p>• السيارة مضمونة لدى الوكيل العام بالمملكة العربية السعودية</p>
+              <p>• السعر يشمل ضريبة القيمة المضافة واللوحات والاستمارة</p>
+              <p>• هذا العرض صالح حتى {validUntil.toLocaleDateString('ar-SA')}</p>
+            </div>
           </div>
 
-          {/* Footer */}
-          <div className="mt-8 text-center text-sm text-gray-600">
-            <p>نشكركم لثقتكم بنا ونتطلع لخدمتكم</p>
-            <p className="mt-2">
-              {selectedCompany?.name || "اسم الشركة"} - {selectedCompany?.phone || "الهاتف"}
-            </p>
+          {/* Footer - Albarimi style */}
+          <div className="text-center pt-4">
+            <div className="border-t-2 border-green-600 pt-3">
+              <p className="text-sm text-gray-600 mb-2">وتفضلوا بقبول فائق الاحترام،،،</p>
+              <p className="text-lg font-bold text-green-700">{selectedCompany?.name || "اسم الشركة"}</p>
+            </div>
           </div>
         </div>
       </div>
