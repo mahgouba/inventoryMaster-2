@@ -302,6 +302,41 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     const validUntilDate = new Date();
     validUntilDate.setDate(validUntilDate.getDate() + validityDays);
 
+    // Format detailed specifications for the quotation
+    const formatSpecifications = () => {
+      if (!vehicleSpecs) return "";
+      
+      const specs = [];
+      if (vehicleSpecs.engine) specs.push(`المحرك: ${vehicleSpecs.engine}`);
+      if (vehicleSpecs.transmission) specs.push(`ناقل الحركة: ${vehicleSpecs.transmission}`);
+      if (vehicleSpecs.drivetrain) specs.push(`نظام الدفع: ${vehicleSpecs.drivetrain}`);
+      if (vehicleSpecs.fuelType) specs.push(`نوع الوقود: ${vehicleSpecs.fuelType}`);
+      if (vehicleSpecs.fuelCapacity) specs.push(`سعة خزان الوقود: ${vehicleSpecs.fuelCapacity}`);
+      if (vehicleSpecs.seatingCapacity) specs.push(`عدد المقاعد: ${vehicleSpecs.seatingCapacity}`);
+      if (vehicleSpecs.wheelbase) specs.push(`قاعدة العجلات: ${vehicleSpecs.wheelbase}`);
+      if (vehicleSpecs.length) specs.push(`الطول: ${vehicleSpecs.length}`);
+      if (vehicleSpecs.width) specs.push(`العرض: ${vehicleSpecs.width}`);
+      if (vehicleSpecs.height) specs.push(`الارتفاع: ${vehicleSpecs.height}`);
+      if (vehicleSpecs.groundClearance) specs.push(`المسافة من الأرض: ${vehicleSpecs.groundClearance}`);
+      if (vehicleSpecs.curbWeight) specs.push(`الوزن الفارغ: ${vehicleSpecs.curbWeight}`);
+      if (vehicleSpecs.maxSpeed) specs.push(`السرعة القصوى: ${vehicleSpecs.maxSpeed}`);
+      if (vehicleSpecs.acceleration) specs.push(`التسارع 0-100: ${vehicleSpecs.acceleration}`);
+      if (vehicleSpecs.safetyFeatures) specs.push(`مميزات الأمان: ${vehicleSpecs.safetyFeatures}`);
+      if (vehicleSpecs.infotainment) specs.push(`نظام المعلومات والترفيه: ${vehicleSpecs.infotainment}`);
+      if (vehicleSpecs.connectivity) specs.push(`الاتصال: ${vehicleSpecs.connectivity}`);
+      if (vehicleSpecs.driverAssistance) specs.push(`مساعدة السائق: ${vehicleSpecs.driverAssistance}`);
+      if (vehicleSpecs.comfortFeatures) specs.push(`مميزات الراحة: ${vehicleSpecs.comfortFeatures}`);
+      if (vehicleSpecs.exteriorFeatures) specs.push(`مميزات خارجية: ${vehicleSpecs.exteriorFeatures}`);
+      if (vehicleSpecs.interiorFeatures) specs.push(`مميزات داخلية: ${vehicleSpecs.interiorFeatures}`);
+      if (vehicleSpecs.wheelsTires) specs.push(`العجلات والإطارات: ${vehicleSpecs.wheelsTires}`);
+      if (vehicleSpecs.suspension) specs.push(`نظام التعليق: ${vehicleSpecs.suspension}`);
+      if (vehicleSpecs.brakes) specs.push(`نظام الفرامل: ${vehicleSpecs.brakes}`);
+      if (vehicleSpecs.warranty) specs.push(`الضمان: ${vehicleSpecs.warranty}`);
+      if (vehicleSpecs.notes) specs.push(`ملاحظات: ${vehicleSpecs.notes}`);
+      
+      return specs.join(' • ');
+    };
+
     const quotationData: InsertQuotation = {
       quoteNumber,
       inventoryItemId: editableVehicle.id || 0,
@@ -313,7 +348,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
       interiorColor: editableVehicle.interiorColor,
       chassisNumber: editableVehicle.chassisNumber,
       engineCapacity: editableVehicle.engineCapacity,
-      specifications: "",
+      specifications: formatSpecifications(),
       basePrice: pricingDetails.basePrice.toString(),
       finalPrice: totals.finalTotal.toString(),
       customerName: customerName.trim(),
