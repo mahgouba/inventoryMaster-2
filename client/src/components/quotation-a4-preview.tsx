@@ -150,7 +150,7 @@ export default function QuotationA4Preview({
             </div>
             
             {/* Contact Info Strip */}
-            <div className="absolute bottom-0 left-0 right-0 bg-black/20 backdrop-blur-sm p-2 rounded-b-lg">
+            <div className="absolute bottom-0 left-0 right-0 backdrop-blur-sm p-2 rounded-b-lg bg-[#bf9231]">
               <div className="flex justify-between items-center text-xs text-blue-100">
                 <div className="flex items-center gap-3">
                   {selectedCompany?.phone && (
