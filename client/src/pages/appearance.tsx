@@ -817,61 +817,64 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                               className="w-16 h-16 object-contain mx-auto border rounded"
                             />
                             <div className="flex items-center justify-center space-x-2 space-x-reverse">
-                              <label className="cursor-pointer">
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  className="hidden"
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                      console.log('File selected:', file.name, 'Size:', file.size);
-                                      
-                                      // Check file size (limit to 5MB)
-                                      if (file.size > 5 * 1024 * 1024) {
-                                        toast({
-                                          title: "خطأ في حجم الملف",
-                                          description: "حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت",
-                                          variant: "destructive",
-                                        });
-                                        return;
-                                      }
-
-                                      const reader = new FileReader();
-                                      reader.onload = (event) => {
-                                        const result = event.target?.result as string;
-                                        if (result) {
-                                          console.log('File read successfully, updating logo...');
-                                          updateManufacturerLogoMutation.mutate({
-                                            id: manufacturer.id,
-                                            logo: result,
-                                          });
-                                        }
-                                      };
-                                      reader.onerror = () => {
-                                        console.error('Error reading file');
-                                        toast({
-                                          title: "خطأ في قراءة الملف",
-                                          description: "حدث خطأ أثناء قراءة الصورة",
-                                          variant: "destructive",
-                                        });
-                                      };
-                                      reader.readAsDataURL(file);
-                                    } else {
-                                      console.log('No file selected');
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                id={`file-change-${manufacturer.id}`}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    console.log('File selected:', file.name, 'Size:', file.size);
+                                    
+                                    // Check file size (limit to 5MB)
+                                    if (file.size > 5 * 1024 * 1024) {
+                                      toast({
+                                        title: "خطأ في حجم الملف",
+                                        description: "حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت",
+                                        variant: "destructive",
+                                      });
+                                      return;
                                     }
-                                  }}
-                                />
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  disabled={updateManufacturerLogoMutation.isPending}
-                                  onClick={() => console.log('Change logo button clicked')}
-                                >
-                                  <Edit2 size={14} />
-                                  {updateManufacturerLogoMutation.isPending ? "جاري التحديث..." : "تغيير"}
-                                </Button>
-                              </label>
+
+                                    const reader = new FileReader();
+                                    reader.onload = (event) => {
+                                      const result = event.target?.result as string;
+                                      if (result) {
+                                        console.log('File read successfully, updating logo...');
+                                        updateManufacturerLogoMutation.mutate({
+                                          id: manufacturer.id,
+                                          logo: result,
+                                        });
+                                      }
+                                    };
+                                    reader.onerror = () => {
+                                      console.error('Error reading file');
+                                      toast({
+                                        title: "خطأ في قراءة الملف",
+                                        description: "حدث خطأ أثناء قراءة الصورة",
+                                        variant: "destructive",
+                                      });
+                                    };
+                                    reader.readAsDataURL(file);
+                                  } else {
+                                    console.log('No file selected');
+                                  }
+                                }}
+                              />
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                disabled={updateManufacturerLogoMutation.isPending}
+                                onClick={() => {
+                                  console.log('Change logo button clicked');
+                                  const fileInput = document.getElementById(`file-change-${manufacturer.id}`) as HTMLInputElement;
+                                  fileInput?.click();
+                                }}
+                              >
+                                <Edit2 size={14} />
+                                {updateManufacturerLogoMutation.isPending ? "جاري التحديث..." : "تغيير"}
+                              </Button>
                               <Button 
                                 variant="outline" 
                                 size="sm" 
@@ -893,61 +896,64 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                               <ImageIcon size={24} className="text-slate-400" />
                             </div>
                             <div className="text-center">
-                              <label className="cursor-pointer">
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  className="hidden"
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                      console.log('File selected:', file.name, 'Size:', file.size);
-                                      
-                                      // Check file size (limit to 5MB)
-                                      if (file.size > 5 * 1024 * 1024) {
-                                        toast({
-                                          title: "خطأ في حجم الملف",
-                                          description: "حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت",
-                                          variant: "destructive",
-                                        });
-                                        return;
-                                      }
-
-                                      const reader = new FileReader();
-                                      reader.onload = (event) => {
-                                        const result = event.target?.result as string;
-                                        if (result) {
-                                          console.log('File read successfully, updating logo...');
-                                          updateManufacturerLogoMutation.mutate({
-                                            id: manufacturer.id,
-                                            logo: result,
-                                          });
-                                        }
-                                      };
-                                      reader.onerror = () => {
-                                        console.error('Error reading file');
-                                        toast({
-                                          title: "خطأ في قراءة الملف",
-                                          description: "حدث خطأ أثناء قراءة الصورة",
-                                          variant: "destructive",
-                                        });
-                                      };
-                                      reader.readAsDataURL(file);
-                                    } else {
-                                      console.log('No file selected');
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                id={`file-upload-${manufacturer.id}`}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    console.log('File selected:', file.name, 'Size:', file.size);
+                                    
+                                    // Check file size (limit to 5MB)
+                                    if (file.size > 5 * 1024 * 1024) {
+                                      toast({
+                                        title: "خطأ في حجم الملف",
+                                        description: "حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت",
+                                        variant: "destructive",
+                                      });
+                                      return;
                                     }
-                                  }}
-                                />
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  disabled={updateManufacturerLogoMutation.isPending}
-                                  onClick={() => console.log('Upload logo button clicked')}
-                                >
-                                  <Upload size={14} />
-                                  {updateManufacturerLogoMutation.isPending ? "جاري الرفع..." : "رفع شعار"}
-                                </Button>
-                              </label>
+
+                                    const reader = new FileReader();
+                                    reader.onload = (event) => {
+                                      const result = event.target?.result as string;
+                                      if (result) {
+                                        console.log('File read successfully, updating logo...');
+                                        updateManufacturerLogoMutation.mutate({
+                                          id: manufacturer.id,
+                                          logo: result,
+                                        });
+                                      }
+                                    };
+                                    reader.onerror = () => {
+                                      console.error('Error reading file');
+                                      toast({
+                                        title: "خطأ في قراءة الملف",
+                                        description: "حدث خطأ أثناء قراءة الصورة",
+                                        variant: "destructive",
+                                      });
+                                    };
+                                    reader.readAsDataURL(file);
+                                  } else {
+                                    console.log('No file selected');
+                                  }
+                                }}
+                              />
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                disabled={updateManufacturerLogoMutation.isPending}
+                                onClick={() => {
+                                  console.log('Upload logo button clicked');
+                                  const fileInput = document.getElementById(`file-upload-${manufacturer.id}`) as HTMLInputElement;
+                                  fileInput?.click();
+                                }}
+                              >
+                                <Upload size={14} />
+                                {updateManufacturerLogoMutation.isPending ? "جاري الرفع..." : "رفع شعار"}
+                              </Button>
                             </div>
                           </div>
                         )}
