@@ -330,7 +330,7 @@ export default function QuotationA4Preview({
                   المجموع: {grandTotal.toLocaleString()} ريال
                 </div>
               </div>
-              <div className="text-center text-xs text-gray-600 mt-2">
+              <div className="text-center text-xs mt-2 font-bold text-[#ffffff]">
                 {numberToArabic(grandTotal)} ريال سعودي لا غير
               </div>
             </div>
