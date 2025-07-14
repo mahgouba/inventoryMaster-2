@@ -4,11 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { QrCode, Phone, Mail, Globe, Building } from "lucide-react";
 import { numberToArabic } from "@/utils/number-to-arabic";
-import type { Company, InventoryItem } from "@shared/schema";
+import type { Company, InventoryItem, Specification } from "@shared/schema";
 
 interface QuotationA4PreviewProps {
   selectedCompany: Company | null;
   selectedVehicle: InventoryItem | null;
+  vehicleSpecs?: Specification | null;
   quoteNumber: string;
   customerName: string;
   customerPhone: string;
@@ -31,6 +32,7 @@ interface QuotationA4PreviewProps {
 export default function QuotationA4Preview({
   selectedCompany,
   selectedVehicle,
+  vehicleSpecs,
   quoteNumber,
   customerName,
   customerPhone,
@@ -62,6 +64,7 @@ export default function QuotationA4Preview({
     <div className="w-full bg-slate-50 dark:bg-slate-800 p-4">
       {/* Fixed A4 Container */}
       <div 
+        data-pdf-export="quotation"
         className="mx-auto bg-white text-black shadow-2xl border border-slate-200 overflow-hidden"
         style={{
           width: '210mm',
@@ -240,7 +243,100 @@ export default function QuotationA4Preview({
                   <span className="font-medium">رقم الهيكل: </span>
                   <span>{selectedVehicle.chassisNumber}</span>
                 </div>
+                {selectedVehicle.trimLevel && (
+                  <div>
+                    <span className="font-medium">الفئة التفصيلية: </span>
+                    <span>{selectedVehicle.trimLevel}</span>
+                  </div>
+                )}
               </div>
+              
+              {/* Detailed Specifications */}
+              {vehicleSpecs && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold mb-3">المواصفات التفصيلية</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium">نوع المحرك: </span>
+                      <span>{vehicleSpecs.engineType || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">القوة الحصانية: </span>
+                      <span>{vehicleSpecs.horsepower || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">ناقل الحركة: </span>
+                      <span>{vehicleSpecs.transmission || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">نوع الوقود: </span>
+                      <span>{vehicleSpecs.fuelType || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">استهلاك الوقود: </span>
+                      <span>{vehicleSpecs.fuelConsumption || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">نوع الدفع: </span>
+                      <span>{vehicleSpecs.drivetrain || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">نوع الإطارات: </span>
+                      <span>{vehicleSpecs.tireSize || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">الأبعاد: </span>
+                      <span>{vehicleSpecs.dimensions || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">الوزن: </span>
+                      <span>{vehicleSpecs.weight || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">سعة التحميل: </span>
+                      <span>{vehicleSpecs.loadCapacity || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">عدد المقاعد: </span>
+                      <span>{vehicleSpecs.seatingCapacity || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">نوع التعليق: </span>
+                      <span>{vehicleSpecs.suspension || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">التسارع: </span>
+                      <span>{vehicleSpecs.acceleration || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">السرعة القصوى: </span>
+                      <span>{vehicleSpecs.topSpeed || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">أنظمة الأمان: </span>
+                      <span>{vehicleSpecs.safetyFeatures || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">أنظمة الترفيه: </span>
+                      <span>{vehicleSpecs.infotainment || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">معدات إضافية: </span>
+                      <span>{vehicleSpecs.additionalEquipment || "غير محدد"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">الضمان: </span>
+                      <span>{vehicleSpecs.warranty || "غير محدد"}</span>
+                    </div>
+                    {vehicleSpecs.notes && (
+                      <div className="col-span-2">
+                        <span className="font-medium">ملاحظات: </span>
+                        <span>{vehicleSpecs.notes}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

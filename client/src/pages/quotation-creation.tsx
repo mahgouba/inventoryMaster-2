@@ -25,7 +25,8 @@ import {
   QrCode,
   Search,
   Calculator,
-  Printer
+  Printer,
+  Download
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useTheme } from "@/hooks/useTheme";
@@ -36,6 +37,8 @@ import type { InventoryItem, Specification, InsertQuotation, Company } from "@sh
 import { numberToArabic } from "@/utils/number-to-arabic";
 import QuotationA4Preview from "@/components/quotation-a4-preview";
 import CompanyManagement from "@/components/company-management";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 interface QuotationCreationPageProps {
   vehicleData?: InventoryItem;
@@ -179,6 +182,69 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     return `Quote: ${quoteNumber}\nCustomer: ${customerName}\nVehicle: ${selectedVehicle?.manufacturer} ${selectedVehicle?.category}\nDate: ${new Date().toLocaleDateString('en-US')}`;
   };
 
+  // Export quotation as PDF
+  const exportToPDF = async () => {
+    try {
+      const element = document.querySelector('[data-pdf-export="quotation"]');
+      if (!element) {
+        toast({
+          title: "خطأ",
+          description: "لا يمكن العثور على العنصر المطلوب تصديره",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create canvas from HTML element
+      const canvas = await html2canvas(element as HTMLElement, {
+        scale: 2,
+        logging: false,
+        allowTaint: true,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+      });
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      // Calculate dimensions
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // Add image to PDF
+      pdf.addImage(
+        canvas.toDataURL('image/png'),
+        'PNG',
+        0,
+        0,
+        imgWidth,
+        imgHeight,
+        '',
+        'FAST'
+      );
+
+      // Save PDF
+      const filename = `عرض_سعر_${quoteNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(filename);
+
+      toast({
+        title: "تم التصدير بنجاح",
+        description: "تم تصدير عرض السعر إلى ملف PDF",
+      });
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      toast({
+        title: "خطأ في التصدير",
+        description: "حدث خطأ أثناء تصدير العرض إلى PDF",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Get vehicle specifications
   const { data: specifications = [] } = useQuery<Specification[]>({
     queryKey: ["/api/specifications"],
@@ -199,13 +265,22 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const manufacturerData = manufacturers.find(m => m.name === selectedVehicle?.manufacturer);
 
   // Get vehicle specifications for selected vehicle
-  const vehicleSpecs = specifications.find(spec => 
-    spec.manufacturer === editableVehicle?.manufacturer &&
-    spec.category === editableVehicle?.category &&
-    spec.trimLevel === editableVehicle?.trimLevel &&
-    spec.year === editableVehicle?.year &&
-    spec.engineCapacity === editableVehicle?.engineCapacity
-  );
+  const { data: vehicleSpecs } = useQuery<Specification>({
+    queryKey: ['/api/specifications', editableVehicle?.manufacturer, editableVehicle?.category, editableVehicle?.trimLevel, editableVehicle?.year, editableVehicle?.engineCapacity],
+    enabled: !!editableVehicle,
+    queryFn: async () => {
+      if (!editableVehicle) return null;
+      
+      const response = await fetch(
+        `/api/specifications/${editableVehicle.manufacturer}/${editableVehicle.category}/${editableVehicle.trimLevel || 'null'}/${editableVehicle.year}/${editableVehicle.engineCapacity}`
+      );
+      
+      if (response.ok) {
+        return response.json();
+      }
+      return null;
+    }
+  });
 
   // Get all quotations for viewing
   const { data: quotations = [] } = useQuery({
@@ -422,6 +497,15 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
               >
                 <Printer size={16} className="ml-2" />
                 طباعة العرض
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={exportToPDF}
+                className="border-purple-500 text-purple-600 hover:bg-purple-50"
+              >
+                <Download size={16} className="ml-2" />
+                تصدير PDF
               </Button>
               
               <Button
@@ -846,6 +930,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
               <QuotationA4Preview
                 selectedCompany={selectedCompanyData}
                 selectedVehicle={editableVehicle}
+                vehicleSpecs={vehicleSpecs}
                 quoteNumber={quoteNumber}
                 customerName={customerName}
                 customerPhone={customerPhone}
