@@ -223,10 +223,6 @@ export default function QuotationA4Preview({
                   <span className="font-medium">الهاتف: </span>
                   <span>{representativePhone || "غير محدد"}</span>
                 </div>
-                <div>
-                  <span className="font-medium">البريد: </span>
-                  <span>{representativeEmail || "غير محدد"}</span>
-                </div>
               </div>
             </div>
           </div>
