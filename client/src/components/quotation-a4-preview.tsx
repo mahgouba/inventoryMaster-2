@@ -133,9 +133,20 @@ export default function QuotationA4Preview({
                   <h1 className="text-xl font-bold mb-1">
                     {selectedCompany?.name || "اسم الشركة"}
                   </h1>
-                  <p className="text-blue-100 text-xs">
+                  <p className="text-blue-100 text-xs mb-1">
                     {selectedCompany?.address || "العنوان"}
                   </p>
+                  <div className="space-y-1 text-xs text-blue-100">
+                    {selectedCompany?.registrationNumber && (
+                      <p>رقم السجل التجاري: {selectedCompany.registrationNumber}</p>
+                    )}
+                    {selectedCompany?.taxNumber && (
+                      <p>الرقم الضريبي: {selectedCompany.taxNumber}</p>
+                    )}
+                    {selectedCompany?.licenseNumber && (
+                      <p>رقم الرخصة: {selectedCompany.licenseNumber}</p>
+                    )}
+                  </div>
                 </div>
               </div>
               
@@ -329,8 +340,6 @@ export default function QuotationA4Preview({
               <p className="text-xs text-gray-700 leading-relaxed">{notes}</p>
             </div>
           )}
-
-          
 
           {/* Footer - Albarimi style */}
           <div className="text-center pt-4">
