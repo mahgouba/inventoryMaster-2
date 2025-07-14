@@ -26,14 +26,17 @@ import {
   Search,
   Calculator,
   Printer,
-  Download
+  Download,
+  MessageCircle,
+  FileUp,
+  Settings2
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useTheme } from "@/hooks/useTheme";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
-import type { InventoryItem, Specification, InsertQuotation, Company } from "@shared/schema";
+import type { InventoryItem, Specification, InsertQuotation, Company, TermsAndConditions } from "@shared/schema";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import QuotationA4Preview from "@/components/quotation-a4-preview";
 import CompanyManagement from "@/components/company-management";
@@ -177,6 +180,13 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     isVATInclusive: false
   });
 
+  // New state variables for enhanced features
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [termsContent, setTermsContent] = useState("");
+  const [showTermsDialog, setShowTermsDialog] = useState(false);
+  const [showWhatsappDialog, setShowWhatsappDialog] = useState(false);
+  const [showCompanyManagement, setShowCompanyManagement] = useState(false);
+
   // Generate QR code data
   const generateQRData = () => {
     return `Quote: ${quoteNumber}\nCustomer: ${customerName}\nVehicle: ${selectedVehicle?.manufacturer} ${selectedVehicle?.category}\nDate: ${new Date().toLocaleDateString('en-US')}`;
@@ -244,6 +254,63 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
       });
     }
   };
+
+  // Convert quotation to invoice
+  const convertToInvoice = () => {
+    const invoiceData = {
+      quoteNumber,
+      customerName,
+      customerPhone,
+      customerEmail,
+      selectedVehicle,
+      pricingDetails,
+      notes,
+      type: "invoice"
+    };
+    
+    // Store invoice data for future invoice generation
+    localStorage.setItem('invoiceData', JSON.stringify(invoiceData));
+    
+    toast({
+      title: "تم التحويل بنجاح",
+      description: "تم تحويل عرض السعر إلى فاتورة",
+    });
+  };
+
+  // Share via WhatsApp
+  const shareViaWhatsApp = () => {
+    if (!whatsappNumber) {
+      toast({
+        title: "خطأ",
+        description: "يرجى إدخال رقم الواتساب",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const message = `
+🏢 عرض سعر رقم: ${quoteNumber}
+
+👤 العميل: ${customerName}
+🚗 السيارة: ${selectedVehicle?.manufacturer} ${selectedVehicle?.category} ${selectedVehicle?.year}
+💰 السعر النهائي: ${calculateTotals().finalTotal.toLocaleString()} ريال
+
+📱 للاستفسار:
+${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567890"}
+
+🏢 ${selectedCompanyData?.name || "شركة السيارات"}
+`;
+
+    const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    setShowWhatsappDialog(false);
+  };
+
+  // Get terms and conditions for selected company
+  const { data: companyTerms } = useQuery<TermsAndConditions>({
+    queryKey: ["/api/terms", selectedCompanyData?.id],
+    enabled: !!selectedCompanyData?.id,
+  });
 
   // Get vehicle specifications
   const { data: specifications = [] } = useQuery<Specification[]>({
@@ -489,23 +556,59 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
               <h1 className="text-xl font-bold text-slate-800 dark:text-slate-200">إنشاء عرض سعر</h1>
             </div>
             
-            <div className="flex items-center space-x-2 space-x-reverse">
+            <div className="flex items-center space-x-2 space-x-reverse flex-wrap gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowTermsDialog(true)}
+                className="border-orange-500 text-orange-600 hover:bg-orange-50"
+              >
+                <Settings2 size={16} className="ml-2" />
+                شروط
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => setShowCompanyManagement(true)}
+                className="border-indigo-500 text-indigo-600 hover:bg-indigo-50"
+              >
+                <Building2 size={16} className="ml-2" />
+                شركات
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => setShowWhatsappDialog(true)}
+                className="border-emerald-500 text-emerald-600 hover:bg-emerald-50"
+              >
+                <MessageCircle size={16} className="ml-2" />
+                واتساب
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={convertToInvoice}
+                className="border-purple-500 text-purple-600 hover:bg-purple-50"
+              >
+                <FileUp size={16} className="ml-2" />
+                فاتورة
+              </Button>
+              
               <Button
                 variant="outline"
                 onClick={() => window.print()}
                 className="border-blue-500 text-blue-600 hover:bg-blue-50"
               >
                 <Printer size={16} className="ml-2" />
-                طباعة العرض
+                طباعة
               </Button>
               
               <Button
                 variant="outline"
                 onClick={exportToPDF}
-                className="border-purple-500 text-purple-600 hover:bg-purple-50"
+                className="border-slate-500 text-slate-600 hover:bg-slate-50"
               >
                 <Download size={16} className="ml-2" />
-                تصدير PDF
+                PDF
               </Button>
               
               <Button
@@ -514,7 +617,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
                 <Save size={16} className="ml-2" />
-                {createQuotationMutation.isPending ? "جاري الحفظ..." : "حفظ عرض السعر"}
+                {createQuotationMutation.isPending ? "جاري الحفظ..." : "حفظ"}
               </Button>
             </div>
           </div>
@@ -1634,6 +1737,87 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
           <CompanyManagement />
         </DialogContent>
       </Dialog>
+      {/* WhatsApp Dialog */}
+      <Dialog open={showWhatsappDialog} onOpenChange={setShowWhatsappDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5 text-emerald-600" />
+              مشاركة عبر الواتساب
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="whatsapp-number">رقم الواتساب (مع رمز الدولة)</Label>
+              <Input
+                id="whatsapp-number"
+                placeholder="+966501234567"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                className="text-left"
+              />
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={shareViaWhatsApp} className="bg-emerald-600 hover:bg-emerald-700">
+                <MessageCircle size={16} className="ml-2" />
+                إرسال
+              </Button>
+              <Button variant="outline" onClick={() => setShowWhatsappDialog(false)}>
+                إلغاء
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Terms and Conditions Dialog */}
+      <Dialog open={showTermsDialog} onOpenChange={setShowTermsDialog}>
+        <DialogContent className="sm:max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings2 className="h-5 w-5 text-orange-600" />
+              الشروط والأحكام
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="terms-content">محتوى الشروط والأحكام</Label>
+              <Textarea
+                id="terms-content"
+                placeholder="أدخل الشروط والأحكام الخاصة بالشركة..."
+                value={companyTerms?.content || termsContent}
+                onChange={(e) => setTermsContent(e.target.value)}
+                className="min-h-[300px] text-right"
+              />
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={() => setShowTermsDialog(false)} className="bg-orange-600 hover:bg-orange-700">
+                <Save size={16} className="ml-2" />
+                حفظ
+              </Button>
+              <Button variant="outline" onClick={() => setShowTermsDialog(false)}>
+                إغلاق
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Company Management Dialog */}
+      <Dialog open={showCompanyManagement} onOpenChange={setShowCompanyManagement}>
+        <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-indigo-600" />
+              إدارة الشركات
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <CompanyManagement />
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { inventoryItems, users, manufacturers, type InsertInventoryItem } from "@shared/schema";
+import { inventoryItems, users, manufacturers, companies, termsAndConditions, type InsertInventoryItem } from "@shared/schema";
 import bcrypt from "bcryptjs";
 
 async function seedDatabase() {
@@ -318,6 +318,89 @@ async function seedDatabase() {
   } catch (error) {
     console.error("Error seeding database:", error);
   }
+
+  // Seed companies
+  console.log("🏢 Seeding companies...");
+  const sampleCompanies = [
+    {
+      name: "شركة المتقدمة للسيارات",
+      logo: null,
+      registrationNumber: "1234567890",
+      licenseNumber: "LIC-001-2025",
+      taxNumber: "123456789012345",
+      address: "حي الورود، طريق الملك فهد، الرياض 12345، المملكة العربية السعودية",
+      email: "info@advanced-cars.com",
+      website: "www.advanced-cars.com",
+      primaryColor: "#00627F",
+      secondaryColor: "#BF9231",
+      accentColor: "#64748B"
+    },
+    {
+      name: "مؤسسة النخبة للسيارات",
+      logo: null,
+      registrationNumber: "2345678901",
+      licenseNumber: "LIC-002-2025",
+      taxNumber: "234567890123456",
+      address: "حي السليمانية، شارع التحلية، جدة 21234، المملكة العربية السعودية",
+      email: "info@elite-motors.com",
+      website: "www.elite-motors.com",
+      primaryColor: "#1E3A8A",
+      secondaryColor: "#F59E0B",
+      accentColor: "#6B7280"
+    },
+    {
+      name: "مركز الفخامة للسيارات الفاخرة",
+      logo: null,
+      registrationNumber: "3456789012",
+      licenseNumber: "LIC-003-2025",
+      taxNumber: "345678901234567",
+      address: "حي الحمراء، طريق الأمير محمد بن عبدالعزيز، الدمام 31234، المملكة العربية السعودية",
+      email: "info@luxury-center.com",
+      website: "www.luxury-center.com",
+      primaryColor: "#7C2D12",
+      secondaryColor: "#DC2626",
+      accentColor: "#9CA3AF"
+    }
+  ];
+
+  for (const company of sampleCompanies) {
+    try {
+      await db.insert(companies).values(company);
+    } catch (error) {
+      console.log(`Company ${company.name} might already exist`);
+    }
+  }
+
+  // Seed terms and conditions for companies
+  console.log("📋 Seeding terms and conditions...");
+  const [firstCompany] = await db.select().from(companies).limit(1);
+  
+  if (firstCompany) {
+    const defaultTerms = {
+      companyId: firstCompany.id,
+      content: `الشروط والأحكام:
+
+1. العرض صالح للمدة المحددة فقط
+2. الأسعار المذكورة شاملة ضريبة القيمة المضافة حسب المحدد
+3. يمكن أن تتغير الأسعار بدون إشعار مسبق
+4. المركبة متوفرة حسب التوفر في المخزون
+5. يتطلب دفع عربون لحجز المركبة
+6. جميع المعاملات تخضع لقوانين المملكة العربية السعودية
+7. أي نزاع يُحل وفقاً للأنظمة المعمول بها في المملكة
+8. الشركة غير مسؤولة عن أي تأخير في التسليم لأسباب خارجة عن إرادتها
+9. يحق للعميل فحص المركبة قبل الاستلام النهائي
+10. الضمان حسب ضمان الوكيل المعتمد`,
+      isActive: true
+    };
+
+    try {
+      await db.insert(termsAndConditions).values(defaultTerms);
+    } catch (error) {
+      console.log("Terms and conditions might already exist");
+    }
+  }
+
+  console.log("✅ Database seeding completed successfully");
 }
 
 seedDatabase();

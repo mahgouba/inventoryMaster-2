@@ -1559,6 +1559,100 @@ export class DatabaseStorage implements IStorage {
       return undefined;
     }
   }
+
+  // Companies management methods
+  async getAllCompanies(): Promise<Company[]> {
+    try {
+      const results = await db.select().from(companies).orderBy(companies.name);
+      return results;
+    } catch (error) {
+      console.error('Get all companies error:', error);
+      return [];
+    }
+  }
+
+  async createCompany(data: InsertCompany): Promise<Company> {
+    try {
+      const [newCompany] = await db.insert(companies).values(data).returning();
+      return newCompany;
+    } catch (error) {
+      console.error('Create company error:', error);
+      throw error;
+    }
+  }
+
+  async updateCompany(id: number, data: InsertCompany): Promise<Company | undefined> {
+    try {
+      const [updatedCompany] = await db
+        .update(companies)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(companies.id, id))
+        .returning();
+      return updatedCompany;
+    } catch (error) {
+      console.error('Update company error:', error);
+      return undefined;
+    }
+  }
+
+  async deleteCompany(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(companies).where(eq(companies.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error('Delete company error:', error);
+      return false;
+    }
+  }
+
+  async getCompanyById(id: number): Promise<Company | undefined> {
+    try {
+      const [company] = await db.select().from(companies).where(eq(companies.id, id));
+      return company;
+    } catch (error) {
+      console.error('Get company by ID error:', error);
+      return undefined;
+    }
+  }
+
+  // Terms and conditions methods
+  async getTermsByCompanyId(companyId: number): Promise<TermsAndConditions | undefined> {
+    try {
+      const [terms] = await db
+        .select()
+        .from(termsAndConditions)
+        .where(eq(termsAndConditions.companyId, companyId))
+        .where(eq(termsAndConditions.isActive, true));
+      return terms;
+    } catch (error) {
+      console.error('Get terms by company ID error:', error);
+      return undefined;
+    }
+  }
+
+  async createTerms(data: InsertTermsAndConditions): Promise<TermsAndConditions> {
+    try {
+      const [newTerms] = await db.insert(termsAndConditions).values(data).returning();
+      return newTerms;
+    } catch (error) {
+      console.error('Create terms error:', error);
+      throw error;
+    }
+  }
+
+  async updateTerms(id: number, data: InsertTermsAndConditions): Promise<TermsAndConditions | undefined> {
+    try {
+      const [updatedTerms] = await db
+        .update(termsAndConditions)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(termsAndConditions.id, id))
+        .returning();
+      return updatedTerms;
+    } catch (error) {
+      console.error('Update terms error:', error);
+      return undefined;
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();

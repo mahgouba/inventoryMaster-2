@@ -46,19 +46,20 @@ export const manufacturers = pgTable("manufacturers", {
 export const companies = pgTable("companies", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(), // اسم الشركة
-  registrationNumber: text("registration_number").notNull(), // رقم السجل
+  logo: text("logo"), // شعار الشركة (Base64)
+  registrationNumber: text("registration_number").notNull(), // رقم السجل التجاري
   licenseNumber: text("license_number").notNull(), // رقم الرخصة
-  logo: text("logo"), // شعار الشركة
-  address: text("address"), // العنوان
+  taxNumber: text("tax_number").notNull(), // الرقم الضريبي
+  address: text("address").notNull(), // العنوان
   phone: text("phone"), // الهاتف
-  email: text("email"), // البريد الإلكتروني
+  email: text("email").notNull(), // البريد الإلكتروني
   website: text("website"), // الموقع الإلكتروني
-  taxNumber: text("tax_number"), // الرقم الضريبي
-  primaryColor: text("primary_color").default("#1a73e8"), // اللون الأساسي
-  secondaryColor: text("secondary_color").default("#34a853"), // اللون الثانوي
+  primaryColor: text("primary_color").default("#00627F").notNull(), // اللون الأساسي
+  secondaryColor: text("secondary_color").default("#BF9231").notNull(), // اللون الثانوي
+  accentColor: text("accent_color").default("#0891b2").notNull(), // لون التمييز
   isActive: boolean("is_active").default(true).notNull(), // نشط
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // Locations table for managing inventory locations
@@ -225,6 +226,18 @@ export const insertTrimLevelSchema = createInsertSchema(trimLevels).omit({
   createdAt: true,
 });
 
+
+
+// Terms and conditions table
+export const termsAndConditions = pgTable("terms_and_conditions", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").references(() => companies.id).notNull(),
+  content: text("content").notNull(), // محتوى الشروط والأحكام
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const insertCompanySchema = createInsertSchema(companies).omit({
   id: true,
   createdAt: true,
@@ -233,6 +246,15 @@ export const insertCompanySchema = createInsertSchema(companies).omit({
   name: z.string().min(1, "اسم الشركة مطلوب"),
   registrationNumber: z.string().min(1, "رقم السجل مطلوب"),
   licenseNumber: z.string().min(1, "رقم الرخصة مطلوب"),
+  taxNumber: z.string().min(1, "الرقم الضريبي مطلوب"),
+  address: z.string().min(1, "العنوان مطلوب"),
+  email: z.string().email("البريد الإلكتروني غير صحيح"),
+});
+
+export const insertTermsSchema = createInsertSchema(termsAndConditions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const insertQuotationSchema = createInsertSchema(quotations).omit({
@@ -353,6 +375,12 @@ export type InsertLowStockAlert = z.infer<typeof insertLowStockAlertSchema>;
 
 export type StockSettings = typeof stockSettings.$inferSelect;
 export type InsertStockSettings = z.infer<typeof insertStockSettingsSchema>;
+
+export type Company = typeof companies.$inferSelect;
+export type InsertCompany = z.infer<typeof insertCompanySchema>;
+
+export type TermsAndConditions = typeof termsAndConditions.$inferSelect;
+export type InsertTermsAndConditions = z.infer<typeof insertTermsSchema>;
 
 // Appearance settings table
 export const appearanceSettings = pgTable("appearance_settings", {
