@@ -323,6 +323,8 @@ export default function QuotationA4Preview({
               </div>
             )}
             
+
+            
             {/* Total Row */}
             <div className="p-3 rounded-b-lg bg-[#bf9231] pl-[0px] pr-[0px] pt-[7px] pb-[7px]" style={{backgroundColor: '#f8fafc', borderTop: '2px solid #00627F'}}>
               <div className="flex justify-center">
