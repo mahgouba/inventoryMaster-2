@@ -189,7 +189,7 @@ export default function QuotationA4Preview({
           {/* Customer & Representative Info Cards */}
           <div className="grid grid-cols-2 gap-3 mb-3">
             {/* Customer Information */}
-            <div className="border border-slate-200 rounded-lg p-3">
+            <div className="border border-slate-200 rounded-lg p-3 mt-[27px] mb-[27px]">
               <h3 className="text-sm font-semibold mb-2" style={{color: '#00627F'}}>بيانات العميل</h3>
               <div className="space-y-1 text-xs">
                 <div>
