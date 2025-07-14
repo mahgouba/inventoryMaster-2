@@ -439,10 +439,10 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Left Column - Vehicle Info & Basic Form */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6">
             
             {/* Selected Vehicle Card */}
             <Card>
@@ -832,36 +832,40 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
               </CardContent>
             </Card>
 
-            {/* A4 Preview Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>معاينة العرض (A4)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <QuotationA4Preview
-                  selectedCompany={selectedCompanyData}
-                  selectedVehicle={editableVehicle}
-                  quoteNumber={quoteNumber}
-                  customerName={customerName}
-                  customerPhone={customerPhone}
-                  customerEmail={customerEmail}
-                  validUntil={new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000)}
-                  basePrice={pricingDetails.basePrice * pricingDetails.quantity}
-                  finalPrice={calculateTotals().finalTotal}
-                  licensePlatePrice={pricingDetails.licensePlatePrice}
-                  includeLicensePlate={pricingDetails.includeLicensePlate}
-                  licensePlateSubjectToTax={pricingDetails.licensePlateSubjectToTax}
-                  taxRate={pricingDetails.taxRate}
-                  isVATInclusive={pricingDetails.isVATInclusive}
-                  representativeName={representatives.find(r => r.id === selectedRepresentative)?.name || "غير محدد"}
-                  representativePhone={representatives.find(r => r.id === selectedRepresentative)?.phone || "غير محدد"}
-                  representativeEmail={representatives.find(r => r.id === selectedRepresentative)?.email || "غير محدد"}
-                  representativePosition={representatives.find(r => r.id === selectedRepresentative)?.position || "غير محدد"}
-                  notes={notes}
-                />
-              </CardContent>
-            </Card>
+
           </div>
+        </div>
+        
+        {/* A4 Preview Section - Bottom */}
+        <div className="mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-center">معاينة العرض (A4)</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <QuotationA4Preview
+                selectedCompany={selectedCompanyData}
+                selectedVehicle={editableVehicle}
+                quoteNumber={quoteNumber}
+                customerName={customerName}
+                customerPhone={customerPhone}
+                customerEmail={customerEmail}
+                validUntil={new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000)}
+                basePrice={pricingDetails.basePrice * pricingDetails.quantity}
+                finalPrice={calculateTotals().finalTotal}
+                licensePlatePrice={pricingDetails.licensePlatePrice}
+                includeLicensePlate={pricingDetails.includeLicensePlate}
+                licensePlateSubjectToTax={pricingDetails.licensePlateSubjectToTax}
+                taxRate={pricingDetails.taxRate}
+                isVATInclusive={pricingDetails.isVATInclusive}
+                representativeName={representatives.find(r => r.id === selectedRepresentative)?.name || "غير محدد"}
+                representativePhone={representatives.find(r => r.id === selectedRepresentative)?.phone || "غير محدد"}
+                representativeEmail={representatives.find(r => r.id === selectedRepresentative)?.email || "غير محدد"}
+                representativePosition={representatives.find(r => r.id === selectedRepresentative)?.position || "غير محدد"}
+                notes={notes}
+              />
+            </CardContent>
+          </Card>
         </div>
       </div>
 

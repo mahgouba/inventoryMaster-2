@@ -59,17 +59,21 @@ export default function QuotationA4Preview({
   const grandTotal = isVATInclusive ? taxableAmount : totalBeforeTax + taxAmount;
 
   return (
-    <div className="w-full max-w-none">
-      {/* A4 Container with responsive scaling */}
+    <div className="w-full bg-slate-50 dark:bg-slate-800 p-4">
+      {/* Fixed A4 Container */}
       <div 
-        className="mx-auto bg-white text-black shadow-lg"
+        className="mx-auto bg-white text-black shadow-2xl border border-slate-200 overflow-hidden"
         style={{
           width: '210mm',
-          minHeight: '297mm',
-          maxWidth: '100%',
-          transform: 'scale(0.4)',
+          height: '297mm',
+          fontSize: '12pt',
+          fontFamily: '"Noto Sans Arabic", Arial, sans-serif',
+          padding: '20mm',
+          boxSizing: 'border-box',
+          direction: 'rtl',
+          transform: 'scale(0.7)',
           transformOrigin: 'top center',
-          marginBottom: '-60%',
+          marginBottom: '-30%',
         }}
       >
         {/* Mobile responsive scaling */}
