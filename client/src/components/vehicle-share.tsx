@@ -24,6 +24,8 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
   const [showSpecificationForm, setShowSpecificationForm] = useState(false);
   const [specificationDescription, setSpecificationDescription] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [sharePrice, setSharePrice] = useState(vehicle.price || "");
+  const [isEditingPrice, setIsEditingPrice] = useState(false);
 
   // Query for existing specification
   const { data: specification, isLoading } = useQuery<Specification>({
@@ -75,10 +77,23 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
   };
 
   const generateShareText = () => {
-    const baseText = `🚗 ${vehicle.manufacturer} ${vehicle.category}
+    let baseText = `🚗 ${vehicle.manufacturer} ${vehicle.category}
 ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
 📅 السنة: ${vehicle.year}
 ⚙️ سعة المحرك: ${vehicle.engineCapacity}`;
+
+    // Add colors
+    if (vehicle.exteriorColor) {
+      baseText += `\n🎨 اللون الخارجي: ${vehicle.exteriorColor}`;
+    }
+    if (vehicle.interiorColor) {
+      baseText += `\n🪑 اللون الداخلي: ${vehicle.interiorColor}`;
+    }
+
+    // Add price if available
+    if (sharePrice) {
+      baseText += `\n💰 السعر: ${sharePrice}`;
+    }
 
     const detailedDescription = specification?.detailedDescription || "";
     
@@ -147,6 +162,50 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
                   <Label className="text-sm font-medium text-slate-600">الحالة</Label>
                   <Badge variant="secondary">{vehicle.status}</Badge>
                 </div>
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">اللون الخارجي</Label>
+                  <p className="text-sm">{vehicle.exteriorColor}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">اللون الداخلي</Label>
+                  <p className="text-sm">{vehicle.interiorColor}</p>
+                </div>
+              </div>
+              
+              {/* Editable Price Section */}
+              <div className="border-t pt-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium text-slate-600">السعر للمشاركة</Label>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsEditingPrice(!isEditingPrice)}
+                    className="text-blue-600 hover:bg-blue-50"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                {isEditingPrice ? (
+                  <div className="flex gap-2 mt-2">
+                    <Input
+                      value={sharePrice}
+                      onChange={(e) => setSharePrice(e.target.value)}
+                      placeholder="أدخل السعر..."
+                      className="flex-1"
+                    />
+                    <Button
+                      size="sm"
+                      onClick={() => setIsEditingPrice(false)}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Save className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-sm mt-1 text-blue-600 font-medium">
+                    {sharePrice || "لم يتم تحديد السعر"}
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
