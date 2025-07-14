@@ -309,14 +309,6 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
     }
   }, [editItem, open, form, localManufacturerCategories]);
 
-  // Load trim levels when manufacturer and category change (for both new and edit items)
-  useEffect(() => {
-    if (selectedManufacturer && selectedCategory) {
-      // The trim levels query will automatically refetch when these change
-      refetchTrimLevels();
-    }
-  }, [selectedManufacturer, selectedCategory]);
-
   // Update available trim levels when trim levels data changes
   useEffect(() => {
     if (trimLevels) {
