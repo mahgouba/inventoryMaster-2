@@ -1547,7 +1547,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(quotation);
     } catch (error) {
       console.error("Error creating quotation:", error);
-      res.status(400).json({ message: "Invalid quotation data" });
+      if (error.errors) {
+        console.error("Validation errors:", error.errors);
+        res.status(400).json({ message: "Invalid quotation data", errors: error.errors });
+      } else {
+        res.status(400).json({ message: "Invalid quotation data" });
+      }
     }
   });
 

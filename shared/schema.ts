@@ -173,7 +173,12 @@ export const insertQuotationSchema = createInsertSchema(quotations).omit({
   customerName: z.string().min(1, "اسم العميل مطلوب"),
   basePrice: z.string().min(1, "السعر الأساسي مطلوب"),
   finalPrice: z.string().min(1, "السعر النهائي مطلوب"),
-  validUntil: z.string().min(1, "تاريخ انتهاء الصلاحية مطلوب"),
+  validUntil: z.union([z.string(), z.date()]).transform((val) => {
+    if (typeof val === 'string') {
+      return new Date(val);
+    }
+    return val;
+  }),
 });
 
 export type User = typeof users.$inferSelect;

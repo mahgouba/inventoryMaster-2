@@ -293,24 +293,30 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     const selectedRepData = representatives.find(rep => rep.id === selectedRepresentative);
     const selectedCompanyData = companies.find(comp => comp.id === selectedCompany);
 
+    const validUntilDate = new Date();
+    validUntilDate.setDate(validUntilDate.getDate() + validityDays);
+
     const quotationData: InsertQuotation = {
       quoteNumber,
+      inventoryItemId: editableVehicle.id || 0,
+      manufacturer: editableVehicle.manufacturer,
+      category: editableVehicle.category,
+      trimLevel: editableVehicle.trimLevel || "",
+      year: editableVehicle.year,
+      exteriorColor: editableVehicle.exteriorColor,
+      interiorColor: editableVehicle.interiorColor,
+      chassisNumber: editableVehicle.chassisNumber,
+      engineCapacity: editableVehicle.engineCapacity,
+      specifications: "",
+      basePrice: pricingDetails.basePrice.toString(),
+      finalPrice: totals.finalTotal.toString(),
       customerName: customerName.trim(),
       customerPhone: customerPhone.trim(),
       customerEmail: customerEmail.trim(),
-      vehicleManufacturer: editableVehicle.manufacturer,
-      vehicleCategory: editableVehicle.category,
-      vehicleTrimLevel: editableVehicle.trimLevel,
-      vehicleYear: editableVehicle.year,
-      vehicleEngineCapacity: editableVehicle.engineCapacity,
-      vehicleExteriorColor: editableVehicle.exteriorColor,
-      vehicleInteriorColor: editableVehicle.interiorColor,
-      vehicleChassisNumber: editableVehicle.chassisNumber,
-      basePrice: pricingDetails.basePrice,
-      finalPrice: totals.finalTotal,
-      validityDays,
-      status: "مسودة",
       notes: notes.trim(),
+      validUntil: validUntilDate.toISOString(),
+      status: "مسودة",
+      createdBy: "admin", // This should be the current user
       companyData: JSON.stringify(selectedCompanyData),
       representativeData: JSON.stringify(selectedRepData),
       quoteAppearance: JSON.stringify(quoteAppearance),

@@ -1331,8 +1331,8 @@ export class DatabaseStorage implements IStorage {
 
   async createQuotation(quotationData: InsertQuotation): Promise<Quotation> {
     try {
-      // Generate quote number
-      const quoteNumber = `Q-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      // Use the provided quote number or generate one if not provided
+      const quoteNumber = quotationData.quoteNumber || `Q-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
       
       const [quotation] = await db.insert(quotations).values({
         ...quotationData,
