@@ -306,7 +306,7 @@ export default function QuotationA4Preview({
             )}
             
             {/* Total Row */}
-            <div className="p-3 rounded-b-lg" style={{backgroundColor: '#f8fafc', borderTop: '2px solid #00627F'}}>
+            <div className="p-3 rounded-b-lg pt-[0px] pb-[0px] bg-[#bf9231]" style={{backgroundColor: '#f8fafc', borderTop: '2px solid #00627F'}}>
               <div className="flex justify-center">
                 <div className="text-lg font-bold" style={{color: '#00627F'}}>
                   المجموع: {grandTotal.toLocaleString()} ريال
