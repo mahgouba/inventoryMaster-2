@@ -42,6 +42,25 @@ export const manufacturers = pgTable("manufacturers", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Companies table for quotation management
+export const companies = pgTable("companies", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(), // اسم الشركة
+  registrationNumber: text("registration_number").notNull(), // رقم السجل
+  licenseNumber: text("license_number").notNull(), // رقم الرخصة
+  logo: text("logo"), // شعار الشركة
+  address: text("address"), // العنوان
+  phone: text("phone"), // الهاتف
+  email: text("email"), // البريد الإلكتروني
+  website: text("website"), // الموقع الإلكتروني
+  taxNumber: text("tax_number"), // الرقم الضريبي
+  primaryColor: text("primary_color").default("#1a73e8"), // اللون الأساسي
+  secondaryColor: text("secondary_color").default("#34a853"), // اللون الثانوي
+  isActive: boolean("is_active").default(true).notNull(), // نشط
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Locations table for managing inventory locations
 export const locations = pgTable("locations", {
   id: serial("id").primaryKey(),
@@ -165,6 +184,16 @@ export const insertTrimLevelSchema = createInsertSchema(trimLevels).omit({
   createdAt: true,
 });
 
+export const insertCompanySchema = createInsertSchema(companies).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  name: z.string().min(1, "اسم الشركة مطلوب"),
+  registrationNumber: z.string().min(1, "رقم السجل مطلوب"),
+  licenseNumber: z.string().min(1, "رقم الرخصة مطلوب"),
+});
+
 export const insertQuotationSchema = createInsertSchema(quotations).omit({
   id: true,
   createdAt: true,
@@ -187,6 +216,8 @@ export type InventoryItem = typeof inventoryItems.$inferSelect;
 export type InsertInventoryItem = typeof insertInventoryItemSchema._type;
 export type Manufacturer = typeof manufacturers.$inferSelect;
 export type InsertManufacturer = typeof insertManufacturerSchema._type;
+export type Company = typeof companies.$inferSelect;
+export type InsertCompany = typeof insertCompanySchema._type;
 export type Location = typeof locations.$inferSelect;
 export type InsertLocation = typeof insertLocationSchema._type;
 export type LocationTransfer = typeof locationTransfers.$inferSelect;

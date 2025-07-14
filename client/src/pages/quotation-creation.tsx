@@ -32,8 +32,10 @@ import { useTheme } from "@/hooks/useTheme";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
-import type { InventoryItem, Specification, InsertQuotation } from "@shared/schema";
+import type { InventoryItem, Specification, InsertQuotation, Company } from "@shared/schema";
 import { numberToArabic } from "@/utils/number-to-arabic";
+import QuotationA4Preview from "@/components/quotation-a4-preview";
+import CompanyManagement from "@/components/company-management";
 
 interface QuotationCreationPageProps {
   vehicleData?: InventoryItem;
@@ -108,7 +110,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [selectedRepresentative, setSelectedRepresentative] = useState<string>("");
   const [selectedCompany, setSelectedCompany] = useState<string>("");
   
-  // Available representatives and companies
+  // Available representatives
   const representatives = [
     { id: "1", name: "أحمد محمد", phone: "01234567890", email: "ahmed@company.com", position: "مندوب مبيعات أول" },
     { id: "2", name: "محمد عبدالله", phone: "01234567891", email: "mohammed@company.com", position: "مندوب مبيعات" },
@@ -116,20 +118,24 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     { id: "4", name: "عمر حسن", phone: "01234567893", email: "omar@company.com", position: "مستشار مبيعات" },
   ];
   
-  const companies = [
-    { id: "1", name: "شركة السيارات الفاخرة", address: "الرياض، المملكة العربية السعودية", phone: "0112345678", email: "info@luxurycars.com", taxNumber: "300012345600003" },
-    { id: "2", name: "مؤسسة الخليج للسيارات", address: "جدة، المملكة العربية السعودية", phone: "0126789012", email: "info@gulfauto.com", taxNumber: "300012345600004" },
-    { id: "3", name: "شركة الشرق الأوسط للسيارات", address: "الدمام، المملكة العربية السعودية", phone: "0138901234", email: "info@mideastcars.com", taxNumber: "300012345600005" },
-  ];
+  // Fetch companies from API
+  const { data: companies = [] } = useQuery<Company[]>({
+    queryKey: ["/api/companies"],
+    queryFn: () => apiRequest("/api/companies")
+  });
   
   // Management windows states
   const [specificationsOpen, setSpecificationsOpen] = useState(false);
   const [companyDataOpen, setCompanyDataOpen] = useState(false);
+  const [companyManagementOpen, setCompanyManagementOpen] = useState(false);
   const [representativeOpen, setRepresentativeOpen] = useState(false);
   const [appearanceOpen, setAppearanceOpen] = useState(false);
   const [quotesViewOpen, setQuotesViewOpen] = useState(false);
   const [vehicleEditOpen, setVehicleEditOpen] = useState(false);
   const [editableVehicle, setEditableVehicle] = useState<InventoryItem | null>(selectedVehicle);
+  
+  // Get selected company object
+  const selectedCompanyData = companies.find(c => c.id.toString() === selectedCompany);
   
   // Data states
   const [companyData, setCompanyData] = useState<CompanyData>({
@@ -755,6 +761,15 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
                 <Button
                   variant="outline"
                   className="w-full justify-start"
+                  onClick={() => setCompanyManagementOpen(true)}
+                >
+                  <Settings size={16} className="ml-2" />
+                  إدارة الشركات
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
                   onClick={() => setRepresentativeOpen(true)}
                 >
                   <User size={16} className="ml-2" />
@@ -782,39 +797,33 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
               </CardContent>
             </Card>
 
-            {/* Preview Card */}
+            {/* A4 Preview Card */}
             <Card>
               <CardHeader>
-                <CardTitle>معاينة العرض</CardTitle>
+                <CardTitle>معاينة العرض (A4)</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h4 className="font-bold text-lg">{companyData.name}</h4>
-                      <p className="text-slate-600 dark:text-slate-400 text-xs">{companyData.address}</p>
-                    </div>
-                    {companyData.logo && (
-                      <div className="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded"></div>
-                    )}
-                  </div>
-                  
-                  <div className="border-t border-slate-200 dark:border-slate-700 pt-3">
-                    <h5 className="font-semibold mb-2">عرض سعر رقم: {quoteNumber}</h5>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">العميل: {customerName || "اسم العميل"}</p>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                      {editableVehicle.manufacturer} {editableVehicle.category} - {editableVehicle.year}
-                    </p>
-                    {(() => {
-                      const totals = calculateTotals();
-                      return (
-                        <p className="text-sm font-medium mt-2">
-                          السعر النهائي: {totals.finalTotal.toLocaleString()} ريال
-                        </p>
-                      );
-                    })()}
-                  </div>
-                </div>
+                <QuotationA4Preview
+                  selectedCompany={selectedCompanyData}
+                  selectedVehicle={editableVehicle}
+                  quoteNumber={quoteNumber}
+                  customerName={customerName}
+                  customerPhone={customerPhone}
+                  customerEmail={customerEmail}
+                  validUntil={new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000)}
+                  basePrice={pricingDetails.basePrice * pricingDetails.quantity}
+                  finalPrice={calculateTotals().finalTotal}
+                  licensePlatePrice={pricingDetails.licensePlatePrice}
+                  includeLicensePlate={pricingDetails.includeLicensePlate}
+                  licensePlateSubjectToTax={pricingDetails.licensePlateSubjectToTax}
+                  taxRate={pricingDetails.taxRate}
+                  isVATInclusive={pricingDetails.isVATInclusive}
+                  representativeName={representatives.find(r => r.id === selectedRepresentative)?.name || "غير محدد"}
+                  representativePhone={representatives.find(r => r.id === selectedRepresentative)?.phone || "غير محدد"}
+                  representativeEmail={representatives.find(r => r.id === selectedRepresentative)?.email || "غير محدد"}
+                  representativePosition={representatives.find(r => r.id === selectedRepresentative)?.position || "غير محدد"}
+                  notes={notes}
+                />
               </CardContent>
             </Card>
           </div>
@@ -1366,6 +1375,16 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
           </div>
         </div>
       </div>
+      
+      {/* Company Management Dialog */}
+      <Dialog open={companyManagementOpen} onOpenChange={setCompanyManagementOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>إدارة الشركات</DialogTitle>
+          </DialogHeader>
+          <CompanyManagement />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,9 +1,10 @@
 import { 
-  users, inventoryItems, manufacturers, locations, locationTransfers, 
+  users, inventoryItems, manufacturers, companies, locations, locationTransfers, 
   lowStockAlerts, stockSettings, appearanceSettings, specifications, trimLevels, quotations,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Manufacturer, type InsertManufacturer, 
+  type Company, type InsertCompany,
   type Location, type InsertLocation, 
   type LocationTransfer, type InsertLocationTransfer,
   type LowStockAlert, type InsertLowStockAlert,
@@ -88,6 +89,13 @@ export interface IStorage {
   createManufacturer(manufacturer: InsertManufacturer): Promise<Manufacturer>;
   updateManufacturer(id: number, manufacturer: Partial<InsertManufacturer>): Promise<Manufacturer | undefined>;
   deleteManufacturer(id: number): Promise<boolean>;
+  
+  // Company methods
+  getAllCompanies(): Promise<Company[]>;
+  getCompany(id: number): Promise<Company | undefined>;
+  createCompany(company: InsertCompany): Promise<Company>;
+  updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined>;
+  deleteCompany(id: number): Promise<boolean>;
   
   // Low stock alerts methods
   getLowStockAlerts(): Promise<LowStockAlert[]>;
@@ -1389,6 +1397,63 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Get quotation by number error:', error);
       return undefined;
+    }
+  }
+
+  // Company methods
+  async getAllCompanies(): Promise<Company[]> {
+    try {
+      return await db.select().from(companies).orderBy(companies.name);
+    } catch (error) {
+      console.error('Get all companies error:', error);
+      return [];
+    }
+  }
+
+  async getCompany(id: number): Promise<Company | undefined> {
+    try {
+      const results = await db.select().from(companies).where(eq(companies.id, id));
+      return results[0];
+    } catch (error) {
+      console.error('Get company error:', error);
+      return undefined;
+    }
+  }
+
+  async createCompany(companyData: InsertCompany): Promise<Company> {
+    try {
+      const results = await db.insert(companies).values({
+        ...companyData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }).returning();
+      return results[0];
+    } catch (error) {
+      console.error('Create company error:', error);
+      throw error;
+    }
+  }
+
+  async updateCompany(id: number, companyData: Partial<InsertCompany>): Promise<Company | undefined> {
+    try {
+      const results = await db.update(companies)
+        .set({ ...companyData, updatedAt: new Date() })
+        .where(eq(companies.id, id))
+        .returning();
+      return results[0];
+    } catch (error) {
+      console.error('Update company error:', error);
+      return undefined;
+    }
+  }
+
+  async deleteCompany(id: number): Promise<boolean> {
+    try {
+      await db.delete(companies).where(eq(companies.id, id));
+      return true;
+    } catch (error) {
+      console.error('Delete company error:', error);
+      return false;
     }
   }
 
