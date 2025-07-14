@@ -15,7 +15,6 @@ import {
   Settings, 
   Building2, 
   User, 
-  Palette,
   Save,
   Eye,
   Upload,
@@ -135,7 +134,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [companyDataOpen, setCompanyDataOpen] = useState(false);
   const [companyManagementOpen, setCompanyManagementOpen] = useState(false);
   const [representativeOpen, setRepresentativeOpen] = useState(false);
-  const [appearanceOpen, setAppearanceOpen] = useState(false);
+  
   const [quotesViewOpen, setQuotesViewOpen] = useState(false);
   const [vehicleEditOpen, setVehicleEditOpen] = useState(false);
   const [editableVehicle, setEditableVehicle] = useState<InventoryItem | null>(selectedVehicle);
@@ -991,14 +990,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   إدارة بيانات المندوب
                 </Button>
                 
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => setAppearanceOpen(true)}
-                >
-                  <Palette size={16} className="ml-2" />
-                  التحكم في مظهر العرض
-                </Button>
+                
                 
                 <Button
                   variant="outline"
@@ -1343,78 +1335,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         </DialogContent>
       </Dialog>
 
-      {/* Quote Appearance Management Dialog */}
-      <Dialog open={appearanceOpen} onOpenChange={setAppearanceOpen}>
-        <DialogContent className="max-w-2xl" dir="rtl">
-          <DialogHeader>
-            <DialogTitle>التحكم في مظهر عرض السعر</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="primaryColor">اللون الأساسي</Label>
-                <Input
-                  id="primaryColor"
-                  type="color"
-                  value={quoteAppearance.primaryColor}
-                  onChange={(e) => setQuoteAppearance(prev => ({ ...prev, primaryColor: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="secondaryColor">اللون الثانوي</Label>
-                <Input
-                  id="secondaryColor"
-                  type="color"
-                  value={quoteAppearance.secondaryColor}
-                  onChange={(e) => setQuoteAppearance(prev => ({ ...prev, secondaryColor: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="logoPosition">موضع الشعار</Label>
-                <Select
-                  value={quoteAppearance.logoPosition}
-                  onValueChange={(value: 'left' | 'center' | 'right') => 
-                    setQuoteAppearance(prev => ({ ...prev, logoPosition: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="right">يمين</SelectItem>
-                    <SelectItem value="center">وسط</SelectItem>
-                    <SelectItem value="left">يسار</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="fontFamily">نوع الخط</Label>
-                <Select
-                  value={quoteAppearance.fontFamily}
-                  onValueChange={(value) => setQuoteAppearance(prev => ({ ...prev, fontFamily: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Noto Sans Arabic">Noto Sans Arabic</SelectItem>
-                    <SelectItem value="Cairo">Cairo</SelectItem>
-                    <SelectItem value="Tajawal">Tajawal</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="flex justify-end space-x-2 space-x-reverse">
-              <Button variant="outline" onClick={() => setAppearanceOpen(false)}>
-                إلغاء
-              </Button>
-              <Button onClick={() => setAppearanceOpen(false)}>
-                حفظ التغييرات
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      
 
       {/* Vehicle Edit Dialog */}
       <Dialog open={vehicleEditOpen} onOpenChange={setVehicleEditOpen}>
