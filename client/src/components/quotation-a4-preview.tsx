@@ -310,18 +310,7 @@ export default function QuotationA4Preview({
               <div className="p-2 font-bold" style={{color: '#00627F'}}>{grandTotal.toLocaleString()}</div>
             </div>
             
-            {/* License Plate Row if included */}
-            {includeLicensePlate && (
-              <div className="grid grid-cols-5 border-b border-gray-200 text-xs text-center">
-                <div className="p-2 border-l border-gray-200 font-medium">لوحة الأرقام</div>
-                <div className="p-2 border-l border-gray-200">1</div>
-                <div className="p-2 border-l border-gray-200 font-medium">{licensePlatePrice.toLocaleString()}</div>
-                <div className="p-2 border-l border-gray-200 font-medium">
-                  {licensePlateSubjectToTax ? Math.round(licensePlatePrice * taxRate / 100).toLocaleString() : "0"}
-                </div>
-                <div className="p-2 font-medium">{(licensePlatePrice + (licensePlateSubjectToTax ? Math.round(licensePlatePrice * taxRate / 100) : 0)).toLocaleString()}</div>
-              </div>
-            )}
+
             
 
             
