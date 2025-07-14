@@ -65,11 +65,9 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [selectedManufacturer, setSelectedManufacturer] = useState(editItem?.manufacturer || "");
-  const [selectedCategory, setSelectedCategory] = useState(editItem?.category || "");
-  const [availableCategories, setAvailableCategories] = useState<string[]>(
-    editItem?.manufacturer ? manufacturerCategories[editItem.manufacturer] || [] : []
-  );
+  const [selectedManufacturer, setSelectedManufacturer] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [availableTrimLevels, setAvailableTrimLevels] = useState<string[]>([]);
   
   // Local state for editable lists
@@ -92,7 +90,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
 
   const form = useForm<InsertInventoryItem>({
     resolver: zodResolver(insertInventoryItemSchema),
-    defaultValues: editItem || {
+    defaultValues: {
       manufacturer: "",
       category: "",
       trimLevel: "",
@@ -310,6 +308,22 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
       setAvailableTrimLevels([]);
     }
   }, [editItem, open, form, localManufacturerCategories]);
+
+  // Load trim levels when manufacturer and category change (for both new and edit items)
+  useEffect(() => {
+    if (selectedManufacturer && selectedCategory) {
+      // The trim levels query will automatically refetch when these change
+      refetchTrimLevels();
+    }
+  }, [selectedManufacturer, selectedCategory, refetchTrimLevels]);
+
+  // Update available trim levels when trim levels data changes
+  useEffect(() => {
+    if (trimLevels) {
+      const trimLevelNames = trimLevels.map((tl: TrimLevel) => tl.trimLevel);
+      setAvailableTrimLevels(trimLevelNames);
+    }
+  }, [trimLevels]);
 
   return (
     <>
