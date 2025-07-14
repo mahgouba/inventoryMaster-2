@@ -210,24 +210,7 @@ export const insertQuotationSchema = createInsertSchema(quotations).omit({
   }),
 });
 
-export type User = typeof users.$inferSelect;
-export type InsertUser = typeof insertUserSchema._type;
-export type InventoryItem = typeof inventoryItems.$inferSelect;
-export type InsertInventoryItem = typeof insertInventoryItemSchema._type;
-export type Manufacturer = typeof manufacturers.$inferSelect;
-export type InsertManufacturer = typeof insertManufacturerSchema._type;
-export type Company = typeof companies.$inferSelect;
-export type InsertCompany = typeof insertCompanySchema._type;
-export type Location = typeof locations.$inferSelect;
-export type InsertLocation = typeof insertLocationSchema._type;
-export type LocationTransfer = typeof locationTransfers.$inferSelect;
-export type InsertLocationTransfer = typeof insertLocationTransferSchema._type;
-export type Specification = typeof specifications.$inferSelect;
-export type InsertSpecification = typeof insertSpecificationSchema._type;
-export type TrimLevel = typeof trimLevels.$inferSelect;
-export type InsertTrimLevel = typeof insertTrimLevelSchema._type;
-export type Quotation = typeof quotations.$inferSelect;
-export type InsertQuotation = typeof insertQuotationSchema._type;
+
 
 // User sessions table for tracking login/logout times
 export const userSessions = pgTable("user_sessions", {
