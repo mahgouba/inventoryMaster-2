@@ -24,7 +24,8 @@ import {
   Trash2,
   QrCode,
   Search,
-  Calculator
+  Calculator,
+  Printer
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useTheme } from "@/hooks/useTheme";
@@ -337,6 +338,15 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
             
             <div className="flex items-center space-x-2 space-x-reverse">
               <Button
+                variant="outline"
+                onClick={() => window.print()}
+                className="border-blue-500 text-blue-600 hover:bg-blue-50"
+              >
+                <Printer size={16} className="ml-2" />
+                طباعة العرض
+              </Button>
+              
+              <Button
                 onClick={handleSaveQuotation}
                 disabled={createQuotationMutation.isPending}
                 className="bg-green-600 hover:bg-green-700 text-white"
@@ -513,6 +523,135 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
                     placeholder="أي ملاحظات أو شروط خاصة بالعرض..."
                     rows={3}
                   />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Pricing Details Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Calculator className="ml-2" size={20} />
+                  تفاصيل التسعير
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="basePrice">السعر الأساسي</Label>
+                    <Input
+                      id="basePrice"
+                      type="number"
+                      value={pricingDetails.basePrice}
+                      onChange={(e) => setPricingDetails(prev => ({ ...prev, basePrice: parseFloat(e.target.value) || 0 }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="quantity">الكمية</Label>
+                    <Input
+                      id="quantity"
+                      type="number"
+                      min="1"
+                      value={pricingDetails.quantity}
+                      onChange={(e) => setPricingDetails(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="taxRate">معدل الضريبة (%)</Label>
+                    <Input
+                      id="taxRate"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={pricingDetails.taxRate}
+                      onChange={(e) => setPricingDetails(prev => ({ ...prev, taxRate: parseFloat(e.target.value) || 0 }))}
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2 space-x-reverse pt-6">
+                    <input
+                      type="checkbox"
+                      id="isVATInclusive"
+                      checked={pricingDetails.isVATInclusive}
+                      onChange={(e) => setPricingDetails(prev => ({ ...prev, isVATInclusive: e.target.checked }))}
+                      className="rounded"
+                    />
+                    <Label htmlFor="isVATInclusive">السعر شامل الضريبة</Label>
+                  </div>
+                </div>
+
+                {/* License Plate Section */}
+                <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+                  <div className="flex items-center space-x-2 space-x-reverse mb-3">
+                    <input
+                      type="checkbox"
+                      id="includeLicensePlate"
+                      checked={pricingDetails.includeLicensePlate}
+                      onChange={(e) => setPricingDetails(prev => ({ ...prev, includeLicensePlate: e.target.checked }))}
+                      className="rounded"
+                    />
+                    <Label htmlFor="includeLicensePlate">تشمل اللوحات</Label>
+                  </div>
+                  
+                  {pricingDetails.includeLicensePlate && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6">
+                      <div>
+                        <Label htmlFor="licensePlatePrice">سعر اللوحات</Label>
+                        <Input
+                          id="licensePlatePrice"
+                          type="number"
+                          value={pricingDetails.licensePlatePrice}
+                          onChange={(e) => setPricingDetails(prev => ({ ...prev, licensePlatePrice: parseFloat(e.target.value) || 0 }))}
+                        />
+                      </div>
+                      <div className="flex items-center space-x-2 space-x-reverse pt-6">
+                        <input
+                          type="checkbox"
+                          id="licensePlateSubjectToTax"
+                          checked={pricingDetails.licensePlateSubjectToTax}
+                          onChange={(e) => setPricingDetails(prev => ({ ...prev, licensePlateSubjectToTax: e.target.checked }))}
+                          className="rounded"
+                        />
+                        <Label htmlFor="licensePlateSubjectToTax">اللوحات خاضعة للضريبة</Label>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Pricing Summary */}
+                <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+                  <h4 className="font-semibold mb-3">ملخص التسعير</h4>
+                  {(() => {
+                    const totals = calculateTotals();
+                    return (
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>إجمالي السيارات ({pricingDetails.quantity}):</span>
+                          <span className="font-medium">{(pricingDetails.basePrice * pricingDetails.quantity).toLocaleString()} ريال</span>
+                        </div>
+                        {pricingDetails.includeLicensePlate && (
+                          <div className="flex justify-between">
+                            <span>اللوحات:</span>
+                            <span className="font-medium">{totals.licensePlateTotal.toLocaleString()} ريال</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span>المبلغ الفرعي:</span>
+                          <span className="font-medium">{totals.subtotal.toLocaleString()} ريال</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>الضريبة ({pricingDetails.taxRate}%):</span>
+                          <span className="font-medium text-red-600">{totals.taxAmount.toLocaleString()} ريال</span>
+                        </div>
+                        <div className="flex justify-between border-t border-slate-200 dark:border-slate-700 pt-2 font-semibold text-lg">
+                          <span>المجموع النهائي:</span>
+                          <span className="text-green-600">{totals.finalTotal.toLocaleString()} ريال</span>
+                        </div>
+                        {pricingDetails.isVATInclusive && (
+                          <p className="text-xs text-slate-500 mt-2">* السعر شامل ضريبة القيمة المضافة</p>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               </CardContent>
             </Card>
