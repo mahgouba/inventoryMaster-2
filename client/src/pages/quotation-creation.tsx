@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +21,10 @@ import {
   Upload,
   Plus,
   Edit3,
-  Trash2
+  Trash2,
+  QrCode,
+  Search,
+  Calculator
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useTheme } from "@/hooks/useTheme";
@@ -60,6 +63,16 @@ interface QuoteAppearance {
   showRepresentativeInfo: boolean;
 }
 
+interface PricingDetails {
+  basePrice: number;
+  quantity: number;
+  licensePlatePrice: number;
+  includeLicensePlate: boolean;
+  licensePlateSubjectToTax: boolean;
+  taxRate: number;
+  isVATInclusive: boolean;
+}
+
 export default function QuotationCreationPage({ vehicleData }: QuotationCreationPageProps) {
   const { companyName, companyLogo, darkMode } = useTheme();
   const { toast } = useToast();
@@ -94,6 +107,9 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [companyDataOpen, setCompanyDataOpen] = useState(false);
   const [representativeOpen, setRepresentativeOpen] = useState(false);
   const [appearanceOpen, setAppearanceOpen] = useState(false);
+  const [quotesViewOpen, setQuotesViewOpen] = useState(false);
+  const [vehicleEditOpen, setVehicleEditOpen] = useState(false);
+  const [editableVehicle, setEditableVehicle] = useState<InventoryItem | null>(selectedVehicle);
   
   // Data states
   const [companyData, setCompanyData] = useState<CompanyData>({
@@ -122,6 +138,21 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     showRepresentativeInfo: true
   });
 
+  const [pricingDetails, setPricingDetails] = useState<PricingDetails>({
+    basePrice: selectedVehicle?.price || 0,
+    quantity: 1,
+    licensePlatePrice: 500,
+    includeLicensePlate: true,
+    licensePlateSubjectToTax: false,
+    taxRate: 15,
+    isVATInclusive: false
+  });
+
+  // Generate QR code data
+  const generateQRData = () => {
+    return `Quote: ${quoteNumber}\nCustomer: ${customerName}\nVehicle: ${selectedVehicle?.manufacturer} ${selectedVehicle?.category}\nDate: ${new Date().toLocaleDateString('en-US')}`;
+  };
+
   // Get vehicle specifications
   const { data: specifications = [] } = useQuery<Specification[]>({
     queryKey: ["/api/specifications"],
@@ -143,12 +174,61 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
 
   // Get vehicle specifications for selected vehicle
   const vehicleSpecs = specifications.find(spec => 
-    spec.manufacturer === selectedVehicle?.manufacturer &&
-    spec.category === selectedVehicle?.category &&
-    spec.trimLevel === selectedVehicle?.trimLevel &&
-    spec.year === selectedVehicle?.year &&
-    spec.engineCapacity === selectedVehicle?.engineCapacity
+    spec.manufacturer === editableVehicle?.manufacturer &&
+    spec.category === editableVehicle?.category &&
+    spec.trimLevel === editableVehicle?.trimLevel &&
+    spec.year === editableVehicle?.year &&
+    spec.engineCapacity === editableVehicle?.engineCapacity
   );
+
+  // Get all quotations for viewing
+  const { data: quotations = [] } = useQuery({
+    queryKey: ["/api/quotations"],
+  });
+
+  // Calculate pricing
+  const calculateTotals = () => {
+    const baseTotal = pricingDetails.basePrice * pricingDetails.quantity;
+    const licensePlateTotal = pricingDetails.includeLicensePlate ? pricingDetails.licensePlatePrice : 0;
+    
+    let subtotal = baseTotal;
+    let taxableAmount = baseTotal;
+    
+    if (pricingDetails.includeLicensePlate) {
+      subtotal += licensePlateTotal;
+      if (pricingDetails.licensePlateSubjectToTax) {
+        taxableAmount += licensePlateTotal;
+      }
+    }
+    
+    let taxAmount = 0;
+    let finalTotal = 0;
+    
+    if (pricingDetails.isVATInclusive) {
+      // VAT is included in the price
+      taxAmount = (taxableAmount * pricingDetails.taxRate) / (100 + pricingDetails.taxRate);
+      finalTotal = subtotal;
+    } else {
+      // VAT is added to the price
+      taxAmount = (taxableAmount * pricingDetails.taxRate) / 100;
+      finalTotal = subtotal + taxAmount;
+    }
+    
+    return {
+      subtotal,
+      taxAmount,
+      finalTotal,
+      licensePlateTotal
+    };
+  };
+
+  // Update editable vehicle when selected vehicle changes
+  React.useEffect(() => {
+    if (selectedVehicle) {
+      setEditableVehicle(selectedVehicle);
+      setPricingDetails(prev => ({ ...prev, basePrice: selectedVehicle.price || 0 }));
+    }
+  }, [selectedVehicle]);
 
   // Create quotation mutation
   const createQuotationMutation = useMutation({
@@ -178,7 +258,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   });
 
   const handleSaveQuotation = () => {
-    if (!selectedVehicle || !customerName.trim()) {
+    if (!editableVehicle || !customerName.trim()) {
       toast({
         title: "بيانات ناقصة",
         description: "يرجى التأكد من اختيار السيارة وإدخال اسم العميل",
@@ -187,33 +267,37 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
       return;
     }
 
+    const totals = calculateTotals();
+
     const quotationData: InsertQuotation = {
       quoteNumber,
       customerName: customerName.trim(),
       customerPhone: customerPhone.trim(),
       customerEmail: customerEmail.trim(),
-      vehicleManufacturer: selectedVehicle.manufacturer,
-      vehicleCategory: selectedVehicle.category,
-      vehicleTrimLevel: selectedVehicle.trimLevel,
-      vehicleYear: selectedVehicle.year,
-      vehicleEngineCapacity: selectedVehicle.engineCapacity,
-      vehicleExteriorColor: selectedVehicle.exteriorColor,
-      vehicleInteriorColor: selectedVehicle.interiorColor,
-      vehicleChassisNumber: selectedVehicle.chassisNumber,
-      basePrice: selectedVehicle.price || 0,
-      finalPrice: selectedVehicle.price || 0,
+      vehicleManufacturer: editableVehicle.manufacturer,
+      vehicleCategory: editableVehicle.category,
+      vehicleTrimLevel: editableVehicle.trimLevel,
+      vehicleYear: editableVehicle.year,
+      vehicleEngineCapacity: editableVehicle.engineCapacity,
+      vehicleExteriorColor: editableVehicle.exteriorColor,
+      vehicleInteriorColor: editableVehicle.interiorColor,
+      vehicleChassisNumber: editableVehicle.chassisNumber,
+      basePrice: pricingDetails.basePrice,
+      finalPrice: totals.finalTotal,
       validityDays,
       status: "مسودة",
       notes: notes.trim(),
       companyData: JSON.stringify(companyData),
       representativeData: JSON.stringify(representativeData),
-      quoteAppearance: JSON.stringify(quoteAppearance)
+      quoteAppearance: JSON.stringify(quoteAppearance),
+      pricingDetails: JSON.stringify(pricingDetails),
+      qrCodeData: generateQRData()
     };
 
     createQuotationMutation.mutate(quotationData);
   };
 
-  if (!selectedVehicle) {
+  if (!editableVehicle) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-black p-4">
         <div className="max-w-4xl mx-auto">
@@ -287,49 +371,60 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
                     {manufacturerData?.logo ? (
                       <img 
                         src={manufacturerData.logo} 
-                        alt={selectedVehicle.manufacturer} 
+                        alt={editableVehicle.manufacturer} 
                         className="w-full h-full object-contain"
                       />
                     ) : (
                       <span className="text-2xl font-bold text-slate-600 dark:text-slate-300">
-                        {selectedVehicle.manufacturer?.charAt(0)}
+                        {editableVehicle.manufacturer?.charAt(0)}
                       </span>
                     )}
                   </div>
                   
                   {/* Vehicle Details */}
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
-                      {selectedVehicle.manufacturer} {selectedVehicle.category}
-                    </h3>
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
+                        {editableVehicle.manufacturer} {editableVehicle.category}
+                      </h3>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setVehicleEditOpen(true)}
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        <Edit3 size={14} className="ml-1" />
+                        تعديل
+                      </Button>
+                    </div>
                     <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
                       <div>
                         <span className="text-slate-500">السنة:</span>
-                        <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{selectedVehicle.year}</span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.year}</span>
                       </div>
                       <div>
                         <span className="text-slate-500">سعة المحرك:</span>
-                        <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{selectedVehicle.engineCapacity}</span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.engineCapacity}</span>
                       </div>
                       <div>
                         <span className="text-slate-500">اللون الخارجي:</span>
-                        <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{selectedVehicle.exteriorColor}</span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.exteriorColor}</span>
                       </div>
                       <div>
                         <span className="text-slate-500">اللون الداخلي:</span>
-                        <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{selectedVehicle.interiorColor}</span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.interiorColor}</span>
                       </div>
-                      {selectedVehicle.chassisNumber && (
+                      {editableVehicle.chassisNumber && (
                         <div className="col-span-2">
                           <span className="text-slate-500">رقم الهيكل:</span>
-                          <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{selectedVehicle.chassisNumber}</span>
+                          <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.chassisNumber}</span>
                         </div>
                       )}
-                      {selectedVehicle.price && (
+                      {editableVehicle.price && (
                         <div className="col-span-2">
-                          <span className="text-slate-500">السعر:</span>
+                          <span className="text-slate-500">السعر الأساسي:</span>
                           <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">
-                            {selectedVehicle.price.toLocaleString()} ريال
+                            {editableVehicle.price.toLocaleString()} ريال
                           </span>
                         </div>
                       )}
@@ -348,12 +443,24 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="quoteNumber">رقم عرض السعر</Label>
-                    <Input
-                      id="quoteNumber"
-                      value={quoteNumber}
-                      onChange={(e) => setQuoteNumber(e.target.value)}
-                      placeholder="Q-123456"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="quoteNumber"
+                        value={quoteNumber}
+                        readOnly
+                        className="bg-slate-50 dark:bg-slate-800"
+                        placeholder="Q-123456"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="px-3"
+                        title="رمز QR للعرض"
+                      >
+                        <QrCode size={16} />
+                      </Button>
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor="customerName">اسم العميل *</Label>
@@ -457,6 +564,15 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
                   التحكم في مظهر العرض
                 </Button>
                 
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => setQuotesViewOpen(true)}
+                >
+                  <Search size={16} className="ml-2" />
+                  عرض العروض المحفوظة
+                </Button>
+                
               </CardContent>
             </Card>
 
@@ -481,13 +597,16 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
                     <h5 className="font-semibold mb-2">عرض سعر رقم: {quoteNumber}</h5>
                     <p className="text-xs text-slate-600 dark:text-slate-400">العميل: {customerName || "اسم العميل"}</p>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                      {selectedVehicle.manufacturer} {selectedVehicle.category} - {selectedVehicle.year}
+                      {editableVehicle.manufacturer} {editableVehicle.category} - {editableVehicle.year}
                     </p>
-                    {selectedVehicle.price && (
-                      <p className="text-sm font-medium mt-2">
-                        السعر: {selectedVehicle.price.toLocaleString()} ريال
-                      </p>
-                    )}
+                    {(() => {
+                      const totals = calculateTotals();
+                      return (
+                        <p className="text-sm font-medium mt-2">
+                          السعر النهائي: {totals.finalTotal.toLocaleString()} ريال
+                        </p>
+                      );
+                    })()}
                   </div>
                 </div>
               </CardContent>
@@ -733,6 +852,131 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
                 حفظ التغييرات
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Vehicle Edit Dialog */}
+      <Dialog open={vehicleEditOpen} onOpenChange={setVehicleEditOpen}>
+        <DialogContent className="max-w-2xl" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>تعديل بيانات السيارة</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="editManufacturer">الصانع</Label>
+                <Input
+                  id="editManufacturer"
+                  value={editableVehicle?.manufacturer || ""}
+                  onChange={(e) => setEditableVehicle(prev => prev ? { ...prev, manufacturer: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="editCategory">الفئة</Label>
+                <Input
+                  id="editCategory"
+                  value={editableVehicle?.category || ""}
+                  onChange={(e) => setEditableVehicle(prev => prev ? { ...prev, category: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="editYear">السنة</Label>
+                <Input
+                  id="editYear"
+                  type="number"
+                  value={editableVehicle?.year || ""}
+                  onChange={(e) => setEditableVehicle(prev => prev ? { ...prev, year: parseInt(e.target.value) || 2024 } : null)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="editEngineCapacity">سعة المحرك</Label>
+                <Input
+                  id="editEngineCapacity"
+                  value={editableVehicle?.engineCapacity || ""}
+                  onChange={(e) => setEditableVehicle(prev => prev ? { ...prev, engineCapacity: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="editExteriorColor">اللون الخارجي</Label>
+                <Input
+                  id="editExteriorColor"
+                  value={editableVehicle?.exteriorColor || ""}
+                  onChange={(e) => setEditableVehicle(prev => prev ? { ...prev, exteriorColor: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="editInteriorColor">اللون الداخلي</Label>
+                <Input
+                  id="editInteriorColor"
+                  value={editableVehicle?.interiorColor || ""}
+                  onChange={(e) => setEditableVehicle(prev => prev ? { ...prev, interiorColor: e.target.value } : null)}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="editChassisNumber">رقم الهيكل</Label>
+                <Input
+                  id="editChassisNumber"
+                  value={editableVehicle?.chassisNumber || ""}
+                  onChange={(e) => setEditableVehicle(prev => prev ? { ...prev, chassisNumber: e.target.value } : null)}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2 space-x-reverse">
+              <Button variant="outline" onClick={() => setVehicleEditOpen(false)}>
+                إلغاء
+              </Button>
+              <Button onClick={() => setVehicleEditOpen(false)}>
+                حفظ التغييرات
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Quotes View Dialog */}
+      <Dialog open={quotesViewOpen} onOpenChange={setQuotesViewOpen}>
+        <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>العروض المحفوظة</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {quotations.length > 0 ? (
+              <div className="grid gap-4">
+                {quotations.map((quote: any) => (
+                  <Card key={quote.id} className="border border-slate-200 dark:border-slate-700">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-lg">{quote.quoteNumber}</h4>
+                          <p className="text-slate-600 dark:text-slate-400">العميل: {quote.customerName}</p>
+                          <p className="text-sm text-slate-500">
+                            {quote.vehicleManufacturer} {quote.vehicleCategory} - {quote.vehicleYear}
+                          </p>
+                          <p className="text-sm font-medium text-green-600 mt-1">
+                            {quote.finalPrice?.toLocaleString()} ريال
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <Badge variant={quote.status === "مسودة" ? "secondary" : "default"}>
+                            {quote.status}
+                          </Badge>
+                          <Button size="sm" variant="outline">
+                            <Edit3 size={14} className="ml-1" />
+                            تعديل
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <FileText size={48} className="mx-auto text-slate-400 mb-4" />
+                <p className="text-slate-500">لا توجد عروض محفوظة</p>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

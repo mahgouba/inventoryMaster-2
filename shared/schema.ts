@@ -113,6 +113,11 @@ export const quotations = pgTable("quotations", {
   validUntil: timestamp("valid_until").notNull(), // صالح حتى
   status: text("status").notNull().default("مسودة"), // الحالة (مسودة، مرسل، مقبول، مرفوض)
   createdBy: text("created_by").notNull(), // المُنشئ
+  companyData: text("company_data"), // بيانات الشركة
+  representativeData: text("representative_data"), // بيانات المندوب
+  quoteAppearance: text("quote_appearance"), // مظهر العرض
+  pricingDetails: text("pricing_details"), // تفاصيل التسعير
+  qrCodeData: text("qr_code_data"), // بيانات رمز QR
   createdAt: timestamp("created_at").defaultNow().notNull(), // تاريخ الإنشاء
   updatedAt: timestamp("updated_at").defaultNow().notNull(), // تاريخ التحديث
 });
