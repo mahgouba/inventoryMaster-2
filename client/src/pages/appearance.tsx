@@ -857,6 +857,8 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                         });
                                       };
                                       reader.readAsDataURL(file);
+                                    } else {
+                                      console.log('No file selected');
                                     }
                                   }}
                                 />
@@ -864,6 +866,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                   variant="outline" 
                                   size="sm"
                                   disabled={updateManufacturerLogoMutation.isPending}
+                                  onClick={() => console.log('Change logo button clicked')}
                                 >
                                   <Edit2 size={14} />
                                   {updateManufacturerLogoMutation.isPending ? "جاري التحديث..." : "تغيير"}
@@ -930,6 +933,8 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                         });
                                       };
                                       reader.readAsDataURL(file);
+                                    } else {
+                                      console.log('No file selected');
                                     }
                                   }}
                                 />
@@ -937,6 +942,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                   variant="outline" 
                                   size="sm"
                                   disabled={updateManufacturerLogoMutation.isPending}
+                                  onClick={() => console.log('Upload logo button clicked')}
                                 >
                                   <Upload size={14} />
                                   {updateManufacturerLogoMutation.isPending ? "جاري الرفع..." : "رفع شعار"}
