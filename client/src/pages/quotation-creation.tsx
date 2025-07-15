@@ -812,8 +812,6 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 </Button>
               </Link>
               
-              
-              
               <Button
                 variant="outline"
                 onClick={() => window.print()}
@@ -831,10 +829,6 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 <Download size={16} className="ml-2" />
                 PDF
               </Button>
-              
-              
-              
-
             </div>
           </div>
         </div>
