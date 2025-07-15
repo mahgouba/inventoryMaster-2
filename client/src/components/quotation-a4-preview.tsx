@@ -193,7 +193,7 @@ export default function QuotationA4Preview({
                   </p>
                   {!isInvoiceMode && (
                     <p className="text-blue-100 text-xs">
-                      صالح حتى: {validUntil.toLocaleDateString('ar-SA')}
+                      صالح حتى: {validUntil && validUntil.toLocaleDateString ? validUntil.toLocaleDateString('ar-SA') : 'غير محدد'}
                     </p>
                   )}
                 </div>

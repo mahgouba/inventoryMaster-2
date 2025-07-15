@@ -102,6 +102,17 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     }
     return null;
   });
+
+  // Vehicle data selection states (for empty mode)
+  const [vehicleManufacturer, setVehicleManufacturer] = useState<string>("");
+  const [vehicleCategory, setVehicleCategory] = useState<string>("");
+  const [vehicleTrimLevel, setVehicleTrimLevel] = useState<string>("");
+  const [vehicleYear, setVehicleYear] = useState<string>("");
+  const [vehicleEngineCapacity, setVehicleEngineCapacity] = useState<string>("");
+  const [vehicleExteriorColor, setVehicleExteriorColor] = useState<string>("");
+  const [vehicleInteriorColor, setVehicleInteriorColor] = useState<string>("");
+  const [vehicleChassisNumber, setVehicleChassisNumber] = useState<string>("");
+  const [vehiclePrice, setVehiclePrice] = useState<number>(0);
   
   // Form states
   const [quoteNumber, setQuoteNumber] = useState<string>(`Q-${Date.now()}`);
@@ -129,6 +140,32 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
     queryFn: () => apiRequest("/api/companies")
+  });
+
+  // Fetch manufacturers for dropdown selection
+  const { data: manufacturers = [] } = useQuery<any[]>({
+    queryKey: ["/api/manufacturers"],
+    queryFn: () => apiRequest("/api/manufacturers")
+  });
+
+  // Fetch categories based on selected manufacturer
+  const { data: categories = [] } = useQuery<{ category: string }[]>({
+    queryKey: ["/api/categories", vehicleManufacturer],
+    queryFn: () => apiRequest(`/api/categories/${vehicleManufacturer}`),
+    enabled: !!vehicleManufacturer
+  });
+
+  // Fetch trim levels based on selected manufacturer and category
+  const { data: trimLevels = [] } = useQuery<any[]>({
+    queryKey: ["/api/trim-levels", vehicleManufacturer, vehicleCategory],
+    queryFn: () => apiRequest(`/api/trim-levels/category/${vehicleManufacturer}/${vehicleCategory}`),
+    enabled: !!vehicleManufacturer && !!vehicleCategory
+  });
+
+  // Fetch engine capacities
+  const { data: engineCapacities = [] } = useQuery<{ engineCapacity: string }[]>({
+    queryKey: ["/api/engine-capacities"],
+    queryFn: () => apiRequest("/api/engine-capacities")
   });
   
   // Management windows states
@@ -417,7 +454,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
   });
 
   // Get manufacturer data with logo
-  const { data: manufacturers = [] } = useQuery<Array<{
+  const { data: manufacturersWithLogo = [] } = useQuery<Array<{
     id: number;
     name: string;
     logo: string | null;
@@ -427,7 +464,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
   });
 
   // Find manufacturer logo
-  const manufacturerData = manufacturers.find(m => m.name === selectedVehicle?.manufacturer);
+  const manufacturerData = manufacturersWithLogo.find(m => m.name === selectedVehicle?.manufacturer);
 
   // Get vehicle specifications for selected vehicle
   const { data: vehicleSpecs, isLoading: specsLoading } = useQuery<Specification>({
@@ -798,81 +835,264 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
           {/* Left Column - Vehicle Info & Basic Form */}
           <div className="space-y-6">
             
-            {/* Selected Vehicle Card */}
+            {/* Vehicle Selection Card */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <FileText className="ml-2" size={20} />
-                  بيانات السيارة المختارة
+                  {selectedVehicle ? "بيانات السيارة المختارة" : "اختيار بيانات السيارة"}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex items-start space-x-4 space-x-reverse">
-                  {/* Manufacturer Logo */}
-                  <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
-                    {manufacturerData?.logo ? (
-                      <img 
-                        src={manufacturerData.logo} 
-                        alt={editableVehicle.manufacturer} 
-                        className="w-full h-full object-contain"
-                      />
-                    ) : (
-                      <span className="text-2xl font-bold text-slate-600 dark:text-slate-300">
-                        {editableVehicle.manufacturer?.charAt(0)}
-                      </span>
-                    )}
+                {selectedVehicle ? (
+                  // Existing Vehicle Display
+                  <div className="flex items-start space-x-4 space-x-reverse">
+                    {/* Manufacturer Logo */}
+                    <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
+                      {manufacturerData?.logo ? (
+                        <img 
+                          src={manufacturerData.logo} 
+                          alt={editableVehicle.manufacturer} 
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <span className="text-2xl font-bold text-slate-600 dark:text-slate-300">
+                          {editableVehicle.manufacturer?.charAt(0)}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Vehicle Details */}
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
+                          {editableVehicle.manufacturer} {editableVehicle.category}
+                        </h3>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setVehicleEditOpen(true)}
+                          className="text-blue-600 hover:text-blue-700"
+                        >
+                          <Edit3 size={14} className="ml-1" />
+                          تعديل
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
+                        <div>
+                          <span className="text-slate-500">السنة:</span>
+                          <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.year}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500">سعة المحرك:</span>
+                          <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.engineCapacity}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500">اللون الخارجي:</span>
+                          <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.exteriorColor}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500">اللون الداخلي:</span>
+                          <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.interiorColor}</span>
+                        </div>
+                        {editableVehicle.chassisNumber && (
+                          <div className="col-span-2">
+                            <span className="text-slate-500">رقم الهيكل:</span>
+                            <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.chassisNumber}</span>
+                          </div>
+                        )}
+                        {editableVehicle.price && (
+                          <div className="col-span-2">
+                            <span className="text-slate-500">السعر الأساسي:</span>
+                            <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">
+                              {editableVehicle.price.toLocaleString()} ريال
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  
-                  {/* Vehicle Details */}
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
-                        {editableVehicle.manufacturer} {editableVehicle.category}
-                      </h3>
+                ) : (
+                  // Vehicle Data Selection Form
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Manufacturer Selection */}
+                      <div>
+                        <Label htmlFor="manufacturer">الصانع</Label>
+                        <Select value={vehicleManufacturer} onValueChange={(value) => {
+                          setVehicleManufacturer(value);
+                          setVehicleCategory(""); // Clear category when manufacturer changes
+                          setVehicleTrimLevel(""); // Clear trim level when manufacturer changes
+                        }}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر الصانع" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {manufacturers.map((manufacturer) => (
+                              <SelectItem key={manufacturer.id} value={manufacturer.name}>
+                                {manufacturer.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Category Selection */}
+                      <div>
+                        <Label htmlFor="category">الفئة</Label>
+                        <Select value={vehicleCategory} onValueChange={(value) => {
+                          setVehicleCategory(value);
+                          setVehicleTrimLevel(""); // Clear trim level when category changes
+                        }} disabled={!vehicleManufacturer}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر الفئة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem key={category.category} value={category.category}>
+                                {category.category}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Trim Level Selection */}
+                      <div>
+                        <Label htmlFor="trimLevel">درجة التجهيز</Label>
+                        <Select value={vehicleTrimLevel} onValueChange={setVehicleTrimLevel} disabled={!vehicleCategory}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر درجة التجهيز" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {trimLevels.map((trimLevel) => (
+                              <SelectItem key={trimLevel.id} value={trimLevel.trimLevel}>
+                                {trimLevel.trimLevel}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Year Selection */}
+                      <div>
+                        <Label htmlFor="year">السنة</Label>
+                        <Select value={vehicleYear} onValueChange={setVehicleYear}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر السنة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                              <SelectItem key={year} value={year.toString()}>
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Engine Capacity Selection */}
+                      <div>
+                        <Label htmlFor="engineCapacity">سعة المحرك</Label>
+                        <Select value={vehicleEngineCapacity} onValueChange={setVehicleEngineCapacity}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر سعة المحرك" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {engineCapacities.map((capacity) => (
+                              <SelectItem key={capacity.engineCapacity} value={capacity.engineCapacity}>
+                                {capacity.engineCapacity}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Exterior Color */}
+                      <div>
+                        <Label htmlFor="exteriorColor">اللون الخارجي</Label>
+                        <Input
+                          id="exteriorColor"
+                          value={vehicleExteriorColor}
+                          onChange={(e) => setVehicleExteriorColor(e.target.value)}
+                          placeholder="أدخل اللون الخارجي"
+                        />
+                      </div>
+
+                      {/* Interior Color */}
+                      <div>
+                        <Label htmlFor="interiorColor">اللون الداخلي</Label>
+                        <Input
+                          id="interiorColor"
+                          value={vehicleInteriorColor}
+                          onChange={(e) => setVehicleInteriorColor(e.target.value)}
+                          placeholder="أدخل اللون الداخلي"
+                        />
+                      </div>
+
+                      {/* Chassis Number */}
+                      <div>
+                        <Label htmlFor="chassisNumber">رقم الهيكل</Label>
+                        <Input
+                          id="chassisNumber"
+                          value={vehicleChassisNumber}
+                          onChange={(e) => setVehicleChassisNumber(e.target.value)}
+                          placeholder="أدخل رقم الهيكل"
+                        />
+                      </div>
+
+                      {/* Price */}
+                      <div>
+                        <Label htmlFor="price">السعر</Label>
+                        <Input
+                          id="price"
+                          type="number"
+                          value={vehiclePrice}
+                          onChange={(e) => setVehiclePrice(Number(e.target.value))}
+                          placeholder="أدخل السعر"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Create Vehicle Button */}
+                    <div className="flex justify-end">
                       <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setVehicleEditOpen(true)}
-                        className="text-blue-600 hover:text-blue-700"
+                        onClick={() => {
+                          if (vehicleManufacturer && vehicleCategory && vehicleYear && vehicleEngineCapacity) {
+                            const newVehicle = {
+                              id: Date.now(),
+                              manufacturer: vehicleManufacturer,
+                              category: vehicleCategory,
+                              trimLevel: vehicleTrimLevel,
+                              year: parseInt(vehicleYear),
+                              engineCapacity: vehicleEngineCapacity,
+                              exteriorColor: vehicleExteriorColor,
+                              interiorColor: vehicleInteriorColor,
+                              chassisNumber: vehicleChassisNumber,
+                              price: vehiclePrice,
+                              entryDate: new Date(),
+                              status: "متوفر",
+                              importType: "مستعمل",
+                              location: "الرياض",
+                              notes: ""
+                            };
+                            setSelectedVehicle(newVehicle);
+                            setEditableVehicle(newVehicle);
+                            setPricingDetails(prev => ({
+                              ...prev,
+                              basePrice: vehiclePrice
+                            }));
+                          }
+                        }}
+                        disabled={!vehicleManufacturer || !vehicleCategory || !vehicleYear || !vehicleEngineCapacity}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
                       >
-                        <Edit3 size={14} className="ml-1" />
-                        تعديل
+                        <Plus size={16} className="ml-2" />
+                        إنشاء السيارة
                       </Button>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
-                      <div>
-                        <span className="text-slate-500">السنة:</span>
-                        <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.year}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500">سعة المحرك:</span>
-                        <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.engineCapacity}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500">اللون الخارجي:</span>
-                        <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.exteriorColor}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500">اللون الداخلي:</span>
-                        <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.interiorColor}</span>
-                      </div>
-                      {editableVehicle.chassisNumber && (
-                        <div className="col-span-2">
-                          <span className="text-slate-500">رقم الهيكل:</span>
-                          <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.chassisNumber}</span>
-                        </div>
-                      )}
-                      {editableVehicle.price && (
-                        <div className="col-span-2">
-                          <span className="text-slate-500">السعر الأساسي:</span>
-                          <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">
-                            {editableVehicle.price.toLocaleString()} ريال
-                          </span>
-                        </div>
-                      )}
-                    </div>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
