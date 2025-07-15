@@ -455,7 +455,7 @@ export default function QuotationA4Preview({
               <h3 className="text-sm font-semibold mb-2 text-center" style={{color: '#BF9231'}}>
                 {isInvoiceMode ? 'ختم الفاتورة' : 'لختم العرض'}
               </h3>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg h-24 flex items-center justify-center">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg h-24 flex items-center justify-center mt-[20px] mb-[20px]">
                 {companyStamp ? (
                   <img 
                     src={companyStamp} 
@@ -471,7 +471,7 @@ export default function QuotationA4Preview({
 
           {/* Notes Section */}
           {notes && (
-            <div className="border border-slate-200 rounded-lg p-3 mb-3 mt-[20px] mb-[20px]">
+            <div className="border border-slate-200 rounded-lg p-3 w-48 pt-[2px] pb-[2px] pl-[2px] pr-[2px]">
               <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>ملاحظات</h3>
               <p className="text-xs text-gray-700 leading-relaxed">{notes}</p>
             </div>
