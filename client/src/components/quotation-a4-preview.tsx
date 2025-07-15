@@ -27,6 +27,7 @@ interface QuotationA4PreviewProps {
   representativeEmail: string;
   representativePosition: string;
   notes: string;
+  termsRefreshTrigger?: number;
 }
 
 export default function QuotationA4Preview({
@@ -49,7 +50,8 @@ export default function QuotationA4Preview({
   representativePhone,
   representativeEmail,
   representativePosition,
-  notes
+  notes,
+  termsRefreshTrigger = 0
 }: QuotationA4PreviewProps) {
   
   const [termsConditions, setTermsConditions] = useState<Array<{ id: number; term_text: string; display_order: number }>>([]);
@@ -69,7 +71,7 @@ export default function QuotationA4Preview({
     };
     
     fetchTermsConditions();
-  }, []);
+  }, [termsRefreshTrigger]);
 
   useEffect(() => {
     const fetchManufacturerLogo = async () => {

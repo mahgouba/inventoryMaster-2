@@ -185,6 +185,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [showWhatsappDialog, setShowWhatsappDialog] = useState(false);
   const [showCompanyManagement, setShowCompanyManagement] = useState(false);
+  const [termsRefreshTrigger, setTermsRefreshTrigger] = useState(0);
 
   // Load existing terms and conditions
   const { data: existingTerms = [] } = useQuery<Array<{ id: number; term_text: string; display_order: number }>>({
@@ -385,6 +386,9 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       
       // Refresh terms in the preview component
       queryClient.invalidateQueries({ queryKey: ['/api/terms-conditions'] });
+      
+      // Trigger refresh of terms in preview component
+      setTermsRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error("Error saving terms:", error);
       toast({
@@ -1129,6 +1133,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 representativeEmail={representatives.find(r => r.id === selectedRepresentative)?.email || "غير محدد"}
                 representativePosition={representatives.find(r => r.id === selectedRepresentative)?.position || "غير محدد"}
                 notes={notes}
+                termsRefreshTrigger={termsRefreshTrigger}
               />
             </CardContent>
           </Card>
