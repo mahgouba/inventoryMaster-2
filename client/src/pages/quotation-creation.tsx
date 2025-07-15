@@ -1276,24 +1276,13 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="quoteNumber">رقم عرض السعر</Label>
-                        <div className="flex gap-2">
-                          <Input
-                            id="quoteNumber"
-                            value={quoteNumber}
-                            readOnly
-                            className="bg-slate-50 dark:bg-slate-800"
-                            placeholder="Q-123456"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="px-3"
-                            title="رمز QR للعرض"
-                          >
-                            <QrCode size={16} />
-                          </Button>
-                        </div>
+                        <Input
+                          id="quoteNumber"
+                          value={quoteNumber}
+                          readOnly
+                          className="bg-slate-50 dark:bg-slate-800"
+                          placeholder="Q-123456"
+                        />
                       </div>
                       <div>
                         <Label htmlFor="customerName">اسم العميل *</Label>
