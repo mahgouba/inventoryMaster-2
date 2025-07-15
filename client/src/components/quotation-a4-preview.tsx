@@ -324,8 +324,7 @@ export default function QuotationA4Preview({
             </div>
             
             {/* Table Header */}
-            <div className="grid grid-cols-6 bg-gray-100 border-b border-gray-300 text-xs font-semibold text-center">
-              <div className="p-2 border-l border-gray-300">الموديل</div>
+            <div className="grid grid-cols-5 bg-gray-100 border-b border-gray-300 text-xs font-semibold text-center">
               <div className="p-2 border-l border-gray-300">الكمية</div>
               <div className="p-2 border-l border-gray-300">السعر الفردي</div>
               <div className="p-2 border-l border-gray-300">الضريبة ({taxRate}%)</div>
@@ -334,10 +333,7 @@ export default function QuotationA4Preview({
             </div>
             
             {/* Table Row */}
-            <div className="grid grid-cols-6 border-b border-gray-200 text-xs text-center">
-              <div className="p-2 border-l border-gray-200 font-medium">
-                {selectedVehicle ? `${selectedVehicle.year} ${selectedVehicle.manufacturer} ${selectedVehicle.category}` : "المركبة المحددة"}
-              </div>
+            <div className="grid grid-cols-5 border-b border-gray-200 text-xs text-center">
               <div className="p-2 border-l border-gray-200">1</div>
               <div className="p-2 border-l border-gray-200 font-medium">{basePrice.toLocaleString()}</div>
               <div className="p-2 border-l border-gray-200 font-medium">{taxAmount.toLocaleString()}</div>
