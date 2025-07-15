@@ -1473,24 +1473,6 @@ export class DatabaseStorage implements IStorage {
       console.error('Delete company error:', error);
       return false;
     }
-  }et({ ...companyData, updatedAt: new Date() })
-        .where(eq(companies.id, id))
-        .returning();
-      return results[0];
-    } catch (error) {
-      console.error('Update company error:', error);
-      return undefined;
-    }
-  }
-
-  async deleteCompany(id: number): Promise<boolean> {
-    try {
-      await db.delete(companies).where(eq(companies.id, id));
-      return true;
-    } catch (error) {
-      console.error('Delete company error:', error);
-      return false;
-    }
   }
 
   // Specifications methods
@@ -1593,35 +1575,6 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Get specification by vehicle params error:', error);
       return undefined;
-    }
-  }
-
-  eate company error:', error);
-      throw error;
-    }
-  }
-
-  async updateCompany(id: number, data: InsertCompany): Promise<Company | undefined> {
-    try {
-      const [updatedCompany] = await db
-        .update(companies)
-        .set({ ...data, updatedAt: new Date() })
-        .where(eq(companies.id, id))
-        .returning();
-      return updatedCompany;
-    } catch (error) {
-      console.error('Update company error:', error);
-      return undefined;
-    }
-  }
-
-  async deleteCompany(id: number): Promise<boolean> {
-    try {
-      const result = await db.delete(companies).where(eq(companies.id, id));
-      return result.rowCount > 0;
-    } catch (error) {
-      console.error('Delete company error:', error);
-      return false;
     }
   }
 
