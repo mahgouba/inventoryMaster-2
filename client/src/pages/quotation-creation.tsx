@@ -494,11 +494,8 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
   // Create quotation mutation
   const createQuotationMutation = useMutation({
     mutationFn: async (data: InsertQuotation) => {
-      const response = await apiRequest('/api/quotations', {
-        method: 'POST',
-        body: JSON.stringify(data)
-      });
-      return response;
+      const response = await apiRequest('POST', '/api/quotations', data);
+      return response.json();
     },
     onSuccess: () => {
       toast({
