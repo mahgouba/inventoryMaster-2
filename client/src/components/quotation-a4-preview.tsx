@@ -364,6 +364,23 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
+          {/* Terms & Conditions Section */}
+          <div className="border border-slate-200 rounded-lg p-3 mb-3">
+            <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>شروط المحفظة</h3>
+            <div className="text-xs text-gray-700 space-y-1">
+              {termsConditions.length > 0 ? (
+                termsConditions.map((term, index) => (
+                  <div key={term.id} className="flex items-start gap-2">
+                    <span className="text-gray-500 font-medium">{index + 1}.</span>
+                    <span className="leading-relaxed">{term.term_text}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 italic">لم يتم إضافة شروط وأحكام بعد</p>
+              )}
+            </div>
+          </div>
+
           {/* Notes Section */}
           {notes && (
             <div className="border border-slate-200 rounded-lg p-3 mb-3">
