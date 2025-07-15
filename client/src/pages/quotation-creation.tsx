@@ -812,14 +812,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 </Button>
               </Link>
               
-              <Button
-                variant="outline"
-                onClick={convertToInvoice}
-                className="border-green-500 text-green-600 hover:bg-green-50"
-              >
-                <FileText size={16} className="ml-2" />
-                فاتورة
-              </Button>
+              
               
               <Button
                 variant="outline"
