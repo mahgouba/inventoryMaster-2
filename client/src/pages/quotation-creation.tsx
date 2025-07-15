@@ -844,51 +844,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 {createQuotationMutation.isPending ? "جاري الحفظ..." : "حفظ كمسودة"}
               </Button>
               
-              <Button
-                onClick={() => {
-                  // Clear vehicle data for new quote
-                  setSelectedVehicle(null);
-                  setEditableVehicle(null);
-                  setVehicleManufacturer("");
-                  setVehicleCategory("");
-                  setVehicleTrimLevel("");
-                  setVehicleYear("");
-                  setVehicleEngineCapacity("");
-                  setVehicleExteriorColor("");
-                  setVehicleInteriorColor("");
-                  setVehicleChassisNumber("");
-                  setVehiclePrice(0);
-                  
-                  // Reset pricing details
-                  setPricingDetails({
-                    basePrice: 0,
-                    quantity: 1,
-                    taxRate: 15,
-                    isVATInclusive: false,
-                    includeLicensePlate: false,
-                    licensePlatePrice: 900,
-                    licensePlateSubjectToTax: false
-                  });
-                  
-                  // Generate new quote number
-                  setQuoteNumber(`Q-${Date.now()}`);
-                  
-                  // Clear customer data
-                  setCustomerName("");
-                  setCustomerPhone("");
-                  setCustomerEmail("");
-                  setNotes("");
-                  setValidityDays(30);
-                  
-                  // Reset company and representative selection
-                  setSelectedCompany("");
-                  setSelectedRepresentative("");
-                }}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Plus size={16} className="ml-2" />
-                عرض جديد
-              </Button>
+
             </div>
           </div>
         </div>
