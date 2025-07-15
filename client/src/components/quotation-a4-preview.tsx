@@ -239,6 +239,9 @@ export default function QuotationA4Preview({
                       {selectedCompany?.taxNumber && (
                         <p>💰 الرقم الضريبي: {selectedCompany.taxNumber}</p>
                       )}
+                      {selectedCompany?.licenseNumber && (
+                        <p>📋 رقم الرخصة: {selectedCompany.licenseNumber}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -278,6 +281,12 @@ export default function QuotationA4Preview({
                         <span>{selectedCompany.email}</span>
                       </div>
                     )}
+                    {selectedCompany?.website && (
+                      <div className="flex items-center gap-1">
+                        <Globe size={12} />
+                        <span>{selectedCompany.website}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -309,6 +318,9 @@ export default function QuotationA4Preview({
                       )}
                       {selectedCompany?.taxNumber && (
                         <p>الرقم الضريبي: {selectedCompany.taxNumber}</p>
+                      )}
+                      {selectedCompany?.licenseNumber && (
+                        <p>رقم الرخصة: {selectedCompany.licenseNumber}</p>
                       )}
                     </div>
                   </div>
@@ -349,6 +361,12 @@ export default function QuotationA4Preview({
                         <span>{selectedCompany.email}</span>
                       </div>
                     )}
+                    {selectedCompany?.website && (
+                      <div className="flex items-center gap-1">
+                        <Globe size={14} />
+                        <span>{selectedCompany.website}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -375,6 +393,17 @@ export default function QuotationA4Preview({
                     <p className="text-blue-100 text-xs mb-1">
                       {selectedCompany?.address || "العنوان"}
                     </p>
+                    <div className="space-y-1 text-xs text-blue-100">
+                      {selectedCompany?.registrationNumber && (
+                        <p>رقم السجل: {selectedCompany.registrationNumber}</p>
+                      )}
+                      {selectedCompany?.taxNumber && (
+                        <p>الرقم الضريبي: {selectedCompany.taxNumber}</p>
+                      )}
+                      {selectedCompany?.licenseNumber && (
+                        <p>رقم الرخصة: {selectedCompany.licenseNumber}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
                 
@@ -391,6 +420,32 @@ export default function QuotationA4Preview({
                     <p className="text-blue-100 text-xs">
                       رقم: {isInvoiceMode ? invoiceNumber : quoteNumber}
                     </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Footer with contact info */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-teal-700 to-teal-800 p-2 rounded-b-lg">
+                <div className="flex justify-between items-center text-xs text-white">
+                  <div className="flex items-center gap-4">
+                    {selectedCompany?.phone && (
+                      <div className="flex items-center gap-1">
+                        <Phone size={12} />
+                        <span>{selectedCompany.phone}</span>
+                      </div>
+                    )}
+                    {selectedCompany?.email && (
+                      <div className="flex items-center gap-1">
+                        <Mail size={12} />
+                        <span>{selectedCompany.email}</span>
+                      </div>
+                    )}
+                    {selectedCompany?.website && (
+                      <div className="flex items-center gap-1">
+                        <Globe size={12} />
+                        <span>{selectedCompany.website}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -57,6 +57,8 @@ interface CompanyData {
   email: string;
   website: string;
   taxNumber: string;
+  registrationNumber: string;
+  licenseNumber: string;
 }
 
 interface RepresentativeData {
@@ -207,8 +209,34 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     phone: "+966 11 123 4567",
     email: "info@company.com",
     website: "www.company.com",
-    taxNumber: "123456789"
+    taxNumber: "123456789",
+    registrationNumber: "1234567890",
+    licenseNumber: "L123456789"
   });
+
+  // Update company data when selected company changes
+  useEffect(() => {
+    if (selectedCompanyData) {
+      setCompanyData({
+        name: selectedCompanyData.name,
+        logo: selectedCompanyData.logo || "",
+        address: selectedCompanyData.address,
+        phone: selectedCompanyData.phone || "",
+        email: selectedCompanyData.email,
+        website: selectedCompanyData.website || "",
+        taxNumber: selectedCompanyData.taxNumber,
+        registrationNumber: selectedCompanyData.registrationNumber,
+        licenseNumber: selectedCompanyData.licenseNumber
+      });
+      
+      // Update appearance based on company colors
+      setQuoteAppearance(prev => ({
+        ...prev,
+        primaryColor: selectedCompanyData.primaryColor || "#0F172A",
+        secondaryColor: selectedCompanyData.secondaryColor || "#64748B"
+      }));
+    }
+  }, [selectedCompanyData]);
   
   const [representativeData, setRepresentativeData] = useState<RepresentativeData>({
     name: "أحمد محمد",
