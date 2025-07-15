@@ -947,15 +947,6 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   الفواتير
                 </Button>
               </Link>
-              
-              <Button
-                variant="outline"
-                onClick={() => window.print()}
-                className="border-blue-500 text-blue-600 hover:bg-blue-50"
-              >
-                <Printer size={16} className="ml-2" />
-                طباعة
-              </Button>
             </div>
           </div>
         </div>
