@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { 
   ArrowLeft,
   FileText, 
@@ -873,14 +874,35 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 حفظ {isInvoiceMode ? "الفاتورة" : "العرض"}
               </Button>
               
-              <Button
-                variant="outline"
-                onClick={convertToInvoice}
-                className="border-purple-500 text-purple-600 hover:bg-purple-50"
-              >
-                <FileUp size={16} className="ml-2" />
-                فاتورة
-              </Button>
+              {/* Toggle Switch for Invoice/Quotation Mode */}
+              <div className="flex items-center space-x-2 space-x-reverse border border-purple-500 rounded-lg px-3 py-2 bg-white">
+                <Label htmlFor="invoice-mode" className="text-sm font-medium text-purple-600">
+                  {isInvoiceMode ? "فاتورة" : "عرض سعر"}
+                </Label>
+                <Switch
+                  id="invoice-mode"
+                  checked={isInvoiceMode}
+                  onCheckedChange={(checked) => {
+                    setIsInvoiceMode(checked);
+                    if (checked) {
+                      // Generate invoice number when switching to invoice mode
+                      const newInvoiceNumber = `INV-${Date.now()}`;
+                      setInvoiceNumber(newInvoiceNumber);
+                      toast({
+                        title: "تم التبديل إلى وضع الفاتورة",
+                        description: `رقم الفاتورة: ${newInvoiceNumber}`,
+                      });
+                    } else {
+                      toast({
+                        title: "تم التبديل إلى وضع عرض السعر",
+                        description: "يمكنك الآن إنشاء عرض سعر",
+                      });
+                    }
+                  }}
+                  className="data-[state=checked]:bg-purple-600"
+                />
+                <FileUp size={16} className="text-purple-600" />
+              </div>
               
               <Link href="/invoice-management">
                 <Button

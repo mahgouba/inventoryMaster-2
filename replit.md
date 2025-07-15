@@ -210,6 +210,7 @@ Changelog:
 - July 15, 2025: Successfully migrated project from Replit Agent to Replit environment with full functionality - configured PostgreSQL database, installed all dependencies, integrated OpenAI API for voice assistant, seeded database with comprehensive sample data, verified all core features working including inventory management, specifications system, quotation creation, and voice assistant integration
 - July 15, 2025: Modified quotation to invoice conversion functionality - removed all data validation requirements from convertToInvoice function, allowing conversion to invoice even with incomplete data by using fallback values for missing fields, ensuring seamless invoice creation regardless of data completeness
 - July 15, 2025: Implemented comprehensive QR code functionality in quotation headers - added QR code generation using qrcode library with vehicle details, customer information, and pricing data, integrated QR code display in quotation A4 preview header section, fixed styling issues in stamp and notes sections, and removed unused quotation-creation-empty page and its references from routing system
+- July 15, 2025: Replaced invoice button with toggle switch for seamless quotation/invoice mode switching - implemented Switch component with purple styling, automatic invoice number generation when switching to invoice mode, toast notifications for mode changes, and dynamic label display showing current mode (عرض سعر/فاتورة)
 ```
 
 ## User Preferences
