@@ -53,6 +53,7 @@ export default function QuotationA4Preview({
 }: QuotationA4PreviewProps) {
   
   const [termsConditions, setTermsConditions] = useState<Array<{ id: number; term_text: string; display_order: number }>>([]);
+  const [manufacturerLogo, setManufacturerLogo] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTermsConditions = async () => {
@@ -69,6 +70,27 @@ export default function QuotationA4Preview({
     
     fetchTermsConditions();
   }, []);
+
+  useEffect(() => {
+    const fetchManufacturerLogo = async () => {
+      if (selectedVehicle?.manufacturer) {
+        try {
+          const response = await fetch('/api/manufacturers');
+          if (response.ok) {
+            const manufacturers = await response.json();
+            const manufacturer = manufacturers.find((m: any) => m.name === selectedVehicle.manufacturer);
+            if (manufacturer?.logo) {
+              setManufacturerLogo(manufacturer.logo);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching manufacturer logo:', error);
+        }
+      }
+    };
+    
+    fetchManufacturerLogo();
+  }, [selectedVehicle?.manufacturer]);
   
   // Calculate tax amounts
   const vehicleSubtotal = basePrice;
@@ -236,9 +258,18 @@ export default function QuotationA4Preview({
             <div className="border border-slate-200 rounded-lg p-3 mb-3">
               <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>بيانات المركبة</h3>
               <div className="grid grid-cols-2 gap-2 text-xs">
-                <div>
+                <div className="flex items-center gap-2">
                   <span className="font-medium">الصانع: </span>
-                  <span>{selectedVehicle.manufacturer}</span>
+                  <div className="flex items-center gap-1">
+                    {manufacturerLogo && (
+                      <img 
+                        src={manufacturerLogo} 
+                        alt={selectedVehicle.manufacturer} 
+                        className="w-5 h-5 object-contain"
+                      />
+                    )}
+                    <span>{selectedVehicle.manufacturer}</span>
+                  </div>
                 </div>
                 <div>
                   <span className="font-medium">الفئة: </span>
