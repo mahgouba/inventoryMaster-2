@@ -471,7 +471,7 @@ export default function QuotationA4Preview({
 
           {/* Notes Section */}
           {notes && (
-            <div className="border border-slate-200 rounded-lg p-3 mb-3">
+            <div className="border border-slate-200 rounded-lg p-3 mb-3 mt-[20px] mb-[20px]">
               <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>ملاحظات</h3>
               <p className="text-xs text-gray-700 leading-relaxed">{notes}</p>
             </div>
