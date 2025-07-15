@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, timestamp, boolean, decimal, varchar } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -171,7 +172,7 @@ export const quotations = pgTable("quotations", {
   customerPhone: text("customer_phone"), // هاتف العميل
   customerEmail: text("customer_email"), // بريد العميل
   notes: text("notes"), // ملاحظات
-  validUntil: timestamp("valid_until").notNull(), // صالح حتى
+  validUntil: timestamp("valid_until").default(sql`NOW() + INTERVAL '30 days'`), // صالح حتى
   status: text("status").notNull().default("مسودة"), // الحالة (مسودة، مرسل، مقبول، مرفوض)
   createdBy: text("created_by").notNull(), // المُنشئ
   companyData: text("company_data"), // بيانات الشركة
@@ -312,7 +313,11 @@ export const insertQuotationSchema = createInsertSchema(quotations).omit({
       return new Date(val);
     }
     return val;
-  }).optional().default(() => new Date()),
+  }).optional().default(() => {
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() + 30);
+    return defaultDate;
+  }),
 });
 
 

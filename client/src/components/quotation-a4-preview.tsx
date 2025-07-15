@@ -185,7 +185,7 @@ export default function QuotationA4Preview({
         <div className="h-full">
           {/* Modern Header Section - Custom brand colors */}
           <div className="relative text-white p-4 rounded-lg bg-[#c70e0e00] pl-[38px] pr-[38px] ml-[-41px] mr-[-41px] mt-[-23px] mb-[-23px]" style={{background: 'linear-gradient(to right, #00627F, #004B5C)'}}>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between pt-[6px] pb-[6px]">
               <div className="flex items-center gap-4">
                 {selectedCompany?.logo && (
                   <div className="w-14 h-14 bg-white rounded-full p-2 flex items-center justify-center">
