@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -167,6 +167,12 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     queryKey: ["/api/engine-capacities"],
     queryFn: () => apiRequest("/api/engine-capacities")
   });
+
+  // Query for all available vehicles
+  const { data: availableVehicles = [] } = useQuery({
+    queryKey: ["/api/inventory"],
+    select: (data) => data.filter((vehicle: any) => vehicle.status !== "مباع")
+  });
   
   // Management windows states
   const [specificationsOpen, setSpecificationsOpen] = useState(false);
@@ -177,6 +183,9 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [quotesViewOpen, setQuotesViewOpen] = useState(false);
   const [vehicleEditOpen, setVehicleEditOpen] = useState(false);
   const [editableVehicle, setEditableVehicle] = useState<InventoryItem | null>(selectedVehicle);
+  const [vehicleDescriptionOpen, setVehicleDescriptionOpen] = useState(false);
+  const [vehicleSearchQuery, setVehicleSearchQuery] = useState("");
+  const [selectedVehicleFromDB, setSelectedVehicleFromDB] = useState<any>(null);
   
   // Get selected company object
   const selectedCompanyData = companies.find(c => c.id.toString() === selectedCompany);
@@ -1054,8 +1063,17 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                       </div>
                     </div>
 
-                    {/* Create Vehicle Button */}
-                    <div className="flex justify-end">
+                    {/* Action Buttons */}
+                    <div className="flex justify-between items-center">
+                      <Button
+                        onClick={() => setVehicleDescriptionOpen(true)}
+                        variant="outline"
+                        className="text-blue-600 hover:text-blue-700 border-blue-600 hover:border-blue-700"
+                      >
+                        <Search size={16} className="ml-2" />
+                        اختيار سيارة موجودة
+                      </Button>
+                      
                       <Button
                         onClick={() => {
                           if (vehicleManufacturer && vehicleCategory && vehicleYear && vehicleEngineCapacity) {
@@ -1723,6 +1741,230 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       </Dialog>
 
       
+
+      {/* Vehicle Description and Selection Dialog */}
+      <Dialog open={vehicleDescriptionOpen} onOpenChange={setVehicleDescriptionOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>اختيار سيارة من المخزون</DialogTitle>
+            <DialogDescription>
+              يمكنك البحث واختيار سيارة من المخزون المتاح لإنشاء عرض السعر
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6">
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="البحث برقم الهيكل، الصانع، الفئة، أو اللون..."
+                value={vehicleSearchQuery}
+                onChange={(e) => setVehicleSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            {/* Vehicle Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {availableVehicles
+                .filter((vehicle: any) => 
+                  !vehicleSearchQuery || 
+                  vehicle.chassisNumber?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
+                  vehicle.manufacturer?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
+                  vehicle.category?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
+                  vehicle.exteriorColor?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
+                  vehicle.interiorColor?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
+                  vehicle.engineCapacity?.toLowerCase().includes(vehicleSearchQuery.toLowerCase())
+                )
+                .map((vehicle: any) => (
+                  <Card 
+                    key={vehicle.id} 
+                    className={`cursor-pointer transition-all hover:shadow-md ${
+                      selectedVehicleFromDB?.id === vehicle.id ? 'ring-2 ring-blue-500' : ''
+                    }`}
+                    onClick={() => setSelectedVehicleFromDB(vehicle)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start space-x-4 space-x-reverse">
+                        {/* Manufacturer Logo */}
+                        <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
+                          {manufacturers.find(m => m.name === vehicle.manufacturer)?.logo ? (
+                            <img 
+                              src={manufacturers.find(m => m.name === vehicle.manufacturer)?.logo} 
+                              alt={vehicle.manufacturer} 
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <span className="text-lg font-bold text-slate-600 dark:text-slate-300">
+                              {vehicle.manufacturer?.charAt(0)}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {/* Vehicle Info */}
+                        <div className="flex-1">
+                          <h3 className="font-bold text-lg">{vehicle.manufacturer} {vehicle.category}</h3>
+                          {vehicle.trimLevel && (
+                            <p className="text-sm text-blue-600 font-medium">{vehicle.trimLevel}</p>
+                          )}
+                          <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
+                            <div>
+                              <span className="text-gray-500">السنة:</span>
+                              <span className="font-medium mr-1">{vehicle.year}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">المحرك:</span>
+                              <span className="font-medium mr-1">{vehicle.engineCapacity}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">خارجي:</span>
+                              <span className="font-medium mr-1">{vehicle.exteriorColor}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">داخلي:</span>
+                              <span className="font-medium mr-1">{vehicle.interiorColor}</span>
+                            </div>
+                          </div>
+                          {vehicle.chassisNumber && (
+                            <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded text-sm">
+                              <span className="text-gray-500">رقم الهيكل:</span>
+                              <span className="font-mono font-medium mr-1">{vehicle.chassisNumber}</span>
+                            </div>
+                          )}
+                          {vehicle.price && (
+                            <div className="mt-2 text-lg font-bold text-green-600">
+                              {vehicle.price.toLocaleString()} ريال
+                            </div>
+                          )}
+                          <div className="mt-2 flex gap-2">
+                            <Badge variant={vehicle.status === "متوفر" ? "default" : "secondary"}>
+                              {vehicle.status}
+                            </Badge>
+                            <Badge variant="outline">{vehicle.importType}</Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+            </div>
+
+            {/* No vehicles found */}
+            {availableVehicles.length === 0 && (
+              <div className="text-center py-8">
+                <FileText size={48} className="mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-500">لا توجد سيارات متاحة في المخزون</p>
+              </div>
+            )}
+
+            {/* Selected Vehicle Details */}
+            {selectedVehicleFromDB && (
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-bold mb-4">تفاصيل السيارة المختارة</h3>
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-bold text-xl text-blue-800 dark:text-blue-200">
+                        {selectedVehicleFromDB.manufacturer} {selectedVehicleFromDB.category}
+                      </h4>
+                      {selectedVehicleFromDB.trimLevel && (
+                        <p className="text-blue-600 font-medium mt-1">{selectedVehicleFromDB.trimLevel}</p>
+                      )}
+                    </div>
+                    <div className="text-left">
+                      <p className="text-2xl font-bold text-green-600">
+                        {selectedVehicleFromDB.price?.toLocaleString()} ريال
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">السنة:</span>
+                      <p className="font-medium">{selectedVehicleFromDB.year}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">سعة المحرك:</span>
+                      <p className="font-medium">{selectedVehicleFromDB.engineCapacity}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">اللون الخارجي:</span>
+                      <p className="font-medium">{selectedVehicleFromDB.exteriorColor}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">اللون الداخلي:</span>
+                      <p className="font-medium">{selectedVehicleFromDB.interiorColor}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">الحالة:</span>
+                      <p className="font-medium">{selectedVehicleFromDB.status}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">نوع الاستيراد:</span>
+                      <p className="font-medium">{selectedVehicleFromDB.importType}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">الموقع:</span>
+                      <p className="font-medium">{selectedVehicleFromDB.location}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">تاريخ الإدخال:</span>
+                      <p className="font-medium">{new Date(selectedVehicleFromDB.entryDate).toLocaleDateString('ar-SA')}</p>
+                    </div>
+                  </div>
+                  
+                  {selectedVehicleFromDB.chassisNumber && (
+                    <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded border">
+                      <span className="text-gray-600">رقم الهيكل:</span>
+                      <p className="font-mono font-bold text-lg">{selectedVehicleFromDB.chassisNumber}</p>
+                    </div>
+                  )}
+                  
+                  {selectedVehicleFromDB.notes && (
+                    <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded border">
+                      <span className="text-gray-600">ملاحظات:</span>
+                      <p className="mt-1">{selectedVehicleFromDB.notes}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex justify-between items-center border-t pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setVehicleDescriptionOpen(false);
+                  setSelectedVehicleFromDB(null);
+                  setVehicleSearchQuery("");
+                }}
+              >
+                إلغاء
+              </Button>
+              <Button 
+                onClick={() => {
+                  if (selectedVehicleFromDB) {
+                    setSelectedVehicle(selectedVehicleFromDB);
+                    setEditableVehicle(selectedVehicleFromDB);
+                    setPricingDetails(prev => ({
+                      ...prev,
+                      basePrice: selectedVehicleFromDB.price || 0
+                    }));
+                    setVehicleDescriptionOpen(false);
+                    setSelectedVehicleFromDB(null);
+                    setVehicleSearchQuery("");
+                  }
+                }}
+                disabled={!selectedVehicleFromDB}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Plus size={16} className="ml-2" />
+                اختيار هذه السيارة
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Vehicle Edit Dialog */}
       <Dialog open={vehicleEditOpen} onOpenChange={setVehicleEditOpen}>
