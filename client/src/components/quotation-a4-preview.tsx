@@ -28,6 +28,7 @@ interface QuotationA4PreviewProps {
   representativePosition: string;
   notes: string;
   termsRefreshTrigger?: number;
+  companyStamp?: string | null;
 }
 
 export default function QuotationA4Preview({
@@ -51,7 +52,8 @@ export default function QuotationA4Preview({
   representativeEmail,
   representativePosition,
   notes,
-  termsRefreshTrigger = 0
+  termsRefreshTrigger = 0,
+  companyStamp = null
 }: QuotationA4PreviewProps) {
   
   const [termsConditions, setTermsConditions] = useState<Array<{ id: number; term_text: string; display_order: number }>>([]);
@@ -362,20 +364,39 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
-          {/* Terms & Conditions Section */}
-          <div className="border border-slate-200 rounded-lg p-3 mb-3 ml-[257px] mr-[257px]">
-            <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>الشروط  الاحكام </h3>
-            <div className="text-xs text-gray-700 space-y-1">
-              {termsConditions.length > 0 ? (
-                termsConditions.map((term, index) => (
-                  <div key={term.id} className="flex items-start gap-2">
-                    <span className="text-gray-500 font-medium">{index + 1}.</span>
-                    <span className="leading-relaxed">{term.term_text}</span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 italic">لم يتم إضافة شروط وأحكام بعد</p>
-              )}
+          {/* Terms & Conditions and Stamp Section */}
+          <div className="flex gap-4 mb-3">
+            {/* Terms & Conditions Section */}
+            <div className="border border-slate-200 rounded-lg p-3 flex-1">
+              <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>الشروط والأحكام</h3>
+              <div className="text-xs text-gray-700 space-y-1">
+                {termsConditions.length > 0 ? (
+                  termsConditions.map((term, index) => (
+                    <div key={term.id} className="flex items-start gap-2">
+                      <span className="text-gray-500 font-medium">{index + 1}.</span>
+                      <span className="leading-relaxed">{term.term_text}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic">لم يتم إضافة شروط وأحكام بعد</p>
+                )}
+              </div>
+            </div>
+            
+            {/* Stamp Section */}
+            <div className="border border-slate-200 rounded-lg p-3 w-48">
+              <h3 className="text-sm font-semibold mb-2 text-center" style={{color: '#BF9231'}}>لختم العرض</h3>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg h-24 flex items-center justify-center">
+                {companyStamp ? (
+                  <img 
+                    src={companyStamp} 
+                    alt="ختم الشركة" 
+                    className="max-w-full max-h-full object-contain"
+                  />
+                ) : (
+                  <span className="text-xs text-gray-400">منطقة الختم</span>
+                )}
+              </div>
             </div>
           </div>
 

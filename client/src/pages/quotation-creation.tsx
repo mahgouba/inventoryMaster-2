@@ -186,6 +186,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [showWhatsappDialog, setShowWhatsappDialog] = useState(false);
   const [showCompanyManagement, setShowCompanyManagement] = useState(false);
   const [termsRefreshTrigger, setTermsRefreshTrigger] = useState(0);
+  const [companyStamp, setCompanyStamp] = useState<string | null>(null);
 
   // Load existing terms and conditions
   const { data: existingTerms = [] } = useQuery<Array<{ id: number; term_text: string; display_order: number }>>({
@@ -657,6 +658,37 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               >
                 <Settings2 size={16} className="ml-2" />
                 شروط
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.onchange = (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        const result = event.target?.result as string;
+                        if (result) {
+                          setCompanyStamp(result);
+                          toast({
+                            title: "تم رفع الختم بنجاح",
+                            description: "تم إضافة ختم الشركة إلى العرض",
+                          });
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  };
+                  input.click();
+                }}
+                className="border-red-500 text-red-600 hover:bg-red-50"
+              >
+                <Upload size={16} className="ml-2" />
+                {companyStamp ? "تغيير الختم" : "إضافة ختم"}
               </Button>
               
               <Button
@@ -1134,6 +1166,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 representativePosition={representatives.find(r => r.id === selectedRepresentative)?.position || "غير محدد"}
                 notes={notes}
                 termsRefreshTrigger={termsRefreshTrigger}
+                companyStamp={companyStamp}
               />
             </CardContent>
           </Card>
