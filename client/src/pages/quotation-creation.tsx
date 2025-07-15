@@ -110,6 +110,8 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [validityDays, setValidityDays] = useState<number>(30);
   const [notes, setNotes] = useState<string>("");
+  const [isInvoiceMode, setIsInvoiceMode] = useState<boolean>(false);
+  const [invoiceNumber, setInvoiceNumber] = useState<string>("");
   
   // Representative selection
   const [selectedRepresentative, setSelectedRepresentative] = useState<string>("");
@@ -283,14 +285,18 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
       }
 
       // Generate invoice number
-      const invoiceNumber = `INV-${Date.now().toString().slice(-8)}`;
+      const newInvoiceNumber = `INV-${Date.now().toString().slice(-8)}`;
+      
+      // Switch to invoice mode
+      setIsInvoiceMode(true);
+      setInvoiceNumber(newInvoiceNumber);
       
       // Calculate totals
       const totals = calculateTotals();
       
       // Prepare invoice data
       const invoiceData = {
-        invoiceNumber,
+        invoiceNumber: newInvoiceNumber,
         quoteNumber,
         inventoryItemId: selectedVehicle.id,
         manufacturer: selectedVehicle.manufacturer,
@@ -316,7 +322,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
         companyData: JSON.stringify(selectedCompanyData),
         representativeData: JSON.stringify(representatives.find(r => r.id === selectedRepresentative)),
         pricingDetails: JSON.stringify(pricingDetails),
-        qrCodeData: JSON.stringify({ invoiceNumber, customerName, finalPrice: totals.finalTotal })
+        qrCodeData: JSON.stringify({ invoiceNumber: newInvoiceNumber, customerName, finalPrice: totals.finalTotal })
       };
 
       // Create invoice via API
@@ -324,7 +330,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
       
       toast({
         title: "تم التحويل بنجاح",
-        description: `تم إنشاء الفاتورة رقم ${invoiceNumber}`,
+        description: `تم تحويل العرض إلى فاتورة رقم ${newInvoiceNumber}`,
       });
 
       // Store invoice data for potential future use
@@ -748,6 +754,15 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               
               <Button
                 variant="outline"
+                onClick={convertToInvoice}
+                className="border-green-500 text-green-600 hover:bg-green-50"
+              >
+                <FileText size={16} className="ml-2" />
+                فاتورة
+              </Button>
+              
+              <Button
+                variant="outline"
                 onClick={() => window.print()}
                 className="border-blue-500 text-blue-600 hover:bg-blue-50"
               >
@@ -1159,7 +1174,9 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         <div className="mt-8">
           <Card>
             <CardHeader>
-              <CardTitle className="text-center">معاينة العرض (A4)</CardTitle>
+              <CardTitle className="text-center">
+                {isInvoiceMode ? 'معاينة الفاتورة (A4)' : 'معاينة العرض (A4)'}
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <QuotationA4Preview
@@ -1185,6 +1202,8 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 notes={notes}
                 termsRefreshTrigger={termsRefreshTrigger}
                 companyStamp={companyStamp}
+                isInvoiceMode={isInvoiceMode}
+                invoiceNumber={invoiceNumber}
               />
             </CardContent>
           </Card>
@@ -1632,13 +1651,13 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               {companies.find(c => c.id === selectedCompany)?.address || "العنوان"}
             </p>
             <p className="text-sm">
-              تاريخ العرض: {new Date().toLocaleDateString('ar-SA')}
+              {isInvoiceMode ? 'تاريخ الفاتورة' : 'تاريخ العرض'}: {new Date().toLocaleDateString('ar-SA')}
             </p>
           </div>
           <div className="print-header-qr">
             <div className="text-center">
               <div className="text-xs mb-1">QR Code</div>
-              <div className="text-xs">{quoteNumber}</div>
+              <div className="text-xs">{isInvoiceMode ? invoiceNumber : quoteNumber}</div>
             </div>
           </div>
         </div>
@@ -1779,15 +1798,19 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         {/* Footer */}
         <div className="print-section mt-8">
           <div className="print-row">
-            <span className="print-label">رقم عرض السعر:</span>
-            <span className="print-value">{quoteNumber}</span>
-          </div>
-          <div className="print-row">
-            <span className="print-label">صالح حتى:</span>
-            <span className="print-value">
-              {new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000).toLocaleDateString('ar-SA')}
+            <span className="print-label">
+              {isInvoiceMode ? 'رقم الفاتورة:' : 'رقم عرض السعر:'}
             </span>
+            <span className="print-value">{isInvoiceMode ? invoiceNumber : quoteNumber}</span>
           </div>
+          {!isInvoiceMode && (
+            <div className="print-row">
+              <span className="print-label">صالح حتى:</span>
+              <span className="print-value">
+                {new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000).toLocaleDateString('ar-SA')}
+              </span>
+            </div>
+          )}
         </div>
       </div>
       

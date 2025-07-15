@@ -29,6 +29,8 @@ interface QuotationA4PreviewProps {
   notes: string;
   termsRefreshTrigger?: number;
   companyStamp?: string | null;
+  isInvoiceMode?: boolean;
+  invoiceNumber?: string;
 }
 
 export default function QuotationA4Preview({
@@ -53,7 +55,9 @@ export default function QuotationA4Preview({
   representativePosition,
   notes,
   termsRefreshTrigger = 0,
-  companyStamp = null
+  companyStamp = null,
+  isInvoiceMode = false,
+  invoiceNumber = ""
 }: QuotationA4PreviewProps) {
   
   const [termsConditions, setTermsConditions] = useState<Array<{ id: number; term_text: string; display_order: number }>>([]);
@@ -178,10 +182,20 @@ export default function QuotationA4Preview({
               
               <div className="text-right text-sm">
                 <div className="backdrop-blur-sm rounded-lg p-3 bg-[#015a7400] mt-[-7px] mb-[-7px] pt-[11px] pb-[11px] pl-[20px] pr-[20px] text-right">
-                  <h2 className="text-lg font-bold mb-1">عرض سعر</h2>
-                  <p className="text-blue-100 text-xs">رقم: {quoteNumber}</p>
-                  <p className="text-blue-100 text-xs">التاريخ: {new Date().toLocaleDateString('ar-SA')}</p>
-                  <p className="text-blue-100 text-xs">صالح حتى: {validUntil.toLocaleDateString('ar-SA')}</p>
+                  <h2 className="text-lg font-bold mb-1">
+                    {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
+                  </h2>
+                  <p className="text-blue-100 text-xs">
+                    رقم: {isInvoiceMode ? invoiceNumber : quoteNumber}
+                  </p>
+                  <p className="text-blue-100 text-xs">
+                    التاريخ: {new Date().toLocaleDateString('ar-SA')}
+                  </p>
+                  {!isInvoiceMode && (
+                    <p className="text-blue-100 text-xs">
+                      صالح حتى: {validUntil.toLocaleDateString('ar-SA')}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -366,26 +380,30 @@ export default function QuotationA4Preview({
 
           {/* Terms & Conditions and Stamp Section */}
           <div className="flex gap-4 mb-3">
-            {/* Terms & Conditions Section */}
-            <div className="border border-slate-200 rounded-lg p-3 flex-1">
-              <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>الشروط والأحكام</h3>
-              <div className="text-xs text-gray-700 space-y-1">
-                {termsConditions.length > 0 ? (
-                  termsConditions.map((term, index) => (
-                    <div key={term.id} className="flex items-start gap-2">
-                      <span className="text-gray-500 font-medium">{index + 1}.</span>
-                      <span className="leading-relaxed">{term.term_text}</span>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 italic">لم يتم إضافة شروط وأحكام بعد</p>
-                )}
+            {/* Terms & Conditions Section - Hidden in invoice mode */}
+            {!isInvoiceMode && (
+              <div className="border border-slate-200 rounded-lg p-3 flex-1">
+                <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>الشروط والأحكام</h3>
+                <div className="text-xs text-gray-700 space-y-1">
+                  {termsConditions.length > 0 ? (
+                    termsConditions.map((term, index) => (
+                      <div key={term.id} className="flex items-start gap-2">
+                        <span className="text-gray-500 font-medium">{index + 1}.</span>
+                        <span className="leading-relaxed">{term.term_text}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 italic">لم يتم إضافة شروط وأحكام بعد</p>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
             
             {/* Stamp Section */}
-            <div className="border border-slate-200 rounded-lg p-3 w-48">
-              <h3 className="text-sm font-semibold mb-2 text-center" style={{color: '#BF9231'}}>لختم العرض</h3>
+            <div className={`border border-slate-200 rounded-lg p-3 ${isInvoiceMode ? 'w-full' : 'w-48'}`}>
+              <h3 className="text-sm font-semibold mb-2 text-center" style={{color: '#BF9231'}}>
+                {isInvoiceMode ? 'ختم الفاتورة' : 'لختم العرض'}
+              </h3>
               <div className="border-2 border-dashed border-gray-300 rounded-lg h-24 flex items-center justify-center">
                 {companyStamp ? (
                   <img 
