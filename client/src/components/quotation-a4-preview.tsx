@@ -363,7 +363,7 @@ export default function QuotationA4Preview({
           </div>
 
           {/* Terms & Conditions Section */}
-          <div className="border border-slate-200 rounded-lg p-3 mb-3">
+          <div className="border border-slate-200 rounded-lg p-3 mb-3 ml-[257px] mr-[257px]">
             <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>الشروط  الاحكام </h3>
             <div className="text-xs text-gray-700 space-y-1">
               {termsConditions.length > 0 ? (
