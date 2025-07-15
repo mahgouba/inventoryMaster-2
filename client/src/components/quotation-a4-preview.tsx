@@ -182,7 +182,18 @@ export default function QuotationA4Preview({
           `
         }} />
         
-        <div className="h-full">
+        {/* Large Watermark Background */}
+        {selectedCompany?.logo && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none z-0">
+            <img 
+              src={selectedCompany.logo} 
+              alt="Watermark" 
+              className="w-80 h-80 object-contain transform rotate-12"
+            />
+          </div>
+        )}
+        
+        <div className="h-full relative z-10">
           {/* Modern Header Section - Custom brand colors */}
           <div className="relative text-white p-4 rounded-lg bg-[#c70e0e00] pl-[38px] pr-[38px] ml-[-41px] mr-[-41px] mt-[-23px] mb-[-23px]" style={{background: 'linear-gradient(to right, #00627F, #004B5C)'}}>
             <div className="flex items-center justify-between pt-[6px] pb-[6px]">
@@ -203,15 +214,28 @@ export default function QuotationA4Preview({
                   <p className="text-blue-100 text-xs mb-1">
                     {selectedCompany?.address || "العنوان"}
                   </p>
-                  <div className="space-y-1 text-xs text-blue-100">
-                    {selectedCompany?.registrationNumber && (
-                      <p>رقم السجل التجاري: {selectedCompany.registrationNumber}</p>
-                    )}
-                    {selectedCompany?.taxNumber && (
-                      <p>الرقم الضريبي: {selectedCompany.taxNumber}</p>
-                    )}
-                    {selectedCompany?.licenseNumber && (
-                      <p>رقم الرخصة: {selectedCompany.licenseNumber}</p>
+                  <div className="space-y-1 text-xs text-blue-100 flex items-center justify-between pt-[6px] pb-[6px]">
+                    <div>
+                      {selectedCompany?.registrationNumber && (
+                        <p>رقم السجل التجاري: {selectedCompany.registrationNumber}</p>
+                      )}
+                      {selectedCompany?.taxNumber && (
+                        <p>الرقم الضريبي: {selectedCompany.taxNumber}</p>
+                      )}
+                      {selectedCompany?.licenseNumber && (
+                        <p>رقم الرخصة: {selectedCompany.licenseNumber}</p>
+                      )}
+                    </div>
+                    
+                    {/* Company Logo */}
+                    {selectedCompany?.logo && (
+                      <div className="ml-4">
+                        <img 
+                          src={selectedCompany.logo} 
+                          alt="شعار الشركة" 
+                          className="w-12 h-12 object-contain"
+                        />
+                      </div>
                     )}
                   </div>
                 </div>

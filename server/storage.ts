@@ -1392,6 +1392,9 @@ export class DatabaseStorage implements IStorage {
   async createQuotation(quotationData: any): Promise<any> {
     try {
       // Remove validation - save without any conditions
+      const validUntil = new Date();
+      validUntil.setDate(validUntil.getDate() + 30);
+      
       const simpleQuotation = {
         quoteNumber: quotationData.quoteNumber || `Q-${Date.now()}`,
         inventoryItemId: quotationData.inventoryItemId || 0,
@@ -1410,15 +1413,13 @@ export class DatabaseStorage implements IStorage {
         customerPhone: quotationData.customerPhone || '',
         customerEmail: quotationData.customerEmail || '',
         notes: quotationData.notes || '',
+        validUntil: validUntil,
         status: quotationData.status || 'مسودة',
-        validityDays: quotationData.validityDays || 30,
         createdBy: quotationData.createdBy || 'system',
         companyData: quotationData.companyData || '{}',
         representativeData: quotationData.representativeData || '{}',
         pricingDetails: quotationData.pricingDetails || '{}',
-        qrCodeData: quotationData.qrCodeData || '{}',
-        createdAt: new Date(),
-        updatedAt: new Date()
+        qrCodeData: quotationData.qrCodeData || '{}'
       };
       
       const [quotation] = await db.insert(quotations).values(simpleQuotation).returning();
