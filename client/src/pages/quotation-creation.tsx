@@ -141,34 +141,29 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   
   // Fetch companies from API
   const { data: companies = [] } = useQuery<Company[]>({
-    queryKey: ["/api/companies"],
-    queryFn: () => apiRequest("/api/companies")
+    queryKey: ["/api/companies"]
   });
 
   // Fetch manufacturers for dropdown selection
   const { data: manufacturers = [] } = useQuery<any[]>({
-    queryKey: ["/api/manufacturers"],
-    queryFn: () => apiRequest("/api/manufacturers")
+    queryKey: ["/api/manufacturers"]
   });
 
   // Fetch categories based on selected manufacturer
   const { data: categories = [] } = useQuery<{ category: string }[]>({
-    queryKey: ["/api/categories", vehicleManufacturer],
-    queryFn: () => apiRequest(`/api/categories/${vehicleManufacturer}`),
+    queryKey: [`/api/categories/${vehicleManufacturer}`],
     enabled: !!vehicleManufacturer
   });
 
   // Fetch trim levels based on selected manufacturer and category
   const { data: trimLevels = [] } = useQuery<any[]>({
-    queryKey: ["/api/trim-levels", vehicleManufacturer, vehicleCategory],
-    queryFn: () => apiRequest(`/api/trim-levels/category/${vehicleManufacturer}/${vehicleCategory}`),
+    queryKey: [`/api/trim-levels/category/${vehicleManufacturer}/${vehicleCategory}`],
     enabled: !!vehicleManufacturer && !!vehicleCategory
   });
 
   // Fetch engine capacities
   const { data: engineCapacities = [] } = useQuery<{ engineCapacity: string }[]>({
-    queryKey: ["/api/engine-capacities"],
-    queryFn: () => apiRequest("/api/engine-capacities")
+    queryKey: ["/api/engine-capacities"]
   });
 
   // Query for all available vehicles
