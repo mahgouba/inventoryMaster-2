@@ -406,6 +406,75 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     }
   };
 
+  // Save quotation or invoice
+  const saveQuotation = async () => {
+    try {
+      // Calculate totals
+      const totals = calculateTotals();
+      
+      // Get current vehicle data (from selected vehicle or form inputs)
+      const currentVehicle = selectedVehicle || editableVehicle || {
+        id: Date.now(),
+        manufacturer: vehicleManufacturer || "غير محدد",
+        category: vehicleCategory || "غير محدد",
+        trimLevel: vehicleTrimLevel || "",
+        year: parseInt(vehicleYear) || new Date().getFullYear(),
+        exteriorColor: vehicleExteriorColor || "",
+        interiorColor: vehicleInteriorColor || "",
+        chassisNumber: vehicleChassisNumber || "",
+        engineCapacity: vehicleEngineCapacity || "",
+        price: vehiclePrice || 0
+      };
+      
+      // Prepare quotation data
+      const quotationData = {
+        quoteNumber: quoteNumber || `Q-${Date.now()}`,
+        inventoryItemId: currentVehicle.id || null,
+        manufacturer: currentVehicle.manufacturer || "غير محدد",
+        category: currentVehicle.category || "غير محدد",
+        trimLevel: currentVehicle.trimLevel || "",
+        year: currentVehicle.year || new Date().getFullYear(),
+        exteriorColor: currentVehicle.exteriorColor || "",
+        interiorColor: currentVehicle.interiorColor || "",
+        chassisNumber: currentVehicle.chassisNumber || "",
+        engineCapacity: currentVehicle.engineCapacity || "",
+        specifications: vehicleSpecs?.detailedDescription || "",
+        basePrice: pricingDetails.basePrice.toString(),
+        finalPrice: totals.finalTotal.toString(),
+        customerName: customerName || "عميل غير محدد",
+        customerPhone: customerPhone || "",
+        customerEmail: customerEmail || "",
+        notes: notes || "",
+        status: "مسودة",
+        validityDays: validityDays || 30,
+        createdBy: "system", // Should be current user
+        companyData: JSON.stringify(selectedCompanyData || {}),
+        representativeData: JSON.stringify(representatives.find(r => r.id === selectedRepresentative) || {}),
+        pricingDetails: JSON.stringify(pricingDetails),
+        qrCodeData: JSON.stringify({ quoteNumber: quoteNumber || `Q-${Date.now()}`, customerName: customerName || "عميل غير محدد", finalPrice: totals.finalTotal })
+      };
+
+      // Save quotation via API
+      const response = await apiRequest('POST', '/api/quotations', quotationData);
+      
+      toast({
+        title: "تم الحفظ بنجاح",
+        description: `تم حفظ ${isInvoiceMode ? 'الفاتورة' : 'عرض السعر'} بنجاح`,
+      });
+
+      // Store quotation data for potential future use
+      localStorage.setItem('lastQuotationData', JSON.stringify(response));
+      
+    } catch (error) {
+      console.error("Error saving quotation:", error);
+      toast({
+        title: "خطأ في الحفظ",
+        description: `حدث خطأ أثناء حفظ ${isInvoiceMode ? 'الفاتورة' : 'عرض السعر'}`,
+        variant: "destructive",
+      });
+    }
+  };
+
   // Share via WhatsApp
   const shareViaWhatsApp = () => {
     if (!whatsappNumber) {
@@ -791,6 +860,15 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               >
                 <MessageCircle size={16} className="ml-2" />
                 واتساب
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={saveQuotation}
+                className="border-green-500 text-green-600 hover:bg-green-50"
+              >
+                <Save size={16} className="ml-2" />
+                حفظ {isInvoiceMode ? "الفاتورة" : "العرض"}
               </Button>
               
               <Button
