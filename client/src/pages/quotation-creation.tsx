@@ -956,15 +956,6 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 <Printer size={16} className="ml-2" />
                 طباعة
               </Button>
-              
-              <Button
-                variant="outline"
-                onClick={exportToPDF}
-                className="border-slate-500 text-slate-600 hover:bg-slate-50"
-              >
-                <Download size={16} className="ml-2" />
-                PDF
-              </Button>
             </div>
           </div>
         </div>
