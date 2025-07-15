@@ -330,16 +330,6 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   // Convert quotation to invoice
   const convertToInvoice = async () => {
     try {
-      // Validate required fields
-      if (!customerName || !selectedRepresentative || !selectedCompany || !selectedVehicle) {
-        toast({
-          title: "خطأ في التحويل",
-          description: "يرجى التأكد من إدخال جميع البيانات المطلوبة",
-          variant: "destructive",
-        });
-        return;
-      }
-
       // Generate invoice number
       const newInvoiceNumber = `INV-${Date.now().toString().slice(-8)}`;
       
@@ -347,38 +337,52 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
       setIsInvoiceMode(true);
       setInvoiceNumber(newInvoiceNumber);
       
-      // Calculate totals
+      // Calculate totals (with fallback for empty data)
       const totals = calculateTotals();
       
-      // Prepare invoice data
+      // Get current vehicle data (from selected vehicle or form inputs)
+      const currentVehicle = selectedVehicle || editableVehicle || {
+        id: Date.now(),
+        manufacturer: vehicleManufacturer || "غير محدد",
+        category: vehicleCategory || "غير محدد",
+        trimLevel: vehicleTrimLevel || "",
+        year: parseInt(vehicleYear) || new Date().getFullYear(),
+        exteriorColor: vehicleExteriorColor || "",
+        interiorColor: vehicleInteriorColor || "",
+        chassisNumber: vehicleChassisNumber || "",
+        engineCapacity: vehicleEngineCapacity || "",
+        price: vehiclePrice || 0
+      };
+      
+      // Prepare invoice data with fallback values for missing fields
       const invoiceData = {
         invoiceNumber: newInvoiceNumber,
-        quoteNumber,
-        inventoryItemId: selectedVehicle.id,
-        manufacturer: selectedVehicle.manufacturer,
-        category: selectedVehicle.category,
-        trimLevel: selectedVehicle.trimLevel,
-        year: selectedVehicle.year,
-        exteriorColor: selectedVehicle.exteriorColor,
-        interiorColor: selectedVehicle.interiorColor,
-        chassisNumber: selectedVehicle.chassisNumber,
-        engineCapacity: selectedVehicle.engineCapacity,
+        quoteNumber: quoteNumber || `Q-${Date.now()}`,
+        inventoryItemId: currentVehicle.id || null,
+        manufacturer: currentVehicle.manufacturer || "غير محدد",
+        category: currentVehicle.category || "غير محدد",
+        trimLevel: currentVehicle.trimLevel || "",
+        year: currentVehicle.year || new Date().getFullYear(),
+        exteriorColor: currentVehicle.exteriorColor || "",
+        interiorColor: currentVehicle.interiorColor || "",
+        chassisNumber: currentVehicle.chassisNumber || "",
+        engineCapacity: currentVehicle.engineCapacity || "",
         specifications: vehicleSpecs?.detailedDescription || "",
         basePrice: pricingDetails.basePrice.toString(),
         finalPrice: totals.finalTotal.toString(),
-        customerName,
-        customerPhone,
-        customerEmail,
-        notes,
+        customerName: customerName || "عميل غير محدد",
+        customerPhone: customerPhone || "",
+        customerEmail: customerEmail || "",
+        notes: notes || "",
         status: "مسودة",
         paymentStatus: "غير مدفوع",
         remainingAmount: totals.finalTotal.toString(),
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
         createdBy: "system", // Should be current user
-        companyData: JSON.stringify(selectedCompanyData),
-        representativeData: JSON.stringify(representatives.find(r => r.id === selectedRepresentative)),
+        companyData: JSON.stringify(selectedCompanyData || {}),
+        representativeData: JSON.stringify(representatives.find(r => r.id === selectedRepresentative) || {}),
         pricingDetails: JSON.stringify(pricingDetails),
-        qrCodeData: JSON.stringify({ invoiceNumber: newInvoiceNumber, customerName, finalPrice: totals.finalTotal })
+        qrCodeData: JSON.stringify({ invoiceNumber: newInvoiceNumber, customerName: customerName || "عميل غير محدد", finalPrice: totals.finalTotal })
       };
 
       // Create invoice via API
