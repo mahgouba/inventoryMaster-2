@@ -502,8 +502,8 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
     },
     onSuccess: () => {
       toast({
-        title: "تم إنشاء عرض السعر",
-        description: "تم إنشاء عرض السعر بنجاح ويمكنك الآن طباعته أو إرساله للعميل",
+        title: "تم حفظ عرض السعر",
+        description: "تم حفظ عرض السعر بنجاح. يمكنك تعديله لاحقاً أو طباعته",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/quotations'] });
       // Navigate back to previous page
@@ -519,10 +519,10 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
   });
 
   const handleSaveQuotation = () => {
-    if (!editableVehicle || !customerName.trim() || !selectedRepresentative || !selectedCompany) {
+    if (!editableVehicle) {
       toast({
         title: "بيانات ناقصة",
-        description: "يرجى التأكد من اختيار السيارة وإدخال اسم العميل واختيار المندوب والشركة",
+        description: "يرجى التأكد من اختيار السيارة",
         variant: "destructive",
       });
       return;
@@ -530,9 +530,27 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
 
     const totals = calculateTotals();
     
-    // Get selected representative and company data
-    const selectedRepData = representatives.find(rep => rep.id === selectedRepresentative);
-    const selectedCompanyData = companies.find(comp => comp.id === selectedCompany);
+    // Get selected representative and company data (use defaults if not selected)
+    const selectedRepData = representatives.find(rep => rep.id === selectedRepresentative) || {
+      id: "",
+      name: "",
+      phone: "",
+      email: "",
+      position: ""
+    };
+    const selectedCompanyData = companies.find(comp => comp.id === selectedCompany) || {
+      id: 0,
+      name: "",
+      logo: "",
+      address: "",
+      phone: "",
+      email: "",
+      website: "",
+      taxNumber: "",
+      primaryColor: "#1a73e8",
+      secondaryColor: "#34a853",
+      isActive: true
+    };
 
     const validUntilDate = new Date();
     validUntilDate.setDate(validUntilDate.getDate() + validityDays);
@@ -584,9 +602,9 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       chassisNumber: editableVehicle.chassisNumber,
       engineCapacity: editableVehicle.engineCapacity,
       specifications: formatSpecifications(),
-      basePrice: pricingDetails.basePrice.toString(),
-      finalPrice: totals.finalTotal.toString(),
-      customerName: customerName.trim(),
+      basePrice: pricingDetails.basePrice.toString() || "0",
+      finalPrice: totals.finalTotal.toString() || "0",
+      customerName: customerName.trim() || "غير محدد",
       customerPhone: customerPhone.trim(),
       customerEmail: customerEmail.trim(),
       notes: notes.trim(),
@@ -751,7 +769,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
                 <Save size={16} className="ml-2" />
-                {createQuotationMutation.isPending ? "جاري الحفظ..." : "حفظ"}
+                {createQuotationMutation.isPending ? "جاري الحفظ..." : "حفظ كمسودة"}
               </Button>
             </div>
           </div>

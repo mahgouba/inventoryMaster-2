@@ -303,15 +303,15 @@ export const insertQuotationSchema = createInsertSchema(quotations).omit({
   createdAt: true,
   updatedAt: true,
 }).extend({
-  customerName: z.string().min(1, "اسم العميل مطلوب"),
-  basePrice: z.string().min(1, "السعر الأساسي مطلوب"),
-  finalPrice: z.string().min(1, "السعر النهائي مطلوب"),
+  customerName: z.string().optional().default("غير محدد"),
+  basePrice: z.string().optional().default("0"),
+  finalPrice: z.string().optional().default("0"),
   validUntil: z.union([z.string(), z.date()]).transform((val) => {
     if (typeof val === 'string') {
       return new Date(val);
     }
     return val;
-  }),
+  }).optional().default(() => new Date()),
 });
 
 
