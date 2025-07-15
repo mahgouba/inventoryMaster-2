@@ -28,7 +28,8 @@ import {
   Download,
   MessageCircle,
   FileUp,
-  Settings2
+  Settings2,
+  X
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useTheme } from "@/hooks/useTheme";
@@ -186,6 +187,16 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [vehicleDescriptionOpen, setVehicleDescriptionOpen] = useState(false);
   const [vehicleSearchQuery, setVehicleSearchQuery] = useState("");
   const [selectedVehicleFromDB, setSelectedVehicleFromDB] = useState<any>(null);
+  
+  // Filter states for vehicle selection dialog
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterTrimLevel, setFilterTrimLevel] = useState("");
+  const [filterYear, setFilterYear] = useState("");
+  const [filterEngineCapacity, setFilterEngineCapacity] = useState("");
+  const [filterImportType, setFilterImportType] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterExteriorColor, setFilterExteriorColor] = useState("");
+  const [filterInteriorColor, setFilterInteriorColor] = useState("");
   
   // Get selected company object
   const selectedCompanyData = companies.find(c => c.id.toString() === selectedCompany);
@@ -1809,18 +1820,195 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               />
             </div>
 
+            {/* Filters */}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+              <div>
+                <Label className="text-sm font-medium">الفئة</Label>
+                <Select value={filterCategory} onValueChange={setFilterCategory}>
+                  <SelectTrigger className="h-8">
+                    <SelectValue placeholder="الكل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">الكل</SelectItem>
+                    {Array.from(new Set(availableVehicles.map((v: any) => v.category))).map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">درجة التجهيز</Label>
+                <Select value={filterTrimLevel} onValueChange={setFilterTrimLevel}>
+                  <SelectTrigger className="h-8">
+                    <SelectValue placeholder="الكل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">الكل</SelectItem>
+                    {Array.from(new Set(availableVehicles.map((v: any) => v.trimLevel).filter(Boolean))).map((trimLevel) => (
+                      <SelectItem key={trimLevel} value={trimLevel}>
+                        {trimLevel}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">السنة</Label>
+                <Select value={filterYear} onValueChange={setFilterYear}>
+                  <SelectTrigger className="h-8">
+                    <SelectValue placeholder="الكل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">الكل</SelectItem>
+                    {Array.from(new Set(availableVehicles.map((v: any) => v.year.toString()))).sort((a, b) => parseInt(b) - parseInt(a)).map((year) => (
+                      <SelectItem key={year} value={year}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">سعة المحرك</Label>
+                <Select value={filterEngineCapacity} onValueChange={setFilterEngineCapacity}>
+                  <SelectTrigger className="h-8">
+                    <SelectValue placeholder="الكل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">الكل</SelectItem>
+                    {Array.from(new Set(availableVehicles.map((v: any) => v.engineCapacity).filter(Boolean))).map((capacity) => (
+                      <SelectItem key={capacity} value={capacity}>
+                        {capacity}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">نوع الاستيراد</Label>
+                <Select value={filterImportType} onValueChange={setFilterImportType}>
+                  <SelectTrigger className="h-8">
+                    <SelectValue placeholder="الكل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">الكل</SelectItem>
+                    {Array.from(new Set(availableVehicles.map((v: any) => v.importType).filter(Boolean))).map((importType) => (
+                      <SelectItem key={importType} value={importType}>
+                        {importType}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">الحالة</Label>
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="h-8">
+                    <SelectValue placeholder="الكل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">الكل</SelectItem>
+                    {Array.from(new Set(availableVehicles.map((v: any) => v.status).filter(Boolean))).map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">اللون الخارجي</Label>
+                <Select value={filterExteriorColor} onValueChange={setFilterExteriorColor}>
+                  <SelectTrigger className="h-8">
+                    <SelectValue placeholder="الكل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">الكل</SelectItem>
+                    {Array.from(new Set(availableVehicles.map((v: any) => v.exteriorColor).filter(Boolean))).map((color) => (
+                      <SelectItem key={color} value={color}>
+                        {color}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">اللون الداخلي</Label>
+                <Select value={filterInteriorColor} onValueChange={setFilterInteriorColor}>
+                  <SelectTrigger className="h-8">
+                    <SelectValue placeholder="الكل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">الكل</SelectItem>
+                    {Array.from(new Set(availableVehicles.map((v: any) => v.interiorColor).filter(Boolean))).map((color) => (
+                      <SelectItem key={color} value={color}>
+                        {color}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Clear Filters Button */}
+              <div className="flex items-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setFilterCategory("");
+                    setFilterTrimLevel("");
+                    setFilterYear("");
+                    setFilterEngineCapacity("");
+                    setFilterImportType("");
+                    setFilterStatus("");
+                    setFilterExteriorColor("");
+                    setFilterInteriorColor("");
+                    setVehicleSearchQuery("");
+                  }}
+                  className="h-8 text-red-600 hover:text-red-700"
+                >
+                  <X size={14} className="ml-1" />
+                  مسح الفلاتر
+                </Button>
+              </div>
+            </div>
+
             {/* Vehicle Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {availableVehicles
-                .filter((vehicle: any) => 
-                  !vehicleSearchQuery || 
-                  vehicle.chassisNumber?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
-                  vehicle.manufacturer?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
-                  vehicle.category?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
-                  vehicle.exteriorColor?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
-                  vehicle.interiorColor?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
-                  vehicle.engineCapacity?.toLowerCase().includes(vehicleSearchQuery.toLowerCase())
-                )
+                .filter((vehicle: any) => {
+                  // Search filter
+                  const searchMatch = !vehicleSearchQuery || 
+                    vehicle.chassisNumber?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
+                    vehicle.manufacturer?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
+                    vehicle.category?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
+                    vehicle.exteriorColor?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
+                    vehicle.interiorColor?.toLowerCase().includes(vehicleSearchQuery.toLowerCase()) ||
+                    vehicle.engineCapacity?.toLowerCase().includes(vehicleSearchQuery.toLowerCase());
+                  
+                  // Filter conditions
+                  const categoryMatch = !filterCategory || vehicle.category === filterCategory;
+                  const trimLevelMatch = !filterTrimLevel || vehicle.trimLevel === filterTrimLevel;
+                  const yearMatch = !filterYear || vehicle.year.toString() === filterYear;
+                  const engineCapacityMatch = !filterEngineCapacity || vehicle.engineCapacity === filterEngineCapacity;
+                  const importTypeMatch = !filterImportType || vehicle.importType === filterImportType;
+                  const statusMatch = !filterStatus || vehicle.status === filterStatus;
+                  const exteriorColorMatch = !filterExteriorColor || vehicle.exteriorColor === filterExteriorColor;
+                  const interiorColorMatch = !filterInteriorColor || vehicle.interiorColor === filterInteriorColor;
+                  
+                  return searchMatch && categoryMatch && trimLevelMatch && yearMatch && 
+                         engineCapacityMatch && importTypeMatch && statusMatch && 
+                         exteriorColorMatch && interiorColorMatch;
+                })
                 .map((vehicle: any) => (
                   <Card 
                     key={vehicle.id} 
@@ -1983,6 +2171,15 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   setVehicleDescriptionOpen(false);
                   setSelectedVehicleFromDB(null);
                   setVehicleSearchQuery("");
+                  // Clear filters
+                  setFilterCategory("");
+                  setFilterTrimLevel("");
+                  setFilterYear("");
+                  setFilterEngineCapacity("");
+                  setFilterImportType("");
+                  setFilterStatus("");
+                  setFilterExteriorColor("");
+                  setFilterInteriorColor("");
                 }}
               >
                 إلغاء
@@ -1999,6 +2196,15 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     setVehicleDescriptionOpen(false);
                     setSelectedVehicleFromDB(null);
                     setVehicleSearchQuery("");
+                    // Clear filters
+                    setFilterCategory("");
+                    setFilterTrimLevel("");
+                    setFilterYear("");
+                    setFilterEngineCapacity("");
+                    setFilterImportType("");
+                    setFilterStatus("");
+                    setFilterExteriorColor("");
+                    setFilterInteriorColor("");
                   }
                 }}
                 disabled={!selectedVehicleFromDB}
