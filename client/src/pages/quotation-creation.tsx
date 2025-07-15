@@ -191,8 +191,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
 
   // Load existing terms and conditions
   const { data: existingTerms = [] } = useQuery<Array<{ id: number; term_text: string; display_order: number }>>({
-    queryKey: ['/api/terms-conditions'],
-    queryFn: () => apiRequest('/api/terms-conditions')
+    queryKey: ['/api/terms-conditions']
   });
 
   // Update terms content when existing terms are loaded
