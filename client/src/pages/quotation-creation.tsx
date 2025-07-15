@@ -842,6 +842,16 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 {companyStamp ? "تغيير الختم" : "إضافة ختم"}
               </Button>
               
+              <Link href="/dynamic-company-control">
+                <Button
+                  variant="outline"
+                  className="border-purple-500 text-purple-600 hover:bg-purple-50"
+                >
+                  <Settings size={16} className="ml-2" />
+                  تحكم الشركات
+                </Button>
+              </Link>
+              
               <Button
                 variant="outline"
                 onClick={() => setShowCompanyManagement(true)}

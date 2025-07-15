@@ -240,6 +240,13 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           إدارة المستخدمين
                         </DropdownMenuItem>
                       </Link>
+
+                      <Link href="/dynamic-company-control">
+                        <DropdownMenuItem>
+                          <Building2 className="mr-2 h-4 w-4" />
+                          التحكم في الشركة
+                        </DropdownMenuItem>
+                      </Link>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}

@@ -1101,6 +1101,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // System Settings Routes
+  app.get("/api/system-settings", async (req, res) => {
+    try {
+      const settings = await storage.getSystemSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching system settings:", error);
+      res.status(500).json({ message: "Failed to fetch system settings" });
+    }
+  });
+
+  app.put("/api/system-settings/:key", async (req, res) => {
+    try {
+      const { key } = req.params;
+      const { value } = req.body;
+      const setting = await storage.updateSystemSetting(key, value);
+      res.json(setting);
+    } catch (error) {
+      console.error("Error updating system setting:", error);
+      res.status(500).json({ message: "Failed to update system setting" });
+    }
+  });
+
+  app.get("/api/system-settings/default-company", async (req, res) => {
+    try {
+      const defaultCompanyId = await storage.getDefaultCompanyId();
+      if (defaultCompanyId) {
+        const company = await storage.getCompany(defaultCompanyId);
+        res.json(company);
+      } else {
+        res.status(404).json({ message: "No default company set" });
+      }
+    } catch (error) {
+      console.error("Error fetching default company:", error);
+      res.status(500).json({ message: "Failed to fetch default company" });
+    }
+  });
+
+  app.put("/api/system-settings/default-company/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.updateSystemSetting("default_company_id", id);
+      const company = await storage.getCompany(parseInt(id));
+      res.json({ message: "Default company updated", company });
+    } catch (error) {
+      console.error("Error updating default company:", error);
+      res.status(500).json({ message: "Failed to update default company" });
+    }
+  });
+
   // Terms and Conditions Routes
   app.get("/api/terms-conditions", async (req, res) => {
     try {

@@ -14,7 +14,7 @@ import {
   type TrimLevel, type InsertTrimLevel,
   type Quotation, type InsertQuotation
 } from "@shared/schema";
-import { db } from "./db";
+import { db, pool } from "./db";
 import { eq } from "drizzle-orm";
 
 export interface IStorage {
@@ -160,6 +160,11 @@ export interface IStorage {
   deleteInvoice(id: number): Promise<boolean>;
   getInvoicesByStatus(status: string): Promise<any[]>;
   getInvoiceByNumber(invoiceNumber: string): Promise<any | undefined>;
+
+  // System Settings methods
+  getSystemSettings(): Promise<Array<{key: string, value: string}>>;
+  updateSystemSetting(key: string, value: string): Promise<{key: string, value: string}>;
+  getDefaultCompanyId(): Promise<number | null>;
 }
 
 export class MemStorage implements IStorage {
@@ -1817,6 +1822,50 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Get invoice by number error:', error);
       return undefined;
+    }
+  }
+
+  // System Settings methods (using raw SQL for simplicity)
+  async getSystemSettings(): Promise<Array<{key: string, value: string}>> {
+    try {
+      const result = await pool.query(`SELECT setting_key as key, setting_value as value FROM system_settings`);
+      return result.rows.map(row => ({
+        key: row.key as string,
+        value: row.value as string
+      }));
+    } catch (error) {
+      console.error('Get system settings error:', error);
+      return [];
+    }
+  }
+
+  async updateSystemSetting(key: string, value: string): Promise<{key: string, value: string}> {
+    try {
+      // Use raw SQL for upsert operation
+      await pool.query(`
+        INSERT INTO system_settings (setting_key, setting_value, updated_at) 
+        VALUES ($1, $2, CURRENT_TIMESTAMP)
+        ON CONFLICT (setting_key) 
+        DO UPDATE SET setting_value = $2, updated_at = CURRENT_TIMESTAMP
+      `, [key, value]);
+      
+      return { key, value };
+    } catch (error) {
+      console.error('Update system setting error:', error);
+      throw error;
+    }
+  }
+
+  async getDefaultCompanyId(): Promise<number | null> {
+    try {
+      const result = await pool.query(`SELECT setting_value FROM system_settings WHERE setting_key = 'default_company_id'`);
+      if (result.rows.length > 0) {
+        return parseInt(result.rows[0].setting_value as string);
+      }
+      return null;
+    } catch (error) {
+      console.error('Get default company ID error:', error);
+      return null;
     }
   }
 }
