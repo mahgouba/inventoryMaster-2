@@ -1330,6 +1330,40 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  // Categories methods
+  async getAllCategories(): Promise<{ category: string }[]> {
+    try {
+      const result = await db.selectDistinct({ category: inventoryItems.category }).from(inventoryItems);
+      return result;
+    } catch (error) {
+      console.error('Get all categories error:', error);
+      return [];
+    }
+  }
+
+  async getCategoriesByManufacturer(manufacturer: string): Promise<{ category: string }[]> {
+    try {
+      const result = await db.selectDistinct({ category: inventoryItems.category })
+        .from(inventoryItems)
+        .where(eq(inventoryItems.manufacturer, manufacturer));
+      return result;
+    } catch (error) {
+      console.error('Get categories by manufacturer error:', error);
+      return [];
+    }
+  }
+
+  // Engine capacities methods
+  async getAllEngineCapacities(): Promise<{ engineCapacity: string }[]> {
+    try {
+      const result = await db.selectDistinct({ engineCapacity: inventoryItems.engineCapacity }).from(inventoryItems);
+      return result;
+    } catch (error) {
+      console.error('Get all engine capacities error:', error);
+      return [];
+    }
+  }
+
   // Quotations methods
   async getAllQuotations(): Promise<Quotation[]> {
     try {

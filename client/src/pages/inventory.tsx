@@ -380,6 +380,14 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       <FileText className="w-4 h-4 ml-2" />
                       إدارة المواصفات
                     </Button>
+                    <Link href="/quotation-creation-empty">
+                      <Button 
+                        className="bg-purple-600 hover:bg-purple-700 text-white w-full sm:w-auto"
+                      >
+                        <FileText className="w-4 h-4 ml-2" />
+                        إنشاء عرض سعر
+                      </Button>
+                    </Link>
                     <Button 
                       onClick={() => setIsExcelImportOpen(true)}
                       variant="outline"

@@ -1546,6 +1546,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Categories API Routes
+  app.get("/api/categories", async (req, res) => {
+    try {
+      const categories = await storage.getAllCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  app.get("/api/categories/:manufacturer", async (req, res) => {
+    try {
+      const { manufacturer } = req.params;
+      const categories = await storage.getCategoriesByManufacturer(manufacturer);
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories by manufacturer:", error);
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  // Engine Capacities API Routes
+  app.get("/api/engine-capacities", async (req, res) => {
+    try {
+      const engineCapacities = await storage.getAllEngineCapacities();
+      res.json(engineCapacities);
+    } catch (error) {
+      console.error("Error fetching engine capacities:", error);
+      res.status(500).json({ message: "Failed to fetch engine capacities" });
+    }
+  });
+
   // Quotations API Routes
   app.get("/api/quotations", async (req, res) => {
     try {
