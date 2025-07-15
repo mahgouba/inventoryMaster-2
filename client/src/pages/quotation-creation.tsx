@@ -497,14 +497,18 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       const response = await apiRequest('POST', '/api/quotations', data);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       toast({
         title: "تم حفظ عرض السعر",
-        description: "تم حفظ عرض السعر بنجاح. يمكنك تعديله لاحقاً أو طباعته",
+        description: "تم حفظ عرض السعر بنجاح. سيتم تحويلك لصفحة التعديل",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/quotations'] });
-      // Navigate back to previous page
-      navigate('/card-view');
+      // Navigate to edit page with the new quotation ID
+      if (response.id) {
+        navigate(`/quotation-edit/${response.id}`);
+      } else {
+        navigate('/card-view');
+      }
     },
     onError: (error) => {
       toast({
