@@ -184,7 +184,6 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [termsContent, setTermsContent] = useState("");
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [showWhatsappDialog, setShowWhatsappDialog] = useState(false);
-  const [showCompanyManagement, setShowCompanyManagement] = useState(false);
   const [termsRefreshTrigger, setTermsRefreshTrigger] = useState(0);
   const [companyStamp, setCompanyStamp] = useState<string | null>(null);
 
@@ -1848,20 +1847,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         </DialogContent>
       </Dialog>
 
-      {/* Company Management Dialog */}
-      <Dialog open={showCompanyManagement} onOpenChange={setShowCompanyManagement}>
-        <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-indigo-600" />
-              إدارة الشركات
-            </DialogTitle>
-          </DialogHeader>
-          <div className="mt-4">
-            <CompanyManagement />
-          </div>
-        </DialogContent>
-      </Dialog>
+      
 
     </div>
   );

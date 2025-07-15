@@ -1450,7 +1450,30 @@ export class DatabaseStorage implements IStorage {
   async updateCompany(id: number, companyData: Partial<InsertCompany>): Promise<Company | undefined> {
     try {
       const results = await db.update(companies)
-        .set({ ...companyData, updatedAt: new Date() })
+        .set({
+          ...companyData,
+          updatedAt: new Date()
+        })
+        .where(eq(companies.id, id))
+        .returning();
+      return results[0];
+    } catch (error) {
+      console.error('Update company error:', error);
+      throw error;
+    }
+  }
+
+  async deleteCompany(id: number): Promise<boolean> {
+    try {
+      const results = await db.delete(companies)
+        .where(eq(companies.id, id))
+        .returning();
+      return results.length > 0;
+    } catch (error) {
+      console.error('Delete company error:', error);
+      return false;
+    }
+  }et({ ...companyData, updatedAt: new Date() })
         .where(eq(companies.id, id))
         .returning();
       return results[0];
@@ -1573,23 +1596,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Companies management methods
-  async getAllCompanies(): Promise<Company[]> {
-    try {
-      const results = await db.select().from(companies).orderBy(companies.name);
-      return results;
-    } catch (error) {
-      console.error('Get all companies error:', error);
-      return [];
-    }
-  }
-
-  async createCompany(data: InsertCompany): Promise<Company> {
-    try {
-      const [newCompany] = await db.insert(companies).values(data).returning();
-      return newCompany;
-    } catch (error) {
-      console.error('Create company error:', error);
+  eate company error:', error);
       throw error;
     }
   }
