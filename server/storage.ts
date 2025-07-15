@@ -1384,17 +1384,39 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async createQuotation(quotationData: InsertQuotation): Promise<Quotation> {
+  async createQuotation(quotationData: any): Promise<any> {
     try {
-      // Use the provided quote number or generate one if not provided
-      const quoteNumber = quotationData.quoteNumber || `Q-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-      
-      const [quotation] = await db.insert(quotations).values({
-        ...quotationData,
-        quoteNumber,
+      // Remove validation - save without any conditions
+      const simpleQuotation = {
+        quoteNumber: quotationData.quoteNumber || `Q-${Date.now()}`,
+        inventoryItemId: quotationData.inventoryItemId || 0,
+        manufacturer: quotationData.manufacturer || 'غير محدد',
+        category: quotationData.category || 'غير محدد',
+        trimLevel: quotationData.trimLevel || '',
+        year: quotationData.year || new Date().getFullYear(),
+        exteriorColor: quotationData.exteriorColor || '',
+        interiorColor: quotationData.interiorColor || '',
+        chassisNumber: quotationData.chassisNumber || '',
+        engineCapacity: quotationData.engineCapacity || '',
+        specifications: quotationData.specifications || '',
+        basePrice: quotationData.basePrice || '0',
+        finalPrice: quotationData.finalPrice || '0',
+        customerName: quotationData.customerName || 'عميل غير محدد',
+        customerPhone: quotationData.customerPhone || '',
+        customerEmail: quotationData.customerEmail || '',
+        notes: quotationData.notes || '',
+        status: quotationData.status || 'مسودة',
+        validityDays: quotationData.validityDays || 30,
+        createdBy: quotationData.createdBy || 'system',
+        companyData: quotationData.companyData || '{}',
+        representativeData: quotationData.representativeData || '{}',
+        pricingDetails: quotationData.pricingDetails || '{}',
+        qrCodeData: quotationData.qrCodeData || '{}',
         createdAt: new Date(),
         updatedAt: new Date()
-      }).returning();
+      };
+      
+      const [quotation] = await db.insert(quotations).values(simpleQuotation).returning();
       return quotation;
     } catch (error) {
       console.error('Create quotation error:', error);
@@ -1692,7 +1714,40 @@ export class DatabaseStorage implements IStorage {
   // Invoice methods
   async createInvoice(invoice: any): Promise<any> {
     try {
-      const [createdInvoice] = await this.db.insert(invoices).values(invoice).returning();
+      // Remove validation - save without any conditions
+      const simpleInvoice = {
+        invoiceNumber: invoice.invoiceNumber || `INV-${Date.now()}`,
+        quoteNumber: invoice.quoteNumber || '',
+        inventoryItemId: invoice.inventoryItemId || 0,
+        manufacturer: invoice.manufacturer || 'غير محدد',
+        category: invoice.category || 'غير محدد',
+        trimLevel: invoice.trimLevel || '',
+        year: invoice.year || new Date().getFullYear(),
+        exteriorColor: invoice.exteriorColor || '',
+        interiorColor: invoice.interiorColor || '',
+        chassisNumber: invoice.chassisNumber || '',
+        engineCapacity: invoice.engineCapacity || '',
+        specifications: invoice.specifications || '',
+        basePrice: invoice.basePrice || '0',
+        finalPrice: invoice.finalPrice || '0',
+        customerName: invoice.customerName || 'عميل غير محدد',
+        customerPhone: invoice.customerPhone || '',
+        customerEmail: invoice.customerEmail || '',
+        notes: invoice.notes || '',
+        status: invoice.status || 'مسودة',
+        paymentStatus: invoice.paymentStatus || 'غير مدفوع',
+        paymentMethod: invoice.paymentMethod || '',
+        paidAmount: invoice.paidAmount || '0',
+        remainingAmount: invoice.remainingAmount || '0',
+        dueDate: invoice.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        createdBy: invoice.createdBy || 'system',
+        companyData: invoice.companyData || '{}',
+        representativeData: invoice.representativeData || '{}',
+        pricingDetails: invoice.pricingDetails || '{}',
+        qrCodeData: invoice.qrCodeData || '{}'
+      };
+      
+      const [createdInvoice] = await this.db.insert(invoices).values(simpleInvoice).returning();
       return createdInvoice;
     } catch (error) {
       console.error('Create invoice error:', error);
