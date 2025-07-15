@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { QrCode, Phone, Mail, Globe, Building } from "lucide-react";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import type { Company, InventoryItem, Specification } from "@shared/schema";
+import QRCode from "qrcode";
 
 interface QuotationA4PreviewProps {
   selectedCompany: Company | null;
@@ -62,6 +63,7 @@ export default function QuotationA4Preview({
   
   const [termsConditions, setTermsConditions] = useState<Array<{ id: number; term_text: string; display_order: number }>>([]);
   const [manufacturerLogo, setManufacturerLogo] = useState<string | null>(null);
+  const [qrCodeDataURL, setQrCodeDataURL] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTermsConditions = async () => {
@@ -99,6 +101,41 @@ export default function QuotationA4Preview({
     
     fetchManufacturerLogo();
   }, [selectedVehicle?.manufacturer]);
+
+  // Generate QR Code
+  useEffect(() => {
+    const generateQRCode = async () => {
+      try {
+        const qrData = {
+          quoteNumber: isInvoiceMode ? invoiceNumber : quoteNumber,
+          customerName,
+          vehicleInfo: `${selectedVehicle?.manufacturer} ${selectedVehicle?.category} ${selectedVehicle?.year}`,
+          chassisNumber: selectedVehicle?.chassisNumber,
+          finalPrice: finalPrice,
+          company: selectedCompany?.name,
+          date: new Date().toISOString().split('T')[0]
+        };
+        
+        const qrString = JSON.stringify(qrData);
+        const qrCodeURL = await QRCode.toDataURL(qrString, {
+          width: 80,
+          margin: 1,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF'
+          }
+        });
+        
+        setQrCodeDataURL(qrCodeURL);
+      } catch (error) {
+        console.error('Error generating QR code:', error);
+      }
+    };
+    
+    if (quoteNumber && customerName && selectedVehicle) {
+      generateQRCode();
+    }
+  }, [quoteNumber, invoiceNumber, customerName, selectedVehicle, finalPrice, selectedCompany, isInvoiceMode]);
   
   // Calculate tax amounts
   const vehicleSubtotal = basePrice;
@@ -180,22 +217,36 @@ export default function QuotationA4Preview({
                 </div>
               </div>
               
-              <div className="text-right text-sm">
-                <div className="backdrop-blur-sm rounded-lg p-3 bg-[#015a7400] mt-[-7px] mb-[-7px] pt-[11px] pb-[11px] pl-[20px] pr-[20px] text-right">
-                  <h2 className="text-lg font-bold mb-1">
-                    {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
-                  </h2>
-                  <p className="text-blue-100 text-xs">
-                    رقم: {isInvoiceMode ? invoiceNumber : quoteNumber}
-                  </p>
-                  <p className="text-blue-100 text-xs">
-                    التاريخ: {new Date().toLocaleDateString('ar-SA')}
-                  </p>
-                  {!isInvoiceMode && (
+              <div className="flex items-center gap-3">
+                {/* QR Code */}
+                {qrCodeDataURL && (
+                  <div className="bg-white rounded-lg p-2">
+                    <img 
+                      src={qrCodeDataURL} 
+                      alt="QR Code"
+                      className="w-16 h-16"
+                    />
+                  </div>
+                )}
+                
+                {/* Quote/Invoice Info */}
+                <div className="text-right text-sm">
+                  <div className="backdrop-blur-sm rounded-lg p-3 bg-[#015a7400] mt-[-7px] mb-[-7px] pt-[11px] pb-[11px] pl-[20px] pr-[20px] text-right">
+                    <h2 className="text-lg font-bold mb-1">
+                      {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
+                    </h2>
                     <p className="text-blue-100 text-xs">
-                      صالح حتى: {validUntil && validUntil.toLocaleDateString ? validUntil.toLocaleDateString('ar-SA') : 'غير محدد'}
+                      رقم: {isInvoiceMode ? invoiceNumber : quoteNumber}
                     </p>
-                  )}
+                    <p className="text-blue-100 text-xs">
+                      التاريخ: {new Date().toLocaleDateString('ar-SA')}
+                    </p>
+                    {!isInvoiceMode && (
+                      <p className="text-blue-100 text-xs">
+                        صالح حتى: {validUntil && validUntil.toLocaleDateString ? validUntil.toLocaleDateString('ar-SA') : 'غير محدد'}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

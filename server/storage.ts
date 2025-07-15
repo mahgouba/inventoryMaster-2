@@ -1744,7 +1744,7 @@ export class DatabaseStorage implements IStorage {
         paymentMethod: invoice.paymentMethod || '',
         paidAmount: invoice.paidAmount || '0',
         remainingAmount: invoice.remainingAmount || '0',
-        dueDate: invoice.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        dueDate: invoice.dueDate ? new Date(invoice.dueDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         createdBy: invoice.createdBy || 'system',
         companyData: invoice.companyData || '{}',
         representativeData: invoice.representativeData || '{}',
