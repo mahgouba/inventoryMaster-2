@@ -324,7 +324,7 @@ export default function QuotationA4Preview({
 
           {/* Vehicle Information */}
           {selectedVehicle && (
-            <div className="border border-slate-200 rounded-lg p-3 mb-3">
+            <div className="border border-slate-200 rounded-lg p-3 mb-3 pt-[2px] pb-[2px] pl-[2px] pr-[2px]">
               <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>بيانات المركبة</h3>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="flex items-center gap-2">
