@@ -65,6 +65,21 @@ export default function QuotationA4Preview({
   const [manufacturerLogo, setManufacturerLogo] = useState<string | null>(null);
   const [qrCodeDataURL, setQrCodeDataURL] = useState<string | null>(null);
 
+  // تصميم PDF مخصص حسب الشركة
+  const getCompanyTheme = () => {
+    if (!selectedCompany) return "default";
+    
+    // تصميم مختلف كليا للشركتين
+    if (selectedCompany.name === "معرض نخبة البريمي للسيارات") {
+      return "elite-modern";
+    } else if (selectedCompany.name === "شركة معرض البريمي للسيارات") {
+      return "classic-corporate";
+    }
+    return "default";
+  };
+
+  const companyTheme = getCompanyTheme();
+
   useEffect(() => {
     const fetchTermsConditions = async () => {
       try {
@@ -194,129 +209,215 @@ export default function QuotationA4Preview({
         )}
         
         <div className="h-full relative z-10">
-          {/* Modern Header Section - Custom brand colors */}
-          <div className="relative text-white p-4 rounded-lg bg-[#c70e0e00] pl-[38px] pr-[38px] ml-[-41px] mr-[-41px] mt-[-23px] mb-[-23px]" style={{background: 'linear-gradient(to right, #00627F, #004B5C)'}}>
-            <div className="flex items-center justify-between pt-[6px] pb-[6px]">
-              <div className="flex items-center gap-4">
-                {selectedCompany?.logo && (
-                  <div className="w-14 h-14 bg-white rounded-full p-2 flex items-center justify-center">
-                    <img 
-                      src={selectedCompany.logo} 
-                      alt={selectedCompany.name}
-                      className="max-w-full max-h-full object-contain"
-                    />
-                  </div>
-                )}
-                <div>
-                  <h1 className="text-xl font-bold mb-1">
-                    {selectedCompany?.name || "اسم الشركة"}
-                  </h1>
-                  <p className="text-blue-100 text-xs mb-1">
-                    {selectedCompany?.address || "العنوان"}
-                  </p>
-                  <div className="space-y-1 text-xs text-blue-100 flex items-center justify-between pt-[6px] pb-[6px]">
-                    <div>
+          {/* Company-Specific Header Design */}
+          {companyTheme === "elite-modern" ? (
+            /* تصميم عصري لمعرض نخبة البريمي - تدرج بنفسجي/ذهبي */
+            <div className="relative text-white p-4 rounded-lg pl-[38px] pr-[38px] ml-[-41px] mr-[-41px] mt-[-23px] mb-[-23px]" 
+                 style={{background: 'linear-gradient(45deg, #6B46C1, #8B5CF6, #D97706)'}}>
+              <div className="flex items-center justify-between pt-[6px] pb-[6px]">
+                <div className="flex items-center gap-4">
+                  {selectedCompany?.logo && (
+                    <div className="w-16 h-16 bg-white/90 rounded-xl p-2 shadow-lg">
+                      <img 
+                        src={selectedCompany.logo} 
+                        alt={selectedCompany.name}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <h1 className="text-2xl font-bold mb-1 text-yellow-100">
+                      {selectedCompany?.name || "اسم الشركة"}
+                    </h1>
+                    <p className="text-purple-100 text-sm mb-2">
+                      {selectedCompany?.address || "العنوان"}
+                    </p>
+                    <div className="space-y-1 text-xs text-purple-100">
                       {selectedCompany?.registrationNumber && (
-                        <p>رقم السجل التجاري: {selectedCompany.registrationNumber}</p>
+                        <p>🏢 رقم السجل التجاري: {selectedCompany.registrationNumber}</p>
                       )}
                       {selectedCompany?.taxNumber && (
-                        <p>الرقم الضريبي: {selectedCompany.taxNumber}</p>
-                      )}
-                      {selectedCompany?.licenseNumber && (
-                        <p>رقم الرخصة: {selectedCompany.licenseNumber}</p>
+                        <p>💰 الرقم الضريبي: {selectedCompany.taxNumber}</p>
                       )}
                     </div>
-                    
-                    {/* Company Logo */}
-                    {selectedCompany?.logo && (
-                      <div className="ml-4">
-                        <img 
-                          src={selectedCompany.logo} 
-                          alt="شعار الشركة" 
-                          className="w-12 h-12 object-contain"
-                        />
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  {qrCodeDataURL && (
+                    <div className="bg-white rounded-xl p-3 shadow-lg">
+                      <img src={qrCodeDataURL} alt="QR Code" className="w-20 h-20" />
+                    </div>
+                  )}
+                  <div className="text-right bg-white/20 backdrop-blur rounded-xl p-4">
+                    <h2 className="text-xl font-bold mb-1 text-yellow-200">
+                      {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
+                    </h2>
+                    <p className="text-purple-100 text-sm">
+                      رقم: {isInvoiceMode ? invoiceNumber : quoteNumber}
+                    </p>
+                    <p className="text-purple-100 text-sm">
+                      التاريخ: {new Date().toLocaleDateString('ar-SA')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-yellow-600 to-orange-600 p-2 rounded-b-lg">
+                <div className="flex justify-between items-center text-xs text-white">
+                  <div className="flex items-center gap-4">
+                    {selectedCompany?.phone && (
+                      <div className="flex items-center gap-1">
+                        <Phone size={12} />
+                        <span>{selectedCompany.phone}</span>
+                      </div>
+                    )}
+                    {selectedCompany?.email && (
+                      <div className="flex items-center gap-1">
+                        <Mail size={12} />
+                        <span>{selectedCompany.email}</span>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-3">
-                {/* QR Code */}
-                {qrCodeDataURL && (
-                  <div className="bg-white rounded-lg p-2">
-                    <img 
-                      src={qrCodeDataURL} 
-                      alt="QR Code"
-                      className="w-16 h-16"
-                    />
+            </div>
+          ) : companyTheme === "classic-corporate" ? (
+            /* تصميم كلاسيكي للشركة الثانية - أزرق/رمادي محافظ */
+            <div className="relative text-gray-800 border-2 border-gray-300 rounded-lg p-4 bg-white pl-[38px] pr-[38px] ml-[-41px] mr-[-41px] mt-[-23px] mb-[-23px]">
+              <div className="flex items-center justify-between border-b-2 border-gray-200 pb-4">
+                <div className="flex items-center gap-6">
+                  {selectedCompany?.logo && (
+                    <div className="w-20 h-20 border-2 border-gray-300 rounded p-2">
+                      <img 
+                        src={selectedCompany.logo} 
+                        alt={selectedCompany.name}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <h1 className="text-3xl font-bold mb-2 text-gray-800" style={{fontFamily: 'serif'}}>
+                      {selectedCompany?.name || "اسم الشركة"}
+                    </h1>
+                    <p className="text-gray-600 text-base mb-2">
+                      {selectedCompany?.address || "العنوان"}
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
+                      {selectedCompany?.registrationNumber && (
+                        <p>رقم السجل: {selectedCompany.registrationNumber}</p>
+                      )}
+                      {selectedCompany?.taxNumber && (
+                        <p>الرقم الضريبي: {selectedCompany.taxNumber}</p>
+                      )}
+                    </div>
                   </div>
-                )}
+                </div>
                 
-                {/* Quote/Invoice Info */}
-                <div className="text-right text-sm">
-                  <div className="backdrop-blur-sm rounded-lg p-3 bg-[#015a7400] mt-[-7px] mb-[-7px] pt-[11px] pb-[11px] pl-[20px] pr-[20px] text-right">
+                <div className="flex items-center gap-4">
+                  {qrCodeDataURL && (
+                    <div className="border-2 border-gray-300 rounded p-2">
+                      <img src={qrCodeDataURL} alt="QR Code" className="w-16 h-16" />
+                    </div>
+                  )}
+                  <div className="text-right border-2 border-blue-200 bg-blue-50 rounded p-4">
+                    <h2 className="text-2xl font-bold mb-2 text-blue-800">
+                      {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
+                    </h2>
+                    <p className="text-gray-700 text-sm">
+                      رقم: {isInvoiceMode ? invoiceNumber : quoteNumber}
+                    </p>
+                    <p className="text-gray-700 text-sm">
+                      التاريخ: {new Date().toLocaleDateString('ar-SA')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-4 pt-2 border-t border-gray-200">
+                <div className="flex justify-between items-center text-sm text-gray-600">
+                  <div className="flex items-center gap-4">
+                    {selectedCompany?.phone && (
+                      <div className="flex items-center gap-1">
+                        <Phone size={14} />
+                        <span>{selectedCompany.phone}</span>
+                      </div>
+                    )}
+                    {selectedCompany?.email && (
+                      <div className="flex items-center gap-1">
+                        <Mail size={14} />
+                        <span>{selectedCompany.email}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* التصميم الافتراضي */
+            <div className="relative text-white p-4 rounded-lg pl-[38px] pr-[38px] ml-[-41px] mr-[-41px] mt-[-23px] mb-[-23px]" 
+                 style={{background: 'linear-gradient(to right, #00627F, #004B5C)'}}>
+              <div className="flex items-center justify-between pt-[6px] pb-[6px]">
+                <div className="flex items-center gap-4">
+                  {selectedCompany?.logo && (
+                    <div className="w-14 h-14 bg-white rounded-full p-2">
+                      <img 
+                        src={selectedCompany.logo} 
+                        alt={selectedCompany.name}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <h1 className="text-xl font-bold mb-1">
+                      {selectedCompany?.name || "اسم الشركة"}
+                    </h1>
+                    <p className="text-blue-100 text-xs mb-1">
+                      {selectedCompany?.address || "العنوان"}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  {qrCodeDataURL && (
+                    <div className="bg-white rounded-lg p-2">
+                      <img src={qrCodeDataURL} alt="QR Code" className="w-16 h-16" />
+                    </div>
+                  )}
+                  <div className="text-right">
                     <h2 className="text-lg font-bold mb-1">
                       {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
                     </h2>
                     <p className="text-blue-100 text-xs">
                       رقم: {isInvoiceMode ? invoiceNumber : quoteNumber}
                     </p>
-                    <p className="text-blue-100 text-xs">
-                      التاريخ: {new Date().toLocaleDateString('ar-SA')}
-                    </p>
-                    {!isInvoiceMode && (
-                      <p className="text-blue-100 text-xs">
-                        صالح حتى: {validUntil && validUntil.toLocaleDateString ? validUntil.toLocaleDateString('ar-SA') : 'غير محدد'}
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
             </div>
-            
-            {/* Contact Info Strip */}
-            <div className="absolute bottom-0 left-0 right-0 backdrop-blur-sm p-2 rounded-b-lg bg-[#bf9231]">
-              <div className="flex justify-between items-center text-xs text-blue-100">
-                <div className="flex items-center gap-3">
-                  {selectedCompany?.phone && (
-                    <div className="flex items-center gap-1">
-                      <Phone size={10} />
-                      <span>{selectedCompany.phone}</span>
-                    </div>
-                  )}
-                  {selectedCompany?.email && (
-                    <div className="flex items-center gap-1">
-                      <Mail size={10} />
-                      <span>{selectedCompany.email}</span>
-                    </div>
-                  )}
-                  {selectedCompany?.website && (
-                    <div className="flex items-center gap-1">
-                      <Globe size={10} />
-                      <span>{selectedCompany.website}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-3">
-                  {selectedCompany?.registrationNumber && (
-                    <span>س.ت: {selectedCompany.registrationNumber}</span>
-                  )}
-                  {selectedCompany?.taxNumber && (
-                    <span>الرقم الضريبي: {selectedCompany.taxNumber}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
 
 
 
-          {/* Customer & Representative Info Cards */}
+          {/* Customer & Representative Info Cards - Company themed */}
           <div className="grid grid-cols-2 gap-3 pt-[-13px] pb-[-13px] mt-[-21px] mb-[-21px]">
             {/* Customer Information */}
-            <div className="border border-slate-200 rounded-lg p-3 mt-[27px] mb-[27px]">
-              <h3 className="text-sm font-semibold mb-2" style={{color: '#00627F'}}>بيانات العميل</h3>
+            <div className={`rounded-lg p-3 mt-[27px] mb-[27px] ${
+              companyTheme === "elite-modern" 
+                ? "border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-orange-50"
+                : companyTheme === "classic-corporate"
+                ? "border-2 border-gray-300 bg-gray-50"
+                : "border border-slate-200"
+            }`}>
+              <h3 className={`text-sm font-semibold mb-2 ${
+                companyTheme === "elite-modern" 
+                  ? "text-purple-700"
+                  : companyTheme === "classic-corporate"
+                  ? "text-gray-800"
+                  : ""
+              }`} style={{color: companyTheme === "default" ? '#00627F' : ''}}>
+                👤 بيانات العميل
+              </h3>
               <div className="space-y-1 text-xs">
                 <div>
                   <span className="font-medium">الاسم: </span>
@@ -330,8 +431,22 @@ export default function QuotationA4Preview({
             </div>
 
             {/* Representative Information */}
-            <div className="border border-slate-200 rounded-lg p-3 mt-[27px] mb-[27px]">
-              <h3 className="text-sm font-semibold mb-2" style={{color: '#00627F'}}>بيانات المندوب</h3>
+            <div className={`rounded-lg p-3 mt-[27px] mb-[27px] ${
+              companyTheme === "elite-modern" 
+                ? "border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-orange-50"
+                : companyTheme === "classic-corporate"
+                ? "border-2 border-gray-300 bg-gray-50"
+                : "border border-slate-200"
+            }`}>
+              <h3 className={`text-sm font-semibold mb-2 ${
+                companyTheme === "elite-modern" 
+                  ? "text-purple-700"
+                  : companyTheme === "classic-corporate"
+                  ? "text-gray-800"
+                  : ""
+              }`} style={{color: companyTheme === "default" ? '#00627F' : ''}}>
+                👨‍💼 بيانات المندوب
+              </h3>
               <div className="space-y-1 text-xs">
                 <div>
                   <span className="font-medium">الاسم: </span>
@@ -346,10 +461,24 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
-          {/* Vehicle Information */}
+          {/* Vehicle Information - Company themed */}
           {selectedVehicle && (
-            <div className="border border-slate-200 rounded-lg p-3 mb-3 pt-[2px] pb-[2px] pl-[2px] pr-[2px]">
-              <h3 className="text-sm font-semibold mb-2" style={{color: '#BF9231'}}>بيانات المركبة</h3>
+            <div className={`rounded-lg p-3 mb-3 pt-[2px] pb-[2px] pl-[2px] pr-[2px] ${
+              companyTheme === "elite-modern" 
+                ? "border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50"
+                : companyTheme === "classic-corporate"
+                ? "border-2 border-blue-300 bg-blue-50"
+                : "border border-slate-200"
+            }`}>
+              <h3 className={`text-sm font-semibold mb-2 ${
+                companyTheme === "elite-modern" 
+                  ? "text-orange-700"
+                  : companyTheme === "classic-corporate"
+                  ? "text-blue-800"
+                  : ""
+              }`} style={{color: companyTheme === "default" ? '#BF9231' : ''}}>
+                🚗 بيانات المركبة
+              </h3>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">الصانع: </span>
@@ -408,10 +537,22 @@ export default function QuotationA4Preview({
             </div>
           )}
 
-          {/* Price Breakdown Table - Following Albarimi style */}
-          <div className="border border-slate-200 rounded-lg mb-3">
-            <div className="text-white p-2 rounded-t-lg" style={{backgroundColor: '#00627F'}}>
-              <h3 className="text-sm font-semibold text-center">تفاصيل السعر</h3>
+          {/* Price Breakdown Table - Company themed */}
+          <div className={`rounded-lg mb-3 ${
+            companyTheme === "elite-modern" 
+              ? "border-2 border-purple-200"
+              : companyTheme === "classic-corporate"
+              ? "border-2 border-gray-400"
+              : "border border-slate-200"
+          }`}>
+            <div className={`text-white p-2 rounded-t-lg ${
+              companyTheme === "elite-modern" 
+                ? "bg-gradient-to-r from-purple-600 to-orange-600"
+                : companyTheme === "classic-corporate"
+                ? "bg-gray-700"
+                : ""
+            }`} style={{backgroundColor: companyTheme === "default" ? '#00627F' : ''}}>
+              <h3 className="text-sm font-semibold text-center">💰 تفاصيل السعر</h3>
             </div>
             
             {/* Table Header */}

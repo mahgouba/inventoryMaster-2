@@ -40,6 +40,7 @@ import { apiRequest } from "@/lib/queryClient";
 import type { InventoryItem, Specification, InsertQuotation, Company, TermsAndConditions } from "@shared/schema";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import QuotationA4Preview from "@/components/quotation-a4-preview";
+import CompanyPDFTemplates from "@/components/company-pdf-templates";
 import CompanyManagement from "@/components/company-management";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";

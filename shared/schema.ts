@@ -59,6 +59,36 @@ export const companies = pgTable("companies", {
   secondaryColor: text("secondary_color").default("#BF9231").notNull(), // اللون الثانوي
   accentColor: text("accent_color").default("#0891b2").notNull(), // لون التمييز
   isActive: boolean("is_active").default(true).notNull(), // نشط
+  
+  // PDF Design Configuration
+  pdfTemplate: text("pdf_template").default("classic").notNull(), // classic, modern, elegant
+  pdfHeaderStyle: text("pdf_header_style").default("standard").notNull(), // standard, minimal, bold
+  pdfLogoPosition: text("pdf_logo_position").default("left").notNull(), // left, center, right
+  pdfLogoSize: text("pdf_logo_size").default("medium").notNull(), // small, medium, large
+  pdfFontFamily: text("pdf_font_family").default("Noto Sans Arabic").notNull(),
+  pdfFontSize: integer("pdf_font_size").default(12).notNull(),
+  pdfLineHeight: text("pdf_line_height").default("1.5").notNull(),
+  pdfMarginTop: integer("pdf_margin_top").default(20).notNull(),
+  pdfMarginBottom: integer("pdf_margin_bottom").default(20).notNull(),
+  pdfMarginLeft: integer("pdf_margin_left").default(20).notNull(),
+  pdfMarginRight: integer("pdf_margin_right").default(20).notNull(),
+  
+  // PDF Colors
+  pdfHeaderBgColor: text("pdf_header_bg_color").default("#ffffff").notNull(),
+  pdfHeaderTextColor: text("pdf_header_text_color").default("#000000").notNull(),
+  pdfTableHeaderBg: text("pdf_table_header_bg").default("#f8f9fa").notNull(),
+  pdfTableHeaderText: text("pdf_table_header_text").default("#000000").notNull(),
+  pdfTableBorderColor: text("pdf_table_border_color").default("#dee2e6").notNull(),
+  pdfAccentColor: text("pdf_accent_color").default("#0891b2").notNull(),
+  
+  // PDF Layout Options
+  pdfShowWatermark: boolean("pdf_show_watermark").default(false).notNull(),
+  pdfWatermarkText: text("pdf_watermark_text"),
+  pdfShowQrCode: boolean("pdf_show_qr_code").default(true).notNull(),
+  pdfQrPosition: text("pdf_qr_position").default("top-right").notNull(), // top-left, top-right, bottom-left, bottom-right
+  pdfFooterText: text("pdf_footer_text"),
+  pdfShowPageNumbers: boolean("pdf_show_page_numbers").default(true).notNull(),
+  
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -374,8 +404,7 @@ export type InsertUserSession = z.infer<typeof insertUserSessionSchema>;
 export type UserSession = typeof userSessions.$inferSelect;
 export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
 export type ActivityLog = typeof activityLogs.$inferSelect;
-export type InsertCompany = z.infer<typeof insertCompanySchema>;
-export type Company = typeof companies.$inferSelect;
+
 export type InsertQuotation = z.infer<typeof insertQuotationSchema>;
 export type Quotation = typeof quotations.$inferSelect;
 
