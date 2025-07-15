@@ -835,14 +835,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 PDF
               </Button>
               
-              <Button
-                onClick={handleSaveQuotation}
-                disabled={createQuotationMutation.isPending}
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                <Save size={16} className="ml-2" />
-                {createQuotationMutation.isPending ? "جاري الحفظ..." : "حفظ كمسودة"}
-              </Button>
+              
               
 
             </div>
