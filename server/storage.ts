@@ -1744,10 +1744,11 @@ export class DatabaseStorage implements IStorage {
         companyData: invoice.companyData || '{}',
         representativeData: invoice.representativeData || '{}',
         pricingDetails: invoice.pricingDetails || '{}',
-        qrCodeData: invoice.qrCodeData || '{}'
+        qrCodeData: invoice.qrCodeData || '{}',
+        authorizationNumber: invoice.authorizationNumber || ''
       };
       
-      const [createdInvoice] = await this.db.insert(invoices).values(simpleInvoice).returning();
+      const [createdInvoice] = await db.insert(invoices).values(simpleInvoice).returning();
       return createdInvoice;
     } catch (error) {
       console.error('Create invoice error:', error);
@@ -1757,7 +1758,7 @@ export class DatabaseStorage implements IStorage {
 
   async getInvoices(): Promise<any[]> {
     try {
-      return await this.db.select().from(invoices).orderBy(invoices.createdAt);
+      return await db.select().from(invoices).orderBy(invoices.createdAt);
     } catch (error) {
       console.error('Get invoices error:', error);
       return [];
@@ -1766,7 +1767,7 @@ export class DatabaseStorage implements IStorage {
 
   async getInvoiceById(id: number): Promise<any | undefined> {
     try {
-      const [invoice] = await this.db.select().from(invoices).where(eq(invoices.id, id));
+      const [invoice] = await db.select().from(invoices).where(eq(invoices.id, id));
       return invoice;
     } catch (error) {
       console.error('Get invoice by ID error:', error);
@@ -1776,7 +1777,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateInvoice(id: number, invoice: any): Promise<any> {
     try {
-      const [updatedInvoice] = await this.db.update(invoices).set(invoice).where(eq(invoices.id, id)).returning();
+      const [updatedInvoice] = await db.update(invoices).set(invoice).where(eq(invoices.id, id)).returning();
       return updatedInvoice;
     } catch (error) {
       console.error('Update invoice error:', error);
@@ -1786,7 +1787,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteInvoice(id: number): Promise<boolean> {
     try {
-      const result = await this.db.delete(invoices).where(eq(invoices.id, id));
+      const result = await db.delete(invoices).where(eq(invoices.id, id));
       return result.rowCount > 0;
     } catch (error) {
       console.error('Delete invoice error:', error);
@@ -1796,7 +1797,7 @@ export class DatabaseStorage implements IStorage {
 
   async getInvoicesByStatus(status: string): Promise<any[]> {
     try {
-      return await this.db.select().from(invoices).where(eq(invoices.status, status));
+      return await db.select().from(invoices).where(eq(invoices.status, status));
     } catch (error) {
       console.error('Get invoices by status error:', error);
       return [];
@@ -1805,7 +1806,7 @@ export class DatabaseStorage implements IStorage {
 
   async getInvoiceByNumber(invoiceNumber: string): Promise<any | undefined> {
     try {
-      const [invoice] = await this.db.select().from(invoices).where(eq(invoices.invoiceNumber, invoiceNumber));
+      const [invoice] = await db.select().from(invoices).where(eq(invoices.invoiceNumber, invoiceNumber));
       return invoice;
     } catch (error) {
       console.error('Get invoice by number error:', error);

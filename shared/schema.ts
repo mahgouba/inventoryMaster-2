@@ -216,6 +216,7 @@ export const invoices = pgTable("invoices", {
   representativeData: text("representative_data"), // بيانات المندوب
   pricingDetails: text("pricing_details"), // تفاصيل التسعير
   qrCodeData: text("qr_code_data"), // بيانات رمز QR
+  authorizationNumber: text("authorization_number"), // رقم التخويل
   createdAt: timestamp("created_at").defaultNow().notNull(), // تاريخ الإنشاء
   updatedAt: timestamp("updated_at").defaultNow().notNull(), // تاريخ التحديث
 });

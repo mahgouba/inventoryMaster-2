@@ -124,6 +124,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [notes, setNotes] = useState<string>("");
   const [isInvoiceMode, setIsInvoiceMode] = useState<boolean>(false);
   const [invoiceNumber, setInvoiceNumber] = useState<string>("");
+  const [authorizationNumber, setAuthorizationNumber] = useState<string>("");
   
   // Representative selection
   const [selectedRepresentative, setSelectedRepresentative] = useState<string>("");
@@ -382,7 +383,8 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
         companyData: JSON.stringify(selectedCompanyData || {}),
         representativeData: JSON.stringify(representatives.find(r => r.id === selectedRepresentative) || {}),
         pricingDetails: JSON.stringify(pricingDetails),
-        qrCodeData: JSON.stringify({ invoiceNumber: newInvoiceNumber, customerName: customerName || "عميل غير محدد", finalPrice: totals.finalTotal })
+        qrCodeData: JSON.stringify({ invoiceNumber: newInvoiceNumber, customerName: customerName || "عميل غير محدد", finalPrice: totals.finalTotal }),
+        authorizationNumber: authorizationNumber || ""
       };
 
       // Create invoice via API
@@ -1189,116 +1191,147 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               </CardContent>
             </Card>
 
-            {/* Customer Information Form */}
+            {/* Customer Information Form or Authorization */}
             <Card>
               <CardHeader>
-                <CardTitle>بيانات العميل</CardTitle>
+                <CardTitle>{isInvoiceMode ? "تخويل الفاتورة" : "بيانات العميل"}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="quoteNumber">رقم عرض السعر</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="quoteNumber"
-                        value={quoteNumber}
-                        readOnly
-                        className="bg-slate-50 dark:bg-slate-800"
-                        placeholder="Q-123456"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="px-3"
-                        title="رمز QR للعرض"
-                      >
-                        <QrCode size={16} />
-                      </Button>
+                {isInvoiceMode ? (
+                  // Authorization number field for invoice mode
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="invoiceNumber">رقم الفاتورة</Label>
+                        <Input
+                          id="invoiceNumber"
+                          value={invoiceNumber}
+                          readOnly
+                          className="bg-slate-50 dark:bg-slate-800"
+                          placeholder="INV-123456"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="authorizationNumber">بناء على تخويدكم رقم:</Label>
+                        <Input
+                          id="authorizationNumber"
+                          value={authorizationNumber}
+                          onChange={(e) => setAuthorizationNumber(e.target.value)}
+                          placeholder="أدخل رقم التخويل"
+                          className="font-medium"
+                        />
+                      </div>
                     </div>
                   </div>
+                ) : (
+                  // Original customer and representative data
                   <div>
-                    <Label htmlFor="customerName">اسم العميل *</Label>
-                    <Input
-                      id="customerName"
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      placeholder="أدخل اسم العميل"
-                      required
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="quoteNumber">رقم عرض السعر</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="quoteNumber"
+                            value={quoteNumber}
+                            readOnly
+                            className="bg-slate-50 dark:bg-slate-800"
+                            placeholder="Q-123456"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="px-3"
+                            title="رمز QR للعرض"
+                          >
+                            <QrCode size={16} />
+                          </Button>
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="customerName">اسم العميل *</Label>
+                        <Input
+                          id="customerName"
+                          value={customerName}
+                          onChange={(e) => setCustomerName(e.target.value)}
+                          placeholder="أدخل اسم العميل"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="customerPhone">رقم الهاتف</Label>
+                        <Input
+                          id="customerPhone"
+                          value={customerPhone}
+                          onChange={(e) => setCustomerPhone(e.target.value)}
+                          placeholder="+966 50 123 4567"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="customerEmail">البريد الإلكتروني</Label>
+                        <Input
+                          id="customerEmail"
+                          type="email"
+                          value={customerEmail}
+                          onChange={(e) => setCustomerEmail(e.target.value)}
+                          placeholder="customer@email.com"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="validityDays">مدة صلاحية العرض (أيام)</Label>
+                        <Input
+                          id="validityDays"
+                          type="number"
+                          value={validityDays}
+                          onChange={(e) => setValidityDays(parseInt(e.target.value) || 30)}
+                          min={1}
+                          max={365}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="representativeSelect">المندوب *</Label>
+                        <Select value={selectedRepresentative} onValueChange={setSelectedRepresentative}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر المندوب" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {representatives.map((rep) => (
+                              <SelectItem key={rep.id} value={rep.id}>
+                                {rep.name} - {rep.position}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="companySelect">الشركة *</Label>
+                        <Select value={selectedCompany} onValueChange={setSelectedCompany}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر الشركة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {companies.map((company) => (
+                              <SelectItem key={company.id} value={company.id}>
+                                {company.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4">
+                      <Label htmlFor="notes">ملاحظات إضافية</Label>
+                      <Textarea
+                        id="notes"
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="أي ملاحظات أو شروط خاصة بالعرض..."
+                        rows={3}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Label htmlFor="customerPhone">رقم الهاتف</Label>
-                    <Input
-                      id="customerPhone"
-                      value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
-                      placeholder="+966 50 123 4567"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="customerEmail">البريد الإلكتروني</Label>
-                    <Input
-                      id="customerEmail"
-                      type="email"
-                      value={customerEmail}
-                      onChange={(e) => setCustomerEmail(e.target.value)}
-                      placeholder="customer@email.com"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="validityDays">مدة صلاحية العرض (أيام)</Label>
-                    <Input
-                      id="validityDays"
-                      type="number"
-                      value={validityDays}
-                      onChange={(e) => setValidityDays(parseInt(e.target.value) || 30)}
-                      min={1}
-                      max={365}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="representativeSelect">المندوب *</Label>
-                    <Select value={selectedRepresentative} onValueChange={setSelectedRepresentative}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر المندوب" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {representatives.map((rep) => (
-                          <SelectItem key={rep.id} value={rep.id}>
-                            {rep.name} - {rep.position}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="companySelect">الشركة *</Label>
-                    <Select value={selectedCompany} onValueChange={setSelectedCompany}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر الشركة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {companies.map((company) => (
-                          <SelectItem key={company.id} value={company.id}>
-                            {company.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="notes">ملاحظات إضافية</Label>
-                  <Textarea
-                    id="notes"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="أي ملاحظات أو شروط خاصة بالعرض..."
-                    rows={3}
-                  />
-                </div>
+                )}
               </CardContent>
             </Card>
 
