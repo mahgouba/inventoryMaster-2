@@ -134,6 +134,11 @@ export interface IStorage {
   deleteTrimLevel(id: number): Promise<boolean>;
   getTrimLevelsByCategory(manufacturer: string, category: string): Promise<TrimLevel[]>;
   
+  // Categories and engine capacities methods
+  getAllCategories(): Promise<{ category: string }[]>;
+  getCategoriesByManufacturer(manufacturer: string): Promise<{ category: string }[]>;
+  getAllEngineCapacities(): Promise<{ engineCapacity: string }[]>;
+  
   // Quotations methods
   getAllQuotations(): Promise<Quotation[]>;
   getQuotation(id: number): Promise<Quotation | undefined>;
