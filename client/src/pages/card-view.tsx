@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp, Eye, Edit, DollarSign, Table, LayoutGrid, Bell, UserCircle, Settings, LogOut, Palette, Users } from "lucide-react";
+import { ChevronDown, ChevronUp, Eye, Edit, DollarSign, Table, LayoutGrid, Bell, UserCircle, Settings, LogOut, Palette, Users, FileText } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/hooks/useTheme";
 import { getStatusColor } from "@/lib/utils";
@@ -179,6 +179,12 @@ export default function CardViewPage({ userRole }: CardViewPageProps) {
                         <DropdownMenuItem>
                           <Palette className="mr-2 h-4 w-4" />
                           إدارة المظهر
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/pdf-appearance">
+                        <DropdownMenuItem>
+                          <FileText className="mr-2 h-4 w-4" />
+                          مظهر عرض السعر PDF
                         </DropdownMenuItem>
                       </Link>
                       <Link href="/user-management">

@@ -229,6 +229,13 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         </DropdownMenuItem>
                       </Link>
 
+                      <Link href="/pdf-appearance">
+                        <DropdownMenuItem>
+                          <FileText className="mr-2 h-4 w-4" />
+                          مظهر عرض السعر PDF
+                        </DropdownMenuItem>
+                      </Link>
+
                       <DropdownMenuItem onClick={() => setSpecificationsManagerOpen(true)}>
                         <Settings className="mr-2 h-4 w-4" />
                         إدارة المواصفات
