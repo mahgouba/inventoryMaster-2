@@ -395,6 +395,15 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         إنشاء عرض سعر
                       </Button>
                     </Link>
+                    <Link href="/quotation-management">
+                      <Button 
+                        variant="outline"
+                        className="border-green-600 text-green-600 hover:bg-green-50 w-full sm:w-auto"
+                      >
+                        <FileText className="w-4 h-4 ml-2" />
+                        العروض المحفوظة
+                      </Button>
+                    </Link>
                     <Button 
                       onClick={() => setIsExcelImportOpen(true)}
                       variant="outline"

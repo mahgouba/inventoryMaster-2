@@ -938,6 +938,16 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 <FileUp size={16} className="text-purple-600" />
               </div>
               
+              <Link href="/quotation-management">
+                <Button
+                  variant="outline"
+                  className="border-green-500 text-green-600 hover:bg-green-50"
+                >
+                  <FileText size={16} className="ml-2" />
+                  العروض
+                </Button>
+              </Link>
+              
               <Link href="/invoice-management">
                 <Button
                   variant="outline"

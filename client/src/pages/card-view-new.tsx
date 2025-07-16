@@ -389,10 +389,12 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                       <FileText className="mr-2 h-4 w-4" />
                       إدارة المواصفات
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setQuotationManagementOpen(true)}>
-                      <FileText className="mr-2 h-4 w-4" />
-                      إدارة عروض الأسعار
-                    </DropdownMenuItem>
+                    <Link href="/quotation-management">
+                      <DropdownMenuItem>
+                        <FileText className="mr-2 h-4 w-4" />
+                        العروض المحفوظة
+                      </DropdownMenuItem>
+                    </Link>
 
                   </DropdownMenuContent>
                 </DropdownMenu>
