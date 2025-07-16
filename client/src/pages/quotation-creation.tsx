@@ -900,13 +900,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 واتساب
               </Button>
               
-              <Button
-                onClick={exportToPDF}
-                className="bg-red-600 hover:bg-red-700 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200"
-              >
-                <FileDown size={16} className="ml-2" />
-                تحميل PDF
-              </Button>
+              
               
               <Button
                 variant="outline"
