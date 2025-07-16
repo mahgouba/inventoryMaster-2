@@ -1539,14 +1539,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 
                 
                 
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => setQuotesViewOpen(true)}
-                >
-                  <Search size={16} className="ml-2" />
-                  عرض العروض المحفوظة
-                </Button>
+                
                 
               </CardContent>
             </Card>
