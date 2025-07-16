@@ -212,14 +212,14 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
 
   // Fetch categories based on selected manufacturer (for both main form and edit dialog)
   const { data: categories = [] } = useQuery<{ category: string }[]>({
-    queryKey: [`/api/categories/${vehicleManufacturer || editingVehicleData.manufacturer}`],
-    enabled: !!(vehicleManufacturer || editingVehicleData.manufacturer)
+    queryKey: [`/api/categories/${vehicleManufacturer || editingQuotation?.manufacturer}`],
+    enabled: !!(vehicleManufacturer || editingQuotation?.manufacturer)
   });
 
   // Fetch trim levels based on selected manufacturer and category (for both main form and edit dialog)
   const { data: trimLevels = [] } = useQuery<any[]>({
-    queryKey: [`/api/trim-levels/category/${vehicleManufacturer || editingVehicleData.manufacturer}/${vehicleCategory || editingVehicleData.category}`],
-    enabled: !!(vehicleManufacturer || editingVehicleData.manufacturer) && !!(vehicleCategory || editingVehicleData.category)
+    queryKey: [`/api/trim-levels/category/${vehicleManufacturer || editingQuotation?.manufacturer}/${vehicleCategory || editingQuotation?.category}`],
+    enabled: !!(vehicleManufacturer || editingQuotation?.manufacturer) && !!(vehicleCategory || editingQuotation?.category)
   });
 
   // Fetch engine capacities
