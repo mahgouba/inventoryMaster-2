@@ -22,7 +22,7 @@ import {
   Trash2,
   FileText
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { AppearanceSettings, Manufacturer } from "@/../../shared/schema";
@@ -428,15 +428,16 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
         <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4 space-x-reverse">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => window.history.back()}
-                className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
-              >
-                <ArrowLeft size={20} />
-                العودة
-              </Button>
+              <Link href="/inventory">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                >
+                  <ArrowLeft size={20} />
+                  العودة
+                </Button>
+              </Link>
               <h1 className="text-2xl font-bold text-slate-900 dark:text-white">إدارة المظهر</h1>
             </div>
             
