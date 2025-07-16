@@ -222,18 +222,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     enabled: !!(vehicleManufacturer || editingQuotation?.manufacturer) && !!(vehicleCategory || editingQuotation?.category)
   });
 
-  // Fetch engine capacities
-  const { data: engineCapacities = [] } = useQuery<{ engineCapacity: string }[]>({
-    queryKey: ["/api/engine-capacities"]
-  });
-
-  // Query for all available vehicles
-  const { data: availableVehicles = [] } = useQuery({
-    queryKey: ["/api/inventory"],
-    select: (data) => data.filter((vehicle: any) => vehicle.status !== "مباع")
-  });
-  
-  // Vehicle editing state for editable form - moved here to fix initialization order
+  // Vehicle editing state for editable form
   const [editingVehicleData, setEditingVehicleData] = useState({
     manufacturer: "",
     category: "",
@@ -245,6 +234,31 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     chassisNumber: "",
     price: 0
   });
+
+  // Fetch categories for editing dialog
+  const { data: editingCategories = [] } = useQuery<{ category: string }[]>({
+    queryKey: [`/api/categories/${editingVehicleData.manufacturer}`],
+    enabled: !!editingVehicleData.manufacturer
+  });
+
+  // Fetch trim levels for editing dialog
+  const { data: editingTrimLevels = [] } = useQuery<any[]>({
+    queryKey: [`/api/trim-levels/category/${editingVehicleData.manufacturer}/${editingVehicleData.category}`],
+    enabled: !!(editingVehicleData.manufacturer && editingVehicleData.category)
+  });
+
+  // Fetch engine capacities
+  const { data: engineCapacities = [] } = useQuery<{ engineCapacity: string }[]>({
+    queryKey: ["/api/engine-capacities"]
+  });
+
+  // Query for all available vehicles
+  const { data: availableVehicles = [] } = useQuery({
+    queryKey: ["/api/inventory"],
+    select: (data) => data.filter((vehicle: any) => vehicle.status !== "مباع")
+  });
+  
+
 
   // Management windows states
   const [specificationsOpen, setSpecificationsOpen] = useState(false);
@@ -729,6 +743,24 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
     }
   });
 
+  // Query for vehicle specifications based on editingVehicleData (for editing dialog)
+  const { data: editingVehicleSpecs, isLoading: editingSpecsLoading } = useQuery<Specification>({
+    queryKey: ['/api/specifications', editingVehicleData.manufacturer, editingVehicleData.category, editingVehicleData.trimLevel, editingVehicleData.year, editingVehicleData.engineCapacity],
+    enabled: !!(editingVehicleData.manufacturer && editingVehicleData.category && editingVehicleData.year && editingVehicleData.engineCapacity),
+    queryFn: async () => {
+      if (!editingVehicleData.manufacturer || !editingVehicleData.category || !editingVehicleData.year || !editingVehicleData.engineCapacity) return null;
+      
+      const response = await fetch(
+        `/api/specifications/${editingVehicleData.manufacturer}/${editingVehicleData.category}/${editingVehicleData.trimLevel || 'null'}/${editingVehicleData.year}/${editingVehicleData.engineCapacity}`
+      );
+      
+      if (response.ok) {
+        return response.json();
+      }
+      return null;
+    }
+  });
+
   // Get all quotations for viewing
   const { data: quotations = [] } = useQuery({
     queryKey: ["/api/quotations"],
@@ -777,6 +809,23 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       setPricingDetails(prev => ({ ...prev, basePrice: selectedVehicle.price || 0 }));
     }
   }, [selectedVehicle]);
+
+  // Initialize editing vehicle data when vehicle edit dialog opens
+  React.useEffect(() => {
+    if (vehicleEditOpen && editableVehicle) {
+      setEditingVehicleData({
+        manufacturer: editableVehicle.manufacturer || "",
+        category: editableVehicle.category || "",
+        trimLevel: editableVehicle.trimLevel || "",
+        year: editableVehicle.year?.toString() || "",
+        engineCapacity: editableVehicle.engineCapacity || "",
+        exteriorColor: editableVehicle.exteriorColor || "",
+        interiorColor: editableVehicle.interiorColor || "",
+        chassisNumber: editableVehicle.chassisNumber || "",
+        price: editableVehicle.price || 0
+      });
+    }
+  }, [vehicleEditOpen, editableVehicle]);
 
   // Create quotation mutation
   const createQuotationMutation = useMutation({
@@ -2825,6 +2874,48 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 />
               </div>
             </div>
+
+            {/* Specifications Preview */}
+            {editingVehicleSpecs && (
+              <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <h4 className="font-semibold mb-3 text-gray-900 dark:text-gray-100">المواصفات التفصيلية</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  {editingVehicleSpecs.engine && (
+                    <div><span className="font-medium">المحرك:</span> {editingVehicleSpecs.engine}</div>
+                  )}
+                  {editingVehicleSpecs.transmission && (
+                    <div><span className="font-medium">ناقل الحركة:</span> {editingVehicleSpecs.transmission}</div>
+                  )}
+                  {editingVehicleSpecs.drivetrain && (
+                    <div><span className="font-medium">نظام الدفع:</span> {editingVehicleSpecs.drivetrain}</div>
+                  )}
+                  {editingVehicleSpecs.fuelType && (
+                    <div><span className="font-medium">نوع الوقود:</span> {editingVehicleSpecs.fuelType}</div>
+                  )}
+                  {editingVehicleSpecs.seatingCapacity && (
+                    <div><span className="font-medium">عدد المقاعد:</span> {editingVehicleSpecs.seatingCapacity}</div>
+                  )}
+                  {editingVehicleSpecs.maxSpeed && (
+                    <div><span className="font-medium">السرعة القصوى:</span> {editingVehicleSpecs.maxSpeed}</div>
+                  )}
+                  {editingVehicleSpecs.acceleration && (
+                    <div><span className="font-medium">التسارع 0-100:</span> {editingVehicleSpecs.acceleration}</div>
+                  )}
+                  {editingVehicleSpecs.safetyFeatures && (
+                    <div><span className="font-medium">مميزات الأمان:</span> {editingVehicleSpecs.safetyFeatures}</div>
+                  )}
+                  {editingVehicleSpecs.comfortFeatures && (
+                    <div><span className="font-medium">مميزات الراحة:</span> {editingVehicleSpecs.comfortFeatures}</div>
+                  )}
+                  {editingVehicleSpecs.warranty && (
+                    <div><span className="font-medium">الضمان:</span> {editingVehicleSpecs.warranty}</div>
+                  )}
+                </div>
+                {editingSpecsLoading && (
+                  <div className="text-center text-gray-500">جاري تحميل المواصفات...</div>
+                )}
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4">
