@@ -22,7 +22,7 @@ import {
   AlertCircle,
   RefreshCw,
   Save,
-  Test,
+  Play,
   Plus,
   Trash2,
   Edit2,
@@ -476,7 +476,7 @@ const IntegrationManagement: React.FC = () => {
 
         <div className="flex gap-2">
           <Button onClick={() => testConnection(integration.id)} disabled={isLoading}>
-            <Test className="h-4 w-4 mr-2" />
+            <Play className="h-4 w-4 mr-2" />
             اختبار الاتصال
           </Button>
           
@@ -557,7 +557,7 @@ const IntegrationManagement: React.FC = () => {
                         onClick={() => testConnection(integration.id)}
                         disabled={isLoading}
                       >
-                        <Test className="h-4 w-4" />
+                        <Play className="h-4 w-4" />
                       </Button>
                     </div>
                   </CardContent>
