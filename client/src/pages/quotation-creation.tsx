@@ -210,16 +210,16 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     queryKey: ["/api/manufacturers"]
   });
 
-  // Fetch categories based on selected manufacturer
+  // Fetch categories based on selected manufacturer (for both main form and edit dialog)
   const { data: categories = [] } = useQuery<{ category: string }[]>({
-    queryKey: [`/api/categories/${vehicleManufacturer}`],
-    enabled: !!vehicleManufacturer
+    queryKey: [`/api/categories/${vehicleManufacturer || editingVehicleData.manufacturer}`],
+    enabled: !!(vehicleManufacturer || editingVehicleData.manufacturer)
   });
 
-  // Fetch trim levels based on selected manufacturer and category
+  // Fetch trim levels based on selected manufacturer and category (for both main form and edit dialog)
   const { data: trimLevels = [] } = useQuery<any[]>({
-    queryKey: [`/api/trim-levels/category/${vehicleManufacturer}/${vehicleCategory}`],
-    enabled: !!vehicleManufacturer && !!vehicleCategory
+    queryKey: [`/api/trim-levels/category/${vehicleManufacturer || editingVehicleData.manufacturer}/${vehicleCategory || editingVehicleData.category}`],
+    enabled: !!(vehicleManufacturer || editingVehicleData.manufacturer) && !!(vehicleCategory || editingVehicleData.category)
   });
 
   // Fetch engine capacities
@@ -346,6 +346,19 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [showWhatsappDialog, setShowWhatsappDialog] = useState(false);
   const [termsRefreshTrigger, setTermsRefreshTrigger] = useState(0);
   const [companyStamp, setCompanyStamp] = useState<string | null>(null);
+  
+  // Vehicle editing state for editable form
+  const [editingVehicleData, setEditingVehicleData] = useState({
+    manufacturer: "",
+    category: "",
+    trimLevel: "",
+    year: "",
+    engineCapacity: "",
+    exteriorColor: "",
+    interiorColor: "",
+    chassisNumber: "",
+    price: 0
+  });
 
   // Load existing terms and conditions
   const { data: existingTerms = [] } = useQuery<Array<{ id: number; term_text: string; display_order: number }>>({
@@ -1098,7 +1111,21 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => setVehicleEditOpen(true)}
+                          onClick={() => {
+                            // Pre-populate editing form with current vehicle data
+                            setEditingVehicleData({
+                              manufacturer: editableVehicle?.manufacturer || "",
+                              category: editableVehicle?.category || "",
+                              trimLevel: editableVehicle?.trimLevel || "",
+                              year: editableVehicle?.year?.toString() || "",
+                              engineCapacity: editableVehicle?.engineCapacity || "",
+                              exteriorColor: editableVehicle?.exteriorColor || "",
+                              interiorColor: editableVehicle?.interiorColor || "",
+                              chassisNumber: editableVehicle?.chassisNumber || "",
+                              price: editableVehicle?.price || 0
+                            });
+                            setVehicleEditOpen(true);
+                          }}
                           className="text-blue-600 hover:text-blue-700"
                         >
                           <Edit3 size={14} className="ml-1" />
@@ -2624,7 +2651,236 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         </DialogContent>
       </Dialog>
 
-      
+      {/* Vehicle Edit Dialog */}
+      <Dialog open={vehicleEditOpen} onOpenChange={setVehicleEditOpen}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit3 className="h-5 w-5 text-blue-600" />
+              تعديل بيانات السيارة
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Manufacturer Selection */}
+              <div>
+                <Label htmlFor="editManufacturer">الصانع</Label>
+                <Select 
+                  value={editingVehicleData.manufacturer} 
+                  onValueChange={(value) => {
+                    setEditingVehicleData(prev => ({
+                      ...prev,
+                      manufacturer: value,
+                      category: "", // Clear category when manufacturer changes
+                      trimLevel: "" // Clear trim level when manufacturer changes
+                    }));
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر الصانع" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {manufacturers.map((manufacturer) => (
+                      <SelectItem key={manufacturer.id} value={manufacturer.name}>
+                        {manufacturer.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Category Selection */}
+              <div>
+                <Label htmlFor="editCategory">الفئة</Label>
+                <Select 
+                  value={editingVehicleData.category} 
+                  onValueChange={(value) => {
+                    setEditingVehicleData(prev => ({
+                      ...prev,
+                      category: value,
+                      trimLevel: "" // Clear trim level when category changes
+                    }));
+                  }}
+                  disabled={!editingVehicleData.manufacturer}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر الفئة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.category} value={category.category}>
+                        {category.category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Trim Level Selection */}
+              <div>
+                <Label htmlFor="editTrimLevel">درجة التجهيز</Label>
+                <Select 
+                  value={editingVehicleData.trimLevel} 
+                  onValueChange={(value) => setEditingVehicleData(prev => ({ ...prev, trimLevel: value }))}
+                  disabled={!editingVehicleData.category}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر درجة التجهيز" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {trimLevels.map((trimLevel) => (
+                      <SelectItem key={trimLevel.id} value={trimLevel.trimLevel}>
+                        {trimLevel.trimLevel}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Year Selection */}
+              <div>
+                <Label htmlFor="editYear">السنة</Label>
+                <Select 
+                  value={editingVehicleData.year} 
+                  onValueChange={(value) => setEditingVehicleData(prev => ({ ...prev, year: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر السنة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Engine Capacity Selection */}
+              <div>
+                <Label htmlFor="editEngineCapacity">سعة المحرك</Label>
+                <Select 
+                  value={editingVehicleData.engineCapacity} 
+                  onValueChange={(value) => setEditingVehicleData(prev => ({ ...prev, engineCapacity: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر سعة المحرك" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {engineCapacities.map((capacity) => (
+                      <SelectItem key={capacity.engineCapacity} value={capacity.engineCapacity}>
+                        {capacity.engineCapacity}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Exterior Color */}
+              <div>
+                <Label htmlFor="editExteriorColor">اللون الخارجي</Label>
+                <Input
+                  id="editExteriorColor"
+                  value={editingVehicleData.exteriorColor}
+                  onChange={(e) => setEditingVehicleData(prev => ({ ...prev, exteriorColor: e.target.value }))}
+                  placeholder="أدخل اللون الخارجي"
+                />
+              </div>
+
+              {/* Interior Color */}
+              <div>
+                <Label htmlFor="editInteriorColor">اللون الداخلي</Label>
+                <Input
+                  id="editInteriorColor"
+                  value={editingVehicleData.interiorColor}
+                  onChange={(e) => setEditingVehicleData(prev => ({ ...prev, interiorColor: e.target.value }))}
+                  placeholder="أدخل اللون الداخلي"
+                />
+              </div>
+
+              {/* Chassis Number */}
+              <div>
+                <Label htmlFor="editChassisNumber">رقم الهيكل</Label>
+                <Input
+                  id="editChassisNumber"
+                  value={editingVehicleData.chassisNumber}
+                  onChange={(e) => setEditingVehicleData(prev => ({ ...prev, chassisNumber: e.target.value }))}
+                  placeholder="أدخل رقم الهيكل"
+                />
+              </div>
+
+              {/* Price */}
+              <div>
+                <Label htmlFor="editPrice">السعر</Label>
+                <Input
+                  id="editPrice"
+                  type="number"
+                  value={editingVehicleData.price}
+                  onChange={(e) => setEditingVehicleData(prev => ({ ...prev, price: Number(e.target.value) }))}
+                  placeholder="أدخل السعر"
+                />
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-4">
+              <Button 
+                onClick={() => {
+                  // Update the vehicle data
+                  const updatedVehicle = {
+                    ...editableVehicle,
+                    manufacturer: editingVehicleData.manufacturer,
+                    category: editingVehicleData.category,
+                    trimLevel: editingVehicleData.trimLevel,
+                    year: parseInt(editingVehicleData.year),
+                    engineCapacity: editingVehicleData.engineCapacity,
+                    exteriorColor: editingVehicleData.exteriorColor,
+                    interiorColor: editingVehicleData.interiorColor,
+                    chassisNumber: editingVehicleData.chassisNumber,
+                    price: editingVehicleData.price
+                  };
+                  
+                  setEditableVehicle(updatedVehicle);
+                  setSelectedVehicle(updatedVehicle);
+                  
+                  // Update pricing details with new price
+                  setPricingDetails(prev => ({
+                    ...prev,
+                    basePrice: editingVehicleData.price
+                  }));
+                  
+                  // Update the individual state variables as well
+                  setVehicleManufacturer(editingVehicleData.manufacturer);
+                  setVehicleCategory(editingVehicleData.category);
+                  setVehicleTrimLevel(editingVehicleData.trimLevel);
+                  setVehicleYear(editingVehicleData.year);
+                  setVehicleEngineCapacity(editingVehicleData.engineCapacity);
+                  setVehicleExteriorColor(editingVehicleData.exteriorColor);
+                  setVehicleInteriorColor(editingVehicleData.interiorColor);
+                  setVehicleChassisNumber(editingVehicleData.chassisNumber);
+                  setVehiclePrice(editingVehicleData.price);
+                  
+                  setVehicleEditOpen(false);
+                  
+                  toast({
+                    title: "تم التحديث",
+                    description: "تم تحديث بيانات السيارة بنجاح",
+                  });
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Save size={16} className="ml-2" />
+                حفظ التعديلات
+              </Button>
+              <Button variant="outline" onClick={() => setVehicleEditOpen(false)}>
+                إلغاء
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
