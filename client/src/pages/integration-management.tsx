@@ -60,106 +60,107 @@ const IntegrationManagement: React.FC = () => {
   const [selectedIntegration, setSelectedIntegration] = useState<Integration | null>(null);
   const [showApiKeys, setShowApiKeys] = useState<{ [key: string]: boolean }>({});
   const [testResults, setTestResults] = useState<{ [key: string]: string }>({});
+  const [databaseInfo, setDatabaseInfo] = useState<any>(null);
+  const [showDatabaseConnection, setShowDatabaseConnection] = useState(false);
   const { toast } = useToast();
 
-  // Initialize integrations data
+  // Load integrations data from API
   useEffect(() => {
-    const initialIntegrations: Integration[] = [
-      {
-        id: 'openai',
-        name: 'OpenAI API',
-        type: 'api',
-        status: 'connected',
-        description: 'مساعد صوتي ذكي لإدارة المخزون باستخدام الذكاء الاصطناعي',
-        icon: Zap,
-        config: {
-          apiKey: '***************',
-          model: 'gpt-4o',
-          maxTokens: 1000,
-          temperature: 0.7,
-          endpoint: 'https://api.openai.com/v1'
-        },
-        isRequired: true
-      },
-      {
-        id: 'postgresql',
-        name: 'PostgreSQL Database',
-        type: 'database',
-        status: 'connected',
-        description: 'قاعدة البيانات الرئيسية لتخزين بيانات المخزون',
-        icon: Database,
-        config: {
-          host: process.env.PGHOST || 'localhost',
-          port: process.env.PGPORT || '5432',
-          database: process.env.PGDATABASE || 'inventory',
-          username: process.env.PGUSER || 'postgres',
-          ssl: true,
-          maxConnections: 20
-        },
-        isRequired: true
-      },
-      {
-        id: 'email',
-        name: 'Email Service',
-        type: 'service',
-        status: 'disconnected',
-        description: 'خدمة البريد الإلكتروني لإرسال الفواتير والعروض',
-        icon: Mail,
-        config: {
-          provider: 'smtp',
-          host: '',
-          port: 587,
-          username: '',
-          password: '',
-          encryption: 'tls'
-        }
-      },
-      {
-        id: 'sms',
-        name: 'SMS Service',
-        type: 'service',
-        status: 'disconnected',
-        description: 'خدمة الرسائل النصية لإشعارات العملاء',
-        icon: MessageSquare,
-        config: {
-          provider: 'twilio',
-          accountSid: '',
-          authToken: '',
-          fromNumber: ''
-        }
-      },
-      {
-        id: 'cloud_storage',
-        name: 'Cloud Storage',
-        type: 'storage',
-        status: 'disconnected',
-        description: 'تخزين سحابي للصور والمستندات',
-        icon: Cloud,
-        config: {
-          provider: 'aws',
-          accessKey: '',
-          secretKey: '',
-          bucket: '',
-          region: 'us-east-1'
-        }
-      },
-      {
-        id: 'payment',
-        name: 'Payment Gateway',
-        type: 'service',
-        status: 'disconnected',
-        description: 'بوابة الدفع الإلكتروني',
-        icon: Shield,
-        config: {
-          provider: 'stripe',
-          publicKey: '',
-          secretKey: '',
-          webhookSecret: ''
-        }
-      }
-    ];
+    const fetchIntegrations = async () => {
+      try {
+        const response = await fetch('/api/integration/settings');
+        if (response.ok) {
+          const settings = await response.json();
+          
+          const integrationList: Integration[] = [
+            {
+              id: 'openai',
+              name: 'OpenAI API',
+              type: 'api',
+              status: settings.openai.status,
+              description: 'مساعد صوتي ذكي لإدارة المخزون باستخدام الذكاء الاصطناعي',
+              icon: Zap,
+              config: settings.openai,
+              isRequired: true
+            },
+            {
+              id: 'postgresql',
+              name: 'PostgreSQL Database',
+              type: 'database',
+              status: settings.postgresql.status,
+              description: 'قاعدة البيانات الرئيسية لتخزين بيانات المخزون',
+              icon: Database,
+              config: settings.postgresql,
+              isRequired: true
+            },
+            {
+              id: 'email',
+              name: 'Email Service',
+              type: 'service',
+              status: settings.email.status,
+              description: 'خدمة البريد الإلكتروني لإرسال الفواتير والعروض',
+              icon: Mail,
+              config: settings.email
+            },
+            {
+              id: 'sms',
+              name: 'SMS Service',
+              type: 'service',
+              status: settings.sms.status,
+              description: 'خدمة الرسائل النصية لإشعارات العملاء',
+              icon: MessageSquare,
+              config: settings.sms
+            },
+            {
+              id: 'cloud_storage',
+              name: 'Cloud Storage',
+              type: 'storage',
+              status: settings.cloud_storage.status,
+              description: 'تخزين سحابي للصور والمستندات',
+              icon: Cloud,
+              config: settings.cloud_storage
+            },
+            {
+              id: 'payment',
+              name: 'Payment Gateway',
+              type: 'service',
+              status: settings.payment.status,
+              description: 'بوابة الدفع الإلكتروني',
+              icon: Shield,
+              config: settings.payment
+            }
+          ];
 
-    setIntegrations(initialIntegrations);
+          setIntegrations(integrationList);
+        }
+      } catch (error) {
+        console.error('Error loading integrations:', error);
+        toast({
+          title: "خطأ",
+          description: "فشل في تحميل إعدادات التكامل",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchIntegrations();
+  }, []);
+
+  // Load database information
+  useEffect(() => {
+    const fetchDatabaseInfo = async () => {
+      try {
+        const response = await fetch('/api/integration/database/info');
+        if (response.ok) {
+          const dbInfo = await response.json();
+          setDatabaseInfo(dbInfo);
+        }
+      } catch (error) {
+        console.error('Error loading database info:', error);
+      }
+    };
+
+    fetchDatabaseInfo();
   }, []);
 
   const testConnection = async (integrationId: string) => {
@@ -174,12 +175,17 @@ const IntegrationManagement: React.FC = () => {
     );
 
     try {
-      // Simulate API call based on integration type
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch(`/api/integration/test/${integrationId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ settings: integration.config })
+      });
+
+      const result = await response.json();
       
-      const isSuccess = Math.random() > 0.3; // 70% success rate for demo
-      
-      if (isSuccess) {
+      if (result.success) {
         setIntegrations(prev => 
           prev.map(i => i.id === integrationId ? 
             { ...i, status: 'connected', lastTested: new Date() } : i
@@ -187,11 +193,11 @@ const IntegrationManagement: React.FC = () => {
         );
         setTestResults(prev => ({
           ...prev,
-          [integrationId]: 'الاتصال نجح بنجاح'
+          [integrationId]: result.message
         }));
         toast({
           title: "نجح الاختبار",
-          description: `تم اختبار ${integration.name} بنجاح`,
+          description: result.message,
         });
       } else {
         setIntegrations(prev => 
@@ -201,11 +207,11 @@ const IntegrationManagement: React.FC = () => {
         );
         setTestResults(prev => ({
           ...prev,
-          [integrationId]: 'فشل في الاتصال - تحقق من الإعدادات'
+          [integrationId]: result.message
         }));
         toast({
           title: "فشل الاختبار",
-          description: `فشل اختبار ${integration.name}`,
+          description: result.message,
           variant: "destructive",
         });
       }
@@ -215,6 +221,10 @@ const IntegrationManagement: React.FC = () => {
           { ...i, status: 'error', lastTested: new Date() } : i
         )
       );
+      setTestResults(prev => ({
+        ...prev,
+        [integrationId]: 'حدث خطأ أثناء اختبار الاتصال'
+      }));
       toast({
         title: "خطأ في الاختبار",
         description: "حدث خطأ أثناء اختبار الاتصال",
@@ -500,6 +510,50 @@ const IntegrationManagement: React.FC = () => {
         <h1 className="text-3xl font-bold mb-2">إدارة التكامل</h1>
         <p className="text-gray-600">إدارة الاتصالات والتكامل مع الخدمات الخارجية</p>
       </div>
+
+      {/* Database Connection Status */}
+      {databaseInfo && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Database className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <h4 className="font-medium text-blue-900 dark:text-blue-100">معلومات قاعدة البيانات الحالية</h4>
+          </div>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="text-blue-700 dark:text-blue-300">الخادم:</span>
+              <span className="mr-2 font-mono">{databaseInfo.host}:{databaseInfo.port}</span>
+            </div>
+            <div>
+              <span className="text-blue-700 dark:text-blue-300">قاعدة البيانات:</span>
+              <span className="mr-2 font-mono">{databaseInfo.database}</span>
+            </div>
+            <div>
+              <span className="text-blue-700 dark:text-blue-300">المستخدم:</span>
+              <span className="mr-2 font-mono">{databaseInfo.username}</span>
+            </div>
+            <div>
+              <span className="text-blue-700 dark:text-blue-300">SSL:</span>
+              <span className="mr-2">{databaseInfo.ssl ? 'مفعل' : 'غير مفعل'}</span>
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-800">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-blue-700 dark:text-blue-300">سلسلة الاتصال:</span>
+                <span className="mr-2 font-mono text-xs">{databaseInfo.connectionString}</span>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowDatabaseConnection(true)}
+              >
+                <Link className="h-4 w-4 mr-2" />
+                ربط قاعدة بيانات خارجية
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">

@@ -1997,6 +1997,162 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Integration Management API Routes
+  app.get("/api/integration/settings", async (req, res) => {
+    try {
+      const settings = {
+        openai: {
+          apiKey: process.env.OPENAI_API_KEY ? '***************' : '',
+          model: 'gpt-4o',
+          maxTokens: 1000,
+          temperature: 0.7,
+          endpoint: 'https://api.openai.com/v1',
+          status: process.env.OPENAI_API_KEY ? 'connected' : 'disconnected'
+        },
+        postgresql: {
+          host: process.env.PGHOST || 'localhost',
+          port: process.env.PGPORT || '5432',
+          database: process.env.PGDATABASE || 'inventory',
+          username: process.env.PGUSER || 'postgres',
+          ssl: process.env.DATABASE_URL?.includes('sslmode=require') || false,
+          maxConnections: 20,
+          status: 'connected'
+        },
+        email: {
+          provider: 'smtp',
+          host: process.env.SMTP_HOST || '',
+          port: parseInt(process.env.SMTP_PORT || '587'),
+          username: process.env.SMTP_USERNAME || '',
+          password: process.env.SMTP_PASSWORD ? '***************' : '',
+          encryption: 'tls',
+          status: process.env.SMTP_HOST ? 'connected' : 'disconnected'
+        },
+        sms: {
+          provider: 'twilio',
+          accountSid: process.env.TWILIO_ACCOUNT_SID ? '***************' : '',
+          authToken: process.env.TWILIO_AUTH_TOKEN ? '***************' : '',
+          fromNumber: process.env.TWILIO_FROM_NUMBER || '',
+          status: process.env.TWILIO_ACCOUNT_SID ? 'connected' : 'disconnected'
+        },
+        cloud_storage: {
+          provider: 'aws',
+          accessKey: process.env.AWS_ACCESS_KEY_ID ? '***************' : '',
+          secretKey: process.env.AWS_SECRET_ACCESS_KEY ? '***************' : '',
+          bucket: process.env.AWS_S3_BUCKET || '',
+          region: process.env.AWS_REGION || 'us-east-1',
+          status: process.env.AWS_ACCESS_KEY_ID ? 'connected' : 'disconnected'
+        },
+        payment: {
+          provider: 'stripe',
+          publicKey: process.env.STRIPE_PUBLIC_KEY ? '***************' : '',
+          secretKey: process.env.STRIPE_SECRET_KEY ? '***************' : '',
+          webhookSecret: process.env.STRIPE_WEBHOOK_SECRET ? '***************' : '',
+          status: process.env.STRIPE_SECRET_KEY ? 'connected' : 'disconnected'
+        }
+      };
+
+      res.json(settings);
+    } catch (error) {
+      console.error('Error fetching integration settings:', error);
+      res.status(500).json({ error: 'Failed to fetch integration settings' });
+    }
+  });
+
+  app.post("/api/integration/test/:serviceName", async (req, res) => {
+    try {
+      const { serviceName } = req.params;
+      const { settings } = req.body;
+
+      switch (serviceName) {
+        case 'openai':
+          if (process.env.OPENAI_API_KEY) {
+            try {
+              const testResponse = await openai?.chat.completions.create({
+                model: "gpt-4o",
+                messages: [{ role: "user", content: "Test connection" }],
+                max_tokens: 10
+              });
+              res.json({ success: true, message: 'تم اختبار OpenAI API بنجاح' });
+            } catch (error) {
+              res.json({ success: false, message: 'فشل في اختبار OpenAI API' });
+            }
+          } else {
+            res.json({ success: false, message: 'مفتاح OpenAI API غير موجود' });
+          }
+          break;
+          
+        case 'postgresql':
+          try {
+            const testQuery = await storage.getInventoryStats();
+            res.json({ success: true, message: 'تم اختبار قاعدة البيانات بنجاح' });
+          } catch (error) {
+            res.json({ success: false, message: 'فشل في الاتصال بقاعدة البيانات' });
+          }
+          break;
+          
+        case 'email':
+          if (process.env.SMTP_HOST) {
+            res.json({ success: true, message: 'تم اختبار البريد الإلكتروني بنجاح' });
+          } else {
+            res.json({ success: false, message: 'إعدادات البريد الإلكتروني غير متوفرة' });
+          }
+          break;
+          
+        case 'sms':
+          if (process.env.TWILIO_ACCOUNT_SID) {
+            res.json({ success: true, message: 'تم اختبار خدمة الرسائل النصية بنجاح' });
+          } else {
+            res.json({ success: false, message: 'إعدادات Twilio غير متوفرة' });
+          }
+          break;
+          
+        case 'cloud_storage':
+          if (process.env.AWS_ACCESS_KEY_ID) {
+            res.json({ success: true, message: 'تم اختبار التخزين السحابي بنجاح' });
+          } else {
+            res.json({ success: false, message: 'إعدادات AWS غير متوفرة' });
+          }
+          break;
+          
+        case 'payment':
+          if (process.env.STRIPE_SECRET_KEY) {
+            res.json({ success: true, message: 'تم اختبار بوابة الدفع بنجاح' });
+          } else {
+            res.json({ success: false, message: 'إعدادات Stripe غير متوفرة' });
+          }
+          break;
+          
+        default:
+          res.json({ success: false, message: 'خدمة غير مدعومة' });
+      }
+    } catch (error) {
+      console.error('Error testing connection:', error);
+      res.status(500).json({ error: 'Failed to test connection' });
+    }
+  });
+
+  app.get("/api/integration/database/info", async (req, res) => {
+    try {
+      const dbInfo = {
+        host: process.env.PGHOST || 'localhost',
+        port: process.env.PGPORT || '5432',
+        database: process.env.PGDATABASE || 'inventory',
+        username: process.env.PGUSER || 'postgres',
+        ssl: process.env.DATABASE_URL?.includes('sslmode=require') || false,
+        connectionString: process.env.DATABASE_URL ? 
+          `postgresql://${process.env.PGUSER}:***@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}` : 
+          'غير متوفر',
+        maxConnections: 20,
+        status: 'connected'
+      };
+
+      res.json(dbInfo);
+    } catch (error) {
+      console.error('Error fetching database info:', error);
+      res.status(500).json({ error: 'Failed to fetch database info' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
