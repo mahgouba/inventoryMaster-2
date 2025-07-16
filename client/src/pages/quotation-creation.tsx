@@ -94,6 +94,19 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const queryClient = useQueryClient();
   const [location, navigate] = useLocation();
   
+  // Check for editing quotation data first
+  const [editingQuotation, setEditingQuotation] = useState<any | null>(() => {
+    const storedQuotation = localStorage.getItem('editingQuotation');
+    if (storedQuotation) {
+      try {
+        return JSON.parse(storedQuotation);
+      } catch (error) {
+        console.error('Error parsing editing quotation data:', error);
+      }
+    }
+    return null;
+  });
+
   // Parse vehicle data from localStorage if not provided as prop
   const [selectedVehicle, setSelectedVehicle] = useState<InventoryItem | null>(() => {
     // If editing quotation, don't use any pre-selected vehicle
@@ -110,19 +123,6 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
         return parsedVehicle;
       } catch (error) {
         console.error('Error parsing stored vehicle data:', error);
-      }
-    }
-    return null;
-  });
-
-  // Check for editing quotation data
-  const [editingQuotation, setEditingQuotation] = useState<any | null>(() => {
-    const storedQuotation = localStorage.getItem('editingQuotation');
-    if (storedQuotation) {
-      try {
-        return JSON.parse(storedQuotation);
-      } catch (error) {
-        console.error('Error parsing editing quotation data:', error);
       }
     }
     return null;
