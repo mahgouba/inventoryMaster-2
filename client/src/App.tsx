@@ -9,6 +9,7 @@ import InventoryPage from "@/pages/inventory";
 import CardViewPage from "@/pages/card-view-new";
 
 import AppearancePage from "@/pages/appearance";
+import PdfAppearanceManagement from "@/pages/pdf-appearance-management";
 import LocationPage from "@/pages/locations";
 import LoginPage from "@/pages/login";
 import UserManagementPage from "@/pages/user-management-simple";
@@ -50,6 +51,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
       {user.role === "admin" && (
         <>
           <Route path="/appearance" component={() => <AppearancePage userRole={user.role} onLogout={onLogout} />} />
+          <Route path="/pdf-appearance" component={() => <PdfAppearanceManagement userRole={user.role} onLogout={onLogout} />} />
           <Route path="/user-management" component={() => <UserManagementPage onLogout={onLogout} />} />
           <Route path="/company-management" component={() => <CompanyManagementPage />} />
           <Route path="/dynamic-company-control" component={() => <DynamicCompanyControl />} />

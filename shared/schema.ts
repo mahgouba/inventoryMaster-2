@@ -252,6 +252,50 @@ export const invoices = pgTable("invoices", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(), // تاريخ التحديث
 });
 
+// PDF Appearance Settings table for managing PDF quote appearance
+export const pdfAppearanceSettings = pgTable("pdf_appearance_settings", {
+  id: serial("id").primaryKey(),
+  
+  // Header Colors
+  headerBackgroundColor: text("header_background_color").default("#0f766e").notNull(),
+  headerTextColor: text("header_text_color").default("#ffffff").notNull(),
+  logoBackgroundColor: text("logo_background_color").default("#ffffff").notNull(),
+  
+  // Table Colors
+  tableHeaderBackgroundColor: text("table_header_background_color").default("#f8fafc").notNull(),
+  tableHeaderTextColor: text("table_header_text_color").default("#1e293b").notNull(),
+  tableRowBackgroundColor: text("table_row_background_color").default("#ffffff").notNull(),
+  tableRowTextColor: text("table_row_text_color").default("#1e293b").notNull(),
+  tableAlternateRowBackgroundColor: text("table_alternate_row_background_color").default("#f8fafc").notNull(),
+  tableBorderColor: text("table_border_color").default("#e2e8f0").notNull(),
+  
+  // Text Colors
+  primaryTextColor: text("primary_text_color").default("#1e293b").notNull(),
+  secondaryTextColor: text("secondary_text_color").default("#64748b").notNull(),
+  priceTextColor: text("price_text_color").default("#059669").notNull(),
+  totalTextColor: text("total_text_color").default("#dc2626").notNull(),
+  
+  // Border and Background Colors
+  borderColor: text("border_color").default("#e2e8f0").notNull(),
+  backgroundColor: text("background_color").default("#ffffff").notNull(),
+  sectionBackgroundColor: text("section_background_color").default("#f8fafc").notNull(),
+  
+  // Company Logo and Stamp
+  companyStamp: text("company_stamp"), // Base64 encoded stamp
+  watermarkOpacity: decimal("watermark_opacity", { precision: 3, scale: 2 }).default('0.10').notNull(),
+  
+  // Footer Colors
+  footerBackgroundColor: text("footer_background_color").default("#f8fafc").notNull(),
+  footerTextColor: text("footer_text_color").default("#64748b").notNull(),
+  
+  // QR Code Settings
+  qrCodeBackgroundColor: text("qr_code_background_color").default("#ffffff").notNull(),
+  qrCodeForegroundColor: text("qr_code_foreground_color").default("#000000").notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -325,6 +369,12 @@ export const insertCompanySchema = createInsertSchema(companies).omit({
 });
 
 export const insertTermsSchema = createInsertSchema(termsAndConditions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPdfAppearanceSchema = createInsertSchema(pdfAppearanceSettings).omit({
   id: true,
   createdAt: true,
   updatedAt: true,

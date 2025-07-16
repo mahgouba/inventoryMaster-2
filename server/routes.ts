@@ -10,7 +10,8 @@ import {
   insertUserSchema,
   insertSpecificationSchema,
   insertTrimLevelSchema,
-  insertQuotationSchema
+  insertQuotationSchema,
+  insertPdfAppearanceSchema
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -1946,6 +1947,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error getting invoices by status:", error);
       res.status(500).json({ message: "Failed to fetch invoices" });
+    }
+  });
+
+  // PDF Appearance Settings API Routes
+  app.get("/api/pdf-appearance", async (req, res) => {
+    try {
+      const settings = await storage.getPdfAppearanceSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching PDF appearance settings:", error);
+      res.status(500).json({ message: "Failed to fetch PDF appearance settings" });
+    }
+  });
+
+  app.post("/api/pdf-appearance", async (req, res) => {
+    try {
+      const settingsData = insertPdfAppearanceSchema.parse(req.body);
+      const settings = await storage.savePdfAppearanceSettings(settingsData);
+      res.json(settings);
+    } catch (error) {
+      console.error("Error saving PDF appearance settings:", error);
+      res.status(500).json({ message: "Failed to save PDF appearance settings" });
+    }
+  });
+
+  app.put("/api/pdf-appearance/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid PDF appearance settings ID" });
+      }
+
+      const settingsData = insertPdfAppearanceSchema.partial().parse(req.body);
+      const settings = await storage.updatePdfAppearanceSettings(id, settingsData);
+      
+      if (!settings) {
+        return res.status(404).json({ message: "PDF appearance settings not found" });
+      }
+
+      res.json(settings);
+    } catch (error) {
+      console.error("Error updating PDF appearance settings:", error);
+      res.status(500).json({ message: "Failed to update PDF appearance settings" });
     }
   });
 

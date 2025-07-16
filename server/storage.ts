@@ -1,6 +1,6 @@
 import { 
   users, inventoryItems, manufacturers, companies, locations, locationTransfers, 
-  lowStockAlerts, stockSettings, appearanceSettings, specifications, trimLevels, quotations, invoices,
+  lowStockAlerts, stockSettings, appearanceSettings, specifications, trimLevels, quotations, invoices, pdfAppearanceSettings,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Manufacturer, type InsertManufacturer, 
@@ -116,6 +116,11 @@ export interface IStorage {
   getAppearanceSettings(): Promise<AppearanceSettings | undefined>;
   updateAppearanceSettings(settings: Partial<InsertAppearanceSettings>): Promise<AppearanceSettings>;
   updateManufacturerLogo(id: number, logo: string): Promise<Manufacturer | undefined>;
+  
+  // PDF Appearance settings methods
+  getPdfAppearanceSettings(): Promise<any>;
+  savePdfAppearanceSettings(settings: any): Promise<any>;
+  updatePdfAppearanceSettings(id: number, settings: any): Promise<any>;
   
   // Specifications methods
   getAllSpecifications(): Promise<Specification[]>;
@@ -1865,6 +1870,81 @@ export class DatabaseStorage implements IStorage {
       return null;
     } catch (error) {
       console.error('Get default company ID error:', error);
+      return null;
+    }
+  }
+
+  // PDF Appearance Settings methods
+  async getPdfAppearanceSettings(): Promise<any> {
+    try {
+      const [settings] = await db.select().from(pdfAppearanceSettings).limit(1);
+      return settings || {
+        headerBackgroundColor: "#0f766e",
+        headerTextColor: "#ffffff",
+        logoBackgroundColor: "#ffffff",
+        tableHeaderBackgroundColor: "#f8fafc",
+        tableHeaderTextColor: "#1e293b",
+        tableRowBackgroundColor: "#ffffff",
+        tableRowTextColor: "#1e293b",
+        tableAlternateRowBackgroundColor: "#f8fafc",
+        tableBorderColor: "#e2e8f0",
+        primaryTextColor: "#1e293b",
+        secondaryTextColor: "#64748b",
+        priceTextColor: "#059669",
+        totalTextColor: "#dc2626",
+        borderColor: "#e2e8f0",
+        backgroundColor: "#ffffff",
+        sectionBackgroundColor: "#f8fafc",
+        companyStamp: null,
+        watermarkOpacity: 0.1,
+        footerBackgroundColor: "#f8fafc",
+        footerTextColor: "#64748b",
+        qrCodeBackgroundColor: "#ffffff",
+        qrCodeForegroundColor: "#000000"
+      };
+    } catch (error) {
+      console.error('Get PDF appearance settings error:', error);
+      return {};
+    }
+  }
+
+  async savePdfAppearanceSettings(settings: any): Promise<any> {
+    try {
+      // Check if settings exist
+      const existingSettings = await db.select().from(pdfAppearanceSettings).limit(1);
+      
+      if (existingSettings.length > 0) {
+        // Update existing settings
+        const [updatedSettings] = await db
+          .update(pdfAppearanceSettings)
+          .set({ ...settings, updatedAt: new Date() })
+          .where(eq(pdfAppearanceSettings.id, existingSettings[0].id))
+          .returning();
+        return updatedSettings;
+      } else {
+        // Create new settings
+        const [newSettings] = await db
+          .insert(pdfAppearanceSettings)
+          .values(settings)
+          .returning();
+        return newSettings;
+      }
+    } catch (error) {
+      console.error('Save PDF appearance settings error:', error);
+      throw error;
+    }
+  }
+
+  async updatePdfAppearanceSettings(id: number, settings: any): Promise<any> {
+    try {
+      const [updatedSettings] = await db
+        .update(pdfAppearanceSettings)
+        .set({ ...settings, updatedAt: new Date() })
+        .where(eq(pdfAppearanceSettings.id, id))
+        .returning();
+      return updatedSettings;
+    } catch (error) {
+      console.error('Update PDF appearance settings error:', error);
       return null;
     }
   }

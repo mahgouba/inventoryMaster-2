@@ -19,8 +19,10 @@ import {
   Image as ImageIcon,
   Edit2,
   Plus,
-  Trash2
+  Trash2,
+  FileText
 } from "lucide-react";
+import { Link } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { AppearanceSettings, Manufacturer } from "@/../../shared/schema";
@@ -439,6 +441,15 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
             </div>
             
             <div className="flex items-center space-x-3 space-x-reverse">
+              <Link href="/pdf-appearance">
+                <Button 
+                  variant="outline" 
+                  className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+                >
+                  <FileText size={16} />
+                  مظهر عرض السعر PDF
+                </Button>
+              </Link>
               <Button 
                 onClick={handleSaveSettings} 
                 disabled={saveAppearanceMutation.isPending}
