@@ -513,6 +513,11 @@ export const appearanceSettings = pgTable("appearance_settings", {
   id: serial("id").primaryKey(),
   companyName: varchar("company_name", { length: 255 }).default("إدارة المخزون"),
   companyNameEn: varchar("company_name_en", { length: 255 }).default("Inventory System"),
+  companyAddress: text("company_address"), // عنوان الشركة
+  companyRegistrationNumber: varchar("company_registration_number", { length: 100 }), // رقم السجل التجاري
+  companyLicenseNumber: varchar("company_license_number", { length: 100 }), // رقم الرخصة
+  companyTaxNumber: varchar("company_tax_number", { length: 100 }), // الرقم الضريبي
+  companyWebsite: varchar("company_website", { length: 255 }), // موقع الشركة
   companyLogo: text("company_logo"), // Base64 encoded image
   primaryColor: varchar("primary_color", { length: 7 }).default("#0f766e"), // Teal-700
   primaryHoverColor: varchar("primary_hover_color", { length: 7 }).default("#134e4a"), // Teal-900

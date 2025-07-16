@@ -60,6 +60,11 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
   // State variables for all color customization
   const [companyName, setCompanyName] = useState("إدارة المخزون");
   const [companyNameEn, setCompanyNameEn] = useState("Inventory System");
+  const [companyAddress, setCompanyAddress] = useState("");
+  const [companyRegistrationNumber, setCompanyRegistrationNumber] = useState("");
+  const [companyLicenseNumber, setCompanyLicenseNumber] = useState("");
+  const [companyTaxNumber, setCompanyTaxNumber] = useState("");
+  const [companyWebsite, setCompanyWebsite] = useState("");
   const [companyLogo, setCompanyLogo] = useState<string | null>(null);
   
   // Light mode colors
@@ -307,6 +312,11 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
     if (appearanceSettings) {
       setCompanyName(appearanceSettings.companyName || "إدارة المخزون");
       setCompanyNameEn(appearanceSettings.companyNameEn || "Inventory System");
+      setCompanyAddress(appearanceSettings.companyAddress || "");
+      setCompanyRegistrationNumber(appearanceSettings.companyRegistrationNumber || "");
+      setCompanyLicenseNumber(appearanceSettings.companyLicenseNumber || "");
+      setCompanyTaxNumber(appearanceSettings.companyTaxNumber || "");
+      setCompanyWebsite(appearanceSettings.companyWebsite || "");
       setCompanyLogo(appearanceSettings.companyLogo);
       
       // Light mode colors
@@ -353,6 +363,11 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
     const settings = {
       companyName,
       companyNameEn,
+      companyAddress,
+      companyRegistrationNumber,
+      companyLicenseNumber,
+      companyTaxNumber,
+      companyWebsite,
       companyLogo,
       primaryColor,
       primaryHoverColor,
@@ -507,6 +522,62 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                   </div>
                 </div>
 
+                <div className="space-y-2">
+                  <Label htmlFor="companyAddress">عنوان الشركة</Label>
+                  <Input
+                    id="companyAddress"
+                    value={companyAddress}
+                    onChange={(e) => setCompanyAddress(e.target.value)}
+                    placeholder="عنوان الشركة الكامل"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="companyRegistrationNumber">رقم السجل التجاري</Label>
+                    <Input
+                      id="companyRegistrationNumber"
+                      value={companyRegistrationNumber}
+                      onChange={(e) => setCompanyRegistrationNumber(e.target.value)}
+                      placeholder="رقم السجل التجاري"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="companyLicenseNumber">رقم الرخصة</Label>
+                    <Input
+                      id="companyLicenseNumber"
+                      value={companyLicenseNumber}
+                      onChange={(e) => setCompanyLicenseNumber(e.target.value)}
+                      placeholder="رقم الرخصة"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="companyTaxNumber">الرقم الضريبي</Label>
+                    <Input
+                      id="companyTaxNumber"
+                      value={companyTaxNumber}
+                      onChange={(e) => setCompanyTaxNumber(e.target.value)}
+                      placeholder="الرقم الضريبي"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="companyWebsite">موقع الشركة الإلكتروني</Label>
+                    <Input
+                      id="companyWebsite"
+                      value={companyWebsite}
+                      onChange={(e) => setCompanyWebsite(e.target.value)}
+                      placeholder="https://example.com"
+                      className="text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-4">
                   <Label>شعار الشركة</Label>
                   <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center">
@@ -533,9 +604,26 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
+                                  // Check file size (limit to 5MB)
+                                  if (file.size > 5 * 1024 * 1024) {
+                                    toast({
+                                      title: "خطأ في حجم الملف",
+                                      description: "حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت",
+                                      variant: "destructive",
+                                    });
+                                    return;
+                                  }
+                                  
                                   const reader = new FileReader();
                                   reader.onload = () => {
                                     setCompanyLogo(reader.result as string);
+                                  };
+                                  reader.onerror = () => {
+                                    toast({
+                                      title: "خطأ في قراءة الملف",
+                                      description: "حدث خطأ أثناء قراءة الصورة",
+                                      variant: "destructive",
+                                    });
                                   };
                                   reader.readAsDataURL(file);
                                 }
@@ -563,9 +651,26 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
+                                  // Check file size (limit to 5MB)
+                                  if (file.size > 5 * 1024 * 1024) {
+                                    toast({
+                                      title: "خطأ في حجم الملف",
+                                      description: "حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت",
+                                      variant: "destructive",
+                                    });
+                                    return;
+                                  }
+                                  
                                   const reader = new FileReader();
                                   reader.onload = () => {
                                     setCompanyLogo(reader.result as string);
+                                  };
+                                  reader.onerror = () => {
+                                    toast({
+                                      title: "خطأ في قراءة الملف",
+                                      description: "حدث خطأ أثناء قراءة الصورة",
+                                      variant: "destructive",
+                                    });
                                   };
                                   reader.readAsDataURL(file);
                                 }
