@@ -17,9 +17,9 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+}) : null;
 
 // Voice command processing functions
 async function processVoiceCommand(command: string) {
