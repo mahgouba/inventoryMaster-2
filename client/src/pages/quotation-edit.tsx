@@ -26,6 +26,7 @@ import {
   Calculator,
   Printer,
   Download,
+  FileDown,
   MessageCircle,
   FileUp,
   Settings2
@@ -239,6 +240,67 @@ export default function QuotationEditPage({}: QuotationEditPageProps) {
     }
   });
 
+  // Export quotation as PDF
+  const exportToPDF = async () => {
+    try {
+      const element = document.querySelector('[data-pdf-export="quotation"]');
+      if (!element) {
+        toast({
+          title: "خطأ",
+          description: "لا يمكن العثور على العنصر المطلوب تصديره",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create canvas from HTML element
+      const canvas = await html2canvas(element as HTMLElement, {
+        scale: 2,
+        logging: false,
+        allowTaint: true,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+      });
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      // Calculate dimensions
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // Add image to PDF
+      pdf.addImage(
+        canvas.toDataURL('image/png'),
+        'PNG',
+        0,
+        0,
+        imgWidth,
+        imgHeight
+      );
+
+      // Save PDF
+      const fileName = `عرض_سعر_${quoteNumber || 'Q-' + Date.now()}.pdf`;
+      pdf.save(fileName);
+      
+      toast({
+        title: "تم تصدير عرض السعر",
+        description: `تم تصدير عرض السعر بصيغة PDF بنجاح`,
+      });
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      toast({
+        title: "خطأ في التصدير",
+        description: "حدث خطأ أثناء تصدير العرض إلى PDF",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleUpdateQuotation = () => {
     if (!editableVehicle) {
       toast({
@@ -370,6 +432,14 @@ export default function QuotationEditPage({}: QuotationEditPageProps) {
               >
                 <Printer size={16} className="ml-2" />
                 طباعة
+              </Button>
+              
+              <Button
+                onClick={exportToPDF}
+                className="bg-red-600 hover:bg-red-700 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                <FileDown size={16} className="ml-2" />
+                تحميل PDF
               </Button>
               
               <Button
