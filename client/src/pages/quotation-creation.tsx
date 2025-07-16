@@ -96,12 +96,18 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   
   // Parse vehicle data from localStorage if not provided as prop
   const [selectedVehicle, setSelectedVehicle] = useState<InventoryItem | null>(() => {
+    // If editing quotation, don't use any pre-selected vehicle
+    if (editingQuotation) return null;
+    
     if (vehicleData) return vehicleData;
     
     const storedVehicle = localStorage.getItem('selectedVehicleForQuote');
     if (storedVehicle) {
       try {
-        return JSON.parse(storedVehicle);
+        const parsedVehicle = JSON.parse(storedVehicle);
+        // Clear the stored vehicle data after reading it
+        localStorage.removeItem('selectedVehicleForQuote');
+        return parsedVehicle;
       } catch (error) {
         console.error('Error parsing stored vehicle data:', error);
       }
@@ -122,16 +128,52 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     return null;
   });
 
-  // Vehicle data selection states (for empty mode)
-  const [vehicleManufacturer, setVehicleManufacturer] = useState<string>(editingQuotation?.manufacturer || "");
-  const [vehicleCategory, setVehicleCategory] = useState<string>(editingQuotation?.category || "");
-  const [vehicleTrimLevel, setVehicleTrimLevel] = useState<string>(editingQuotation?.trimLevel || "");
-  const [vehicleYear, setVehicleYear] = useState<string>(editingQuotation?.year?.toString() || "");
-  const [vehicleEngineCapacity, setVehicleEngineCapacity] = useState<string>(editingQuotation?.engineCapacity || "");
-  const [vehicleExteriorColor, setVehicleExteriorColor] = useState<string>(editingQuotation?.exteriorColor || "");
-  const [vehicleInteriorColor, setVehicleInteriorColor] = useState<string>(editingQuotation?.interiorColor || "");
-  const [vehicleChassisNumber, setVehicleChassisNumber] = useState<string>(editingQuotation?.chassisNumber || "");
-  const [vehiclePrice, setVehiclePrice] = useState<number>(editingQuotation?.basePrice ? parseFloat(editingQuotation.basePrice) : 0);
+  // Vehicle data selection states (for empty mode or editing)
+  const [vehicleManufacturer, setVehicleManufacturer] = useState<string>(() => {
+    if (editingQuotation) return editingQuotation.manufacturer || "";
+    if (selectedVehicle) return selectedVehicle.manufacturer || "";
+    return "";
+  });
+  const [vehicleCategory, setVehicleCategory] = useState<string>(() => {
+    if (editingQuotation) return editingQuotation.category || "";
+    if (selectedVehicle) return selectedVehicle.category || "";
+    return "";
+  });
+  const [vehicleTrimLevel, setVehicleTrimLevel] = useState<string>(() => {
+    if (editingQuotation) return editingQuotation.trimLevel || "";
+    if (selectedVehicle) return selectedVehicle.trimLevel || "";
+    return "";
+  });
+  const [vehicleYear, setVehicleYear] = useState<string>(() => {
+    if (editingQuotation) return editingQuotation.year?.toString() || "";
+    if (selectedVehicle) return selectedVehicle.year?.toString() || "";
+    return "";
+  });
+  const [vehicleEngineCapacity, setVehicleEngineCapacity] = useState<string>(() => {
+    if (editingQuotation) return editingQuotation.engineCapacity || "";
+    if (selectedVehicle) return selectedVehicle.engineCapacity || "";
+    return "";
+  });
+  const [vehicleExteriorColor, setVehicleExteriorColor] = useState<string>(() => {
+    if (editingQuotation) return editingQuotation.exteriorColor || "";
+    if (selectedVehicle) return selectedVehicle.exteriorColor || "";
+    return "";
+  });
+  const [vehicleInteriorColor, setVehicleInteriorColor] = useState<string>(() => {
+    if (editingQuotation) return editingQuotation.interiorColor || "";
+    if (selectedVehicle) return selectedVehicle.interiorColor || "";
+    return "";
+  });
+  const [vehicleChassisNumber, setVehicleChassisNumber] = useState<string>(() => {
+    if (editingQuotation) return editingQuotation.chassisNumber || "";
+    if (selectedVehicle) return selectedVehicle.chassisNumber || "";
+    return "";
+  });
+  const [vehiclePrice, setVehiclePrice] = useState<number>(() => {
+    if (editingQuotation && editingQuotation.basePrice) return parseFloat(editingQuotation.basePrice);
+    if (selectedVehicle && selectedVehicle.price) return selectedVehicle.price;
+    return 0;
+  });
   
   // Form states
   const [quoteNumber, setQuoteNumber] = useState<string>(() => {

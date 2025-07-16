@@ -394,14 +394,18 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       <FileText className="w-4 h-4 ml-2" />
                       إدارة المواصفات
                     </Button>
-                    <Link href="/quotation-creation">
-                      <Button 
-                        className="bg-purple-600 hover:bg-purple-700 text-white w-full sm:w-auto"
-                      >
-                        <FileText className="w-4 h-4 ml-2" />
-                        إنشاء عرض سعر
-                      </Button>
-                    </Link>
+                    <Button 
+                      className="bg-purple-600 hover:bg-purple-700 text-white w-full sm:w-auto"
+                      onClick={() => {
+                        // Clear any stored vehicle data for empty quotation creation
+                        localStorage.removeItem('selectedVehicleForQuote');
+                        localStorage.removeItem('editingQuotation');
+                        window.location.href = '/quotation-creation';
+                      }}
+                    >
+                      <FileText className="w-4 h-4 ml-2" />
+                      إنشاء عرض سعر
+                    </Button>
                     <Link href="/quotation-management">
                       <Button 
                         variant="outline"
