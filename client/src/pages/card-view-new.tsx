@@ -395,6 +395,13 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         العروض المحفوظة
                       </DropdownMenuItem>
                     </Link>
+                    
+                    <Link href="/integration-management">
+                      <DropdownMenuItem>
+                        <Settings className="mr-2 h-4 w-4" />
+                        إدارة التكامل
+                      </DropdownMenuItem>
+                    </Link>
 
                   </DropdownMenuContent>
                 </DropdownMenu>

@@ -21,6 +21,7 @@ import QuotationManagementPage from "@/pages/quotation-management";
 import CompanyManagementPage from "@/pages/company-management";
 import InvoiceManagementPage from "@/pages/invoice-management";
 import DynamicCompanyControl from "@/pages/dynamic-company-control";
+import IntegrationManagementPage from "@/pages/integration-management";
 
 interface User {
   username: string;
@@ -55,6 +56,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           <Route path="/user-management" component={() => <UserManagementPage onLogout={onLogout} />} />
           <Route path="/company-management" component={() => <CompanyManagementPage />} />
           <Route path="/dynamic-company-control" component={() => <DynamicCompanyControl />} />
+          <Route path="/integration-management" component={() => <IntegrationManagementPage />} />
         </>
       )}
       <Route component={NotFound} />
