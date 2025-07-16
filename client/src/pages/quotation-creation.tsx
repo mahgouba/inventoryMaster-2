@@ -109,24 +109,39 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     return null;
   });
 
+  // Check for editing quotation data
+  const [editingQuotation, setEditingQuotation] = useState<any | null>(() => {
+    const storedQuotation = localStorage.getItem('editingQuotation');
+    if (storedQuotation) {
+      try {
+        return JSON.parse(storedQuotation);
+      } catch (error) {
+        console.error('Error parsing editing quotation data:', error);
+      }
+    }
+    return null;
+  });
+
   // Vehicle data selection states (for empty mode)
-  const [vehicleManufacturer, setVehicleManufacturer] = useState<string>("");
-  const [vehicleCategory, setVehicleCategory] = useState<string>("");
-  const [vehicleTrimLevel, setVehicleTrimLevel] = useState<string>("");
-  const [vehicleYear, setVehicleYear] = useState<string>("");
-  const [vehicleEngineCapacity, setVehicleEngineCapacity] = useState<string>("");
-  const [vehicleExteriorColor, setVehicleExteriorColor] = useState<string>("");
-  const [vehicleInteriorColor, setVehicleInteriorColor] = useState<string>("");
-  const [vehicleChassisNumber, setVehicleChassisNumber] = useState<string>("");
-  const [vehiclePrice, setVehiclePrice] = useState<number>(0);
+  const [vehicleManufacturer, setVehicleManufacturer] = useState<string>(editingQuotation?.manufacturer || "");
+  const [vehicleCategory, setVehicleCategory] = useState<string>(editingQuotation?.category || "");
+  const [vehicleTrimLevel, setVehicleTrimLevel] = useState<string>(editingQuotation?.trimLevel || "");
+  const [vehicleYear, setVehicleYear] = useState<string>(editingQuotation?.year?.toString() || "");
+  const [vehicleEngineCapacity, setVehicleEngineCapacity] = useState<string>(editingQuotation?.engineCapacity || "");
+  const [vehicleExteriorColor, setVehicleExteriorColor] = useState<string>(editingQuotation?.exteriorColor || "");
+  const [vehicleInteriorColor, setVehicleInteriorColor] = useState<string>(editingQuotation?.interiorColor || "");
+  const [vehicleChassisNumber, setVehicleChassisNumber] = useState<string>(editingQuotation?.chassisNumber || "");
+  const [vehiclePrice, setVehiclePrice] = useState<number>(editingQuotation?.basePrice ? parseFloat(editingQuotation.basePrice) : 0);
   
   // Form states
-  const [quoteNumber, setQuoteNumber] = useState<string>(`Q-${Date.now()}`);
-  const [customerName, setCustomerName] = useState<string>("");
-  const [customerPhone, setCustomerPhone] = useState<string>("");
-  const [customerEmail, setCustomerEmail] = useState<string>("");
+  const [quoteNumber, setQuoteNumber] = useState<string>(() => {
+    return editingQuotation?.quoteNumber || `Q-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  });
+  const [customerName, setCustomerName] = useState<string>(editingQuotation?.customerName || "");
+  const [customerPhone, setCustomerPhone] = useState<string>(editingQuotation?.customerPhone || "");
+  const [customerEmail, setCustomerEmail] = useState<string>(editingQuotation?.customerEmail || "");
   const [validityDays, setValidityDays] = useState<number>(30);
-  const [notes, setNotes] = useState<string>("");
+  const [notes, setNotes] = useState<string>(editingQuotation?.notes || "");
   const [isInvoiceMode, setIsInvoiceMode] = useState<boolean>(false);
   const [invoiceNumber, setInvoiceNumber] = useState<string>("");
   const [authorizationNumber, setAuthorizationNumber] = useState<string>("");
@@ -252,14 +267,34 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     showRepresentativeInfo: true
   });
 
-  const [pricingDetails, setPricingDetails] = useState<PricingDetails>({
-    basePrice: selectedVehicle?.price || 0,
-    quantity: 1,
-    licensePlatePrice: 500,
-    includeLicensePlate: true,
-    licensePlateSubjectToTax: false,
-    taxRate: 15,
-    isVATInclusive: false
+  // Pricing details state
+  const [pricingDetails, setPricingDetails] = useState<PricingDetails>(() => {
+    // Initialize from editing quotation if available
+    if (editingQuotation?.pricingDetails) {
+      try {
+        const parsed = JSON.parse(editingQuotation.pricingDetails);
+        return {
+          basePrice: parsed.basePrice || selectedVehicle?.price || 0,
+          quantity: parsed.quantity || 1,
+          licensePlatePrice: parsed.licensePlatePrice || 900,
+          includeLicensePlate: parsed.includeLicensePlate ?? true,
+          licensePlateSubjectToTax: parsed.licensePlateSubjectToTax ?? false,
+          taxRate: parsed.taxRate || 15,
+          isVATInclusive: parsed.isVATInclusive ?? false,
+        };
+      } catch (error) {
+        console.error('Error parsing pricing details from editing quotation:', error);
+      }
+    }
+    return {
+      basePrice: selectedVehicle?.price || 0,
+      quantity: 1,
+      licensePlatePrice: 900,
+      includeLicensePlate: true,
+      licensePlateSubjectToTax: false,
+      taxRate: 15,
+      isVATInclusive: false,
+    };
   });
 
   // New state variables for enhanced features
@@ -282,6 +317,13 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
       setTermsContent(termsText);
     }
   }, [existingTerms, termsContent]);
+
+  // Clear editing quotation from localStorage after loading
+  useEffect(() => {
+    if (editingQuotation) {
+      localStorage.removeItem('editingQuotation');
+    }
+  }, [editingQuotation]);
 
   // Generate QR code data
   const generateQRData = () => {
@@ -483,7 +525,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
       let response;
       if (isInvoiceMode) {
         // Generate invoice number if not exists
-        const newInvoiceNumber = invoiceNumber || `INV-${Date.now()}`;
+        const newInvoiceNumber = invoiceNumber || `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
         setInvoiceNumber(newInvoiceNumber);
         
         // Prepare invoice data
@@ -501,9 +543,16 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
         response = await apiRequest('POST', '/api/invoices', invoiceData);
         localStorage.setItem('lastInvoiceData', JSON.stringify(response));
       } else {
-        // Save as quotation
-        response = await apiRequest('POST', '/api/quotations', quotationData);
-        localStorage.setItem('lastQuotationData', JSON.stringify(response));
+        // Check if we're editing existing quotation
+        if (editingQuotation?.id) {
+          // Update existing quotation
+          response = await apiRequest('PUT', `/api/quotations/${editingQuotation.id}`, quotationData);
+          localStorage.setItem('lastQuotationData', JSON.stringify(response));
+        } else {
+          // Create new quotation
+          response = await apiRequest('POST', '/api/quotations', quotationData);
+          localStorage.setItem('lastQuotationData', JSON.stringify(response));
+        }
       }
       
       toast({

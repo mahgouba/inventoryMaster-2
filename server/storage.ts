@@ -1405,8 +1405,15 @@ export class DatabaseStorage implements IStorage {
       const validUntil = new Date();
       validUntil.setDate(validUntil.getDate() + 30);
       
+      // Generate unique quote number with additional randomness
+      const generateUniqueQuoteNumber = () => {
+        const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 1000);
+        return `Q-${timestamp}-${random}`;
+      };
+
       const simpleQuotation = {
-        quoteNumber: quotationData.quoteNumber || `Q-${Date.now()}`,
+        quoteNumber: quotationData.quoteNumber || generateUniqueQuoteNumber(),
         inventoryItemId: quotationData.inventoryItemId || 0,
         manufacturer: quotationData.manufacturer || 'غير محدد',
         category: quotationData.category || 'غير محدد',
@@ -1440,16 +1447,40 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async updateQuotation(id: number, quotationData: Partial<InsertQuotation>): Promise<Quotation | undefined> {
+  async updateQuotation(id: number, quotationData: any): Promise<any> {
     try {
+      const updatedQuotation = {
+        manufacturer: quotationData.manufacturer || 'غير محدد',
+        category: quotationData.category || 'غير محدد',
+        trimLevel: quotationData.trimLevel || '',
+        year: quotationData.year || new Date().getFullYear(),
+        exteriorColor: quotationData.exteriorColor || '',
+        interiorColor: quotationData.interiorColor || '',
+        chassisNumber: quotationData.chassisNumber || '',
+        engineCapacity: quotationData.engineCapacity || '',
+        specifications: quotationData.specifications || '',
+        basePrice: quotationData.basePrice || '0',
+        finalPrice: quotationData.finalPrice || '0',
+        customerName: quotationData.customerName || 'عميل غير محدد',
+        customerPhone: quotationData.customerPhone || '',
+        customerEmail: quotationData.customerEmail || '',
+        notes: quotationData.notes || '',
+        status: quotationData.status || 'مسودة',
+        companyData: quotationData.companyData || '{}',
+        representativeData: quotationData.representativeData || '{}',
+        pricingDetails: quotationData.pricingDetails || '{}',
+        qrCodeData: quotationData.qrCodeData || '{}',
+        updatedAt: new Date()
+      };
+      
       const [quotation] = await db.update(quotations)
-        .set({ ...quotationData, updatedAt: new Date() })
+        .set(updatedQuotation)
         .where(eq(quotations.id, id))
         .returning();
       return quotation;
     } catch (error) {
       console.error('Update quotation error:', error);
-      return undefined;
+      throw error;
     }
   }
 

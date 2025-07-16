@@ -184,8 +184,10 @@ export default function QuotationManagement() {
   };
 
   const handleEditQuotation = (quotation: Quotation) => {
-    // Navigate to quotation creation page with the quotation data
-    window.location.href = `/quotation-edit/${quotation.id}`;
+    // Store quotation data in localStorage for the creation page to pick up
+    localStorage.setItem('editingQuotation', JSON.stringify(quotation));
+    // Navigate to quotation creation page
+    window.location.href = `/quotation-creation`;
   };
 
   const handleDeleteQuotation = (id: number) => {
