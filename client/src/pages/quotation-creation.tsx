@@ -50,6 +50,72 @@ interface QuotationCreationPageProps {
   vehicleData?: InventoryItem;
 }
 
+// Component to display vehicle specifications
+function VehicleSpecificationsDisplayComponent({ manufacturer, category, trimLevel, year, engineCapacity }: {
+  manufacturer: string;
+  category: string;
+  trimLevel: string;
+  year: string;
+  engineCapacity: string;
+}) {
+  const { data: specs, isLoading } = useQuery<Specification>({
+    queryKey: ['/api/specifications', manufacturer, category, trimLevel, year, engineCapacity],
+    enabled: !!(manufacturer && category && year && engineCapacity),
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/specifications/${manufacturer}/${category}/${trimLevel || 'null'}/${year}/${engineCapacity}`
+      );
+      if (response.ok) {
+        return response.json();
+      }
+      return null;
+    }
+  });
+
+  if (isLoading) {
+    return <div className="text-center text-gray-500">جاري تحميل المواصفات...</div>;
+  }
+
+  if (!specs) {
+    return <div className="text-center text-gray-500">لا توجد مواصفات متاحة لهذه المعاملات</div>;
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+      {specs.engine && (
+        <div><span className="font-medium">المحرك:</span> {specs.engine}</div>
+      )}
+      {specs.transmission && (
+        <div><span className="font-medium">ناقل الحركة:</span> {specs.transmission}</div>
+      )}
+      {specs.drivetrain && (
+        <div><span className="font-medium">نظام الدفع:</span> {specs.drivetrain}</div>
+      )}
+      {specs.fuelType && (
+        <div><span className="font-medium">نوع الوقود:</span> {specs.fuelType}</div>
+      )}
+      {specs.seatingCapacity && (
+        <div><span className="font-medium">عدد المقاعد:</span> {specs.seatingCapacity}</div>
+      )}
+      {specs.maxSpeed && (
+        <div><span className="font-medium">السرعة القصوى:</span> {specs.maxSpeed}</div>
+      )}
+      {specs.acceleration && (
+        <div><span className="font-medium">التسارع 0-100:</span> {specs.acceleration}</div>
+      )}
+      {specs.safetyFeatures && (
+        <div><span className="font-medium">مميزات الأمان:</span> {specs.safetyFeatures}</div>
+      )}
+      {specs.comfortFeatures && (
+        <div><span className="font-medium">مميزات الراحة:</span> {specs.comfortFeatures}</div>
+      )}
+      {specs.warranty && (
+        <div><span className="font-medium">الضمان:</span> {specs.warranty}</div>
+      )}
+    </div>
+  );
+}
+
 interface CompanyData {
   name: string;
   logo: string;
@@ -1405,6 +1471,20 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                         إنشاء السيارة
                       </Button>
                     </div>
+
+                    {/* Vehicle Specifications Display */}
+                    {vehicleManufacturer && vehicleCategory && vehicleYear && vehicleEngineCapacity && (
+                      <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <h4 className="font-semibold mb-3 text-gray-900 dark:text-gray-100">المواصفات التفصيلية</h4>
+                        <VehicleSpecificationsDisplayComponent 
+                          manufacturer={vehicleManufacturer}
+                          category={vehicleCategory}
+                          trimLevel={vehicleTrimLevel}
+                          year={vehicleYear}
+                          engineCapacity={vehicleEngineCapacity}
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>
