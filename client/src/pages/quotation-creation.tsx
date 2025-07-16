@@ -42,7 +42,7 @@ import type { InventoryItem, Specification, InsertQuotation, Company, TermsAndCo
 import { numberToArabic } from "@/utils/number-to-arabic";
 import QuotationA4Preview from "@/components/quotation-a4-preview";
 import CompanyPDFTemplates from "@/components/company-pdf-templates";
-import CompanyManagement from "@/components/company-management";
+
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
@@ -178,9 +178,6 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   
   // Management windows states
   const [specificationsOpen, setSpecificationsOpen] = useState(false);
-  const [companyDataOpen, setCompanyDataOpen] = useState(false);
-  const [companyManagementOpen, setCompanyManagementOpen] = useState(false);
-  const [representativeOpen, setRepresentativeOpen] = useState(false);
   
   const [quotesViewOpen, setQuotesViewOpen] = useState(false);
   const [vehicleEditOpen, setVehicleEditOpen] = useState(false);
@@ -872,24 +869,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 {companyStamp ? "تغيير الختم" : "إضافة ختم"}
               </Button>
               
-              <Link href="/dynamic-company-control">
-                <Button
-                  variant="outline"
-                  className="border-purple-500 text-purple-600 hover:bg-purple-50"
-                >
-                  <Settings size={16} className="ml-2" />
-                  تحكم الشركات
-                </Button>
-              </Link>
-              
-              <Button
-                variant="outline"
-                onClick={() => setShowCompanyManagement(true)}
-                className="border-indigo-500 text-indigo-600 hover:bg-indigo-50"
-              >
-                <Building2 size={16} className="ml-2" />
-                شركات
-              </Button>
+
               
               <Button
                 variant="outline"
@@ -1512,33 +1492,9 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 <CardTitle>إدارة بيانات العرض</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                
-                
-                
-                
-                
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => setCompanyManagementOpen(true)}
-                >
-                  <Settings size={16} className="ml-2" />
-                  إدارة الشركات
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => setRepresentativeOpen(true)}
-                >
-                  <User size={16} className="ml-2" />
-                  إدارة بيانات المندوب
-                </Button>
-                
-                
-                
-                
-                
+                <p className="text-center text-slate-500 py-8">
+                  لا توجد خيارات إدارة إضافية
+                </p>
               </CardContent>
             </Card>
 
@@ -1757,127 +1713,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         </DialogContent>
       </Dialog>
 
-      {/* Company Data Management Dialog */}
-      <Dialog open={companyDataOpen} onOpenChange={setCompanyDataOpen}>
-        <DialogContent className="max-w-2xl" dir="rtl">
-          <DialogHeader>
-            <DialogTitle>إدارة بيانات الشركة</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="companyName">اسم الشركة</Label>
-                <Input
-                  id="companyName"
-                  value={companyData.name}
-                  onChange={(e) => setCompanyData(prev => ({ ...prev, name: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="taxNumber">الرقم الضريبي</Label>
-                <Input
-                  id="taxNumber"
-                  value={companyData.taxNumber}
-                  onChange={(e) => setCompanyData(prev => ({ ...prev, taxNumber: e.target.value }))}
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="address">العنوان</Label>
-                <Input
-                  id="address"
-                  value={companyData.address}
-                  onChange={(e) => setCompanyData(prev => ({ ...prev, address: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone">رقم الهاتف</Label>
-                <Input
-                  id="phone"
-                  value={companyData.phone}
-                  onChange={(e) => setCompanyData(prev => ({ ...prev, phone: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">البريد الإلكتروني</Label>
-                <Input
-                  id="email"
-                  value={companyData.email}
-                  onChange={(e) => setCompanyData(prev => ({ ...prev, email: e.target.value }))}
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="website">الموقع الإلكتروني</Label>
-                <Input
-                  id="website"
-                  value={companyData.website}
-                  onChange={(e) => setCompanyData(prev => ({ ...prev, website: e.target.value }))}
-                />
-              </div>
-            </div>
-            <div className="flex justify-end space-x-2 space-x-reverse">
-              <Button variant="outline" onClick={() => setCompanyDataOpen(false)}>
-                إلغاء
-              </Button>
-              <Button onClick={() => setCompanyDataOpen(false)}>
-                حفظ التغييرات
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
-      {/* Representative Data Management Dialog */}
-      <Dialog open={representativeOpen} onOpenChange={setRepresentativeOpen}>
-        <DialogContent className="max-w-2xl" dir="rtl">
-          <DialogHeader>
-            <DialogTitle>إدارة بيانات المندوب</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="repName">اسم المندوب</Label>
-                <Input
-                  id="repName"
-                  value={representativeData.name}
-                  onChange={(e) => setRepresentativeData(prev => ({ ...prev, name: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="repPosition">المنصب</Label>
-                <Input
-                  id="repPosition"
-                  value={representativeData.position}
-                  onChange={(e) => setRepresentativeData(prev => ({ ...prev, position: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="repPhone">رقم الهاتف</Label>
-                <Input
-                  id="repPhone"
-                  value={representativeData.phone}
-                  onChange={(e) => setRepresentativeData(prev => ({ ...prev, phone: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="repEmail">البريد الإلكتروني</Label>
-                <Input
-                  id="repEmail"
-                  value={representativeData.email}
-                  onChange={(e) => setRepresentativeData(prev => ({ ...prev, email: e.target.value }))}
-                />
-              </div>
-            </div>
-            <div className="flex justify-end space-x-2 space-x-reverse">
-              <Button variant="outline" onClick={() => setRepresentativeOpen(false)}>
-                إلغاء
-              </Button>
-              <Button onClick={() => setRepresentativeOpen(false)}>
-                حفظ التغييرات
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       
 
@@ -2609,15 +2445,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         </div>
       </div>
       
-      {/* Company Management Dialog */}
-      <Dialog open={companyManagementOpen} onOpenChange={setCompanyManagementOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto" dir="rtl">
-          <DialogHeader>
-            <DialogTitle>إدارة الشركات</DialogTitle>
-          </DialogHeader>
-          <CompanyManagement />
-        </DialogContent>
-      </Dialog>
+
       {/* WhatsApp Dialog */}
       <Dialog open={showWhatsappDialog} onOpenChange={setShowWhatsappDialog}>
         <DialogContent className="sm:max-w-md">
