@@ -233,6 +233,19 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     select: (data) => data.filter((vehicle: any) => vehicle.status !== "مباع")
   });
   
+  // Vehicle editing state for editable form - moved here to fix initialization order
+  const [editingVehicleData, setEditingVehicleData] = useState({
+    manufacturer: "",
+    category: "",
+    trimLevel: "",
+    year: "",
+    engineCapacity: "",
+    exteriorColor: "",
+    interiorColor: "",
+    chassisNumber: "",
+    price: 0
+  });
+
   // Management windows states
   const [specificationsOpen, setSpecificationsOpen] = useState(false);
   
@@ -347,18 +360,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [termsRefreshTrigger, setTermsRefreshTrigger] = useState(0);
   const [companyStamp, setCompanyStamp] = useState<string | null>(null);
   
-  // Vehicle editing state for editable form
-  const [editingVehicleData, setEditingVehicleData] = useState({
-    manufacturer: "",
-    category: "",
-    trimLevel: "",
-    year: "",
-    engineCapacity: "",
-    exteriorColor: "",
-    interiorColor: "",
-    chassisNumber: "",
-    price: 0
-  });
+
 
   // Load existing terms and conditions
   const { data: existingTerms = [] } = useQuery<Array<{ id: number; term_text: string; display_order: number }>>({
