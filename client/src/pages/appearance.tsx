@@ -936,13 +936,24 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                             <div className="flex items-center justify-center space-x-2 space-x-reverse">
                               <input
                                 type="file"
-                                accept="image/*"
+                                accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
                                 className="hidden"
                                 id={`file-change-${manufacturer.id}`}
                                 onChange={(e) => {
                                   const file = e.target.files?.[0];
                                   if (file) {
-                                    console.log('File selected:', file.name, 'Size:', file.size);
+                                    console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+                                    
+                                    // Check file type
+                                    if (!file.type.startsWith('image/')) {
+                                      toast({
+                                        title: "نوع ملف غير صحيح",
+                                        description: "يرجى اختيار ملف صورة صحيح (PNG, JPG, JPEG, GIF, WebP)",
+                                        variant: "destructive",
+                                      });
+                                      e.target.value = '';
+                                      return;
+                                    }
                                     
                                     // Check file size (limit to 5MB)
                                     if (file.size > 5 * 1024 * 1024) {
@@ -951,6 +962,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                         description: "حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت",
                                         variant: "destructive",
                                       });
+                                      e.target.value = '';
                                       return;
                                     }
 
@@ -958,25 +970,25 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                     reader.onload = (event) => {
                                       const result = event.target?.result as string;
                                       if (result) {
-                                        console.log('File read successfully, updating logo...');
+                                        console.log('File read successfully, base64 length:', result.length);
                                         updateManufacturerLogoMutation.mutate({
                                           id: manufacturer.id,
                                           logo: result,
                                         });
                                       }
                                     };
-                                    reader.onerror = () => {
-                                      console.error('Error reading file');
+                                    reader.onerror = (error) => {
+                                      console.error('Error reading file:', error);
                                       toast({
                                         title: "خطأ في قراءة الملف",
-                                        description: "حدث خطأ أثناء قراءة الصورة",
+                                        description: "حدث خطأ أثناء قراءة الصورة. يرجى المحاولة مرة أخرى",
                                         variant: "destructive",
                                       });
                                     };
                                     reader.readAsDataURL(file);
-                                  } else {
-                                    console.log('No file selected');
                                   }
+                                  // Reset the input value to allow selecting the same file again
+                                  e.target.value = '';
                                 }}
                               />
                               <Button 
@@ -1015,13 +1027,24 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                             <div className="text-center">
                               <input
                                 type="file"
-                                accept="image/*"
+                                accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
                                 className="hidden"
                                 id={`file-upload-${manufacturer.id}`}
                                 onChange={(e) => {
                                   const file = e.target.files?.[0];
                                   if (file) {
-                                    console.log('File selected:', file.name, 'Size:', file.size);
+                                    console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+                                    
+                                    // Check file type
+                                    if (!file.type.startsWith('image/')) {
+                                      toast({
+                                        title: "نوع ملف غير صحيح",
+                                        description: "يرجى اختيار ملف صورة صحيح (PNG, JPG, JPEG, GIF, WebP)",
+                                        variant: "destructive",
+                                      });
+                                      e.target.value = '';
+                                      return;
+                                    }
                                     
                                     // Check file size (limit to 5MB)
                                     if (file.size > 5 * 1024 * 1024) {
@@ -1030,6 +1053,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                         description: "حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت",
                                         variant: "destructive",
                                       });
+                                      e.target.value = '';
                                       return;
                                     }
 
@@ -1037,25 +1061,25 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                     reader.onload = (event) => {
                                       const result = event.target?.result as string;
                                       if (result) {
-                                        console.log('File read successfully, updating logo...');
+                                        console.log('File read successfully, base64 length:', result.length);
                                         updateManufacturerLogoMutation.mutate({
                                           id: manufacturer.id,
                                           logo: result,
                                         });
                                       }
                                     };
-                                    reader.onerror = () => {
-                                      console.error('Error reading file');
+                                    reader.onerror = (error) => {
+                                      console.error('Error reading file:', error);
                                       toast({
                                         title: "خطأ في قراءة الملف",
-                                        description: "حدث خطأ أثناء قراءة الصورة",
+                                        description: "حدث خطأ أثناء قراءة الصورة. يرجى المحاولة مرة أخرى",
                                         variant: "destructive",
                                       });
                                     };
                                     reader.readAsDataURL(file);
-                                  } else {
-                                    console.log('No file selected');
                                   }
+                                  // Reset the input value to allow selecting the same file again
+                                  e.target.value = '';
                                 }}
                               />
                               <Button 
@@ -1150,17 +1174,55 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                       <label className="cursor-pointer">
                         <input
                           type="file"
-                          accept="image/*"
+                          accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
                           className="hidden"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
+                              console.log('New manufacturer file selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+                              
+                              // Check file type
+                              if (!file.type.startsWith('image/')) {
+                                toast({
+                                  title: "نوع ملف غير صحيح",
+                                  description: "يرجى اختيار ملف صورة صحيح (PNG, JPG, JPEG, GIF, WebP)",
+                                  variant: "destructive",
+                                });
+                                e.target.value = '';
+                                return;
+                              }
+                              
+                              // Check file size (limit to 5MB)
+                              if (file.size > 5 * 1024 * 1024) {
+                                toast({
+                                  title: "خطأ في حجم الملف",
+                                  description: "حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت",
+                                  variant: "destructive",
+                                });
+                                e.target.value = '';
+                                return;
+                              }
+
                               const reader = new FileReader();
-                              reader.onload = () => {
-                                setNewManufacturerLogo(reader.result as string);
+                              reader.onload = (event) => {
+                                const result = event.target?.result as string;
+                                if (result) {
+                                  console.log('New manufacturer logo read successfully');
+                                  setNewManufacturerLogo(result);
+                                }
+                              };
+                              reader.onerror = (error) => {
+                                console.error('Error reading file:', error);
+                                toast({
+                                  title: "خطأ في قراءة الملف",
+                                  description: "حدث خطأ أثناء قراءة الصورة. يرجى المحاولة مرة أخرى",
+                                  variant: "destructive",
+                                });
                               };
                               reader.readAsDataURL(file);
                             }
+                            // Reset the input value to allow selecting the same file again
+                            e.target.value = '';
                           }}
                         />
                         <Button variant="outline" size="sm">
