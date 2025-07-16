@@ -479,16 +479,37 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
         qrCodeData: JSON.stringify({ quoteNumber: quoteNumber || `Q-${Date.now()}`, customerName: customerName || "عميل غير محدد", finalPrice: totals.finalTotal })
       };
 
-      // Save quotation via API
-      const response = await apiRequest('POST', '/api/quotations', quotationData);
+      // Save as quotation or invoice based on mode
+      let response;
+      if (isInvoiceMode) {
+        // Generate invoice number if not exists
+        const newInvoiceNumber = invoiceNumber || `INV-${Date.now()}`;
+        setInvoiceNumber(newInvoiceNumber);
+        
+        // Prepare invoice data
+        const invoiceData = {
+          ...quotationData,
+          invoiceNumber: newInvoiceNumber,
+          quoteNumber: quoteNumber,
+          paymentStatus: "غير مدفوع",
+          remainingAmount: totals.finalTotal.toString(),
+          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          authorizationNumber: authorizationNumber || ""
+        };
+        
+        // Save as invoice
+        response = await apiRequest('POST', '/api/invoices', invoiceData);
+        localStorage.setItem('lastInvoiceData', JSON.stringify(response));
+      } else {
+        // Save as quotation
+        response = await apiRequest('POST', '/api/quotations', quotationData);
+        localStorage.setItem('lastQuotationData', JSON.stringify(response));
+      }
       
       toast({
         title: "تم الحفظ بنجاح",
         description: `تم حفظ ${isInvoiceMode ? 'الفاتورة' : 'عرض السعر'} بنجاح`,
       });
-
-      // Store quotation data for potential future use
-      localStorage.setItem('lastQuotationData', JSON.stringify(response));
       
     } catch (error) {
       console.error("Error saving quotation:", error);
