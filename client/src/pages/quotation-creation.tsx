@@ -440,6 +440,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [showWhatsappDialog, setShowWhatsappDialog] = useState(false);
   const [termsRefreshTrigger, setTermsRefreshTrigger] = useState(0);
   const [companyStamp, setCompanyStamp] = useState<string | null>(null);
+  const [downloadLoading, setDownloadLoading] = useState(false);
   
 
 
@@ -834,6 +835,150 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
   });
 
   // Calculate pricing
+  // Handle PDF download
+  const handleDownloadPDF = async () => {
+    try {
+      setDownloadLoading(true);
+      
+      // Get the quotation preview element
+      const element = document.querySelector('[data-pdf-export="quotation"]');
+      if (!element) {
+        toast({
+          title: "خطأ",
+          description: "لم يتم العثور على معاينة العرض",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Convert to canvas with higher quality
+      const canvas = await html2canvas(element as HTMLElement, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        height: element.scrollHeight,
+        width: element.scrollWidth
+      });
+      
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      // Calculate dimensions
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      
+      // Calculate scale to fit A4
+      const scale = Math.min(pdfWidth / (canvasWidth * 0.264583), pdfHeight / (canvasHeight * 0.264583));
+      const scaledWidth = canvasWidth * 0.264583 * scale;
+      const scaledHeight = canvasHeight * 0.264583 * scale;
+      
+      // Center the image
+      const xOffset = (pdfWidth - scaledWidth) / 2;
+      const yOffset = (pdfHeight - scaledHeight) / 2;
+      
+      // Add canvas to PDF
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, scaledWidth, scaledHeight);
+      
+      // Generate filename
+      const vehicleInfo = selectedVehicle || editableVehicle;
+      const filename = `عرض_سعر_${vehicleInfo?.manufacturer || 'البريمي'}_${vehicleInfo?.category || 'سيارة'}_${new Date().toLocaleDateString('en-US').replace(/\//g, '-')}.pdf`;
+      
+      // Save PDF
+      pdf.save(filename);
+      
+      toast({
+        title: "تم التحميل بنجاح",
+        description: "تم تحميل العرض بصيغة PDF بنجاح",
+      });
+      
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      toast({
+        title: "خطأ في التحميل",
+        description: "حدث خطأ أثناء تحميل العرض",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloadLoading(false);
+    }
+  };
+  
+  // Handle print quotation
+  const handlePrintQuotation = () => {
+    try {
+      // Get the quotation preview element
+      const element = document.querySelector('[data-pdf-export="quotation"]');
+      if (!element) {
+        toast({
+          title: "خطأ",
+          description: "لم يتم العثور على معاينة العرض",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Create a new window for printing
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        toast({
+          title: "خطأ",
+          description: "لم يتم السماح بفتح نافذة جديدة للطباعة",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Copy styles and content to print window
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>طباعة العرض</title>
+            <style>
+              @media print {
+                body { margin: 0; padding: 20px; }
+                * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
+              }
+              ${Array.from(document.styleSheets).map(sheet => {
+                try {
+                  return Array.from(sheet.cssRules).map(rule => rule.cssText).join('\n');
+                } catch (e) {
+                  return '';
+                }
+              }).join('\n')}
+            </style>
+          </head>
+          <body>
+            ${element.outerHTML}
+          </body>
+        </html>
+      `);
+      
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      
+      toast({
+        title: "تم التحضير للطباعة",
+        description: "تم تحضير العرض للطباعة بنجاح",
+      });
+      
+    } catch (error) {
+      console.error('Error printing quotation:', error);
+      toast({
+        title: "خطأ في الطباعة",
+        description: "حدث خطأ أثناء تحضير العرض للطباعة",
+        variant: "destructive",
+      });
+    }
+  };
+
   const calculateTotals = () => {
     const baseTotal = pricingDetails.basePrice * pricingDetails.quantity;
     const licensePlateTotal = pricingDetails.includeLicensePlate ? pricingDetails.licensePlatePrice : 0;
@@ -1763,9 +1908,32 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 <CardTitle>إدارة بيانات العرض</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="text-center text-slate-500 py-8">
-                  لا توجد خيارات إدارة إضافية
-                </p>
+                <Button 
+                  onClick={handleDownloadPDF}
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  disabled={downloadLoading}
+                >
+                  {downloadLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                      جاري التحميل...
+                    </>
+                  ) : (
+                    <>
+                      <Download size={16} className="ml-2" />
+                      تحميل العرض PDF
+                    </>
+                  )}
+                </Button>
+                
+                <Button 
+                  onClick={handlePrintQuotation}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Printer size={16} className="ml-2" />
+                  طباعة العرض
+                </Button>
               </CardContent>
             </Card>
 
@@ -2948,245 +3116,47 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               </div>
             </div>
 
-            {/* Detailed Specifications Editing Section */}
-            <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100 flex items-center">
-                <Settings size={18} className="ml-2" />
-                المواصفات التفصيلية - قابلة للتعديل
-              </h4>
-              
-              {editingSpecsLoading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-500">جاري تحميل المواصفات...</p>
+            {/* Vehicle Specifications Preview from Database */}
+            {editingVehicleSpecs && (
+              <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <h4 className="font-semibold mb-3 text-gray-900 dark:text-gray-100">المواصفات التفصيلية من قاعدة البيانات</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  {editingVehicleSpecs.engine && (
+                    <div><span className="font-medium">المحرك:</span> {editingVehicleSpecs.engine}</div>
+                  )}
+                  {editingVehicleSpecs.transmission && (
+                    <div><span className="font-medium">ناقل الحركة:</span> {editingVehicleSpecs.transmission}</div>
+                  )}
+                  {editingVehicleSpecs.drivetrain && (
+                    <div><span className="font-medium">نظام الدفع:</span> {editingVehicleSpecs.drivetrain}</div>
+                  )}
+                  {editingVehicleSpecs.fuelType && (
+                    <div><span className="font-medium">نوع الوقود:</span> {editingVehicleSpecs.fuelType}</div>
+                  )}
+                  {editingVehicleSpecs.seatingCapacity && (
+                    <div><span className="font-medium">عدد المقاعد:</span> {editingVehicleSpecs.seatingCapacity}</div>
+                  )}
+                  {editingVehicleSpecs.maxSpeed && (
+                    <div><span className="font-medium">السرعة القصوى:</span> {editingVehicleSpecs.maxSpeed}</div>
+                  )}
+                  {editingVehicleSpecs.acceleration && (
+                    <div><span className="font-medium">التسارع 0-100:</span> {editingVehicleSpecs.acceleration}</div>
+                  )}
+                  {editingVehicleSpecs.safetyFeatures && (
+                    <div><span className="font-medium">مميزات الأمان:</span> {editingVehicleSpecs.safetyFeatures}</div>
+                  )}
+                  {editingVehicleSpecs.comfortFeatures && (
+                    <div><span className="font-medium">مميزات الراحة:</span> {editingVehicleSpecs.comfortFeatures}</div>
+                  )}
+                  {editingVehicleSpecs.warranty && (
+                    <div><span className="font-medium">الضمان:</span> {editingVehicleSpecs.warranty}</div>
+                  )}
                 </div>
-              ) : (
-                <div className="space-y-6">
-                  {/* Engine & Performance Section */}
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                    <h5 className="font-medium text-blue-600 dark:text-blue-400 mb-3">الأداء والمحرك</h5>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="specEngine">المحرك</Label>
-                        <Input
-                          id="specEngine"
-                          value={editingVehicleSpecs?.engine || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, engine: e.target.value }))}
-                          placeholder="مثال: V8 4.0L Twin Turbo"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specHorsepower">القوة الحصانية</Label>
-                        <Input
-                          id="specHorsepower"
-                          value={editingVehicleSpecs?.horsepower || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, horsepower: e.target.value }))}
-                          placeholder="مثال: 630 حصان"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specTorque">عزم الدوران</Label>
-                        <Input
-                          id="specTorque"
-                          value={editingVehicleSpecs?.torque || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, torque: e.target.value }))}
-                          placeholder="مثال: 900 نيوتن متر"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specTransmission">ناقل الحركة</Label>
-                        <Input
-                          id="specTransmission"
-                          value={editingVehicleSpecs?.transmission || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, transmission: e.target.value }))}
-                          placeholder="مثال: أوتوماتيك 9 سرعات"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specDrivetrain">نظام الدفع</Label>
-                        <Input
-                          id="specDrivetrain"
-                          value={editingVehicleSpecs?.drivetrain || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, drivetrain: e.target.value }))}
-                          placeholder="مثال: دفع رباعي"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specFuelType">نوع الوقود</Label>
-                        <Input
-                          id="specFuelType"
-                          value={editingVehicleSpecs?.fuelType || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, fuelType: e.target.value }))}
-                          placeholder="مثال: بنزين ممتاز"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specAcceleration">التسارع 0-100 كم/س</Label>
-                        <Input
-                          id="specAcceleration"
-                          value={editingVehicleSpecs?.acceleration || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, acceleration: e.target.value }))}
-                          placeholder="مثال: 3.9 ثانية"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specMaxSpeed">السرعة القصوى</Label>
-                        <Input
-                          id="specMaxSpeed"
-                          value={editingVehicleSpecs?.maxSpeed || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, maxSpeed: e.target.value }))}
-                          placeholder="مثال: 300 كم/س"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Dimensions Section */}
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                    <h5 className="font-medium text-green-600 dark:text-green-400 mb-3">الأبعاد والمقاييس</h5>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="specLength">الطول</Label>
-                        <Input
-                          id="specLength"
-                          value={editingVehicleSpecs?.length || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, length: e.target.value }))}
-                          placeholder="مثال: 5,179 مم"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specWidth">العرض</Label>
-                        <Input
-                          id="specWidth"
-                          value={editingVehicleSpecs?.width || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, width: e.target.value }))}
-                          placeholder="مثال: 1,948 مم"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specHeight">الارتفاع</Label>
-                        <Input
-                          id="specHeight"
-                          value={editingVehicleSpecs?.height || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, height: e.target.value }))}
-                          placeholder="مثال: 1,498 مم"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specWheelbase">قاعدة العجلات</Label>
-                        <Input
-                          id="specWheelbase"
-                          value={editingVehicleSpecs?.wheelbase || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, wheelbase: e.target.value }))}
-                          placeholder="مثال: 3,106 مم"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specCurbWeight">الوزن الفارغ</Label>
-                        <Input
-                          id="specCurbWeight"
-                          value={editingVehicleSpecs?.curbWeight || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, curbWeight: e.target.value }))}
-                          placeholder="مثال: 2,070 كج"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specSeatingCapacity">عدد المقاعد</Label>
-                        <Input
-                          id="specSeatingCapacity"
-                          value={editingVehicleSpecs?.seatingCapacity || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, seatingCapacity: e.target.value }))}
-                          placeholder="مثال: 5 مقاعد"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Features Section */}
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                    <h5 className="font-medium text-purple-600 dark:text-purple-400 mb-3">المميزات والتجهيزات</h5>
-                    <div className="grid grid-cols-1 gap-4">
-                      <div>
-                        <Label htmlFor="specSafetyFeatures">مميزات الأمان</Label>
-                        <Textarea
-                          id="specSafetyFeatures"
-                          value={editingVehicleSpecs?.safetyFeatures || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, safetyFeatures: e.target.value }))}
-                          placeholder="مثال: مكابح ABS، نظام مراقبة النقطة العمياء، نظام الوقوف التلقائي"
-                          rows={3}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specComfortFeatures">مميزات الراحة</Label>
-                        <Textarea
-                          id="specComfortFeatures"
-                          value={editingVehicleSpecs?.comfortFeatures || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, comfortFeatures: e.target.value }))}
-                          placeholder="مثال: مقاعد جلدية، تدفئة وتبريد المقاعد، نظام صوتي متقدم"
-                          rows={3}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specInfotainment">نظام المعلومات والترفيه</Label>
-                        <Textarea
-                          id="specInfotainment"
-                          value={editingVehicleSpecs?.infotainment || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, infotainment: e.target.value }))}
-                          placeholder="مثال: شاشة لمس 12.3 بوصة، Apple CarPlay، Android Auto"
-                          rows={2}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specDriverAssistance">مساعدة السائق</Label>
-                        <Textarea
-                          id="specDriverAssistance"
-                          value={editingVehicleSpecs?.driverAssistance || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, driverAssistance: e.target.value }))}
-                          placeholder="مثال: نظام الحفاظ على المسار، مثبت السرعة التكيفي، نظام تجنب الاصطدام"
-                          rows={2}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Warranty & Additional Info */}
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                    <h5 className="font-medium text-orange-600 dark:text-orange-400 mb-3">الضمان والمعلومات الإضافية</h5>
-                    <div className="grid grid-cols-1 gap-4">
-                      <div>
-                        <Label htmlFor="specWarranty">الضمان</Label>
-                        <Input
-                          id="specWarranty"
-                          value={editingVehicleSpecs?.warranty || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, warranty: e.target.value }))}
-                          placeholder="مثال: 5 سنوات أو 100,000 كم"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="specNotes">ملاحظات إضافية</Label>
-                        <Textarea
-                          id="specNotes"
-                          value={editingVehicleSpecs?.notes || ""}
-                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, notes: e.target.value }))}
-                          placeholder="أي معلومات إضافية أو ملاحظات خاصة"
-                          rows={3}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Real-time Update Notice */}
-                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-                    <div className="flex items-center">
-                      <Info size={16} className="text-blue-600 dark:text-blue-400 ml-2" />
-                      <span className="text-sm text-blue-800 dark:text-blue-200">
-                        التغييرات في المواصفات يتم حفظها تلقائياً عند تحديث بيانات السيارة
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+                {editingSpecsLoading && (
+                  <div className="text-center text-gray-500">جاري تحميل المواصفات...</div>
+                )}
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4">
@@ -3226,10 +3196,8 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   setVehicleChassisNumber(editingVehicleData.chassisNumber);
                   setVehiclePrice(editingVehicleData.price);
                   
-                  // Update vehicle specifications in real-time
-                  if (editingVehicleSpecs) {
-                    setVehicleSpecs(editingVehicleSpecs);
-                  }
+                  // Update vehicle specifications automatically from database
+                  setVehicleSpecs(editingVehicleSpecs);
                   
                   setVehicleEditOpen(false);
                   
