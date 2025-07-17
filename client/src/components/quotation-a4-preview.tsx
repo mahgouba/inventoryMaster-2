@@ -380,10 +380,7 @@ export default function QuotationA4Preview({
                   <span className="font-semibold text-gray-700">الاسم:</span>
                   <span>{customerName || "غير محدد"}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="font-semibold text-gray-700">الهاتف:</span>
-                  <span>{customerPhone || "غير محدد"}</span>
-                </div>
+                
                 <div className="flex justify-between">
                   <span className="font-semibold text-gray-700">البريد الإلكتروني:</span>
                   <span>{customerEmail || "غير محدد"}</span>
