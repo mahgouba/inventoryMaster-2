@@ -382,9 +382,7 @@ export default function QuotationA4Preview({
             {/* Vehicle Information */}
             {selectedVehicle && (
               <div className="bg-white/90 border border-gray-300 p-4 rounded shadow-sm w-full">
-                <h3 className="text-sm font-bold mb-3 text-blue-800 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>
-                  بيانات المركبة
-                </h3>
+                
                 <div className="space-y-2 text-xs text-black">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-gray-700">الصانع:</span>
