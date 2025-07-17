@@ -356,41 +356,39 @@ export default function QuotationA4Preview({
                   <span>{new Date().toLocaleDateString('ar-SA')}</span>
                 </div>
               </div>
+              
+              {/* Customer Information Details below header */}
+              <div className="mt-4 bg-white/90 border border-gray-300 p-3 rounded shadow-sm">
+                <div className="space-y-2 text-xs text-black">
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-700">الاسم:</span>
+                    <span>{customerName || "غير محدد"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-700">البريد الإلكتروني:</span>
+                    <span>{customerEmail || "غير محدد"}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Customer Addressing Section - Full width bar below "عرض سعر" */}
-          <div className="mb-6" style={{marginTop: '20px'}}>
-            <div className="bg-white/90 border border-gray-300 p-4 rounded-lg w-full">
-              <h3 className="text-lg font-bold text-blue-800 text-center" style={{fontFamily: 'Cairo, sans-serif'}}>
-                {customerTitle || "السادة"} / {customerName || "غير محدد"} الموقرين
-              </h3>
-            </div>
-          </div>
 
-          {/* Customer & Vehicle Information Side by Side */}
-          <div className="grid grid-cols-2 gap-6 mb-8" style={{marginTop: '220px'}}>
-            {/* Customer Information */}
-            <div className="bg-white/90 border border-gray-300 p-4 rounded shadow-sm">
-              <h3 className="text-sm font-bold mb-3 text-blue-800 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>
-                بيانات العميل
-              </h3>
-              <div className="space-y-2 text-xs text-black">
-                <div className="flex justify-between">
-                  <span className="font-semibold text-gray-700">الاسم:</span>
-                  <span>{customerName || "غير محدد"}</span>
-                </div>
-                
-                <div className="flex justify-between">
-                  <span className="font-semibold text-gray-700">البريد الإلكتروني:</span>
-                  <span>{customerEmail || "غير محدد"}</span>
-                </div>
+
+          {/* Vehicle Information Section */}
+          <div className="mb-8" style={{marginTop: '220px'}}>
+            {/* Customer Addressing Section - Full width bar */}
+            <div className="mb-6">
+              <div className="bg-white/90 border border-gray-300 p-4 rounded-lg w-full">
+                <h3 className="text-lg font-bold text-blue-800 text-center" style={{fontFamily: 'Cairo, sans-serif'}}>
+                  {customerTitle || "السادة"} / {customerName || "غير محدد"} الموقرين
+                </h3>
               </div>
             </div>
 
             {/* Vehicle Information */}
             {selectedVehicle && (
-              <div className="bg-white/90 border border-gray-300 p-4 rounded shadow-sm">
+              <div className="bg-white/90 border border-gray-300 p-4 rounded shadow-sm w-full">
                 <h3 className="text-sm font-bold mb-3 text-blue-800 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>
                   بيانات المركبة
                 </h3>
