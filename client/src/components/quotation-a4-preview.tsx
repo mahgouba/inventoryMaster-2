@@ -359,6 +359,15 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
+          {/* Customer Addressing Section - Right below "عرض سعر" */}
+          <div className="text-center mb-6" style={{marginTop: '20px'}}>
+            <div className="bg-white/90 border border-gray-300 p-4 rounded-lg inline-block">
+              <h3 className="text-lg font-bold text-blue-800 mb-2" style={{fontFamily: 'Cairo, sans-serif'}}>
+                {customerTitle || "السادة"} / {customerName || "غير محدد"} الموقرين
+              </h3>
+            </div>
+          </div>
+
           {/* Customer Information */}
           <div className="grid grid-cols-1 gap-6 mb-8" style={{marginTop: '180px'}}>
             <div className="bg-white/80 border border-gray-300 p-4 rounded">
@@ -367,9 +376,8 @@ export default function QuotationA4Preview({
               </h3>
               <div className="space-y-2 text-xs text-black">
                 <div>
-                  <span className="font-semibold">
-                    {customerTitle || "السادة"} / {customerName || "غير محدد"} الموقرين
-                  </span>
+                  <span className="font-semibold">الاسم: </span>
+                  <span>{customerName || "غير محدد"}</span>
                 </div>
                 <div>
                   <span className="font-semibold">الهاتف: </span>
