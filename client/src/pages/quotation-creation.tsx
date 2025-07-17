@@ -95,45 +95,98 @@ function VehicleSpecificationsDisplayComponent({ manufacturer, category, trimLev
   }
 
   const specsData = [
-    { key: 'engine', label: 'المحرك', value: specs.engine, icon: '🔧' },
-    { key: 'transmission', label: 'ناقل الحركة', value: specs.transmission, icon: '⚙️' },
-    { key: 'drivetrain', label: 'نظام الدفع', value: specs.drivetrain, icon: '🚗' },
-    { key: 'fuelType', label: 'نوع الوقود', value: specs.fuelType, icon: '⛽' },
-    { key: 'seatingCapacity', label: 'عدد المقاعد', value: specs.seatingCapacity, icon: '🪑' },
-    { key: 'maxSpeed', label: 'السرعة القصوى', value: specs.maxSpeed, icon: '🏎️' },
-    { key: 'acceleration', label: 'التسارع 0-100', value: specs.acceleration, icon: '🚀' },
-    { key: 'safetyFeatures', label: 'مميزات الأمان', value: specs.safetyFeatures, icon: '🛡️' },
-    { key: 'comfortFeatures', label: 'مميزات الراحة', value: specs.comfortFeatures, icon: '✨' },
-    { key: 'warranty', label: 'الضمان', value: specs.warranty, icon: '🔒' },
+    // Engine & Performance
+    { key: 'engineType', label: 'نوع المحرك', value: specs.engineType, icon: '🔧', category: 'engine' },
+    { key: 'horsepower', label: 'القوة الحصانية', value: specs.horsepower, icon: '⚡', category: 'engine' },
+    { key: 'torque', label: 'عزم الدوران', value: specs.torque, icon: '🔄', category: 'engine' },
+    { key: 'transmission', label: 'ناقل الحركة', value: specs.transmission, icon: '⚙️', category: 'engine' },
+    { key: 'fuelType', label: 'نوع الوقود', value: specs.fuelType, icon: '⛽', category: 'engine' },
+    { key: 'fuelConsumption', label: 'استهلاك الوقود', value: specs.fuelConsumption, icon: '📊', category: 'engine' },
+    { key: 'drivetrain', label: 'نوع الدفع', value: specs.drivetrain, icon: '🚗', category: 'engine' },
+    { key: 'acceleration', label: 'التسارع 0-100', value: specs.acceleration, icon: '🚀', category: 'engine' },
+    { key: 'topSpeed', label: 'السرعة القصوى', value: specs.topSpeed, icon: '🏎️', category: 'engine' },
+    
+    // Dimensions & Weight
+    { key: 'length', label: 'الطول', value: specs.length, icon: '📏', category: 'dimensions' },
+    { key: 'width', label: 'العرض', value: specs.width, icon: '📐', category: 'dimensions' },
+    { key: 'height', label: 'الارتفاع', value: specs.height, icon: '📏', category: 'dimensions' },
+    { key: 'wheelbase', label: 'قاعدة العجلات', value: specs.wheelbase, icon: '🛞', category: 'dimensions' },
+    { key: 'curbWeight', label: 'الوزن الفارغ', value: specs.curbWeight, icon: '⚖️', category: 'dimensions' },
+    { key: 'grossWeight', label: 'إجمالي الوزن', value: specs.grossWeight, icon: '⚖️', category: 'dimensions' },
+    { key: 'loadCapacity', label: 'سعة التحميل', value: specs.loadCapacity, icon: '📦', category: 'dimensions' },
+    { key: 'seatingCapacity', label: 'عدد المقاعد', value: specs.seatingCapacity, icon: '🪑', category: 'dimensions' },
+    
+    // Features & Equipment
+    { key: 'safetyFeatures', label: 'مميزات الأمان', value: specs.safetyFeatures, icon: '🛡️', category: 'features' },
+    { key: 'comfortFeatures', label: 'مميزات الراحة', value: specs.comfortFeatures, icon: '✨', category: 'features' },
+    { key: 'infotainment', label: 'نظام المعلومات والترفيه', value: specs.infotainment, icon: '📱', category: 'features' },
+    { key: 'driverAssistance', label: 'مساعدة السائق', value: specs.driverAssistance, icon: '🤖', category: 'features' },
+    { key: 'exteriorFeatures', label: 'المميزات الخارجية', value: specs.exteriorFeatures, icon: '🌟', category: 'features' },
+    { key: 'interiorFeatures', label: 'المميزات الداخلية', value: specs.interiorFeatures, icon: '🏠', category: 'features' },
+    
+    // Technical Specifications
+    { key: 'tireSize', label: 'مقاس الإطارات', value: specs.tireSize, icon: '🛞', category: 'technical' },
+    { key: 'suspension', label: 'نوع التعليق', value: specs.suspension, icon: '🔧', category: 'technical' },
+    { key: 'brakes', label: 'نظام الكبح', value: specs.brakes, icon: '🛑', category: 'technical' },
+    { key: 'steering', label: 'نظام التوجيه', value: specs.steering, icon: '🎯', category: 'technical' },
+    { key: 'groundClearance', label: 'ارتفاع عن الأرض', value: specs.groundClearance, icon: '📏', category: 'technical' },
+    
+    // Additional Information
+    { key: 'warranty', label: 'الضمان', value: specs.warranty, icon: '🔒', category: 'additional' },
+    { key: 'detailedDescription', label: 'الوصف التفصيلي', value: specs.detailedDescription, icon: '📝', category: 'additional' },
+    { key: 'notes', label: 'ملاحظات', value: specs.notes, icon: '📋', category: 'additional' },
   ];
 
   const availableSpecs = specsData.filter(spec => spec.value);
 
+  // Group specifications by category
+  const engineSpecs = availableSpecs.filter(spec => spec.category === 'engine');
+  const dimensionSpecs = availableSpecs.filter(spec => spec.category === 'dimensions');
+  const featureSpecs = availableSpecs.filter(spec => spec.category === 'features');
+  const technicalSpecs = availableSpecs.filter(spec => spec.category === 'technical');
+  const additionalSpecs = availableSpecs.filter(spec => spec.category === 'additional');
+
+  const specCategories = [
+    { name: 'المحرك والأداء', specs: engineSpecs, icon: '🔧' },
+    { name: 'الأبعاد والوزن', specs: dimensionSpecs, icon: '📏' },
+    { name: 'المميزات والتجهيزات', specs: featureSpecs, icon: '✨' },
+    { name: 'المواصفات التقنية', specs: technicalSpecs, icon: '🔧' },
+    { name: 'معلومات إضافية', specs: additionalSpecs, icon: '📋' }
+  ].filter(category => category.specs.length > 0);
+
   return (
-    <div className="space-y-4">
-      {availableSpecs.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {availableSpecs.map((spec) => (
-            <div 
-              key={spec.key} 
-              className="p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-colors duration-200"
-            >
-              <div className="flex items-start space-x-3 space-x-reverse">
-                <span className="text-lg" role="img" aria-label={spec.label}>
-                  {spec.icon}
-                </span>
-                <div className="flex-1">
-                  <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-1">
-                    {spec.label}
-                  </h5>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                    {spec.value}
-                  </p>
+    <div className="space-y-6">
+      {specCategories.length > 0 ? (
+        specCategories.map((category) => (
+          <div key={category.name} className="space-y-3">
+            <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <span role="img" aria-label={category.name}>{category.icon}</span>
+              {category.name}
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {category.specs.map((spec) => (
+                <div 
+                  key={spec.key} 
+                  className="p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-colors duration-200"
+                >
+                  <div className="flex items-start space-x-3 space-x-reverse">
+                    <span className="text-lg" role="img" aria-label={spec.label}>
+                      {spec.icon}
+                    </span>
+                    <div className="flex-1">
+                      <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-1">
+                        {spec.label}
+                      </h5>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                        {spec.value}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))
       ) : (
         <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
           <Info className="mx-auto h-8 w-8 text-gray-400 mb-2" />
@@ -3176,43 +3229,153 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
             </div>
 
             {/* Vehicle Specifications Preview from Database */}
-            {editingVehicleSpecs && (
+            {(editingVehicleSpecs || editingSpecsLoading) && (
               <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <h4 className="font-semibold mb-3 text-gray-900 dark:text-gray-100">المواصفات التفصيلية من قاعدة البيانات</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  {editingVehicleSpecs.engine && (
-                    <div><span className="font-medium">المحرك:</span> {editingVehicleSpecs.engine}</div>
-                  )}
-                  {editingVehicleSpecs.transmission && (
-                    <div><span className="font-medium">ناقل الحركة:</span> {editingVehicleSpecs.transmission}</div>
-                  )}
-                  {editingVehicleSpecs.drivetrain && (
-                    <div><span className="font-medium">نظام الدفع:</span> {editingVehicleSpecs.drivetrain}</div>
-                  )}
-                  {editingVehicleSpecs.fuelType && (
-                    <div><span className="font-medium">نوع الوقود:</span> {editingVehicleSpecs.fuelType}</div>
-                  )}
-                  {editingVehicleSpecs.seatingCapacity && (
-                    <div><span className="font-medium">عدد المقاعد:</span> {editingVehicleSpecs.seatingCapacity}</div>
-                  )}
-                  {editingVehicleSpecs.maxSpeed && (
-                    <div><span className="font-medium">السرعة القصوى:</span> {editingVehicleSpecs.maxSpeed}</div>
-                  )}
-                  {editingVehicleSpecs.acceleration && (
-                    <div><span className="font-medium">التسارع 0-100:</span> {editingVehicleSpecs.acceleration}</div>
-                  )}
-                  {editingVehicleSpecs.safetyFeatures && (
-                    <div><span className="font-medium">مميزات الأمان:</span> {editingVehicleSpecs.safetyFeatures}</div>
-                  )}
-                  {editingVehicleSpecs.comfortFeatures && (
-                    <div><span className="font-medium">مميزات الراحة:</span> {editingVehicleSpecs.comfortFeatures}</div>
-                  )}
-                  {editingVehicleSpecs.warranty && (
-                    <div><span className="font-medium">الضمان:</span> {editingVehicleSpecs.warranty}</div>
-                  )}
-                </div>
+                
                 {editingSpecsLoading && (
-                  <div className="text-center text-gray-500">جاري تحميل المواصفات...</div>
+                  <div className="text-center text-gray-500 py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                    جاري تحميل المواصفات...
+                  </div>
+                )}
+                
+                {editingVehicleSpecs && !editingSpecsLoading && (
+                  <div className="space-y-6">
+                    {/* Engine & Performance Specifications */}
+                    <div>
+                      <h5 className="font-medium text-sm text-gray-600 dark:text-gray-300 mb-2">المحرك والأداء</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        {editingVehicleSpecs.engineType && (
+                          <div><span className="font-medium">نوع المحرك:</span> {editingVehicleSpecs.engineType}</div>
+                        )}
+                        {editingVehicleSpecs.horsepower && (
+                          <div><span className="font-medium">القوة الحصانية:</span> {editingVehicleSpecs.horsepower}</div>
+                        )}
+                        {editingVehicleSpecs.torque && (
+                          <div><span className="font-medium">عزم الدوران:</span> {editingVehicleSpecs.torque}</div>
+                        )}
+                        {editingVehicleSpecs.transmission && (
+                          <div><span className="font-medium">ناقل الحركة:</span> {editingVehicleSpecs.transmission}</div>
+                        )}
+                        {editingVehicleSpecs.fuelType && (
+                          <div><span className="font-medium">نوع الوقود:</span> {editingVehicleSpecs.fuelType}</div>
+                        )}
+                        {editingVehicleSpecs.fuelConsumption && (
+                          <div><span className="font-medium">استهلاك الوقود:</span> {editingVehicleSpecs.fuelConsumption}</div>
+                        )}
+                        {editingVehicleSpecs.drivetrain && (
+                          <div><span className="font-medium">نوع الدفع:</span> {editingVehicleSpecs.drivetrain}</div>
+                        )}
+                        {editingVehicleSpecs.acceleration && (
+                          <div><span className="font-medium">التسارع 0-100:</span> {editingVehicleSpecs.acceleration}</div>
+                        )}
+                        {editingVehicleSpecs.topSpeed && (
+                          <div><span className="font-medium">السرعة القصوى:</span> {editingVehicleSpecs.topSpeed}</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Dimensions & Weight */}
+                    <div>
+                      <h5 className="font-medium text-sm text-gray-600 dark:text-gray-300 mb-2">الأبعاد والوزن</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        {editingVehicleSpecs.length && (
+                          <div><span className="font-medium">الطول:</span> {editingVehicleSpecs.length}</div>
+                        )}
+                        {editingVehicleSpecs.width && (
+                          <div><span className="font-medium">العرض:</span> {editingVehicleSpecs.width}</div>
+                        )}
+                        {editingVehicleSpecs.height && (
+                          <div><span className="font-medium">الارتفاع:</span> {editingVehicleSpecs.height}</div>
+                        )}
+                        {editingVehicleSpecs.wheelbase && (
+                          <div><span className="font-medium">قاعدة العجلات:</span> {editingVehicleSpecs.wheelbase}</div>
+                        )}
+                        {editingVehicleSpecs.curbWeight && (
+                          <div><span className="font-medium">الوزن الفارغ:</span> {editingVehicleSpecs.curbWeight}</div>
+                        )}
+                        {editingVehicleSpecs.grossWeight && (
+                          <div><span className="font-medium">إجمالي الوزن:</span> {editingVehicleSpecs.grossWeight}</div>
+                        )}
+                        {editingVehicleSpecs.loadCapacity && (
+                          <div><span className="font-medium">سعة التحميل:</span> {editingVehicleSpecs.loadCapacity}</div>
+                        )}
+                        {editingVehicleSpecs.seatingCapacity && (
+                          <div><span className="font-medium">عدد المقاعد:</span> {editingVehicleSpecs.seatingCapacity}</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Features & Equipment */}
+                    <div>
+                      <h5 className="font-medium text-sm text-gray-600 dark:text-gray-300 mb-2">المميزات والتجهيزات</h5>
+                      <div className="grid grid-cols-1 gap-3 text-sm">
+                        {editingVehicleSpecs.safetyFeatures && (
+                          <div><span className="font-medium">مميزات الأمان:</span> {editingVehicleSpecs.safetyFeatures}</div>
+                        )}
+                        {editingVehicleSpecs.comfortFeatures && (
+                          <div><span className="font-medium">مميزات الراحة:</span> {editingVehicleSpecs.comfortFeatures}</div>
+                        )}
+                        {editingVehicleSpecs.infotainment && (
+                          <div><span className="font-medium">نظام المعلومات والترفيه:</span> {editingVehicleSpecs.infotainment}</div>
+                        )}
+                        {editingVehicleSpecs.driverAssistance && (
+                          <div><span className="font-medium">مساعدة السائق:</span> {editingVehicleSpecs.driverAssistance}</div>
+                        )}
+                        {editingVehicleSpecs.exteriorFeatures && (
+                          <div><span className="font-medium">المميزات الخارجية:</span> {editingVehicleSpecs.exteriorFeatures}</div>
+                        )}
+                        {editingVehicleSpecs.interiorFeatures && (
+                          <div><span className="font-medium">المميزات الداخلية:</span> {editingVehicleSpecs.interiorFeatures}</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Technical Specifications */}
+                    <div>
+                      <h5 className="font-medium text-sm text-gray-600 dark:text-gray-300 mb-2">المواصفات التقنية</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        {editingVehicleSpecs.tireSize && (
+                          <div><span className="font-medium">مقاس الإطارات:</span> {editingVehicleSpecs.tireSize}</div>
+                        )}
+                        {editingVehicleSpecs.suspension && (
+                          <div><span className="font-medium">نوع التعليق:</span> {editingVehicleSpecs.suspension}</div>
+                        )}
+                        {editingVehicleSpecs.brakes && (
+                          <div><span className="font-medium">نظام الكبح:</span> {editingVehicleSpecs.brakes}</div>
+                        )}
+                        {editingVehicleSpecs.steering && (
+                          <div><span className="font-medium">نظام التوجيه:</span> {editingVehicleSpecs.steering}</div>
+                        )}
+                        {editingVehicleSpecs.groundClearance && (
+                          <div><span className="font-medium">ارتفاع عن الأرض:</span> {editingVehicleSpecs.groundClearance}</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Additional Information */}
+                    <div>
+                      <h5 className="font-medium text-sm text-gray-600 dark:text-gray-300 mb-2">معلومات إضافية</h5>
+                      <div className="grid grid-cols-1 gap-3 text-sm">
+                        {editingVehicleSpecs.warranty && (
+                          <div><span className="font-medium">الضمان:</span> {editingVehicleSpecs.warranty}</div>
+                        )}
+                        {editingVehicleSpecs.detailedDescription && (
+                          <div><span className="font-medium">الوصف التفصيلي:</span> {editingVehicleSpecs.detailedDescription}</div>
+                        )}
+                        {editingVehicleSpecs.notes && (
+                          <div><span className="font-medium">ملاحظات:</span> {editingVehicleSpecs.notes}</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {!editingVehicleSpecs && !editingSpecsLoading && (
+                  <div className="text-center text-gray-500 py-4">
+                    لا توجد مواصفات تفصيلية متاحة لهذه المركبة
+                  </div>
                 )}
               </div>
             )}
