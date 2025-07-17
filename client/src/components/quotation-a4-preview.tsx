@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { QrCode, Phone, Mail, Globe, Building } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { QrCode, Phone, Mail, Globe, Building, Download } from "lucide-react";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import type { Company, InventoryItem, Specification } from "@shared/schema";
 import QRCode from "qrcode";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 interface QuotationA4PreviewProps {
   selectedCompany: Company | null;
@@ -64,6 +67,8 @@ export default function QuotationA4Preview({
   const [termsConditions, setTermsConditions] = useState<Array<{ id: number; term_text: string; display_order: number }>>([]);
   const [manufacturerLogo, setManufacturerLogo] = useState<string | null>(null);
   const [qrCodeDataURL, setQrCodeDataURL] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   // تصميم PDF مخصص حسب الشركة
   const getCompanyTheme = () => {
@@ -155,10 +160,76 @@ export default function QuotationA4Preview({
   const totalBeforeTax = isVATInclusive ? taxableAmount - taxAmount : taxableAmount;
   const grandTotal = isVATInclusive ? taxableAmount : totalBeforeTax + taxAmount;
 
+  // PDF Download function
+  const downloadPDF = async () => {
+    if (!previewRef.current) return;
+    
+    setIsDownloading(true);
+    
+    try {
+      // Hide the download button during capture
+      const downloadButton = document.querySelector('[data-download-button]') as HTMLElement;
+      if (downloadButton) downloadButton.style.display = 'none';
+      
+      // Create canvas from the preview element
+      const canvas = await html2canvas(previewRef.current, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: previewRef.current.offsetWidth,
+        height: previewRef.current.offsetHeight,
+        scrollX: 0,
+        scrollY: 0
+      });
+      
+      // Show the download button again
+      if (downloadButton) downloadButton.style.display = '';
+      
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      
+      // Generate filename
+      const filename = `${isInvoiceMode ? 'فاتورة' : 'عرض_سعر'}_${isInvoiceMode ? invoiceNumber : quoteNumber}_${new Date().toLocaleDateString('ar-SA').replace(/\//g, '-')}.pdf`;
+      
+      // Download the PDF
+      pdf.save(filename);
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('حدث خطأ أثناء إنشاء ملف PDF. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className="w-full bg-slate-50 dark:bg-slate-800 p-4">
+      {/* Download Button */}
+      <div className="flex justify-center mb-4" data-download-button>
+        <Button 
+          onClick={downloadPDF}
+          disabled={isDownloading}
+          size="lg"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg flex items-center gap-2"
+        >
+          <Download size={20} />
+          {isDownloading ? 'جاري التحميل...' : `تحميل ${isInvoiceMode ? 'الفاتورة' : 'العرض'} بصيغة PDF`}
+        </Button>
+      </div>
       {/* Fixed A4 Container */}
       <div 
+        ref={previewRef}
         data-pdf-export="quotation"
         className="mx-auto bg-white text-black shadow-2xl border border-slate-200 overflow-hidden pl-[21.2362px] pr-[21.2362px] pt-[16.2362px] pb-[16.2362px]"
         style={{
