@@ -25,6 +25,7 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
   const [notes, setNotes] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
 
   // Fetch company data
   const { data: companies } = useQuery<Company[]>({
@@ -110,6 +111,7 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
   };
 
   const downloadPDF = async () => {
+    setIsDownloadingPDF(true);
     try {
       const element = document.getElementById('quote-preview');
       if (!element) return;
@@ -156,7 +158,45 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
         description: "حدث خطأ أثناء تنزيل الملف",
         variant: "destructive",
       });
+    } finally {
+      setIsDownloadingPDF(false);
     }
+  };
+
+  const printQuote = () => {
+    const element = document.getElementById('quote-preview');
+    if (!element) return;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>عرض سعر - ${vehicle.manufacturer} ${vehicle.category}</title>
+          <style>
+            body { margin: 0; font-family: Arial, sans-serif; }
+            @media print { 
+              body { -webkit-print-color-adjust: exact; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          ${element.innerHTML}
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+
+    toast({
+      title: "تم إرسال للطباعة",
+      description: "تم إرسال عرض السعر للطباعة",
+    });
   };
 
   const quotationData = {
@@ -315,12 +355,22 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
                     تعديل
                   </Button>
                   <Button
-                    onClick={downloadPDF}
+                    onClick={printQuote}
+                    variant="outline"
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700"
+                    className="text-blue-600 hover:text-blue-700 border-blue-300 hover:border-blue-400"
                   >
-                    <Download className="w-4 h-4 mr-2" />
-                    تنزيل PDF
+                    <Printer className="w-4 h-4 mr-2" />
+                    طباعة
+                  </Button>
+                  <Button
+                    onClick={downloadPDF}
+                    size="default"
+                    disabled={isDownloadingPDF}
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg px-6 py-2"
+                  >
+                    <Download className="w-5 h-5 mr-2" />
+                    {isDownloadingPDF ? "جاري التنزيل..." : "تنزيل PDF"}
                   </Button>
                 </div>
               </div>
@@ -355,6 +405,16 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
               >
                 {isGenerating ? "جاري الإنشاء..." : "إنشاء عرض السعر"}
               </Button>
+              {showPreview && (
+                <Button
+                  onClick={downloadPDF}
+                  disabled={isDownloadingPDF}
+                  className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  {isDownloadingPDF ? "جاري التنزيل..." : "تنزيل PDF"}
+                </Button>
+              )}
             </div>
           )}
         </div>
