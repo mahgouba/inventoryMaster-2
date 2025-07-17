@@ -201,6 +201,7 @@ export const quotations = pgTable("quotations", {
   customerName: text("customer_name").notNull(), // اسم العميل
   customerPhone: text("customer_phone"), // هاتف العميل
   customerEmail: text("customer_email"), // بريد العميل
+  customerTitle: text("customer_title"), // كنية العميل (السادة، السيد، السيدة، الشيخ، سمو الأمير)
   notes: text("notes"), // ملاحظات
   validUntil: timestamp("valid_until").default(sql`NOW() + INTERVAL '30 days'`), // صالح حتى
   status: text("status").notNull().default("مسودة"), // الحالة (مسودة، مرسل، مقبول، مرفوض)

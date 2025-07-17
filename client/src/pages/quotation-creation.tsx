@@ -358,6 +358,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [customerName, setCustomerName] = useState<string>(editingQuotation?.customerName || "");
   const [customerPhone, setCustomerPhone] = useState<string>(editingQuotation?.customerPhone || "");
   const [customerEmail, setCustomerEmail] = useState<string>(editingQuotation?.customerEmail || "");
+  const [customerTitle, setCustomerTitle] = useState<string>(editingQuotation?.customerTitle || "السادة");
   const [validityDays, setValidityDays] = useState<number>(30);
   const [notes, setNotes] = useState<string>(editingQuotation?.notes || "");
   const [isInvoiceMode, setIsInvoiceMode] = useState<boolean>(false);
@@ -1265,6 +1266,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       customerName: customerName.trim() || "غير محدد",
       customerPhone: customerPhone.trim(),
       customerEmail: customerEmail.trim(),
+      customerTitle: customerTitle.trim(),
       notes: notes.trim(),
       validUntil: validUntilDate.toISOString(),
       status: "مسودة",
@@ -1795,6 +1797,21 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                         />
                       </div>
                       <div>
+                        <Label htmlFor="customerTitle">كنية العميل *</Label>
+                        <Select value={customerTitle} onValueChange={setCustomerTitle}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر الكنية" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="السادة">السادة</SelectItem>
+                            <SelectItem value="السيد">السيد</SelectItem>
+                            <SelectItem value="السيدة">السيدة</SelectItem>
+                            <SelectItem value="الشيخ">الشيخ</SelectItem>
+                            <SelectItem value="سمو الأمير">سمو الأمير</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
                         <Label htmlFor="customerName">اسم العميل *</Label>
                         <Input
                           id="customerName"
@@ -2062,6 +2079,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
           customerName={customerName}
           customerPhone={customerPhone}
           customerEmail={customerEmail}
+          customerTitle={customerTitle}
           validUntil={new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000)}
           basePrice={pricingDetails.basePrice * pricingDetails.quantity}
           finalPrice={calculateTotals().finalTotal}
