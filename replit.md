@@ -172,6 +172,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - Moved representative information section below Terms & Conditions section in quotation preview per user request
 - Updated quotation preview layout to display quote number and date in the same row as "عرض سعر" title
 - Removed customer addressing section from quotation preview per user request
+- Added background toggle switch functionality to quotation preview allowing users to switch between albarimi-1.jpg and albarimi-2.jpg backgrounds with Arabic labels (خلفية 1 / خلفية 2)
 - Updated vehicle information display format to show labels and values side by side (e.g., "الصانع: مرسيدس") instead of vertically stacked for better readability
 - Fixed text alignment in vehicle information section from center to right-aligned for proper Arabic text display
 - Enhanced specifications management to load all dropdown data from database APIs (manufacturers, categories, engine capacities)

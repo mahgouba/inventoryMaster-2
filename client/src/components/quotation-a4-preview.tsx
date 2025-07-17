@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { QrCode, Phone, Mail, Globe, Building, Download } from "lucide-react";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import type { Company, InventoryItem, Specification } from "@shared/schema";
@@ -10,8 +11,11 @@ import QRCode from "qrcode";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
-// Use albarimi-2.jpg as background image
-const A4Background = '/albarimi-2.jpg';
+// Background images
+const backgroundImages = {
+  albarimi1: '/albarimi-1.jpg',
+  albarimi2: '/albarimi-2.jpg'
+};
 
 interface QuotationA4PreviewProps {
   selectedCompany: Company | null;
@@ -75,6 +79,7 @@ export default function QuotationA4Preview({
   const [isDownloading, setIsDownloading] = useState(false);
   const [isEditingSpecs, setIsEditingSpecs] = useState(false);
   const [editableSpecs, setEditableSpecs] = useState<string>("");
+  const [useAlbarimi2Background, setUseAlbarimi2Background] = useState(true); // Default to albarimi-2
   const previewRef = useRef<HTMLDivElement>(null);
 
   // Fetch terms and conditions
@@ -297,6 +302,19 @@ export default function QuotationA4Preview({
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
+      {/* Background Toggle Switch */}
+      <div className="mb-4 flex justify-center items-center gap-4">
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-gray-600">خلفية 1</span>
+          <Switch 
+            checked={useAlbarimi2Background} 
+            onCheckedChange={setUseAlbarimi2Background}
+            className="mx-2"
+          />
+          <span className="text-sm text-gray-600">خلفية 2</span>
+        </div>
+      </div>
+      
       <div className="mb-4 flex justify-center">
         <Button onClick={downloadPDF} disabled={isDownloading} className="bg-blue-600 hover:bg-blue-700">
           <Download className="w-4 h-4 mr-2" />
@@ -317,7 +335,7 @@ export default function QuotationA4Preview({
           maxHeight: '297mm',
           fontFamily: '"Noto Sans Arabic", Arial, sans-serif',
           direction: 'rtl',
-          backgroundImage: `url(/A4%20-%201.jpg)`,
+          backgroundImage: `url(${useAlbarimi2Background ? backgroundImages.albarimi2 : backgroundImages.albarimi1})`,
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
           backgroundSize: 'cover',
