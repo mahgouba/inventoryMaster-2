@@ -152,14 +152,18 @@ export default function QuotationA4Preview({
   const grandTotal = isVATInclusive ? finalPrice : (finalPrice + (finalPrice * taxRate / 100));
   const taxAmount = isVATInclusive ? (finalPrice * taxRate / (100 + taxRate)) : (finalPrice * taxRate / 100);
 
-  // PDF Download Function with ultra-high quality settings
+  // PDF Download Function with ultra-high quality settings and fixed dimensions
   const downloadPDF = async () => {
     if (!previewRef.current) return;
     
     setIsDownloading(true);
     
     try {
-      // Create high-resolution canvas with maximum quality settings
+      // Fixed A4 dimensions in pixels (300 DPI)
+      const A4_WIDTH_PX = 2480; // 210mm at 300 DPI
+      const A4_HEIGHT_PX = 3508; // 297mm at 300 DPI
+      
+      // Create high-resolution canvas with fixed A4 dimensions
       const canvas = await html2canvas(previewRef.current, {
         scale: 4, // Ultra-high resolution scale (4x)
         useCORS: true,
@@ -169,16 +173,16 @@ export default function QuotationA4Preview({
         imageTimeout: 30000, // Increased timeout for high-res processing
         removeContainer: true,
         logging: false,
-        width: previewRef.current.scrollWidth,
-        height: previewRef.current.scrollHeight,
+        width: A4_WIDTH_PX / 4, // Divide by scale to get proper dimensions
+        height: A4_HEIGHT_PX / 4,
         x: 0,
         y: 0,
-        windowWidth: previewRef.current.scrollWidth,
-        windowHeight: previewRef.current.scrollHeight,
+        windowWidth: A4_WIDTH_PX / 4,
+        windowHeight: A4_HEIGHT_PX / 4,
         scrollX: 0,
         scrollY: 0,
         onclone: (clonedDoc) => {
-          // Enhance font rendering in cloned document
+          // Enhance font rendering and fix dimensions in cloned document
           const style = clonedDoc.createElement('style');
           style.textContent = `
             * {
@@ -190,6 +194,23 @@ export default function QuotationA4Preview({
               image-rendering: -webkit-optimize-contrast;
               image-rendering: crisp-edges;
               image-rendering: pixelated;
+            }
+            [data-pdf-export="quotation"] {
+              width: ${A4_WIDTH_PX / 4}px !important;
+              height: ${A4_HEIGHT_PX / 4}px !important;
+              min-width: ${A4_WIDTH_PX / 4}px !important;
+              min-height: ${A4_HEIGHT_PX / 4}px !important;
+              max-width: ${A4_WIDTH_PX / 4}px !important;
+              max-height: ${A4_HEIGHT_PX / 4}px !important;
+              transform: none !important;
+              zoom: 1 !important;
+              box-sizing: border-box !important;
+            }
+            @media print {
+              [data-pdf-export="quotation"] {
+                width: ${A4_WIDTH_PX / 4}px !important;
+                height: ${A4_HEIGHT_PX / 4}px !important;
+              }
             }
           `;
           clonedDoc.head.appendChild(style);
@@ -219,13 +240,30 @@ export default function QuotationA4Preview({
       
     } catch (error) {
       console.error('Error generating PDF:', error);
-      // Fallback to lower quality if high-res fails
+      // Fallback to lower quality with fixed dimensions if high-res fails
       try {
+        const A4_WIDTH_PX = 2480; // 210mm at 300 DPI
+        const A4_HEIGHT_PX = 3508; // 297mm at 300 DPI
+        
         const canvas = await html2canvas(previewRef.current, {
           scale: 2,
           useCORS: true,
           backgroundColor: '#ffffff',
-          allowTaint: true
+          allowTaint: true,
+          width: A4_WIDTH_PX / 2,
+          height: A4_HEIGHT_PX / 2,
+          windowWidth: A4_WIDTH_PX / 2,
+          windowHeight: A4_HEIGHT_PX / 2,
+          onclone: (clonedDoc) => {
+            const style = clonedDoc.createElement('style');
+            style.textContent = `
+              [data-pdf-export="quotation"] {
+                width: ${A4_WIDTH_PX / 2}px !important;
+                height: ${A4_HEIGHT_PX / 2}px !important;
+              }
+            `;
+            clonedDoc.head.appendChild(style);
+          }
         });
         
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
@@ -262,12 +300,20 @@ export default function QuotationA4Preview({
         style={{
           width: '210mm',
           height: '297mm',
+          minWidth: '210mm',
+          minHeight: '297mm',
+          maxWidth: '210mm',
+          maxHeight: '297mm',
           fontFamily: '"Noto Sans Arabic", Arial, sans-serif',
           direction: 'rtl',
           backgroundImage: `url(/A4%20-%201.jpg)`,
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
-          backgroundSize: 'cover'
+          backgroundSize: 'cover',
+          boxSizing: 'border-box',
+          position: 'relative',
+          transform: 'none',
+          zoom: 1
         }}
       >
         {/* Content overlay on A4 background */}
