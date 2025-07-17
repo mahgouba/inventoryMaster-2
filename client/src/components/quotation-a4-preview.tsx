@@ -290,10 +290,7 @@ export default function QuotationA4Preview({
                   <span className="font-semibold">الاسم: </span>
                   <span>{representativeName || "غير محدد"}</span>
                 </div>
-                <div>
-                  <span className="font-semibold">الهاتف: </span>
-                  <span>{representativePhone || "غير محدد"}</span>
-                </div>
+                
                 <div>
                   <span className="font-semibold">المنصب: </span>
                   <span>{representativePosition || "غير محدد"}</span>
