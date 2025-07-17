@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useTheme } from "@/hooks/useTheme";
 import { getStatusColor } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
+import QuickQuoteGenerator from "@/components/quick-quote-generator";
 
 interface CardViewPageProps {
   userRole: string;
@@ -366,6 +367,9 @@ export default function CardViewPage({ userRole }: CardViewPageProps) {
                                           </Button>
                                         </>
                                       )}
+                                      <div className="inline-block">
+                                        <QuickQuoteGenerator vehicle={item} />
+                                      </div>
                                     </div>
                                     <div className="text-xs text-slate-500">
                                       {item.entryDate ? new Date(item.entryDate).toLocaleDateString('ar-SA') : ''}

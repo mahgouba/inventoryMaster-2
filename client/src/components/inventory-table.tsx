@@ -3,13 +3,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Eye, Images, ArrowUpDown, ShoppingCart, DollarSign, Calendar, X } from "lucide-react";
+import { Edit, Trash2, Eye, Images, ArrowUpDown, ShoppingCart, DollarSign, Calendar, X, FileText } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { getStatusColor } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
 import InventoryForm from "./inventory-form";
+import QuickQuoteGenerator from "./quick-quote-generator";
 
 interface InventoryTableProps {
   searchQuery: string;
@@ -345,6 +346,9 @@ export default function InventoryTable({ searchQuery, categoryFilter, manufactur
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
+                      <div className="inline-block">
+                        <QuickQuoteGenerator vehicle={item} />
+                      </div>
                       <Button
                         variant="ghost"
                         size="sm"
