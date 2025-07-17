@@ -235,8 +235,6 @@ export default function QuotationA4Preview({
         data-pdf-export="quotation"
         className="mx-auto bg-white text-black shadow-2xl border border-slate-200 overflow-hidden pl-[21.2362px] pr-[21.2362px] pt-[16.2362px] pb-[16.2362px] relative"
         style={{
-          width: '210mm',
-          height: '297mm',
           fontSize: '11pt',
           fontFamily: '"Noto Sans Arabic", Arial, sans-serif',
           padding: '8mm',

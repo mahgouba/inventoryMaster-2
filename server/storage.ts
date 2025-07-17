@@ -183,6 +183,10 @@ export class MemStorage implements IStorage {
   private currentManufacturerId: number;
   private currentLocationId: number;
   private currentLocationTransferId: number;
+  private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
+  private systemSettings: Map<string, string> = new Map();
+  private companies: Map<number, Company> = new Map();
+  private currentCompanyId: number = 1;
 
   constructor() {
     this.users = new Map();
@@ -195,6 +199,10 @@ export class MemStorage implements IStorage {
     this.currentManufacturerId = 1;
     this.currentLocationId = 1;
     this.currentLocationTransferId = 1;
+    this.storedTermsConditions = [];
+    this.systemSettings = new Map();
+    this.companies = new Map();
+    this.currentCompanyId = 1;
     
     // Initialize with some sample data
     this.initializeInventoryData();
@@ -239,6 +247,91 @@ export class MemStorage implements IStorage {
   async deleteQuotation(id: number): Promise<boolean> { return true; }
   async getQuotationsByStatus(status: string): Promise<any[]> { return []; }
   async getQuotationByNumber(quoteNumber: string): Promise<any> { return undefined; }
+
+  // Terms and Conditions methods
+  async getAllTermsConditions(): Promise<Array<{ id: number; term_text: string; display_order: number }>> {
+    try {
+      return this.storedTermsConditions;
+    } catch (error) {
+      console.error('Get all terms conditions error:', error);
+      return [];
+    }
+  }
+
+  async updateTermsConditions(terms: Array<{ id: number; term_text: string; display_order: number }>): Promise<void> {
+    try {
+      this.storedTermsConditions = terms;
+    } catch (error) {
+      console.error('Update terms conditions error:', error);
+    }
+  }
+
+  // System Settings methods
+  async getSystemSettings(): Promise<Array<{key: string, value: string}>> {
+    const settings = [];
+    for (const [key, value] of this.systemSettings.entries()) {
+      settings.push({ key, value });
+    }
+    return settings;
+  }
+
+  async updateSystemSetting(key: string, value: string): Promise<{key: string, value: string}> {
+    this.systemSettings.set(key, value);
+    return { key, value };
+  }
+
+  async getDefaultCompanyId(): Promise<number | null> {
+    const defaultCompanyId = this.systemSettings.get('default_company_id');
+    return defaultCompanyId ? parseInt(defaultCompanyId) : null;
+  }
+
+  // Company methods
+  async getAllCompanies(): Promise<Company[]> {
+    return Array.from(this.companies.values());
+  }
+
+  async getCompany(id: number): Promise<Company | undefined> {
+    return this.companies.get(id);
+  }
+
+  async createCompany(company: InsertCompany): Promise<Company> {
+    const newCompany: Company = {
+      id: this.currentCompanyId++,
+      ...company
+    };
+    this.companies.set(newCompany.id, newCompany);
+    return newCompany;
+  }
+
+  async updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined> {
+    const existing = this.companies.get(id);
+    if (existing) {
+      const updated = { ...existing, ...company };
+      this.companies.set(id, updated);
+      return updated;
+    }
+    return undefined;
+  }
+
+  async deleteCompany(id: number): Promise<boolean> {
+    return this.companies.delete(id);
+  }
+
+  // Additional missing methods
+  async getAllCategories(): Promise<{ category: string }[]> { return []; }
+  async getCategoriesByManufacturer(manufacturer: string): Promise<{ category: string }[]> { return []; }
+  async getAllEngineCapacities(): Promise<{ engineCapacity: string }[]> { return []; }
+  async getSpecificationByVehicleParams(manufacturer: string, category: string, trimLevel: string | null, year: number, engineCapacity: string): Promise<any> { return undefined; }
+  async getPdfAppearanceSettings(): Promise<any> { return {}; }
+  async savePdfAppearanceSettings(settings: any): Promise<any> { return settings; }
+  async updatePdfAppearanceSettings(id: number, settings: any): Promise<any> { return settings; }
+  async createInvoice(invoice: any): Promise<any> { return invoice; }
+  async getInvoices(): Promise<any[]> { return []; }
+  async getInvoiceById(id: number): Promise<any> { return undefined; }
+  async updateInvoice(id: number, invoice: any): Promise<any> { return invoice; }
+  async deleteInvoice(id: number): Promise<boolean> { return true; }
+  async getInvoicesByStatus(status: string): Promise<any[]> { return []; }
+  async getInvoiceByNumber(invoiceNumber: string): Promise<any> { return undefined; }
 
   private initializeInventoryData() {
     const sampleItems: InsertInventoryItem[] = [
