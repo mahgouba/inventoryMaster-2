@@ -173,6 +173,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - Updated quotation preview layout to display quote number and date in the same row as "عرض سعر" title
 - Removed customer addressing section from quotation preview per user request
 - Enhanced specifications management to load all dropdown data from database APIs (manufacturers, categories, engine capacities)
+- Removed email field from customer information section in quotation preview per user request
 - Migration completed with full functionality verification
 - Updated quotation preview layout per user request: moved customer details (name, email) to display directly below "عرض سعر" header and date
 - Added PDF download functionality to quotation preview component with html2canvas and jsPDF integration
