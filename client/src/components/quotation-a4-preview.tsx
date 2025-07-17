@@ -369,7 +369,7 @@ export default function QuotationA4Preview({
           </div>
 
           {/* Customer Information */}
-          <div className="grid grid-cols-1 gap-6 mb-8" style={{marginTop: '180px'}}>
+          <div className="grid grid-cols-1 gap-6 mb-8" style={{marginTop: '237px'}}>
             <div className="bg-white/80 border border-gray-300 p-4 rounded">
               <h3 className="text-sm font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
                 بيانات العميل
