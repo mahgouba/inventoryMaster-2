@@ -363,6 +363,8 @@ export default function QuotationA4Preview({
                 <div className="text-xs text-black">
                   <span className="font-semibold">التاريخ: </span>
                   <span>{new Date().toLocaleDateString('ar-SA')}</span>
+                  <span className="font-semibold ml-4">صالح حتى: </span>
+                  <span>{new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('ar-SA')}</span>
                 </div>
               </div>
               
@@ -370,7 +372,7 @@ export default function QuotationA4Preview({
               <div className="mt-4 bg-white/90 border border-gray-300 p-3 rounded shadow-sm">
                 <div className="space-y-2 text-xs text-black">
                   <div className="text-center text-[16px] font-semibold">
-                    <span>{customerTitle} / {customerName || "غير محدد"} الموقرين</span>
+                    <span>{customerTitle} / {customerName || "غير محدد"} &nbsp;&nbsp;&nbsp; الموقرين</span>
                   </div>
                 </div>
               </div>
@@ -475,22 +477,22 @@ export default function QuotationA4Preview({
             
             {/* Table Header */}
             <div className="grid grid-cols-5 bg-gray-100 border-b border-gray-300 text-xs font-bold text-center">
-              <div className="p-3 border-l border-gray-300">الكمية</div>
-              <div className="p-3 border-l border-gray-300">السعر الفردي</div>
-              <div className="p-3 border-l border-gray-300">الضريبة ({taxRate}%)</div>
-              <div className="p-3 border-l border-gray-300">اللوحات</div>
-              <div className="p-3">الإجمالي</div>
+              <div className="p-2 border-l border-gray-300">الكمية</div>
+              <div className="p-2 border-l border-gray-300">السعر الفردي</div>
+              <div className="p-2 border-l border-gray-300">الضريبة ({taxRate}%)</div>
+              <div className="p-2 border-l border-gray-300">اللوحات</div>
+              <div className="p-2">الإجمالي</div>
             </div>
             
             {/* Table Row */}
             <div className="grid grid-cols-5 border-b border-gray-200 text-xs text-center text-black bg-white">
-              <div className="p-3 border-l border-gray-200">1</div>
-              <div className="p-3 border-l border-gray-200 font-semibold">{basePrice.toLocaleString()}</div>
-              <div className="p-3 border-l border-gray-200 font-semibold">{taxAmount.toLocaleString()}</div>
-              <div className="p-3 border-l border-gray-200 font-semibold">
+              <div className="p-2 border-l border-gray-200">1</div>
+              <div className="p-2 border-l border-gray-200 font-semibold">{basePrice.toLocaleString()}</div>
+              <div className="p-2 border-l border-gray-200 font-semibold">{taxAmount.toLocaleString()}</div>
+              <div className="p-2 border-l border-gray-200 font-semibold">
                 {includeLicensePlate ? licensePlatePrice.toLocaleString() : "0"}
               </div>
-              <div className="p-3 font-bold text-blue-800">
+              <div className="p-2 font-bold text-blue-800">
                 {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}
               </div>
             </div>
@@ -530,11 +532,11 @@ export default function QuotationA4Preview({
             )}
             
             {/* Stamp Section */}
-            <div className={`bg-white/90 border border-gray-300 p-4 rounded shadow-sm ${isInvoiceMode ? 'w-full' : 'w-64'}`}>
+            <div className={`bg-transparent border border-gray-300 p-4 rounded shadow-sm ${isInvoiceMode ? 'w-full' : 'w-64'}`}>
               <h3 className="text-sm font-bold mb-3 text-center text-amber-600 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>
                 {isInvoiceMode ? 'ختم الفاتورة' : 'ختم العرض'}
               </h3>
-              <div className="border-2 border-dashed border-gray-300 h-32 flex items-center justify-center rounded bg-gray-50">
+              <div className="border-2 border-dashed border-gray-300 h-32 flex items-center justify-center rounded bg-transparent">
                 {companyStamp ? (
                   <img 
                     src={companyStamp} 
