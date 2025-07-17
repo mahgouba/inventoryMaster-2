@@ -161,6 +161,8 @@ The application uses PostgreSQL for persistent data storage with proper database
 - Removed representative phone field from quotation preview per user request
 - Enhanced PDF export quality with 4x resolution scaling, PNG format, optimized font rendering, and fallback system for ultra-high quality output
 - Implemented fixed A4 dimensions (2480x3508px at 300 DPI) for consistent PDF output regardless of device screen size or mobile/desktop viewing
+- Added customer title/addressing format to quotation preview with options for السادة، السيد، السيدة، الشيخ، سمو الأمير displayed as "Title / CustomerName الموقرين"
+- Moved vehicle information section below Terms & Conditions section in quotation preview per user request
 - Updated quotation preview layout to display quote number and date in the same row as "عرض سعر" title
 
 ## Changelog
