@@ -249,23 +249,7 @@ export default function QuotationA4Preview({
           backgroundSize: '100% 100%'
         }}
       >
-        {/* Mobile responsive scaling */}
-        <style dangerouslySetInnerHTML={{
-          __html: `
-            @media (max-width: 768px) {
-              div[style*="transform: scale(0.4)"] {
-                transform: scale(0.28) !important;
-                margin-bottom: -70% !important;
-              }
-            }
-            @media (max-width: 480px) {
-              div[style*="transform: scale(0.4)"] {
-                transform: scale(0.22) !important;
-                margin-bottom: -75% !important;
-              }
-            }
-          `
-        }} />
+        
         
         {/* Large Watermark Background */}
         {selectedCompany?.logo && (
