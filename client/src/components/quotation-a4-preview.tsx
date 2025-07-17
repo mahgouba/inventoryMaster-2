@@ -75,6 +75,8 @@ export default function QuotationA4Preview({
   const [isDownloading, setIsDownloading] = useState(false);
   const [isEditingSpecs, setIsEditingSpecs] = useState(false);
   const [editableSpecs, setEditableSpecs] = useState<string>("");
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [selectedTitle, setSelectedTitle] = useState(customerTitle || "السادة");
   const previewRef = useRef<HTMLDivElement>(null);
 
   // Fetch terms and conditions
@@ -156,6 +158,14 @@ export default function QuotationA4Preview({
   useEffect(() => {
     setEditableSpecs(vehicleSpecs?.detailedDescription || "");
   }, [vehicleSpecs?.detailedDescription]);
+
+  // Update title when customerTitle changes
+  useEffect(() => {
+    setSelectedTitle(customerTitle || "السادة");
+  }, [customerTitle]);
+
+  // Available titles
+  const availableTitles = ["السادة", "السيد", "السيدة", "الشيخ", "سمو الأمير"];
 
   // Calculate pricing
   const grandTotal = isVATInclusive ? finalPrice : (finalPrice + (finalPrice * taxRate / 100));
@@ -367,6 +377,50 @@ export default function QuotationA4Preview({
               {/* Customer Information Details below header */}
               <div className="mt-4 bg-white/90 border border-gray-300 p-3 rounded shadow-sm">
                 <div className="space-y-2 text-xs text-black">
+                  {/* Customer Title Selection */}
+                  <div className="flex justify-between items-center text-[16px] ml-[0px] mr-[0px]">
+                    <span className="font-semibold text-gray-700">الكنية:</span>
+                    <div className="flex items-center gap-2">
+                      {isEditingTitle ? (
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={selectedTitle}
+                            onChange={(e) => setSelectedTitle(e.target.value)}
+                            className="text-xs border border-gray-300 rounded px-2 py-1 bg-white"
+                            style={{ direction: 'rtl' }}
+                          >
+                            {availableTitles.map((title) => (
+                              <option key={title} value={title}>
+                                {title}
+                              </option>
+                            ))}
+                          </select>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setIsEditingTitle(false)}
+                            className="text-xs px-2 py-1"
+                          >
+                            حفظ
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span>{selectedTitle}</span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setIsEditingTitle(true)}
+                            className="text-xs px-2 py-1"
+                          >
+                            تحرير
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Customer Name */}
                   <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
                     <span className="font-semibold text-gray-700">الاسم:</span>
                     <span>{customerName || "غير محدد"}</span>
