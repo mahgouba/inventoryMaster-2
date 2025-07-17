@@ -403,8 +403,8 @@ export default function QuotationA4Preview({
                       <span>{selectedVehicle.year}</span>
                     </div>
                     <div className="text-right">
-                      <span className="font-semibold text-gray-700">سعة المحرك: </span>
-                      <span>{selectedVehicle.engineCapacity}</span>
+                      <div className="font-semibold text-gray-700">سعة المحرك:</div>
+                      <div>{selectedVehicle.engineCapacity}</div>
                     </div>
                     <div className="text-right">
                       <span className="font-semibold text-gray-700">اللون الخارجي: </span>
