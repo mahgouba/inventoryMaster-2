@@ -9,6 +9,8 @@ import type { Company, InventoryItem, Specification } from "@shared/schema";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+// Use SVG background from public folder
+const AlbarimiBackground = '/albarimi-background.svg';
 
 interface QuotationA4PreviewProps {
   selectedCompany: Company | null;
@@ -231,7 +233,7 @@ export default function QuotationA4Preview({
       <div 
         ref={previewRef}
         data-pdf-export="quotation"
-        className="mx-auto bg-white text-black shadow-2xl border border-slate-200 overflow-hidden pl-[21.2362px] pr-[21.2362px] pt-[16.2362px] pb-[16.2362px]"
+        className="mx-auto bg-white text-black shadow-2xl border border-slate-200 overflow-hidden pl-[21.2362px] pr-[21.2362px] pt-[16.2362px] pb-[16.2362px] relative"
         style={{
           width: '210mm',
           height: '297mm',
@@ -243,6 +245,10 @@ export default function QuotationA4Preview({
           transform: 'scale(0.7)',
           transformOrigin: 'top center',
           marginBottom: '-30%',
+          backgroundImage: `url(${AlbarimiBackground})`,
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover'
         }}
       >
         {/* Mobile responsive scaling */}
