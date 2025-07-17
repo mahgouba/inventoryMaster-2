@@ -239,22 +239,20 @@ export default function QuotationA4Preview({
               </div>
             )}
 
-            {/* Document Type */}
+            {/* Document Type with Number and Date in same row */}
             <div className="absolute top-20 right-8">
-              <h2 className="text-base font-bold text-black" style={{fontFamily: 'Cairo, sans-serif'}}>
-                {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
-              </h2>
-            </div>
-
-            {/* Document info */}
-            <div className="absolute top-32 right-8 text-xs text-black">
-              <div className="mb-2">
-                <span className="font-semibold">رقم: </span>
-                <span>{isInvoiceMode ? invoiceNumber : quoteNumber}</span>
-              </div>
-              <div>
-                <span className="font-semibold">التاريخ: </span>
-                <span>{new Date().toLocaleDateString('ar-SA')}</span>
+              <div className="flex items-center gap-6">
+                <h2 className="text-base font-bold text-black" style={{fontFamily: 'Cairo, sans-serif'}}>
+                  {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
+                </h2>
+                <div className="text-xs text-black">
+                  <span className="font-semibold">رقم: </span>
+                  <span>{isInvoiceMode ? invoiceNumber : quoteNumber}</span>
+                </div>
+                <div className="text-xs text-black">
+                  <span className="font-semibold">التاريخ: </span>
+                  <span>{new Date().toLocaleDateString('ar-SA')}</span>
+                </div>
               </div>
             </div>
           </div>

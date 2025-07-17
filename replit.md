@@ -156,6 +156,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - Fixed server storage interface to include all required methods for terms and conditions, system settings, and company management
 - Implemented complete MemStorage class with all required methods to ensure compatibility
 - Removed fixed width and height styling from quotation preview div element per user request
+- Updated quotation preview layout to display quote number and date in the same row as "عرض سعر" title
 
 ## Changelog
 
