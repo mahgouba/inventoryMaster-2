@@ -359,9 +359,8 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
-          {/* Customer & Representative Info */}
-          <div className="grid grid-cols-2 gap-6 mb-8" style={{marginTop: '180px'}}>
-            {/* Customer Information */}
+          {/* Customer Information */}
+          <div className="grid grid-cols-1 gap-6 mb-8" style={{marginTop: '180px'}}>
             <div className="bg-white/80 border border-gray-300 p-4 rounded">
               <h3 className="text-sm font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
                 بيانات العميل
@@ -382,27 +381,88 @@ export default function QuotationA4Preview({
                 </div>
               </div>
             </div>
-
-            {/* Representative Information */}
-            <div className="bg-white/80 border border-gray-300 p-4 rounded">
-              <h3 className="text-sm font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
-                بيانات المندوب
-              </h3>
-              <div className="space-y-2 text-xs text-black">
-                <div>
-                  <span className="font-semibold">الاسم: </span>
-                  <span>{representativeName || "غير محدد"}</span>
-                </div>
-                
-                <div>
-                  <span className="font-semibold">المنصب: </span>
-                  <span>{representativePosition || "غير محدد"}</span>
-                </div>
-              </div>
-            </div>
           </div>
 
 
+          {/* Vehicle Information */}
+          {selectedVehicle && (
+            <div className="bg-white/80 border border-gray-300 p-4 rounded mb-6">
+              <h3 className="text-sm font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
+                بيانات المركبة
+              </h3>
+              <div className="space-y-3 text-xs text-black">
+                {/* الصف الأول: الصانع، الفئة، درجة التجهيز */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">الصانع: </span>
+                    <div className="flex items-center gap-1">
+                      {manufacturerLogo && (
+                        <img 
+                          src={manufacturerLogo} 
+                          alt={selectedVehicle.manufacturer} 
+                          className="w-6 h-6 object-contain"
+                        />
+                      )}
+                      <span>{selectedVehicle.manufacturer}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="font-semibold">الفئة: </span>
+                    <span>{selectedVehicle.category}</span>
+                  </div>
+                  {selectedVehicle.trimLevel ? (
+                    <div>
+                      <span className="font-semibold">درجة التجهيز: </span>
+                      <span>{selectedVehicle.trimLevel}</span>
+                    </div>
+                  ) : (
+                    <div>
+                      <span className="font-semibold">درجة التجهيز: </span>
+                      <span>غير محدد</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* الصف الثاني: السنة، سعة المحرك، اللون الخارجي */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <span className="font-semibold">السنة: </span>
+                    <span>{selectedVehicle.year}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold">سعة المحرك: </span>
+                    <span>{selectedVehicle.engineCapacity}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold">اللون الخارجي: </span>
+                    <span>{selectedVehicle.exteriorColor}</span>
+                  </div>
+                </div>
+
+                {/* الصف الثالث: اللون الداخلي، رقم الهيكل */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="font-semibold">اللون الداخلي: </span>
+                    <span>{selectedVehicle.interiorColor}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold">رقم الهيكل: </span>
+                    <span>{selectedVehicle.chassisNumber}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Detailed Specifications */}
+              {vehicleSpecs && vehicleSpecs.detailedDescription && (
+                <div className="mt-4 pt-4 border-t border-gray-300">
+                  <h4 className="text-xs font-bold mb-2 text-amber-600">المواصفات التفصيلية:</h4>
+                  <div className="text-xs text-black whitespace-pre-wrap">
+                    {vehicleSpecs.detailedDescription}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Price Breakdown Table */}
           <div className="bg-white/80 border border-gray-300 rounded mb-6">
@@ -485,85 +545,23 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
-          {/* Vehicle Information - Moved below Terms & Conditions */}
-          {selectedVehicle && (
-            <div className="bg-white/80 border border-gray-300 p-4 rounded mb-6">
-              <h3 className="text-sm font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
-                بيانات المركبة
-              </h3>
-              <div className="space-y-3 text-xs text-black">
-                {/* الصف الأول: الصانع، الفئة، درجة التجهيز */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold">الصانع: </span>
-                    <div className="flex items-center gap-1">
-                      {manufacturerLogo && (
-                        <img 
-                          src={manufacturerLogo} 
-                          alt={selectedVehicle.manufacturer} 
-                          className="w-6 h-6 object-contain"
-                        />
-                      )}
-                      <span>{selectedVehicle.manufacturer}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <span className="font-semibold">الفئة: </span>
-                    <span>{selectedVehicle.category}</span>
-                  </div>
-                  {selectedVehicle.trimLevel ? (
-                    <div>
-                      <span className="font-semibold">درجة التجهيز: </span>
-                      <span>{selectedVehicle.trimLevel}</span>
-                    </div>
-                  ) : (
-                    <div>
-                      <span className="font-semibold">درجة التجهيز: </span>
-                      <span>غير محدد</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* الصف الثاني: السنة، سعة المحرك، اللون الخارجي */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <span className="font-semibold">السنة: </span>
-                    <span>{selectedVehicle.year}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold">سعة المحرك: </span>
-                    <span>{selectedVehicle.engineCapacity}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold">اللون الخارجي: </span>
-                    <span>{selectedVehicle.exteriorColor}</span>
-                  </div>
-                </div>
-
-                {/* الصف الثالث: اللون الداخلي، رقم الهيكل */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="font-semibold">اللون الداخلي: </span>
-                    <span>{selectedVehicle.interiorColor}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold">رقم الهيكل: </span>
-                    <span>{selectedVehicle.chassisNumber}</span>
-                  </div>
-                </div>
+          {/* Representative Information - Moved below Terms & Conditions */}
+          <div className="bg-white/80 border border-gray-300 p-4 rounded mb-6">
+            <h3 className="text-sm font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
+              بيانات المندوب
+            </h3>
+            <div className="space-y-2 text-xs text-black">
+              <div>
+                <span className="font-semibold">الاسم: </span>
+                <span>{representativeName || "غير محدد"}</span>
               </div>
               
-              {/* Detailed Specifications */}
-              {vehicleSpecs && vehicleSpecs.detailedDescription && (
-                <div className="mt-4 pt-4 border-t border-gray-300">
-                  <h4 className="text-xs font-bold mb-2 text-amber-600">المواصفات التفصيلية:</h4>
-                  <div className="text-xs text-black whitespace-pre-wrap">
-                    {vehicleSpecs.detailedDescription}
-                  </div>
-                </div>
-              )}
+              <div>
+                <span className="font-semibold">المنصب: </span>
+                <span>{representativePosition || "غير محدد"}</span>
+              </div>
             </div>
-          )}
+          </div>
 
           {/* Notes Section */}
           {notes && (
