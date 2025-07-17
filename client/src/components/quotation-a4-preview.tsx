@@ -384,19 +384,6 @@ export default function QuotationA4Preview({
               <div className="bg-white/90 border border-gray-300 p-4 rounded shadow-sm w-full">
                 
                 <div className="space-y-2 text-xs text-black">
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-700">الصانع:</span>
-                    <div className="flex items-center gap-1">
-                      {manufacturerLogo && (
-                        <img 
-                          src={manufacturerLogo} 
-                          alt={selectedVehicle.manufacturer} 
-                          className="w-4 h-4 object-contain"
-                        />
-                      )}
-                      <span>{selectedVehicle.manufacturer}</span>
-                    </div>
-                  </div>
                   <div className="flex justify-between">
                     <span className="font-semibold text-gray-700">الفئة:</span>
                     <span>{selectedVehicle.category}</span>
