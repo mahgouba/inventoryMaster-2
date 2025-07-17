@@ -368,113 +368,95 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
-          {/* Customer Information */}
-          <div className="grid grid-cols-1 gap-6 mb-8" style={{marginTop: '237px'}}>
-            <div className="bg-white/80 border border-gray-300 p-4 rounded">
-              <h3 className="text-sm font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
+          {/* Customer & Vehicle Information Side by Side */}
+          <div className="grid grid-cols-2 gap-6 mb-8" style={{marginTop: '220px'}}>
+            {/* Customer Information */}
+            <div className="bg-white/90 border border-gray-300 p-4 rounded shadow-sm">
+              <h3 className="text-sm font-bold mb-3 text-blue-800 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>
                 بيانات العميل
               </h3>
               <div className="space-y-2 text-xs text-black">
-                <div>
-                  <span className="font-semibold">الاسم: </span>
+                <div className="flex justify-between">
+                  <span className="font-semibold text-gray-700">الاسم:</span>
                   <span>{customerName || "غير محدد"}</span>
                 </div>
-                <div>
-                  <span className="font-semibold">الهاتف: </span>
+                <div className="flex justify-between">
+                  <span className="font-semibold text-gray-700">الهاتف:</span>
                   <span>{customerPhone || "غير محدد"}</span>
                 </div>
-                <div>
-                  <span className="font-semibold">البريد الإلكتروني: </span>
+                <div className="flex justify-between">
+                  <span className="font-semibold text-gray-700">البريد الإلكتروني:</span>
                   <span>{customerEmail || "غير محدد"}</span>
                 </div>
               </div>
             </div>
-          </div>
 
-
-          {/* Vehicle Information */}
-          {selectedVehicle && (
-            <div className="bg-white/80 border border-gray-300 p-4 rounded mb-6">
-              <h3 className="text-sm font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
-                بيانات المركبة
-              </h3>
-              <div className="space-y-3 text-xs text-black">
-                {/* الصف الأول: الصانع، الفئة، درجة التجهيز */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold">الصانع: </span>
+            {/* Vehicle Information */}
+            {selectedVehicle && (
+              <div className="bg-white/90 border border-gray-300 p-4 rounded shadow-sm">
+                <h3 className="text-sm font-bold mb-3 text-blue-800 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>
+                  بيانات المركبة
+                </h3>
+                <div className="space-y-2 text-xs text-black">
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-gray-700">الصانع:</span>
                     <div className="flex items-center gap-1">
                       {manufacturerLogo && (
                         <img 
                           src={manufacturerLogo} 
                           alt={selectedVehicle.manufacturer} 
-                          className="w-6 h-6 object-contain"
+                          className="w-4 h-4 object-contain"
                         />
                       )}
                       <span>{selectedVehicle.manufacturer}</span>
                     </div>
                   </div>
-                  <div>
-                    <span className="font-semibold">الفئة: </span>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-700">الفئة:</span>
                     <span>{selectedVehicle.category}</span>
                   </div>
-                  {selectedVehicle.trimLevel ? (
-                    <div>
-                      <span className="font-semibold">درجة التجهيز: </span>
-                      <span>{selectedVehicle.trimLevel}</span>
-                    </div>
-                  ) : (
-                    <div>
-                      <span className="font-semibold">درجة التجهيز: </span>
-                      <span>غير محدد</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* الصف الثاني: السنة، سعة المحرك، اللون الخارجي */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <span className="font-semibold">السنة: </span>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-700">درجة التجهيز:</span>
+                    <span>{selectedVehicle.trimLevel || "غير محدد"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-700">السنة:</span>
                     <span>{selectedVehicle.year}</span>
                   </div>
-                  <div>
-                    <span className="font-semibold">سعة المحرك: </span>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-700">سعة المحرك:</span>
                     <span>{selectedVehicle.engineCapacity}</span>
                   </div>
-                  <div>
-                    <span className="font-semibold">اللون الخارجي: </span>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-700">اللون الخارجي:</span>
                     <span>{selectedVehicle.exteriorColor}</span>
                   </div>
-                </div>
-
-                {/* الصف الثالث: اللون الداخلي، رقم الهيكل */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="font-semibold">اللون الداخلي: </span>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-700">اللون الداخلي:</span>
                     <span>{selectedVehicle.interiorColor}</span>
                   </div>
-                  <div>
-                    <span className="font-semibold">رقم الهيكل: </span>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-700">رقم الهيكل:</span>
                     <span>{selectedVehicle.chassisNumber}</span>
                   </div>
                 </div>
-              </div>
-              
-              {/* Detailed Specifications */}
-              {vehicleSpecs && vehicleSpecs.detailedDescription && (
-                <div className="mt-4 pt-4 border-t border-gray-300">
-                  <h4 className="text-xs font-bold mb-2 text-amber-600">المواصفات التفصيلية:</h4>
-                  <div className="text-xs text-black whitespace-pre-wrap">
-                    {vehicleSpecs.detailedDescription}
+                
+                {/* Detailed Specifications */}
+                {vehicleSpecs && vehicleSpecs.detailedDescription && (
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <h4 className="text-xs font-bold mb-2 text-amber-600">المواصفات التفصيلية:</h4>
+                    <div className="text-xs text-black whitespace-pre-wrap max-h-20 overflow-y-auto">
+                      {vehicleSpecs.detailedDescription}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Price Breakdown Table */}
-          <div className="bg-white/80 border border-gray-300 rounded mb-6">
-            <div className="p-3 rounded-t pt-[1px] pb-[1px] bg-[#03627f] text-[#c39631] text-[15px]">
+          <div className="bg-white/90 border border-gray-300 rounded mb-6 shadow-sm">
+            <div className="p-4 rounded-t bg-[#03627f] text-[#c39631]">
               <h3 className="text-sm font-bold text-center" style={{fontFamily: 'Cairo, sans-serif'}}>تفاصيل السعر</h3>
             </div>
             
@@ -488,7 +470,7 @@ export default function QuotationA4Preview({
             </div>
             
             {/* Table Row */}
-            <div className="grid grid-cols-5 border-b border-gray-200 text-xs text-center text-black">
+            <div className="grid grid-cols-5 border-b border-gray-200 text-xs text-center text-black bg-white">
               <div className="p-3 border-l border-gray-200">1</div>
               <div className="p-3 border-l border-gray-200 font-semibold">{basePrice.toLocaleString()}</div>
               <div className="p-3 border-l border-gray-200 font-semibold">{taxAmount.toLocaleString()}</div>
@@ -501,29 +483,29 @@ export default function QuotationA4Preview({
             </div>
             
             {/* Total Row */}
-            <div className="p-4 bg-gray-50 border-t-2 border-blue-800 rounded-b pt-[0px] pb-[0px]">
-              <div className="flex justify-center">
+            <div className="p-4 bg-gray-50 border-t-2 border-blue-800 rounded-b">
+              <div className="flex justify-center mb-3">
                 <div className="font-bold text-sm text-blue-800">
                   المجموع: {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()} ريال
                 </div>
               </div>
-              <div className="text-center text-xs mt-3 font-bold text-white px-3 py-2 rounded bg-[#c49631] pt-[3px] pb-[3px]">
+              <div className="text-center text-xs font-bold text-white px-4 py-3 rounded bg-[#c49631]">
                 {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))} ريال سعودي لا غير
               </div>
             </div>
           </div>
 
           {/* Terms & Conditions and Stamp Section */}
-          <div className="flex gap-6 mb-8">
+          <div className="flex gap-6 mb-6">
             {/* Terms & Conditions Section - Hidden in invoice mode */}
             {!isInvoiceMode && (
-              <div className="bg-white/80 border border-gray-300 p-4 rounded flex-1">
-                <h3 className="text-sm font-bold mb-3 text-amber-600" style={{fontFamily: 'Cairo, sans-serif'}}>الشروط والأحكام</h3>
+              <div className="bg-white/90 border border-gray-300 p-4 rounded flex-1 shadow-sm">
+                <h3 className="text-sm font-bold mb-3 text-amber-600 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>الشروط والأحكام</h3>
                 <div className="text-xs text-black space-y-2">
                   {termsConditions.length > 0 ? (
                     termsConditions.map((term, index) => (
                       <div key={term.id} className="flex items-start gap-2">
-                        <span className="text-gray-600 font-semibold">{index + 1}.</span>
+                        <span className="text-amber-600 font-semibold min-w-[1rem]">{index + 1}.</span>
                         <span className="leading-relaxed">{term.term_text}</span>
                       </div>
                     ))
@@ -535,11 +517,11 @@ export default function QuotationA4Preview({
             )}
             
             {/* Stamp Section */}
-            <div className={`bg-white/80 border border-gray-300 p-4 rounded ${isInvoiceMode ? 'w-full' : 'w-64'}`}>
-              <h3 className="text-sm font-bold mb-3 text-center text-amber-600" style={{fontFamily: 'Cairo, sans-serif'}}>
+            <div className={`bg-white/90 border border-gray-300 p-4 rounded shadow-sm ${isInvoiceMode ? 'w-full' : 'w-64'}`}>
+              <h3 className="text-sm font-bold mb-3 text-center text-amber-600 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>
                 {isInvoiceMode ? 'ختم الفاتورة' : 'ختم العرض'}
               </h3>
-              <div className="border-2 border-dashed border-gray-300 h-32 flex items-center justify-center rounded">
+              <div className="border-2 border-dashed border-gray-300 h-32 flex items-center justify-center rounded bg-gray-50">
                 {companyStamp ? (
                   <img 
                     src={companyStamp} 
@@ -554,18 +536,17 @@ export default function QuotationA4Preview({
           </div>
 
           {/* Representative Information - Moved below Terms & Conditions */}
-          <div className="bg-white/80 border border-gray-300 p-4 rounded mb-6">
-            <h3 className="text-sm font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
+          <div className="bg-white/90 border border-gray-300 p-4 rounded mb-6 shadow-sm">
+            <h3 className="text-sm font-bold mb-3 text-blue-800 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>
               بيانات المندوب
             </h3>
             <div className="space-y-2 text-xs text-black">
-              <div>
-                <span className="font-semibold">الاسم: </span>
+              <div className="flex justify-between">
+                <span className="font-semibold text-gray-700">الاسم:</span>
                 <span>{representativeName || "غير محدد"}</span>
               </div>
-              
-              <div>
-                <span className="font-semibold">المنصب: </span>
+              <div className="flex justify-between">
+                <span className="font-semibold text-gray-700">المنصب:</span>
                 <span>{representativePosition || "غير محدد"}</span>
               </div>
             </div>
@@ -573,8 +554,8 @@ export default function QuotationA4Preview({
 
           {/* Notes Section */}
           {notes && (
-            <div className="bg-white/80 border border-gray-300 p-4 rounded w-64 mb-6">
-              <h3 className="text-sm font-bold mb-3 text-amber-600" style={{fontFamily: 'Cairo, sans-serif'}}>ملاحظات</h3>
+            <div className="bg-white/90 border border-gray-300 p-4 rounded mb-6 shadow-sm">
+              <h3 className="text-sm font-bold mb-3 text-amber-600 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>ملاحظات</h3>
               <p className="text-xs text-black leading-relaxed">{notes}</p>
             </div>
           )}
