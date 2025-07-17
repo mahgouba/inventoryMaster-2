@@ -201,11 +201,10 @@ export default function QuotationA4Preview({
           height: '297mm',
           fontFamily: '"Noto Sans Arabic", Arial, sans-serif',
           direction: 'rtl',
-          backgroundImage: `url(${A4Background})`,
+          backgroundImage: `url(/A4%20-%201.jpg)`,
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
-          backgroundSize: 'cover',
-          backgroundColor: 'white'
+          backgroundSize: 'cover'
         }}
       >
         {/* Content overlay on A4 background */}
@@ -254,7 +253,7 @@ export default function QuotationA4Preview({
           {/* Customer & Representative Info */}
           <div className="grid grid-cols-2 gap-6 mb-8" style={{marginTop: '180px'}}>
             {/* Customer Information */}
-            <div className="bg-white/90 border border-gray-300 p-4 rounded">
+            <div className="bg-white/80 border border-gray-300 p-4 rounded">
               <h3 className="text-base font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
                 بيانات العميل
               </h3>
@@ -275,7 +274,7 @@ export default function QuotationA4Preview({
             </div>
 
             {/* Representative Information */}
-            <div className="bg-white/90 border border-gray-300 p-4 rounded">
+            <div className="bg-white/80 border border-gray-300 p-4 rounded">
               <h3 className="text-base font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
                 بيانات المندوب
               </h3>
@@ -298,7 +297,7 @@ export default function QuotationA4Preview({
 
           {/* Vehicle Information */}
           {selectedVehicle && (
-            <div className="bg-white/90 border border-gray-300 p-4 rounded mb-6">
+            <div className="bg-white/80 border border-gray-300 p-4 rounded mb-6">
               <h3 className="text-base font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
                 بيانات المركبة
               </h3>
@@ -361,7 +360,7 @@ export default function QuotationA4Preview({
           )}
 
           {/* Price Breakdown Table */}
-          <div className="bg-white/90 border border-gray-300 rounded mb-6">
+          <div className="bg-white/80 border border-gray-300 rounded mb-6">
             <div className="bg-blue-800 text-white p-3 rounded-t">
               <h3 className="text-base font-bold text-center" style={{fontFamily: 'Cairo, sans-serif'}}>تفاصيل السعر</h3>
             </div>
@@ -405,7 +404,7 @@ export default function QuotationA4Preview({
           <div className="flex gap-6 mb-8">
             {/* Terms & Conditions Section - Hidden in invoice mode */}
             {!isInvoiceMode && (
-              <div className="bg-white/90 border border-gray-300 p-4 rounded flex-1">
+              <div className="bg-white/80 border border-gray-300 p-4 rounded flex-1">
                 <h3 className="text-base font-bold mb-3 text-amber-600" style={{fontFamily: 'Cairo, sans-serif'}}>الشروط والأحكام</h3>
                 <div className="text-sm text-black space-y-2">
                   {termsConditions.length > 0 ? (
@@ -423,7 +422,7 @@ export default function QuotationA4Preview({
             )}
             
             {/* Stamp Section */}
-            <div className={`bg-white/90 border border-gray-300 p-4 rounded ${isInvoiceMode ? 'w-full' : 'w-64'}`}>
+            <div className={`bg-white/80 border border-gray-300 p-4 rounded ${isInvoiceMode ? 'w-full' : 'w-64'}`}>
               <h3 className="text-base font-bold mb-3 text-center text-amber-600" style={{fontFamily: 'Cairo, sans-serif'}}>
                 {isInvoiceMode ? 'ختم الفاتورة' : 'ختم العرض'}
               </h3>
@@ -443,7 +442,7 @@ export default function QuotationA4Preview({
 
           {/* Notes Section */}
           {notes && (
-            <div className="bg-white/90 border border-gray-300 p-4 rounded w-64 mb-6">
+            <div className="bg-white/80 border border-gray-300 p-4 rounded w-64 mb-6">
               <h3 className="text-base font-bold mb-3 text-amber-600" style={{fontFamily: 'Cairo, sans-serif'}}>ملاحظات</h3>
               <p className="text-sm text-black leading-relaxed">{notes}</p>
             </div>
