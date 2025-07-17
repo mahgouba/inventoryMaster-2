@@ -360,7 +360,7 @@ export default function QuotationA4Preview({
               {/* Customer Information Details below header */}
               <div className="mt-4 bg-white/90 border border-gray-300 p-3 rounded shadow-sm">
                 <div className="space-y-2 text-xs text-black">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
                     <span className="font-semibold text-gray-700">الاسم:</span>
                     <span>{customerName || "غير محدد"}</span>
                   </div>
@@ -380,31 +380,31 @@ export default function QuotationA4Preview({
               <div className="bg-white/90 border border-gray-300 p-4 rounded shadow-sm w-full">
                 
                 <div className="space-y-2 text-xs text-black">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
                     <span className="font-semibold text-gray-700">الفئة:</span>
                     <span>{selectedVehicle.category}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
                     <span className="font-semibold text-gray-700">درجة التجهيز:</span>
                     <span>{selectedVehicle.trimLevel || "غير محدد"}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
                     <span className="font-semibold text-gray-700">السنة:</span>
                     <span>{selectedVehicle.year}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
                     <span className="font-semibold text-gray-700">سعة المحرك:</span>
                     <span>{selectedVehicle.engineCapacity}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
                     <span className="font-semibold text-gray-700">اللون الخارجي:</span>
                     <span>{selectedVehicle.exteriorColor}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
                     <span className="font-semibold text-gray-700">اللون الداخلي:</span>
                     <span>{selectedVehicle.interiorColor}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
                     <span className="font-semibold text-gray-700">رقم الهيكل:</span>
                     <span>{selectedVehicle.chassisNumber}</span>
                   </div>
@@ -510,11 +510,11 @@ export default function QuotationA4Preview({
               بيانات المندوب
             </h3>
             <div className="space-y-2 text-xs text-black">
-              <div className="flex justify-between">
+              <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
                 <span className="font-semibold text-gray-700">الاسم:</span>
                 <span>{representativeName || "غير محدد"}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
                 <span className="font-semibold text-gray-700">المنصب:</span>
                 <span>{representativePosition || "غير محدد"}</span>
               </div>
