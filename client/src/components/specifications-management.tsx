@@ -36,24 +36,43 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     enabled: open,
   });
 
-  // Fetch trim levels for dropdowns
+  // Fetch data for dropdowns
   const { data: trimLevels = [] } = useQuery<TrimLevel[]>({
     queryKey: ["/api/trim-levels"],
     enabled: open,
   });
 
-  // Get unique manufacturers from trim levels
-  const manufacturers = [...new Set(trimLevels.map(tl => tl.manufacturer))];
+  // Fetch manufacturers from database
+  const { data: manufacturersData = [] } = useQuery<any[]>({
+    queryKey: ["/api/manufacturers"],
+    enabled: open,
+  });
+
+  // Fetch categories for selected manufacturer
+  const { data: categoriesData = [] } = useQuery<string[]>({
+    queryKey: ["/api/categories", selectedManufacturer],
+    enabled: open && !!selectedManufacturer,
+  });
+
+  // Fetch engine capacities from database
+  const { data: engineCapacitiesData = [] } = useQuery<string[]>({
+    queryKey: ["/api/engine-capacities"],
+    enabled: open,
+  });
+
+  // Get unique manufacturers from database
+  const manufacturers = manufacturersData.map(m => m.name || m);
   
   // Get categories for selected manufacturer
-  const categories = selectedManufacturer 
-    ? [...new Set(trimLevels.filter(tl => tl.manufacturer === selectedManufacturer).map(tl => tl.category))]
-    : [];
+  const categories = selectedManufacturer ? categoriesData : [];
 
   // Get trim levels for selected manufacturer and category
   const availableTrimLevels = selectedManufacturer && selectedCategory
     ? trimLevels.filter(tl => tl.manufacturer === selectedManufacturer && tl.category === selectedCategory)
     : [];
+
+  // Get engine capacities from database
+  const engineCapacities = engineCapacitiesData.length > 0 ? engineCapacitiesData : ["1.5L", "2.0L", "2.5L", "3.0L", "3.5L", "4.0L", "4.5L", "5.0L", "V6", "V8", "V12", "Electric"];
 
   const createMutation = useMutation({
     mutationFn: (data: InsertSpecification) => apiRequest("POST", "/api/specifications", data),
@@ -168,7 +187,6 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     }
   };
 
-  const engineCapacities = ["1.5L", "2.0L", "2.5L", "3.0L", "3.5L", "4.0L", "4.5L", "5.0L", "V6", "V8", "V12", "Electric"];
   const years = Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - i);
 
   return (
