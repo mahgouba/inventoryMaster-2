@@ -152,7 +152,7 @@ export default function QuotationA4Preview({
   const grandTotal = isVATInclusive ? finalPrice : (finalPrice + (finalPrice * taxRate / 100));
   const taxAmount = isVATInclusive ? (finalPrice * taxRate / (100 + taxRate)) : (finalPrice * taxRate / 100);
 
-  // PDF Download Function
+  // PDF Download Function with enhanced quality
   const downloadPDF = async () => {
     if (!previewRef.current) return;
     
@@ -160,18 +160,27 @@ export default function QuotationA4Preview({
     
     try {
       const canvas = await html2canvas(previewRef.current, {
-        scale: 2,
+        scale: 3, // Increased scale for better quality
         useCORS: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        allowTaint: true,
+        foreignObjectRendering: true,
+        imageTimeout: 15000,
+        removeContainer: true,
+        logging: false,
+        width: previewRef.current.scrollWidth,
+        height: previewRef.current.scrollHeight,
+        x: 0,
+        y: 0
       });
       
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/jpeg', 0.95); // Higher quality JPEG
       const pdf = new jsPDF('p', 'mm', 'a4');
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
       
       const fileName = isInvoiceMode ? `فاتورة_${invoiceNumber}.pdf` : `عرض_سعر_${quoteNumber}.pdf`;
       pdf.save(fileName);
@@ -232,13 +241,13 @@ export default function QuotationA4Preview({
 
             {/* Document Type */}
             <div className="absolute top-20 right-8">
-              <h2 className="text-lg font-bold text-black" style={{fontFamily: 'Cairo, sans-serif'}}>
+              <h2 className="text-base font-bold text-black" style={{fontFamily: 'Cairo, sans-serif'}}>
                 {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
               </h2>
             </div>
 
             {/* Document info */}
-            <div className="absolute top-32 right-8 text-sm text-black">
+            <div className="absolute top-32 right-8 text-xs text-black">
               <div className="mb-2">
                 <span className="font-semibold">رقم: </span>
                 <span>{isInvoiceMode ? invoiceNumber : quoteNumber}</span>
@@ -254,10 +263,10 @@ export default function QuotationA4Preview({
           <div className="grid grid-cols-2 gap-6 mb-8" style={{marginTop: '180px'}}>
             {/* Customer Information */}
             <div className="bg-white/80 border border-gray-300 p-4 rounded">
-              <h3 className="text-base font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
+              <h3 className="text-sm font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
                 بيانات العميل
               </h3>
-              <div className="space-y-2 text-sm text-black">
+              <div className="space-y-2 text-xs text-black">
                 <div>
                   <span className="font-semibold">الاسم: </span>
                   <span>{customerName || "غير محدد"}</span>
@@ -275,10 +284,10 @@ export default function QuotationA4Preview({
 
             {/* Representative Information */}
             <div className="bg-white/80 border border-gray-300 p-4 rounded">
-              <h3 className="text-base font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
+              <h3 className="text-sm font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
                 بيانات المندوب
               </h3>
-              <div className="space-y-2 text-sm text-black">
+              <div className="space-y-2 text-xs text-black">
                 <div>
                   <span className="font-semibold">الاسم: </span>
                   <span>{representativeName || "غير محدد"}</span>
@@ -298,10 +307,10 @@ export default function QuotationA4Preview({
           {/* Vehicle Information */}
           {selectedVehicle && (
             <div className="bg-white/80 border border-gray-300 p-4 rounded mb-6">
-              <h3 className="text-base font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
+              <h3 className="text-sm font-bold mb-3 text-blue-800" style={{fontFamily: 'Cairo, sans-serif'}}>
                 بيانات المركبة
               </h3>
-              <div className="grid grid-cols-2 gap-4 text-sm text-black">
+              <div className="grid grid-cols-2 gap-4 text-xs text-black">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">الصانع: </span>
                   <div className="flex items-center gap-1">
@@ -350,8 +359,8 @@ export default function QuotationA4Preview({
               {/* Detailed Specifications */}
               {vehicleSpecs && vehicleSpecs.detailedDescription && (
                 <div className="mt-4 pt-4 border-t border-gray-300">
-                  <h4 className="text-sm font-bold mb-2 text-amber-600">المواصفات التفصيلية:</h4>
-                  <div className="text-sm text-black whitespace-pre-wrap">
+                  <h4 className="text-xs font-bold mb-2 text-amber-600">المواصفات التفصيلية:</h4>
+                  <div className="text-xs text-black whitespace-pre-wrap">
                     {vehicleSpecs.detailedDescription}
                   </div>
                 </div>
@@ -362,11 +371,11 @@ export default function QuotationA4Preview({
           {/* Price Breakdown Table */}
           <div className="bg-white/80 border border-gray-300 rounded mb-6">
             <div className="bg-blue-800 text-white p-3 rounded-t">
-              <h3 className="text-base font-bold text-center" style={{fontFamily: 'Cairo, sans-serif'}}>تفاصيل السعر</h3>
+              <h3 className="text-sm font-bold text-center" style={{fontFamily: 'Cairo, sans-serif'}}>تفاصيل السعر</h3>
             </div>
             
             {/* Table Header */}
-            <div className="grid grid-cols-5 bg-gray-100 border-b border-gray-300 text-sm font-bold text-center">
+            <div className="grid grid-cols-5 bg-gray-100 border-b border-gray-300 text-xs font-bold text-center">
               <div className="p-3 border-l border-gray-300">الكمية</div>
               <div className="p-3 border-l border-gray-300">السعر الفردي</div>
               <div className="p-3 border-l border-gray-300">الضريبة ({taxRate}%)</div>
@@ -375,7 +384,7 @@ export default function QuotationA4Preview({
             </div>
             
             {/* Table Row */}
-            <div className="grid grid-cols-5 border-b border-gray-200 text-sm text-center text-black">
+            <div className="grid grid-cols-5 border-b border-gray-200 text-xs text-center text-black">
               <div className="p-3 border-l border-gray-200">1</div>
               <div className="p-3 border-l border-gray-200 font-semibold">{basePrice.toLocaleString()}</div>
               <div className="p-3 border-l border-gray-200 font-semibold">{taxAmount.toLocaleString()}</div>
@@ -390,11 +399,11 @@ export default function QuotationA4Preview({
             {/* Total Row */}
             <div className="p-4 bg-gray-50 border-t-2 border-blue-800 rounded-b">
               <div className="flex justify-center">
-                <div className="font-bold text-lg text-blue-800">
+                <div className="font-bold text-sm text-blue-800">
                   المجموع: {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()} ريال
                 </div>
               </div>
-              <div className="text-center text-sm mt-3 font-bold text-white px-3 py-2 bg-amber-600 rounded">
+              <div className="text-center text-xs mt-3 font-bold text-white px-3 py-2 bg-amber-600 rounded">
                 {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))} ريال سعودي لا غير
               </div>
             </div>
@@ -405,8 +414,8 @@ export default function QuotationA4Preview({
             {/* Terms & Conditions Section - Hidden in invoice mode */}
             {!isInvoiceMode && (
               <div className="bg-white/80 border border-gray-300 p-4 rounded flex-1">
-                <h3 className="text-base font-bold mb-3 text-amber-600" style={{fontFamily: 'Cairo, sans-serif'}}>الشروط والأحكام</h3>
-                <div className="text-sm text-black space-y-2">
+                <h3 className="text-sm font-bold mb-3 text-amber-600" style={{fontFamily: 'Cairo, sans-serif'}}>الشروط والأحكام</h3>
+                <div className="text-xs text-black space-y-2">
                   {termsConditions.length > 0 ? (
                     termsConditions.map((term, index) => (
                       <div key={term.id} className="flex items-start gap-2">
@@ -423,7 +432,7 @@ export default function QuotationA4Preview({
             
             {/* Stamp Section */}
             <div className={`bg-white/80 border border-gray-300 p-4 rounded ${isInvoiceMode ? 'w-full' : 'w-64'}`}>
-              <h3 className="text-base font-bold mb-3 text-center text-amber-600" style={{fontFamily: 'Cairo, sans-serif'}}>
+              <h3 className="text-sm font-bold mb-3 text-center text-amber-600" style={{fontFamily: 'Cairo, sans-serif'}}>
                 {isInvoiceMode ? 'ختم الفاتورة' : 'ختم العرض'}
               </h3>
               <div className="border-2 border-dashed border-gray-300 h-32 flex items-center justify-center rounded">
@@ -434,7 +443,7 @@ export default function QuotationA4Preview({
                     className="max-w-full max-h-full object-contain"
                   />
                 ) : (
-                  <span className="text-sm text-gray-400">منطقة الختم</span>
+                  <span className="text-xs text-gray-400">منطقة الختم</span>
                 )}
               </div>
             </div>
@@ -443,8 +452,8 @@ export default function QuotationA4Preview({
           {/* Notes Section */}
           {notes && (
             <div className="bg-white/80 border border-gray-300 p-4 rounded w-64 mb-6">
-              <h3 className="text-base font-bold mb-3 text-amber-600" style={{fontFamily: 'Cairo, sans-serif'}}>ملاحظات</h3>
-              <p className="text-sm text-black leading-relaxed">{notes}</p>
+              <h3 className="text-sm font-bold mb-3 text-amber-600" style={{fontFamily: 'Cairo, sans-serif'}}>ملاحظات</h3>
+              <p className="text-xs text-black leading-relaxed">{notes}</p>
             </div>
           )}
         </div>
