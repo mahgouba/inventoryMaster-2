@@ -172,6 +172,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - Moved representative information section below Terms & Conditions section in quotation preview per user request
 - Updated quotation preview layout to display quote number and date in the same row as "عرض سعر" title
 - Removed customer addressing section from quotation preview per user request
+- Updated vehicle information display format to show labels and values side by side (e.g., "الصانع: مرسيدس") instead of vertically stacked for better readability
 - Enhanced specifications management to load all dropdown data from database APIs (manufacturers, categories, engine capacities)
 - Removed email field from customer information section in quotation preview per user request
 - Reorganized vehicle information section into grid layout with three rows: (1) Manufacturer/Category/Trim Level, (2) Year/Engine/Exterior Color, (3) Interior Color/Chassis Number for better space utilization

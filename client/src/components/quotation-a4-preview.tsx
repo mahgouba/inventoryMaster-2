@@ -383,15 +383,15 @@ export default function QuotationA4Preview({
                   {/* First Row: Manufacturer, Category, Trim Level */}
                   <div className="grid grid-cols-3 gap-4">
                     <div className="text-center">
-                      <span className="font-semibold text-gray-700 block">الصانع:</span>
+                      <span className="font-semibold text-gray-700">الصانع: </span>
                       <span>{selectedVehicle.manufacturer}</span>
                     </div>
                     <div className="text-center">
-                      <span className="font-semibold text-gray-700 block">الفئة:</span>
+                      <span className="font-semibold text-gray-700">الفئة: </span>
                       <span>{selectedVehicle.category}</span>
                     </div>
                     <div className="text-center">
-                      <span className="font-semibold text-gray-700 block">درجة التجهيز:</span>
+                      <span className="font-semibold text-gray-700">درجة التجهيز: </span>
                       <span>{selectedVehicle.trimLevel || "غير محدد"}</span>
                     </div>
                   </div>
@@ -399,15 +399,15 @@ export default function QuotationA4Preview({
                   {/* Second Row: Year, Engine Capacity, Exterior Color */}
                   <div className="grid grid-cols-3 gap-4">
                     <div className="text-center">
-                      <span className="font-semibold text-gray-700 block">السنة:</span>
+                      <span className="font-semibold text-gray-700">السنة: </span>
                       <span>{selectedVehicle.year}</span>
                     </div>
                     <div className="text-center">
-                      <span className="font-semibold text-gray-700 block">سعة المحرك:</span>
+                      <span className="font-semibold text-gray-700">سعة المحرك: </span>
                       <span>{selectedVehicle.engineCapacity}</span>
                     </div>
                     <div className="text-center">
-                      <span className="font-semibold text-gray-700 block">اللون الخارجي:</span>
+                      <span className="font-semibold text-gray-700">اللون الخارجي: </span>
                       <span>{selectedVehicle.exteriorColor}</span>
                     </div>
                   </div>
@@ -415,11 +415,11 @@ export default function QuotationA4Preview({
                   {/* Third Row: Interior Color, Chassis Number */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
-                      <span className="font-semibold text-gray-700 block">اللون الداخلي:</span>
+                      <span className="font-semibold text-gray-700">اللون الداخلي: </span>
                       <span>{selectedVehicle.interiorColor}</span>
                     </div>
                     <div className="text-center">
-                      <span className="font-semibold text-gray-700 block">رقم الهيكل:</span>
+                      <span className="font-semibold text-gray-700">رقم الهيكل: </span>
                       <span>{selectedVehicle.chassisNumber}</span>
                     </div>
                   </div>
