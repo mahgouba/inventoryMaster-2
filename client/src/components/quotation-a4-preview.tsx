@@ -9,8 +9,8 @@ import type { Company, InventoryItem, Specification } from "@shared/schema";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-// Use original SVG background from public folder
-const AlbarimiBackground = '/original-albarimi-background.svg';
+// Use A4 background image
+const AlbarimiBackground = '/a4-background.png';
 
 interface QuotationA4PreviewProps {
   selectedCompany: Company | null;
@@ -248,7 +248,7 @@ export default function QuotationA4Preview({
           backgroundImage: `url(${AlbarimiBackground})`,
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
-          backgroundSize: 'cover'
+          backgroundSize: '100% 100%'
         }}
       >
         {/* Mobile responsive scaling */}
@@ -558,20 +558,9 @@ export default function QuotationA4Preview({
             </div>
           )}
 
-          {/* Footer content overlay on SVG background */}
+          {/* Footer content overlay - minimal text only */}
           <div className="absolute bottom-0 left-0 right-0">
-            {/* Footer text content - positioned to match SVG design */}
-            <div className="absolute bottom-2 left-0 right-0 h-10 flex items-center justify-between px-4 text-white text-xs">
-              <div className="flex items-center gap-4">
-                <span>@albarimi_cars | 920033340</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-white">Albarimi</span>
-                <span className="text-amber-400">.com</span>
-              </div>
-            </div>
-
-            {/* Thanks message */}
+            {/* Thanks message positioned over background image */}
             <div className="absolute bottom-16 left-4 text-right text-sm text-black" style={{fontFamily: 'Dubai, sans-serif'}}>
               <p>وتفضلوا بقبول فائق الاحترام،،،</p>
               <p className="font-semibold">{selectedCompany?.name || "شركة البريمي للسيارات"}</p>
