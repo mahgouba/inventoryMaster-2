@@ -51,7 +51,7 @@ interface QuotationCreationPageProps {
   vehicleData?: InventoryItem;
 }
 
-// Component to display vehicle specifications
+// Component to display vehicle specifications with enhanced styling
 function VehicleSpecificationsDisplayComponent({ manufacturer, category, trimLevel, year, engineCapacity }: {
   manufacturer: string;
   category: string;
@@ -74,45 +74,101 @@ function VehicleSpecificationsDisplayComponent({ manufacturer, category, trimLev
   });
 
   if (isLoading) {
-    return <div className="text-center text-gray-500">جاري تحميل المواصفات...</div>;
+    return (
+      <div className="flex items-center justify-center space-x-2 space-x-reverse p-4">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+        <span className="text-gray-500 dark:text-gray-400">جاري تحميل المواصفات...</span>
+      </div>
+    );
   }
 
   if (!specs) {
-    return <div className="text-center text-gray-500">لا توجد مواصفات متاحة لهذه المعاملات</div>;
+    return (
+      <div className="text-center p-6 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+        <Info className="mx-auto h-8 w-8 text-yellow-600 dark:text-yellow-500 mb-2" />
+        <p className="text-yellow-800 dark:text-yellow-200">لا توجد مواصفات متاحة لهذه المعاملات</p>
+        <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
+          يمكنك إضافة المواصفات من خلال إدارة النظام
+        </p>
+      </div>
+    );
   }
 
+  const specsData = [
+    { key: 'engine', label: 'المحرك', value: specs.engine, icon: '🔧' },
+    { key: 'transmission', label: 'ناقل الحركة', value: specs.transmission, icon: '⚙️' },
+    { key: 'drivetrain', label: 'نظام الدفع', value: specs.drivetrain, icon: '🚗' },
+    { key: 'fuelType', label: 'نوع الوقود', value: specs.fuelType, icon: '⛽' },
+    { key: 'seatingCapacity', label: 'عدد المقاعد', value: specs.seatingCapacity, icon: '🪑' },
+    { key: 'maxSpeed', label: 'السرعة القصوى', value: specs.maxSpeed, icon: '🏎️' },
+    { key: 'acceleration', label: 'التسارع 0-100', value: specs.acceleration, icon: '🚀' },
+    { key: 'safetyFeatures', label: 'مميزات الأمان', value: specs.safetyFeatures, icon: '🛡️' },
+    { key: 'comfortFeatures', label: 'مميزات الراحة', value: specs.comfortFeatures, icon: '✨' },
+    { key: 'warranty', label: 'الضمان', value: specs.warranty, icon: '🔒' },
+  ];
+
+  const availableSpecs = specsData.filter(spec => spec.value);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-      {specs.engine && (
-        <div><span className="font-medium">المحرك:</span> {specs.engine}</div>
+    <div className="space-y-4">
+      {availableSpecs.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {availableSpecs.map((spec) => (
+            <div 
+              key={spec.key} 
+              className="p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-colors duration-200"
+            >
+              <div className="flex items-start space-x-3 space-x-reverse">
+                <span className="text-lg" role="img" aria-label={spec.label}>
+                  {spec.icon}
+                </span>
+                <div className="flex-1">
+                  <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-1">
+                    {spec.label}
+                  </h5>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                    {spec.value}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+          <Info className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+          <p className="text-gray-600 dark:text-gray-400">لا توجد مواصفات تفصيلية متاحة</p>
+        </div>
       )}
-      {specs.transmission && (
-        <div><span className="font-medium">ناقل الحركة:</span> {specs.transmission}</div>
-      )}
-      {specs.drivetrain && (
-        <div><span className="font-medium">نظام الدفع:</span> {specs.drivetrain}</div>
-      )}
-      {specs.fuelType && (
-        <div><span className="font-medium">نوع الوقود:</span> {specs.fuelType}</div>
-      )}
-      {specs.seatingCapacity && (
-        <div><span className="font-medium">عدد المقاعد:</span> {specs.seatingCapacity}</div>
-      )}
-      {specs.maxSpeed && (
-        <div><span className="font-medium">السرعة القصوى:</span> {specs.maxSpeed}</div>
-      )}
-      {specs.acceleration && (
-        <div><span className="font-medium">التسارع 0-100:</span> {specs.acceleration}</div>
-      )}
-      {specs.safetyFeatures && (
-        <div><span className="font-medium">مميزات الأمان:</span> {specs.safetyFeatures}</div>
-      )}
-      {specs.comfortFeatures && (
-        <div><span className="font-medium">مميزات الراحة:</span> {specs.comfortFeatures}</div>
-      )}
-      {specs.warranty && (
-        <div><span className="font-medium">الضمان:</span> {specs.warranty}</div>
-      )}
+      
+      {/* Vehicle Selection Summary */}
+      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+        <h6 className="font-medium text-blue-900 dark:text-blue-100 mb-2">الاختيار الحالي</h6>
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div>
+            <span className="text-blue-600 dark:text-blue-400">الصانع:</span>
+            <span className="font-medium text-blue-800 dark:text-blue-200 ml-2">{manufacturer}</span>
+          </div>
+          <div>
+            <span className="text-blue-600 dark:text-blue-400">الفئة:</span>
+            <span className="font-medium text-blue-800 dark:text-blue-200 ml-2">{category}</span>
+          </div>
+          {trimLevel && (
+            <div>
+              <span className="text-blue-600 dark:text-blue-400">درجة التجهيز:</span>
+              <span className="font-medium text-blue-800 dark:text-blue-200 ml-2">{trimLevel}</span>
+            </div>
+          )}
+          <div>
+            <span className="text-blue-600 dark:text-blue-400">السنة:</span>
+            <span className="font-medium text-blue-800 dark:text-blue-200 ml-2">{year}</span>
+          </div>
+          <div className="col-span-2">
+            <span className="text-blue-600 dark:text-blue-400">سعة المحرك:</span>
+            <span className="font-medium text-blue-800 dark:text-blue-200 ml-2">{engineCapacity}</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1618,10 +1674,13 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                       </Button>
                     </div>
 
-                    {/* Vehicle Specifications Display */}
+                    {/* Enhanced Vehicle Specifications Display */}
                     {vehicleManufacturer && vehicleCategory && vehicleYear && vehicleEngineCapacity && (
-                      <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <h4 className="font-semibold mb-3 text-gray-900 dark:text-gray-100">المواصفات التفصيلية</h4>
+                      <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm">
+                        <div className="flex items-center space-x-3 space-x-reverse mb-4">
+                          <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                          <h4 className="font-semibold text-lg text-blue-900 dark:text-blue-100">المواصفات التفصيلية</h4>
+                        </div>
                         <VehicleSpecificationsDisplayComponent 
                           manufacturer={vehicleManufacturer}
                           category={vehicleCategory}
