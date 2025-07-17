@@ -10,8 +10,8 @@ import QRCode from "qrcode";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
-// Use A4 - 1.jpg as background image
-const A4Background = '/A4 - 1.jpg';
+// Use albarimi-2.jpg as background image
+const A4Background = '/albarimi-2.jpg';
 
 interface QuotationA4PreviewProps {
   selectedCompany: Company | null;
