@@ -1775,11 +1775,6 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         {/* A4 Preview Section - Bottom */}
         <div className="mt-8">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-center">
-                {isInvoiceMode ? 'معاينة الفاتورة (A4)' : 'معاينة العرض (A4)'}
-              </CardTitle>
-            </CardHeader>
             <CardContent className="p-0">
               <QuotationA4Preview
                 selectedCompany={selectedCompanyData}
