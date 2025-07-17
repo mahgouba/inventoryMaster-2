@@ -375,14 +375,7 @@ export default function QuotationA4Preview({
 
 
 
-          {/* Customer Addressing Section - Full width bar below "عرض سعر" */}
-          <div className="mb-6" style={{marginTop: '150px'}}>
-            <div className="bg-white/90 border border-gray-300 p-4 rounded-lg w-full pt-[1px] pb-[1px]">
-              <h3 className="text-lg font-bold text-blue-800 text-center" style={{fontFamily: 'Cairo, sans-serif'}}>
-                {customerTitle || "السادة"} / {customerName || "غير محدد"} الموقرين
-              </h3>
-            </div>
-          </div>
+          
 
           {/* Vehicle Information Section */}
           <div className="mb-8">
