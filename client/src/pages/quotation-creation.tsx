@@ -31,7 +31,8 @@ import {
   MessageCircle,
   FileUp,
   Settings2,
-  X
+  X,
+  Info
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useTheme } from "@/hooks/useTheme";
@@ -2779,6 +2780,9 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               <Edit3 className="h-5 w-5 text-blue-600" />
               تعديل بيانات السيارة
             </DialogTitle>
+            <DialogDescription>
+              يمكنك تعديل جميع بيانات السيارة والمواصفات التفصيلية هنا
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
@@ -2944,47 +2948,245 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               </div>
             </div>
 
-            {/* Specifications Preview */}
-            {editingVehicleSpecs && (
-              <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <h4 className="font-semibold mb-3 text-gray-900 dark:text-gray-100">المواصفات التفصيلية</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  {editingVehicleSpecs.engine && (
-                    <div><span className="font-medium">المحرك:</span> {editingVehicleSpecs.engine}</div>
-                  )}
-                  {editingVehicleSpecs.transmission && (
-                    <div><span className="font-medium">ناقل الحركة:</span> {editingVehicleSpecs.transmission}</div>
-                  )}
-                  {editingVehicleSpecs.drivetrain && (
-                    <div><span className="font-medium">نظام الدفع:</span> {editingVehicleSpecs.drivetrain}</div>
-                  )}
-                  {editingVehicleSpecs.fuelType && (
-                    <div><span className="font-medium">نوع الوقود:</span> {editingVehicleSpecs.fuelType}</div>
-                  )}
-                  {editingVehicleSpecs.seatingCapacity && (
-                    <div><span className="font-medium">عدد المقاعد:</span> {editingVehicleSpecs.seatingCapacity}</div>
-                  )}
-                  {editingVehicleSpecs.maxSpeed && (
-                    <div><span className="font-medium">السرعة القصوى:</span> {editingVehicleSpecs.maxSpeed}</div>
-                  )}
-                  {editingVehicleSpecs.acceleration && (
-                    <div><span className="font-medium">التسارع 0-100:</span> {editingVehicleSpecs.acceleration}</div>
-                  )}
-                  {editingVehicleSpecs.safetyFeatures && (
-                    <div><span className="font-medium">مميزات الأمان:</span> {editingVehicleSpecs.safetyFeatures}</div>
-                  )}
-                  {editingVehicleSpecs.comfortFeatures && (
-                    <div><span className="font-medium">مميزات الراحة:</span> {editingVehicleSpecs.comfortFeatures}</div>
-                  )}
-                  {editingVehicleSpecs.warranty && (
-                    <div><span className="font-medium">الضمان:</span> {editingVehicleSpecs.warranty}</div>
-                  )}
+            {/* Detailed Specifications Editing Section */}
+            <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100 flex items-center">
+                <Settings size={18} className="ml-2" />
+                المواصفات التفصيلية - قابلة للتعديل
+              </h4>
+              
+              {editingSpecsLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  <p className="text-gray-500">جاري تحميل المواصفات...</p>
                 </div>
-                {editingSpecsLoading && (
-                  <div className="text-center text-gray-500">جاري تحميل المواصفات...</div>
-                )}
-              </div>
-            )}
+              ) : (
+                <div className="space-y-6">
+                  {/* Engine & Performance Section */}
+                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <h5 className="font-medium text-blue-600 dark:text-blue-400 mb-3">الأداء والمحرك</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="specEngine">المحرك</Label>
+                        <Input
+                          id="specEngine"
+                          value={editingVehicleSpecs?.engine || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, engine: e.target.value }))}
+                          placeholder="مثال: V8 4.0L Twin Turbo"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specHorsepower">القوة الحصانية</Label>
+                        <Input
+                          id="specHorsepower"
+                          value={editingVehicleSpecs?.horsepower || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, horsepower: e.target.value }))}
+                          placeholder="مثال: 630 حصان"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specTorque">عزم الدوران</Label>
+                        <Input
+                          id="specTorque"
+                          value={editingVehicleSpecs?.torque || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, torque: e.target.value }))}
+                          placeholder="مثال: 900 نيوتن متر"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specTransmission">ناقل الحركة</Label>
+                        <Input
+                          id="specTransmission"
+                          value={editingVehicleSpecs?.transmission || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, transmission: e.target.value }))}
+                          placeholder="مثال: أوتوماتيك 9 سرعات"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specDrivetrain">نظام الدفع</Label>
+                        <Input
+                          id="specDrivetrain"
+                          value={editingVehicleSpecs?.drivetrain || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, drivetrain: e.target.value }))}
+                          placeholder="مثال: دفع رباعي"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specFuelType">نوع الوقود</Label>
+                        <Input
+                          id="specFuelType"
+                          value={editingVehicleSpecs?.fuelType || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, fuelType: e.target.value }))}
+                          placeholder="مثال: بنزين ممتاز"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specAcceleration">التسارع 0-100 كم/س</Label>
+                        <Input
+                          id="specAcceleration"
+                          value={editingVehicleSpecs?.acceleration || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, acceleration: e.target.value }))}
+                          placeholder="مثال: 3.9 ثانية"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specMaxSpeed">السرعة القصوى</Label>
+                        <Input
+                          id="specMaxSpeed"
+                          value={editingVehicleSpecs?.maxSpeed || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, maxSpeed: e.target.value }))}
+                          placeholder="مثال: 300 كم/س"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Dimensions Section */}
+                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <h5 className="font-medium text-green-600 dark:text-green-400 mb-3">الأبعاد والمقاييس</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="specLength">الطول</Label>
+                        <Input
+                          id="specLength"
+                          value={editingVehicleSpecs?.length || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, length: e.target.value }))}
+                          placeholder="مثال: 5,179 مم"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specWidth">العرض</Label>
+                        <Input
+                          id="specWidth"
+                          value={editingVehicleSpecs?.width || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, width: e.target.value }))}
+                          placeholder="مثال: 1,948 مم"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specHeight">الارتفاع</Label>
+                        <Input
+                          id="specHeight"
+                          value={editingVehicleSpecs?.height || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, height: e.target.value }))}
+                          placeholder="مثال: 1,498 مم"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specWheelbase">قاعدة العجلات</Label>
+                        <Input
+                          id="specWheelbase"
+                          value={editingVehicleSpecs?.wheelbase || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, wheelbase: e.target.value }))}
+                          placeholder="مثال: 3,106 مم"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specCurbWeight">الوزن الفارغ</Label>
+                        <Input
+                          id="specCurbWeight"
+                          value={editingVehicleSpecs?.curbWeight || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, curbWeight: e.target.value }))}
+                          placeholder="مثال: 2,070 كج"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specSeatingCapacity">عدد المقاعد</Label>
+                        <Input
+                          id="specSeatingCapacity"
+                          value={editingVehicleSpecs?.seatingCapacity || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, seatingCapacity: e.target.value }))}
+                          placeholder="مثال: 5 مقاعد"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Features Section */}
+                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <h5 className="font-medium text-purple-600 dark:text-purple-400 mb-3">المميزات والتجهيزات</h5>
+                    <div className="grid grid-cols-1 gap-4">
+                      <div>
+                        <Label htmlFor="specSafetyFeatures">مميزات الأمان</Label>
+                        <Textarea
+                          id="specSafetyFeatures"
+                          value={editingVehicleSpecs?.safetyFeatures || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, safetyFeatures: e.target.value }))}
+                          placeholder="مثال: مكابح ABS، نظام مراقبة النقطة العمياء، نظام الوقوف التلقائي"
+                          rows={3}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specComfortFeatures">مميزات الراحة</Label>
+                        <Textarea
+                          id="specComfortFeatures"
+                          value={editingVehicleSpecs?.comfortFeatures || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, comfortFeatures: e.target.value }))}
+                          placeholder="مثال: مقاعد جلدية، تدفئة وتبريد المقاعد، نظام صوتي متقدم"
+                          rows={3}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specInfotainment">نظام المعلومات والترفيه</Label>
+                        <Textarea
+                          id="specInfotainment"
+                          value={editingVehicleSpecs?.infotainment || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, infotainment: e.target.value }))}
+                          placeholder="مثال: شاشة لمس 12.3 بوصة، Apple CarPlay، Android Auto"
+                          rows={2}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specDriverAssistance">مساعدة السائق</Label>
+                        <Textarea
+                          id="specDriverAssistance"
+                          value={editingVehicleSpecs?.driverAssistance || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, driverAssistance: e.target.value }))}
+                          placeholder="مثال: نظام الحفاظ على المسار، مثبت السرعة التكيفي، نظام تجنب الاصطدام"
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Warranty & Additional Info */}
+                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <h5 className="font-medium text-orange-600 dark:text-orange-400 mb-3">الضمان والمعلومات الإضافية</h5>
+                    <div className="grid grid-cols-1 gap-4">
+                      <div>
+                        <Label htmlFor="specWarranty">الضمان</Label>
+                        <Input
+                          id="specWarranty"
+                          value={editingVehicleSpecs?.warranty || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, warranty: e.target.value }))}
+                          placeholder="مثال: 5 سنوات أو 100,000 كم"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="specNotes">ملاحظات إضافية</Label>
+                        <Textarea
+                          id="specNotes"
+                          value={editingVehicleSpecs?.notes || ""}
+                          onChange={(e) => setEditingVehicleSpecs(prev => ({ ...prev, notes: e.target.value }))}
+                          placeholder="أي معلومات إضافية أو ملاحظات خاصة"
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Real-time Update Notice */}
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                    <div className="flex items-center">
+                      <Info size={16} className="text-blue-600 dark:text-blue-400 ml-2" />
+                      <span className="text-sm text-blue-800 dark:text-blue-200">
+                        التغييرات في المواصفات يتم حفظها تلقائياً عند تحديث بيانات السيارة
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4">
@@ -3024,11 +3226,16 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   setVehicleChassisNumber(editingVehicleData.chassisNumber);
                   setVehiclePrice(editingVehicleData.price);
                   
+                  // Update vehicle specifications in real-time
+                  if (editingVehicleSpecs) {
+                    setVehicleSpecs(editingVehicleSpecs);
+                  }
+                  
                   setVehicleEditOpen(false);
                   
                   toast({
                     title: "تم التحديث",
-                    description: "تم تحديث بيانات السيارة بنجاح",
+                    description: "تم تحديث بيانات السيارة والمواصفات بنجاح",
                   });
                 }}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
