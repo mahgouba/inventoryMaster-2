@@ -152,41 +152,95 @@ export default function QuotationA4Preview({
   const grandTotal = isVATInclusive ? finalPrice : (finalPrice + (finalPrice * taxRate / 100));
   const taxAmount = isVATInclusive ? (finalPrice * taxRate / (100 + taxRate)) : (finalPrice * taxRate / 100);
 
-  // PDF Download Function with enhanced quality
+  // PDF Download Function with ultra-high quality settings
   const downloadPDF = async () => {
     if (!previewRef.current) return;
     
     setIsDownloading(true);
     
     try {
+      // Create high-resolution canvas with maximum quality settings
       const canvas = await html2canvas(previewRef.current, {
-        scale: 3, // Increased scale for better quality
+        scale: 4, // Ultra-high resolution scale (4x)
         useCORS: true,
         backgroundColor: '#ffffff',
         allowTaint: true,
         foreignObjectRendering: true,
-        imageTimeout: 15000,
+        imageTimeout: 30000, // Increased timeout for high-res processing
         removeContainer: true,
         logging: false,
         width: previewRef.current.scrollWidth,
         height: previewRef.current.scrollHeight,
         x: 0,
-        y: 0
+        y: 0,
+        windowWidth: previewRef.current.scrollWidth,
+        windowHeight: previewRef.current.scrollHeight,
+        scrollX: 0,
+        scrollY: 0,
+        onclone: (clonedDoc) => {
+          // Enhance font rendering in cloned document
+          const style = clonedDoc.createElement('style');
+          style.textContent = `
+            * {
+              -webkit-font-smoothing: antialiased;
+              -moz-osx-font-smoothing: grayscale;
+              text-rendering: optimizeLegibility;
+            }
+            img {
+              image-rendering: -webkit-optimize-contrast;
+              image-rendering: crisp-edges;
+              image-rendering: pixelated;
+            }
+          `;
+          clonedDoc.head.appendChild(style);
+        }
       });
       
-      const imgData = canvas.toDataURL('image/jpeg', 0.95); // Higher quality JPEG
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      // Convert to PNG first for maximum quality, then to high-quality JPEG
+      const imgData = canvas.toDataURL('image/png', 1.0); // Maximum PNG quality
+      
+      // Create PDF with high compression settings
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true,
+        precision: 16 // Higher precision for better quality
+      });
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
+      // Add image with optimal quality settings
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, '', 'NONE');
       
       const fileName = isInvoiceMode ? `فاتورة_${invoiceNumber}.pdf` : `عرض_سعر_${quoteNumber}.pdf`;
       pdf.save(fileName);
       
     } catch (error) {
       console.error('Error generating PDF:', error);
+      // Fallback to lower quality if high-res fails
+      try {
+        const canvas = await html2canvas(previewRef.current, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          allowTaint: true
+        });
+        
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+        
+        const fileName = isInvoiceMode ? `فاتورة_${invoiceNumber}.pdf` : `عرض_سعر_${quoteNumber}.pdf`;
+        pdf.save(fileName);
+        
+      } catch (fallbackError) {
+        console.error('Fallback PDF generation failed:', fallbackError);
+      }
     } finally {
       setIsDownloading(false);
     }

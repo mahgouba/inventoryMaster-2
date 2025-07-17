@@ -158,6 +158,8 @@ The application uses PostgreSQL for persistent data storage with proper database
 - Removed fixed width and height styling from quotation preview div element per user request
 - Updated quotation preview layout: moved quote number and date to same row as "عرض سعر" title
 - Reorganized vehicle information section into three rows: (1) Manufacturer/Category/Trim Level, (2) Year/Engine/Exterior Color, (3) Interior Color/Chassis Number
+- Removed representative phone field from quotation preview per user request
+- Enhanced PDF export quality with 4x resolution scaling, PNG format, optimized font rendering, and fallback system for ultra-high quality output
 - Updated quotation preview layout to display quote number and date in the same row as "عرض سعر" title
 
 ## Changelog
