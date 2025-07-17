@@ -284,12 +284,7 @@ export default function QuotationA4Preview({
                 </div>
               )}
 
-              {/* Company Name */}
-              <div className="text-center pt-6">
-                <h1 className="text-xl font-bold text-black mb-4" style={{fontFamily: 'Cairo, sans-serif'}}>
-                  {selectedCompany?.name || "شركة البريمي للسيارات"}
-                </h1>
-              </div>
+              
 
               {/* Document Type */}
               <div className="absolute top-16 right-4">
