@@ -162,7 +162,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - Enhanced PDF export quality with 4x resolution scaling, PNG format, optimized font rendering, and fallback system for ultra-high quality output
 - Implemented fixed A4 dimensions (2480x3508px at 300 DPI) for consistent PDF output regardless of device screen size or mobile/desktop viewing
 - Added customer title/addressing format to quotation preview with options for السادة، السيد، السيدة، الشيخ، سمو الأمير displayed as "Title / CustomerName الموقرين"
-- Added prominent customer addressing section directly below "عرض سعر" header with centered layout and enhanced styling
+- Added full-width customer addressing section directly below "عرض سعر" header with centered text and enhanced styling
 - Moved representative information section below Terms & Conditions section in quotation preview per user request
 - Updated quotation preview layout to display quote number and date in the same row as "عرض سعر" title
 
