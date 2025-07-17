@@ -195,7 +195,7 @@ export default function QuotationA4Preview({
       <div 
         ref={previewRef}
         data-pdf-export="quotation"
-        className="mx-auto bg-white text-black shadow-2xl border border-slate-200 overflow-hidden relative"
+        className="mx-auto text-black shadow-2xl border border-slate-200 overflow-hidden relative"
         style={{
           width: '210mm',
           height: '297mm',
@@ -204,7 +204,8 @@ export default function QuotationA4Preview({
           backgroundImage: `url(${A4Background})`,
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
-          backgroundSize: 'cover'
+          backgroundSize: 'cover',
+          backgroundColor: 'white'
         }}
       >
         {/* Content overlay on A4 background */}
