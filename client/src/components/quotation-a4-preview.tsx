@@ -73,6 +73,8 @@ export default function QuotationA4Preview({
   const [manufacturerLogo, setManufacturerLogo] = useState<string | null>(null);
   const [qrCodeDataURL, setQrCodeDataURL] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isEditingSpecs, setIsEditingSpecs] = useState(false);
+  const [editableSpecs, setEditableSpecs] = useState<string>("");
   const previewRef = useRef<HTMLDivElement>(null);
 
   // Fetch terms and conditions
@@ -149,6 +151,11 @@ export default function QuotationA4Preview({
 
     generateQRCode();
   }, [selectedVehicle, customerName, customerPhone, quoteNumber, invoiceNumber, isInvoiceMode, basePrice]);
+
+  // Update editable specs when vehicle specs change
+  useEffect(() => {
+    setEditableSpecs(vehicleSpecs?.detailedDescription || "");
+  }, [vehicleSpecs?.detailedDescription]);
 
   // Calculate pricing
   const grandTotal = isVATInclusive ? finalPrice : (finalPrice + (finalPrice * taxRate / 100));
@@ -428,15 +435,33 @@ export default function QuotationA4Preview({
                   </div>
                 </div>
                 
-                {/* Detailed Specifications */}
-                {vehicleSpecs && vehicleSpecs.detailedDescription && (
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <h4 className="text-xs font-bold mb-2 text-amber-600">المواصفات التفصيلية:</h4>
-                    <div className="text-xs text-black whitespace-pre-wrap max-h-20 overflow-y-auto">
-                      {vehicleSpecs.detailedDescription}
-                    </div>
+                {/* Detailed Specifications - Full Width Editable */}
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-bold text-amber-600">المواصفات التفصيلية:</h4>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditingSpecs(!isEditingSpecs)}
+                      className="text-xs px-2 py-1"
+                    >
+                      {isEditingSpecs ? "حفظ" : "تحرير"}
+                    </Button>
                   </div>
-                )}
+                  {isEditingSpecs ? (
+                    <textarea
+                      value={editableSpecs}
+                      onChange={(e) => setEditableSpecs(e.target.value)}
+                      className="w-full h-20 p-2 text-xs text-black border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      placeholder="اكتب المواصفات التفصيلية هنا..."
+                      style={{ direction: 'rtl' }}
+                    />
+                  ) : (
+                    <div className="text-xs text-black whitespace-pre-wrap max-h-20 overflow-y-auto bg-gray-50 p-2 rounded border">
+                      {editableSpecs || "لا توجد مواصفات تفصيلية"}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
