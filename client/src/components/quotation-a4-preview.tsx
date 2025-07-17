@@ -369,8 +369,7 @@ export default function QuotationA4Preview({
               {/* Customer Information Details below header */}
               <div className="mt-4 bg-white/90 border border-gray-300 p-3 rounded shadow-sm">
                 <div className="space-y-2 text-xs text-black">
-                  <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
-                    <span className="font-semibold text-gray-700">الاسم:</span>
+                  <div className="text-center text-[16px] font-semibold">
                     <span>{customerTitle} / {customerName || "غير محدد"} الموقرين</span>
                   </div>
                 </div>
