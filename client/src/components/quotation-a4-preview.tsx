@@ -305,7 +305,7 @@ export default function QuotationA4Preview({
       {/* Background Toggle Switch */}
       <div className="mb-4 flex justify-center items-center gap-4">
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600">خلفية 1</span>
+          <span className="bg-[#cf9b46] text-[#fcfcfc] text-[15px]">البريمي </span>
           <Switch 
             checked={useAlbarimi2Background} 
             onCheckedChange={setUseAlbarimi2Background}
