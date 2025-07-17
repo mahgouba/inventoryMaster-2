@@ -1773,34 +1773,32 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         </div>
         
         {/* A4 Preview Section - Bottom */}
-        <div className="mt-8">
-          <QuotationA4Preview
-            selectedCompany={selectedCompanyData}
-            selectedVehicle={editableVehicle}
-            vehicleSpecs={vehicleSpecs}
-            quoteNumber={quoteNumber}
-            customerName={customerName}
-            customerPhone={customerPhone}
-            customerEmail={customerEmail}
-            validUntil={new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000)}
-            basePrice={pricingDetails.basePrice * pricingDetails.quantity}
-            finalPrice={calculateTotals().finalTotal}
-            licensePlatePrice={pricingDetails.licensePlatePrice}
-            includeLicensePlate={pricingDetails.includeLicensePlate}
-            licensePlateSubjectToTax={pricingDetails.licensePlateSubjectToTax}
-            taxRate={pricingDetails.taxRate}
-            isVATInclusive={pricingDetails.isVATInclusive}
-            representativeName={representatives.find(r => r.id === selectedRepresentative)?.name || "غير محدد"}
-            representativePhone={representatives.find(r => r.id === selectedRepresentative)?.phone || "غير محدد"}
-            representativeEmail={representatives.find(r => r.id === selectedRepresentative)?.email || "غير محدد"}
-            representativePosition={representatives.find(r => r.id === selectedRepresentative)?.position || "غير محدد"}
-            notes={notes}
-            termsRefreshTrigger={termsRefreshTrigger}
-            companyStamp={companyStamp}
-            isInvoiceMode={isInvoiceMode}
-            invoiceNumber={invoiceNumber}
-          />
-        </div>
+        <QuotationA4Preview
+          selectedCompany={selectedCompanyData}
+          selectedVehicle={editableVehicle}
+          vehicleSpecs={vehicleSpecs}
+          quoteNumber={quoteNumber}
+          customerName={customerName}
+          customerPhone={customerPhone}
+          customerEmail={customerEmail}
+          validUntil={new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000)}
+          basePrice={pricingDetails.basePrice * pricingDetails.quantity}
+          finalPrice={calculateTotals().finalTotal}
+          licensePlatePrice={pricingDetails.licensePlatePrice}
+          includeLicensePlate={pricingDetails.includeLicensePlate}
+          licensePlateSubjectToTax={pricingDetails.licensePlateSubjectToTax}
+          taxRate={pricingDetails.taxRate}
+          isVATInclusive={pricingDetails.isVATInclusive}
+          representativeName={representatives.find(r => r.id === selectedRepresentative)?.name || "غير محدد"}
+          representativePhone={representatives.find(r => r.id === selectedRepresentative)?.phone || "غير محدد"}
+          representativeEmail={representatives.find(r => r.id === selectedRepresentative)?.email || "غير محدد"}
+          representativePosition={representatives.find(r => r.id === selectedRepresentative)?.position || "غير محدد"}
+          notes={notes}
+          termsRefreshTrigger={termsRefreshTrigger}
+          companyStamp={companyStamp}
+          isInvoiceMode={isInvoiceMode}
+          invoiceNumber={invoiceNumber}
+        />
       </div>
 
       {/* Management Dialogs */}
