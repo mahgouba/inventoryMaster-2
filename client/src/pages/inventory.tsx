@@ -395,226 +395,174 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 </div>
               </div>
               
-              {/* Enhanced Filter Controls with Button Design */}
+              {/* Enhanced Filter Controls with Dropdowns */}
               <div className="space-y-4 animate-in fade-in duration-300">
-                {/* الصانع */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الصانع</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {manufacturers.map((manufacturer) => (
-                      <Button
-                        key={manufacturer}
-                        variant={manufacturerFilter === manufacturer ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => handleManufacturerChange(manufacturer)}
-                        className={`transition-all duration-200 ${
-                          manufacturerFilter === manufacturer
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {manufacturer}
-                      </Button>
-                    ))}
+                {/* Row 1: الصانع، الفئات، درجة التجهيز، السنة، سعة المحرك */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  <div className="group">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">
+                      الصانع
+                    </label>
+                    <Select value={manufacturerFilter} onValueChange={handleManufacturerChange}>
+                      <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                        {manufacturers.map((manufacturer) => (
+                          <SelectItem key={manufacturer} value={manufacturer} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                            {manufacturer}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="group">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">
+                      الفئة
+                    </label>
+                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                      <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                        {categories.map((category) => (
+                          <SelectItem key={category} value={category} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="group">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">
+                      درجة التجهيز
+                    </label>
+                    <Select value={trimLevelFilter} onValueChange={setTrimLevelFilter}>
+                      <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                        {availableTrimLevels.map((trim) => (
+                          <SelectItem key={trim} value={trim} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                            {trim}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="group">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">
+                      السنة
+                    </label>
+                    <Select value={yearFilter} onValueChange={setYearFilter}>
+                      <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                        {years.map((year) => (
+                          <SelectItem key={year} value={year} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="group">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">
+                      سعة المحرك
+                    </label>
+                    <Select value={engineCapacityFilter} onValueChange={setEngineCapacityFilter}>
+                      <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                        {availableEngineCapacities.map((capacity) => (
+                          <SelectItem key={capacity} value={capacity} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                            {capacity}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-
-                {/* الفئة */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الفئة</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((category) => (
-                      <Button
-                        key={category}
-                        variant={categoryFilter === category ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setCategoryFilter(category)}
-                        className={`transition-all duration-200 ${
-                          categoryFilter === category
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {category}
-                      </Button>
-                    ))}
+                
+                {/* Row 2: اللون الداخلي، اللون الخارجي، الحالة، نوع الاستيراد */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in duration-500 delay-150">
+                  <div className="group">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">
+                      اللون الداخلي
+                    </label>
+                    <Select value={interiorColorFilter} onValueChange={setInteriorColorFilter}>
+                      <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                        {availableInteriorColors.map((color) => (
+                          <SelectItem key={color} value={color} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                            {color}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </div>
-
-                {/* درجة التجهيز */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">درجة التجهيز</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {availableTrimLevels.map((trim) => (
-                      <Button
-                        key={trim}
-                        variant={trimLevelFilter === trim ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setTrimLevelFilter(trim)}
-                        className={`transition-all duration-200 ${
-                          trimLevelFilter === trim
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {trim}
-                      </Button>
-                    ))}
+                  
+                  <div className="group">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">
+                      اللون الخارجي
+                    </label>
+                    <Select value={exteriorColorFilter} onValueChange={setExteriorColorFilter}>
+                      <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                        {availableExteriorColors.map((color) => (
+                          <SelectItem key={color} value={color} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                            {color}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </div>
-
-                {/* السنة */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">السنة</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {years.map((year) => (
-                      <Button
-                        key={year}
-                        variant={yearFilter === year ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setYearFilter(year)}
-                        className={`transition-all duration-200 ${
-                          yearFilter === year
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {year}
-                      </Button>
-                    ))}
+                  
+                  <div className="group">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">
+                      الحالة
+                    </label>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                        {availableStatuses.map((status) => (
+                          <SelectItem key={status} value={status} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </div>
-
-                {/* سعة المحرك */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">سعة المحرك</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {availableEngineCapacities.map((capacity) => (
-                      <Button
-                        key={capacity}
-                        variant={engineCapacityFilter === capacity ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setEngineCapacityFilter(capacity)}
-                        className={`transition-all duration-200 ${
-                          engineCapacityFilter === capacity
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {capacity}
-                      </Button>
-                    ))}
+                  
+                  <div className="group">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">
+                      نوع الاستيراد
+                    </label>
+                    <Select value={importTypeFilter} onValueChange={setImportTypeFilter}>
+                      <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                        {availableImportTypes.map((type) => (
+                          <SelectItem key={type} value={type} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </div>
-
-                {/* اللون الداخلي */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الداخلي</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {availableInteriorColors.map((color) => (
-                      <Button
-                        key={color}
-                        variant={interiorColorFilter === color ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setInteriorColorFilter(color)}
-                        className={`transition-all duration-200 ${
-                          interiorColorFilter === color
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {color}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* اللون الخارجي */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الخارجي</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {availableExteriorColors.map((color) => (
-                      <Button
-                        key={color}
-                        variant={exteriorColorFilter === color ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setExteriorColorFilter(color)}
-                        className={`transition-all duration-200 ${
-                          exteriorColorFilter === color
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {color}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* الحالة */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الحالة</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {availableStatuses.map((status) => (
-                      <Button
-                        key={status}
-                        variant={statusFilter === status ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setStatusFilter(status)}
-                        className={`transition-all duration-200 ${
-                          statusFilter === status
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {status}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* نوع الاستيراد */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">نوع الاستيراد</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {availableImportTypes.map((type) => (
-                      <Button
-                        key={type}
-                        variant={importTypeFilter === type ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setImportTypeFilter(type)}
-                        className={`transition-all duration-200 ${
-                          importTypeFilter === type
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {type}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Reset Filters Button */}
-                <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setManufacturerFilter("جميع الصناع");
-                      setCategoryFilter("جميع الفئات");
-                      setTrimLevelFilter("جميع درجات التجهيز");
-                      setYearFilter("جميع السنوات");
-                      setEngineCapacityFilter("جميع السعات");
-                      setInteriorColorFilter("جميع الألوان الداخلية");
-                      setExteriorColorFilter("جميع الألوان الخارجية");
-                      setStatusFilter("جميع الحالات");
-                      setImportTypeFilter("جميع الأنواع");
-                    }}
-                    className="hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20"
-                  >
-                    إعادة تعيين الفلاتر
-                  </Button>
                 </div>
               </div>
               

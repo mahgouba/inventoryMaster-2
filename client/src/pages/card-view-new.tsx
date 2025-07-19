@@ -545,244 +545,156 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               </div>
             </div>
 
-            {/* Enhanced Filter Controls with Button Design */}
-            <div className="space-y-6 animate-in fade-in duration-300">
-              {/* الصانع */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الصانع</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
-                    {manufacturers.map((manufacturer) => (
-                      <Button
-                        key={manufacturer}
-                        variant={selectedManufacturer === manufacturer ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => handleManufacturerChange(manufacturer)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedManufacturer === manufacturer
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {manufacturer}
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
+            {/* Enhanced Filter Controls with Dropdowns */}
+            <div className="space-y-4 animate-in fade-in duration-300">
+              {/* Row 1: الصانع، الفئات، درجة التجهيز، السنة، سعة المحرك */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">الصانع</label>
+                  <Select value={selectedManufacturer} onValueChange={handleManufacturerChange}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {manufacturers.map((manufacturer) => (
+                        <SelectItem key={manufacturer} value={manufacturer} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {manufacturer}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">الفئة</label>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">درجة التجهيز</label>
+                  <Select value={selectedTrimLevel} onValueChange={setSelectedTrimLevel}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableTrimLevels.map((trim) => (
+                        <SelectItem key={trim} value={trim} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {trim}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">السنة</label>
+                  <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableYears.map((year) => (
+                        <SelectItem key={year} value={year} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">سعة المحرك</label>
+                  <Select value={selectedEngineCapacity} onValueChange={setSelectedEngineCapacity}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableEngineCapacities.map((capacity) => (
+                        <SelectItem key={capacity} value={capacity} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {capacity}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-
-              {/* الفئة */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الفئة</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
-                    {categories.map((category) => (
-                      <Button
-                        key={category}
-                        variant={selectedCategory === category ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedCategory(category)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedCategory === category
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {category}
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-
-              {/* درجة التجهيز */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">درجة التجهيز</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
-                    {availableTrimLevels.map((trim) => (
-                      <Button
-                        key={trim}
-                        variant={selectedTrimLevel === trim ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedTrimLevel(trim)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedTrimLevel === trim
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {trim}
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-
-              {/* السنة */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">السنة</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
-                    {availableYears.map((year) => (
-                      <Button
-                        key={year}
-                        variant={selectedYear === year ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedYear(year)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedYear === year
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {year}
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-
-              {/* سعة المحرك */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">سعة المحرك</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
-                    {availableEngineCapacities.map((capacity) => (
-                      <Button
-                        key={capacity}
-                        variant={selectedEngineCapacity === capacity ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedEngineCapacity(capacity)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedEngineCapacity === capacity
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {capacity}
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-
-              {/* اللون الداخلي */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الداخلي</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
-                    {availableInteriorColors.map((color) => (
-                      <Button
-                        key={color}
-                        variant={selectedInteriorColor === color ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedInteriorColor(color)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedInteriorColor === color
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {color}
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-
-              {/* اللون الخارجي */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الخارجي</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
-                    {availableExteriorColors.map((color) => (
-                      <Button
-                        key={color}
-                        variant={selectedExteriorColor === color ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedExteriorColor(color)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedExteriorColor === color
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {color}
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-
-              {/* الحالة */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الحالة</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
-                    {availableStatuses.map((status) => (
-                      <Button
-                        key={status}
-                        variant={selectedStatus === status ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedStatus(status)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedStatus === status
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {status}
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-
-              {/* نوع الاستيراد */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">نوع الاستيراد</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
-                    {availableImportTypes.map((type) => (
-                      <Button
-                        key={type}
-                        variant={selectedImportType === type ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedImportType(type)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedImportType === type
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
-                        }`}
-                      >
-                        {type}
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-
-              {/* Reset Filters Button */}
-              <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedManufacturer("الكل");
-                    setSelectedCategory("الكل");
-                    setSelectedTrimLevel("الكل");
-                    setSelectedYear("الكل");
-                    setSelectedEngineCapacity("الكل");
-                    setSelectedInteriorColor("الكل");
-                    setSelectedExteriorColor("الكل");
-                    setSelectedStatus("الكل");
-                    setSelectedImportType("الكل");
-                  }}
-                  className="hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20"
-                >
-                  إعادة تعيين الفلاتر
-                </Button>
+            
+              {/* Row 2: اللون الداخلي، اللون الخارجي، الحالة، نوع الاستيراد */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in duration-500 delay-150">
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">اللون الداخلي</label>
+                  <Select value={selectedInteriorColor} onValueChange={setSelectedInteriorColor}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableInteriorColors.map((color) => (
+                        <SelectItem key={color} value={color} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {color}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">اللون الخارجي</label>
+                  <Select value={selectedExteriorColor} onValueChange={setSelectedExteriorColor}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableExteriorColors.map((color) => (
+                        <SelectItem key={color} value={color} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {color}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">الحالة</label>
+                  <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableStatuses.map((status) => (
+                        <SelectItem key={status} value={status} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">نوع الاستيراد</label>
+                  <Select value={selectedImportType} onValueChange={setSelectedImportType}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableImportTypes.map((type) => (
+                        <SelectItem key={type} value={type} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           </div>
