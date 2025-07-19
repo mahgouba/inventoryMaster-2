@@ -377,7 +377,7 @@ export default function QuotationA4Preview({
                   <span>{isInvoiceMode ? invoiceNumber : quoteNumber}</span>
                 </div>
                 <div className="text-xs text-black">
-                  <span className="font-semibold">التاريخ: </span>
+                  <span className="font-semibold">الإصدار:      </span>
                   <span>{new Date().toLocaleDateString('en-GB')}</span>
                   <span className="font-semibold ml-4">صالح حتى: </span>
                   <span>{validUntil.toLocaleDateString('en-GB')}</span>
