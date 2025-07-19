@@ -149,6 +149,17 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   };
 
   const manufacturers = getAvailableManufacturers();
+
+  // Get count for each filter option
+  const getFilterCount = (field: keyof InventoryItem, value: string) => {
+    const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
+    if (value === "جميع الصناع" || value === "جميع الفئات" || value === "جميع درجات التجهيز" || 
+        value === "جميع السنوات" || value === "جميع السعات" || value === "جميع الألوان الداخلية" || 
+        value === "جميع الألوان الخارجية" || value === "جميع الحالات" || value === "جميع الأنواع") {
+      return availableData.length;
+    }
+    return availableData.filter(item => item[field] === value).length;
+  };
   
   // Reset category filter when manufacturer changes
   const handleManufacturerChange = (value: string) => {
@@ -412,11 +423,11 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       </Button>
                     </CollapsibleTrigger>
                     
-                    <CollapsibleContent className="mt-4">
-                      <Card className="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shadow-sm">
-                        <CardContent className="p-4">
+                    <CollapsibleContent className="mt-4 w-full">
+                      <Card className="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shadow-sm w-full">
+                        <CardContent className="p-6">
                           {/* Enhanced Filter Controls with Button Design */}
-                          <div className="space-y-4 animate-in fade-in duration-300">
+                          <div className="space-y-6 animate-in fade-in duration-300">
                 {/* الصانع */}
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الصانع</h3>
@@ -434,7 +445,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                           }`}
                         >
-                          {manufacturer}
+                          {manufacturer} ({getFilterCount("manufacturer", manufacturer)})
                         </Button>
                       ))}
                     </div>
@@ -458,7 +469,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                           }`}
                         >
-                          {category}
+                          {category} ({getFilterCount("category", category)})
                         </Button>
                       ))}
                     </div>
@@ -482,7 +493,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                           }`}
                         >
-                          {trim}
+                          {trim} ({getFilterCount("trimLevel", trim)})
                         </Button>
                       ))}
                     </div>
@@ -506,7 +517,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                           }`}
                         >
-                          {year}
+                          {year} ({getFilterCount("year", year)})
                         </Button>
                       ))}
                     </div>
@@ -530,7 +541,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                           }`}
                         >
-                          {capacity}
+                          {capacity} ({getFilterCount("engineCapacity", capacity)})
                         </Button>
                       ))}
                     </div>
@@ -554,7 +565,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                           }`}
                         >
-                          {color}
+                          {color} ({getFilterCount("interiorColor", color)})
                         </Button>
                       ))}
                     </div>
@@ -578,7 +589,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                           }`}
                         >
-                          {color}
+                          {color} ({getFilterCount("exteriorColor", color)})
                         </Button>
                       ))}
                     </div>
@@ -602,7 +613,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                           }`}
                         >
-                          {status}
+                          {status} ({getFilterCount("status", status)})
                         </Button>
                       ))}
                     </div>
@@ -626,7 +637,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                           }`}
                         >
-                          {type}
+                          {type} ({getFilterCount("importType", type)})
                         </Button>
                       ))}
                     </div>

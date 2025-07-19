@@ -99,6 +99,14 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   // Filter out sold cars from display unless showSoldCars is true
   const availableItems = showSoldCars ? inventoryData : inventoryData.filter(item => item.status !== "مباع");
 
+  // Get count for each filter option
+  const getFilterCount = (field: keyof InventoryItem, value: string) => {
+    if (value === "الكل") {
+      return availableItems.length;
+    }
+    return availableItems.filter(item => item[field] === value).length;
+  };
+
   // Apply search filter
   const searchFilteredItems = searchQuery.trim() === "" 
     ? availableItems 
@@ -561,9 +569,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     </Button>
                   </CollapsibleTrigger>
                   
-                  <CollapsibleContent className="mt-4">
-                    <Card className="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shadow-sm">
-                      <CardContent className="p-4">
+                  <CollapsibleContent className="mt-4 w-full">
+                    <Card className="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shadow-sm w-full">
+                      <CardContent className="p-6">
                         {/* Enhanced Filter Controls with Button Design */}
                         <div className="space-y-6 animate-in fade-in duration-300">
               {/* الصانع */}
@@ -583,7 +591,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                         }`}
                       >
-                        {manufacturer}
+                        {manufacturer} ({getFilterCount("manufacturer", manufacturer)})
                       </Button>
                     ))}
                   </div>
@@ -607,7 +615,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                         }`}
                       >
-                        {category}
+                        {category} ({getFilterCount("category", category)})
                       </Button>
                     ))}
                   </div>
@@ -631,7 +639,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                         }`}
                       >
-                        {trim}
+                        {trim} ({getFilterCount("trimLevel", trim)})
                       </Button>
                     ))}
                   </div>
@@ -655,7 +663,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                         }`}
                       >
-                        {year}
+                        {year} ({getFilterCount("year", year)})
                       </Button>
                     ))}
                   </div>
@@ -679,7 +687,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                         }`}
                       >
-                        {capacity}
+                        {capacity} ({getFilterCount("engineCapacity", capacity)})
                       </Button>
                     ))}
                   </div>
@@ -703,7 +711,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                         }`}
                       >
-                        {color}
+                        {color} ({getFilterCount("interiorColor", color)})
                       </Button>
                     ))}
                   </div>
@@ -727,7 +735,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                         }`}
                       >
-                        {color}
+                        {color} ({getFilterCount("exteriorColor", color)})
                       </Button>
                     ))}
                   </div>
@@ -751,7 +759,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                         }`}
                       >
-                        {status}
+                        {status} ({getFilterCount("status", status)})
                       </Button>
                     ))}
                   </div>
@@ -775,7 +783,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
                         }`}
                       >
-                        {type}
+                        {type} ({getFilterCount("importType", type)})
                       </Button>
                     ))}
                   </div>
