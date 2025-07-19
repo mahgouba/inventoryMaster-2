@@ -145,6 +145,13 @@ The application uses PostgreSQL for persistent data storage with proper database
 
 ## Recent Changes
 
+### Data Refresh Issue Fixed (July 19, 2025)
+- ✅ Fixed cache invalidation issue that prevented data updates from appearing in UI
+- ✅ Changed queryClient staleTime from Infinity to 5 minutes to allow proper data refresh
+- ✅ Enhanced mutation success handlers to force immediate data refetch after updates
+- ✅ Added removeQueries() calls to ensure cached data is cleared before refetch
+- ✅ Improved form data loading with better error handling and field validation
+
 ### Migration to Replit Environment Completed (July 19, 2025)
 - ✅ Successfully completed full migration from Replit Agent to standard Replit environment
 - ✅ All required packages installed and verified working

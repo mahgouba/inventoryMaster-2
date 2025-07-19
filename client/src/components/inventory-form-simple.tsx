@@ -139,10 +139,19 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
 
   const createMutation = useMutation({
     mutationFn: (data: InsertInventoryItem) => apiRequest("POST", "/api/inventory", data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory/stats"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
+    onSuccess: async () => {
+      // Force immediate refetch by invalidating and removing cached data
+      await queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/inventory/stats"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
+      
+      // Force immediate refetch by removing all inventory-related cached data
+      queryClient.removeQueries({ queryKey: ["/api/inventory"] });
+      
+      // Refetch the data immediately to ensure UI updates
+      await queryClient.refetchQueries({ queryKey: ["/api/inventory"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/inventory/stats"] });
+      
       toast({
         title: "تم الإنشاء",
         description: "تم إضافة العنصر بنجاح",
@@ -162,10 +171,19 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   const updateMutation = useMutation({
     mutationFn: (data: InsertInventoryItem) => 
       apiRequest("PUT", `/api/inventory/${editItem?.id}`, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory/stats"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
+    onSuccess: async () => {
+      // Force immediate refetch by invalidating and removing cached data
+      await queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/inventory/stats"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
+      
+      // Force immediate refetch by removing all inventory-related cached data
+      queryClient.removeQueries({ queryKey: ["/api/inventory"] });
+      
+      // Refetch the data immediately to ensure UI updates
+      await queryClient.refetchQueries({ queryKey: ["/api/inventory"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/inventory/stats"] });
+      
       toast({
         title: "تم التحديث",
         description: "تم تحديث العنصر بنجاح",
