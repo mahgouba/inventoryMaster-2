@@ -457,15 +457,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
             </div>
             
             <div className="flex items-center space-x-3 space-x-reverse">
-              <Link href="/pdf-appearance">
-                <Button 
-                  variant="outline" 
-                  className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
-                >
-                  <FileText size={16} />
-                  مظهر عرض السعر PDF
-                </Button>
-              </Link>
+
               <Button 
                 onClick={handleSaveSettings} 
                 disabled={saveAppearanceMutation.isPending}
