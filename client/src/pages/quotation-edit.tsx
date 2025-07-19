@@ -38,6 +38,7 @@ import { apiRequest } from "@/lib/queryClient";
 
 import type { InventoryItem, Specification, InsertQuotation, Company, TermsAndConditions } from "@shared/schema";
 import { numberToArabic } from "@/utils/number-to-arabic";
+import { generateQuoteNumber } from "@/utils/serial-number";
 import QuotationA4Preview from "@/components/quotation-a4-preview";
 import CompanyManagement from "@/components/company-management";
 import jsPDF from "jspdf";
@@ -284,7 +285,7 @@ export default function QuotationEditPage({}: QuotationEditPageProps) {
       );
 
       // Save PDF
-      const fileName = `عرض_سعر_${quoteNumber || 'Q-' + Date.now()}.pdf`;
+      const fileName = `عرض_سعر_${quoteNumber || generateQuoteNumber()}.pdf`;
       pdf.save(fileName);
       
       toast({

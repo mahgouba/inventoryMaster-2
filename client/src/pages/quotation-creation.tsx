@@ -41,6 +41,7 @@ import { apiRequest } from "@/lib/queryClient";
 
 import type { InventoryItem, Specification, InsertQuotation, Company, TermsAndConditions } from "@shared/schema";
 import { numberToArabic } from "@/utils/number-to-arabic";
+import { generateQuoteNumber, generateInvoiceNumber } from "@/utils/serial-number";
 import QuotationA4Preview from "@/components/quotation-a4-preview";
 import CompanyPDFTemplates from "@/components/company-pdf-templates";
 
@@ -353,7 +354,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   
   // Form states
   const [quoteNumber, setQuoteNumber] = useState<string>(() => {
-    return editingQuotation?.quoteNumber || `Q-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    return editingQuotation?.quoteNumber || generateQuoteNumber();
   });
   const [customerName, setCustomerName] = useState<string>(editingQuotation?.customerName || "");
   const [customerPhone, setCustomerPhone] = useState<string>(editingQuotation?.customerPhone || "");
@@ -645,8 +646,8 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   // Convert quotation to invoice
   const convertToInvoice = async () => {
     try {
-      // Generate invoice number
-      const newInvoiceNumber = `INV-${Date.now().toString().slice(-8)}`;
+      // Generate invoice number with 6-digit serial format
+      const newInvoiceNumber = generateInvoiceNumber();
       
       // Switch to invoice mode
       setIsInvoiceMode(true);
@@ -672,7 +673,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
       // Prepare invoice data with fallback values for missing fields
       const invoiceData = {
         invoiceNumber: newInvoiceNumber,
-        quoteNumber: quoteNumber || `Q-${Date.now()}`,
+        quoteNumber: quoteNumber || generateQuoteNumber(),
         inventoryItemId: currentVehicle.id || null,
         manufacturer: currentVehicle.manufacturer || "غير محدد",
         category: currentVehicle.category || "غير محدد",
@@ -744,7 +745,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
       
       // Prepare quotation data
       const quotationData = {
-        quoteNumber: quoteNumber || `Q-${Date.now()}`,
+        quoteNumber: quoteNumber || generateQuoteNumber(),
         inventoryItemId: currentVehicle.id || null,
         manufacturer: currentVehicle.manufacturer || "غير محدد",
         category: currentVehicle.category || "غير محدد",
@@ -767,14 +768,14 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
         companyData: JSON.stringify(selectedCompanyData || {}),
         representativeData: JSON.stringify(representatives.find(r => r.id === selectedRepresentative) || {}),
         pricingDetails: JSON.stringify(pricingDetails),
-        qrCodeData: JSON.stringify({ quoteNumber: quoteNumber || `Q-${Date.now()}`, customerName: customerName || "عميل غير محدد", finalPrice: totals.finalTotal })
+        qrCodeData: JSON.stringify({ quoteNumber: quoteNumber || generateQuoteNumber(), customerName: customerName || "عميل غير محدد", finalPrice: totals.finalTotal })
       };
 
       // Save as quotation or invoice based on mode
       let response;
       if (isInvoiceMode) {
         // Generate invoice number if not exists
-        const newInvoiceNumber = invoiceNumber || `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        const newInvoiceNumber = invoiceNumber || generateInvoiceNumber();
         setInvoiceNumber(newInvoiceNumber);
         
         // Prepare invoice data
@@ -1400,7 +1401,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     setIsInvoiceMode(checked);
                     if (checked) {
                       // Generate invoice number when switching to invoice mode
-                      const newInvoiceNumber = `INV-${Date.now()}`;
+                      const newInvoiceNumber = generateInvoiceNumber();
                       setInvoiceNumber(newInvoiceNumber);
                       toast({
                         title: "تم التبديل إلى وضع الفاتورة",

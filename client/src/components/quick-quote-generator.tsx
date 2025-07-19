@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { FileText, Download, Printer, QrCode, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AlbarimiQuoteTemplate from "./albarimi-quote-template";
+import { generateQuoteNumber } from "@/utils/serial-number";
 import type { InventoryItem, Company } from "@shared/schema";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -200,7 +201,7 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
   };
 
   const quotationData = {
-    quotationNumber: `Q-${Date.now()}`,
+    quotationNumber: generateQuoteNumber(),
     customerName,
     customerPhone,
     notes,

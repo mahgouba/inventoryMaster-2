@@ -1,4 +1,5 @@
 import React, { forwardRef } from "react";
+import { generateQuoteNumber } from "@/utils/serial-number";
 import type { InventoryItem, Company, InsertQuotation } from "@shared/schema";
 
 interface AlbarimiQuoteTemplateProps {
@@ -12,7 +13,7 @@ interface AlbarimiQuoteTemplateProps {
 const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplateProps>(
   ({ vehicle, company, quotationData, qrCodeUrl, showWatermark = false }, ref) => {
     const currentDate = new Date().toLocaleDateString('ar-SA');
-    const quotationNumber = quotationData?.quotationNumber || `Q-${Date.now()}`;
+    const quotationNumber = quotationData?.quotationNumber || generateQuoteNumber();
 
     return (
       <div ref={ref} className="albarimi-quote-template">
