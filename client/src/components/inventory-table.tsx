@@ -10,7 +10,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { getStatusColor } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
 import InventoryForm from "./inventory-form";
-import QuickQuoteGenerator from "./quick-quote-generator";
+
 
 interface InventoryTableProps {
   searchQuery: string;
@@ -346,9 +346,7 @@ export default function InventoryTable({ searchQuery, categoryFilter, manufactur
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <div className="inline-block">
-                        <QuickQuoteGenerator vehicle={item} />
-                      </div>
+
                       <Button
                         variant="ghost"
                         size="sm"

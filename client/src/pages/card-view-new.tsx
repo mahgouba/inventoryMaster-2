@@ -288,12 +288,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     setShareDialogOpen(true);
   };
 
-  const handleCreateQuote = (item: InventoryItem) => {
-    // Store vehicle data in localStorage for the quotation creation page
-    localStorage.setItem('selectedVehicleForQuote', JSON.stringify(item));
-    // Navigate to quotation creation page
-    window.location.href = '/quotation-creation';
-  };
+
 
   // Status color mapping
   const getStatusColor = (status: string) => {
@@ -687,15 +682,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               >
                                 <Share2 size={14} />
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="px-3 h-9 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
-                                onClick={() => handleCreateQuote(item)}
-                                title="إنشاء عرض سعر"
-                              >
-                                <FileText size={14} />
-                              </Button>
+
                               {item.status === "محجوز" ? (
                                 userRole === "admin" ? (
                                   <Button
