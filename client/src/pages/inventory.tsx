@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database, Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -50,6 +51,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [specificationsManagerOpen, setSpecificationsManagerOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Get theme settings and hooks
   const { companyName, companyLogo, darkMode, toggleDarkMode, isUpdatingDarkMode } = useTheme();
@@ -382,8 +384,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         <Card className="mb-8 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
           <CardContent className="p-6">
             <div className="flex flex-col gap-4">
-              {/* Search Bar */}
-              <div className="w-full">
+              {/* Search Bar and Filter Toggle */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="relative max-w-md">
                   <Input
                     type="text"
@@ -394,10 +396,27 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   />
                   <Search className="absolute right-3 top-3 h-4 w-4 text-slate-400" />
                 </div>
-              </div>
-              
-              {/* Enhanced Filter Controls with Button Design */}
-              <div className="space-y-4 animate-in fade-in duration-300">
+                
+                {/* Filter Toggle Button - Right Aligned */}
+                <div className="flex items-center justify-end w-full sm:w-auto">
+                  <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
+                    <CollapsibleTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex items-center gap-2 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 hover:from-teal-50 hover:to-teal-100 dark:hover:from-teal-900/30 dark:hover:to-teal-800/30 border-slate-300 dark:border-slate-600 transition-all duration-200"
+                      >
+                        <Filter size={16} />
+                        الفلاتر
+                        {filtersOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                      </Button>
+                    </CollapsibleTrigger>
+                    
+                    <CollapsibleContent className="mt-4">
+                      <Card className="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shadow-sm">
+                        <CardContent className="p-4">
+                          {/* Enhanced Filter Controls with Button Design */}
+                          <div className="space-y-4 animate-in fade-in duration-300">
                 {/* الصانع */}
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الصانع</h3>
@@ -634,6 +653,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   >
                     إعادة تعيين الفلاتر
                   </Button>
+                </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </div>
               </div>
               
