@@ -16,6 +16,8 @@ import {
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import OpenAI from "openai";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -2150,6 +2152,168 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching database info:', error);
       res.status(500).json({ error: 'Failed to fetch database info' });
+    }
+  });
+
+  // Cars data endpoints
+  app.get("/api/cars", async (req, res) => {
+    try {
+      const carsData = JSON.parse(readFileSync(join(process.cwd(), "cars.json"), "utf8"));
+      res.json(carsData);
+    } catch (error) {
+      console.error("Error reading cars data:", error);
+      res.status(500).json({ message: "Failed to load cars data" });
+    }
+  });
+
+  app.get("/api/cars/manufacturers", async (req, res) => {
+    try {
+      const carsData = JSON.parse(readFileSync(join(process.cwd(), "cars.json"), "utf8"));
+      const manufacturers = carsData.map((brand: any) => ({
+        name_ar: brand.brand_ar,
+        name_en: brand.brand_en
+      }));
+      res.json(manufacturers);
+    } catch (error) {
+      console.error("Error reading manufacturers data:", error);
+      res.status(500).json({ message: "Failed to load manufacturers data" });
+    }
+  });
+
+  app.get("/api/cars/models/:manufacturer", async (req, res) => {
+    try {
+      const manufacturerName = decodeURIComponent(req.params.manufacturer);
+      const carsData = JSON.parse(readFileSync(join(process.cwd(), "cars.json"), "utf8"));
+      
+      const brand = carsData.find((b: any) => 
+        b.brand_ar === manufacturerName || b.brand_en === manufacturerName
+      );
+      
+      if (!brand) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+      
+      const models = brand.models.map((model: any) => ({
+        model_ar: model.model_ar,
+        model_en: model.model_en
+      }));
+      
+      res.json(models);
+    } catch (error) {
+      console.error("Error reading models data:", error);
+      res.status(500).json({ message: "Failed to load models data" });
+    }
+  });
+
+  app.get("/api/cars/trims/:manufacturer/:model", async (req, res) => {
+    try {
+      const manufacturerName = decodeURIComponent(req.params.manufacturer);
+      const modelName = decodeURIComponent(req.params.model);
+      const carsData = JSON.parse(readFileSync(join(process.cwd(), "cars.json"), "utf8"));
+      
+      const brand = carsData.find((b: any) => 
+        b.brand_ar === manufacturerName || b.brand_en === manufacturerName
+      );
+      
+      if (!brand) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+      
+      const model = brand.models.find((m: any) => 
+        m.model_ar === modelName || m.model_en === modelName
+      );
+      
+      if (!model) {
+        return res.status(404).json({ message: "Model not found" });
+      }
+      
+      res.json(model.trims);
+    } catch (error) {
+      console.error("Error reading trims data:", error);
+      res.status(500).json({ message: "Failed to load trims data" });
+    }
+  });
+
+  // Import cars data to database
+  app.post("/api/cars/import", async (req, res) => {
+    try {
+      const carsData = JSON.parse(readFileSync(join(process.cwd(), "cars.json"), "utf8"));
+      
+      // Import manufacturers
+      for (const brand of carsData) {
+        try {
+          const existingManufacturers = await storage.getAllManufacturers();
+          const exists = existingManufacturers.some(m => m.name === brand.brand_ar);
+          
+          if (!exists) {
+            await storage.createManufacturer({
+              name: brand.brand_ar,
+              logo: null
+            });
+          }
+        } catch (error) {
+          console.log(`Manufacturer ${brand.brand_ar} already exists or error occurred`);
+        }
+      }
+
+      // Import categories and trim levels
+      for (const brand of carsData) {
+        for (const model of brand.models) {
+          // Add categories to specifications
+          try {
+            const existingSpecs = await storage.getAllSpecifications();
+            const categoryExists = existingSpecs.some(s => 
+              s.manufacturer === brand.brand_ar && 
+              s.category === model.model_ar && 
+              s.type === "category"
+            );
+            
+            if (!categoryExists) {
+              await storage.createSpecification({
+                type: "category",
+                manufacturer: brand.brand_ar,
+                category: model.model_ar,
+                value: model.model_ar,
+                valueEn: model.model_en,
+                description: `${model.model_ar} (${model.model_en})`
+              });
+            }
+          } catch (error) {
+            console.log(`Category ${model.model_ar} already exists or error occurred`);
+          }
+
+          // Import trim levels
+          for (const trim of model.trims) {
+            try {
+              const existingTrimLevels = await storage.getAllTrimLevels();
+              const trimExists = existingTrimLevels.some(t =>
+                t.manufacturer === brand.brand_ar &&
+                t.category === model.model_ar &&
+                t.trimLevel === trim.trim_ar
+              );
+              
+              if (!trimExists) {
+                await storage.createTrimLevel({
+                  manufacturer: brand.brand_ar,
+                  category: model.model_ar,
+                  trimLevel: trim.trim_ar,
+                  description: `${trim.trim_ar} (${trim.trim_en})`
+                });
+              }
+            } catch (error) {
+              console.log(`Trim level ${trim.trim_ar} already exists or error occurred`);
+            }
+          }
+        }
+      }
+
+      res.json({ 
+        message: "Cars data imported successfully",
+        imported: true
+      });
+    } catch (error) {
+      console.error("Error importing cars data:", error);
+      res.status(500).json({ message: "Failed to import cars data" });
     }
   });
 

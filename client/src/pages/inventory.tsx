@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText } from "lucide-react";
+import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/hooks/useTheme";
 import InventoryStats from "@/components/inventory-stats";
@@ -44,11 +46,35 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Get theme settings
+  // Get theme settings and hooks
   const { companyName, companyLogo, darkMode, toggleDarkMode, isUpdatingDarkMode } = useTheme();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: items = [] } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory"],
+  });
+
+  // Mutation for importing cars data
+  const importCarsMutation = useMutation({
+    mutationFn: () => apiRequest("POST", "/api/cars/import", {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/manufacturers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/trim-levels"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/cars/manufacturers"] });
+      toast({
+        title: "تم الاستيراد",
+        description: "تم استيراد بيانات السيارات بنجاح من ملف cars.json",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ في الاستيراد", 
+        description: "فشل في استيراد بيانات السيارات",
+        variant: "destructive",
+      });
+    },
   });
 
   const manufacturers = ["جميع الصناع", "مرسيدس", "بي ام دبليو", "اودي", "تويوتا", "لكزس", "رنج روفر", "بورش", "نيسان", "انفينيتي", "هيونداي", "كيا", "فولفو", "جاكوار", "مازيراتي", "فيراري", "لامبورغيني", "تسلا", "لوسيد", "كاديلاك", "جي ام سي"];
@@ -108,6 +134,10 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const handleFormClose = () => {
     setFormOpen(false);
     setEditItem(undefined);
+  };
+
+  const handleImportCarsData = () => {
+    importCarsMutation.mutate();
   };
 
 
@@ -239,6 +269,16 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       <DropdownMenuItem onClick={() => setSpecificationsManagerOpen(true)}>
                         <Settings className="mr-2 h-4 w-4" />
                         إدارة المواصفات
+                      </DropdownMenuItem>
+
+                      <DropdownMenuSeparator />
+
+                      <DropdownMenuItem 
+                        onClick={handleImportCarsData}
+                        disabled={importCarsMutation.isPending}
+                      >
+                        <Database className="mr-2 h-4 w-4" />
+                        {importCarsMutation.isPending ? "جاري الاستيراد..." : "استيراد بيانات السيارات"}
                       </DropdownMenuItem>
 
                       <Link href="/user-management">

@@ -23,37 +23,31 @@ interface InventoryFormProps {
   editItem?: InventoryItem;
 }
 
-const manufacturerCategories: Record<string, string[]> = {
-  "مرسيدس": ["C-Class", "E-Class", "S-Class", "GLE"],
-  "بي ام دبليو": ["3 Series", "5 Series", "7 Series", "X5"],
-  "رولز رويز": ["جوست", "فانتوم", "كولينان"],
-  "فيراري": ["296", "SF90", "روما", "بوروسانجوي"],
-  "فورد": ["تورس", "إكسبلورر", "برونكو", "F-150"],
-  "شيفروليه": ["كابتيفا", "تاهو", "سيلفرادو"],
-  "جي إم سي": ["تيرين", "أكاديا", "يوكون", "سييرا"],
-  "هوندا": ["سيفيك", "أكورد", "HR-V", "CR-V"],
-  "هيونداي": ["إلنترا", "سوناتا", "توسان", "سنتافي", "باليسيد"],
-  "كيا": ["سيراتو", "K5", "سبورتاج", "تيلورايد"],
-  "جينيسيس": ["G70", "G80", "G90", "GV70", "GV80"],
-  "مازدا": ["Mazda6", "CX-5", "CX-9"],
-  "نيسان": ["صني", "ألتيما", "إكس-تريل", "باترول"],
-  "إم جي": ["MG5", "MG GT", "RX5", "HS"],
-  "جيب": ["رانجلر", "جراند شيروكي", "جراند واجونير"],
-  "دودج": ["تشارجر", "دورانجو"],
-  "مازيراتي": ["جيبلي", "ليفانتي", "جران توريزمو"],
-  "لاند روفر": ["ديفندر", "رنج روفر سبورت", "رنج روفر", "فيلار"],
-  "تويوتا": ["يارس", "كورولا", "كامري", "راف فور", "هايلاندر", "لاندكروزر", "هايلكس"],
-  "لكزس": ["IS", "ES", "LS", "LX"],
-  "فولكس فاجن": ["جيتا", "تيجوان", "تيرامونت"],
-  "أودي": ["A6", "A8", "Q5", "Q7", "Q8"],
-  "بورش": ["911", "كايين", "باناميرا"],
-  "بنتلي": ["كونتيننتال جي تي", "فلاينج سبير", "بينتايجا"],
-  "لامبورجيني": ["ريفويلتو", "هوراكان", "أوروس"],
-  "شانجان": ["UNI-V", "UNI-K", "CS95"],
-  "هافال": ["جوليان", "H6", "دارجو"]
+// Fetch manufacturers from cars.json
+const useCarsManufacturers = () => {
+  return useQuery({
+    queryKey: ["/api/cars/manufacturers"],
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
 };
 
-const initialManufacturers = Object.keys(manufacturerCategories);
+// Fetch models for a specific manufacturer
+const useCarsModels = (manufacturer: string) => {
+  return useQuery({
+    queryKey: [`/api/cars/models/${manufacturer}`],
+    enabled: Boolean(manufacturer),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+};
+
+// Fetch trims for a specific manufacturer and model
+const useCarsTrims = (manufacturer: string, model: string) => {
+  return useQuery({
+    queryKey: [`/api/cars/trims/${manufacturer}/${model}`],
+    enabled: Boolean(manufacturer && model),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+};
 const initialEngineCapacities = ["2.0L", "1.5L", "3.0L", "4.0L", "5.0L", "V6", "V8", "Electric"];
 const initialYears = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018];
 const initialStatuses = ["متوفر", "في الطريق", "قيد الصيانة", "محجوز", "مباع"];
@@ -67,11 +61,16 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   
   const [selectedManufacturer, setSelectedManufacturer] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
-  const [availableTrimLevels, setAvailableTrimLevels] = useState<string[]>([]);
+  
+  // Fetch data from cars.json
+  const { data: carsManufacturers = [] } = useCarsManufacturers();
+  const { data: carsModels = [] } = useCarsModels(selectedManufacturer);
+  const { data: carsTrims = [] } = useCarsTrims(selectedManufacturer, selectedCategory);
   
   // Local state for editable lists
-  const [manufacturers, setManufacturers] = useState<string[]>(initialManufacturers);
+  const [manufacturers, setManufacturers] = useState<string[]>([]);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [availableTrimLevels, setAvailableTrimLevels] = useState<string[]>([]);
   const [engineCapacities, setEngineCapacities] = useState<string[]>(initialEngineCapacities);
   const [statuses, setStatuses] = useState<string[]>(initialStatuses);
   const [importTypes, setImportTypes] = useState<string[]>(initialImportTypes);
@@ -81,9 +80,6 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   
   // List manager state
   const [showListManager, setShowListManager] = useState(false);
-  
-  // Manufacturer categories state
-  const [localManufacturerCategories, setLocalManufacturerCategories] = useState<Record<string, string[]>>(manufacturerCategories);
   
   // Chassis number scanner state
   const [showChassisScanner, setShowChassisScanner] = useState(false);
@@ -115,28 +111,31 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
     enabled: Boolean(selectedManufacturer && selectedCategory),
   });
 
+  // Get manufacturers from API - no state needed, use data directly
+  const carsManufacturerNames = carsManufacturers.map((m: any) => m.name_ar);
+  const allManufacturers = [...manufacturers, ...carsManufacturerNames];
+  
+  // Get categories from API - use data directly 
+  const carsModelNames = carsModels.map((m: any) => m.model_ar);
+  const dynamicCategories = selectedManufacturer ? carsModelNames : [];
+  const allCategories = [...availableCategories, ...dynamicCategories];
+  
+  // Get trim levels from API - use data directly
+  const carsTrimsNames = carsTrims.map((t: any) => t.trim_ar);
+  const dynamicTrimLevels = selectedCategory ? carsTrimsNames : [];
+  const allTrimLevels = [...availableTrimLevels, ...dynamicTrimLevels];
+
   const handleManufacturerChange = (manufacturer: string) => {
     setSelectedManufacturer(manufacturer);
-    setAvailableCategories(localManufacturerCategories[manufacturer] || []);
     setSelectedCategory("");
-    setAvailableTrimLevels([]);
     form.setValue("category", "");
     form.setValue("trimLevel", "");
   };
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    setAvailableTrimLevels([]);
     form.setValue("trimLevel", "");
   };
-
-  // Update trim levels when data is fetched
-  useEffect(() => {
-    if (trimLevels.length > 0) {
-      const trimLevelNames = trimLevels.map((tl: TrimLevel) => tl.trimLevel);
-      setAvailableTrimLevels(trimLevelNames);
-    }
-  }, [trimLevels]);
 
   const createMutation = useMutation({
     mutationFn: (data: InsertInventoryItem) => apiRequest("POST", "/api/inventory", data),
@@ -204,7 +203,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
 
   const getOptionsForType = (type: string) => {
     switch (type) {
-      case "manufacturers": return manufacturers;
+      case "manufacturers": return [...new Set(allManufacturers)]; // Remove duplicates
       case "engineCapacities": return engineCapacities;
       case "statuses": return statuses;
       case "importTypes": return importTypes;
@@ -221,7 +220,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
         setManufacturers(newList as string[]); 
         break;
       case "manufacturerCategories": 
-        setLocalManufacturerCategories(newList as Record<string, string[]>); 
+        // Handle manufacturer categories if needed
         break;
       case "engineCapacities": 
         setEngineCapacities(newList as string[]); 
@@ -257,9 +256,11 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
     return titles[type] || "";
   };
 
-  // Load edit item data when editItem changes
+  // Load edit item data when editItem changes - use useMemo to prevent infinite loops
   useEffect(() => {
-    if (editItem && open) {
+    if (!open) return;
+
+    if (editItem) {
       // Set form values from editItem
       form.reset({
         manufacturer: editItem.manufacturer,
@@ -282,8 +283,8 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
       // Set manufacturer and available categories
       setSelectedManufacturer(editItem.manufacturer);
       setSelectedCategory(editItem.category);
-      setAvailableCategories(localManufacturerCategories[editItem.manufacturer] || []);
-    } else if (!editItem && open) {
+      // Categories will be loaded from API when manufacturer is set
+    } else {
       // Reset form for new item
       form.reset({
         manufacturer: "",
@@ -304,10 +305,8 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
       });
       setSelectedManufacturer("");
       setSelectedCategory("");
-      setAvailableCategories([]);
-      setAvailableTrimLevels([]);
     }
-  }, [editItem, open, form, localManufacturerCategories]);
+  }, [editItem?.id, open]); // Only depend on editItem.id to prevent infinite loops
 
   
 
@@ -352,7 +351,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                             <SelectValue placeholder="اختر الصانع" />
                           </SelectTrigger>
                           <SelectContent>
-                            {manufacturers.map((manufacturer) => (
+                            {[...new Set(allManufacturers)].map((manufacturer) => (
                               <SelectItem key={manufacturer} value={manufacturer}>
                                 {manufacturer}
                               </SelectItem>
@@ -382,7 +381,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                               <SelectValue placeholder="اختر الفئة" />
                             </SelectTrigger>
                             <SelectContent>
-                              {availableCategories.map((category) => (
+                              {[...new Set(allCategories)].map((category) => (
                                 <SelectItem key={category} value={category}>
                                   {category}
                                 </SelectItem>
@@ -399,12 +398,8 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   {selectedManufacturer && (
                     <ManufacturerCategoriesButton
                       manufacturer={selectedManufacturer}
-                      categories={localManufacturerCategories[selectedManufacturer] || []}
+                      categories={availableCategories}
                       onCategoriesChange={(newCategories) => {
-                        setLocalManufacturerCategories(prev => ({
-                          ...prev,
-                          [selectedManufacturer]: newCategories
-                        }));
                         setAvailableCategories(newCategories);
                       }}
                     />
@@ -425,7 +420,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                               <SelectValue placeholder="اختر درجة التجهيز" />
                             </SelectTrigger>
                             <SelectContent>
-                              {availableTrimLevels.map((trimLevel) => (
+                              {[...new Set(allTrimLevels)].map((trimLevel) => (
                                 <SelectItem key={trimLevel} value={trimLevel}>
                                   {trimLevel}
                                 </SelectItem>
