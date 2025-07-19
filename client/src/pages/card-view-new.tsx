@@ -151,14 +151,23 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     return ["الكل", ...manufacturerCats];
   };
 
+  // Get dynamic filter options from inventory data
+  const getUniqueValues = (field: keyof InventoryItem) => {
+    const values = inventoryData
+      .map(item => item[field])
+      .filter((value, index, self) => value && self.indexOf(value) === index)
+      .sort();
+    return values;
+  };
+
   const categories = getAvailableCategories();
-  const years = ["الكل", "2025", "2024", "2023", "2022", "2021"];
-  const statuses = ["الكل", "متوفر", "محجوز", "مباع", "في الطريق", "قيد الصيانة"];
-  const importTypes = ["الكل", "شخصي", "شركة", "مستعمل شخصي"];
-  const engineCapacities = ["الكل", "2.0L", "1.5L", "3.0L", "4.0L", "5.0L", "V6", "V8"];
-  const exteriorColors = ["الكل", "أبيض", "أسود", "رمادي", "فضي", "أزرق", "أحمر", "بني", "ذهبي", "أخضر"];
-  const interiorColors = ["الكل", "أسود", "بني", "بيج", "رمادي", "أبيض", "كريمي"];
-  const trimLevels = ["الكل", "Base", "Premium", "Sport", "Luxury", "AMG", "M Series", "RS"];
+  const availableYears = ["الكل", ...getUniqueValues("year").map(String)];
+  const availableStatuses = ["الكل", ...getUniqueValues("status")];
+  const availableImportTypes = ["الكل", ...getUniqueValues("importType")];
+  const availableEngineCapacities = ["الكل", ...getUniqueValues("engineCapacity")];
+  const availableExteriorColors = ["الكل", ...getUniqueValues("exteriorColor")];
+  const availableInteriorColors = ["الكل", ...getUniqueValues("interiorColor")];
+  const availableTrimLevels = ["الكل", ...getUniqueValues("trimLevel")];
   
   // Reset category filter when manufacturer changes
   const handleManufacturerChange = (value: string) => {
@@ -517,127 +526,157 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               </div>
             </div>
 
-            {/* Filter Row 1: الصانع، الفئات، درجة التجهيز، السنة، سعة المحرك */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
-              <Select value={selectedManufacturer} onValueChange={handleManufacturerChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {manufacturers.map((manufacturer) => (
-                    <SelectItem key={manufacturer} value={manufacturer}>
-                      {manufacturer}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            {/* Enhanced Filter Controls with Animation */}
+            <div className="space-y-4 animate-in fade-in duration-300">
+              {/* Row 1: الصانع، الفئات، درجة التجهيز، السنة، سعة المحرك */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">الصانع</label>
+                  <Select value={selectedManufacturer} onValueChange={handleManufacturerChange}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {manufacturers.map((manufacturer) => (
+                        <SelectItem key={manufacturer} value={manufacturer} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {manufacturer}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">الفئة</label>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Select value={selectedTrimLevel} onValueChange={setSelectedTrimLevel}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {trimLevels.map((trim) => (
-                    <SelectItem key={trim} value={trim}>
-                      {trim}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map((year) => (
-                    <SelectItem key={year} value={year}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Select value={selectedEngineCapacity} onValueChange={setSelectedEngineCapacity}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {engineCapacities.map((capacity) => (
-                    <SelectItem key={capacity} value={capacity}>
-                      {capacity}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">درجة التجهيز</label>
+                  <Select value={selectedTrimLevel} onValueChange={setSelectedTrimLevel}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableTrimLevels.map((trim) => (
+                        <SelectItem key={trim} value={trim} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {trim}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">السنة</label>
+                  <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableYears.map((year) => (
+                        <SelectItem key={year} value={year} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">سعة المحرك</label>
+                  <Select value={selectedEngineCapacity} onValueChange={setSelectedEngineCapacity}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableEngineCapacities.map((capacity) => (
+                        <SelectItem key={capacity} value={capacity} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {capacity}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             
-            {/* Filter Row 2: اللون الداخلي، اللون الخارجي، الحالة، نوع الاستيراد */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <Select value={selectedInteriorColor} onValueChange={setSelectedInteriorColor}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {interiorColors.map((color) => (
-                    <SelectItem key={color} value={color}>
-                      {color}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Select value={selectedExteriorColor} onValueChange={setSelectedExteriorColor}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {exteriorColors.map((color) => (
-                    <SelectItem key={color} value={color}>
-                      {color}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {statuses.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Select value={selectedImportType} onValueChange={setSelectedImportType}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {importTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Row 2: اللون الداخلي، اللون الخارجي، الحالة، نوع الاستيراد */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in duration-500 delay-150">
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">اللون الداخلي</label>
+                  <Select value={selectedInteriorColor} onValueChange={setSelectedInteriorColor}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableInteriorColors.map((color) => (
+                        <SelectItem key={color} value={color} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {color}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">اللون الخارجي</label>
+                  <Select value={selectedExteriorColor} onValueChange={setSelectedExteriorColor}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableExteriorColors.map((color) => (
+                        <SelectItem key={color} value={color} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {color}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">الحالة</label>
+                  <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableStatuses.map((status) => (
+                        <SelectItem key={status} value={status} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-200 group-hover:text-teal-600">نوع الاستيراد</label>
+                  <Select value={selectedImportType} onValueChange={setSelectedImportType}>
+                    <SelectTrigger className="w-full transition-all duration-200 hover:border-teal-400 hover:shadow-md focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="animate-in fade-in-0 zoom-in-95 duration-200">
+                      {availableImportTypes.map((type) => (
+                        <SelectItem key={type} value={type} className="transition-colors hover:bg-teal-50 focus:bg-teal-50">
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
           </div>
         </div>
