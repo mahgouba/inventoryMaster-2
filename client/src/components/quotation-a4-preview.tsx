@@ -520,7 +520,7 @@ export default function QuotationA4Preview({
                   المجموع: {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()} ريال
                 </div>
               </div>
-              <div className="text-center text-xs font-bold text-white px-4 py-3 rounded bg-[#c49631]">
+              <div className="text-center text-xs font-bold text-white px-4 py-3 rounded bg-[#c49631] pt-[2px] pb-[2px]">
                 {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))} ريال سعودي لا غير
               </div>
             </div>
