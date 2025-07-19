@@ -514,7 +514,7 @@ export default function QuotationA4Preview({
             </div>
             
             {/* Total Row */}
-            <div className="p-4 bg-gray-50 border-t-2 border-blue-800 rounded-b">
+            <div className="p-4 bg-gray-50 border-t-2 border-blue-800 rounded-b pt-[4px] pb-[4px]">
               <div className="flex justify-center mb-3">
                 <div className="font-bold text-sm text-blue-800">
                   المجموع: {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()} ريال
