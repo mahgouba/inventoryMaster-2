@@ -359,7 +359,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [customerPhone, setCustomerPhone] = useState<string>(editingQuotation?.customerPhone || "");
   const [customerEmail, setCustomerEmail] = useState<string>(editingQuotation?.customerEmail || "");
   const [customerTitle, setCustomerTitle] = useState<string>(editingQuotation?.customerTitle || "السادة");
-  const [validityDays, setValidityDays] = useState<number>(30);
+  const [validityDays, setValidityDays] = useState<number>(3);
   const [notes, setNotes] = useState<string>(editingQuotation?.notes || "");
   const [isInvoiceMode, setIsInvoiceMode] = useState<boolean>(false);
   const [invoiceNumber, setInvoiceNumber] = useState<string>("");
@@ -1846,7 +1846,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                           id="validityDays"
                           type="number"
                           value={validityDays}
-                          onChange={(e) => setValidityDays(parseInt(e.target.value) || 30)}
+                          onChange={(e) => setValidityDays(parseInt(e.target.value) || 3)}
                           min={1}
                           max={365}
                         />
@@ -1866,33 +1866,9 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                           </SelectContent>
                         </Select>
                       </div>
-                      <div>
-                        <Label htmlFor="companySelect">الشركة *</Label>
-                        <Select value={selectedCompany} onValueChange={setSelectedCompany}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر الشركة" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {companies.map((company) => (
-                              <SelectItem key={company.id} value={company.id}>
-                                {company.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+
                     </div>
-                    
-                    <div className="mt-4">
-                      <Label htmlFor="notes">ملاحظات إضافية</Label>
-                      <Textarea
-                        id="notes"
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder="أي ملاحظات أو شروط خاصة بالعرض..."
-                        rows={3}
-                      />
-                    </div>
+
                   </div>
                 )}
               </CardContent>

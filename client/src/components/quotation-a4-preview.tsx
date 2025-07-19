@@ -378,9 +378,9 @@ export default function QuotationA4Preview({
                 </div>
                 <div className="text-xs text-black">
                   <span className="font-semibold">التاريخ: </span>
-                  <span>{new Date().toLocaleDateString('ar-SA')}</span>
+                  <span>{new Date().toLocaleDateString('en-GB')}</span>
                   <span className="font-semibold ml-4">صالح حتى: </span>
-                  <span>{new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('ar-SA')}</span>
+                  <span>{validUntil.toLocaleDateString('en-GB')}</span>
                 </div>
               </div>
               
@@ -572,13 +572,7 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
-          {/* Notes Section */}
-          {notes && (
-            <div className="bg-white/90 border border-gray-300 p-4 rounded mb-6 shadow-sm">
-              <h3 className="text-sm font-bold mb-3 text-amber-600 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>ملاحظات</h3>
-              <p className="text-xs text-black leading-relaxed">{notes}</p>
-            </div>
-          )}
+
         </div>
       </div>
     </div>

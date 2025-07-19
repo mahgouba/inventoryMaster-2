@@ -119,7 +119,7 @@ export default function QuotationEditPage({}: QuotationEditPageProps) {
       setCustomerPhone(quotation.customerPhone || "");
       setCustomerEmail(quotation.customerEmail || "");
       setNotes(quotation.notes || "");
-      setValidityDays(quotation.validityDays || 30);
+      setValidityDays(quotation.validityDays || 3);
       
       // Parse pricing details if available
       if (quotation.pricingDetails) {
