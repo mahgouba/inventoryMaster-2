@@ -48,10 +48,28 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     enabled: open,
   });
 
+  // Fetch manufacturers from cars.json
+  const { data: carsManufacturers = [] } = useQuery<any[]>({
+    queryKey: ["/api/cars/manufacturers"],
+    enabled: open,
+  });
+
   // Fetch categories for selected manufacturer
   const { data: categoriesData = [] } = useQuery<string[]>({
     queryKey: ["/api/categories", selectedManufacturer],
     enabled: open && !!selectedManufacturer,
+  });
+
+  // Fetch categories from cars.json for selected manufacturer
+  const { data: carsModels = [] } = useQuery<any[]>({
+    queryKey: [`/api/cars/models/${selectedManufacturer}`],
+    enabled: open && !!selectedManufacturer,
+  });
+
+  // Fetch trim levels from cars.json for selected manufacturer and category
+  const { data: carsTrims = [] } = useQuery<any[]>({
+    queryKey: [`/api/cars/trims/${selectedManufacturer}/${selectedCategory}`],
+    enabled: open && !!selectedManufacturer && !!selectedCategory,
   });
 
   // Fetch engine capacities from database
@@ -60,16 +78,22 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     enabled: open,
   });
 
-  // Get unique manufacturers from database
-  const manufacturers = manufacturersData.map(m => m.name || m);
+  // Combine manufacturers from database and cars.json
+  const dbManufacturers = manufacturersData.map(m => m.name || m);
+  const carsManufacturerNames = carsManufacturers.map((m: any) => m.name_ar);
+  const manufacturers = [...new Set([...dbManufacturers, ...carsManufacturerNames])];
   
-  // Get categories for selected manufacturer
-  const categories = selectedManufacturer ? categoriesData : [];
+  // Combine categories from database and cars.json
+  const dbCategories = selectedManufacturer ? categoriesData : [];
+  const carsModelNames = carsModels.map((m: any) => m.model_ar);
+  const categories = [...new Set([...dbCategories, ...carsModelNames])];
 
-  // Get trim levels for selected manufacturer and category
-  const availableTrimLevels = selectedManufacturer && selectedCategory
+  // Combine trim levels from database and cars.json
+  const dbTrimLevels = selectedManufacturer && selectedCategory
     ? trimLevels.filter(tl => tl.manufacturer === selectedManufacturer && tl.category === selectedCategory)
     : [];
+  const carsTrimsNames = carsTrims.map((t: any) => t.trim_ar);
+  const allTrimLevelNames = [...new Set([...dbTrimLevels.map(t => t.trimLevel), ...carsTrimsNames])];
 
   // Get engine capacities from database
   const engineCapacities = engineCapacitiesData.length > 0 ? engineCapacitiesData : ["1.5L", "2.0L", "2.5L", "3.0L", "3.5L", "4.0L", "4.5L", "5.0L", "V6", "V8", "V12", "Electric"];
@@ -258,9 +282,9 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                         <SelectValue placeholder="اختر درجة التجهيز" />
                       </SelectTrigger>
                       <SelectContent>
-                        {availableTrimLevels.map((tl) => (
-                          <SelectItem key={tl.id} value={tl.trimLevel}>
-                            {tl.trimLevel}
+                        {allTrimLevelNames.map((trimLevel) => (
+                          <SelectItem key={trimLevel} value={trimLevel}>
+                            {trimLevel}
                           </SelectItem>
                         ))}
                       </SelectContent>
