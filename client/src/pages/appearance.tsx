@@ -20,7 +20,8 @@ import {
   Edit2,
   Plus,
   Trash2,
-  FileText
+  FileText,
+  Home
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -457,15 +458,14 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
             </div>
             
             <div className="flex items-center space-x-3 space-x-reverse">
-
-              <Button 
-                onClick={handleSaveSettings} 
-                disabled={saveAppearanceMutation.isPending}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
-              >
-                <Save size={16} />
-                {saveAppearanceMutation.isPending ? "جاري الحفظ..." : "حفظ الإعدادات"}
-              </Button>
+              <Link href="/">
+                <Button 
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  <Home size={16} />
+                  الصفحة الرئيسية
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
