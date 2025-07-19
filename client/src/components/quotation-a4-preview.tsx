@@ -445,7 +445,7 @@ export default function QuotationA4Preview({
                 
                 {/* Detailed Specifications - Full Width Editable */}
                 <div className="mt-3 pt-3 border-t border-gray-200">
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mt-[-10px] mb-[-10px] pt-[0px] pb-[0px]">
                     <h4 className="text-xs font-bold text-amber-600">المواصفات التفصيلية:</h4>
                     <Button
                       variant="outline"
