@@ -150,15 +150,120 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
   const manufacturers = getAvailableManufacturers();
 
-  // Get count for each filter option
+  // Get count for each filter option - dynamically based on previously applied filters
   const getFilterCount = (field: keyof InventoryItem, value: string) => {
     const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
+    
+    // Apply all filters that come BEFORE the current field in the hierarchy
+    let filteredData = availableData.filter(item => {
+      // Apply search filter
+      if (searchQuery.trim() !== "") {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = 
+          item.chassisNumber?.toLowerCase().includes(query) ||
+          item.category?.toLowerCase().includes(query) ||
+          item.trimLevel?.toLowerCase().includes(query) ||
+          item.exteriorColor?.toLowerCase().includes(query) ||
+          item.interiorColor?.toLowerCase().includes(query) ||
+          item.location?.toLowerCase().includes(query) ||
+          item.manufacturer?.toLowerCase().includes(query) ||
+          item.engineCapacity?.toLowerCase().includes(query) ||
+          item.year?.toString().includes(query) ||
+          item.status?.toLowerCase().includes(query) ||
+          item.importType?.toLowerCase().includes(query) ||
+          item.notes?.toLowerCase().includes(query);
+        if (!matchesSearch) return false;
+      }
+
+      // Filter hierarchy: manufacturer -> category -> trimLevel -> year -> engineCapacity -> colors -> status -> importType
+      if (field === "manufacturer") {
+        // No previous filters for manufacturer
+        return true;
+      }
+      
+      if (field === "category") {
+        // Apply manufacturer filter if set
+        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
+        return true;
+      }
+      
+      if (field === "trimLevel") {
+        // Apply manufacturer and category filters
+        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
+        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
+        return true;
+      }
+      
+      if (field === "year") {
+        // Apply manufacturer, category, trimLevel filters
+        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
+        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
+        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
+        return true;
+      }
+      
+      if (field === "engineCapacity") {
+        // Apply all previous filters
+        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
+        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
+        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
+        if (yearFilter !== "جميع السنوات" && item.year?.toString() !== yearFilter) return false;
+        return true;
+      }
+      
+      if (field === "exteriorColor") {
+        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
+        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
+        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
+        if (yearFilter !== "جميع السنوات" && item.year?.toString() !== yearFilter) return false;
+        if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
+        return true;
+      }
+      
+      if (field === "interiorColor") {
+        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
+        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
+        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
+        if (yearFilter !== "جميع السنوات" && item.year?.toString() !== yearFilter) return false;
+        if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
+        if (exteriorColorFilter !== "جميع الألوان الخارجية" && item.exteriorColor !== exteriorColorFilter) return false;
+        return true;
+      }
+      
+      if (field === "status") {
+        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
+        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
+        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
+        if (yearFilter !== "جميع السنوات" && item.year?.toString() !== yearFilter) return false;
+        if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
+        if (exteriorColorFilter !== "جميع الألوان الخارجية" && item.exteriorColor !== exteriorColorFilter) return false;
+        if (interiorColorFilter !== "جميع الألوان الداخلية" && item.interiorColor !== interiorColorFilter) return false;
+        return true;
+      }
+      
+      if (field === "importType") {
+        // Apply all previous filters
+        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
+        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
+        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
+        if (yearFilter !== "جميع السنوات" && item.year?.toString() !== yearFilter) return false;
+        if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
+        if (exteriorColorFilter !== "جميع الألوان الخارجية" && item.exteriorColor !== exteriorColorFilter) return false;
+        if (interiorColorFilter !== "جميع الألوان الداخلية" && item.interiorColor !== interiorColorFilter) return false;
+        if (statusFilter !== "جميع الحالات" && item.status !== statusFilter) return false;
+        return true;
+      }
+      
+      return true;
+    });
+    
+    // Return count based on value
     if (value === "جميع الصناع" || value === "جميع الفئات" || value === "جميع درجات التجهيز" || 
         value === "جميع السنوات" || value === "جميع السعات" || value === "جميع الألوان الداخلية" || 
         value === "جميع الألوان الخارجية" || value === "جميع الحالات" || value === "جميع الأنواع") {
-      return availableData.length;
+      return filteredData.length;
     }
-    return availableData.filter(item => item[field] === value).length;
+    return filteredData.filter(item => item[field] === value).length;
   };
   
   // Reset category filter when manufacturer changes
@@ -167,14 +272,107 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     setCategoryFilter("جميع الفئات");
   };
 
-  // Dynamic filter arrays based on inventory data
-  const availableStatuses = ["جميع الحالات", ...getUniqueValues("status")];
-  const availableImportTypes = ["جميع الأنواع", ...getUniqueValues("importType")];
-  const availableEngineCapacities = ["جميع السعات", ...getUniqueValues("engineCapacity")];
-  const availableExteriorColors = ["جميع الألوان الخارجية", ...getUniqueValues("exteriorColor")];
-  const availableInteriorColors = ["جميع الألوان الداخلية", ...getUniqueValues("interiorColor")];
-  const availableTrimLevels = ["جميع درجات التجهيز", ...getUniqueValues("trimLevel")];
-  const availableYears = ["جميع السنوات", ...getUniqueValues("year").map(String)];
+  // Get dynamic filter arrays based on currently applied filters
+  const getFilteredUniqueValues = (field: keyof InventoryItem, appliedFilters: Record<string, string>) => {
+    const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
+    
+    let filteredData = availableData.filter(item => {
+      // Apply search filter
+      if (searchQuery.trim() !== "") {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = 
+          item.chassisNumber?.toLowerCase().includes(query) ||
+          item.category?.toLowerCase().includes(query) ||
+          item.trimLevel?.toLowerCase().includes(query) ||
+          item.exteriorColor?.toLowerCase().includes(query) ||
+          item.interiorColor?.toLowerCase().includes(query) ||
+          item.location?.toLowerCase().includes(query) ||
+          item.manufacturer?.toLowerCase().includes(query) ||
+          item.engineCapacity?.toLowerCase().includes(query) ||
+          item.year?.toString().includes(query) ||
+          item.status?.toLowerCase().includes(query) ||
+          item.importType?.toLowerCase().includes(query) ||
+          item.notes?.toLowerCase().includes(query);
+        if (!matchesSearch) return false;
+      }
+
+      // Apply previous filters in hierarchy order
+      if (appliedFilters.manufacturer && appliedFilters.manufacturer !== "جميع الصناع" && item.manufacturer !== appliedFilters.manufacturer) return false;
+      if (appliedFilters.category && appliedFilters.category !== "جميع الفئات" && item.category !== appliedFilters.category) return false;
+      if (appliedFilters.trimLevel && appliedFilters.trimLevel !== "جميع درجات التجهيز" && item.trimLevel !== appliedFilters.trimLevel) return false;
+      if (appliedFilters.year && appliedFilters.year !== "جميع السنوات" && item.year?.toString() !== appliedFilters.year) return false;
+      if (appliedFilters.engineCapacity && appliedFilters.engineCapacity !== "جميع السعات" && item.engineCapacity !== appliedFilters.engineCapacity) return false;
+      if (appliedFilters.exteriorColor && appliedFilters.exteriorColor !== "جميع الألوان الخارجية" && item.exteriorColor !== appliedFilters.exteriorColor) return false;
+      if (appliedFilters.interiorColor && appliedFilters.interiorColor !== "جميع الألوان الداخلية" && item.interiorColor !== appliedFilters.interiorColor) return false;
+      if (appliedFilters.status && appliedFilters.status !== "جميع الحالات" && item.status !== appliedFilters.status) return false;
+      
+      return true;
+    });
+    
+    const values = filteredData
+      .map(item => item[field])
+      .filter((value, index, self) => value && self.indexOf(value) === index)
+      .sort();
+    return values;
+  };
+
+  // Dynamic filter arrays based on previously applied filters
+  const availableStatuses = ["جميع الحالات", ...getFilteredUniqueValues("status", {
+    manufacturer: manufacturerFilter,
+    category: categoryFilter,
+    trimLevel: trimLevelFilter,
+    year: yearFilter,
+    engineCapacity: engineCapacityFilter,
+    exteriorColor: exteriorColorFilter,
+    interiorColor: interiorColorFilter
+  })];
+  
+  const availableImportTypes = ["جميع الأنواع", ...getFilteredUniqueValues("importType", {
+    manufacturer: manufacturerFilter,
+    category: categoryFilter,
+    trimLevel: trimLevelFilter,
+    year: yearFilter,
+    engineCapacity: engineCapacityFilter,
+    exteriorColor: exteriorColorFilter,
+    interiorColor: interiorColorFilter,
+    status: statusFilter
+  })];
+  
+  const availableEngineCapacities = ["جميع السعات", ...getFilteredUniqueValues("engineCapacity", {
+    manufacturer: manufacturerFilter,
+    category: categoryFilter,
+    trimLevel: trimLevelFilter,
+    year: yearFilter
+  })];
+  
+  const availableExteriorColors = ["جميع الألوان الخارجية", ...getFilteredUniqueValues("exteriorColor", {
+    manufacturer: manufacturerFilter,
+    category: categoryFilter,
+    trimLevel: trimLevelFilter,
+    year: yearFilter,
+    engineCapacity: engineCapacityFilter
+  })];
+  
+  const availableInteriorColors = ["جميع الألوان الداخلية", ...getFilteredUniqueValues("interiorColor", {
+    manufacturer: manufacturerFilter,
+    category: categoryFilter,
+    trimLevel: trimLevelFilter,
+    year: yearFilter,
+    engineCapacity: engineCapacityFilter,
+    exteriorColor: exteriorColorFilter
+  })];
+  
+  const availableTrimLevels = ["جميع درجات التجهيز", ...getFilteredUniqueValues("trimLevel", {
+    manufacturer: manufacturerFilter,
+    category: categoryFilter
+  })];
+  
+  const availableYears = ["جميع السنوات", ...getFilteredUniqueValues("year", {
+    manufacturer: manufacturerFilter,
+    category: categoryFilter,
+    trimLevel: trimLevelFilter
+  }).map(String)];
+  
   const years = availableYears;
 
   const handleExport = () => {

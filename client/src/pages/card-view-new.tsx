@@ -99,12 +99,118 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   // Filter out sold cars from display unless showSoldCars is true
   const availableItems = showSoldCars ? inventoryData : inventoryData.filter(item => item.status !== "مباع");
 
-  // Get count for each filter option
+  // Get count for each filter option - dynamically based on previously applied filters
   const getFilterCount = (field: keyof InventoryItem, value: string) => {
+    const availableData = showSoldCars ? inventoryData : inventoryData.filter(item => item.status !== "مباع");
+    
+    // Apply all filters that come BEFORE the current field in the hierarchy
+    let filteredData = availableData.filter(item => {
+      // Apply search filter
+      if (searchQuery.trim() !== "") {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = 
+          item.chassisNumber?.toLowerCase().includes(query) ||
+          item.category?.toLowerCase().includes(query) ||
+          item.trimLevel?.toLowerCase().includes(query) ||
+          item.exteriorColor?.toLowerCase().includes(query) ||
+          item.interiorColor?.toLowerCase().includes(query) ||
+          item.location?.toLowerCase().includes(query) ||
+          item.manufacturer?.toLowerCase().includes(query) ||
+          item.engineCapacity?.toLowerCase().includes(query) ||
+          item.year?.toString().includes(query) ||
+          item.status?.toLowerCase().includes(query) ||
+          item.importType?.toLowerCase().includes(query) ||
+          item.notes?.toLowerCase().includes(query);
+        if (!matchesSearch) return false;
+      }
+
+      // Filter hierarchy: manufacturer -> category -> trimLevel -> year -> engineCapacity -> colors -> status -> importType
+      if (field === "manufacturer") {
+        // No previous filters for manufacturer
+        return true;
+      }
+      
+      if (field === "category") {
+        // Apply manufacturer filter if set
+        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
+        return true;
+      }
+      
+      if (field === "trimLevel") {
+        // Apply manufacturer and category filters
+        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
+        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
+        return true;
+      }
+      
+      if (field === "year") {
+        // Apply manufacturer, category, trimLevel filters
+        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
+        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
+        if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
+        return true;
+      }
+      
+      if (field === "engineCapacity") {
+        // Apply all previous filters
+        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
+        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
+        if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
+        if (selectedYear !== "الكل" && item.year?.toString() !== selectedYear) return false;
+        return true;
+      }
+      
+      if (field === "exteriorColor") {
+        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
+        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
+        if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
+        if (selectedYear !== "الكل" && item.year?.toString() !== selectedYear) return false;
+        if (selectedEngineCapacity !== "الكل" && item.engineCapacity !== selectedEngineCapacity) return false;
+        return true;
+      }
+      
+      if (field === "interiorColor") {
+        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
+        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
+        if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
+        if (selectedYear !== "الكل" && item.year?.toString() !== selectedYear) return false;
+        if (selectedEngineCapacity !== "الكل" && item.engineCapacity !== selectedEngineCapacity) return false;
+        if (selectedExteriorColor !== "الكل" && item.exteriorColor !== selectedExteriorColor) return false;
+        return true;
+      }
+      
+      if (field === "status") {
+        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
+        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
+        if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
+        if (selectedYear !== "الكل" && item.year?.toString() !== selectedYear) return false;
+        if (selectedEngineCapacity !== "الكل" && item.engineCapacity !== selectedEngineCapacity) return false;
+        if (selectedExteriorColor !== "الكل" && item.exteriorColor !== selectedExteriorColor) return false;
+        if (selectedInteriorColor !== "الكل" && item.interiorColor !== selectedInteriorColor) return false;
+        return true;
+      }
+      
+      if (field === "importType") {
+        // Apply all previous filters
+        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
+        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
+        if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
+        if (selectedYear !== "الكل" && item.year?.toString() !== selectedYear) return false;
+        if (selectedEngineCapacity !== "الكل" && item.engineCapacity !== selectedEngineCapacity) return false;
+        if (selectedExteriorColor !== "الكل" && item.exteriorColor !== selectedExteriorColor) return false;
+        if (selectedInteriorColor !== "الكل" && item.interiorColor !== selectedInteriorColor) return false;
+        if (selectedStatus !== "الكل" && item.status !== selectedStatus) return false;
+        return true;
+      }
+      
+      return true;
+    });
+    
+    // Return count based on value
     if (value === "الكل") {
-      return availableItems.length;
+      return filteredData.length;
     }
-    return availableItems.filter(item => item[field] === value).length;
+    return filteredData.filter(item => item[field] === value).length;
   };
 
   // Apply search filter
@@ -153,50 +259,112 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     "جي ام سي": ["Yukon", "Tahoe", "Sierra", "Canyon", "Terrain"]
   };
   
-  const getAvailableCategories = () => {
-    if (!selectedManufacturer || selectedManufacturer === "الكل") {
-      // Return all categories from actual inventory data
-      return ["الكل", ...getUniqueValues("category")];
-    }
-    // Return categories for specific manufacturer from actual inventory data
+  // Get dynamic filter arrays based on currently applied filters
+  const getFilteredUniqueValues = (field: keyof InventoryItem, appliedFilters: Record<string, string>) => {
     const availableData = inventoryData.filter(item => !showSoldCars ? !item.isSold : true);
-    const manufacturerCats = availableData
-      .filter(item => item.manufacturer === selectedManufacturer)
-      .map(item => item.category)
-      .filter((category, index, self) => category && self.indexOf(category) === index)
-      .sort();
-    return ["الكل", ...manufacturerCats];
-  };
+    
+    let filteredData = availableData.filter(item => {
+      // Apply search filter
+      if (searchQuery.trim() !== "") {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = 
+          item.chassisNumber?.toLowerCase().includes(query) ||
+          item.category?.toLowerCase().includes(query) ||
+          item.trimLevel?.toLowerCase().includes(query) ||
+          item.exteriorColor?.toLowerCase().includes(query) ||
+          item.interiorColor?.toLowerCase().includes(query) ||
+          item.location?.toLowerCase().includes(query) ||
+          item.manufacturer?.toLowerCase().includes(query) ||
+          item.engineCapacity?.toLowerCase().includes(query) ||
+          item.year?.toString().includes(query) ||
+          item.status?.toLowerCase().includes(query) ||
+          item.importType?.toLowerCase().includes(query) ||
+          item.notes?.toLowerCase().includes(query);
+        if (!matchesSearch) return false;
+      }
 
-  // Get dynamic filter options from inventory data (only from available cars, not sold ones)
-  const getUniqueValues = (field: keyof InventoryItem) => {
-    const availableData = inventoryData.filter(item => !showSoldCars ? !item.isSold : true);
-    const values = availableData
+      // Apply previous filters in hierarchy order
+      if (appliedFilters.manufacturer && appliedFilters.manufacturer !== "الكل" && item.manufacturer !== appliedFilters.manufacturer) return false;
+      if (appliedFilters.category && appliedFilters.category !== "الكل" && item.category !== appliedFilters.category) return false;
+      if (appliedFilters.trimLevel && appliedFilters.trimLevel !== "الكل" && item.trimLevel !== appliedFilters.trimLevel) return false;
+      if (appliedFilters.year && appliedFilters.year !== "الكل" && item.year?.toString() !== appliedFilters.year) return false;
+      if (appliedFilters.engineCapacity && appliedFilters.engineCapacity !== "الكل" && item.engineCapacity !== appliedFilters.engineCapacity) return false;
+      if (appliedFilters.exteriorColor && appliedFilters.exteriorColor !== "الكل" && item.exteriorColor !== appliedFilters.exteriorColor) return false;
+      if (appliedFilters.interiorColor && appliedFilters.interiorColor !== "الكل" && item.interiorColor !== appliedFilters.interiorColor) return false;
+      if (appliedFilters.status && appliedFilters.status !== "الكل" && item.status !== appliedFilters.status) return false;
+      
+      return true;
+    });
+    
+    const values = filteredData
       .map(item => item[field])
       .filter((value, index, self) => value && self.indexOf(value) === index)
       .sort();
     return values;
   };
 
-  // Get available manufacturers from inventory data
-  const getAvailableManufacturers = () => {
-    const availableData = inventoryData.filter(item => !showSoldCars ? !item.isSold : true);
-    const manufacturers = availableData
-      .map(item => item.manufacturer)
-      .filter((manufacturer, index, self) => manufacturer && self.indexOf(manufacturer) === index)
-      .sort();
-    return ["الكل", ...manufacturers];
-  };
-
-  const manufacturers = getAvailableManufacturers();
-  const categories = getAvailableCategories();
-  const availableYears = ["الكل", ...getUniqueValues("year").map(String)];
-  const availableStatuses = ["الكل", ...getUniqueValues("status")];
-  const availableImportTypes = ["الكل", ...getUniqueValues("importType")];
-  const availableEngineCapacities = ["الكل", ...getUniqueValues("engineCapacity")];
-  const availableExteriorColors = ["الكل", ...getUniqueValues("exteriorColor")];
-  const availableInteriorColors = ["الكل", ...getUniqueValues("interiorColor")];
-  const availableTrimLevels = ["الكل", ...getUniqueValues("trimLevel")];
+  // Dynamic filter arrays based on previously applied filters
+  const manufacturers = ["الكل", ...getFilteredUniqueValues("manufacturer", {})];
+  
+  const categories = ["الكل", ...getFilteredUniqueValues("category", {
+    manufacturer: selectedManufacturer
+  })];
+  
+  const availableTrimLevels = ["الكل", ...getFilteredUniqueValues("trimLevel", {
+    manufacturer: selectedManufacturer,
+    category: selectedCategory
+  })];
+  
+  const availableYears = ["الكل", ...getFilteredUniqueValues("year", {
+    manufacturer: selectedManufacturer,
+    category: selectedCategory,
+    trimLevel: selectedTrimLevel
+  }).map(String)];
+  
+  const availableEngineCapacities = ["الكل", ...getFilteredUniqueValues("engineCapacity", {
+    manufacturer: selectedManufacturer,
+    category: selectedCategory,
+    trimLevel: selectedTrimLevel,
+    year: selectedYear
+  })];
+  
+  const availableExteriorColors = ["الكل", ...getFilteredUniqueValues("exteriorColor", {
+    manufacturer: selectedManufacturer,
+    category: selectedCategory,
+    trimLevel: selectedTrimLevel,
+    year: selectedYear,
+    engineCapacity: selectedEngineCapacity
+  })];
+  
+  const availableInteriorColors = ["الكل", ...getFilteredUniqueValues("interiorColor", {
+    manufacturer: selectedManufacturer,
+    category: selectedCategory,
+    trimLevel: selectedTrimLevel,
+    year: selectedYear,
+    engineCapacity: selectedEngineCapacity,
+    exteriorColor: selectedExteriorColor
+  })];
+  
+  const availableStatuses = ["الكل", ...getFilteredUniqueValues("status", {
+    manufacturer: selectedManufacturer,
+    category: selectedCategory,
+    trimLevel: selectedTrimLevel,
+    year: selectedYear,
+    engineCapacity: selectedEngineCapacity,
+    exteriorColor: selectedExteriorColor,
+    interiorColor: selectedInteriorColor
+  })];
+  
+  const availableImportTypes = ["الكل", ...getFilteredUniqueValues("importType", {
+    manufacturer: selectedManufacturer,
+    category: selectedCategory,
+    trimLevel: selectedTrimLevel,
+    year: selectedYear,
+    engineCapacity: selectedEngineCapacity,
+    exteriorColor: selectedExteriorColor,
+    interiorColor: selectedInteriorColor,
+    status: selectedStatus
+  })];
   
   // Reset category filter when manufacturer changes
   const handleManufacturerChange = (value: string) => {
