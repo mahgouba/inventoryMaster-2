@@ -403,7 +403,7 @@ export default function QuotationA4Preview({
 
             {/* Vehicle Information */}
             {selectedVehicle && (
-              <div className="bg-white/90 border border-gray-300 p-4 rounded shadow-sm w-full mt-[166px] mb-[16px]">
+              <div className="bg-white/90 p-4 w-full mt-[166px] mb-[16px]">
                 
                 <div className="space-y-3 text-xs text-black">
                   {/* First Row: Manufacturer, Category, Trim Level, Year */}
