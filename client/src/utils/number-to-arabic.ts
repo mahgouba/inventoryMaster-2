@@ -90,7 +90,7 @@ export function numberToArabic(num: number): string {
   let result = convertThousands(integerPart);
   
   if (decimalPart > 0) {
-    result += " و " + convertHundreds(decimalPart) + " قرش";
+    result += " و " + convertHundreds(decimalPart) + " هلل";
   }
   
   return result + " ريال";
