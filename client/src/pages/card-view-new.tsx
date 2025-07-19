@@ -748,7 +748,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   
                   <CollapsibleContent className="mt-4 w-full">
                     <Card className="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shadow-sm w-full">
-                      <CardContent className="p-6">
+                      <CardContent className="p-6 w-full">
                         {/* Enhanced Filter Controls with Button Design */}
                         <div className="space-y-6 animate-in fade-in duration-300">
               {/* الصانع */}
