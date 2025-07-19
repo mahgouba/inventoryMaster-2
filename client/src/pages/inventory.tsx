@@ -416,15 +416,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   </>
                 )}
                 
-                {/* Voice Assistant - Available for all users */}
-                <Button 
-                  onClick={() => setVoiceChatOpen(true)}
-                  variant="outline"
-                  className="border-green-600 text-green-600 hover:bg-green-50 w-full sm:w-auto"
-                >
-                  <MessageSquare className="w-4 h-4 ml-2" />
-                  المساعد الصوتي
-                </Button>
+
                 <Button 
                   onClick={handleExport}
                   variant="outline"
