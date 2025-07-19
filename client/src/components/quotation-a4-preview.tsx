@@ -398,7 +398,7 @@ export default function QuotationA4Preview({
 
 
           {/* Vehicle Information Section */}
-          <div className="mb-8" style={{marginTop: '220px'}}>
+          <div className="mb-8 ml-[25px] mr-[25px]" style={{marginTop: '220px'}}>
             
 
             {/* Vehicle Information */}
