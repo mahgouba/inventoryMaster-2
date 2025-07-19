@@ -406,8 +406,8 @@ export default function QuotationA4Preview({
               <div className="bg-white/90 border border-gray-300 p-4 rounded shadow-sm w-full">
                 
                 <div className="space-y-3 text-xs text-black">
-                  {/* First Row: Manufacturer, Category, Trim Level */}
-                  <div className="ml-[0px] mr-[0px] pl-[3px] pr-[3px] text-[13px] text-right">
+                  {/* First Row: Manufacturer, Category, Trim Level - Single horizontal line */}
+                  <div className="flex gap-6 items-center text-[13px] text-right">
                     <div className="text-right">
                       <span className="font-semibold text-gray-700">الصانع: </span>
                       <span>{selectedVehicle.manufacturer}</span>
