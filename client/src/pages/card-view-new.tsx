@@ -117,8 +117,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         );
       });
 
-  // Filter Arrays
-  const manufacturers = ["الكل", "مرسيدس", "بي ام دبليو", "اودي", "تويوتا", "لكزس", "رنج روفر", "بورش", "نيسان", "انفينيتي", "هيونداي", "كيا", "فولفو", "جاكوار", "مازيراتي", "فيراري", "لامبورغيني", "تسلا", "لوسيد", "كاديلاك", "جي ام سي"];
+  // Filter Arrays - removed, now using dynamic data
   
   const manufacturerCategories: Record<string, string[]> = {
     "مرسيدس": ["S-Class", "E-Class", "C-Class", "GLE", "GLS", "A-Class", "CLA", "CLS", "G-Class", "GLC"],
@@ -145,21 +144,40 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   
   const getAvailableCategories = () => {
     if (!selectedManufacturer || selectedManufacturer === "الكل") {
-      return ["الكل"];
+      // Return all categories from actual inventory data
+      return ["الكل", ...getUniqueValues("category")];
     }
-    const manufacturerCats = manufacturerCategories[selectedManufacturer] || [];
+    // Return categories for specific manufacturer from actual inventory data
+    const availableData = inventoryData.filter(item => !showSoldCars ? !item.isSold : true);
+    const manufacturerCats = availableData
+      .filter(item => item.manufacturer === selectedManufacturer)
+      .map(item => item.category)
+      .filter((category, index, self) => category && self.indexOf(category) === index)
+      .sort();
     return ["الكل", ...manufacturerCats];
   };
 
-  // Get dynamic filter options from inventory data
+  // Get dynamic filter options from inventory data (only from available cars, not sold ones)
   const getUniqueValues = (field: keyof InventoryItem) => {
-    const values = inventoryData
+    const availableData = inventoryData.filter(item => !showSoldCars ? !item.isSold : true);
+    const values = availableData
       .map(item => item[field])
       .filter((value, index, self) => value && self.indexOf(value) === index)
       .sort();
     return values;
   };
 
+  // Get available manufacturers from inventory data
+  const getAvailableManufacturers = () => {
+    const availableData = inventoryData.filter(item => !showSoldCars ? !item.isSold : true);
+    const manufacturers = availableData
+      .map(item => item.manufacturer)
+      .filter((manufacturer, index, self) => manufacturer && self.indexOf(manufacturer) === index)
+      .sort();
+    return ["الكل", ...manufacturers];
+  };
+
+  const manufacturers = getAvailableManufacturers();
   const categories = getAvailableCategories();
   const availableYears = ["الكل", ...getUniqueValues("year").map(String)];
   const availableStatuses = ["الكل", ...getUniqueValues("status")];

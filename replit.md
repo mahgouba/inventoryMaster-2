@@ -175,6 +175,13 @@ The application uses PostgreSQL for persistent data storage with proper database
   - Fixed year field to use value instead of defaultValue for proper data binding
   - Improved form reset logic for both edit and create modes
   - Ensured price field is properly included in form schema and validation
+- ✅ Enhanced card view filters to use real inventory data only:
+  - Updated filter functions to extract values from actual inventory items
+  - Removed hardcoded manufacturer and category lists
+  - Added getAvailableManufacturers() to dynamically load manufacturers from inventory
+  - Modified getAvailableCategories() to show categories from real data based on selected manufacturer
+  - All filter dropdowns now display only available options from existing inventory items
+  - Improved data filtering to exclude sold cars unless specifically requested to show them
 
 ### Previous Migration to Replit Environment (July 17, 2025)
 - ✅ Successfully completed migration from Replit Agent to Replit environment
