@@ -178,11 +178,17 @@ export class MemStorage implements IStorage {
   private manufacturers: Map<number, Manufacturer>;
   private locations: Map<number, Location>;
   private locationTransfers: Map<number, LocationTransfer>;
+  private specifications: Map<number, Specification>;
+  private trimLevels: Map<number, TrimLevel>;
+  private quotations: Map<number, Quotation>;
   private currentUserId: number;
   private currentInventoryId: number;
   private currentManufacturerId: number;
   private currentLocationId: number;
   private currentLocationTransferId: number;
+  private currentSpecificationId: number;
+  private currentTrimLevelId: number;
+  private currentQuotationId: number;
   private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
   private systemSettings: Map<string, string> = new Map();
   private companies: Map<number, Company> = new Map();
@@ -194,11 +200,17 @@ export class MemStorage implements IStorage {
     this.manufacturers = new Map();
     this.locations = new Map();
     this.locationTransfers = new Map();
+    this.specifications = new Map();
+    this.trimLevels = new Map();
+    this.quotations = new Map();
     this.currentUserId = 1;
     this.currentInventoryId = 1;
     this.currentManufacturerId = 1;
     this.currentLocationId = 1;
     this.currentLocationTransferId = 1;
+    this.currentSpecificationId = 1;
+    this.currentTrimLevelId = 1;
+    this.currentQuotationId = 1;
     this.storedTermsConditions = [];
     this.systemSettings = new Map();
     this.companies = new Map();
@@ -239,14 +251,142 @@ export class MemStorage implements IStorage {
   async updateUser(id: number, user: any): Promise<any> { return user; }
   async deleteUser(id: number): Promise<boolean> { return true; }
   
+  // Specifications methods for MemStorage
+  async getAllSpecifications(): Promise<Specification[]> {
+    return Array.from(this.specifications.values());
+  }
+
+  async getSpecification(id: number): Promise<Specification | undefined> {
+    return this.specifications.get(id);
+  }
+
+  async createSpecification(specificationData: InsertSpecification): Promise<Specification> {
+    const id = this.currentSpecificationId++;
+    const specification: Specification = {
+      id,
+      manufacturer: specificationData.manufacturer,
+      category: specificationData.category,
+      trimLevel: specificationData.trimLevel,
+      year: specificationData.year,
+      engineCapacity: specificationData.engineCapacity,
+      detailedDescription: specificationData.detailedDescription,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.specifications.set(id, specification);
+    return specification;
+  }
+
+  async updateSpecification(id: number, specificationData: Partial<InsertSpecification>): Promise<Specification | undefined> {
+    const existing = this.specifications.get(id);
+    if (!existing) return undefined;
+    
+    const updated: Specification = {
+      ...existing,
+      ...specificationData,
+      updatedAt: new Date()
+    };
+    this.specifications.set(id, updated);
+    return updated;
+  }
+
+  async deleteSpecification(id: number): Promise<boolean> {
+    return this.specifications.delete(id);
+  }
+
+  async getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<Specification[]> {
+    return Array.from(this.specifications.values()).filter(spec => 
+      spec.manufacturer === manufacturer && 
+      spec.category === category &&
+      (!trimLevel || spec.trimLevel === trimLevel)
+    );
+  }
+
+  async getSpecificationByVehicleParams(manufacturer: string, category: string, trimLevel: string | null, year: number, engineCapacity: string): Promise<Specification | undefined> {
+    return Array.from(this.specifications.values()).find(spec => 
+      spec.manufacturer === manufacturer && 
+      spec.category === category &&
+      spec.trimLevel === trimLevel &&
+      spec.year === year &&
+      spec.engineCapacity === engineCapacity
+    );
+  }
+
+  // Trim levels methods for MemStorage
+  async getAllTrimLevels(): Promise<TrimLevel[]> {
+    return Array.from(this.trimLevels.values());
+  }
+
+  async getTrimLevel(id: number): Promise<TrimLevel | undefined> {
+    return this.trimLevels.get(id);
+  }
+
+  async createTrimLevel(trimLevelData: InsertTrimLevel): Promise<TrimLevel> {
+    const id = this.currentTrimLevelId++;
+    const trimLevel: TrimLevel = {
+      id,
+      manufacturer: trimLevelData.manufacturer,
+      category: trimLevelData.category,
+      trimLevel: trimLevelData.trimLevel,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.trimLevels.set(id, trimLevel);
+    return trimLevel;
+  }
+
+  async updateTrimLevel(id: number, trimLevelData: Partial<InsertTrimLevel>): Promise<TrimLevel | undefined> {
+    const existing = this.trimLevels.get(id);
+    if (!existing) return undefined;
+    
+    const updated: TrimLevel = {
+      ...existing,
+      ...trimLevelData,
+      updatedAt: new Date()
+    };
+    this.trimLevels.set(id, updated);
+    return updated;
+  }
+
+  async deleteTrimLevel(id: number): Promise<boolean> {
+    return this.trimLevels.delete(id);
+  }
+
+  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<TrimLevel[]> {
+    return Array.from(this.trimLevels.values()).filter(tl => 
+      tl.manufacturer === manufacturer && tl.category === category
+    );
+  }
+
   // Quotation stub methods for MemStorage
-  async getAllQuotations(): Promise<any[]> { return []; }
-  async getQuotation(id: number): Promise<any> { return undefined; }
-  async createQuotation(quotation: any): Promise<any> { return quotation; }
-  async updateQuotation(id: number, quotation: any): Promise<any> { return quotation; }
-  async deleteQuotation(id: number): Promise<boolean> { return true; }
-  async getQuotationsByStatus(status: string): Promise<any[]> { return []; }
-  async getQuotationByNumber(quoteNumber: string): Promise<any> { return undefined; }
+  async getAllQuotations(): Promise<any[]> { 
+    return Array.from(this.quotations.values()); 
+  }
+  async getQuotation(id: number): Promise<any> { 
+    return this.quotations.get(id); 
+  }
+  async createQuotation(quotation: any): Promise<any> { 
+    const id = this.currentQuotationId++;
+    const newQuotation = { ...quotation, id };
+    this.quotations.set(id, newQuotation);
+    return newQuotation; 
+  }
+  async updateQuotation(id: number, quotation: any): Promise<any> { 
+    const existing = this.quotations.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...quotation };
+    this.quotations.set(id, updated);
+    return updated; 
+  }
+  async deleteQuotation(id: number): Promise<boolean> { 
+    return this.quotations.delete(id); 
+  }
+  async getQuotationsByStatus(status: string): Promise<any[]> { 
+    return Array.from(this.quotations.values()).filter(q => q.status === status); 
+  }
+  async getQuotationByNumber(quoteNumber: string): Promise<any> { 
+    return Array.from(this.quotations.values()).find(q => q.quoteNumber === quoteNumber); 
+  }
 
   // Terms and Conditions methods
   async getAllTermsConditions(): Promise<Array<{ id: number; term_text: string; display_order: number }>> {
