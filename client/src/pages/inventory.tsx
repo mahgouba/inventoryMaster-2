@@ -410,18 +410,21 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 
                 {/* Filter Toggle Button - Right Aligned */}
                 <div className="flex items-center justify-end w-full sm:w-auto">
-                  <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
-                    <CollapsibleTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex items-center gap-2 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 hover:from-teal-50 hover:to-teal-100 dark:hover:from-teal-900/30 dark:hover:to-teal-800/30 border-slate-300 dark:border-slate-600 transition-all duration-200"
-                      >
-                        <Filter size={16} />
-                        الفلاتر
-                        {filtersOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                      </Button>
-                    </CollapsibleTrigger>
+                  <div className="w-full">
+                    <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
+                      <div className="flex justify-end w-full">
+                        <CollapsibleTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex items-center gap-2 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 hover:from-teal-50 hover:to-teal-100 dark:hover:from-teal-900/30 dark:hover:to-teal-800/30 border-slate-300 dark:border-slate-600 transition-all duration-200"
+                          >
+                            <Filter size={16} />
+                            الفلاتر
+                            {filtersOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                          </Button>
+                        </CollapsibleTrigger>
+                      </div>
                     
                     <CollapsibleContent className="mt-4 w-full">
                       <Card className="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shadow-sm w-full">
@@ -669,7 +672,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         </CardContent>
                       </Card>
                     </CollapsibleContent>
-                  </Collapsible>
+                    </Collapsible>
+                  </div>
                 </div>
               </div>
               

@@ -145,7 +145,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 
 ## Recent Changes
 
-### Filter System Enhancement - Button-Based Interface (July 19, 2025)
+### Filter System Enhancement - Button-Based Interface with Statistics (July 19, 2025)
 - ✅ Reverted all filters back to button-based interface with horizontal scrolling per user final request
 - ✅ Converted all filter dropdowns to interactive button-based interface in inventory page
 - ✅ Converted all filter dropdowns to button-based interface in card-view-new page  
@@ -156,6 +156,10 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Enhanced filter buttons with proper selected/unselected states and hover effects
 - ✅ Improved user experience with whitespace-nowrap to prevent button text wrapping
 - ✅ Added proper dark mode support for all filter buttons and scroll areas
+- ✅ Made filter container span full page width with proper responsive design
+- ✅ Added item count statistics to all filter buttons showing number of items for each option
+- ✅ Implemented getFilterCount function to dynamically calculate and display statistics
+- ✅ Enhanced user experience with real-time count updates based on available inventory data
 
 ### Data Refresh Issue Fixed (July 19, 2025)
 - ✅ Fixed cache invalidation issue that prevented data updates from appearing in UI
