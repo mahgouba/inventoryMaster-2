@@ -599,7 +599,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   }
 
   return (
-    <div className="bg-slate-50 dark:bg-black min-h-screen">
+    <div className="bg-slate-50 dark:bg-black min-h-screen" dir="rtl">
       {/* Header */}
       <header className="bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
@@ -709,30 +709,30 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2">عرض البطاقات التفصيلي</h1>
-          <p className="text-slate-600 dark:text-slate-400">عرض جميع تفاصيل السيارات مجمعة حسب الصانع</p>
+        <div className="mb-8 text-right">
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2 text-right">عرض البطاقات التفصيلي</h1>
+          <p className="text-slate-600 dark:text-slate-400 text-right">عرض جميع تفاصيل السيارات مجمعة حسب الصانع</p>
           
           {/* Search and Filter Section */}
           <div className="mt-6">
             {/* Search Input and Filter Toggle */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
               <div className="relative max-w-md">
-                <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                <Search size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
                 <Input
                   type="text"
                   placeholder="البحث في رقم الهيكل، الفئة، درجة التجهيز، اللون، الموقع..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full border-slate-300 focus:border-custom-primary focus:ring-custom-primary"
+                  className="pr-10 pl-4 py-2 w-full border-slate-300 focus:border-custom-primary focus:ring-custom-primary text-right"
                 />
               </div>
               
               {/* Filter Toggle Button - Right Aligned */}
-              <div className="flex items-center justify-end w-full sm:w-auto">
+              <div className="flex items-center justify-start w-full sm:w-auto">
                 <div className="w-full">
                   <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
-                    <div className="flex justify-end w-full">
+                    <div className="flex justify-start w-full">
                       <CollapsibleTrigger asChild>
                         <Button 
                           variant="outline" 
@@ -753,9 +753,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         <div className="space-y-6 animate-in fade-in duration-300">
               {/* الصانع */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الصانع</h3>
+                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">الصانع</h3>
                 <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
+                  <div className="flex gap-2 pb-2 justify-start">
                     {manufacturers.map((manufacturer) => (
                       <Button
                         key={manufacturer}
@@ -777,9 +777,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
               {/* الفئة */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الفئة</h3>
+                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">الفئة</h3>
                 <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
+                  <div className="flex gap-2 pb-2 justify-start">
                     {categories.map((category) => (
                       <Button
                         key={category}
@@ -801,9 +801,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
               {/* درجة التجهيز */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">درجة التجهيز</h3>
+                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">درجة التجهيز</h3>
                 <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
+                  <div className="flex gap-2 pb-2 justify-start">
                     {availableTrimLevels.map((trim) => (
                       <Button
                         key={trim}
@@ -825,9 +825,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
               {/* السنة */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">السنة</h3>
+                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">السنة</h3>
                 <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
+                  <div className="flex gap-2 pb-2 justify-start">
                     {availableYears.map((year) => (
                       <Button
                         key={year}
@@ -849,9 +849,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
               {/* سعة المحرك */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">سعة المحرك</h3>
+                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">سعة المحرك</h3>
                 <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
+                  <div className="flex gap-2 pb-2 justify-start">
                     {availableEngineCapacities.map((capacity) => (
                       <Button
                         key={capacity}
@@ -873,9 +873,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
               {/* اللون الداخلي */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الداخلي</h3>
+                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">اللون الداخلي</h3>
                 <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
+                  <div className="flex gap-2 pb-2 justify-start">
                     {availableInteriorColors.map((color) => (
                       <Button
                         key={color}
@@ -897,9 +897,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
               {/* اللون الخارجي */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الخارجي</h3>
+                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">اللون الخارجي</h3>
                 <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
+                  <div className="flex gap-2 pb-2 justify-start">
                     {availableExteriorColors.map((color) => (
                       <Button
                         key={color}
@@ -921,9 +921,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
               {/* الحالة */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الحالة</h3>
+                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">الحالة</h3>
                 <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
+                  <div className="flex gap-2 pb-2 justify-start">
                     {availableStatuses.map((status) => (
                       <Button
                         key={status}
@@ -945,9 +945,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
               {/* نوع الاستيراد */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">نوع الاستيراد</h3>
+                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">نوع الاستيراد</h3>
                 <ScrollArea className="w-full">
-                  <div className="flex space-x-2 space-x-reverse pb-2">
+                  <div className="flex gap-2 pb-2 justify-start">
                     {availableImportTypes.map((type) => (
                       <Button
                         key={type}
