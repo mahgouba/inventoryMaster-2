@@ -314,14 +314,12 @@ export default function QuotationA4Preview({
           <span className="text-sm text-gray-600">خلفية 2</span>
         </div>
       </div>
-      
       <div className="mb-4 flex justify-center">
         <Button onClick={downloadPDF} disabled={isDownloading} className="bg-blue-600 hover:bg-blue-700">
           <Download className="w-4 h-4 mr-2" />
           {isDownloading ? 'جاري التحميل...' : 'تحميل PDF'}
         </Button>
       </div>
-      
       <div 
         ref={previewRef}
         data-pdf-export="quotation"
@@ -409,7 +407,7 @@ export default function QuotationA4Preview({
                 
                 <div className="space-y-3 text-xs text-black">
                   {/* First Row: Manufacturer, Category, Trim Level */}
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="ml-[0px] mr-[0px] pl-[3px] pr-[3px] text-[13px] text-right">
                     <div className="text-right">
                       <span className="font-semibold text-gray-700">الصانع: </span>
                       <span>{selectedVehicle.manufacturer}</span>
