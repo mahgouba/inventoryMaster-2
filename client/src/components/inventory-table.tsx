@@ -234,13 +234,13 @@ export default function InventoryTable({
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
       <div className="overflow-x-auto">
         <Table data-table="inventory-table">
-          <TableHeader className="bg-teal-600">
+          <TableHeader className="bg-custom-primary">
             <TableRow>
               <TableHead className="text-white text-right">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-white hover:text-teal-100 hover:bg-teal-700 p-1"
+                  className="text-white hover:text-teal-100 hover:bg-custom-primary-dark p-1"
                   onClick={() => handleSort("manufacturer")}
                 >
                   الصانع
@@ -252,7 +252,7 @@ export default function InventoryTable({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-white hover:text-teal-100 hover:bg-teal-700 p-1"
+                  className="text-white hover:text-teal-100 hover:bg-custom-primary-dark p-1"
                   onClick={() => handleSort("category")}
                 >
                   الفئة
@@ -263,7 +263,7 @@ export default function InventoryTable({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-white hover:text-teal-100 hover:bg-teal-700 p-1"
+                  className="text-white hover:text-teal-100 hover:bg-custom-primary-dark p-1"
                   onClick={() => handleSort("trimLevel")}
                 >
                   درجة التجهيز
@@ -274,7 +274,7 @@ export default function InventoryTable({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-white hover:text-teal-100 hover:bg-teal-700 p-1"
+                  className="text-white hover:text-teal-100 hover:bg-custom-primary-dark p-1"
                   onClick={() => handleSort("engineCapacity")}
                 >
                   سعة المحرك
@@ -285,7 +285,7 @@ export default function InventoryTable({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-white hover:text-teal-100 hover:bg-teal-700 p-1"
+                  className="text-white hover:text-teal-100 hover:bg-custom-primary-dark p-1"
                   onClick={() => handleSort("year")}
                 >
                   السنة
@@ -299,7 +299,7 @@ export default function InventoryTable({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-white hover:text-teal-100 hover:bg-teal-700 p-1"
+                  className="text-white hover:text-teal-100 hover:bg-custom-primary-dark p-1"
                   onClick={() => handleSort("location")}
                 >
                   الموقع
@@ -342,7 +342,7 @@ export default function InventoryTable({
                   <TableCell className="text-sm text-slate-800">{item.importType}</TableCell>
                   <TableCell className="text-sm text-slate-600 font-latin">{item.chassisNumber}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm" className="text-teal-600 hover:text-teal-800">
+                    <Button variant="ghost" size="sm" className="text-custom-primary hover:text-custom-primary-dark">
                       <Images className="w-4 h-4 ml-1" />
                       عرض
                     </Button>
@@ -364,7 +364,7 @@ export default function InventoryTable({
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(item)}
-                        className="text-teal-600 hover:text-teal-800 p-1"
+                        className="text-custom-primary hover:text-custom-primary-dark p-1"
                         title="تحرير"
                       >
                         <Edit className="h-4 w-4" />

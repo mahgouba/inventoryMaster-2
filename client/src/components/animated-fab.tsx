@@ -157,7 +157,7 @@ export default function AnimatedFAB({
                       setIsOpen(false);
                     }}
                     className={`${sizeClasses[size]} rounded-full shadow-lg hover:shadow-xl transition-all duration-200 ${
-                      action.color || "bg-teal-600 hover:bg-teal-700"
+                      action.color || "bg-custom-primary hover:bg-custom-primary-dark"
                     } text-white border-0`}
                     size="icon"
                   >
@@ -192,7 +192,7 @@ export default function AnimatedFAB({
         {/* Pulse Animation for Main FAB when closed */}
         {!isOpen && (
           <motion.div
-            className={`absolute ${sizeClasses[size]} rounded-full bg-teal-600/30 -z-10 fab-pulse-ring`}
+            className={`absolute ${sizeClasses[size]} rounded-full bg-custom-primary/30 -z-10 fab-pulse-ring`}
             animate={{
               scale: [1, 1.2, 1],
               opacity: [0.7, 0, 0.7],
@@ -250,7 +250,7 @@ export function InventoryFAB({
       label: "تصدير البيانات",
       icon: <Download size={18} />,
       onClick: onExport,
-      color: "bg-teal-600 hover:bg-teal-700"
+      color: "bg-custom-primary hover:bg-custom-primary-dark"
     },
     {
       id: "print",

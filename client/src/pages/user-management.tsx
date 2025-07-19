@@ -271,7 +271,7 @@ export default function UserManagement() {
               <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">
                 إجمالي المستخدمين
               </CardTitle>
-              <Users className="h-4 w-4 text-teal-600" />
+              <Users className="h-4 w-4 text-custom-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-slate-900 dark:text-white">{users.length}</div>
@@ -330,7 +330,7 @@ export default function UserManagement() {
           
           <Dialog open={newUserOpen} onOpenChange={setNewUserOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-teal-600 hover:bg-teal-700 text-white">
+              <Button className="bg-custom-primary hover:bg-custom-primary-dark text-white">
                 <Plus className="w-4 h-4 ml-2" />
                 إضافة مستخدم جديد
               </Button>

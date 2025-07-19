@@ -245,7 +245,7 @@ export default function LocationPage({ userRole, onLogout }: LocationPageProps) 
             {userRole === "admin" && (
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-teal-600 hover:bg-teal-700 text-white">
+                  <Button className="bg-custom-primary hover:bg-custom-primary-dark text-white">
                     <Plus size={20} className="ml-2" />
                     إضافة موقع جديد
                   </Button>
@@ -359,7 +359,7 @@ export default function LocationPage({ userRole, onLogout }: LocationPageProps) 
                         <Button 
                           type="submit" 
                           disabled={createLocationMutation.isPending}
-                          className="bg-teal-600 hover:bg-teal-700"
+                          className="bg-custom-primary hover:bg-custom-primary-dark"
                         >
                           {createLocationMutation.isPending ? "جاري الحفظ..." : "حفظ"}
                         </Button>
@@ -383,7 +383,7 @@ export default function LocationPage({ userRole, onLogout }: LocationPageProps) 
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 space-x-reverse">
-                      <MapPin className="h-5 w-5 text-teal-600" />
+                      <MapPin className="h-5 w-5 text-custom-primary" />
                       <CardTitle className="text-lg">{location.name}</CardTitle>
                     </div>
                     {userRole === "admin" && (
@@ -709,7 +709,7 @@ export default function LocationPage({ userRole, onLogout }: LocationPageProps) 
                   <Button 
                     type="submit" 
                     disabled={updateLocationMutation.isPending}
-                    className="bg-teal-600 hover:bg-teal-700"
+                    className="bg-custom-primary hover:bg-custom-primary-dark"
                   >
                     {updateLocationMutation.isPending ? "جاري الحفظ..." : "حفظ التغييرات"}
                   </Button>

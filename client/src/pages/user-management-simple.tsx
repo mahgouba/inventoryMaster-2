@@ -228,7 +228,7 @@ export default function UserManagementSimple() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4 space-x-reverse">
-              <Users className="w-8 h-8 text-teal-600" />
+              <Users className="w-8 h-8 text-custom-primary" />
               <div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">المستخدمين</h2>
                 <p className="text-slate-600 dark:text-slate-400">إدارة حسابات المستخدمين في النظام</p>
@@ -237,7 +237,7 @@ export default function UserManagementSimple() {
 
             <Dialog open={newUserOpen} onOpenChange={setNewUserOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-teal-600 hover:bg-teal-700 text-white">
+                <Button className="bg-custom-primary hover:bg-custom-primary-dark text-white">
                   <Plus size={16} className="ml-2" />
                   إضافة مستخدم جديد
                 </Button>
@@ -288,7 +288,7 @@ export default function UserManagementSimple() {
                     <Button
                       onClick={handleCreateUser}
                       disabled={createUserMutation.isPending}
-                      className="bg-teal-600 hover:bg-teal-700 text-white flex-1"
+                      className="bg-custom-primary hover:bg-custom-primary-dark text-white flex-1"
                     >
                       {createUserMutation.isPending ? "جاري الإنشاء..." : "إنشاء المستخدم"}
                     </Button>
@@ -411,7 +411,7 @@ export default function UserManagementSimple() {
                 <Button
                   onClick={handleUpdateUser}
                   disabled={updateUserMutation.isPending}
-                  className="bg-teal-600 hover:bg-teal-700 text-white flex-1"
+                  className="bg-custom-primary hover:bg-custom-primary-dark text-white flex-1"
                 >
                   {updateUserMutation.isPending ? "جاري التحديث..." : "حفظ التغييرات"}
                 </Button>

@@ -114,7 +114,7 @@ export default function CardViewPage({ userRole }: CardViewPageProps) {
                     <span className="hidden lg:inline">جدول</span>
                   </Button>
                 </Link>
-                <Button variant="default" size="sm" className="bg-teal-600 hover:bg-teal-700 text-white">
+                <Button variant="default" size="sm" className="bg-custom-primary hover:bg-custom-primary-dark text-white">
                   <LayoutGrid size={14} className="ml-1" />
                   <span className="hidden lg:inline">بطاقات</span>
                 </Button>
@@ -127,14 +127,14 @@ export default function CardViewPage({ userRole }: CardViewPageProps) {
                     <Table size={16} />
                   </Button>
                 </Link>
-                <Button variant="default" size="sm" className="bg-teal-600 hover:bg-teal-700 text-white p-2">
+                <Button variant="default" size="sm" className="bg-custom-primary hover:bg-custom-primary-dark text-white p-2">
                   <LayoutGrid size={16} />
                 </Button>
               </div>
 
               {/* Appearance Management Button - Always Visible */}
               <Link href="/appearance">
-                <Button variant="outline" size="sm" className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 border-teal-200 transition-colors">
+                <Button variant="outline" size="sm" className="text-custom-primary hover:text-custom-primary-dark hover:bg-blue-50 border-teal-200 transition-colors">
                   <Palette size={16} className="ml-1" />
                   <span className="hidden sm:inline">إدارة المظهر</span>
                   <span className="sm:hidden">المظهر</span>
@@ -145,7 +145,7 @@ export default function CardViewPage({ userRole }: CardViewPageProps) {
               {userRole === "admin" && (
                 <div className="flex items-center space-x-2 space-x-reverse">
                   <Link href="/appearance">
-                    <Button variant="outline" size="sm" className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 border-teal-200 transition-colors">
+                    <Button variant="outline" size="sm" className="text-custom-primary hover:text-custom-primary-dark hover:bg-blue-50 border-teal-200 transition-colors">
                       <Palette size={16} className="ml-1" />
                       <span className="hidden sm:inline">إدارة المظهر</span>
                       <span className="sm:hidden">المظهر</span>

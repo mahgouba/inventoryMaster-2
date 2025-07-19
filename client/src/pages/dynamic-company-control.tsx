@@ -491,7 +491,7 @@ export default function DynamicCompanyControl() {
                   <Button 
                     type="submit" 
                     disabled={updateCompanyMutation.isPending}
-                    className="bg-teal-600 hover:bg-teal-700"
+                    className="bg-custom-primary hover:bg-custom-primary-dark"
                   >
                     {updateCompanyMutation.isPending ? "جاري الحفظ..." : "حفظ التغييرات"}
                   </Button>

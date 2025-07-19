@@ -550,7 +550,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   placeholder="البحث في رقم الهيكل، الفئة، درجة التجهيز، اللون، الموقع..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full border-slate-300 focus:border-teal-500 focus:ring-teal-500"
+                  className="pl-10 pr-4 py-2 w-full border-slate-300 focus:border-custom-primary focus:ring-custom-primary"
                 />
               </div>
               
@@ -563,7 +563,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="flex items-center gap-2 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 hover:from-teal-50 hover:to-teal-100 dark:hover:from-teal-900/30 dark:hover:to-teal-800/30 border-slate-300 dark:border-slate-600 transition-all duration-200"
+                          className="flex items-center gap-2 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900/30 dark:hover:to-blue-800/30 border-slate-300 dark:border-slate-600 transition-all duration-200"
                         >
                           <Filter size={16} />
                           الفلاتر
@@ -590,8 +590,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         onClick={() => handleManufacturerChange(manufacturer)}
                         className={`transition-all duration-200 whitespace-nowrap ${
                           selectedManufacturer === manufacturer
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                         }`}
                       >
                         {manufacturer} ({getFilterCount("manufacturer", manufacturer)})
@@ -614,8 +614,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         onClick={() => setSelectedCategory(category)}
                         className={`transition-all duration-200 whitespace-nowrap ${
                           selectedCategory === category
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                         }`}
                       >
                         {category} ({getFilterCount("category", category)})
@@ -638,8 +638,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         onClick={() => setSelectedTrimLevel(trim)}
                         className={`transition-all duration-200 whitespace-nowrap ${
                           selectedTrimLevel === trim
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                         }`}
                       >
                         {trim} ({getFilterCount("trimLevel", trim)})
@@ -662,8 +662,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         onClick={() => setSelectedYear(year)}
                         className={`transition-all duration-200 whitespace-nowrap ${
                           selectedYear === year
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                         }`}
                       >
                         {year} ({getFilterCount("year", year)})
@@ -686,8 +686,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         onClick={() => setSelectedEngineCapacity(capacity)}
                         className={`transition-all duration-200 whitespace-nowrap ${
                           selectedEngineCapacity === capacity
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                         }`}
                       >
                         {capacity} ({getFilterCount("engineCapacity", capacity)})
@@ -710,8 +710,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         onClick={() => setSelectedInteriorColor(color)}
                         className={`transition-all duration-200 whitespace-nowrap ${
                           selectedInteriorColor === color
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                         }`}
                       >
                         {color} ({getFilterCount("interiorColor", color)})
@@ -734,8 +734,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         onClick={() => setSelectedExteriorColor(color)}
                         className={`transition-all duration-200 whitespace-nowrap ${
                           selectedExteriorColor === color
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                         }`}
                       >
                         {color} ({getFilterCount("exteriorColor", color)})
@@ -758,8 +758,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         onClick={() => setSelectedStatus(status)}
                         className={`transition-all duration-200 whitespace-nowrap ${
                           selectedStatus === status
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                         }`}
                       >
                         {status} ({getFilterCount("status", status)})
@@ -782,8 +782,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         onClick={() => setSelectedImportType(type)}
                         className={`transition-all duration-200 whitespace-nowrap ${
                           selectedImportType === type
-                            ? "bg-teal-600 hover:bg-teal-700 text-white"
-                            : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                         }`}
                       >
                         {type} ({getFilterCount("importType", type)})
@@ -840,7 +840,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
             {filteredItems.length > 0 && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="mt-2 text-sm text-teal-600 hover:text-teal-800 underline"
+                className="mt-2 text-sm text-custom-primary hover:text-custom-primary-dark underline"
               >
                 مسح البحث
               </button>
@@ -859,14 +859,14 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               <div key={manufacturer} className="space-y-4">
                 {/* Manufacturer Header - Clickable */}
                 <div 
-                  className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6 cursor-pointer hover:shadow-md hover:border-teal-300 transition-all duration-200"
+                  className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6 cursor-pointer hover:shadow-md hover:border-custom-primary transition-all duration-200"
                   onClick={() => toggleManufacturer(manufacturer)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-6 space-x-reverse">
                       {/* Manufacturer Logo with Interactive Hover Effect */}
                       <div className="relative group">
-                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center border-2 border-slate-200 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:border-teal-400 group-hover:bg-gradient-to-br group-hover:from-teal-50 group-hover:to-blue-50">
+                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center border-2 border-slate-200 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:border-custom-primary group-hover:bg-gradient-to-br group-hover:from-blue-50 group-hover:to-blue-50">
                           {logo ? (
                             <img 
                               src={logo} 
@@ -874,7 +874,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               className="w-12 h-12 object-contain transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-md"
                             />
                           ) : (
-                            <span className="text-xl font-bold text-slate-600 transition-all duration-300 group-hover:text-teal-700 group-hover:scale-110">
+                            <span className="text-xl font-bold text-slate-600 transition-all duration-300 group-hover:text-custom-primary-dark group-hover:scale-110">
                               {manufacturer.charAt(0)}
                             </span>
                           )}

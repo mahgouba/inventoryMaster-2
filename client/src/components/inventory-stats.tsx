@@ -84,7 +84,7 @@ export default function InventoryStats() {
       title: "إجمالي العناصر",
       value: stats?.total || 0,
       icon: Package,
-      color: "bg-teal-100 text-teal-600",
+      color: "bg-teal-100 text-custom-primary",
     },
   ];
 

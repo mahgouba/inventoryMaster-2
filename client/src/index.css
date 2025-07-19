@@ -3,6 +3,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom colors for the application */
+.bg-custom-primary {
+  background-color: #00627F !important;
+}
+.hover\:bg-custom-primary-dark:hover {
+  background-color: #004f66 !important;
+}
+.text-custom-primary {
+  color: #00627F !important;
+}
+.hover\:text-custom-primary-dark:hover {
+  color: #004f66 !important;
+}
+.border-custom-primary {
+  border-color: #00627F !important;
+}
+.hover\:border-custom-primary:hover {
+  border-color: #00627F !important;
+}
+.focus\:border-custom-primary:focus {
+  border-color: #00627F !important;
+}
+.focus\:ring-custom-primary:focus {
+  --tw-ring-color: #00627F !important;
+}
+
 /* Print Styles for Quotation */
 @media print {
   @page {

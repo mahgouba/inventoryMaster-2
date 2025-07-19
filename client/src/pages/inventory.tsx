@@ -231,7 +231,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
             <div className="flex items-center space-x-2 sm:space-x-4 space-x-reverse">
               {/* Navigation Tabs - Hidden on mobile */}
               <div className="hidden md:flex items-center space-x-2 space-x-reverse border border-slate-200 rounded-lg p-1">
-                <Button variant="default" size="sm" className="bg-teal-600 hover:bg-teal-700 text-white">
+                <Button variant="default" size="sm" className="bg-custom-primary hover:bg-custom-primary-dark text-white">
                   <Table size={14} className="ml-1" />
                   <span className="hidden lg:inline">جدول</span>
                 </Button>
@@ -245,7 +245,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
               
               {/* Mobile Navigation Icons */}
               <div className="flex md:hidden items-center space-x-1 space-x-reverse">
-                <Button variant="default" size="sm" className="bg-teal-600 hover:bg-teal-700 text-white p-2">
+                <Button variant="default" size="sm" className="bg-custom-primary hover:bg-custom-primary-dark text-white p-2">
                   <Table size={16} />
                 </Button>
                 <Link href="/cards">
@@ -259,7 +259,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
               {userRole === "admin" && (
                 <div className="flex items-center space-x-2 space-x-reverse">
                   <Link href="/appearance">
-                    <Button variant="outline" size="sm" className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 border-teal-200 transition-colors">
+                    <Button variant="outline" size="sm" className="text-custom-primary hover:text-custom-primary-dark hover:bg-blue-50 border-teal-200 transition-colors">
                       <Palette size={16} className="ml-1" />
                       <span className="hidden sm:inline">إدارة المظهر</span>
                       <span className="sm:hidden">المظهر</span>
@@ -417,7 +417,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            className="flex items-center gap-2 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 hover:from-teal-50 hover:to-teal-100 dark:hover:from-teal-900/30 dark:hover:to-teal-800/30 border-slate-300 dark:border-slate-600 transition-all duration-200"
+                            className="flex items-center gap-2 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900/30 dark:hover:to-blue-800/30 border-slate-300 dark:border-slate-600 transition-all duration-200"
                           >
                             <Filter size={16} />
                             الفلاتر
@@ -444,8 +444,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           onClick={() => handleManufacturerChange(manufacturer)}
                           className={`transition-all duration-200 whitespace-nowrap ${
                             manufacturerFilter === manufacturer
-                              ? "bg-teal-600 hover:bg-teal-700 text-white"
-                              : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                           }`}
                         >
                           {manufacturer} ({getFilterCount("manufacturer", manufacturer)})
@@ -468,8 +468,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           onClick={() => setCategoryFilter(category)}
                           className={`transition-all duration-200 whitespace-nowrap ${
                             categoryFilter === category
-                              ? "bg-teal-600 hover:bg-teal-700 text-white"
-                              : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                           }`}
                         >
                           {category} ({getFilterCount("category", category)})
@@ -492,8 +492,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           onClick={() => setTrimLevelFilter(trim)}
                           className={`transition-all duration-200 whitespace-nowrap ${
                             trimLevelFilter === trim
-                              ? "bg-teal-600 hover:bg-teal-700 text-white"
-                              : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                           }`}
                         >
                           {trim} ({getFilterCount("trimLevel", trim)})
@@ -516,8 +516,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           onClick={() => setYearFilter(year)}
                           className={`transition-all duration-200 whitespace-nowrap ${
                             yearFilter === year
-                              ? "bg-teal-600 hover:bg-teal-700 text-white"
-                              : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                           }`}
                         >
                           {year} ({getFilterCount("year", year)})
@@ -540,8 +540,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           onClick={() => setEngineCapacityFilter(capacity)}
                           className={`transition-all duration-200 whitespace-nowrap ${
                             engineCapacityFilter === capacity
-                              ? "bg-teal-600 hover:bg-teal-700 text-white"
-                              : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                           }`}
                         >
                           {capacity} ({getFilterCount("engineCapacity", capacity)})
@@ -564,8 +564,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           onClick={() => setInteriorColorFilter(color)}
                           className={`transition-all duration-200 whitespace-nowrap ${
                             interiorColorFilter === color
-                              ? "bg-teal-600 hover:bg-teal-700 text-white"
-                              : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                           }`}
                         >
                           {color} ({getFilterCount("interiorColor", color)})
@@ -588,8 +588,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           onClick={() => setExteriorColorFilter(color)}
                           className={`transition-all duration-200 whitespace-nowrap ${
                             exteriorColorFilter === color
-                              ? "bg-teal-600 hover:bg-teal-700 text-white"
-                              : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                           }`}
                         >
                           {color} ({getFilterCount("exteriorColor", color)})
@@ -612,8 +612,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           onClick={() => setStatusFilter(status)}
                           className={`transition-all duration-200 whitespace-nowrap ${
                             statusFilter === status
-                              ? "bg-teal-600 hover:bg-teal-700 text-white"
-                              : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                           }`}
                         >
                           {status} ({getFilterCount("status", status)})
@@ -636,8 +636,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           onClick={() => setImportTypeFilter(type)}
                           className={`transition-all duration-200 whitespace-nowrap ${
                             importTypeFilter === type
-                              ? "bg-teal-600 hover:bg-teal-700 text-white"
-                              : "hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-400"
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                           }`}
                         >
                           {type} ({getFilterCount("importType", type)})
@@ -684,7 +684,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   <>
                     <Button 
                       onClick={() => setFormOpen(true)}
-                      className="bg-teal-600 hover:bg-teal-700 text-white w-full sm:w-auto"
+                      className="bg-custom-primary hover:bg-custom-primary-dark text-white w-full sm:w-auto"
                     >
                       <Plus className="w-4 h-4 ml-2" />
                       إضافة عنصر
@@ -768,7 +768,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 variant={currentPage === i + 1 ? "default" : "outline"}
                 size="sm"
                 onClick={() => setCurrentPage(i + 1)}
-                className={currentPage === i + 1 ? "bg-teal-600 hover:bg-teal-700" : ""}
+                className={currentPage === i + 1 ? "bg-custom-primary hover:bg-custom-primary-dark" : ""}
               >
                 {i + 1}
               </Button>

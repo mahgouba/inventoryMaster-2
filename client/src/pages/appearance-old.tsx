@@ -565,7 +565,7 @@ export default function AppearancePage({ userRole }: AppearancePageProps) {
             <Button 
               onClick={handleSaveSettings}
               disabled={saveSettingsMutation.isPending}
-              className="bg-teal-600 hover:bg-teal-700"
+              className="bg-custom-primary hover:bg-custom-primary-dark"
             >
               {saveSettingsMutation.isPending ? (
                 "جاري الحفظ..."

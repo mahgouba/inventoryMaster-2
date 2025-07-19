@@ -244,7 +244,7 @@ export default function VehicleTransfer({ open, onOpenChange, vehicle }: Vehicle
               <Button 
                 type="submit" 
                 disabled={transferMutation.isPending}
-                className="bg-teal-600 hover:bg-teal-700"
+                className="bg-custom-primary hover:bg-custom-primary-dark"
               >
                 {transferMutation.isPending ? (
                   <>

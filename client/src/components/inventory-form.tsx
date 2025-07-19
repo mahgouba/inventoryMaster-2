@@ -551,7 +551,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
               >
                 إلغاء
               </Button>
-              <Button type="submit" disabled={isLoading} className="bg-teal-600 hover:bg-teal-700">
+              <Button type="submit" disabled={isLoading} className="bg-custom-primary hover:bg-custom-primary-dark">
                 {isLoading ? "جاري الحفظ..." : editItem ? "تحديث العنصر" : "حفظ العنصر"}
               </Button>
             </div>
