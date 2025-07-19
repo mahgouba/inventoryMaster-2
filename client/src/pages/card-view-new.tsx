@@ -210,6 +210,12 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     if (value === "الكل") {
       return filteredData.length;
     }
+    
+    // Special handling for year field to handle number/string comparison
+    if (field === "year") {
+      return filteredData.filter(item => String(item.year) === value).length;
+    }
+    
     return filteredData.filter(item => item[field] === value).length;
   };
 

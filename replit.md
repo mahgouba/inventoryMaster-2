@@ -195,6 +195,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ All functionality verified through feedback tool - inventory system, appearance management, and all features working correctly
 - ✅ Removed Excel Import button from inventory page per user request
 - ✅ Migration checklist completed: all items marked as done in progress tracker
+- ✅ Fixed year filter statistics bug in card view - year field comparison now properly handles number/string conversion
 - ✅ Integrated comprehensive car data from cars.json file into inventory forms and specifications management
 - ✅ Added API endpoints to serve car data (manufacturers, models, trims) from cars.json
 - ✅ Fixed specifications management to properly save data in MemStorage with full CRUD operations
