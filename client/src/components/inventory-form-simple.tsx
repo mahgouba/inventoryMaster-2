@@ -256,37 +256,49 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
     return titles[type] || "";
   };
 
-  // Load edit item data when editItem changes - use useMemo to prevent infinite loops
+  // Load edit item data when editItem changes or dialog opens
   useEffect(() => {
     if (!open) return;
 
     if (editItem) {
-      // Set form values from editItem
-      form.reset({
-        manufacturer: editItem.manufacturer,
-        category: editItem.category,
+      console.log('Loading edit item:', editItem); // Debug log
+      
+      // Set form values from editItem - ensure all fields are populated
+      const formData = {
+        manufacturer: editItem.manufacturer || "",
+        category: editItem.category || "",
         trimLevel: editItem.trimLevel || "",
-        engineCapacity: editItem.engineCapacity,
-        year: editItem.year,
-        exteriorColor: editItem.exteriorColor,
-        interiorColor: editItem.interiorColor,
-        status: editItem.status,
-        importType: editItem.importType,
-        location: editItem.location,
-        chassisNumber: editItem.chassisNumber,
+        engineCapacity: editItem.engineCapacity || "",
+        year: editItem.year || new Date().getFullYear(),
+        exteriorColor: editItem.exteriorColor || "",
+        interiorColor: editItem.interiorColor || "",
+        status: editItem.status || "متوفر",
+        importType: editItem.importType || "شخصي",
+        location: editItem.location || "المستودع الرئيسي",
+        chassisNumber: editItem.chassisNumber || "",
         price: editItem.price || "",
         images: editItem.images || [],
         notes: editItem.notes || "",
         isSold: editItem.isSold || false,
-      });
+      };
+      
+      console.log('Form data being set:', formData); // Debug log
+      form.reset(formData);
 
-      // Set manufacturer and available categories
-      setSelectedManufacturer(editItem.manufacturer);
-      setSelectedCategory(editItem.category);
-      // Categories will be loaded from API when manufacturer is set
+      // Set manufacturer and category states to ensure dropdowns work
+      setSelectedManufacturer(editItem.manufacturer || "");
+      setSelectedCategory(editItem.category || "");
+      
+      // Force form field values to be set individually to ensure they display
+      setTimeout(() => {
+        Object.entries(formData).forEach(([key, value]) => {
+          form.setValue(key as keyof typeof formData, value);
+        });
+      }, 100);
+      
     } else {
       // Reset form for new item
-      form.reset({
+      const defaultData = {
         manufacturer: "",
         category: "",
         trimLevel: "",
@@ -302,11 +314,12 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
         images: [],
         notes: "",
         isSold: false,
-      });
+      };
+      form.reset(defaultData);
       setSelectedManufacturer("");
       setSelectedCategory("");
     }
-  }, [editItem?.id, open]); // Only depend on editItem.id to prevent infinite loops
+  }, [editItem, open, form]); // Include form in dependencies
 
   
 
@@ -664,9 +677,9 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                       <FormControl>
                         <Input 
                           placeholder="أدخل السعر" 
-                          type="number"
+                          type="text"
                           value={field.value || ''}
-                          onChange={field.onChange}
+                          onChange={(e) => field.onChange(e.target.value)}
                         />
                       </FormControl>
                       <FormMessage />
