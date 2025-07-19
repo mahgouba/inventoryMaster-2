@@ -64,9 +64,10 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
 
   const form = useForm<InsertInventoryItem>({
     resolver: zodResolver(insertInventoryItemSchema),
-    defaultValues: editItem || {
+    defaultValues: {
       manufacturer: "",
       category: "",
+      trimLevel: "",
       engineCapacity: "",
       year: new Date().getFullYear(),
       exteriorColor: "",
@@ -78,6 +79,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
       images: [],
       logo: "",
       notes: "",
+      price: "",
       isSold: false,
     },
   });
@@ -95,9 +97,51 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   // Update form when editItem changes
   useEffect(() => {
     if (editItem) {
-      form.reset(editItem);
-      setSelectedManufacturer(editItem.manufacturer);
+      // Make sure all fields are properly populated
+      const formData = {
+        manufacturer: editItem.manufacturer || "",
+        category: editItem.category || "",
+        trimLevel: editItem.trimLevel || "",
+        engineCapacity: editItem.engineCapacity || "",
+        year: editItem.year || new Date().getFullYear(),
+        exteriorColor: editItem.exteriorColor || "",
+        interiorColor: editItem.interiorColor || "",
+        status: editItem.status || "",
+        importType: editItem.importType || "",
+        location: editItem.location || "",
+        chassisNumber: editItem.chassisNumber || "",
+        images: editItem.images || [],
+        logo: editItem.logo || "",
+        notes: editItem.notes || "",
+        price: editItem.price || "",
+        isSold: editItem.isSold || false,
+      };
+      
+      form.reset(formData);
+      setSelectedManufacturer(editItem.manufacturer || "");
       setAvailableCategories(manufacturerCategories[editItem.manufacturer] || []);
+    } else {
+      // Reset to empty form when creating new item
+      form.reset({
+        manufacturer: "",
+        category: "",
+        trimLevel: "",
+        engineCapacity: "",
+        year: new Date().getFullYear(),
+        exteriorColor: "",
+        interiorColor: "",
+        status: "",
+        importType: "",
+        location: "",
+        chassisNumber: "",
+        images: [],
+        logo: "",
+        notes: "",
+        price: "",
+        isSold: false,
+      });
+      setSelectedManufacturer("");
+      setAvailableCategories([]);
     }
   }, [editItem, form]);
 
@@ -246,6 +290,24 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
 
               <FormField
                 control={form.control}
+                name="trimLevel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>درجة التجهيز</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="فل كامل، ستاندرد، خاص"
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="engineCapacity"
                 render={({ field }) => (
                   <FormItem>
@@ -275,7 +337,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                     <FormLabel>السنة</FormLabel>
                     <FormControl>
                       <Select onValueChange={(value) => field.onChange(parseInt(value))} 
-                              defaultValue={field.value?.toString()}>
+                              value={field.value?.toString()}>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر السنة" />
                         </SelectTrigger>
