@@ -5,12 +5,22 @@
 
 /* Print Styles for Quotation */
 @media print {
-  body, html {
+  @page {
     margin: 0;
-    padding: 0;
+    size: A4;
+  }
+  
+  body, html {
+    margin: 0 !important;
+    padding: 0 !important;
     font-size: 12pt;
     color: #000;
     background: white;
+  }
+  
+  * {
+    margin: 0 !important;
+    box-shadow: none !important;
   }
   
   .print-page {

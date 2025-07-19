@@ -172,6 +172,11 @@ The application uses PostgreSQL for persistent data storage with proper database
 - Moved representative information section below Terms & Conditions section in quotation preview per user request
 - Updated quotation preview layout to display quote number and date in the same row as "عرض سعر" title
 - Removed customer addressing section from quotation preview per user request
+- Fixed currency display from "قرش" to "هلل" in Arabic number conversion for quotation totals
+- Reorganized vehicle information into 2 rows: (1) Manufacturer/Category/Trim/Year, (2) Exterior Color/Interior Color/Chassis Number
+- Removed engine capacity field from vehicle information display
+- Added print-specific styling to hide edit button and remove all margins for clean printing
+- Enhanced quotation preview with improved padding and spacing for better presentation
 - Fixed Arabic currency text in numberToArabic function: changed "قرش" to "هلل" for proper Saudi currency format
 - Updated customer information section styling in quotation preview with specific classes: pt-[1px] pb-[1px] text-[13px] text-right
 - Added background toggle switch functionality to quotation preview allowing users to switch between albarimi-1.jpg and albarimi-2.jpg backgrounds with Arabic labels (خلفية 1 / خلفية 2)

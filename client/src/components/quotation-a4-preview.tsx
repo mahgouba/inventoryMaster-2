@@ -451,7 +451,7 @@ export default function QuotationA4Preview({
                       variant="outline"
                       size="sm"
                       onClick={() => setIsEditingSpecs(!isEditingSpecs)}
-                      className="text-xs px-2 py-1"
+                      className="text-xs px-2 py-1 print:hidden"
                     >
                       {isEditingSpecs ? "حفظ" : "تحرير"}
                     </Button>
