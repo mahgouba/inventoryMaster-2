@@ -413,15 +413,6 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       <FileText className="w-4 h-4 ml-2" />
                       إنشاء عرض سعر
                     </Button>
-                    
-                    <Button 
-                      onClick={() => setIsExcelImportOpen(true)}
-                      variant="outline"
-                      className="border-teal-600 text-teal-600 hover:bg-teal-50 w-full sm:w-auto"
-                    >
-                      <FileSpreadsheet className="w-4 h-4 ml-2" />
-                      استيراد Excel
-                    </Button>
                   </>
                 )}
                 
