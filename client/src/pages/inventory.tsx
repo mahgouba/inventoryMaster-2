@@ -30,12 +30,16 @@ interface InventoryPageProps {
 
 export default function InventoryPage({ userRole, username, onLogout }: InventoryPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("جميع الفئات");
   const [manufacturerFilter, setManufacturerFilter] = useState("جميع الصناع");
+  const [categoryFilter, setCategoryFilter] = useState("جميع الفئات");
+  const [trimLevelFilter, setTrimLevelFilter] = useState("جميع درجات التجهيز");
   const [yearFilter, setYearFilter] = useState("جميع السنوات");
+  const [engineCapacityFilter, setEngineCapacityFilter] = useState("جميع السعات");
+  const [interiorColorFilter, setInteriorColorFilter] = useState("جميع الألوان الداخلية");
+  const [exteriorColorFilter, setExteriorColorFilter] = useState("جميع الألوان الخارجية");
+  const [statusFilter, setStatusFilter] = useState("جميع الحالات");
   const [importTypeFilter, setImportTypeFilter] = useState("جميع الأنواع");
   const [locationFilter, setLocationFilter] = useState("");
-  const [engineCapacityFilter, setEngineCapacityFilter] = useState("جميع السعات");
   const [showSoldCars, setShowSoldCars] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editItem, setEditItem] = useState<InventoryItem | undefined>(undefined);
@@ -114,9 +118,14 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   
   const categories = getAvailableCategories();
   const years = ["جميع السنوات", "2025", "2024", "2023", "2022", "2021"];
+  // Filter arrays
+  const statuses = ["جميع الحالات", "متوفر", "محجوز", "مباع", "في الطريق", "قيد الصيانة"];
   const importTypes = ["جميع الأنواع", "شخصي", "شركة", "مستعمل شخصي"];
   const locations = ["المستودع الرئيسي", "المعرض", "الورشة", "الميناء", "مستودع فرعي"];
   const engineCapacities = ["جميع السعات", "2.0L", "1.5L", "3.0L", "4.0L", "5.0L", "V6", "V8"];
+  const exteriorColors = ["جميع الألوان الخارجية", "أبيض", "أسود", "رمادي", "فضي", "أزرق", "أحمر", "بني", "ذهبي", "أخضر"];
+  const interiorColors = ["جميع الألوان الداخلية", "أسود", "بني", "بيج", "رمادي", "أبيض", "كريمي"];
+  const trimLevels = ["جميع درجات التجهيز", "Base", "Premium", "Sport", "Luxury", "AMG", "M Series", "RS"];
 
   const handleExport = () => {
     exportToExcel(items, "تصدير-المخزون.xlsx");
@@ -358,20 +367,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 </div>
               </div>
               
-              {/* Filter Controls */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              {/* Filter Controls - Row 1: الصانع، الفئات، درجة التجهيز، السنة، سعة المحرك */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
                 <Select value={manufacturerFilter} onValueChange={handleManufacturerChange}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -384,6 +381,33 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     ))}
                   </SelectContent>
                 </Select>
+                
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select value={trimLevelFilter} onValueChange={setTrimLevelFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {trimLevels.map((trim) => (
+                      <SelectItem key={trim} value={trim}>
+                        {trim}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
                 <Select value={yearFilter} onValueChange={setYearFilter}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -396,18 +420,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     ))}
                   </SelectContent>
                 </Select>
-                <Select value={importTypeFilter} onValueChange={setImportTypeFilter}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {importTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                
                 <Select value={engineCapacityFilter} onValueChange={setEngineCapacityFilter}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -416,6 +429,61 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     {engineCapacities.map((capacity) => (
                       <SelectItem key={capacity} value={capacity}>
                         {capacity}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Filter Controls - Row 2: اللون الداخلي، اللون الخارجي، الحالة، نوع الاستيراد */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <Select value={interiorColorFilter} onValueChange={setInteriorColorFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {interiorColors.map((color) => (
+                      <SelectItem key={color} value={color}>
+                        {color}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select value={exteriorColorFilter} onValueChange={setExteriorColorFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {exteriorColors.map((color) => (
+                      <SelectItem key={color} value={color}>
+                        {color}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statuses.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select value={importTypeFilter} onValueChange={setImportTypeFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {importTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -481,11 +549,15 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         {/* Inventory Table */}
         <InventoryTable
           searchQuery={searchQuery}
-          categoryFilter={categoryFilter}
           manufacturerFilter={manufacturerFilter}
+          categoryFilter={categoryFilter}
+          trimLevelFilter={trimLevelFilter}
           yearFilter={yearFilter}
-          importTypeFilter={importTypeFilter}
           engineCapacityFilter={engineCapacityFilter}
+          interiorColorFilter={interiorColorFilter}
+          exteriorColorFilter={exteriorColorFilter}
+          statusFilter={statusFilter}
+          importTypeFilter={importTypeFilter}
           showSoldCars={showSoldCars}
           userRole={userRole}
           username={username}

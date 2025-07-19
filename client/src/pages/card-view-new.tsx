@@ -64,6 +64,14 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [reservingItemId, setReservingItemId] = useState<number | null>(null);
   const [cancelingReservationId, setCancelingReservationId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("الكل");
+  const [selectedTrimLevel, setSelectedTrimLevel] = useState<string>("الكل");
+  const [selectedYear, setSelectedYear] = useState<string>("الكل");
+  const [selectedEngineCapacity, setSelectedEngineCapacity] = useState<string>("الكل");
+  const [selectedInteriorColor, setSelectedInteriorColor] = useState<string>("الكل");
+  const [selectedExteriorColor, setSelectedExteriorColor] = useState<string>("الكل");
+  const [selectedStatus, setSelectedStatus] = useState<string>("الكل");
+  const [selectedImportType, setSelectedImportType] = useState<string>("الكل");
   const [showSoldCars, setShowSoldCars] = useState<boolean>(false);
   const [shareVehicle, setShareVehicle] = useState<InventoryItem | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -109,10 +117,69 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         );
       });
 
-  // Apply manufacturer filter
-  const filteredItems = selectedManufacturer === "الكل" 
-    ? searchFilteredItems 
-    : searchFilteredItems.filter(item => item.manufacturer === selectedManufacturer);
+  // Filter Arrays
+  const manufacturers = ["الكل", "مرسيدس", "بي ام دبليو", "اودي", "تويوتا", "لكزس", "رنج روفر", "بورش", "نيسان", "انفينيتي", "هيونداي", "كيا", "فولفو", "جاكوار", "مازيراتي", "فيراري", "لامبورغيني", "تسلا", "لوسيد", "كاديلاك", "جي ام سي"];
+  
+  const manufacturerCategories: Record<string, string[]> = {
+    "مرسيدس": ["S-Class", "E-Class", "C-Class", "GLE", "GLS", "A-Class", "CLA", "CLS", "G-Class", "GLC"],
+    "بي ام دبليو": ["7 Series", "5 Series", "3 Series", "X7", "X5", "X3", "X1", "i8", "M3", "M5"],
+    "اودي": ["A8", "A6", "A4", "Q8", "Q7", "Q5", "Q3", "A3", "TT", "RS6", "e-tron"],
+    "تويوتا": ["لاند كروزر", "كامري", "كورولا", "هايلاندر", "بريوس", "أفالون", "RAV4", "سيكويا"],
+    "لكزس": ["LX 600", "GX 460", "RX 350", "ES 350", "LS 500", "IS 350", "UX 250h", "LC 500"],
+    "رنج روفر": ["Range Rover Vogue", "Range Rover Sport", "Range Rover Evoque", "Range Rover Velar", "Discovery", "Defender"],
+    "بورش": ["Cayenne", "Macan", "911", "Panamera", "Taycan", "718"],
+    "نيسان": ["باترول", "التيما", "ماكسيما", "اكس تريل", "سنترا", "مورانو", "أرمادا", "Z"],
+    "انفينيتي": ["QX80", "QX60", "QX50", "Q50", "Q60", "QX55"],
+    "هيونداي": ["النترا", "سوناتا", "توسان", "سانتا في", "باليسايد", "أكسنت", "فيلوستر"],
+    "كيا": ["سورينتو", "تيلورايد", "سيراتو", "أوبتيما", "سبورتاج", "كارنيفال", "ستينغر"],
+    "فولفو": ["XC90", "XC60", "S90", "V90", "S60", "XC40"],
+    "جاكوار": ["F-PACE", "I-PACE", "XF", "XE", "F-TYPE"],
+    "مازيراتي": ["Levante", "Ghibli", "Quattroporte", "GranTurismo"],
+    "فيراري": ["488", "F8", "Roma", "Portofino", "SF90"],
+    "لامبورغيني": ["Aventador", "Huracan", "Urus"],
+    "تسلا": ["Model S", "Model 3", "Model X", "Model Y"],
+    "لوسيد": ["Air Dream", "Air Touring", "Air Pure"],
+    "كاديلاك": ["Escalade", "XT6", "XT5", "XT4", "CT5"],
+    "جي ام سي": ["Yukon", "Tahoe", "Sierra", "Canyon", "Terrain"]
+  };
+  
+  const getAvailableCategories = () => {
+    if (!selectedManufacturer || selectedManufacturer === "الكل") {
+      return ["الكل"];
+    }
+    const manufacturerCats = manufacturerCategories[selectedManufacturer] || [];
+    return ["الكل", ...manufacturerCats];
+  };
+
+  const categories = getAvailableCategories();
+  const years = ["الكل", "2025", "2024", "2023", "2022", "2021"];
+  const statuses = ["الكل", "متوفر", "محجوز", "مباع", "في الطريق", "قيد الصيانة"];
+  const importTypes = ["الكل", "شخصي", "شركة", "مستعمل شخصي"];
+  const engineCapacities = ["الكل", "2.0L", "1.5L", "3.0L", "4.0L", "5.0L", "V6", "V8"];
+  const exteriorColors = ["الكل", "أبيض", "أسود", "رمادي", "فضي", "أزرق", "أحمر", "بني", "ذهبي", "أخضر"];
+  const interiorColors = ["الكل", "أسود", "بني", "بيج", "رمادي", "أبيض", "كريمي"];
+  const trimLevels = ["الكل", "Base", "Premium", "Sport", "Luxury", "AMG", "M Series", "RS"];
+  
+  // Reset category filter when manufacturer changes
+  const handleManufacturerChange = (value: string) => {
+    setSelectedManufacturer(value);
+    setSelectedCategory("الكل");
+  };
+
+  // Apply all filters
+  const filteredItems = searchFilteredItems.filter(item => {
+    return (
+      (selectedManufacturer === "الكل" || item.manufacturer === selectedManufacturer) &&
+      (selectedCategory === "الكل" || item.category === selectedCategory) &&
+      (selectedTrimLevel === "الكل" || item.trimLevel === selectedTrimLevel) &&
+      (selectedYear === "الكل" || item.year?.toString() === selectedYear) &&
+      (selectedEngineCapacity === "الكل" || item.engineCapacity === selectedEngineCapacity) &&
+      (selectedInteriorColor === "الكل" || item.interiorColor === selectedInteriorColor) &&
+      (selectedExteriorColor === "الكل" || item.exteriorColor === selectedExteriorColor) &&
+      (selectedStatus === "الكل" || item.status === selectedStatus) &&
+      (selectedImportType === "الكل" || item.importType === selectedImportType)
+    );
+  });
 
   // Group ALL items by manufacturer first (including sold cars for count calculation)
   const allGroupedData = inventoryData.reduce((acc, item) => {
@@ -435,10 +502,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           <p className="text-slate-600 dark:text-slate-400">عرض جميع تفاصيل السيارات مجمعة حسب الصانع</p>
           
           {/* Search and Filter Section */}
-          <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="mt-6">
             {/* Search Input */}
-            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 flex-1">
-              <div className="relative flex-1 max-w-md">
+            <div className="mb-4">
+              <div className="relative max-w-md">
                 <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
                 <Input
                   type="text"
@@ -450,51 +517,127 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               </div>
             </div>
 
-            
-
-            {/* Manufacturer Filter */}
-            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-              <Filter size={18} />
-              <span>تصفية حسب الصانع:</span>
-              <div className="min-w-[200px]">
-                <Select value={selectedManufacturer} onValueChange={setSelectedManufacturer}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="اختر الصانع" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="الكل">
-                      <div className="flex items-center gap-3">
-                        <Filter size={16} />
-                        <span>عرض جميع الشركات</span>
-                      </div>
+            {/* Filter Row 1: الصانع، الفئات، درجة التجهيز، السنة، سعة المحرك */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
+              <Select value={selectedManufacturer} onValueChange={handleManufacturerChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {manufacturers.map((manufacturer) => (
+                    <SelectItem key={manufacturer} value={manufacturer}>
+                      {manufacturer}
                     </SelectItem>
-                    {manufacturerStats.map((stat) => (
-                      <SelectItem key={stat.manufacturer} value={stat.manufacturer}>
-                        <div className="flex items-center gap-3 group">
-                          {stat.logo ? (
-                            <div className="relative">
-                              <img 
-                                src={stat.logo} 
-                                alt={stat.manufacturer}
-                                className="w-6 h-6 object-contain rounded transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-sm"
-                              />
-                              <div className="absolute inset-0 rounded bg-dynamic-primary opacity-0 scale-125 transition-all duration-200 group-hover:opacity-10 group-hover:scale-110"></div>
-                            </div>
-                          ) : (
-                            <div className="w-6 h-6 bg-slate-200 rounded flex items-center justify-center text-xs text-slate-600 transition-all duration-200 group-hover:bg-dynamic-card group-hover:text-dynamic-primary group-hover:scale-110">
-                              {stat.manufacturer.charAt(0)}
-                            </div>
-                          )}
-                          <span className="transition-colors duration-200 group-hover:text-dynamic-primary">{stat.manufacturer}</span>
-                          <Badge variant="secondary" className="text-xs transition-all duration-200 group-hover:bg-dynamic-card group-hover:text-dynamic-primary">
-                            {stat.total}
-                          </Badge>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={selectedTrimLevel} onValueChange={setSelectedTrimLevel}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {trimLevels.map((trim) => (
+                    <SelectItem key={trim} value={trim}>
+                      {trim}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={selectedEngineCapacity} onValueChange={setSelectedEngineCapacity}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {engineCapacities.map((capacity) => (
+                    <SelectItem key={capacity} value={capacity}>
+                      {capacity}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Filter Row 2: اللون الداخلي، اللون الخارجي، الحالة، نوع الاستيراد */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <Select value={selectedInteriorColor} onValueChange={setSelectedInteriorColor}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {interiorColors.map((color) => (
+                    <SelectItem key={color} value={color}>
+                      {color}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={selectedExteriorColor} onValueChange={setSelectedExteriorColor}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {exteriorColors.map((color) => (
+                    <SelectItem key={color} value={color}>
+                      {color}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {statuses.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={selectedImportType} onValueChange={setSelectedImportType}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {importTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>

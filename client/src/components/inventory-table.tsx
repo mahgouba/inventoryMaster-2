@@ -14,18 +14,37 @@ import InventoryForm from "./inventory-form";
 
 interface InventoryTableProps {
   searchQuery: string;
-  categoryFilter: string;
   manufacturerFilter: string;
+  categoryFilter: string;
+  trimLevelFilter: string;
   yearFilter: string;
-  importTypeFilter: string;
   engineCapacityFilter: string;
+  interiorColorFilter: string;
+  exteriorColorFilter: string;
+  statusFilter: string;
+  importTypeFilter: string;
   showSoldCars: boolean;
   userRole: string;
   username: string;
   onEdit?: (item: InventoryItem) => void;
 }
 
-export default function InventoryTable({ searchQuery, categoryFilter, manufacturerFilter, yearFilter, importTypeFilter, engineCapacityFilter, showSoldCars, userRole, username, onEdit }: InventoryTableProps) {
+export default function InventoryTable({ 
+  searchQuery, 
+  manufacturerFilter, 
+  categoryFilter, 
+  trimLevelFilter, 
+  yearFilter, 
+  engineCapacityFilter, 
+  interiorColorFilter, 
+  exteriorColorFilter, 
+  statusFilter, 
+  importTypeFilter, 
+  showSoldCars, 
+  userRole, 
+  username, 
+  onEdit 
+}: InventoryTableProps) {
   const [editItem, setEditItem] = useState<InventoryItem | undefined>();
   const [formOpen, setFormOpen] = useState(false);
   const [sortColumn, setSortColumn] = useState<string>("");
@@ -174,16 +193,20 @@ export default function InventoryTable({ searchQuery, categoryFilter, manufactur
         Object.values(item).some(value => 
           value?.toString().toLowerCase().includes(searchQuery.toLowerCase())
         );
-      const matchesCategory = !categoryFilter || categoryFilter === "جميع الفئات" || item.category === categoryFilter;
       const matchesManufacturer = !manufacturerFilter || manufacturerFilter === "جميع الصناع" || item.manufacturer === manufacturerFilter;
-      const matchesYear = !yearFilter || yearFilter === "جميع السنوات" || item.year.toString() === yearFilter;
-      const matchesImportType = !importTypeFilter || importTypeFilter === "جميع الأنواع" || item.importType === importTypeFilter;
+      const matchesCategory = !categoryFilter || categoryFilter === "جميع الفئات" || item.category === categoryFilter;
+      const matchesTrimLevel = !trimLevelFilter || trimLevelFilter === "جميع درجات التجهيز" || item.trimLevel === trimLevelFilter;
+      const matchesYear = !yearFilter || yearFilter === "جميع السنوات" || item.year?.toString() === yearFilter;
       const matchesEngineCapacity = !engineCapacityFilter || engineCapacityFilter === "جميع السعات" || item.engineCapacity === engineCapacityFilter;
+      const matchesInteriorColor = !interiorColorFilter || interiorColorFilter === "جميع الألوان الداخلية" || item.interiorColor === interiorColorFilter;
+      const matchesExteriorColor = !exteriorColorFilter || exteriorColorFilter === "جميع الألوان الخارجية" || item.exteriorColor === exteriorColorFilter;
+      const matchesStatus = !statusFilter || statusFilter === "جميع الحالات" || item.status === statusFilter;
+      const matchesImportType = !importTypeFilter || importTypeFilter === "جميع الأنواع" || item.importType === importTypeFilter;
       // إذا كان إظهار السيارات المباعة مفعلاً، اعرض جميع السيارات
       // إذا كان مطفياً، اعرض فقط السيارات غير المباعة
-      const matchesSoldFilter = showSoldCars ? true : !item.isSold;
+      const matchesSoldFilter = showSoldCars ? true : item.status !== "مباع";
       
-      return matchesSearch && matchesCategory && matchesManufacturer && matchesYear && matchesImportType && matchesEngineCapacity && matchesSoldFilter;
+      return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesYear && matchesEngineCapacity && matchesInteriorColor && matchesExteriorColor && matchesStatus && matchesImportType && matchesSoldFilter;
     })
     .sort((a: InventoryItem, b: InventoryItem) => {
       if (!sortColumn) return 0;
