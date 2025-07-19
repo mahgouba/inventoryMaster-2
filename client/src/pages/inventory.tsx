@@ -207,7 +207,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
         if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
         if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
-        if (yearFilter !== "جميع السنوات" && item.year?.toString() !== yearFilter) return false;
+        if (yearFilter !== "جميع السنوات" && String(item.year) !== yearFilter) return false;
         return true;
       }
       
@@ -215,7 +215,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
         if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
         if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
-        if (yearFilter !== "جميع السنوات" && item.year?.toString() !== yearFilter) return false;
+        if (yearFilter !== "جميع السنوات" && String(item.year) !== yearFilter) return false;
         if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
         return true;
       }
@@ -224,7 +224,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
         if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
         if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
-        if (yearFilter !== "جميع السنوات" && item.year?.toString() !== yearFilter) return false;
+        if (yearFilter !== "جميع السنوات" && String(item.year) !== yearFilter) return false;
         if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
         if (exteriorColorFilter !== "جميع الألوان الخارجية" && item.exteriorColor !== exteriorColorFilter) return false;
         return true;
@@ -234,7 +234,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
         if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
         if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
-        if (yearFilter !== "جميع السنوات" && item.year?.toString() !== yearFilter) return false;
+        if (yearFilter !== "جميع السنوات" && String(item.year) !== yearFilter) return false;
         if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
         if (exteriorColorFilter !== "جميع الألوان الخارجية" && item.exteriorColor !== exteriorColorFilter) return false;
         if (interiorColorFilter !== "جميع الألوان الداخلية" && item.interiorColor !== interiorColorFilter) return false;
@@ -246,7 +246,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
         if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
         if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
-        if (yearFilter !== "جميع السنوات" && item.year?.toString() !== yearFilter) return false;
+        if (yearFilter !== "جميع السنوات" && String(item.year) !== yearFilter) return false;
         if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
         if (exteriorColorFilter !== "جميع الألوان الخارجية" && item.exteriorColor !== exteriorColorFilter) return false;
         if (interiorColorFilter !== "جميع الألوان الداخلية" && item.interiorColor !== interiorColorFilter) return false;
@@ -300,7 +300,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
       if (appliedFilters.manufacturer && appliedFilters.manufacturer !== "جميع الصناع" && item.manufacturer !== appliedFilters.manufacturer) return false;
       if (appliedFilters.category && appliedFilters.category !== "جميع الفئات" && item.category !== appliedFilters.category) return false;
       if (appliedFilters.trimLevel && appliedFilters.trimLevel !== "جميع درجات التجهيز" && item.trimLevel !== appliedFilters.trimLevel) return false;
-      if (appliedFilters.year && appliedFilters.year !== "جميع السنوات" && item.year?.toString() !== appliedFilters.year) return false;
+      if (appliedFilters.year && appliedFilters.year !== "جميع السنوات" && String(item.year) !== appliedFilters.year) return false;
       if (appliedFilters.engineCapacity && appliedFilters.engineCapacity !== "جميع السعات" && item.engineCapacity !== appliedFilters.engineCapacity) return false;
       if (appliedFilters.exteriorColor && appliedFilters.exteriorColor !== "جميع الألوان الخارجية" && item.exteriorColor !== appliedFilters.exteriorColor) return false;
       if (appliedFilters.interiorColor && appliedFilters.interiorColor !== "جميع الألوان الداخلية" && item.interiorColor !== appliedFilters.interiorColor) return false;
@@ -749,30 +749,6 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   </ScrollArea>
                 </div>
 
-                {/* اللون الداخلي */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الداخلي</h3>
-                  <ScrollArea className="w-full">
-                    <div className="flex space-x-2 space-x-reverse pb-2">
-                      {availableInteriorColors.map((color) => (
-                        <Button
-                          key={color}
-                          variant={interiorColorFilter === color ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setInteriorColorFilter(color)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            interiorColorFilter === color
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {color} ({getFilterCount("interiorColor", color)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-
                 {/* اللون الخارجي */}
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الخارجي</h3>
@@ -791,6 +767,30 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           }`}
                         >
                           {color} ({getFilterCount("exteriorColor", color)})
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+
+                {/* اللون الداخلي */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الداخلي</h3>
+                  <ScrollArea className="w-full">
+                    <div className="flex space-x-2 space-x-reverse pb-2">
+                      {availableInteriorColors.map((color) => (
+                        <Button
+                          key={color}
+                          variant={interiorColorFilter === color ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setInteriorColorFilter(color)}
+                          className={`transition-all duration-200 whitespace-nowrap ${
+                            interiorColorFilter === color
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                          }`}
+                        >
+                          {color} ({getFilterCount("interiorColor", color)})
                         </Button>
                       ))}
                     </div>

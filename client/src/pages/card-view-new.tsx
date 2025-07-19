@@ -156,7 +156,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
         if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
         if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
-        if (selectedYear !== "الكل" && item.year?.toString() !== selectedYear) return false;
+        if (selectedYear !== "الكل" && String(item.year) !== selectedYear) return false;
         return true;
       }
       
@@ -164,7 +164,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
         if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
         if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
-        if (selectedYear !== "الكل" && item.year?.toString() !== selectedYear) return false;
+        if (selectedYear !== "الكل" && String(item.year) !== selectedYear) return false;
         if (selectedEngineCapacity !== "الكل" && item.engineCapacity !== selectedEngineCapacity) return false;
         return true;
       }
@@ -173,7 +173,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
         if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
         if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
-        if (selectedYear !== "الكل" && item.year?.toString() !== selectedYear) return false;
+        if (selectedYear !== "الكل" && String(item.year) !== selectedYear) return false;
         if (selectedEngineCapacity !== "الكل" && item.engineCapacity !== selectedEngineCapacity) return false;
         if (selectedExteriorColor !== "الكل" && item.exteriorColor !== selectedExteriorColor) return false;
         return true;
@@ -183,7 +183,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
         if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
         if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
-        if (selectedYear !== "الكل" && item.year?.toString() !== selectedYear) return false;
+        if (selectedYear !== "الكل" && String(item.year) !== selectedYear) return false;
         if (selectedEngineCapacity !== "الكل" && item.engineCapacity !== selectedEngineCapacity) return false;
         if (selectedExteriorColor !== "الكل" && item.exteriorColor !== selectedExteriorColor) return false;
         if (selectedInteriorColor !== "الكل" && item.interiorColor !== selectedInteriorColor) return false;
@@ -195,7 +195,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
         if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
         if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
-        if (selectedYear !== "الكل" && item.year?.toString() !== selectedYear) return false;
+        if (selectedYear !== "الكل" && String(item.year) !== selectedYear) return false;
         if (selectedEngineCapacity !== "الكل" && item.engineCapacity !== selectedEngineCapacity) return false;
         if (selectedExteriorColor !== "الكل" && item.exteriorColor !== selectedExteriorColor) return false;
         if (selectedInteriorColor !== "الكل" && item.interiorColor !== selectedInteriorColor) return false;
@@ -287,7 +287,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
       if (appliedFilters.manufacturer && appliedFilters.manufacturer !== "الكل" && item.manufacturer !== appliedFilters.manufacturer) return false;
       if (appliedFilters.category && appliedFilters.category !== "الكل" && item.category !== appliedFilters.category) return false;
       if (appliedFilters.trimLevel && appliedFilters.trimLevel !== "الكل" && item.trimLevel !== appliedFilters.trimLevel) return false;
-      if (appliedFilters.year && appliedFilters.year !== "الكل" && item.year?.toString() !== appliedFilters.year) return false;
+      if (appliedFilters.year && appliedFilters.year !== "الكل" && String(item.year) !== appliedFilters.year) return false;
       if (appliedFilters.engineCapacity && appliedFilters.engineCapacity !== "الكل" && item.engineCapacity !== appliedFilters.engineCapacity) return false;
       if (appliedFilters.exteriorColor && appliedFilters.exteriorColor !== "الكل" && item.exteriorColor !== appliedFilters.exteriorColor) return false;
       if (appliedFilters.interiorColor && appliedFilters.interiorColor !== "الكل" && item.interiorColor !== appliedFilters.interiorColor) return false;
