@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Plus, Share2, Copy, Edit2, Save, X, Image, Link } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { InventoryItem, Specification, InsertSpecification } from "@shared/schema";
+import type { InventoryItem } from "@shared/schema";
 
 interface VehicleShareProps {
   vehicle: InventoryItem;
@@ -23,57 +23,38 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showSpecificationForm, setShowSpecificationForm] = useState(false);
-  const [specificationDescription, setSpecificationDescription] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
+  const [specificationDescription, setSpecificationDescription] = useState(vehicle.detailedSpecifications || "");
+  const [isUpdating, setIsUpdating] = useState(false);
   const [sharePrice, setSharePrice] = useState(vehicle.price || "");
   const [isEditingPrice, setIsEditingPrice] = useState(false);
 
-  // Query for existing specification
-  const { data: specification, isLoading } = useQuery<Specification>({
-    queryKey: [`/api/specifications/${vehicle.manufacturer}/${vehicle.category}/${vehicle.trimLevel}/${vehicle.year}/${vehicle.engineCapacity}`],
-    enabled: open,
-  });
-
-  const createSpecificationMutation = useMutation({
-    mutationFn: (data: InsertSpecification) => apiRequest("POST", "/api/specifications", data),
+  const updateSpecificationMutation = useMutation({
+    mutationFn: (data: { detailedSpecifications: string }) => 
+      apiRequest("PATCH", `/api/inventory/${vehicle.id}`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: [`/api/specifications/${vehicle.manufacturer}/${vehicle.category}/${vehicle.trimLevel}/${vehicle.year}/${vehicle.engineCapacity}`] 
-      });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
       setShowSpecificationForm(false);
-      setSpecificationDescription("");
+      setIsUpdating(false);
       toast({
-        title: "تم إضافة المواصفات بنجاح",
-        description: "تم إضافة الوصف التفصيلي للسيارة",
+        title: "تم حفظ المواصفات بنجاح",
+        description: "تم حفظ الوصف التفصيلي لهذه السيارة",
       });
     },
     onError: (error) => {
-      console.error("Error creating specification:", error);
+      console.error("Error updating specification:", error);
+      setIsUpdating(false);
       toast({
-        title: "خطأ في إضافة المواصفات",
-        description: "حدث خطأ أثناء إضافة الوصف التفصيلي",
+        title: "خطأ في حفظ المواصفات",
+        description: "حدث خطأ أثناء حفظ الوصف التفصيلي",
         variant: "destructive",
       });
     },
   });
 
-  const handleCreateSpecification = () => {
-    if (!specificationDescription.trim()) {
-      toast({
-        title: "يرجى إدخال الوصف التفصيلي",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsCreating(true);
-    createSpecificationMutation.mutate({
-      manufacturer: vehicle.manufacturer,
-      category: vehicle.category,
-      trimLevel: vehicle.trimLevel || "",
-      year: vehicle.year,
-      engineCapacity: vehicle.engineCapacity,
-      detailedDescription: specificationDescription,
+  const handleSaveSpecification = () => {
+    setIsUpdating(true);
+    updateSpecificationMutation.mutate({
+      detailedSpecifications: specificationDescription.trim(),
     });
   };
 
@@ -106,7 +87,7 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
       baseText += `\n📸 الصور المرفقة: ${vehicle.images.length} صورة`;
     }
 
-    const detailedDescription = specification?.detailedDescription || "";
+    const detailedDescription = vehicle.detailedSpecifications || "";
     
     return detailedDescription 
       ? `${baseText}\n\n📋 المواصفات التفصيلية:\n${detailedDescription}`
@@ -263,24 +244,24 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
-                  {vehicle.images.slice(0, 4).map((image, index) => (
+                  {vehicle.images?.slice(0, 4).map((image, index) => (
                     <div key={index} className="relative">
                       <img
                         src={image}
                         alt={`صورة السيارة ${index + 1}`}
                         className="w-full h-24 object-cover rounded-lg border"
                       />
-                      {index === 3 && vehicle.images.length > 4 && (
+                      {index === 3 && (vehicle.images?.length || 0) > 4 && (
                         <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
-                          <span className="text-white font-medium">+{vehicle.images.length - 4}</span>
+                          <span className="text-white font-medium">+{(vehicle.images?.length || 0) - 4}</span>
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
-                {vehicle.images.length > 4 && (
+                {(vehicle.images?.length || 0) > 4 && (
                   <p className="text-xs text-slate-500 mt-2 text-center">
-                    إجمالي {vehicle.images.length} صورة
+                    إجمالي {vehicle.images?.length || 0} صورة
                   </p>
                 )}
               </CardContent>
@@ -292,7 +273,7 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">المواصفات التفصيلية</CardTitle>
-                {!specification && !showSpecificationForm && (
+                {!vehicle.detailedSpecifications && !showSpecificationForm && (
                   <Button
                     variant="outline"
                     size="sm"
@@ -306,35 +287,33 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
               </div>
             </CardHeader>
             <CardContent>
-              {isLoading ? (
-                <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="text-sm text-slate-600 mt-2">جاري التحميل...</p>
-                </div>
-              ) : specification ? (
+              {vehicle.detailedSpecifications ? (
                 <div className="space-y-3">
                   <div className="p-4 bg-slate-50 rounded-lg">
-                    <p className="text-sm whitespace-pre-wrap">{specification.detailedDescription}</p>
+                    <p className="text-sm whitespace-pre-wrap">{vehicle.detailedSpecifications}</p>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span>تم الإنشاء: {new Date(specification.createdAt).toLocaleDateString('ar-SA')}</span>
+                  <div className="flex justify-end">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setShowSpecificationForm(true)}
+                      onClick={() => {
+                        setSpecificationDescription(vehicle.detailedSpecifications || "");
+                        setShowSpecificationForm(true);
+                      }}
                       className="text-blue-600 hover:bg-blue-50"
                     >
-                      <Edit2 className="h-4 w-4" />
+                      <Edit2 className="h-4 w-4 ml-1" />
+                      تعديل
                     </Button>
                   </div>
                 </div>
               ) : showSpecificationForm ? (
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="specification">الوصف التفصيلي</Label>
+                    <Label htmlFor="specification">الوصف التفصيلي لهذه السيارة</Label>
                     <Textarea
                       id="specification"
-                      placeholder="اكتب الوصف التفصيلي للسيارة..."
+                      placeholder="اكتب الوصف التفصيلي لهذه السيارة المحددة..."
                       value={specificationDescription}
                       onChange={(e) => setSpecificationDescription(e.target.value)}
                       className="mt-2"
@@ -346,18 +325,18 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
                       variant="outline"
                       onClick={() => {
                         setShowSpecificationForm(false);
-                        setSpecificationDescription("");
+                        setSpecificationDescription(vehicle.detailedSpecifications || "");
                       }}
                     >
                       <X className="h-4 w-4 ml-1" />
                       إلغاء
                     </Button>
                     <Button
-                      onClick={handleCreateSpecification}
-                      disabled={isCreating || !specificationDescription.trim()}
+                      onClick={handleSaveSpecification}
+                      disabled={isUpdating}
                     >
                       <Save className="h-4 w-4 ml-1" />
-                      {isCreating ? "جاري الحفظ..." : "حفظ"}
+                      {isUpdating ? "جاري الحفظ..." : "حفظ"}
                     </Button>
                   </div>
                 </div>
@@ -365,6 +344,7 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
                 <div className="text-center py-6">
                   <div className="text-slate-400 text-4xl mb-2">📋</div>
                   <p className="text-sm text-slate-600">لا توجد مواصفات مضافة لهذه السيارة</p>
+                  <p className="text-xs text-slate-500 mt-1">يمكنك إضافة مواصفات مخصصة لهذه السيارة فقط</p>
                 </div>
               )}
             </CardContent>

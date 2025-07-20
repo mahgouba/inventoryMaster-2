@@ -27,6 +27,7 @@ export const inventoryItems = pgTable("inventory_items", {
   images: text("images").array().default([]), // الصور
   logo: text("logo"), // اللوجو
   notes: text("notes"), // الملاحظات
+  detailedSpecifications: text("detailed_specifications"), // المواصفات التفصيلية الخاصة بهذه السيارة
   entryDate: timestamp("entry_date").defaultNow().notNull(), // تاريخ الدخول
   price: decimal("price", { precision: 10, scale: 2 }), // السعر
   isSold: boolean("is_sold").default(false).notNull(), // مباع

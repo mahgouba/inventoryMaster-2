@@ -490,7 +490,8 @@ export class MemStorage implements IStorage {
         manufacturer: "مرسيدس",
         location: "الميناء",
         chassisNumber: "WASSBER0056464",
-        images: []
+        images: [],
+        detailedSpecifications: null
       },
       {
         category: "لاتوبيغرافي",
@@ -503,7 +504,8 @@ export class MemStorage implements IStorage {
         manufacturer: "لاند روفر",
         location: "المعرض",
         chassisNumber: "WASSBER0056465",
-        images: []
+        images: [],
+        detailedSpecifications: null
       },
       {
         category: "لاتوبيغرافي",
@@ -516,7 +518,8 @@ export class MemStorage implements IStorage {
         manufacturer: "مرسيدس",
         location: "الورشة",
         chassisNumber: "WASSBER0056466",
-        images: []
+        images: [],
+        detailedSpecifications: null
       },
       {
         category: "أوتوماتيكي",
@@ -529,7 +532,8 @@ export class MemStorage implements IStorage {
         manufacturer: "لاند روفر",
         location: "مستودع فرعي",
         chassisNumber: "WASSBER0087523",
-        images: []
+        images: [],
+        detailedSpecifications: null
       },
       {
         category: "يدوي",
@@ -542,7 +546,8 @@ export class MemStorage implements IStorage {
         manufacturer: "مرسيدس",
         location: "المستودع الرئيسي",
         chassisNumber: "WASSBER0098765",
-        images: []
+        images: [],
+        detailedSpecifications: null
       },
       {
         category: "E200",
@@ -556,6 +561,7 @@ export class MemStorage implements IStorage {
         location: "المعرض",
         chassisNumber: "WDB4566001234",
         images: [],
+        detailedSpecifications: null,
         isSold: true,
         soldDate: new Date("2024-12-15")
       },
@@ -571,6 +577,7 @@ export class MemStorage implements IStorage {
         location: "المعرض",
         chassisNumber: "WBA5566005678",
         images: [],
+        detailedSpecifications: null,
         isSold: true,
         soldDate: new Date("2024-11-20")
       }
@@ -615,7 +622,8 @@ export class MemStorage implements IStorage {
       isSold: insertItem.isSold || false,
       images: insertItem.images || [],
       logo: insertItem.logo || null,
-      notes: insertItem.notes || null
+      notes: insertItem.notes || null,
+      detailedSpecifications: insertItem.detailedSpecifications || null
     };
     this.inventoryItems.set(id, item);
     return item;
