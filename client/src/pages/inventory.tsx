@@ -263,6 +263,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         value === "جميع الألوان الخارجية" || value === "جميع الحالات" || value === "جميع الأنواع") {
       return filteredData.length;
     }
+    
+    // Special handling for year field to handle number/string comparison
+    if (field === "year") {
+      return filteredData.filter(item => String(item.year) === String(value)).length;
+    }
+    
     return filteredData.filter(item => item[field] === value).length;
   };
   
@@ -367,11 +373,13 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     category: categoryFilter
   })];
   
-  const availableYears = ["جميع السنوات", ...getFilteredUniqueValues("year", {
+  const yearValues = getFilteredUniqueValues("year", {
     manufacturer: manufacturerFilter,
     category: categoryFilter,
     trimLevel: trimLevelFilter
-  }).map(String)];
+  }).map(year => String(year)).sort((a, b) => parseInt(b) - parseInt(a)); // Sort years in descending order
+  
+  const availableYears = ["جميع السنوات", ...yearValues];
   
   const years = availableYears;
 
