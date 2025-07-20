@@ -815,6 +815,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Image Links API endpoints
+  app.get('/api/image-links', async (req, res) => {
+    try {
+      const imageLinks = await storage.getAllImageLinks();
+      res.json(imageLinks);
+    } catch (error) {
+      console.error('Error fetching image links:', error);
+      res.status(500).json({ message: 'Failed to fetch image links' });
+    }
+  });
+
+  app.post('/api/image-links', async (req, res) => {
+    try {
+      const imageLink = await storage.createImageLink(req.body);
+      res.status(201).json(imageLink);
+    } catch (error) {
+      console.error('Error creating image link:', error);
+      res.status(500).json({ message: 'Failed to create image link' });
+    }
+  });
+
+  app.put('/api/image-links/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const imageLink = await storage.updateImageLink(id, req.body);
+      res.json(imageLink);
+    } catch (error) {
+      console.error('Error updating image link:', error);
+      res.status(500).json({ message: 'Failed to update image link' });
+    }
+  });
+
+  app.delete('/api/image-links/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteImageLink(id);
+      if (success) {
+        res.status(204).send();
+      } else {
+        res.status(404).json({ message: 'Image link not found' });
+      }
+    } catch (error) {
+      console.error('Error deleting image link:', error);
+      res.status(500).json({ message: 'Failed to delete image link' });
+    }
+  });
+
   // Delete inventory item
   app.delete("/api/inventory/:id", async (req, res) => {
     try {

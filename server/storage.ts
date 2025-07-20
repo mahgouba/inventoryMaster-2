@@ -477,6 +477,16 @@ export class MemStorage implements IStorage {
   async getInvoicesByStatus(status: string): Promise<any[]> { return []; }
   async getInvoiceByNumber(invoiceNumber: string): Promise<any> { return undefined; }
 
+  // Image Links methods - placeholder implementations for development
+  async getAllImageLinks(): Promise<any[]> { return []; }
+  async getImageLink(id: number): Promise<any> { return undefined; }
+  async createImageLink(imageLink: any): Promise<any> { 
+    const newLink = { id: Date.now(), ...imageLink, createdAt: new Date() };
+    return newLink;
+  }
+  async updateImageLink(id: number, imageLink: any): Promise<any> { return imageLink; }
+  async deleteImageLink(id: number): Promise<boolean> { return true; }
+
   private initializeInventoryData() {
     const sampleItems: InsertInventoryItem[] = [
       {

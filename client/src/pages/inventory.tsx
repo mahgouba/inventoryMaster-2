@@ -21,6 +21,7 @@ import VoiceAssistant from "@/components/voice-assistant";
 import { InventoryFAB } from "@/components/animated-fab";
 import SpecificationsManager from "@/components/specifications-manager";
 import SpecificationsManagement from "@/components/specifications-management";
+import ImageManagement from "@/components/image-management";
 import { AdvancedPrintDialog } from "@/components/advanced-print-dialog";
 import { exportToCSV, exportToExcel, printTable, printTableWithSettings } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
@@ -51,6 +52,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
   const [voiceChatOpen, setVoiceChatOpen] = useState(false);
   const [specificationsManagerOpen, setSpecificationsManagerOpen] = useState(false);
+  const [imageManagementOpen, setImageManagementOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -169,6 +171,44 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   };
 
   const manufacturers = getAvailableManufacturers();
+  
+  // Helper functions for ImageManagement component
+  const getSimpleManufacturers = (): string[] => {
+    const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
+    const manufacturers = availableData
+      .map(item => item.manufacturer)
+      .filter((manufacturer, index, self) => manufacturer && self.indexOf(manufacturer) === index)
+      .sort();
+    return manufacturers;
+  };
+  
+  const getSimpleCategories = (): string[] => {
+    const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
+    const categories = availableData
+      .map(item => item.category)
+      .filter((category, index, self) => category && self.indexOf(category) === index)
+      .sort();
+    return categories;
+  };
+  
+  const getSimpleTrimLevels = (): string[] => {
+    const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
+    const trimLevels = availableData
+      .map(item => item.trimLevel)
+      .filter((trimLevel, index, self) => trimLevel && self.indexOf(trimLevel) === index)
+      .sort();
+    return trimLevels;
+  };
+  
+  const getSimpleColors = (): string[] => {
+    const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
+    const exteriorColors = availableData.map(item => item.exteriorColor);
+    const interiorColors = availableData.map(item => item.interiorColor);
+    const allColors = [...exteriorColors, ...interiorColors]
+      .filter((color, index, self) => color && self.indexOf(color) === index)
+      .sort();
+    return allColors;
+  };
 
   // Get count for each filter option - dynamically based on previously applied filters
   const getFilterCount = (field: keyof InventoryItem, value: string) => {
@@ -576,6 +616,10 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         <Settings className="mr-2 h-4 w-4" />
                         إدارة المواصفات
                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setImageManagementOpen(true)}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        إدارة الصور
+                      </DropdownMenuItem>
 
                       <DropdownMenuSeparator />
 
@@ -938,6 +982,13 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       إدارة المواصفات
                     </Button>
                     <Button 
+                      onClick={() => setImageManagementOpen(true)}
+                      className="bg-purple-600 hover:bg-purple-700 text-white w-full sm:w-auto"
+                    >
+                      <FileText className="w-4 h-4 ml-2" />
+                      إدارة الصور
+                    </Button>
+                    <Button 
                       onClick={() => setIsExcelImportOpen(true)}
                       className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
                     >
@@ -1109,6 +1160,16 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
       <AdvancedPrintDialog
         open={printDialogOpen}
         onOpenChange={setPrintDialogOpen}
+      />
+
+      {/* Image Management Dialog */}
+      <ImageManagement
+        open={imageManagementOpen}
+        onOpenChange={setImageManagementOpen}
+        manufacturers={getSimpleManufacturers()}
+        categories={getSimpleCategories()}
+        trimLevels={getSimpleTrimLevels()}
+        colors={getSimpleColors()}
       />
     </div>
   );
