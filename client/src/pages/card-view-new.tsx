@@ -859,46 +859,36 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 {/* Master Filter Controls */}
                                 <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                                   <span className="text-sm font-semibold text-blue-800 dark:text-blue-200">التحكم في جميع الفلاتر</span>
-                                  <div className="flex space-x-3 space-x-reverse">
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => {
-                                        setShowManufacturerFilter(true);
-                                        setShowCategoryFilter(true);
-                                        setShowTrimLevelFilter(true);
-                                        setShowYearFilter(true);
-                                        setShowEngineCapacityFilter(true);
-                                        setShowExteriorColorFilter(true);
-                                        setShowInteriorColorFilter(true);
-                                        setShowStatusFilter(true);
-                                        setShowImportTypeFilter(true);
-                                        setShowOwnershipTypeFilter(true);
-                                      }}
-                                      className="text-green-700 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-600 dark:hover:bg-green-900/20"
-                                    >
-                                      إظهار الكل
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => {
-                                        setShowManufacturerFilter(false);
-                                        setShowCategoryFilter(false);
-                                        setShowTrimLevelFilter(false);
-                                        setShowYearFilter(false);
-                                        setShowEngineCapacityFilter(false);
-                                        setShowExteriorColorFilter(false);
-                                        setShowInteriorColorFilter(false);
-                                        setShowStatusFilter(false);
-                                        setShowImportTypeFilter(false);
-                                        setShowOwnershipTypeFilter(false);
-                                      }}
-                                      className="text-red-700 border-red-300 hover:bg-red-50 dark:text-red-400 dark:border-red-600 dark:hover:bg-red-900/20"
-                                    >
-                                      إخفاء الكل
-                                    </Button>
-                                  </div>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      const allFiltersVisible = showManufacturerFilter && showCategoryFilter && showTrimLevelFilter && 
+                                        showYearFilter && showEngineCapacityFilter && showExteriorColorFilter && 
+                                        showInteriorColorFilter && showStatusFilter && showImportTypeFilter && showOwnershipTypeFilter;
+                                      
+                                      const newState = !allFiltersVisible;
+                                      setShowManufacturerFilter(newState);
+                                      setShowCategoryFilter(newState);
+                                      setShowTrimLevelFilter(newState);
+                                      setShowYearFilter(newState);
+                                      setShowEngineCapacityFilter(newState);
+                                      setShowExteriorColorFilter(newState);
+                                      setShowInteriorColorFilter(newState);
+                                      setShowStatusFilter(newState);
+                                      setShowImportTypeFilter(newState);
+                                      setShowOwnershipTypeFilter(newState);
+                                    }}
+                                    className="p-2 h-9 w-9 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                                  >
+                                    {(showManufacturerFilter || showCategoryFilter || showTrimLevelFilter || 
+                                      showYearFilter || showEngineCapacityFilter || showExteriorColorFilter || 
+                                      showInteriorColorFilter || showStatusFilter || showImportTypeFilter || showOwnershipTypeFilter) ? (
+                                      <Eye size={18} className="text-blue-600 dark:text-blue-400" />
+                                    ) : (
+                                      <EyeOff size={18} className="text-slate-400 dark:text-slate-500" />
+                                    )}
+                                  </Button>
                                 </div>
                                 
                                 {/* Individual Filters with Toggles */}
