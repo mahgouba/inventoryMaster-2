@@ -62,6 +62,11 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     queryKey: ["/api/inventory"],
   });
 
+  // Get inventory stats to show sold cars count
+  const { data: stats } = useQuery({
+    queryKey: ["/api/inventory/stats"],
+  });
+
   // Mutation for importing cars data
   const importCarsMutation = useMutation({
     mutationFn: () => apiRequest("POST", "/api/cars/import", {}),
@@ -843,6 +848,11 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   >
                     <DollarSign className="w-4 h-4 ml-2" />
                     {showSoldCars ? "إخفاء السيارات المباعة" : "إظهار السيارات المباعة"}
+                    {stats?.sold && stats.sold > 0 && (
+                      <span className="mr-2 px-2 py-1 text-xs font-semibold rounded-full bg-white bg-opacity-20">
+                        {stats.sold}
+                      </span>
+                    )}
                   </Button>
                 )}
               </div>

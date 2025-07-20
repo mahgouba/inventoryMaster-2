@@ -188,6 +188,11 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Proper responsive design maintained for mobile and desktop viewing
 
 ### Migration to Replit Environment Completed (July 20, 2025)
+- ✅ Fixed statistics display issue: main dashboard statistics now properly exclude sold cars per user request
+- ✅ Added sold cars count display next to "إظهار السيارات المباعة" button for admin users
+- ✅ Enhanced inventory statistics to show sold count only where appropriate (next to show sold cars button)
+
+### Migration to Replit Environment Completed (July 20, 2025)
 - ✅ Successfully completed full migration from Replit Agent to standard Replit environment
 - ✅ All required packages installed and verified working
 - ✅ Application running properly with Express server on port 5000
