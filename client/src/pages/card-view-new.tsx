@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Switch } from "@/components/ui/switch";
 import { 
   Bell, 
   Settings, 
@@ -84,6 +85,18 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [specificationsOpen, setSpecificationsOpen] = useState(false);
   const [quotationManagementOpen, setQuotationManagementOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  
+  // Toggle states for individual filters - default to false (closed)
+  const [showManufacturerFilter, setShowManufacturerFilter] = useState(false);
+  const [showCategoryFilter, setShowCategoryFilter] = useState(false);
+  const [showTrimLevelFilter, setShowTrimLevelFilter] = useState(false);
+  const [showYearFilter, setShowYearFilter] = useState(false);
+  const [showEngineCapacityFilter, setShowEngineCapacityFilter] = useState(false);
+  const [showExteriorColorFilter, setShowExteriorColorFilter] = useState(false);
+  const [showInteriorColorFilter, setShowInteriorColorFilter] = useState(false);
+  const [showStatusFilter, setShowStatusFilter] = useState(false);
+  const [showImportTypeFilter, setShowImportTypeFilter] = useState(false);
+  const [showOwnershipTypeFilter, setShowOwnershipTypeFilter] = useState(false);
 
   const { data: inventoryData = [], isLoading } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory"],
@@ -771,510 +784,253 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   <CollapsibleContent className="mt-4 w-full">
                     <Card className="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shadow-sm w-full">
                       <CardContent className="p-6 w-full">
-                        {/* Enhanced Filter Controls with Button Design */}
+                        {/* Enhanced Filter Controls with Toggle Switches */}
                         <div className="space-y-6 animate-in fade-in duration-300">
-              {/* الصانع */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">الصانع</h3>
-                <div className="relative group">
-                  <ScrollArea className="w-full">
-                    <div className="flex gap-2 pb-2 justify-start">
-                      {manufacturers.map((manufacturer) => (
-                        <Button
-                          key={manufacturer}
-                          variant={selectedManufacturer === manufacturer ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => handleManufacturerChange(manufacturer)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            selectedManufacturer === manufacturer
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {manufacturer} ({getFilterCount("manufacturer", manufacturer)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  {/* Navigation Arrows */}
-                  <button 
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                  <button 
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                </div>
-              </div>
+                          
+                          {/* Filter Slider Component */}
+                          {(() => {
+                            const FilterSlider = ({ title, items, currentFilter, onFilterChange, getCount, toggleState, onToggleChange }) => (
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
+                                  <Switch 
+                                    checked={toggleState} 
+                                    onCheckedChange={onToggleChange}
+                                    className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-slate-400"
+                                  />
+                                </div>
+                                {toggleState && (
+                                  <div className="relative group">
+                                    <ScrollArea className="w-full">
+                                      <div className="flex space-x-2 space-x-reverse pb-2">
+                                        {items.map((item) => (
+                                          <Button
+                                            key={String(item)}
+                                            variant={currentFilter === item ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => onFilterChange(String(item))}
+                                            className={`transition-all duration-200 whitespace-nowrap ${
+                                              currentFilter === item
+                                                ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                                                : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                                            }`}
+                                          >
+                                            {String(item)} ({getCount(String(item))})
+                                          </Button>
+                                        ))}
+                                      </div>
+                                    </ScrollArea>
+                                    {/* Navigation Arrows */}
+                                    <button 
+                                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                                        if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                                      }}
+                                    >
+                                      <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                                    </button>
+                                    <button 
+                                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                                        if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                                      }}
+                                    >
+                                      <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                            
+                            return (
+                              <div className="space-y-4">
+                                {/* Master Filter Controls */}
+                                <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                                  <span className="text-sm font-semibold text-blue-800 dark:text-blue-200">التحكم في جميع الفلاتر</span>
+                                  <div className="flex space-x-3 space-x-reverse">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        setShowManufacturerFilter(true);
+                                        setShowCategoryFilter(true);
+                                        setShowTrimLevelFilter(true);
+                                        setShowYearFilter(true);
+                                        setShowEngineCapacityFilter(true);
+                                        setShowExteriorColorFilter(true);
+                                        setShowInteriorColorFilter(true);
+                                        setShowStatusFilter(true);
+                                        setShowImportTypeFilter(true);
+                                        setShowOwnershipTypeFilter(true);
+                                      }}
+                                      className="text-green-700 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-600 dark:hover:bg-green-900/20"
+                                    >
+                                      إظهار الكل
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        setShowManufacturerFilter(false);
+                                        setShowCategoryFilter(false);
+                                        setShowTrimLevelFilter(false);
+                                        setShowYearFilter(false);
+                                        setShowEngineCapacityFilter(false);
+                                        setShowExteriorColorFilter(false);
+                                        setShowInteriorColorFilter(false);
+                                        setShowStatusFilter(false);
+                                        setShowImportTypeFilter(false);
+                                        setShowOwnershipTypeFilter(false);
+                                      }}
+                                      className="text-red-700 border-red-300 hover:bg-red-50 dark:text-red-400 dark:border-red-600 dark:hover:bg-red-900/20"
+                                    >
+                                      إخفاء الكل
+                                    </Button>
+                                  </div>
+                                </div>
+                                
+                                {/* Individual Filters with Toggles */}
+                                <div className="space-y-3">
+                                  <FilterSlider 
+                                    title="الصانع" 
+                                    items={manufacturers} 
+                                    currentFilter={selectedManufacturer} 
+                                    onFilterChange={handleManufacturerChange} 
+                                    getCount={(item) => getFilterCount("manufacturer", item)} 
+                                    toggleState={showManufacturerFilter}
+                                    onToggleChange={setShowManufacturerFilter}
+                                  />
 
-              {/* الفئة */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">الفئة</h3>
-                <div className="relative group">
-                  <ScrollArea className="w-full">
-                    <div className="flex gap-2 pb-2 justify-start">
-                      {categories.map((category) => (
-                        <Button
-                          key={category}
-                          variant={selectedCategory === category ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setSelectedCategory(category)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            selectedCategory === category
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {category} ({getFilterCount("category", category)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  {/* Navigation Arrows */}
-                  <button 
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                  <button 
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                </div>
-              </div>
+                                  <FilterSlider 
+                                    title="الفئة" 
+                                    items={categories} 
+                                    currentFilter={selectedCategory} 
+                                    onFilterChange={setSelectedCategory} 
+                                    getCount={(item) => getFilterCount("category", item)} 
+                                    toggleState={showCategoryFilter}
+                                    onToggleChange={setShowCategoryFilter}
+                                  />
 
-              {/* درجة التجهيز */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">درجة التجهيز</h3>
-                <div className="relative group">
-                  <ScrollArea className="w-full">
-                    <div className="flex gap-2 pb-2 justify-start">
-                      {availableTrimLevels.map((trim) => (
-                        <Button
-                          key={trim}
-                          variant={selectedTrimLevel === trim ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setSelectedTrimLevel(trim)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            selectedTrimLevel === trim
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {trim} ({getFilterCount("trimLevel", trim)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  {/* Navigation Arrows */}
-                  <button 
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                  <button 
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                </div>
-              </div>
+                                  <FilterSlider 
+                                    title="درجة التجهيز" 
+                                    items={availableTrimLevels} 
+                                    currentFilter={selectedTrimLevel} 
+                                    onFilterChange={setSelectedTrimLevel} 
+                                    getCount={(item) => getFilterCount("trimLevel", item)} 
+                                    toggleState={showTrimLevelFilter}
+                                    onToggleChange={setShowTrimLevelFilter}
+                                  />
 
-              {/* السنة */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">السنة</h3>
-                <div className="relative group">
-                  <ScrollArea className="w-full">
-                    <div className="flex gap-2 pb-2 justify-start">
-                      {availableYears.map((year) => (
-                        <Button
-                          key={year}
-                          variant={selectedYear === year ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setSelectedYear(year)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            selectedYear === year
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {year} ({getFilterCount("year", year)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  {/* Navigation Arrows */}
-                  <button 
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                  <button 
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                </div>
-              </div>
+                                  <FilterSlider 
+                                    title="السنة" 
+                                    items={availableYears} 
+                                    currentFilter={selectedYear} 
+                                    onFilterChange={setSelectedYear} 
+                                    getCount={(item) => getFilterCount("year", item)} 
+                                    toggleState={showYearFilter}
+                                    onToggleChange={setShowYearFilter}
+                                  />
 
-              {/* سعة المحرك */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">سعة المحرك</h3>
-                <div className="relative group">
-                  <ScrollArea className="w-full">
-                    <div className="flex gap-2 pb-2 justify-start">
-                      {availableEngineCapacities.map((capacity) => (
-                        <Button
-                          key={capacity}
-                          variant={selectedEngineCapacity === capacity ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setSelectedEngineCapacity(String(capacity))}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            selectedEngineCapacity === capacity
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {String(capacity)} ({getFilterCount("engineCapacity", String(capacity))})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  {/* Navigation Arrows */}
-                  <button 
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                  <button 
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                </div>
-              </div>
+                                  <FilterSlider 
+                                    title="سعة المحرك" 
+                                    items={availableEngineCapacities} 
+                                    currentFilter={selectedEngineCapacity} 
+                                    onFilterChange={setSelectedEngineCapacity} 
+                                    getCount={(item) => getFilterCount("engineCapacity", item)} 
+                                    toggleState={showEngineCapacityFilter}
+                                    onToggleChange={setShowEngineCapacityFilter}
+                                  />
 
-              {/* اللون الداخلي */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">اللون الداخلي</h3>
-                <div className="relative group">
-                  <ScrollArea className="w-full">
-                    <div className="flex gap-2 pb-2 justify-start">
-                      {availableInteriorColors.map((color) => (
-                        <Button
-                          key={color}
-                          variant={selectedInteriorColor === color ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setSelectedInteriorColor(color)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            selectedInteriorColor === color
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {color} ({getFilterCount("interiorColor", color)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  {/* Navigation Arrows */}
-                  <button 
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                  <button 
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                </div>
-              </div>
+                                  <FilterSlider 
+                                    title="اللون الخارجي" 
+                                    items={availableExteriorColors} 
+                                    currentFilter={selectedExteriorColor} 
+                                    onFilterChange={setSelectedExteriorColor} 
+                                    getCount={(item) => getFilterCount("exteriorColor", item)} 
+                                    toggleState={showExteriorColorFilter}
+                                    onToggleChange={setShowExteriorColorFilter}
+                                  />
 
-              {/* اللون الخارجي */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">اللون الخارجي</h3>
-                <div className="relative group">
-                  <ScrollArea className="w-full">
-                    <div className="flex gap-2 pb-2 justify-start">
-                      {availableExteriorColors.map((color) => (
-                        <Button
-                          key={color}
-                          variant={selectedExteriorColor === color ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setSelectedExteriorColor(color)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            selectedExteriorColor === color
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {color} ({getFilterCount("exteriorColor", color)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  {/* Navigation Arrows */}
-                  <button 
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                  <button 
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                </div>
-              </div>
+                                  <FilterSlider 
+                                    title="اللون الداخلي" 
+                                    items={availableInteriorColors} 
+                                    currentFilter={selectedInteriorColor} 
+                                    onFilterChange={setSelectedInteriorColor} 
+                                    getCount={(item) => getFilterCount("interiorColor", item)} 
+                                    toggleState={showInteriorColorFilter}
+                                    onToggleChange={setShowInteriorColorFilter}
+                                  />
 
-              {/* الحالة */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">الحالة</h3>
-                <div className="relative group">
-                  <ScrollArea className="w-full">
-                    <div className="flex gap-2 pb-2 justify-start">
-                      {availableStatuses.map((status) => (
-                        <Button
-                          key={status}
-                          variant={selectedStatus === status ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setSelectedStatus(status)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            selectedStatus === status
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {status} ({getFilterCount("status", status)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  {/* Navigation Arrows */}
-                  <button 
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                  <button 
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                </div>
-              </div>
+                                  <FilterSlider 
+                                    title="الحالة" 
+                                    items={availableStatuses} 
+                                    currentFilter={selectedStatus} 
+                                    onFilterChange={setSelectedStatus} 
+                                    getCount={(item) => getFilterCount("status", item)} 
+                                    toggleState={showStatusFilter}
+                                    onToggleChange={setShowStatusFilter}
+                                  />
 
-              {/* نوع الاستيراد */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">نوع الاستيراد</h3>
-                <div className="relative group">
-                  <ScrollArea className="w-full">
-                    <div className="flex gap-2 pb-2 justify-start">
-                      {availableImportTypes.map((type) => (
-                        <Button
-                          key={type}
-                          variant={selectedImportType === type ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setSelectedImportType(type)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            selectedImportType === type
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {type} ({getFilterCount("importType", type)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  {/* Navigation Arrows */}
-                  <button 
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                  <button 
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                </div>
-              </div>
+                                  <FilterSlider 
+                                    title="نوع الاستيراد" 
+                                    items={availableImportTypes} 
+                                    currentFilter={selectedImportType} 
+                                    onFilterChange={setSelectedImportType} 
+                                    getCount={(item) => getFilterCount("importType", item)} 
+                                    toggleState={showImportTypeFilter}
+                                    onToggleChange={setShowImportTypeFilter}
+                                  />
 
-              {/* نوع الملكية */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">نوع الملكية</h3>
-                <div className="relative group">
-                  <ScrollArea className="w-full">
-                    <div className="flex gap-2 pb-2 justify-start">
-                      {availableOwnershipTypes.map((type) => (
-                        <Button
-                          key={type}
-                          variant={selectedOwnershipType === type ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setSelectedOwnershipType(type)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            selectedOwnershipType === type
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {type} ({getFilterCount("ownershipType", type)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  {/* Navigation Arrows */}
-                  <button 
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                  <button 
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
-                  </button>
-                </div>
-              </div>
+                                  <FilterSlider 
+                                    title="نوع الملكية" 
+                                    items={availableOwnershipTypes} 
+                                    currentFilter={selectedOwnershipType} 
+                                    onFilterChange={setSelectedOwnershipType} 
+                                    getCount={(item) => getFilterCount("ownershipType", item)} 
+                                    toggleState={showOwnershipTypeFilter}
+                                    onToggleChange={setShowOwnershipTypeFilter}
+                                  />
 
-              {/* Reset Filters Button */}
-              <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedManufacturer("الكل");
-                    setSelectedCategory("الكل");
-                    setSelectedTrimLevel("الكل");
-                    setSelectedYear("الكل");
-                    setSelectedEngineCapacity("الكل");
-                    setSelectedInteriorColor("الكل");
-                    setSelectedExteriorColor("الكل");
-                    setSelectedStatus("الكل");
-                    setSelectedImportType("الكل");
-                    setSelectedOwnershipType("الكل");
-                  }}
-                  className="hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20"
-                >
-                  إعادة تعيين الفلاتر
-                </Button>
-              </div>
+                                  {/* Reset Filters Button */}
+                                  <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedManufacturer("الكل");
+                                        setSelectedCategory("الكل");
+                                        setSelectedTrimLevel("الكل");
+                                        setSelectedYear("الكل");
+                                        setSelectedEngineCapacity("الكل");
+                                        setSelectedInteriorColor("الكل");
+                                        setSelectedExteriorColor("الكل");
+                                        setSelectedStatus("الكل");
+                                        setSelectedImportType("الكل");
+                                        setSelectedOwnershipType("الكل");
+                                      }}
+                                      className="hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20"
+                                    >
+                                      إعادة تعيين الفلاتر
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </CardContent>
                     </Card>
                   </CollapsibleContent>
-                  </Collapsible>
-                </div>
+                </Collapsible>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
         {/* Search Results Indicator */}
         {searchQuery.trim() !== "" && (
