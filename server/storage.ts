@@ -677,16 +677,19 @@ export class MemStorage implements IStorage {
     usedPersonal: number;
   }> {
     const items = Array.from(this.inventoryItems.values());
+    // استبعاد المركبات المباعة من الإحصائيات الأساسية - التحقق من كل من isSold والحالة
+    const activeItems = items.filter(item => !item.isSold && item.status !== "مباع");
+    
     return {
-      total: items.length,
-      available: items.filter(item => item.status === "متوفر").length,
-      inTransit: items.filter(item => item.status === "في الطريق").length,
-      maintenance: items.filter(item => item.status === "قيد الصيانة").length,
-      reserved: items.filter(item => item.status === "محجوز").length,
-      sold: items.filter(item => item.isSold).length,
-      personal: items.filter(item => item.importType === "شخصي").length,
-      company: items.filter(item => item.importType === "شركة").length,
-      usedPersonal: items.filter(item => item.importType === "مستعمل شخصي").length,
+      total: activeItems.length,
+      available: activeItems.filter(item => item.status === "متوفر").length,
+      inTransit: activeItems.filter(item => item.status === "في الطريق").length,
+      maintenance: activeItems.filter(item => item.status === "قيد الصيانة").length,
+      reserved: activeItems.filter(item => item.status === "محجوز").length,
+      sold: items.filter(item => item.isSold || item.status === "مباع").length,
+      personal: activeItems.filter(item => item.importType === "شخصي").length,
+      company: activeItems.filter(item => item.importType === "شركة").length,
+      usedPersonal: activeItems.filter(item => item.importType === "مستعمل شخصي").length,
     };
   }
 
@@ -1275,8 +1278,8 @@ export class DatabaseStorage implements IStorage {
     usedPersonal: number;
   }> {
     const items = await db.select().from(inventoryItems);
-    // استبعاد المركبات المباعة من الإحصائيات الأساسية
-    const activeItems = items.filter(item => !item.isSold);
+    // استبعاد المركبات المباعة من الإحصائيات الأساسية - التحقق من كل من isSold والحالة
+    const activeItems = items.filter(item => !item.isSold && item.status !== "مباع");
     
     return {
       total: activeItems.length,
@@ -1284,7 +1287,7 @@ export class DatabaseStorage implements IStorage {
       inTransit: activeItems.filter(item => item.status === "في الطريق").length,
       maintenance: activeItems.filter(item => item.status === "قيد الصيانة").length,
       reserved: activeItems.filter(item => item.status === "محجوز").length,
-      sold: items.filter(item => item.isSold).length,
+      sold: items.filter(item => item.isSold || item.status === "مباع").length,
       personal: activeItems.filter(item => item.importType === "شخصي").length,
       company: activeItems.filter(item => item.importType === "شركة").length,
       usedPersonal: activeItems.filter(item => item.importType === "مستعمل شخصي").length,
@@ -1302,8 +1305,8 @@ export class DatabaseStorage implements IStorage {
     const items = await db.select().from(inventoryItems);
     const manufacturerEntities = await db.select().from(manufacturers);
     
-    // استبعاد السيارات المباعة من الإحصائيات
-    const availableItems = items.filter(item => !item.isSold);
+    // استبعاد السيارات المباعة من الإحصائيات - التحقق من كل من isSold والحالة
+    const availableItems = items.filter(item => !item.isSold && item.status !== "مباع");
     const manufacturerSet = new Set(availableItems.map(item => item.manufacturer));
     const manufacturerNames = Array.from(manufacturerSet);
     

@@ -187,9 +187,13 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Filters now start in closed state and can be toggled open/closed as requested
 - ✅ Proper responsive design maintained for mobile and desktop viewing
 
-### Migration to Replit Environment Completed (July 20, 2025)
-- ✅ Fixed statistics display issue: main dashboard statistics now properly exclude sold cars per user request
-- ✅ Added sold cars count display next to "إظهار السيارات المباعة" button for admin users
+### Statistics Display Fix - Proper Exclusion of Sold Cars (July 20, 2025)
+- ✅ Fixed critical statistics display issue: main dashboard now properly excludes sold cars from all statistics
+- ✅ Updated both DatabaseStorage and MemStorage implementations to filter out sold cars (`!item.isSold && item.status !== "مباع"`)
+- ✅ Main statistics now show: Total (5 instead of 7), Available (2), In Transit (2), Maintenance (1), Reserved (0)
+- ✅ Sold cars count (2) now displayed separately only next to "إظهار السيارات المباعة" button
+- ✅ Import type statistics also properly exclude sold cars: Personal (2), Company (2), Used Personal (1)
+- ✅ Added sold cars count badge next to "إظهار السيارات المباعة" button for admin users
 - ✅ Enhanced inventory statistics to show sold count only where appropriate (next to show sold cars button)
 
 ### Migration to Replit Environment Completed (July 20, 2025)
