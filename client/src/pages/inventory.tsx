@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Switch } from "@/components/ui/switch";
 import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -53,7 +54,18 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [manufacturerFiltersOpen, setManufacturerFiltersOpen] = useState<Record<string, boolean>>({});
+  
+  // Toggle states for individual filters
+  const [showManufacturerFilter, setShowManufacturerFilter] = useState(true);
+  const [showCategoryFilter, setShowCategoryFilter] = useState(true);
+  const [showTrimLevelFilter, setShowTrimLevelFilter] = useState(true);
+  const [showYearFilter, setShowYearFilter] = useState(true);
+  const [showEngineCapacityFilter, setShowEngineCapacityFilter] = useState(true);
+  const [showExteriorColorFilter, setShowExteriorColorFilter] = useState(true);
+  const [showInteriorColorFilter, setShowInteriorColorFilter] = useState(true);
+  const [showStatusFilter, setShowStatusFilter] = useState(true);
+  const [showImportTypeFilter, setShowImportTypeFilter] = useState(true);
+  const [showOwnershipTypeFilter, setShowOwnershipTypeFilter] = useState(true);
 
   // Get theme settings and hooks
   const { companyName, companyLogo, darkMode, toggleDarkMode, isUpdatingDarkMode } = useTheme();
@@ -723,78 +735,190 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               );
                               
                               return (
-                                <>
-                                  <FilterSlider 
-                                    title="الصانع" 
-                                    items={manufacturers} 
-                                    currentFilter={manufacturerFilter} 
-                                    onFilterChange={handleManufacturerChange} 
-                                    getCount={(item) => getFilterCount("manufacturer", item)} 
-                                  />
-                                  <FilterSlider 
-                                    title="الفئة" 
-                                    items={categories} 
-                                    currentFilter={categoryFilter} 
-                                    onFilterChange={setCategoryFilter} 
-                                    getCount={(item) => getFilterCount("category", item)} 
-                                  />
-                                  <FilterSlider 
-                                    title="درجة التجهيز" 
-                                    items={availableTrimLevels} 
-                                    currentFilter={trimLevelFilter} 
-                                    onFilterChange={setTrimLevelFilter} 
-                                    getCount={(item) => getFilterCount("trimLevel", item)} 
-                                  />
-                                  <FilterSlider 
-                                    title="السنة" 
-                                    items={availableYears} 
-                                    currentFilter={yearFilter} 
-                                    onFilterChange={setYearFilter} 
-                                    getCount={(item) => getFilterCount("year", item)} 
-                                  />
-                                  <FilterSlider 
-                                    title="سعة المحرك" 
-                                    items={availableEngineCapacities} 
-                                    currentFilter={engineCapacityFilter} 
-                                    onFilterChange={setEngineCapacityFilter} 
-                                    getCount={(item) => getFilterCount("engineCapacity", item)} 
-                                  />
-                                  <FilterSlider 
-                                    title="اللون الخارجي" 
-                                    items={availableExteriorColors} 
-                                    currentFilter={exteriorColorFilter} 
-                                    onFilterChange={setExteriorColorFilter} 
-                                    getCount={(item) => getFilterCount("exteriorColor", item)} 
-                                  />
-                                  <FilterSlider 
-                                    title="اللون الداخلي" 
-                                    items={availableInteriorColors} 
-                                    currentFilter={interiorColorFilter} 
-                                    onFilterChange={setInteriorColorFilter} 
-                                    getCount={(item) => getFilterCount("interiorColor", item)} 
-                                  />
-                                  <FilterSlider 
-                                    title="الحالة" 
-                                    items={availableStatuses} 
-                                    currentFilter={statusFilter} 
-                                    onFilterChange={setStatusFilter} 
-                                    getCount={(item) => getFilterCount("status", item)} 
-                                  />
-                                  <FilterSlider 
-                                    title="نوع الاستيراد" 
-                                    items={availableImportTypes} 
-                                    currentFilter={importTypeFilter} 
-                                    onFilterChange={setImportTypeFilter} 
-                                    getCount={(item) => getFilterCount("importType", item)} 
-                                  />
-                                  <FilterSlider 
-                                    title="نوع الملكية" 
-                                    items={availableOwnershipTypes} 
-                                    currentFilter={ownershipTypeFilter} 
-                                    onFilterChange={setOwnershipTypeFilter} 
-                                    getCount={(item) => getFilterCount("ownershipType", item)} 
-                                  />
-                                </>
+                                <div className="space-y-4">
+                                  {/* Master Filter Controls */}
+                                  <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                                    <span className="text-sm font-semibold text-blue-800 dark:text-blue-200">التحكم في الفلاتر</span>
+                                    <div className="flex space-x-3 space-x-reverse">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => {
+                                          setShowManufacturerFilter(true);
+                                          setShowCategoryFilter(true);
+                                          setShowTrimLevelFilter(true);
+                                          setShowYearFilter(true);
+                                          setShowEngineCapacityFilter(true);
+                                          setShowExteriorColorFilter(true);
+                                          setShowInteriorColorFilter(true);
+                                          setShowStatusFilter(true);
+                                          setShowImportTypeFilter(true);
+                                          setShowOwnershipTypeFilter(true);
+                                        }}
+                                        className="text-green-700 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-600 dark:hover:bg-green-900/20"
+                                      >
+                                        إظهار الكل
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => {
+                                          setShowManufacturerFilter(false);
+                                          setShowCategoryFilter(false);
+                                          setShowTrimLevelFilter(false);
+                                          setShowYearFilter(false);
+                                          setShowEngineCapacityFilter(false);
+                                          setShowExteriorColorFilter(false);
+                                          setShowInteriorColorFilter(false);
+                                          setShowStatusFilter(false);
+                                          setShowImportTypeFilter(false);
+                                          setShowOwnershipTypeFilter(false);
+                                        }}
+                                        className="text-red-700 border-red-300 hover:bg-red-50 dark:text-red-400 dark:border-red-600 dark:hover:bg-red-900/20"
+                                      >
+                                        إخفاء الكل
+                                      </Button>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Individual Filter Toggle Controls */}
+                                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border">
+                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
+                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">الصانع</span>
+                                      <Switch checked={showManufacturerFilter} onCheckedChange={setShowManufacturerFilter} />
+                                    </div>
+                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
+                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">الفئة</span>
+                                      <Switch checked={showCategoryFilter} onCheckedChange={setShowCategoryFilter} />
+                                    </div>
+                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
+                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">درجة التجهيز</span>
+                                      <Switch checked={showTrimLevelFilter} onCheckedChange={setShowTrimLevelFilter} />
+                                    </div>
+                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
+                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">السنة</span>
+                                      <Switch checked={showYearFilter} onCheckedChange={setShowYearFilter} />
+                                    </div>
+                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
+                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">سعة المحرك</span>
+                                      <Switch checked={showEngineCapacityFilter} onCheckedChange={setShowEngineCapacityFilter} />
+                                    </div>
+                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
+                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الخارجي</span>
+                                      <Switch checked={showExteriorColorFilter} onCheckedChange={setShowExteriorColorFilter} />
+                                    </div>
+                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
+                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الداخلي</span>
+                                      <Switch checked={showInteriorColorFilter} onCheckedChange={setShowInteriorColorFilter} />
+                                    </div>
+                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
+                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">الحالة</span>
+                                      <Switch checked={showStatusFilter} onCheckedChange={setShowStatusFilter} />
+                                    </div>
+                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
+                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">نوع الاستيراد</span>
+                                      <Switch checked={showImportTypeFilter} onCheckedChange={setShowImportTypeFilter} />
+                                    </div>
+                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
+                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">نوع الملكية</span>
+                                      <Switch checked={showOwnershipTypeFilter} onCheckedChange={setShowOwnershipTypeFilter} />
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Actual Filters */}
+                                  <div className="space-y-3">
+                                    {showManufacturerFilter && (
+                                      <FilterSlider 
+                                        title="الصانع" 
+                                        items={manufacturers} 
+                                        currentFilter={manufacturerFilter} 
+                                        onFilterChange={handleManufacturerChange} 
+                                        getCount={(item) => getFilterCount("manufacturer", item)} 
+                                      />
+                                    )}
+                                    {showCategoryFilter && (
+                                      <FilterSlider 
+                                        title="الفئة" 
+                                        items={categories} 
+                                        currentFilter={categoryFilter} 
+                                        onFilterChange={setCategoryFilter} 
+                                        getCount={(item) => getFilterCount("category", item)} 
+                                      />
+                                    )}
+                                    {showTrimLevelFilter && (
+                                      <FilterSlider 
+                                        title="درجة التجهيز" 
+                                        items={availableTrimLevels} 
+                                        currentFilter={trimLevelFilter} 
+                                        onFilterChange={setTrimLevelFilter} 
+                                        getCount={(item) => getFilterCount("trimLevel", item)} 
+                                      />
+                                    )}
+                                    {showYearFilter && (
+                                      <FilterSlider 
+                                        title="السنة" 
+                                        items={availableYears} 
+                                        currentFilter={yearFilter} 
+                                        onFilterChange={setYearFilter} 
+                                        getCount={(item) => getFilterCount("year", item)} 
+                                      />
+                                    )}
+                                    {showEngineCapacityFilter && (
+                                      <FilterSlider 
+                                        title="سعة المحرك" 
+                                        items={availableEngineCapacities} 
+                                        currentFilter={engineCapacityFilter} 
+                                        onFilterChange={setEngineCapacityFilter} 
+                                        getCount={(item) => getFilterCount("engineCapacity", item)} 
+                                      />
+                                    )}
+                                    {showExteriorColorFilter && (
+                                      <FilterSlider 
+                                        title="اللون الخارجي" 
+                                        items={availableExteriorColors} 
+                                        currentFilter={exteriorColorFilter} 
+                                        onFilterChange={setExteriorColorFilter} 
+                                        getCount={(item) => getFilterCount("exteriorColor", item)} 
+                                      />
+                                    )}
+                                    {showInteriorColorFilter && (
+                                      <FilterSlider 
+                                        title="اللون الداخلي" 
+                                        items={availableInteriorColors} 
+                                        currentFilter={interiorColorFilter} 
+                                        onFilterChange={setInteriorColorFilter} 
+                                        getCount={(item) => getFilterCount("interiorColor", item)} 
+                                      />
+                                    )}
+                                    {showStatusFilter && (
+                                      <FilterSlider 
+                                        title="الحالة" 
+                                        items={availableStatuses} 
+                                        currentFilter={statusFilter} 
+                                        onFilterChange={setStatusFilter} 
+                                        getCount={(item) => getFilterCount("status", item)} 
+                                      />
+                                    )}
+                                    {showImportTypeFilter && (
+                                      <FilterSlider 
+                                        title="نوع الاستيراد" 
+                                        items={availableImportTypes} 
+                                        currentFilter={importTypeFilter} 
+                                        onFilterChange={setImportTypeFilter} 
+                                        getCount={(item) => getFilterCount("importType", item)} 
+                                      />
+                                    )}
+                                    {showOwnershipTypeFilter && (
+                                      <FilterSlider 
+                                        title="نوع الملكية" 
+                                        items={availableOwnershipTypes} 
+                                        currentFilter={ownershipTypeFilter} 
+                                        onFilterChange={setOwnershipTypeFilter} 
+                                        getCount={(item) => getFilterCount("ownershipType", item)} 
+                                      />
+                                    )}
+                                  </div>
+                                </div>
                               );
                             })()}
 
