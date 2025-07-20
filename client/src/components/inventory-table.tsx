@@ -23,6 +23,7 @@ interface InventoryTableProps {
   exteriorColorFilter: string;
   statusFilter: string;
   importTypeFilter: string;
+  ownershipTypeFilter: string;
   showSoldCars: boolean;
   userRole: string;
   username: string;
@@ -40,6 +41,7 @@ export default function InventoryTable({
   exteriorColorFilter, 
   statusFilter, 
   importTypeFilter, 
+  ownershipTypeFilter, 
   showSoldCars, 
   userRole, 
   username, 
@@ -202,11 +204,12 @@ export default function InventoryTable({
       const matchesExteriorColor = !exteriorColorFilter || exteriorColorFilter === "جميع الألوان الخارجية" || item.exteriorColor === exteriorColorFilter;
       const matchesStatus = !statusFilter || statusFilter === "جميع الحالات" || item.status === statusFilter;
       const matchesImportType = !importTypeFilter || importTypeFilter === "جميع الأنواع" || item.importType === importTypeFilter;
+      const matchesOwnershipType = !ownershipTypeFilter || ownershipTypeFilter === "جميع أنواع الملكية" || item.ownershipType === ownershipTypeFilter;
       // إذا كان إظهار السيارات المباعة مفعلاً، اعرض جميع السيارات
       // إذا كان مطفياً، اعرض فقط السيارات غير المباعة
       const matchesSoldFilter = showSoldCars ? true : item.status !== "مباع";
       
-      return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesYear && matchesEngineCapacity && matchesInteriorColor && matchesExteriorColor && matchesStatus && matchesImportType && matchesSoldFilter;
+      return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesYear && matchesEngineCapacity && matchesInteriorColor && matchesExteriorColor && matchesStatus && matchesImportType && matchesOwnershipType && matchesSoldFilter;
     })
     .sort((a: InventoryItem, b: InventoryItem) => {
       if (!sortColumn) return 0;

@@ -41,6 +41,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [exteriorColorFilter, setExteriorColorFilter] = useState("جميع الألوان الخارجية");
   const [statusFilter, setStatusFilter] = useState("جميع الحالات");
   const [importTypeFilter, setImportTypeFilter] = useState("جميع الأنواع");
+  const [ownershipTypeFilter, setOwnershipTypeFilter] = useState("جميع أنواع الملكية");
   const [locationFilter, setLocationFilter] = useState("");
   const [showSoldCars, setShowSoldCars] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -176,6 +177,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
           item.year?.toString().includes(query) ||
           item.status?.toLowerCase().includes(query) ||
           item.importType?.toLowerCase().includes(query) ||
+          item.ownershipType?.toLowerCase().includes(query) ||
           item.notes?.toLowerCase().includes(query);
         if (!matchesSearch) return false;
       }
@@ -259,13 +261,26 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         return true;
       }
       
+      if (field === "ownershipType") {
+        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
+        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
+        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
+        if (yearFilter !== "جميع السنوات" && String(item.year) !== yearFilter) return false;
+        if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
+        if (exteriorColorFilter !== "جميع الألوان الخارجية" && item.exteriorColor !== exteriorColorFilter) return false;
+        if (interiorColorFilter !== "جميع الألوان الداخلية" && item.interiorColor !== interiorColorFilter) return false;
+        if (statusFilter !== "جميع الحالات" && item.status !== statusFilter) return false;
+        if (importTypeFilter !== "جميع الأنواع" && item.importType !== importTypeFilter) return false;
+        return true;
+      }
+      
       return true;
     });
     
     // Return count based on value
     if (value === "جميع الصناع" || value === "جميع الفئات" || value === "جميع درجات التجهيز" || 
         value === "جميع السنوات" || value === "جميع السعات" || value === "جميع الألوان الداخلية" || 
-        value === "جميع الألوان الخارجية" || value === "جميع الحالات" || value === "جميع الأنواع") {
+        value === "جميع الألوان الخارجية" || value === "جميع الحالات" || value === "جميع الأنواع" || value === "جميع أنواع الملكية") {
       return filteredData.length;
     }
     
@@ -303,6 +318,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
           item.year?.toString().includes(query) ||
           item.status?.toLowerCase().includes(query) ||
           item.importType?.toLowerCase().includes(query) ||
+          item.ownershipType?.toLowerCase().includes(query) ||
           item.notes?.toLowerCase().includes(query);
         if (!matchesSearch) return false;
       }
@@ -347,6 +363,18 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     exteriorColor: exteriorColorFilter,
     interiorColor: interiorColorFilter,
     status: statusFilter
+  })];
+
+  const availableOwnershipTypes = ["جميع أنواع الملكية", ...getFilteredUniqueValues("ownershipType", {
+    manufacturer: manufacturerFilter,
+    category: categoryFilter,
+    trimLevel: trimLevelFilter,
+    year: yearFilter,
+    engineCapacity: engineCapacityFilter,
+    exteriorColor: exteriorColorFilter,
+    interiorColor: interiorColorFilter,
+    status: statusFilter,
+    importType: importTypeFilter
   })];
   
   const availableEngineCapacities = ["جميع السعات", ...getFilteredUniqueValues("engineCapacity", {
@@ -758,6 +786,13 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                     onFilterChange={setImportTypeFilter} 
                                     getCount={(item) => getFilterCount("importType", item)} 
                                   />
+                                  <FilterSlider 
+                                    title="نوع الملكية" 
+                                    items={availableOwnershipTypes} 
+                                    currentFilter={ownershipTypeFilter} 
+                                    onFilterChange={setOwnershipTypeFilter} 
+                                    getCount={(item) => getFilterCount("ownershipType", item)} 
+                                  />
                                 </>
                               );
                             })()}
@@ -777,6 +812,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       setExteriorColorFilter("جميع الألوان الخارجية");
                       setStatusFilter("جميع الحالات");
                       setImportTypeFilter("جميع الأنواع");
+                      setOwnershipTypeFilter("جميع أنواع الملكية");
                     }}
                     className="hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20"
                   >
@@ -872,6 +908,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
           exteriorColorFilter={exteriorColorFilter}
           statusFilter={statusFilter}
           importTypeFilter={importTypeFilter}
+          ownershipTypeFilter={ownershipTypeFilter}
           showSoldCars={showSoldCars}
           userRole={userRole}
           username={username}
