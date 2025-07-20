@@ -857,7 +857,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                   <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400">
                     <p className="text-blue-800 text-sm font-medium">📝 تعليمات مهمة:</p>
                     <ul className="text-blue-700 text-sm mt-1 space-y-1">
-                      <li>• الصيغ المدعومة: PNG, JPG, JPEG, GIF, WebP</li>
+                      <li>• الصيغ المدعومة: PNG, JPG, JPEG, GIF, WebP, SVG</li>
                       <li>• الحد الأقصى لحجم الملف: 5 ميجابايت</li>
                       <li>• أبعاد مُوصى بها: 200x200 بكسل لأفضل عرض</li>
                       <li>• الشعارات ستظهر في جميع صفحات النظام</li>
@@ -1024,7 +1024,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                             <div className="flex items-center justify-center space-x-2 space-x-reverse">
                               <input
                                 type="file"
-                                accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                                accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml"
                                 className="hidden"
                                 id={`file-change-${manufacturer.id}`}
                                 onChange={(e) => {
@@ -1036,7 +1036,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                     if (!file.type.startsWith('image/')) {
                                       toast({
                                         title: "نوع ملف غير صحيح",
-                                        description: "يرجى اختيار ملف صورة صحيح (PNG, JPG, JPEG, GIF, WebP)",
+                                        description: "يرجى اختيار ملف صورة صحيح (PNG, JPG, JPEG, GIF, WebP, SVG)",
                                         variant: "destructive",
                                       });
                                       e.target.value = '';
@@ -1120,7 +1120,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                             <div className="text-center">
                               <input
                                 type="file"
-                                accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                                accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml"
                                 className="hidden"
                                 id={`file-upload-${manufacturer.id}`}
                                 onChange={(e) => {
@@ -1132,7 +1132,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                     if (!file.type.startsWith('image/')) {
                                       toast({
                                         title: "نوع ملف غير صحيح",
-                                        description: "يرجى اختيار ملف صورة صحيح (PNG, JPG, JPEG, GIF, WebP)",
+                                        description: "يرجى اختيار ملف صورة صحيح (PNG, JPG, JPEG, GIF, WebP, SVG)",
                                         variant: "destructive",
                                       });
                                       e.target.value = '';
@@ -1279,7 +1279,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                               if (!file.type.startsWith('image/')) {
                                 toast({
                                   title: "نوع ملف غير صحيح",
-                                  description: "يرجى اختيار ملف صورة صحيح (PNG, JPG, JPEG, GIF, WebP)",
+                                  description: "يرجى اختيار ملف صورة صحيح (PNG, JPG, JPEG, GIF, WebP, SVG)",
                                   variant: "destructive",
                                 });
                                 e.target.value = '';
