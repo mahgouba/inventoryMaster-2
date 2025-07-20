@@ -53,6 +53,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [manufacturerFiltersOpen, setManufacturerFiltersOpen] = useState<Record<string, boolean>>({});
 
   // Get theme settings and hooks
   const { companyName, companyLogo, darkMode, toggleDarkMode, isUpdatingDarkMode } = useTheme();
