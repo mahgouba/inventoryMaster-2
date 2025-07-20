@@ -720,7 +720,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="ملك الشركة">ملك الشركة</SelectItem>
-                            <SelectItem value="معرض (وسيط)">معرض (وسيط)</SelectItem>
+                            <SelectItem value="عرض (وسيط)">عرض (وسيط)</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>

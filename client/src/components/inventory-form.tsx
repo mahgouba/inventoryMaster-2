@@ -38,7 +38,7 @@ const initialEngineCapacities = ["2.0L", "1.5L", "3.0L", "4.0L", "5.0L", "V6", "
 const initialYears = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018];
 const initialStatuses = ["متوفر", "في الطريق", "قيد الصيانة"];
 const initialImportTypes = ["شخصي", "شركة", "مستعمل شخصي"];
-const initialOwnershipTypes = ["ملك الشركة", "وسيط"];
+const initialOwnershipTypes = ["ملك الشركة", "عرض (وسيط)"];
 const initialLocations = ["المستودع الرئيسي", "المعرض", "الورشة", "الميناء", "مستودع فرعي"];
 const initialColors = ["أسود", "أبيض", "رمادي", "أزرق", "أحمر", "بني", "فضي", "ذهبي", "بيج"];
 
