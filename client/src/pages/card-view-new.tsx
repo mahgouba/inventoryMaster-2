@@ -213,7 +213,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     
     // Special handling for year field to handle number/string comparison
     if (field === "year") {
-      return filteredData.filter(item => String(item.year) === value).length;
+      return filteredData.filter(item => String(item.year) === String(value)).length;
     }
     
     return filteredData.filter(item => item[field] === value).length;
@@ -321,11 +321,13 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     category: selectedCategory
   })];
   
-  const availableYears = ["الكل", ...getFilteredUniqueValues("year", {
+  const yearValues = getFilteredUniqueValues("year", {
     manufacturer: selectedManufacturer,
     category: selectedCategory,
     trimLevel: selectedTrimLevel
-  }).map(String)];
+  }).map(year => String(year)).sort((a, b) => parseInt(b) - parseInt(a)); // Sort years in descending order
+  
+  const availableYears = ["الكل", ...yearValues];
   
   const availableEngineCapacities = ["الكل", ...getFilteredUniqueValues("engineCapacity", {
     manufacturer: selectedManufacturer,
