@@ -59,14 +59,27 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    if (selectedFile && selectedFile.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-      setFile(selectedFile);
-    } else {
-      toast({
-        title: "خطأ في الملف",
-        description: "يرجى اختيار ملف Excel (.xlsx)",
-        variant: "destructive",
-      });
+    if (selectedFile) {
+      const validTypes = [
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+        "application/vnd.ms-excel", // .xls
+        "text/csv" // .csv
+      ];
+      
+      const isValidType = validTypes.includes(selectedFile.type) || 
+                         selectedFile.name.endsWith('.xlsx') || 
+                         selectedFile.name.endsWith('.xls') ||
+                         selectedFile.name.endsWith('.csv');
+      
+      if (isValidType) {
+        setFile(selectedFile);
+      } else {
+        toast({
+          title: "خطأ في الملف",
+          description: "يرجى اختيار ملف Excel (.xlsx, .xls) أو CSV (.csv)",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -76,72 +89,102 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
     setIsProcessing(true);
     
     try {
-      // Since we can't use xlsx library directly, we'll simulate Excel processing
-      // In a real implementation, you'd use a library like xlsx or sheetjs
+      // Use xlsx library to parse Excel files
+      const { read, utils } = await import('xlsx');
       const reader = new FileReader();
       
       reader.onload = (e) => {
         try {
-          // This is a simplified example - in reality you'd parse the Excel file properly
-          const mockData = [
-            {
-              manufacturer: "مرسيدس",
-              category: "E200",
-              engineCapacity: "2.0L",
-              year: 2025,
-              exteriorColor: "أسود",
-              interiorColor: "بيج",
-              status: "متوفر",
-              importType: "شخصي",
-              location: "المعرض",
-              chassisNumber: "WDB2130461A123456",
-              price: "150000",
-              images: [],
-              notes: "مستورد من Excel - نموذج جديد",
-              isSold: false,
-            },
-            {
-              manufacturer: "بي ام دبليو",
-              category: "X5",
-              engineCapacity: "3.0L",
-              year: 2024,
-              exteriorColor: "أبيض",
-              interiorColor: "أسود",
-              status: "في الطريق",
-              importType: "شركة",
-              location: "الميناء",
-              chassisNumber: "WBAFR9C50KC123457",
-              price: "200000",
-              images: [],
-              notes: "مستورد من Excel - موديل حديث",
-              isSold: false,
-            },
-            {
-              manufacturer: "تسلا",
-              category: "Model S",
-              engineCapacity: "Electric",
-              year: 2024,
-              exteriorColor: "أحمر",
-              interiorColor: "أبيض",
-              status: "متوفر",
-              importType: "شخصي",
-              location: "المعرض",
-              chassisNumber: "5YJ3E1EA4KF123458",
-              price: "300000",
-              images: [],
-              notes: "مستورد من Excel - سيارة كهربائية",
-              isSold: false,
-            }
-          ];
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = read(data, { type: 'array' });
           
-          importMutation.mutate(mockData);
+          // Get the first worksheet
+          const worksheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[worksheetName];
+          
+          // Convert to JSON
+          const jsonData = utils.sheet_to_json(worksheet, { header: 1 });
+          
+          if (jsonData.length < 2) {
+            throw new Error("الملف فارغ أو لا يحتوي على بيانات كافية");
+          }
+          
+          // Get headers from first row
+          const headers = jsonData[0] as string[];
+          const rows = jsonData.slice(1) as any[][];
+          
+          // Map headers to expected field names
+          const headerMap: Record<string, string> = {
+            "الصانع": "manufacturer",
+            "الفئة": "category", 
+            "سعة المحرك": "engineCapacity",
+            "السنة": "year",
+            "اللون الخارجي": "exteriorColor",
+            "اللون الداخلي": "interiorColor",
+            "الحالة": "status",
+            "نوع الاستيراد": "importType",
+            "الموقع": "location",
+            "رقم الهيكل": "chassisNumber",
+            "السعر": "price",
+            "الملاحظات": "notes"
+          };
+          
+          // Convert rows to inventory items
+          const inventoryData = rows
+            .filter(row => row.some(cell => cell != null && cell !== "")) // Skip empty rows
+            .map((row, index) => {
+              const item: any = {
+                images: [],
+                isSold: false
+              };
+              
+              headers.forEach((header, headerIndex) => {
+                const fieldName = headerMap[header] || header;
+                const value = row[headerIndex];
+                
+                if (value != null && value !== "") {
+                  if (fieldName === "year") {
+                    item[fieldName] = parseInt(value) || new Date().getFullYear();
+                  } else if (fieldName === "price") {
+                    item[fieldName] = String(value).replace(/[^\d]/g, ""); // Remove non-digits
+                  } else {
+                    item[fieldName] = String(value);
+                  }
+                }
+              });
+              
+              // Validate required fields
+              const requiredFields = ["manufacturer", "category", "engineCapacity", "year", "exteriorColor", "interiorColor", "status"];
+              const missingFields = requiredFields.filter(field => !item[field]);
+              
+              if (missingFields.length > 0) {
+                throw new Error(`الصف ${index + 2}: حقول مطلوبة مفقودة - ${missingFields.join(", ")}`);
+              }
+              
+              return item;
+            });
+          
+          if (inventoryData.length === 0) {
+            throw new Error("لم يتم العثور على بيانات صالحة في الملف");
+          }
+          
+          importMutation.mutate(inventoryData);
         } catch (error) {
           toast({
             title: "خطأ في معالجة الملف",
-            description: "تأكد من صحة تنسيق الملف",
+            description: error.message || "تأكد من صحة تنسيق الملف واتباع النموذج المحدد",
             variant: "destructive",
           });
+          setIsProcessing(false);
         }
+      };
+      
+      reader.onerror = () => {
+        toast({
+          title: "خطأ في قراءة الملف",
+          description: "تأكد من أن الملف غير تالف",
+          variant: "destructive",
+        });
         setIsProcessing(false);
       };
       
@@ -150,7 +193,7 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
       setIsProcessing(false);
       toast({
         title: "خطأ",
-        description: "فشل في قراءة الملف",
+        description: "فشل في قراءة الملف. تأكد من أن المتصفح يدعم قراءة ملفات Excel",
         variant: "destructive",
       });
     }

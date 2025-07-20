@@ -806,6 +806,13 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       <FileText className="w-4 h-4 ml-2" />
                       إدارة المواصفات
                     </Button>
+                    <Button 
+                      onClick={() => setIsExcelImportOpen(true)}
+                      className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+                    >
+                      <FileSpreadsheet className="w-4 h-4 ml-2" />
+                      استيراد من Excel
+                    </Button>
 
                   </>
                 )}
