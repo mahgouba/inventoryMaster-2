@@ -29,6 +29,24 @@
   --tw-ring-color: #00627F !important;
 }
 
+/* Golden theme colors for buttons */
+.bg-custom-gold {
+  background-color: #C49632 !important;
+  color: white !important;
+}
+.hover\:bg-custom-gold-dark:hover {
+  background-color: #A67C28 !important;
+}
+.text-custom-gold {
+  color: #C49632 !important;
+}
+.border-custom-gold {
+  border-color: #C49632 !important;
+}
+.hover\:border-custom-gold:hover {
+  border-color: #C49632 !important;
+}
+
 /* Print Styles for Quotation */
 @media print {
   @page {
