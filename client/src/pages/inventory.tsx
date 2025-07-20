@@ -686,51 +686,56 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                             
                             {/* Slider Filter Component */}
                             {(() => {
-                              const FilterSlider = ({ title, items, currentFilter, onFilterChange, getCount }) => (
+                              const FilterSlider = ({ title, items, currentFilter, onFilterChange, getCount, showToggle, toggleState, onToggleChange }) => (
                                 <div className="space-y-2">
-                                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
-                                  <div className="relative group">
-                                    <ScrollArea className="w-full">
-                                      <div className="flex space-x-2 space-x-reverse pb-2">
-                                        {items.map((item) => (
-                                          <Button
-                                            key={item}
-                                            variant={currentFilter === item ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => onFilterChange(item)}
-                                            className={`transition-all duration-200 whitespace-nowrap ${
-                                              currentFilter === item
-                                                ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                                                : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                                            }`}
-                                          >
-                                            {item} ({getCount(item)})
-                                          </Button>
-                                        ))}
-                                      </div>
-                                    </ScrollArea>
-                                    {/* Navigation Arrows */}
-                                    <button 
-                                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                                        if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
-                                      }}
-                                    >
-                                      <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
-                                    </button>
-                                    <button 
-                                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                                        if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
-                                      }}
-                                    >
-                                      <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
-                                    </button>
+                                  <div className="flex items-center justify-between">
+                                    <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
+                                    <Switch checked={toggleState} onCheckedChange={onToggleChange} />
                                   </div>
+                                  {toggleState && (
+                                    <div className="relative group">
+                                      <ScrollArea className="w-full">
+                                        <div className="flex space-x-2 space-x-reverse pb-2">
+                                          {items.map((item) => (
+                                            <Button
+                                              key={item}
+                                              variant={currentFilter === item ? "default" : "outline"}
+                                              size="sm"
+                                              onClick={() => onFilterChange(item)}
+                                              className={`transition-all duration-200 whitespace-nowrap ${
+                                                currentFilter === item
+                                                  ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                                                  : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                                              }`}
+                                            >
+                                              {item} ({getCount(item)})
+                                            </Button>
+                                          ))}
+                                        </div>
+                                      </ScrollArea>
+                                      {/* Navigation Arrows */}
+                                      <button 
+                                        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                                          if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                                        }}
+                                      >
+                                        <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                                      </button>
+                                      <button 
+                                        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                                          if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                                        }}
+                                      >
+                                        <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
                               );
                               
@@ -738,7 +743,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                 <div className="space-y-4">
                                   {/* Master Filter Controls */}
                                   <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                                    <span className="text-sm font-semibold text-blue-800 dark:text-blue-200">التحكم في الفلاتر</span>
+                                    <span className="text-sm font-semibold text-blue-800 dark:text-blue-200">التحكم في جميع الفلاتر</span>
                                     <div className="flex space-x-3 space-x-reverse">
                                       <Button
                                         size="sm"
@@ -781,142 +786,98 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                     </div>
                                   </div>
                                   
-                                  {/* Individual Filter Toggle Controls */}
-                                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border">
-                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
-                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">الصانع</span>
-                                      <Switch checked={showManufacturerFilter} onCheckedChange={setShowManufacturerFilter} />
-                                    </div>
-                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
-                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">الفئة</span>
-                                      <Switch checked={showCategoryFilter} onCheckedChange={setShowCategoryFilter} />
-                                    </div>
-                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
-                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">درجة التجهيز</span>
-                                      <Switch checked={showTrimLevelFilter} onCheckedChange={setShowTrimLevelFilter} />
-                                    </div>
-                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
-                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">السنة</span>
-                                      <Switch checked={showYearFilter} onCheckedChange={setShowYearFilter} />
-                                    </div>
-                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
-                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">سعة المحرك</span>
-                                      <Switch checked={showEngineCapacityFilter} onCheckedChange={setShowEngineCapacityFilter} />
-                                    </div>
-                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
-                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الخارجي</span>
-                                      <Switch checked={showExteriorColorFilter} onCheckedChange={setShowExteriorColorFilter} />
-                                    </div>
-                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
-                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الداخلي</span>
-                                      <Switch checked={showInteriorColorFilter} onCheckedChange={setShowInteriorColorFilter} />
-                                    </div>
-                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
-                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">الحالة</span>
-                                      <Switch checked={showStatusFilter} onCheckedChange={setShowStatusFilter} />
-                                    </div>
-                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
-                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">نوع الاستيراد</span>
-                                      <Switch checked={showImportTypeFilter} onCheckedChange={setShowImportTypeFilter} />
-                                    </div>
-                                    <div className="flex items-center justify-between space-x-2 space-x-reverse">
-                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">نوع الملكية</span>
-                                      <Switch checked={showOwnershipTypeFilter} onCheckedChange={setShowOwnershipTypeFilter} />
-                                    </div>
-                                  </div>
-                                  
-                                  {/* Actual Filters */}
+                                  {/* Individual Filters with Toggles */}
                                   <div className="space-y-3">
-                                    {showManufacturerFilter && (
-                                      <FilterSlider 
-                                        title="الصانع" 
-                                        items={manufacturers} 
-                                        currentFilter={manufacturerFilter} 
-                                        onFilterChange={handleManufacturerChange} 
-                                        getCount={(item) => getFilterCount("manufacturer", item)} 
-                                      />
-                                    )}
-                                    {showCategoryFilter && (
-                                      <FilterSlider 
-                                        title="الفئة" 
-                                        items={categories} 
-                                        currentFilter={categoryFilter} 
-                                        onFilterChange={setCategoryFilter} 
-                                        getCount={(item) => getFilterCount("category", item)} 
-                                      />
-                                    )}
-                                    {showTrimLevelFilter && (
-                                      <FilterSlider 
-                                        title="درجة التجهيز" 
-                                        items={availableTrimLevels} 
-                                        currentFilter={trimLevelFilter} 
-                                        onFilterChange={setTrimLevelFilter} 
-                                        getCount={(item) => getFilterCount("trimLevel", item)} 
-                                      />
-                                    )}
-                                    {showYearFilter && (
-                                      <FilterSlider 
-                                        title="السنة" 
-                                        items={availableYears} 
-                                        currentFilter={yearFilter} 
-                                        onFilterChange={setYearFilter} 
-                                        getCount={(item) => getFilterCount("year", item)} 
-                                      />
-                                    )}
-                                    {showEngineCapacityFilter && (
-                                      <FilterSlider 
-                                        title="سعة المحرك" 
-                                        items={availableEngineCapacities} 
-                                        currentFilter={engineCapacityFilter} 
-                                        onFilterChange={setEngineCapacityFilter} 
-                                        getCount={(item) => getFilterCount("engineCapacity", item)} 
-                                      />
-                                    )}
-                                    {showExteriorColorFilter && (
-                                      <FilterSlider 
-                                        title="اللون الخارجي" 
-                                        items={availableExteriorColors} 
-                                        currentFilter={exteriorColorFilter} 
-                                        onFilterChange={setExteriorColorFilter} 
-                                        getCount={(item) => getFilterCount("exteriorColor", item)} 
-                                      />
-                                    )}
-                                    {showInteriorColorFilter && (
-                                      <FilterSlider 
-                                        title="اللون الداخلي" 
-                                        items={availableInteriorColors} 
-                                        currentFilter={interiorColorFilter} 
-                                        onFilterChange={setInteriorColorFilter} 
-                                        getCount={(item) => getFilterCount("interiorColor", item)} 
-                                      />
-                                    )}
-                                    {showStatusFilter && (
-                                      <FilterSlider 
-                                        title="الحالة" 
-                                        items={availableStatuses} 
-                                        currentFilter={statusFilter} 
-                                        onFilterChange={setStatusFilter} 
-                                        getCount={(item) => getFilterCount("status", item)} 
-                                      />
-                                    )}
-                                    {showImportTypeFilter && (
-                                      <FilterSlider 
-                                        title="نوع الاستيراد" 
-                                        items={availableImportTypes} 
-                                        currentFilter={importTypeFilter} 
-                                        onFilterChange={setImportTypeFilter} 
-                                        getCount={(item) => getFilterCount("importType", item)} 
-                                      />
-                                    )}
-                                    {showOwnershipTypeFilter && (
-                                      <FilterSlider 
-                                        title="نوع الملكية" 
-                                        items={availableOwnershipTypes} 
-                                        currentFilter={ownershipTypeFilter} 
-                                        onFilterChange={setOwnershipTypeFilter} 
-                                        getCount={(item) => getFilterCount("ownershipType", item)} 
-                                      />
-                                    )}
+                                    <FilterSlider 
+                                      title="الصانع" 
+                                      items={manufacturers} 
+                                      currentFilter={manufacturerFilter} 
+                                      onFilterChange={handleManufacturerChange} 
+                                      getCount={(item) => getFilterCount("manufacturer", item)} 
+                                      toggleState={showManufacturerFilter}
+                                      onToggleChange={setShowManufacturerFilter}
+                                    />
+                                    <FilterSlider 
+                                      title="الفئة" 
+                                      items={categories} 
+                                      currentFilter={categoryFilter} 
+                                      onFilterChange={setCategoryFilter} 
+                                      getCount={(item) => getFilterCount("category", item)} 
+                                      toggleState={showCategoryFilter}
+                                      onToggleChange={setShowCategoryFilter}
+                                    />
+                                    <FilterSlider 
+                                      title="درجة التجهيز" 
+                                      items={availableTrimLevels} 
+                                      currentFilter={trimLevelFilter} 
+                                      onFilterChange={setTrimLevelFilter} 
+                                      getCount={(item) => getFilterCount("trimLevel", item)} 
+                                      toggleState={showTrimLevelFilter}
+                                      onToggleChange={setShowTrimLevelFilter}
+                                    />
+                                    <FilterSlider 
+                                      title="السنة" 
+                                      items={availableYears} 
+                                      currentFilter={yearFilter} 
+                                      onFilterChange={setYearFilter} 
+                                      getCount={(item) => getFilterCount("year", item)} 
+                                      toggleState={showYearFilter}
+                                      onToggleChange={setShowYearFilter}
+                                    />
+                                    <FilterSlider 
+                                      title="سعة المحرك" 
+                                      items={availableEngineCapacities} 
+                                      currentFilter={engineCapacityFilter} 
+                                      onFilterChange={setEngineCapacityFilter} 
+                                      getCount={(item) => getFilterCount("engineCapacity", item)} 
+                                      toggleState={showEngineCapacityFilter}
+                                      onToggleChange={setShowEngineCapacityFilter}
+                                    />
+                                    <FilterSlider 
+                                      title="اللون الخارجي" 
+                                      items={availableExteriorColors} 
+                                      currentFilter={exteriorColorFilter} 
+                                      onFilterChange={setExteriorColorFilter} 
+                                      getCount={(item) => getFilterCount("exteriorColor", item)} 
+                                      toggleState={showExteriorColorFilter}
+                                      onToggleChange={setShowExteriorColorFilter}
+                                    />
+                                    <FilterSlider 
+                                      title="اللون الداخلي" 
+                                      items={availableInteriorColors} 
+                                      currentFilter={interiorColorFilter} 
+                                      onFilterChange={setInteriorColorFilter} 
+                                      getCount={(item) => getFilterCount("interiorColor", item)} 
+                                      toggleState={showInteriorColorFilter}
+                                      onToggleChange={setShowInteriorColorFilter}
+                                    />
+                                    <FilterSlider 
+                                      title="الحالة" 
+                                      items={availableStatuses} 
+                                      currentFilter={statusFilter} 
+                                      onFilterChange={setStatusFilter} 
+                                      getCount={(item) => getFilterCount("status", item)} 
+                                      toggleState={showStatusFilter}
+                                      onToggleChange={setShowStatusFilter}
+                                    />
+                                    <FilterSlider 
+                                      title="نوع الاستيراد" 
+                                      items={availableImportTypes} 
+                                      currentFilter={importTypeFilter} 
+                                      onFilterChange={setImportTypeFilter} 
+                                      getCount={(item) => getFilterCount("importType", item)} 
+                                      toggleState={showImportTypeFilter}
+                                      onToggleChange={setShowImportTypeFilter}
+                                    />
+                                    <FilterSlider 
+                                      title="نوع الملكية" 
+                                      items={availableOwnershipTypes} 
+                                      currentFilter={ownershipTypeFilter} 
+                                      onFilterChange={setOwnershipTypeFilter} 
+                                      getCount={(item) => getFilterCount("ownershipType", item)} 
+                                      toggleState={showOwnershipTypeFilter}
+                                      onToggleChange={setShowOwnershipTypeFilter}
+                                    />
                                   </div>
                                 </div>
                               );
