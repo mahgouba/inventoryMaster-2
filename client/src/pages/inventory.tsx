@@ -55,16 +55,16 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [filtersOpen, setFiltersOpen] = useState(false);
   
   // Toggle states for individual filters
-  const [showManufacturerFilter, setShowManufacturerFilter] = useState(true);
-  const [showCategoryFilter, setShowCategoryFilter] = useState(true);
-  const [showTrimLevelFilter, setShowTrimLevelFilter] = useState(true);
-  const [showYearFilter, setShowYearFilter] = useState(true);
-  const [showEngineCapacityFilter, setShowEngineCapacityFilter] = useState(true);
-  const [showExteriorColorFilter, setShowExteriorColorFilter] = useState(true);
-  const [showInteriorColorFilter, setShowInteriorColorFilter] = useState(true);
-  const [showStatusFilter, setShowStatusFilter] = useState(true);
-  const [showImportTypeFilter, setShowImportTypeFilter] = useState(true);
-  const [showOwnershipTypeFilter, setShowOwnershipTypeFilter] = useState(true);
+  const [showManufacturerFilter, setShowManufacturerFilter] = useState(false);
+  const [showCategoryFilter, setShowCategoryFilter] = useState(false);
+  const [showTrimLevelFilter, setShowTrimLevelFilter] = useState(false);
+  const [showYearFilter, setShowYearFilter] = useState(false);
+  const [showEngineCapacityFilter, setShowEngineCapacityFilter] = useState(false);
+  const [showExteriorColorFilter, setShowExteriorColorFilter] = useState(false);
+  const [showInteriorColorFilter, setShowInteriorColorFilter] = useState(false);
+  const [showStatusFilter, setShowStatusFilter] = useState(false);
+  const [showImportTypeFilter, setShowImportTypeFilter] = useState(false);
+  const [showOwnershipTypeFilter, setShowOwnershipTypeFilter] = useState(false);
 
   // Get theme settings and hooks
   const { companyName, companyLogo, darkMode, toggleDarkMode, isUpdatingDarkMode } = useTheme();
@@ -756,7 +756,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                     <span className="text-sm font-semibold text-blue-800 dark:text-blue-200">التحكم في جميع الفلاتر</span>
                                     <div className="flex space-x-3 space-x-reverse">
                                       <Button
-                                        size="sm"
+                                        size="lg"
                                         variant="outline"
                                         onClick={() => {
                                           setShowManufacturerFilter(true);
@@ -770,12 +770,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                           setShowImportTypeFilter(true);
                                           setShowOwnershipTypeFilter(true);
                                         }}
-                                        className="text-green-700 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-600 dark:hover:bg-green-900/20"
+                                        className="p-3 h-12 w-12 border-green-300 hover:bg-green-50 dark:border-green-600 dark:hover:bg-green-900/20"
                                       >
-                                        إظهار الكل
+                                        <Eye size={24} className="text-green-600 dark:text-green-400" />
                                       </Button>
                                       <Button
-                                        size="sm"
+                                        size="lg"
                                         variant="outline"
                                         onClick={() => {
                                           setShowManufacturerFilter(false);
@@ -789,9 +789,9 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                           setShowImportTypeFilter(false);
                                           setShowOwnershipTypeFilter(false);
                                         }}
-                                        className="text-red-700 border-red-300 hover:bg-red-50 dark:text-red-400 dark:border-red-600 dark:hover:bg-red-900/20"
+                                        className="p-3 h-12 w-12 border-red-300 hover:bg-red-50 dark:border-red-600 dark:hover:bg-red-900/20"
                                       >
-                                        إخفاء الكل
+                                        <EyeOff size={24} className="text-red-600 dark:text-red-400" />
                                       </Button>
                                     </div>
                                   </div>
