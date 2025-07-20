@@ -18,6 +18,7 @@ import {
   MessageSquare,
   Filter,
   Edit3,
+  Edit2,
   ShoppingCart,
   Trash2,
   ChevronDown,
@@ -1408,6 +1409,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             <span className="font-semibold text-slate-800 dark:text-slate-200">{item.importType}</span>
                           </div>
                           <div className="flex justify-between">
+                            <span className="text-slate-600 dark:text-slate-400 font-medium">نوع الملكية:</span>
+                            <span className="font-semibold text-slate-800 dark:text-slate-200">{item.ownershipType}</span>
+                          </div>
+                          <div className="flex justify-between">
                             <span className="text-slate-600 dark:text-slate-400 font-medium">الموقع:</span>
                             <span className="font-semibold text-slate-800 dark:text-slate-200">{item.location}</span>
                           </div>
@@ -1516,6 +1521,33 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 </Button>
                               )}
                             </div>
+
+                            {/* Edit and Delete buttons (Admin only) */}
+                            {userRole === "admin" && (
+                              <div className="flex gap-2 mt-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex-1 h-9 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
+                                  onClick={() => {
+                                    setEditingItem(item);
+                                    setShowEditDialog(true);
+                                  }}
+                                >
+                                  <Edit2 size={14} className="ml-1" />
+                                  تحرير
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex-1 h-9 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300"
+                                  onClick={() => setItemToDelete(item)}
+                                >
+                                  <Trash2 size={14} className="ml-1" />
+                                  حذف
+                                </Button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </CardContent>
