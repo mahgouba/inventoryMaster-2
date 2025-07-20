@@ -247,7 +247,7 @@ export default function ImageManagement({ open, onOpenChange, manufacturers, cat
                         <SelectValue placeholder="اختر درجة التجهيز" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">غير محدد</SelectItem>
+                        <SelectItem value="غير محدد">غير محدد</SelectItem>
                         {trimLevels.map((trim) => (
                           <SelectItem key={trim} value={trim}>
                             {trim}
