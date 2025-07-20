@@ -315,7 +315,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
             </div>
             <div className="spec-item">
               <span className="spec-label">سعة المحرك:</span>
-              <span className="spec-value">{vehicle.engineCapacity}</span>
+              <span className="spec-value">{String(vehicle.engineCapacity || '')}</span>
             </div>
             <div className="spec-item">
               <span className="spec-label">السنة:</span>

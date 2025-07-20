@@ -73,18 +73,18 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
   });
 
   // Fetch engine capacities from database
-  const { data: engineCapacitiesData = [] } = useQuery<string[]>({
+  const { data: engineCapacitiesData = [] } = useQuery<any[]>({
     queryKey: ["/api/engine-capacities"],
     enabled: open,
   });
 
   // Combine manufacturers from database and cars.json
-  const dbManufacturers = manufacturersData.map(m => m.name || m);
+  const dbManufacturers = manufacturersData.map(m => typeof m === 'string' ? m : (m.name || String(m)));
   const carsManufacturerNames = carsManufacturers.map((m: any) => m.name_ar);
   const manufacturers = [...new Set([...dbManufacturers, ...carsManufacturerNames])];
   
   // Combine categories from database and cars.json
-  const dbCategories = selectedManufacturer ? categoriesData : [];
+  const dbCategories = selectedManufacturer ? categoriesData.map(c => typeof c === 'string' ? c : (c.category || String(c))) : [];
   const carsModelNames = carsModels.map((m: any) => m.model_ar);
   const categories = [...new Set([...dbCategories, ...carsModelNames])];
 
@@ -95,8 +95,10 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
   const carsTrimsNames = carsTrims.map((t: any) => t.trim_ar);
   const allTrimLevelNames = [...new Set([...dbTrimLevels.map(t => t.trimLevel), ...carsTrimsNames])];
 
-  // Get engine capacities from database
-  const engineCapacities = engineCapacitiesData.length > 0 ? engineCapacitiesData : ["1.5L", "2.0L", "2.5L", "3.0L", "3.5L", "4.0L", "4.5L", "5.0L", "V6", "V8", "V12", "Electric"];
+  // Get engine capacities from database - ensure they are strings
+  const engineCapacities = engineCapacitiesData.length > 0 
+    ? engineCapacitiesData.map(item => typeof item === 'string' ? item : (item.engineCapacity || String(item)))
+    : ["1.5L", "2.0L", "2.5L", "3.0L", "3.5L", "4.0L", "4.5L", "5.0L", "V6", "V8", "V12", "Electric"];
 
   const createMutation = useMutation({
     mutationFn: (data: InsertSpecification) => apiRequest("POST", "/api/specifications", data),
@@ -200,7 +202,7 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     setSelectedCategory(spec.category);
     setSelectedTrimLevel(spec.trimLevel);
     setSelectedYear(spec.year.toString());
-    setSelectedEngineCapacity(spec.engineCapacity);
+    setSelectedEngineCapacity(String(spec.engineCapacity || ''));
     setDescription(spec.detailedDescription);
     setShowForm(true);
   };
@@ -250,11 +252,14 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                         <SelectValue placeholder="اختر الصانع" />
                       </SelectTrigger>
                       <SelectContent>
-                        {manufacturers.map((manufacturer) => (
-                          <SelectItem key={manufacturer} value={manufacturer}>
-                            {manufacturer}
-                          </SelectItem>
-                        ))}
+                        {manufacturers.map((manufacturer, index) => {
+                          const manufacturerValue = typeof manufacturer === 'string' ? manufacturer : (manufacturer.name || String(manufacturer));
+                          return (
+                            <SelectItem key={`${manufacturerValue}-${index}`} value={manufacturerValue}>
+                              {manufacturerValue}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   </div>
@@ -266,11 +271,14 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                         <SelectValue placeholder="اختر الفئة" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
+                        {categories.map((category, index) => {
+                          const categoryValue = typeof category === 'string' ? category : (category.category || String(category));
+                          return (
+                            <SelectItem key={`${categoryValue}-${index}`} value={categoryValue}>
+                              {categoryValue}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   </div>
@@ -282,11 +290,14 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                         <SelectValue placeholder="اختر درجة التجهيز" />
                       </SelectTrigger>
                       <SelectContent>
-                        {allTrimLevelNames.map((trimLevel) => (
-                          <SelectItem key={trimLevel} value={trimLevel}>
-                            {trimLevel}
-                          </SelectItem>
-                        ))}
+                        {allTrimLevelNames.map((trimLevel, index) => {
+                          const trimLevelValue = typeof trimLevel === 'string' ? trimLevel : (trimLevel.trimLevel || String(trimLevel));
+                          return (
+                            <SelectItem key={`${trimLevelValue}-${index}`} value={trimLevelValue}>
+                              {trimLevelValue}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   </div>
@@ -314,11 +325,14 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                         <SelectValue placeholder="اختر سعة المحرك" />
                       </SelectTrigger>
                       <SelectContent>
-                        {engineCapacities.map((capacity) => (
-                          <SelectItem key={capacity} value={capacity}>
-                            {capacity}
-                          </SelectItem>
-                        ))}
+                        {engineCapacities.map((capacity, index) => {
+                          const capacityValue = typeof capacity === 'string' ? capacity : (capacity.engineCapacity || String(capacity));
+                          return (
+                            <SelectItem key={`${capacityValue}-${index}`} value={capacityValue}>
+                              {capacityValue}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   </div>
@@ -379,7 +393,7 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                           <div className="flex gap-2 mt-2">
                             <Badge variant="outline">{spec.trimLevel}</Badge>
                             <Badge variant="outline">{spec.year}</Badge>
-                            <Badge variant="outline">{spec.engineCapacity}</Badge>
+                            <Badge variant="outline">{String(spec.engineCapacity || '')}</Badge>
                           </div>
                         </div>
                         <div className="flex gap-2">

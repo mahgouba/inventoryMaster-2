@@ -336,7 +336,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     category: selectedCategory,
     trimLevel: selectedTrimLevel,
     year: selectedYear
-  })];
+  }).map(capacity => String(capacity))];
   
   const availableExteriorColors = ["الكل", ...getFilteredUniqueValues("exteriorColor", {
     manufacturer: selectedManufacturer,
@@ -954,14 +954,14 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           key={capacity}
                           variant={selectedEngineCapacity === capacity ? "default" : "outline"}
                           size="sm"
-                          onClick={() => setSelectedEngineCapacity(capacity)}
+                          onClick={() => setSelectedEngineCapacity(String(capacity))}
                           className={`transition-all duration-200 whitespace-nowrap ${
                             selectedEngineCapacity === capacity
                               ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
                               : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                           }`}
                         >
-                          {capacity} ({getFilterCount("engineCapacity", capacity)})
+                          {String(capacity)} ({getFilterCount("engineCapacity", String(capacity))})
                         </Button>
                       ))}
                     </div>
