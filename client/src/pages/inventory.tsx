@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database, Filter, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -637,221 +637,125 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         <CardContent className="p-6">
                           {/* Enhanced Filter Controls with Button Design */}
                           <div className="space-y-6 animate-in fade-in duration-300">
-                {/* الصانع */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الصانع</h3>
-                  <ScrollArea className="w-full">
-                    <div className="flex space-x-2 space-x-reverse pb-2">
-                      {manufacturers.map((manufacturer) => (
-                        <Button
-                          key={manufacturer}
-                          variant={manufacturerFilter === manufacturer ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => handleManufacturerChange(manufacturer)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            manufacturerFilter === manufacturer
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {manufacturer} ({getFilterCount("manufacturer", manufacturer)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                {/* الفئة */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الفئة</h3>
-                  <ScrollArea className="w-full">
-                    <div className="flex space-x-2 space-x-reverse pb-2">
-                      {categories.map((category) => (
-                        <Button
-                          key={category}
-                          variant={categoryFilter === category ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setCategoryFilter(category)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            categoryFilter === category
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {category} ({getFilterCount("category", category)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                {/* درجة التجهيز */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">درجة التجهيز</h3>
-                  <ScrollArea className="w-full">
-                    <div className="flex space-x-2 space-x-reverse pb-2">
-                      {availableTrimLevels.map((trim) => (
-                        <Button
-                          key={trim}
-                          variant={trimLevelFilter === trim ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setTrimLevelFilter(trim)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            trimLevelFilter === trim
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {trim} ({getFilterCount("trimLevel", trim)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                {/* السنة */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">السنة</h3>
-                  <ScrollArea className="w-full">
-                    <div className="flex space-x-2 space-x-reverse pb-2">
-                      {years.map((year) => (
-                        <Button
-                          key={year}
-                          variant={yearFilter === year ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setYearFilter(year)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            yearFilter === year
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {year} ({getFilterCount("year", year)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                {/* سعة المحرك */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">سعة المحرك</h3>
-                  <ScrollArea className="w-full">
-                    <div className="flex space-x-2 space-x-reverse pb-2">
-                      {availableEngineCapacities.map((capacity) => (
-                        <Button
-                          key={capacity}
-                          variant={engineCapacityFilter === capacity ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setEngineCapacityFilter(capacity)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            engineCapacityFilter === capacity
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {capacity} ({getFilterCount("engineCapacity", capacity)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                {/* اللون الخارجي */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الخارجي</h3>
-                  <ScrollArea className="w-full">
-                    <div className="flex space-x-2 space-x-reverse pb-2">
-                      {availableExteriorColors.map((color) => (
-                        <Button
-                          key={color}
-                          variant={exteriorColorFilter === color ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setExteriorColorFilter(color)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            exteriorColorFilter === color
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {color} ({getFilterCount("exteriorColor", color)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                {/* اللون الداخلي */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">اللون الداخلي</h3>
-                  <ScrollArea className="w-full">
-                    <div className="flex space-x-2 space-x-reverse pb-2">
-                      {availableInteriorColors.map((color) => (
-                        <Button
-                          key={color}
-                          variant={interiorColorFilter === color ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setInteriorColorFilter(color)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            interiorColorFilter === color
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {color} ({getFilterCount("interiorColor", color)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                {/* الحالة */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">الحالة</h3>
-                  <ScrollArea className="w-full">
-                    <div className="flex space-x-2 space-x-reverse pb-2">
-                      {availableStatuses.map((status) => (
-                        <Button
-                          key={status}
-                          variant={statusFilter === status ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setStatusFilter(status)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            statusFilter === status
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {status} ({getFilterCount("status", status)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                {/* نوع الاستيراد */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">نوع الاستيراد</h3>
-                  <ScrollArea className="w-full">
-                    <div className="flex space-x-2 space-x-reverse pb-2">
-                      {availableImportTypes.map((type) => (
-                        <Button
-                          key={type}
-                          variant={importTypeFilter === type ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setImportTypeFilter(type)}
-                          className={`transition-all duration-200 whitespace-nowrap ${
-                            importTypeFilter === type
-                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                          }`}
-                        >
-                          {type} ({getFilterCount("importType", type)})
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
+                            
+                            {/* Slider Filter Component */}
+                            {(() => {
+                              const FilterSlider = ({ title, items, currentFilter, onFilterChange, getCount }) => (
+                                <div className="space-y-2">
+                                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
+                                  <div className="relative group">
+                                    <ScrollArea className="w-full">
+                                      <div className="flex space-x-2 space-x-reverse pb-2">
+                                        {items.map((item) => (
+                                          <Button
+                                            key={item}
+                                            variant={currentFilter === item ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => onFilterChange(item)}
+                                            className={`transition-all duration-200 whitespace-nowrap ${
+                                              currentFilter === item
+                                                ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                                                : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                                            }`}
+                                          >
+                                            {item} ({getCount(item)})
+                                          </Button>
+                                        ))}
+                                      </div>
+                                    </ScrollArea>
+                                    {/* Navigation Arrows */}
+                                    <button 
+                                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                                        if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                                      }}
+                                    >
+                                      <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                                    </button>
+                                    <button 
+                                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                                        if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                                      }}
+                                    >
+                                      <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                              
+                              return (
+                                <>
+                                  <FilterSlider 
+                                    title="الصانع" 
+                                    items={manufacturers} 
+                                    currentFilter={manufacturerFilter} 
+                                    onFilterChange={handleManufacturerChange} 
+                                    getCount={(item) => getFilterCount("manufacturer", item)} 
+                                  />
+                                  <FilterSlider 
+                                    title="الفئة" 
+                                    items={categories} 
+                                    currentFilter={categoryFilter} 
+                                    onFilterChange={setCategoryFilter} 
+                                    getCount={(item) => getFilterCount("category", item)} 
+                                  />
+                                  <FilterSlider 
+                                    title="درجة التجهيز" 
+                                    items={availableTrimLevels} 
+                                    currentFilter={trimLevelFilter} 
+                                    onFilterChange={setTrimLevelFilter} 
+                                    getCount={(item) => getFilterCount("trimLevel", item)} 
+                                  />
+                                  <FilterSlider 
+                                    title="السنة" 
+                                    items={availableYears} 
+                                    currentFilter={yearFilter} 
+                                    onFilterChange={setYearFilter} 
+                                    getCount={(item) => getFilterCount("year", item)} 
+                                  />
+                                  <FilterSlider 
+                                    title="سعة المحرك" 
+                                    items={availableEngineCapacities} 
+                                    currentFilter={engineCapacityFilter} 
+                                    onFilterChange={setEngineCapacityFilter} 
+                                    getCount={(item) => getFilterCount("engineCapacity", item)} 
+                                  />
+                                  <FilterSlider 
+                                    title="اللون الخارجي" 
+                                    items={availableExteriorColors} 
+                                    currentFilter={exteriorColorFilter} 
+                                    onFilterChange={setExteriorColorFilter} 
+                                    getCount={(item) => getFilterCount("exteriorColor", item)} 
+                                  />
+                                  <FilterSlider 
+                                    title="اللون الداخلي" 
+                                    items={availableInteriorColors} 
+                                    currentFilter={interiorColorFilter} 
+                                    onFilterChange={setInteriorColorFilter} 
+                                    getCount={(item) => getFilterCount("interiorColor", item)} 
+                                  />
+                                  <FilterSlider 
+                                    title="الحالة" 
+                                    items={availableStatuses} 
+                                    currentFilter={statusFilter} 
+                                    onFilterChange={setStatusFilter} 
+                                    getCount={(item) => getFilterCount("status", item)} 
+                                  />
+                                  <FilterSlider 
+                                    title="نوع الاستيراد" 
+                                    items={availableImportTypes} 
+                                    currentFilter={importTypeFilter} 
+                                    onFilterChange={setImportTypeFilter} 
+                                    getCount={(item) => getFilterCount("importType", item)} 
+                                  />
+                                </>
+                              );
+                            })()}
 
                 {/* Reset Filters Button */}
                 <div className="pt-2 border-t border-slate-200 dark:border-slate-700">

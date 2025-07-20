@@ -28,7 +28,9 @@ import {
   Calendar,
   X,
   Share2,
-  FileText
+  FileText,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -756,217 +758,424 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               {/* الصانع */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">الصانع</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex gap-2 pb-2 justify-start">
-                    {manufacturers.map((manufacturer) => (
-                      <Button
-                        key={manufacturer}
-                        variant={selectedManufacturer === manufacturer ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => handleManufacturerChange(manufacturer)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedManufacturer === manufacturer
-                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                        }`}
-                      >
-                        {manufacturer} ({getFilterCount("manufacturer", manufacturer)})
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
+                <div className="relative group">
+                  <ScrollArea className="w-full">
+                    <div className="flex gap-2 pb-2 justify-start">
+                      {manufacturers.map((manufacturer) => (
+                        <Button
+                          key={manufacturer}
+                          variant={selectedManufacturer === manufacturer ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => handleManufacturerChange(manufacturer)}
+                          className={`transition-all duration-200 whitespace-nowrap ${
+                            selectedManufacturer === manufacturer
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                          }`}
+                        >
+                          {manufacturer} ({getFilterCount("manufacturer", manufacturer)})
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                  {/* Navigation Arrows */}
+                  <button 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                  <button 
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                </div>
               </div>
 
               {/* الفئة */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">الفئة</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex gap-2 pb-2 justify-start">
-                    {categories.map((category) => (
-                      <Button
-                        key={category}
-                        variant={selectedCategory === category ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedCategory(category)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedCategory === category
-                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                        }`}
-                      >
-                        {category} ({getFilterCount("category", category)})
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
+                <div className="relative group">
+                  <ScrollArea className="w-full">
+                    <div className="flex gap-2 pb-2 justify-start">
+                      {categories.map((category) => (
+                        <Button
+                          key={category}
+                          variant={selectedCategory === category ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedCategory(category)}
+                          className={`transition-all duration-200 whitespace-nowrap ${
+                            selectedCategory === category
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                          }`}
+                        >
+                          {category} ({getFilterCount("category", category)})
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                  {/* Navigation Arrows */}
+                  <button 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                  <button 
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                </div>
               </div>
 
               {/* درجة التجهيز */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">درجة التجهيز</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex gap-2 pb-2 justify-start">
-                    {availableTrimLevels.map((trim) => (
-                      <Button
-                        key={trim}
-                        variant={selectedTrimLevel === trim ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedTrimLevel(trim)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedTrimLevel === trim
-                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                        }`}
-                      >
-                        {trim} ({getFilterCount("trimLevel", trim)})
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
+                <div className="relative group">
+                  <ScrollArea className="w-full">
+                    <div className="flex gap-2 pb-2 justify-start">
+                      {availableTrimLevels.map((trim) => (
+                        <Button
+                          key={trim}
+                          variant={selectedTrimLevel === trim ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedTrimLevel(trim)}
+                          className={`transition-all duration-200 whitespace-nowrap ${
+                            selectedTrimLevel === trim
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                          }`}
+                        >
+                          {trim} ({getFilterCount("trimLevel", trim)})
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                  {/* Navigation Arrows */}
+                  <button 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                  <button 
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                </div>
               </div>
 
               {/* السنة */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">السنة</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex gap-2 pb-2 justify-start">
-                    {availableYears.map((year) => (
-                      <Button
-                        key={year}
-                        variant={selectedYear === year ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedYear(year)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedYear === year
-                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                        }`}
-                      >
-                        {year} ({getFilterCount("year", year)})
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
+                <div className="relative group">
+                  <ScrollArea className="w-full">
+                    <div className="flex gap-2 pb-2 justify-start">
+                      {availableYears.map((year) => (
+                        <Button
+                          key={year}
+                          variant={selectedYear === year ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedYear(year)}
+                          className={`transition-all duration-200 whitespace-nowrap ${
+                            selectedYear === year
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                          }`}
+                        >
+                          {year} ({getFilterCount("year", year)})
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                  {/* Navigation Arrows */}
+                  <button 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                  <button 
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                </div>
               </div>
 
               {/* سعة المحرك */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">سعة المحرك</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex gap-2 pb-2 justify-start">
-                    {availableEngineCapacities.map((capacity) => (
-                      <Button
-                        key={capacity}
-                        variant={selectedEngineCapacity === capacity ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedEngineCapacity(capacity)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedEngineCapacity === capacity
-                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                        }`}
-                      >
-                        {capacity} ({getFilterCount("engineCapacity", capacity)})
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
+                <div className="relative group">
+                  <ScrollArea className="w-full">
+                    <div className="flex gap-2 pb-2 justify-start">
+                      {availableEngineCapacities.map((capacity) => (
+                        <Button
+                          key={capacity}
+                          variant={selectedEngineCapacity === capacity ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedEngineCapacity(capacity)}
+                          className={`transition-all duration-200 whitespace-nowrap ${
+                            selectedEngineCapacity === capacity
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                          }`}
+                        >
+                          {capacity} ({getFilterCount("engineCapacity", capacity)})
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                  {/* Navigation Arrows */}
+                  <button 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                  <button 
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                </div>
               </div>
 
               {/* اللون الداخلي */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">اللون الداخلي</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex gap-2 pb-2 justify-start">
-                    {availableInteriorColors.map((color) => (
-                      <Button
-                        key={color}
-                        variant={selectedInteriorColor === color ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedInteriorColor(color)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedInteriorColor === color
-                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                        }`}
-                      >
-                        {color} ({getFilterCount("interiorColor", color)})
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
+                <div className="relative group">
+                  <ScrollArea className="w-full">
+                    <div className="flex gap-2 pb-2 justify-start">
+                      {availableInteriorColors.map((color) => (
+                        <Button
+                          key={color}
+                          variant={selectedInteriorColor === color ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedInteriorColor(color)}
+                          className={`transition-all duration-200 whitespace-nowrap ${
+                            selectedInteriorColor === color
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                          }`}
+                        >
+                          {color} ({getFilterCount("interiorColor", color)})
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                  {/* Navigation Arrows */}
+                  <button 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                  <button 
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                </div>
               </div>
 
               {/* اللون الخارجي */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">اللون الخارجي</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex gap-2 pb-2 justify-start">
-                    {availableExteriorColors.map((color) => (
-                      <Button
-                        key={color}
-                        variant={selectedExteriorColor === color ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedExteriorColor(color)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedExteriorColor === color
-                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                        }`}
-                      >
-                        {color} ({getFilterCount("exteriorColor", color)})
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
+                <div className="relative group">
+                  <ScrollArea className="w-full">
+                    <div className="flex gap-2 pb-2 justify-start">
+                      {availableExteriorColors.map((color) => (
+                        <Button
+                          key={color}
+                          variant={selectedExteriorColor === color ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedExteriorColor(color)}
+                          className={`transition-all duration-200 whitespace-nowrap ${
+                            selectedExteriorColor === color
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                          }`}
+                        >
+                          {color} ({getFilterCount("exteriorColor", color)})
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                  {/* Navigation Arrows */}
+                  <button 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                  <button 
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                </div>
               </div>
 
               {/* الحالة */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">الحالة</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex gap-2 pb-2 justify-start">
-                    {availableStatuses.map((status) => (
-                      <Button
-                        key={status}
-                        variant={selectedStatus === status ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedStatus(status)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedStatus === status
-                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                        }`}
-                      >
-                        {status} ({getFilterCount("status", status)})
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
+                <div className="relative group">
+                  <ScrollArea className="w-full">
+                    <div className="flex gap-2 pb-2 justify-start">
+                      {availableStatuses.map((status) => (
+                        <Button
+                          key={status}
+                          variant={selectedStatus === status ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedStatus(status)}
+                          className={`transition-all duration-200 whitespace-nowrap ${
+                            selectedStatus === status
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                          }`}
+                        >
+                          {status} ({getFilterCount("status", status)})
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                  {/* Navigation Arrows */}
+                  <button 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                  <button 
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                </div>
               </div>
 
               {/* نوع الاستيراد */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">نوع الاستيراد</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex gap-2 pb-2 justify-start">
-                    {availableImportTypes.map((type) => (
-                      <Button
-                        key={type}
-                        variant={selectedImportType === type ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedImportType(type)}
-                        className={`transition-all duration-200 whitespace-nowrap ${
-                          selectedImportType === type
-                            ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                            : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                        }`}
-                      >
-                        {type} ({getFilterCount("importType", type)})
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
+                <div className="relative group">
+                  <ScrollArea className="w-full">
+                    <div className="flex gap-2 pb-2 justify-start">
+                      {availableImportTypes.map((type) => (
+                        <Button
+                          key={type}
+                          variant={selectedImportType === type ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedImportType(type)}
+                          className={`transition-all duration-200 whitespace-nowrap ${
+                            selectedImportType === type
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                          }`}
+                        >
+                          {type} ({getFilterCount("importType", type)})
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                  {/* Navigation Arrows */}
+                  <button 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                  <button 
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                </div>
               </div>
 
               {/* Reset Filters Button */}
