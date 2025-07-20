@@ -54,11 +54,19 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     enabled: open,
   });
 
-  // Fetch categories for selected manufacturer
-  const { data: categoriesData = [] } = useQuery<string[]>({
-    queryKey: ["/api/categories", selectedManufacturer],
-    enabled: open && !!selectedManufacturer,
+  // Fetch categories for selected manufacturer from inventory
+  const { data: inventoryData = [] } = useQuery<any[]>({
+    queryKey: ["/api/inventory"],
+    enabled: open,
   });
+
+  // Filter categories based on selected manufacturer from inventory
+  const getManufacturerCategories = (manufacturer: string) => {
+    if (!manufacturer || !inventoryData.length) return [];
+    const manufacturerItems = inventoryData.filter(item => item.manufacturer === manufacturer);
+    const uniqueCategories = [...new Set(manufacturerItems.map(item => item.category))].filter(Boolean);
+    return uniqueCategories;
+  };
 
   // Fetch categories from cars.json for selected manufacturer
   const { data: carsModels = [] } = useQuery<any[]>({
@@ -72,33 +80,48 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     enabled: open && !!selectedManufacturer && !!selectedCategory,
   });
 
-  // Fetch engine capacities from database
-  const { data: engineCapacitiesData = [] } = useQuery<any[]>({
-    queryKey: ["/api/engine-capacities"],
-    enabled: open,
-  });
+  // Get trim levels based on selected manufacturer and category from inventory
+  const getManufacturerTrimLevels = (manufacturer: string, category: string) => {
+    if (!manufacturer || !category || !inventoryData.length) return [];
+    const filteredItems = inventoryData.filter(item => 
+      item.manufacturer === manufacturer && item.category === category
+    );
+    const uniqueTrimLevels = [...new Set(filteredItems.map(item => item.trimLevel))].filter(Boolean);
+    return uniqueTrimLevels;
+  };
 
-  // Combine manufacturers from database and cars.json
-  const dbManufacturers = manufacturersData.map(m => typeof m === 'string' ? m : (m.name || String(m)));
-  const carsManufacturerNames = carsManufacturers.map((m: any) => m.name_ar);
-  const manufacturers = [...new Set([...dbManufacturers, ...carsManufacturerNames])];
-  
-  // Combine categories from database and cars.json
-  const dbCategories = selectedManufacturer ? categoriesData.map(c => typeof c === 'string' ? c : (c.category || String(c))) : [];
-  const carsModelNames = carsModels.map((m: any) => m.model_ar);
-  const categories = [...new Set([...dbCategories, ...carsModelNames])];
+  // Get years based on selected manufacturer and category from inventory
+  const getManufacturerYears = (manufacturer: string, category: string) => {
+    if (!manufacturer || !category || !inventoryData.length) return [];
+    const filteredItems = inventoryData.filter(item => 
+      item.manufacturer === manufacturer && item.category === category
+    );
+    const uniqueYears = [...new Set(filteredItems.map(item => item.year))].filter(Boolean);
+    return uniqueYears.sort((a, b) => b - a); // Sort years in descending order
+  };
 
-  // Combine trim levels from database and cars.json
-  const dbTrimLevels = selectedManufacturer && selectedCategory
-    ? trimLevels.filter(tl => tl.manufacturer === selectedManufacturer && tl.category === selectedCategory)
-    : [];
-  const carsTrimsNames = carsTrims.map((t: any) => t.trim_ar);
-  const allTrimLevelNames = [...new Set([...dbTrimLevels.map(t => t.trimLevel), ...carsTrimsNames])];
+  // Get engine capacities based on selected manufacturer and category from inventory
+  const getManufacturerEngineCapacities = (manufacturer: string, category: string) => {
+    if (!manufacturer || !category || !inventoryData.length) return [];
+    const filteredItems = inventoryData.filter(item => 
+      item.manufacturer === manufacturer && item.category === category
+    );
+    const uniqueEngineCapacities = [...new Set(filteredItems.map(item => item.engineCapacity))].filter(Boolean);
+    return uniqueEngineCapacities.map(capacity => String(capacity));
+  };
 
-  // Get engine capacities from database - ensure they are strings
-  const engineCapacities = engineCapacitiesData.length > 0 
-    ? engineCapacitiesData.map(item => typeof item === 'string' ? item : (item.engineCapacity || String(item)))
-    : ["1.5L", "2.0L", "2.5L", "3.0L", "3.5L", "4.0L", "4.5L", "5.0L", "V6", "V8", "V12", "Electric"];
+  // Get manufacturers from inventory data only
+  const getManufacturers = () => {
+    if (!inventoryData.length) return [];
+    const uniqueManufacturers = [...new Set(inventoryData.map(item => item.manufacturer))].filter(Boolean);
+    return uniqueManufacturers;
+  };
+
+  const manufacturers = getManufacturers();
+  const categories = getManufacturerCategories(selectedManufacturer);
+  const allTrimLevelNames = getManufacturerTrimLevels(selectedManufacturer, selectedCategory);
+  const availableYears = getManufacturerYears(selectedManufacturer, selectedCategory);
+  const engineCapacities = getManufacturerEngineCapacities(selectedManufacturer, selectedCategory);
 
   const createMutation = useMutation({
     mutationFn: (data: InsertSpecification) => apiRequest("POST", "/api/specifications", data),
@@ -213,7 +236,24 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     }
   };
 
-  const years = Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - i);
+  // Use years from filtered data instead of hardcoded range
+
+  const handleManufacturerChange = (value: string) => {
+    setSelectedManufacturer(value);
+    // Reset dependent fields when manufacturer changes
+    setSelectedCategory("");
+    setSelectedTrimLevel("");
+    setSelectedYear("");
+    setSelectedEngineCapacity("");
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategory(value);
+    // Reset dependent fields when category changes
+    setSelectedTrimLevel("");
+    setSelectedYear("");
+    setSelectedEngineCapacity("");
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -247,7 +287,7 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="manufacturer">الصانع</Label>
-                    <Select value={selectedManufacturer} onValueChange={setSelectedManufacturer}>
+                    <Select value={selectedManufacturer} onValueChange={handleManufacturerChange}>
                       <SelectTrigger>
                         <SelectValue placeholder="اختر الصانع" />
                       </SelectTrigger>
@@ -266,7 +306,7 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
 
                   <div>
                     <Label htmlFor="category">الفئة</Label>
-                    <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={!selectedManufacturer}>
+                    <Select value={selectedCategory} onValueChange={handleCategoryChange} disabled={!selectedManufacturer}>
                       <SelectTrigger>
                         <SelectValue placeholder="اختر الفئة" />
                       </SelectTrigger>
@@ -309,8 +349,8 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                         <SelectValue placeholder="اختر السنة" />
                       </SelectTrigger>
                       <SelectContent>
-                        {years.map((year) => (
-                          <SelectItem key={year} value={year.toString()}>
+                        {availableYears.map((year, index) => (
+                          <SelectItem key={`${year}-${index}`} value={year.toString()}>
                             {year}
                           </SelectItem>
                         ))}
