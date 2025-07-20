@@ -97,6 +97,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
       status: "متوفر",
       importType: "شخصي",
       location: "المستودع الرئيسي",
+      ownershipType: "ملك الشركة",
       chassisNumber: "",
       price: "",
       images: [],
@@ -705,19 +706,23 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   )}
                 />
 
-                {/* Images */}
+                {/* Ownership Type */}
                 <FormField
                   control={form.control}
-                  name="images"
+                  name="ownershipType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>رابط الصورة</FormLabel>
+                      <FormLabel>نوع الملكية</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="https://example.com/image.jpg" 
-                          value={Array.isArray(field.value) ? field.value.join(', ') : field.value || ''}
-                          onChange={(e) => field.onChange(e.target.value ? [e.target.value] : [])}
-                        />
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر نوع الملكية" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ملك الشركة">ملك الشركة</SelectItem>
+                            <SelectItem value="معرض (وسيط)">معرض (وسيط)</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -532,7 +532,29 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 )}
               />
 
-              {/* خانة رابط الصورة مخفية */}
+              {/* Ownership Type */}
+              <FormField
+                control={form.control}
+                name="ownershipType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>نوع الملكية</FormLabel>
+                    <FormControl>
+                      <EditableSelect
+                        options={editableOwnershipTypes}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        onAddOption={(newType) => {
+                          setEditableOwnershipTypes([...editableOwnershipTypes, newType]);
+                        }}
+                        placeholder="اختر نوع الملكية"
+                        className="w-full"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
 
 

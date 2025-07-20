@@ -76,6 +76,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [selectedExteriorColor, setSelectedExteriorColor] = useState<string>("الكل");
   const [selectedStatus, setSelectedStatus] = useState<string>("الكل");
   const [selectedImportType, setSelectedImportType] = useState<string>("الكل");
+  const [selectedOwnershipType, setSelectedOwnershipType] = useState<string>("الكل");
   const [showSoldCars, setShowSoldCars] = useState<boolean>(false);
   const [shareVehicle, setShareVehicle] = useState<InventoryItem | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -122,6 +123,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           item.year?.toString().includes(query) ||
           item.status?.toLowerCase().includes(query) ||
           item.importType?.toLowerCase().includes(query) ||
+          item.ownershipType?.toLowerCase().includes(query) ||
           item.notes?.toLowerCase().includes(query);
         if (!matchesSearch) return false;
       }
@@ -238,6 +240,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           item.year?.toString().includes(query) ||
           item.status?.toLowerCase().includes(query) ||
           item.importType?.toLowerCase().includes(query) ||
+          item.ownershipType?.toLowerCase().includes(query) ||
           item.notes?.toLowerCase().includes(query)
         );
       });
@@ -287,6 +290,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           item.year?.toString().includes(query) ||
           item.status?.toLowerCase().includes(query) ||
           item.importType?.toLowerCase().includes(query) ||
+          item.ownershipType?.toLowerCase().includes(query) ||
           item.notes?.toLowerCase().includes(query);
         if (!matchesSearch) return false;
       }
@@ -376,6 +380,18 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     status: selectedStatus
   })];
   
+  const availableOwnershipTypes = ["الكل", ...getFilteredUniqueValues("ownershipType", {
+    manufacturer: selectedManufacturer,
+    category: selectedCategory,
+    trimLevel: selectedTrimLevel,
+    year: selectedYear,
+    engineCapacity: selectedEngineCapacity,
+    exteriorColor: selectedExteriorColor,
+    interiorColor: selectedInteriorColor,
+    status: selectedStatus,
+    importType: selectedImportType
+  })];
+  
   // Reset category filter when manufacturer changes
   const handleManufacturerChange = (value: string) => {
     setSelectedManufacturer(value);
@@ -393,7 +409,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
       (selectedInteriorColor === "الكل" || item.interiorColor === selectedInteriorColor) &&
       (selectedExteriorColor === "الكل" || item.exteriorColor === selectedExteriorColor) &&
       (selectedStatus === "الكل" || item.status === selectedStatus) &&
-      (selectedImportType === "الكل" || item.importType === selectedImportType)
+      (selectedImportType === "الكل" || item.importType === selectedImportType) &&
+      (selectedOwnershipType === "الكل" || item.ownershipType === selectedOwnershipType)
     );
   });
 
@@ -1178,6 +1195,53 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                 </div>
               </div>
 
+              {/* نوع الملكية */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 text-right">نوع الملكية</h3>
+                <div className="relative group">
+                  <ScrollArea className="w-full">
+                    <div className="flex gap-2 pb-2 justify-start">
+                      {availableOwnershipTypes.map((type) => (
+                        <Button
+                          key={type}
+                          variant={selectedOwnershipType === type ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedOwnershipType(type)}
+                          className={`transition-all duration-200 whitespace-nowrap ${
+                            selectedOwnershipType === type
+                              ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                              : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                          }`}
+                        >
+                          {type} ({getFilterCount("ownershipType", type)})
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                  {/* Navigation Arrows */}
+                  <button 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                  <button 
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                    }}
+                  >
+                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                  </button>
+                </div>
+              </div>
+
               {/* Reset Filters Button */}
               <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
                 <Button
@@ -1193,6 +1257,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     setSelectedExteriorColor("الكل");
                     setSelectedStatus("الكل");
                     setSelectedImportType("الكل");
+                    setSelectedOwnershipType("الكل");
                   }}
                   className="hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20"
                 >

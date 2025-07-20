@@ -203,6 +203,16 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Using in-memory storage for development compatibility without database setup requirements
 - ✅ All functionality verified through feedback tool - inventory system, appearance management, and all features working correctly
 - ✅ Migration checklist completed: all items marked as done in progress tracker
+
+### Image URL Field Replaced with Ownership Type (July 20, 2025)
+- ✅ Replaced "رابط الصور" (Image URL) field with "نوع الملكية" (Ownership Type) in both inventory forms per user request
+- ✅ Updated inventory-form-simple.tsx to include ownership type selection with options: "ملك الشركة" and "معرض (وسيط)"
+- ✅ Updated inventory-form.tsx to show ownership type field with editable select component
+- ✅ Modified inventory table to display ownership type column instead of images column
+- ✅ Enhanced card-view-new.tsx with ownership type filtering capabilities
+- ✅ Added ownership type to search functionality across all filter systems
+- ✅ Updated default values and schema validation to include ownership type field
+- ✅ Maintained consistency across all UI components and filtering systems
 - ✅ Added Excel import functionality per user request:
   - Added "استيراد من Excel" button in admin section of inventory page
   - Enhanced ExcelImport component to properly parse real Excel files using xlsx library

@@ -308,7 +308,7 @@ export default function InventoryTable({
               </TableHead>
               <TableHead className="text-white text-right">الاستيراد</TableHead>
               <TableHead className="text-white text-right">رقم الهيكل</TableHead>
-              <TableHead className="text-white text-right">الصور</TableHead>
+              <TableHead className="text-white text-right">نوع الملكية</TableHead>
               <TableHead className="text-white text-right">تاريخ الدخول</TableHead>
               <TableHead className="text-white text-right">السعر</TableHead>
               <TableHead className="text-white text-right">الملاحظات</TableHead>
@@ -341,12 +341,7 @@ export default function InventoryTable({
                   <TableCell className="text-sm text-slate-800">{item.location}</TableCell>
                   <TableCell className="text-sm text-slate-800">{item.importType}</TableCell>
                   <TableCell className="text-sm text-slate-600 font-latin">{item.chassisNumber}</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="sm" className="text-custom-primary hover:text-custom-primary-dark">
-                      <Images className="w-4 h-4 ml-1" />
-                      عرض
-                    </Button>
-                  </TableCell>
+                  <TableCell className="text-sm text-slate-800">{item.ownershipType}</TableCell>
                   <TableCell className="text-sm text-slate-600 font-latin">
                     {new Date(item.entryDate).toLocaleDateString('en-GB', {
                       day: '2-digit',
