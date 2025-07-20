@@ -14,6 +14,7 @@ import { insertInventoryItemSchema, type InsertInventoryItem, type InventoryItem
 import { CloudUpload } from "lucide-react";
 import { Settings } from "lucide-react";
 import OptionsEditor from "@/components/options-editor";
+import EditableSelect from "@/components/editable-select";
 
 interface InventoryFormProps {
   open: boolean;
@@ -37,6 +38,7 @@ const initialEngineCapacities = ["2.0L", "1.5L", "3.0L", "4.0L", "5.0L", "V6", "
 const initialYears = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018];
 const initialStatuses = ["متوفر", "في الطريق", "قيد الصيانة"];
 const initialImportTypes = ["شخصي", "شركة", "مستعمل شخصي"];
+const initialOwnershipTypes = ["ملك الشركة", "وسيط"];
 const initialLocations = ["المستودع الرئيسي", "المعرض", "الورشة", "الميناء", "مستودع فرعي"];
 const initialColors = ["أسود", "أبيض", "رمادي", "أزرق", "أحمر", "بني", "فضي", "ذهبي", "بيج"];
 
@@ -55,6 +57,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   const [editableEngineCapacities, setEditableEngineCapacities] = useState<string[]>(initialEngineCapacities);
   const [editableStatuses, setEditableStatuses] = useState<string[]>(initialStatuses);
   const [editableImportTypes, setEditableImportTypes] = useState<string[]>(initialImportTypes);
+  const [editableOwnershipTypes, setEditableOwnershipTypes] = useState<string[]>(initialOwnershipTypes);
   const [editableLocations, setEditableLocations] = useState<string[]>(initialLocations);
   const [editableExteriorColors, setEditableExteriorColors] = useState<string[]>(initialColors);
   const [editableInteriorColors, setEditableInteriorColors] = useState<string[]>(initialColors);
@@ -74,6 +77,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
       interiorColor: "",
       status: "",
       importType: "",
+      ownershipType: "ملك الشركة",
       location: "",
       chassisNumber: "",
       images: [],
@@ -108,6 +112,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
         interiorColor: editItem.interiorColor || "",
         status: editItem.status || "",
         importType: editItem.importType || "",
+        ownershipType: (editItem as any).ownershipType || "ملك الشركة",
         location: editItem.location || "",
         chassisNumber: editItem.chassisNumber || "",
         images: editItem.images || [],
@@ -132,6 +137,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
         interiorColor: "",
         status: "",
         importType: "",
+        ownershipType: "ملك الشركة",
         location: "",
         chassisNumber: "",
         images: [],
@@ -233,20 +239,20 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                     <FormLabel>الصانع</FormLabel>
                     <FormControl>
                       <EditableSelect
-                        options={manufacturers}
+                        options={editableManufacturers}
                         value={field.value}
                         onValueChange={(value) => {
                           handleManufacturerChange(value);
                           field.onChange(value);
                         }}
                         onAddOption={(newManufacturer) => {
-                          setManufacturers([...manufacturers, newManufacturer]);
+                          setEditableManufacturers([...editableManufacturers, newManufacturer]);
                         }}
                         onDeleteOption={(deletedManufacturer) => {
-                          setManufacturers(manufacturers.filter(m => m !== deletedManufacturer));
+                          setEditableManufacturers(editableManufacturers.filter(m => m !== deletedManufacturer));
                         }}
                         onEditOption={(oldManufacturer, newManufacturer) => {
-                          setManufacturers(manufacturers.map(m => m === oldManufacturer ? newManufacturer : m));
+                          setEditableManufacturers(editableManufacturers.map(m => m === oldManufacturer ? newManufacturer : m));
                         }}
                         placeholder="اختر الصانع"
                         className="w-full"
@@ -314,11 +320,11 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                     <FormLabel>سعة المحرك</FormLabel>
                     <FormControl>
                       <EditableSelect
-                        options={engineCapacities}
+                        options={editableEngineCapacities}
                         value={field.value}
                         onValueChange={field.onChange}
                         onAddOption={(newCapacity) => {
-                          setEngineCapacities([...engineCapacities, newCapacity]);
+                          setEditableEngineCapacities([...editableEngineCapacities, newCapacity]);
                         }}
                         placeholder="اختر سعة المحرك"
                         className="w-full"
@@ -342,7 +348,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                           <SelectValue placeholder="اختر السنة" />
                         </SelectTrigger>
                         <SelectContent>
-                          {years.map((year) => (
+                          {initialYears.map((year) => (
                             <SelectItem key={year} value={year.toString()}>
                               {year}
                             </SelectItem>
@@ -363,11 +369,11 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                     <FormLabel>اللون الخارجي</FormLabel>
                     <FormControl>
                       <EditableSelect
-                        options={exteriorColors}
+                        options={editableExteriorColors}
                         value={field.value}
                         onValueChange={field.onChange}
                         onAddOption={(newColor) => {
-                          setExteriorColors([...exteriorColors, newColor]);
+                          setEditableExteriorColors([...editableExteriorColors, newColor]);
                         }}
                         placeholder="اختر اللون الخارجي"
                         className="w-full"
@@ -386,11 +392,11 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                     <FormLabel>اللون الداخلي</FormLabel>
                     <FormControl>
                       <EditableSelect
-                        options={interiorColors}
+                        options={editableInteriorColors}
                         value={field.value}
                         onValueChange={field.onChange}
                         onAddOption={(newColor) => {
-                          setInteriorColors([...interiorColors, newColor]);
+                          setEditableInteriorColors([...editableInteriorColors, newColor]);
                         }}
                         placeholder="اختر اللون الداخلي"
                         className="w-full"
@@ -409,13 +415,36 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                     <FormLabel>الاستيراد</FormLabel>
                     <FormControl>
                       <EditableSelect
-                        options={importTypes}
+                        options={editableImportTypes}
                         value={field.value}
                         onValueChange={field.onChange}
                         onAddOption={(newType) => {
-                          setImportTypes([...importTypes, newType]);
+                          setEditableImportTypes([...editableImportTypes, newType]);
                         }}
                         placeholder="اختر نوع الاستيراد"
+                        className="w-full"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="ownershipType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>نوع الملكية</FormLabel>
+                    <FormControl>
+                      <EditableSelect
+                        options={editableOwnershipTypes}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        onAddOption={(newType) => {
+                          setEditableOwnershipTypes([...editableOwnershipTypes, newType]);
+                        }}
+                        placeholder="اختر نوع الملكية"
                         className="w-full"
                       />
                     </FormControl>
@@ -432,11 +461,11 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                     <FormLabel>الموقع</FormLabel>
                     <FormControl>
                       <EditableSelect
-                        options={locations}
+                        options={editableLocations}
                         value={field.value}
                         onValueChange={field.onChange}
                         onAddOption={(newLocation) => {
-                          setLocations([...locations, newLocation]);
+                          setEditableLocations([...editableLocations, newLocation]);
                         }}
                         placeholder="اختر الموقع"
                         className="w-full"
@@ -455,11 +484,11 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                     <FormLabel>الحالة</FormLabel>
                     <FormControl>
                       <EditableSelect
-                        options={statuses}
+                        options={editableStatuses}
                         value={field.value}
                         onValueChange={field.onChange}
                         onAddOption={(newStatus) => {
-                          setStatuses([...statuses, newStatus]);
+                          setEditableStatuses([...editableStatuses, newStatus]);
                         }}
                         placeholder="اختر الحالة"
                         className="w-full"
@@ -494,7 +523,8 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                       <Input 
                         placeholder="150000" 
                         type="number"
-                        {...field} 
+                        value={field.value || ""}
+                        onChange={field.onChange}
                       />
                     </FormControl>
                     <FormMessage />
@@ -502,23 +532,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="images"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>رابط الصورة</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="https://example.com/image.jpg" 
-                        value={Array.isArray(field.value) ? field.value.join(', ') : field.value || ''}
-                        onChange={(e) => field.onChange(e.target.value ? [e.target.value] : [])}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* خانة رابط الصورة مخفية */}
 
 
 
