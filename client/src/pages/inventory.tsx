@@ -21,7 +21,7 @@ import VoiceAssistant from "@/components/voice-assistant";
 import { InventoryFAB } from "@/components/animated-fab";
 import SpecificationsManager from "@/components/specifications-manager";
 import SpecificationsManagement from "@/components/specifications-management";
-import { PrintCustomizationDialog, type PrintSettings } from "@/components/print-customization-dialog";
+import { AdvancedPrintDialog } from "@/components/advanced-print-dialog";
 import { exportToCSV, exportToExcel, printTable, printTableWithSettings } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
 
@@ -438,10 +438,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     setPrintDialogOpen(true);
   };
 
-  const handlePrintWithSettings = (settings: PrintSettings) => {
-    printTableWithSettings(settings);
-    setPrintDialogOpen(false);
-  };
+
 
   const handleEdit = (item: InventoryItem) => {
     setEditItem(item);
@@ -1108,11 +1105,10 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         onOpenChange={setSpecificationsManagerOpen}
       />
 
-      {/* Print Customization Dialog */}
-      <PrintCustomizationDialog
+      {/* Advanced Print Dialog */}
+      <AdvancedPrintDialog
         open={printDialogOpen}
         onOpenChange={setPrintDialogOpen}
-        onPrint={handlePrintWithSettings}
       />
     </div>
   );

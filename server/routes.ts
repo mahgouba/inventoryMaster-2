@@ -1636,10 +1636,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Import quotation storage
+  const { quotationStorage } = await import('./quotation-storage');
+
   // Quotations API Routes
   app.get("/api/quotations", async (req, res) => {
     try {
-      const quotations = await storage.getAllQuotations();
+      const quotations = await quotationStorage.getAllQuotations();
       res.json(quotations);
     } catch (error) {
       console.error("Error fetching quotations:", error);
@@ -1654,7 +1657,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid quotation ID" });
       }
 
-      const quotation = await storage.getQuotation(id);
+      const quotation = await quotationStorage.getQuotation(id);
       if (!quotation) {
         return res.status(404).json({ message: "Quotation not found" });
       }
@@ -1668,17 +1671,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/quotations", async (req, res) => {
     try {
-      const quotationData = insertQuotationSchema.parse(req.body);
-      const quotation = await storage.createQuotation(quotationData);
+      console.log("Creating quotation with request body:", req.body);
+      const quotation = await quotationStorage.createQuotation(req.body);
+      console.log("Quotation created successfully:", quotation);
       res.status(201).json(quotation);
     } catch (error) {
       console.error("Error creating quotation:", error);
-      if (error.errors) {
-        console.error("Validation errors:", error.errors);
-        res.status(400).json({ message: "Invalid quotation data", errors: error.errors });
-      } else {
-        res.status(400).json({ message: "Invalid quotation data" });
-      }
+      res.status(500).json({ 
+        message: "فشل في حفظ عرض السعر",
+        error: error.message
+      });
     }
   });
 
@@ -1689,17 +1691,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid quotation ID" });
       }
 
-      const quotationData = insertQuotationSchema.parse(req.body);
-      const quotation = await storage.updateQuotation(id, quotationData);
+      console.log("Updating quotation:", id, req.body);
+      const quotation = await quotationStorage.updateQuotation(id, req.body);
       
       if (!quotation) {
         return res.status(404).json({ message: "Quotation not found" });
       }
 
+      console.log("Quotation updated successfully:", quotation);
       res.json(quotation);
     } catch (error) {
       console.error("Error updating quotation:", error);
-      res.status(400).json({ message: "Invalid quotation data" });
+      res.status(500).json({ 
+        message: "فشل في تحديث عرض السعر",
+        error: error.message
+      });
     }
   });
 
@@ -1710,7 +1716,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid quotation ID" });
       }
 
-      const deleted = await storage.deleteQuotation(id);
+      const deleted = await quotationStorage.deleteQuotation(id);
       if (!deleted) {
         return res.status(404).json({ message: "Quotation not found" });
       }
@@ -1878,7 +1884,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Invoice management endpoints
   app.get("/api/invoices", async (req, res) => {
     try {
-      const invoices = await storage.getInvoices();
+      const invoices = await quotationStorage.getInvoices();
       res.json(invoices);
     } catch (error) {
       console.error("Error getting invoices:", error);
@@ -1888,11 +1894,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/invoices", async (req, res) => {
     try {
-      const invoice = await storage.createInvoice(req.body);
+      console.log("Creating invoice with request body:", req.body);
+      const invoice = await quotationStorage.createInvoice(req.body);
+      console.log("Invoice created successfully:", invoice);
       res.json(invoice);
     } catch (error) {
       console.error("Error creating invoice:", error);
-      res.status(500).json({ message: "Failed to create invoice" });
+      res.status(500).json({ 
+        message: "فشل في حفظ الفاتورة",
+        error: error.message
+      });
     }
   });
 
