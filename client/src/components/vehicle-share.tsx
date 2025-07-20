@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Share2, Copy, Edit2, Save, X } from "lucide-react";
+import { Plus, Share2, Copy, Edit2, Save, X, Image, Link } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import type { InventoryItem, Specification, InsertSpecification } from "@shared/schema";
 
 interface VehicleShareProps {
@@ -90,9 +91,19 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
       baseText += `\n🪑 اللون الداخلي: ${vehicle.interiorColor}`;
     }
 
+    // Add chassis number if available
+    if (vehicle.chassisNumber) {
+      baseText += `\n🔢 رقم الهيكل: ${vehicle.chassisNumber}`;
+    }
+
     // Add price if available
     if (sharePrice) {
       baseText += `\n💰 السعر: ${sharePrice}`;
+    }
+
+    // Add images if available
+    if (vehicle.images && vehicle.images.length > 0) {
+      baseText += `\n📸 الصور المرفقة: ${vehicle.images.length} صورة`;
     }
 
     const detailedDescription = specification?.detailedDescription || "";
@@ -100,6 +111,25 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
     return detailedDescription 
       ? `${baseText}\n\n📋 المواصفات التفصيلية:\n${detailedDescription}`
       : baseText;
+  };
+
+  const handleCopyImageLinks = () => {
+    if (!vehicle.images || vehicle.images.length === 0) {
+      toast({
+        title: "لا توجد صور",
+        description: "لا توجد صور مرفقة بهذه السيارة",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const imageLinks = vehicle.images.join('\n');
+    navigator.clipboard.writeText(imageLinks).then(() => {
+      toast({
+        title: "تم نسخ روابط الصور",
+        description: `تم نسخ ${vehicle.images.length} رابط صورة إلى الحافظة`,
+      });
+    });
   };
 
   const handleCopyText = () => {
@@ -130,7 +160,7 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Share2 className="h-5 w-5" />
@@ -138,7 +168,8 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <ScrollArea className="h-[75vh]">
+          <div className="space-y-6 pr-4">
           {/* Vehicle Information Card */}
           <Card>
             <CardHeader>
@@ -209,6 +240,52 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
               </div>
             </CardContent>
           </Card>
+
+          {/* Vehicle Images Section */}
+          {vehicle.images && vehicle.images.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Image className="h-5 w-5" />
+                    صور السيارة ({vehicle.images.length})
+                  </CardTitle>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopyImageLinks}
+                    className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                  >
+                    <Link className="h-4 w-4 ml-1" />
+                    نسخ روابط الصور
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  {vehicle.images.slice(0, 4).map((image, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={image}
+                        alt={`صورة السيارة ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg border"
+                      />
+                      {index === 3 && vehicle.images.length > 4 && (
+                        <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
+                          <span className="text-white font-medium">+{vehicle.images.length - 4}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {vehicle.images.length > 4 && (
+                  <p className="text-xs text-slate-500 mt-2 text-center">
+                    إجمالي {vehicle.images.length} صورة
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Specifications Section */}
           <Card>
@@ -306,24 +383,71 @@ ${vehicle.trimLevel ? `🔧 درجة التجهيز: ${vehicle.trimLevel}` : ""}
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex gap-3">
-            <Button
-              onClick={handleShare}
-              className="flex-1"
-            >
-              <Share2 className="h-4 w-4 ml-1" />
-              مشاركة
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleCopyText}
-              className="flex-1"
-            >
-              <Copy className="h-4 w-4 ml-1" />
-              نسخ النص
-            </Button>
+          <div className="space-y-3">
+            <div className="flex gap-3">
+              <Button
+                onClick={handleShare}
+                className="flex-1"
+              >
+                <Share2 className="h-4 w-4 ml-1" />
+                مشاركة
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleCopyText}
+                className="flex-1"
+              >
+                <Copy className="h-4 w-4 ml-1" />
+                نسخ النص
+              </Button>
+            </div>
+            
+            {/* Image sharing buttons */}
+            {vehicle.images && vehicle.images.length > 0 && (
+              <div className="flex gap-3">
+                <Button
+                  variant="secondary"
+                  onClick={handleCopyImageLinks}
+                  className="flex-1"
+                >
+                  <Link className="h-4 w-4 ml-1" />
+                  نسخ روابط الصور
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    const shareText = `${generateShareText()}\n\nالصور:\n${vehicle.images.join('\n')}`;
+                    if (navigator.share) {
+                      navigator.share({
+                        title: `${vehicle.manufacturer} ${vehicle.category}`,
+                        text: shareText,
+                      }).catch(() => {
+                        navigator.clipboard.writeText(shareText).then(() => {
+                          toast({
+                            title: "تم النسخ",
+                            description: "تم نسخ النص مع روابط الصور",
+                          });
+                        });
+                      });
+                    } else {
+                      navigator.clipboard.writeText(shareText).then(() => {
+                        toast({
+                          title: "تم النسخ",
+                          description: "تم نسخ النص مع روابط الصور",
+                        });
+                      });
+                    }
+                  }}
+                  className="flex-1"
+                >
+                  <Image className="h-4 w-4 ml-1" />
+                  مشاركة مع الصور
+                </Button>
+              </div>
+            )}
           </div>
         </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
