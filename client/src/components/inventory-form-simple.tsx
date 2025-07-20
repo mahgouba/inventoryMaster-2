@@ -754,7 +754,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                   إلغاء
                 </Button>
-                <Button type="submit" disabled={isLoading}>
+                <Button type="submit" disabled={isLoading} className="bg-custom-gold hover:bg-custom-gold-dark text-white">
                   <CloudUpload className="h-4 w-4 ml-2" />
                   {isLoading ? "جاري الحفظ..." : editItem ? "تحديث" : "حفظ"}
                 </Button>

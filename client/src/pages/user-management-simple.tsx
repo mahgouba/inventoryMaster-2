@@ -288,7 +288,7 @@ export default function UserManagementSimple() {
                     <Button
                       onClick={handleCreateUser}
                       disabled={createUserMutation.isPending}
-                      className="bg-custom-primary hover:bg-custom-primary-dark text-white flex-1"
+                      className="bg-custom-gold hover:bg-custom-gold-dark text-white flex-1"
                     >
                       {createUserMutation.isPending ? "جاري الإنشاء..." : "إنشاء المستخدم"}
                     </Button>

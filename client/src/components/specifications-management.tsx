@@ -398,6 +398,7 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                   <Button 
                     onClick={handleSubmit}
                     disabled={createMutation.isPending || updateMutation.isPending}
+                    className="bg-custom-gold hover:bg-custom-gold-dark text-white"
                   >
                     <Save className="h-4 w-4 ml-1" />
                     {editingSpec ? "تحديث" : "حفظ"}

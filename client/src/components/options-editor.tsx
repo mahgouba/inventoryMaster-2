@@ -70,7 +70,7 @@ export default function OptionsEditor({ open, onOpenChange, title, options, onSa
                 onChange={(e) => setNewOption(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addOption()}
               />
-              <Button type="button" size="sm" onClick={addOption}>
+              <Button type="button" size="sm" onClick={addOption} className="bg-custom-gold hover:bg-custom-gold-dark text-white">
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
@@ -81,7 +81,7 @@ export default function OptionsEditor({ open, onOpenChange, title, options, onSa
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء
             </Button>
-            <Button onClick={handleSave}>
+            <Button onClick={handleSave} className="bg-custom-gold hover:bg-custom-gold-dark text-white">
               حفظ التغييرات
             </Button>
           </div>

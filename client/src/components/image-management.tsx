@@ -343,7 +343,7 @@ export default function ImageManagement({ open, onOpenChange, manufacturers, cat
                   <Button variant="outline" onClick={resetForm}>
                     إلغاء
                   </Button>
-                  <Button onClick={handleSubmit}>
+                  <Button onClick={handleSubmit} className="bg-custom-gold hover:bg-custom-gold-dark text-white">
                     {editingId ? 'تحديث' : 'إضافة'}
                   </Button>
                 </div>

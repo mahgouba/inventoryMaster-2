@@ -320,7 +320,7 @@ export default function SpecificationsManager({ open, onOpenChange }: Specificat
                     <Button
                       type="submit"
                       disabled={saveSpecMutation.isPending}
-                      className="bg-blue-600 hover:bg-blue-700"
+                      className="bg-custom-gold hover:bg-custom-gold-dark text-white"
                     >
                       {saveSpecMutation.isPending ? "جاري الحفظ..." : (editingSpec ? "تحديث" : "حفظ")}
                     </Button>

@@ -175,6 +175,7 @@ export default function TrimLevelManager({ manufacturer, category, disabled, onT
                   type="submit"
                   disabled={!newTrimLevel.trim() || createTrimLevelMutation.isPending}
                   size="sm"
+                  className="bg-custom-gold hover:bg-custom-gold-dark text-white"
                 >
                   <Plus className="w-4 h-4" />
                   إضافة
@@ -205,7 +206,7 @@ export default function TrimLevelManager({ manufacturer, category, disabled, onT
                           className="text-right"
                           dir="rtl"
                         />
-                        <Button type="submit" size="sm" disabled={!editValue.trim()}>
+                        <Button type="submit" size="sm" disabled={!editValue.trim()} className="bg-custom-gold hover:bg-custom-gold-dark text-white">
                           حفظ
                         </Button>
                         <Button type="button" size="sm" variant="outline" onClick={cancelEditing}>
