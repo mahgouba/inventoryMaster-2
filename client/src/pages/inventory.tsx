@@ -7,8 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Switch } from "@/components/ui/switch";
-import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -690,7 +689,18 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                 <div className="space-y-2">
                                   <div className="flex items-center justify-between">
                                     <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
-                                    <Switch checked={toggleState} onCheckedChange={onToggleChange} />
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => onToggleChange(!toggleState)}
+                                      className="p-2 h-8 w-8 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                                    >
+                                      {toggleState ? (
+                                        <Eye size={16} className="text-blue-600 dark:text-blue-400" />
+                                      ) : (
+                                        <EyeOff size={16} className="text-slate-400 dark:text-slate-500" />
+                                      )}
+                                    </Button>
                                   </div>
                                   {toggleState && (
                                     <div className="relative group">
