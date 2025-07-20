@@ -116,7 +116,8 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
           // Map headers to expected field names
           const headerMap: Record<string, string> = {
             "الصانع": "manufacturer",
-            "الفئة": "category", 
+            "الفئة": "category",
+            "درجة التجهيز": "trimLevel",
             "سعة المحرك": "engineCapacity",
             "السنة": "year",
             "اللون الخارجي": "exteriorColor",
@@ -126,7 +127,14 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
             "الموقع": "location",
             "رقم الهيكل": "chassisNumber",
             "السعر": "price",
-            "الملاحظات": "notes"
+            "المهندس": "engineer",
+            "تاريخ الوصول": "arrivalDate",
+            "تاريخ البيع": "saleDate",
+            "المشتري": "buyer",
+            "سعر البيع": "salePrice",
+            "الربح": "profit",
+            "الملاحظات": "notes",
+            "مباع": "isSold"
           };
           
           // Convert rows to inventory items
@@ -200,28 +208,32 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
   };
 
   const downloadTemplate = () => {
-    // Create a comprehensive CSV template for Excel with updated fields
+    // Create a comprehensive CSV template for Excel with all inventory fields
     const headers = [
-      "الصانع", "الفئة", "سعة المحرك", "السنة", "اللون الخارجي", 
+      "الصانع", "الفئة", "درجة التجهيز", "سعة المحرك", "السنة", "اللون الخارجي", 
       "اللون الداخلي", "الحالة", "نوع الاستيراد", "الموقع", "رقم الهيكل", 
-      "السعر", "الملاحظات"
+      "السعر", "المهندس", "تاريخ الوصول", "تاريخ البيع", "المشتري", 
+      "سعر البيع", "الربح", "الملاحظات", "مباع"
     ];
     
     const sampleRows = [
       [
-        "مرسيدس", "E200", "2.0L", "2025", "أسود", 
+        "مرسيدس", "E200", "Avantgarde", "2.0L", "2025", "أسود", 
         "بيج", "متوفر", "شخصي", "المعرض", "WDB2130461A123456", 
-        "150000", "سيارة جديدة"
+        "150000", "أحمد محمد", "2024-01-15", "", "", 
+        "", "", "سيارة جديدة - حالة ممتازة", "لا"
       ],
       [
-        "بي ام دبليو", "X5", "3.0L", "2024", "أبيض", 
+        "بي ام دبليو", "X5", "xDrive40i", "3.0L", "2024", "أبيض", 
         "أسود", "في الطريق", "شركة", "الميناء", "WBAFR9C50KC123457", 
-        "200000", "موديل حديث"
+        "200000", "سالم أحمد", "2024-02-20", "", "", 
+        "", "", "موديل حديث - فل أوبشن", "لا"
       ],
       [
-        "تويوتا", "كامري", "2.5L", "2024", "فضي", 
-        "رمادي", "قيد الصيانة", "مستعمل شخصي", "الورشة", "4T1BF1FK0GU123458", 
-        "80000", "حالة جيدة"
+        "تويوتا", "كامري", "Grande", "2.5L", "2024", "فضي", 
+        "رمادي", "مباع", "مستعمل شخصي", "المعرض", "4T1BF1FK0GU123458", 
+        "80000", "محمد سالم", "2023-12-01", "2024-01-10", "خالد العلي", 
+        "85000", "5000", "حالة جيدة - تم البيع", "نعم"
       ]
     ];
     
@@ -259,7 +271,7 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
             <CardHeader className="pb-3">
               <CardTitle className="text-base">تحميل النموذج</CardTitle>
               <CardDescription>
-                احصل على نموذج Excel يحتوي على جميع الحقول المطلوبة: الصانع، الفئة، سعة المحرك، السنة، الألوان، الحالة، نوع الاستيراد، الموقع، رقم الهيكل، السعر والملاحظات
+                احصل على نموذج Excel شامل يحتوي على جميع حقول المخزون: الصانع، الفئة، درجة التجهيز، سعة المحرك، السنة، الألوان، الحالة، نوع الاستيراد، الموقع، رقم الهيكل، السعر، المهندس، التواريخ، بيانات البيع والملاحظات
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -279,7 +291,7 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
             <CardHeader className="pb-3">
               <CardTitle className="text-base">رفع الملف</CardTitle>
               <CardDescription>
-                اختر ملف Excel أو CSV يحتوي على بيانات المخزون. تأكد من تطابق أسماء الأعمدة مع النموذج المحمل
+                اختر ملف Excel أو CSV يحتوي على بيانات المخزون الكاملة. تأكد من تطابق أسماء الأعمدة مع النموذج المحمل وتضمين جميع الحقول المطلوبة
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -312,11 +324,14 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
             <p className="font-medium mb-2">تعليمات مهمة:</p>
             <ul className="space-y-1 text-xs">
               <li>• استخدم النموذج المحمل أعلاه لضمان تطابق الأعمدة</li>
-              <li>• الحقول الإجبارية: الصانع، الفئة، سعة المحرك، السنة، الألوان، الحالة</li>
-              <li>• أسماء الشركات المصنعة المقبولة: مرسيدس، بي ام دبليو، رولز رويز، بنتلي، رنج روفر، دفندر، بورش، لكزس، لينكون، شوفولية، تويوتا، تسلا، لوسيد</li>
-              <li>• قيم الحالة المقبولة: متوفر، في الطريق، قيد الصيانة، محجوز، مباع</li>
-              <li>• قيم نوع الاستيراد: شخصي، شركة، مستعمل شخصي</li>
-              <li>• يقبل ملفات CSV و Excel (.xlsx)</li>
+              <li>• <strong>الحقول الإجبارية:</strong> الصانع، الفئة، سعة المحرك، السنة، الألوان الخارجية والداخلية، الحالة</li>
+              <li>• <strong>الحقول الاختيارية:</strong> درجة التجهيز، المهندس، التواريخ، بيانات البيع (المشتري، سعر البيع، الربح)</li>
+              <li>• <strong>أسماء الشركات المصنعة:</strong> مرسيدس، بي ام دبليو، اودي، تويوتا، لكزس، رنج روفر، بورش، نيسان، انفينيتي، هيونداي، كيا، تسلا، لوسيد وغيرها</li>
+              <li>• <strong>قيم الحالة:</strong> متوفر، في الطريق، قيد الصيانة، محجوز، مباع</li>
+              <li>• <strong>نوع الاستيراد:</strong> شخصي، شركة، مستعمل شخصي</li>
+              <li>• <strong>حالة البيع:</strong> نعم/لا أو Yes/No أو 1/0</li>
+              <li>• <strong>تنسيق التواريخ:</strong> YYYY-MM-DD (مثل: 2024-01-15)</li>
+              <li>• يقبل ملفات CSV و Excel (.xlsx, .xls)</li>
             </ul>
           </div>
         </div>

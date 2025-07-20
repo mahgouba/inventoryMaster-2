@@ -43,11 +43,12 @@ export function exportToExcel(data: any[], filename: string) {
   
   // Import XLSX dynamically
   import('xlsx').then((XLSX) => {
-    // Prepare data with Arabic headers
+    // Prepare data with comprehensive Arabic headers
     const arabicHeaders = {
       'id': 'المعرف',
       'manufacturer': 'الصانع',
       'category': 'الفئة',
+      'trimLevel': 'درجة التجهيز',
       'engineCapacity': 'سعة المحرك',
       'year': 'السنة',
       'exteriorColor': 'اللون الخارجي',
@@ -57,10 +58,17 @@ export function exportToExcel(data: any[], filename: string) {
       'location': 'الموقع',
       'chassisNumber': 'رقم الهيكل',
       'price': 'السعر',
-      'entryDate': 'تاريخ الدخول',
+      'engineer': 'المهندس',
+      'arrivalDate': 'تاريخ الوصول',
+      'saleDate': 'تاريخ البيع',
+      'buyer': 'المشتري',
+      'salePrice': 'سعر البيع',
+      'profit': 'الربح',
+      'images': 'الصور',
       'isSold': 'مباع',
-      'soldDate': 'تاريخ البيع',
-      'notes': 'ملاحظات'
+      'notes': 'ملاحظات',
+      'createdAt': 'تاريخ الإنشاء',
+      'updatedAt': 'تاريخ التحديث'
     };
 
     // Transform data with Arabic headers
@@ -70,12 +78,17 @@ export function exportToExcel(data: any[], filename: string) {
         const arabicKey = arabicHeaders[key as keyof typeof arabicHeaders] || key;
         
         // Format dates
-        if (key === 'entryDate' || key === 'soldDate') {
+        if (key === 'arrivalDate' || key === 'saleDate' || key === 'createdAt' || key === 'updatedAt') {
           transformedItem[arabicKey] = value ? new Date(value as string).toLocaleDateString('ar-SA') : '';
         }
         // Format boolean values
         else if (key === 'isSold') {
           transformedItem[arabicKey] = value ? 'نعم' : 'لا';
+        }
+        // Format price and profit fields
+        else if (key === 'price' || key === 'salePrice' || key === 'profit') {
+          const numValue = parseFloat(value as string);
+          transformedItem[arabicKey] = !isNaN(numValue) ? numValue.toLocaleString('ar-SA') : value || '';
         }
         // Format arrays (images)
         else if (Array.isArray(value)) {
@@ -92,24 +105,32 @@ export function exportToExcel(data: any[], filename: string) {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(transformedData);
 
-    // Set column widths for better display
+    // Set column widths for better display - comprehensive fields
     const colWidths = [
-      { wch: 10 }, // المعرف
-      { wch: 15 }, // الصانع
-      { wch: 15 }, // الفئة
-      { wch: 15 }, // سعة المحرك
-      { wch: 10 }, // السنة
-      { wch: 15 }, // اللون الخارجي
-      { wch: 15 }, // اللون الداخلي
-      { wch: 12 }, // الحالة
-      { wch: 15 }, // نوع الاستيراد
-      { wch: 15 }, // الموقع
-      { wch: 20 }, // رقم الهيكل
-      { wch: 12 }, // السعر
-      { wch: 15 }, // تاريخ الدخول
-      { wch: 10 }, // مباع
-      { wch: 15 }, // تاريخ البيع
-      { wch: 25 }  // ملاحظات
+      { wch: 8 },  // المعرف
+      { wch: 12 }, // الصانع
+      { wch: 12 }, // الفئة
+      { wch: 12 }, // درجة التجهيز
+      { wch: 12 }, // سعة المحرك
+      { wch: 8 },  // السنة
+      { wch: 12 }, // اللون الخارجي
+      { wch: 12 }, // اللون الداخلي
+      { wch: 10 }, // الحالة
+      { wch: 12 }, // نوع الاستيراد
+      { wch: 12 }, // الموقع
+      { wch: 18 }, // رقم الهيكل
+      { wch: 10 }, // السعر
+      { wch: 12 }, // المهندس
+      { wch: 12 }, // تاريخ الوصول
+      { wch: 12 }, // تاريخ البيع
+      { wch: 15 }, // المشتري
+      { wch: 10 }, // سعر البيع
+      { wch: 10 }, // الربح
+      { wch: 15 }, // الصور
+      { wch: 8 },  // مباع
+      { wch: 20 }, // ملاحظات
+      { wch: 12 }, // تاريخ الإنشاء
+      { wch: 12 }  // تاريخ التحديث
     ];
     ws['!cols'] = colWidths;
 
