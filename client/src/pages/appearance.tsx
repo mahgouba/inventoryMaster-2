@@ -126,6 +126,16 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
     queryKey: ["/api/manufacturers"],
   });
 
+  // Fetch inventory data to get all manufacturers
+  const { data: inventoryData = [] } = useQuery<any[]>({
+    queryKey: ["/api/inventory"],
+  });
+
+  // Extract unique manufacturers from inventory
+  const inventoryManufacturers = inventoryData.length > 0 
+    ? [...new Set(inventoryData.map(item => item.manufacturer).filter(Boolean))]
+    : [];
+
   // Save appearance settings mutation
   const saveAppearanceMutation = useMutation({
     mutationFn: async (settings: Partial<AppearanceSettings>) => {
@@ -857,7 +867,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <p className="text-slate-600 font-medium">الصناع المتاحين في النظام</p>
+                  <p className="text-slate-600 font-medium">جميع الصناع في النظام ({manufacturers.length + inventoryManufacturers.filter(name => !manufacturers.find(m => m.name === name)).length} صانع)</p>
                   <Button 
                     onClick={() => setShowNewManufacturerDialog(true)}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -867,7 +877,82 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                   </Button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Manufacturers from Inventory (Auto-detected) */}
+                {inventoryManufacturers && inventoryManufacturers.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
+                      <h3 className="text-green-800 font-semibold mb-2">🚗 الصناع من المخزون</h3>
+                      <p className="text-green-700 text-sm">هذه الشركات المصنعة موجودة في مخزونك ويمكنك رفع شعاراتها</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {inventoryManufacturers.map((manufacturerName, index) => {
+                        // Check if this manufacturer already exists in the manufacturers table
+                        const existingManufacturer = manufacturers.find(m => m.name === manufacturerName);
+                        
+                        if (existingManufacturer) {
+                          return null; // Skip if already exists in manufacturers table
+                        }
+                        
+                        return (
+                          <div key={`inventory-${manufacturerName}-${index}`} className="border-2 border-green-200 rounded-xl p-6 space-y-4 bg-gradient-to-br from-green-50 to-slate-50 hover:border-green-300 transition-all duration-200">
+                            <div className="flex items-center justify-between">
+                              <h3 className="font-semibold text-lg text-green-800">{manufacturerName}</h3>
+                              <Badge variant="outline" className="bg-green-100 text-green-800">من المخزون</Badge>
+                            </div>
+                            
+                            <div className="space-y-3 bg-white p-4 rounded-lg border-2 border-dashed border-orange-300">
+                              <div className="text-center">
+                                <div className="w-20 h-20 bg-orange-50 border-2 border-orange-200 rounded-lg flex items-center justify-center mx-auto">
+                                  <ImageIcon size={32} className="text-orange-400" />
+                                </div>
+                                <p className="text-xs text-orange-600 mt-2 font-medium">لا يوجد شعار</p>
+                              </div>
+                              <div className="text-center">
+                                <Button 
+                                  className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white shadow-lg"
+                                  size="lg"
+                                  onClick={async () => {
+                                    // First create the manufacturer in the database
+                                    try {
+                                      await createManufacturerMutation.mutateAsync({
+                                        name: manufacturerName,
+                                      });
+                                      toast({
+                                        title: "تم إنشاء الصانع بنجاح",
+                                        description: `تم إضافة ${manufacturerName} إلى قاعدة البيانات. يمكنك الآن رفع الشعار`,
+                                      });
+                                    } catch (error) {
+                                      console.error('Error creating manufacturer:', error);
+                                      toast({
+                                        title: "خطأ في إنشاء الصانع",
+                                        description: "حدث خطأ أثناء إضافة الصانع",
+                                        variant: "destructive",
+                                      });
+                                    }
+                                  }}
+                                  disabled={createManufacturerMutation.isPending}
+                                >
+                                  <Plus size={18} className="ml-2" />
+                                  {createManufacturerMutation.isPending ? "جاري الإضافة..." : "إضافة للنظام"}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Registered Manufacturers */}
+                <div className="space-y-4">
+                  <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+                    <h3 className="text-blue-800 font-semibold mb-2">🏭 الصناع المسجلين</h3>
+                    <p className="text-blue-700 text-sm">الشركات المصنعة المسجلة في النظام مع إمكانية إدارة شعاراتها</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {manufacturers.map((manufacturer) => (
                     <div key={manufacturer.id} className="border-2 border-blue-200 rounded-xl p-6 space-y-4 bg-gradient-to-br from-blue-50 to-slate-50 hover:border-blue-300 transition-all duration-200">
                       <div className="flex items-center justify-between">
@@ -1109,6 +1194,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                       </div>
                     </div>
                   ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
