@@ -7,7 +7,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Switch } from "@/components/ui/switch";
 import { 
   Bell, 
   Settings, 
@@ -32,7 +31,9 @@ import {
   Share2,
   FileText,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -793,11 +794,18 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <div className="space-y-2">
                                 <div className="flex items-center justify-between">
                                   <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
-                                  <Switch 
-                                    checked={toggleState} 
-                                    onCheckedChange={onToggleChange}
-                                    className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-slate-400"
-                                  />
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => onToggleChange(!toggleState)}
+                                    className="p-2 h-8 w-8 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                                  >
+                                    {toggleState ? (
+                                      <Eye size={16} className="text-blue-600 dark:text-blue-400" />
+                                    ) : (
+                                      <EyeOff size={16} className="text-slate-400 dark:text-slate-500" />
+                                    )}
+                                  </Button>
                                 </div>
                                 {toggleState && (
                                   <div className="relative group">
