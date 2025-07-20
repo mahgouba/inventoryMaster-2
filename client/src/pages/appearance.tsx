@@ -469,7 +469,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
             <TabsTrigger value="branding">العلامة التجارية</TabsTrigger>
             <TabsTrigger value="light-colors">الألوان العادية</TabsTrigger>
             <TabsTrigger value="dark-colors">الألوان الليلية</TabsTrigger>
-            <TabsTrigger value="logos">شعارات الشركات</TabsTrigger>
+            <TabsTrigger value="logos">🏭 إدارة شعارات الصناع</TabsTrigger>
             <TabsTrigger value="layout">التخطيط</TabsTrigger>
           </TabsList>
 
@@ -838,12 +838,26 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Building size={20} />
-                  شعارات الشركات المصنعة
+                  إدارة شعارات الصناع
                 </CardTitle>
+                <div className="space-y-2 mt-3">
+                  <p className="text-sm text-muted-foreground">
+                    يمكنك هنا إضافة وتعديل شعارات الشركات المصنعة. اختر صوراً بصيغة PNG أو JPG بحجم لا يزيد عن 5 ميجابايت للحصول على أفضل جودة عرض.
+                  </p>
+                  <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400">
+                    <p className="text-blue-800 text-sm font-medium">📝 تعليمات مهمة:</p>
+                    <ul className="text-blue-700 text-sm mt-1 space-y-1">
+                      <li>• الصيغ المدعومة: PNG, JPG, JPEG, GIF, WebP</li>
+                      <li>• الحد الأقصى لحجم الملف: 5 ميجابايت</li>
+                      <li>• أبعاد مُوصى بها: 200x200 بكسل لأفضل عرض</li>
+                      <li>• الشعارات ستظهر في جميع صفحات النظام</li>
+                    </ul>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <p className="text-slate-600">إدارة شعارات الشركات المصنعة في النظام</p>
+                  <p className="text-slate-600 font-medium">الصناع المتاحين في النظام</p>
                   <Button 
                     onClick={() => setShowNewManufacturerDialog(true)}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -855,7 +869,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {manufacturers.map((manufacturer) => (
-                    <div key={manufacturer.id} className="border rounded-lg p-4 space-y-4">
+                    <div key={manufacturer.id} className="border-2 border-blue-200 rounded-xl p-6 space-y-4 bg-gradient-to-br from-blue-50 to-slate-50 hover:border-blue-300 transition-all duration-200">
                       <div className="flex items-center justify-between">
                         {editingManufacturerId === manufacturer.id ? (
                           <div className="flex items-center gap-2 flex-1">
@@ -911,12 +925,17 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                       
                       <div className="space-y-3">
                         {manufacturer.logo ? (
-                          <div className="space-y-2">
-                            <img
-                              src={manufacturer.logo}
-                              alt={`${manufacturer.name} logo`}
-                              className="w-16 h-16 object-contain mx-auto border rounded"
-                            />
+                          <div className="space-y-3 bg-white p-4 rounded-lg border">
+                            <div className="text-center">
+                              <div className="w-20 h-20 mx-auto border-2 border-green-200 rounded-lg p-2 bg-green-50">
+                                <img
+                                  src={manufacturer.logo}
+                                  alt={`${manufacturer.name} logo`}
+                                  className="w-full h-full object-contain"
+                                />
+                              </div>
+                              <p className="text-xs text-green-600 mt-2 font-medium">✓ الشعار محمّل</p>
+                            </div>
                             <div className="flex items-center justify-center space-x-2 space-x-reverse">
                               <input
                                 type="file"
@@ -976,7 +995,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                 }}
                               />
                               <Button 
-                                variant="outline" 
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
                                 size="sm"
                                 disabled={updateManufacturerLogoMutation.isPending}
                                 onClick={() => {
@@ -986,27 +1005,32 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                 }}
                               >
                                 <Edit2 size={14} />
-                                {updateManufacturerLogoMutation.isPending ? "جاري التحديث..." : "تغيير"}
+                                {updateManufacturerLogoMutation.isPending ? "جاري التحديث..." : "تغيير الشعار"}
                               </Button>
                               <Button 
-                                variant="outline" 
+                                variant="destructive" 
                                 size="sm" 
                                 onClick={() => {
-                                  updateManufacturerLogoMutation.mutate({
-                                    id: manufacturer.id,
-                                    logo: "",
-                                  });
+                                  if (confirm(`هل أنت متأكد من حذف شعار ${manufacturer.name}؟`)) {
+                                    updateManufacturerLogoMutation.mutate({
+                                      id: manufacturer.id,
+                                      logo: "",
+                                    });
+                                  }
                                 }}
                               >
                                 <Trash2 size={14} />
-                                حذف
+                                حذف الشعار
                               </Button>
                             </div>
                           </div>
                         ) : (
-                          <div className="space-y-2">
-                            <div className="w-16 h-16 bg-slate-200 rounded flex items-center justify-center mx-auto">
-                              <ImageIcon size={24} className="text-slate-400" />
+                          <div className="space-y-3 bg-white p-4 rounded-lg border-2 border-dashed border-orange-300">
+                            <div className="text-center">
+                              <div className="w-20 h-20 bg-orange-50 border-2 border-orange-200 rounded-lg flex items-center justify-center mx-auto">
+                                <ImageIcon size={32} className="text-orange-400" />
+                              </div>
+                              <p className="text-xs text-orange-600 mt-2 font-medium">لا يوجد شعار</p>
                             </div>
                             <div className="text-center">
                               <input
@@ -1067,8 +1091,8 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                 }}
                               />
                               <Button 
-                                variant="outline" 
-                                size="sm"
+                                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg"
+                                size="lg"
                                 disabled={updateManufacturerLogoMutation.isPending}
                                 onClick={() => {
                                   console.log('Upload logo button clicked');
@@ -1076,7 +1100,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                                   fileInput?.click();
                                 }}
                               >
-                                <Upload size={14} />
+                                <Upload size={18} className="ml-2" />
                                 {updateManufacturerLogoMutation.isPending ? "جاري الرفع..." : "رفع شعار"}
                               </Button>
                             </div>
