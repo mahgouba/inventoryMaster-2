@@ -146,7 +146,16 @@ export function exportToExcel(data: any[], filename: string) {
   });
 }
 
-export function printTable() {
+interface PrintSettings {
+  visibleColumns: string[];
+  orientation: 'portrait' | 'landscape';
+  colorTheme: 'default' | 'grayscale' | 'blue' | 'green';
+  fontSize: 'small' | 'medium' | 'large';
+  includeHeader: boolean;
+  includeDate: boolean;
+}
+
+export function printTableWithSettings(settings: PrintSettings) {
   // Get the table element
   const tableElement = document.querySelector('[data-table="inventory-table"]');
   
@@ -179,7 +188,7 @@ export function printTable() {
         }
         
         @page {
-          size: A4 landscape;
+          size: A4 ${settings.orientation};
           margin: 10mm;
         }
         
@@ -190,7 +199,7 @@ export function printTable() {
           background: white !important;
           color: #000 !important;
           line-height: 1.3;
-          font-size: 10pt;
+          font-size: ${settings.fontSize === 'small' ? '8pt' : settings.fontSize === 'large' ? '12pt' : '10pt'};
           margin: 0;
           padding: 10mm;
         }
@@ -220,7 +229,7 @@ export function printTable() {
           border-collapse: collapse;
           margin-top: 5mm;
           background: white !important;
-          font-size: 8pt;
+          font-size: ${settings.fontSize === 'small' ? '7pt' : settings.fontSize === 'large' ? '11pt' : '9pt'};
         }
         
         th, td {
@@ -262,6 +271,31 @@ export function printTable() {
           border-radius: 0 !important;
         }
         
+        /* Color themes */
+        ${settings.colorTheme === 'grayscale' ? `
+          th { background: #e5e5e5 !important; color: #333 !important; }
+          * { color: #333 !important; }
+        ` : ''}
+        
+        ${settings.colorTheme === 'blue' ? `
+          th { background: #dbeafe !important; color: #1e40af !important; }
+          .status-available { background: #dbeafe !important; color: #1e40af !important; }
+        ` : ''}
+        
+        ${settings.colorTheme === 'green' ? `
+          th { background: #dcfce7 !important; color: #166534 !important; }
+          .status-available { background: #dcfce7 !important; color: #166534 !important; }
+        ` : ''}
+        
+        /* Hide columns based on settings */
+        ${settings.visibleColumns.length > 0 ? 
+          Array.from({length: 20}, (_, i) => i).map(i => 
+            !settings.visibleColumns.includes(['manufacturer', 'category', 'trimLevel', 'engineCapacity', 'year', 'exteriorColor', 'interiorColor', 'status', 'importType', 'location', 'chassisNumber', 'price', 'ownershipType', 'engineer', 'entryDate', 'notes'][i] || '') 
+              ? `table th:nth-child(${i+1}), table td:nth-child(${i+1}) { display: none !important; }`
+              : ''
+          ).join('\n')
+        : ''}
+        
         /* Hide unnecessary elements for simple table */
         .print-footer,
         .summary-section,
@@ -289,10 +323,12 @@ export function printTable() {
       </style>
     </head>
     <body>
+        ${settings.includeHeader ? `
         <div class="print-header">
           <h1>جدول المخزون</h1>
-          <div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</div>
+          ${settings.includeDate ? `<div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</div>` : ''}
         </div>
+        ` : ''}
         
         <!-- Simple Table Only -->
         ${tableElement.outerHTML.replace(/<svg[^>]*>.*?<\/svg>/g, '').replace(/class="[^"]*"/g, '').replace(/<button[^>]*>.*?<\/button>/g, '')}
@@ -310,4 +346,17 @@ export function printTable() {
     printWindow.print();
     printWindow.close();
   };
+}
+
+// Keep the original function for backward compatibility
+export function printTable() {
+  const defaultSettings: PrintSettings = {
+    visibleColumns: ['manufacturer', 'category', 'trimLevel', 'engineCapacity', 'year', 'exteriorColor', 'interiorColor', 'status', 'importType', 'location', 'chassisNumber', 'price', 'ownershipType', 'engineer', 'entryDate', 'notes'],
+    orientation: 'landscape',
+    colorTheme: 'default',
+    fontSize: 'medium',
+    includeHeader: true,
+    includeDate: true
+  };
+  printTableWithSettings(defaultSettings);
 }

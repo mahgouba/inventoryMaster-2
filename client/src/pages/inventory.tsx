@@ -21,7 +21,8 @@ import VoiceAssistant from "@/components/voice-assistant";
 import { InventoryFAB } from "@/components/animated-fab";
 import SpecificationsManager from "@/components/specifications-manager";
 import SpecificationsManagement from "@/components/specifications-management";
-import { exportToCSV, exportToExcel, printTable } from "@/lib/utils";
+import { PrintCustomizationDialog, type PrintSettings } from "@/components/print-customization-dialog";
+import { exportToCSV, exportToExcel, printTable, printTableWithSettings } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
 
 interface InventoryPageProps {
@@ -65,6 +66,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [showStatusFilter, setShowStatusFilter] = useState(false);
   const [showImportTypeFilter, setShowImportTypeFilter] = useState(false);
   const [showOwnershipTypeFilter, setShowOwnershipTypeFilter] = useState(false);
+  const [printDialogOpen, setPrintDialogOpen] = useState(false);
 
   // Get theme settings and hooks
   const { companyName, companyLogo, darkMode, toggleDarkMode, isUpdatingDarkMode } = useTheme();
@@ -433,7 +435,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   };
 
   const handlePrint = () => {
-    printTable();
+    setPrintDialogOpen(true);
+  };
+
+  const handlePrintWithSettings = (settings: PrintSettings) => {
+    printTableWithSettings(settings);
+    setPrintDialogOpen(false);
   };
 
   const handleEdit = (item: InventoryItem) => {
@@ -959,7 +966,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   className="border-slate-300 text-slate-600 hover:bg-slate-50 w-full sm:w-auto"
                 >
                   <Printer className="w-4 h-4 ml-2" />
-                  طباعة
+                  طباعة مخصصة
                 </Button>
                 {/* Show Sold Cars Button - Admin Only */}
                 {userRole === "admin" && (
@@ -1099,6 +1106,13 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
       <SpecificationsManagement
         open={specificationsManagerOpen}
         onOpenChange={setSpecificationsManagerOpen}
+      />
+
+      {/* Print Customization Dialog */}
+      <PrintCustomizationDialog
+        open={printDialogOpen}
+        onOpenChange={setPrintDialogOpen}
+        onPrint={handlePrintWithSettings}
       />
     </div>
   );
