@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { Package, Truck, CheckCircle, Wrench, ShoppingCart, User, Building, Users, Calendar } from "lucide-react";
+import { getManufacturerLogo } from "@shared/manufacturer-logos";
 
 // Type definitions for inventory statistics
 interface InventoryStats {
@@ -14,18 +15,6 @@ interface InventoryStats {
   company: number;
   usedPersonal: number;
 }
-
-// Manufacturer logos mapping
-const manufacturerLogos: { [key: string]: string } = {
-  "مرسيدس": "🔹",
-  "لاند روفر": "🟢", 
-  "تويوتا": "🔴",
-  "بي ام دبليو": "🔵",
-  "اودي": "⚪",
-  "فورد": "⚫",
-  "نيسان": "🔺",
-  "هيونداي": "🔶",
-};
 
 export default function InventoryStats() {
   const { data: stats, isLoading } = useQuery<InventoryStats>({
@@ -177,44 +166,49 @@ export default function InventoryStats() {
 
       {/* Manufacturer Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {manufacturerStats?.slice(0, 6).map((manufacturer: any, index: number) => (
-          <Card key={index} className="border border-slate-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                {manufacturer.logo ? (
-                  <img 
-                    src={manufacturer.logo} 
-                    alt={manufacturer.manufacturer}
-                    className="w-8 h-8 object-contain rounded"
-                  />
-                ) : (
-                  <span className="text-2xl">{manufacturerLogos[manufacturer.manufacturer] || "🔸"}</span>
-                )}
-                {manufacturer.manufacturer}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">إجمالي:</span>
-                  <span className="font-semibold">{manufacturer.total}</span>
+        {(Array.isArray(manufacturerStats) ? manufacturerStats : []).slice(0, 6).map((manufacturer: any, index: number) => {
+          const logoPath = getManufacturerLogo(manufacturer.manufacturer);
+          return (
+            <Card key={index} className="border border-slate-200">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  {logoPath ? (
+                    <img 
+                      src={logoPath} 
+                      alt={manufacturer.manufacturer}
+                      className="w-8 h-8 object-contain rounded"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-slate-200 rounded flex items-center justify-center">
+                      <span className="text-xs text-slate-500">N/A</span>
+                    </div>
+                  )}
+                  {manufacturer.manufacturer}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">إجمالي:</span>
+                    <span className="font-semibold">{manufacturer.total}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">شخصي:</span>
+                    <span className="font-medium text-blue-600">{manufacturer.personal}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">شركة:</span>
+                    <span className="font-medium text-purple-600">{manufacturer.company}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-slate-600">مستعمل:</span>
+                    <span className="font-medium text-orange-600">{manufacturer.usedPersonal}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">شخصي:</span>
-                  <span className="font-medium text-blue-600">{manufacturer.personal}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">شركة:</span>
-                  <span className="font-medium text-purple-600">{manufacturer.company}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-slate-600">مستعمل:</span>
-                  <span className="font-medium text-orange-600">{manufacturer.usedPersonal}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
