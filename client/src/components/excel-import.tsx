@@ -124,7 +124,9 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
             "اللون الداخلي": "interiorColor",
             "الحالة": "status",
             "الموقع": "location",
+            "المكان": "location", // Alternative Arabic name
             "الإستيراد": "importType",
+            "نوع الاستيراد": "importType", // Alternative Arabic name
             "رقم الهيكل": "chassisNumber",
             "نوع الملكية": "ownershipType",
             "تاريخ الدخول": "entryDate",
