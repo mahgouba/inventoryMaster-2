@@ -11,7 +11,10 @@ import {
   insertSpecificationSchema,
   insertTrimLevelSchema,
   insertQuotationSchema,
-  insertPdfAppearanceSchema
+  insertPdfAppearanceSchema,
+  insertImportTypeSchema,
+  insertVehicleStatusSchema,
+  insertOwnershipTypeSchema
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -2386,6 +2389,125 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error importing cars data:", error);
       res.status(500).json({ message: "Failed to import cars data" });
+    }
+  });
+
+  // Comprehensive List Management API Endpoints
+  
+  // Import Types endpoints
+  app.get("/api/import-types", async (req, res) => {
+    try {
+      const importTypes = await storage.getAllImportTypes();
+      res.json(importTypes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch import types" });
+    }
+  });
+
+  app.post("/api/import-types", async (req, res) => {
+    try {
+      const importType = await storage.createImportType(req.body);
+      res.status(201).json(importType);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create import type" });
+    }
+  });
+
+  app.put("/api/import-types/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const importType = await storage.updateImportType(id, req.body);
+      res.json(importType);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update import type" });
+    }
+  });
+
+  app.delete("/api/import-types/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteImportType(id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete import type" });
+    }
+  });
+
+  // Vehicle Statuses endpoints
+  app.get("/api/statuses", async (req, res) => {
+    try {
+      const statuses = await storage.getAllVehicleStatuses();
+      res.json(statuses);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch vehicle statuses" });
+    }
+  });
+
+  app.post("/api/statuses", async (req, res) => {
+    try {
+      const status = await storage.createVehicleStatus(req.body);
+      res.status(201).json(status);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create vehicle status" });
+    }
+  });
+
+  app.put("/api/statuses/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const status = await storage.updateVehicleStatus(id, req.body);
+      res.json(status);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update vehicle status" });
+    }
+  });
+
+  app.delete("/api/statuses/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteVehicleStatus(id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete vehicle status" });
+    }
+  });
+
+  // Ownership Types endpoints
+  app.get("/api/ownership-types", async (req, res) => {
+    try {
+      const ownershipTypes = await storage.getAllOwnershipTypes();
+      res.json(ownershipTypes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch ownership types" });
+    }
+  });
+
+  app.post("/api/ownership-types", async (req, res) => {
+    try {
+      const ownershipType = await storage.createOwnershipType(req.body);
+      res.status(201).json(ownershipType);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create ownership type" });
+    }
+  });
+
+  app.put("/api/ownership-types/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const ownershipType = await storage.updateOwnershipType(id, req.body);
+      res.json(ownershipType);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update ownership type" });
+    }
+  });
+
+  app.delete("/api/ownership-types/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteOwnershipType(id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete ownership type" });
     }
   });
 

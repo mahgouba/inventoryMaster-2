@@ -1,6 +1,7 @@
 import { 
   users, inventoryItems, manufacturers, companies, locations, locationTransfers, 
   lowStockAlerts, stockSettings, appearanceSettings, specifications, trimLevels, quotations, invoices, pdfAppearanceSettings,
+  importTypes, vehicleStatuses, ownershipTypes,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Manufacturer, type InsertManufacturer, 
@@ -123,6 +124,30 @@ export interface IStorage {
   savePdfAppearanceSettings(settings: any): Promise<any>;
   updatePdfAppearanceSettings(id: number, settings: any): Promise<any>;
   
+  // Import Types methods
+  getAllImportTypes(): Promise<any[]>;
+  createImportType(importType: any): Promise<any>;
+  updateImportType(id: number, importType: any): Promise<any>;
+  deleteImportType(id: number): Promise<boolean>;
+  
+  // Vehicle Status methods
+  getAllVehicleStatuses(): Promise<any[]>;
+  createVehicleStatus(status: any): Promise<any>;
+  updateVehicleStatus(id: number, status: any): Promise<any>;
+  deleteVehicleStatus(id: number): Promise<boolean>;
+  
+  // Ownership Type methods
+  getAllOwnershipTypes(): Promise<any[]>;
+  createOwnershipType(ownershipType: any): Promise<any>;
+  updateOwnershipType(id: number, ownershipType: any): Promise<any>;
+  deleteOwnershipType(id: number): Promise<boolean>;
+  
+  // Image Links methods (placeholder methods for missing functionality)
+  getAllImageLinks(): Promise<any[]>;
+  createImageLink(imageLink: any): Promise<any>;
+  updateImageLink(id: number, imageLink: any): Promise<any>;
+  deleteImageLink(id: number): Promise<boolean>;
+  
   // Specifications methods
   getAllSpecifications(): Promise<Specification[]>;
   getSpecification(id: number): Promise<Specification | undefined>;
@@ -240,21 +265,31 @@ export class MemStorage implements IStorage {
   async getAppearanceSettings(): Promise<any> { return undefined; }
   async updateAppearanceSettings(settings: any): Promise<any> { return settings; }
   async updateManufacturerLogo(id: number, logo: string): Promise<any> { return undefined; }
-  async getAllSpecifications(): Promise<any[]> { return []; }
-  async getSpecification(id: number): Promise<any> { return undefined; }
-  async createSpecification(spec: any): Promise<any> { return spec; }
-  async updateSpecification(id: number, spec: any): Promise<any> { return spec; }
-  async deleteSpecification(id: number): Promise<boolean> { return true; }
-  async getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<any[]> { return []; }
-  async getAllTrimLevels(): Promise<any[]> { return []; }
-  async getTrimLevel(id: number): Promise<any> { return undefined; }
-  async createTrimLevel(trimLevel: any): Promise<any> { return trimLevel; }
-  async updateTrimLevel(id: number, trimLevel: any): Promise<any> { return trimLevel; }
-  async deleteTrimLevel(id: number): Promise<boolean> { return true; }
-  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<any[]> { return []; }
   async getAllUsers(): Promise<any[]> { return []; }
   async updateUser(id: number, user: any): Promise<any> { return user; }
   async deleteUser(id: number): Promise<boolean> { return true; }
+  
+  // Comprehensive List Management placeholder methods
+  async getAllImportTypes(): Promise<any[]> { return []; }
+  async createImportType(importType: any): Promise<any> { return importType; }
+  async updateImportType(id: number, importType: any): Promise<any> { return importType; }
+  async deleteImportType(id: number): Promise<boolean> { return true; }
+  
+  async getAllVehicleStatuses(): Promise<any[]> { return []; }
+  async createVehicleStatus(status: any): Promise<any> { return status; }
+  async updateVehicleStatus(id: number, status: any): Promise<any> { return status; }
+  async deleteVehicleStatus(id: number): Promise<boolean> { return true; }
+  
+  async getAllOwnershipTypes(): Promise<any[]> { return []; }
+  async createOwnershipType(ownershipType: any): Promise<any> { return ownershipType; }
+  async updateOwnershipType(id: number, ownershipType: any): Promise<any> { return ownershipType; }
+  async deleteOwnershipType(id: number): Promise<boolean> { return true; }
+  
+  // Image Links placeholder methods
+  async getAllImageLinks(): Promise<any[]> { return []; }
+  async createImageLink(imageLink: any): Promise<any> { return imageLink; }
+  async updateImageLink(id: number, imageLink: any): Promise<any> { return imageLink; }
+  async deleteImageLink(id: number): Promise<boolean> { return true; }
   
   // Specifications methods for MemStorage
   async getAllSpecifications(): Promise<Specification[]> {
@@ -2553,6 +2588,184 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Update PDF appearance settings error:', error);
       return null;
+    }
+  }
+
+  // Comprehensive List Management methods for DatabaseStorage
+  
+  // Import Types methods
+  async getAllImportTypes(): Promise<any[]> {
+    try {
+      return await db.select().from(importTypes).where(eq(importTypes.isActive, true));
+    } catch (error) {
+      console.error('Get all import types error:', error);
+      return [];
+    }
+  }
+
+  async createImportType(importTypeData: any): Promise<any> {
+    try {
+      const [importType] = await db.insert(importTypes).values(importTypeData).returning();
+      return importType;
+    } catch (error) {
+      console.error('Create import type error:', error);
+      throw error;
+    }
+  }
+
+  async updateImportType(id: number, importTypeData: any): Promise<any> {
+    try {
+      const [importType] = await db.update(importTypes)
+        .set(importTypeData)
+        .where(eq(importTypes.id, id))
+        .returning();
+      return importType;
+    } catch (error) {
+      console.error('Update import type error:', error);
+      throw error;
+    }
+  }
+
+  async deleteImportType(id: number): Promise<boolean> {
+    try {
+      await db.update(importTypes)
+        .set({ isActive: false })
+        .where(eq(importTypes.id, id));
+      return true;
+    } catch (error) {
+      console.error('Delete import type error:', error);
+      return false;
+    }
+  }
+
+  // Vehicle Status methods
+  async getAllVehicleStatuses(): Promise<any[]> {
+    try {
+      return await db.select().from(vehicleStatuses).where(eq(vehicleStatuses.isActive, true));
+    } catch (error) {
+      console.error('Get all vehicle statuses error:', error);
+      return [];
+    }
+  }
+
+  async createVehicleStatus(statusData: any): Promise<any> {
+    try {
+      const [status] = await db.insert(vehicleStatuses).values(statusData).returning();
+      return status;
+    } catch (error) {
+      console.error('Create vehicle status error:', error);
+      throw error;
+    }
+  }
+
+  async updateVehicleStatus(id: number, statusData: any): Promise<any> {
+    try {
+      const [status] = await db.update(vehicleStatuses)
+        .set(statusData)
+        .where(eq(vehicleStatuses.id, id))
+        .returning();
+      return status;
+    } catch (error) {
+      console.error('Update vehicle status error:', error);
+      throw error;
+    }
+  }
+
+  async deleteVehicleStatus(id: number): Promise<boolean> {
+    try {
+      await db.update(vehicleStatuses)
+        .set({ isActive: false })
+        .where(eq(vehicleStatuses.id, id));
+      return true;
+    } catch (error) {
+      console.error('Delete vehicle status error:', error);
+      return false;
+    }
+  }
+
+  // Ownership Type methods
+  async getAllOwnershipTypes(): Promise<any[]> {
+    try {
+      return await db.select().from(ownershipTypes).where(eq(ownershipTypes.isActive, true));
+    } catch (error) {
+      console.error('Get all ownership types error:', error);
+      return [];
+    }
+  }
+
+  async createOwnershipType(ownershipTypeData: any): Promise<any> {
+    try {
+      const [ownershipType] = await db.insert(ownershipTypes).values(ownershipTypeData).returning();
+      return ownershipType;
+    } catch (error) {
+      console.error('Create ownership type error:', error);
+      throw error;
+    }
+  }
+
+  async updateOwnershipType(id: number, ownershipTypeData: any): Promise<any> {
+    try {
+      const [ownershipType] = await db.update(ownershipTypes)
+        .set(ownershipTypeData)
+        .where(eq(ownershipTypes.id, id))
+        .returning();
+      return ownershipType;
+    } catch (error) {
+      console.error('Update ownership type error:', error);
+      throw error;
+    }
+  }
+
+  async deleteOwnershipType(id: number): Promise<boolean> {
+    try {
+      await db.update(ownershipTypes)
+        .set({ isActive: false })
+        .where(eq(ownershipTypes.id, id));
+      return true;
+    } catch (error) {
+      console.error('Delete ownership type error:', error);
+      return false;
+    }
+  }
+
+  // Image Links methods for DatabaseStorage (placeholder implementation)
+  async getAllImageLinks(): Promise<any[]> {
+    try {
+      // Placeholder - could be implemented if imageLinks table exists
+      return [];
+    } catch (error) {
+      console.error('Get all image links error:', error);
+      return [];
+    }
+  }
+
+  async createImageLink(imageLinkData: any): Promise<any> {
+    try {
+      // Placeholder - could be implemented if imageLinks table exists
+      return imageLinkData;
+    } catch (error) {
+      console.error('Create image link error:', error);
+      throw error;
+    }
+  }
+
+  async updateImageLink(id: number, imageLinkData: any): Promise<any> {
+    try {
+      // Placeholder - could be implemented if imageLinks table exists
+      return imageLinkData;
+    } catch (error) {
+      console.error('Update image link error:', error);
+      throw error;
+    }
+  }
+
+  async deleteImageLink(id: number): Promise<boolean> {
+    try {
+      // Placeholder - could be implemented if imageLinks table exists
+      return true;
+    } catch (error) {
+      console.error('Delete image link error:', error);
+      return false;
     }
   }
 }

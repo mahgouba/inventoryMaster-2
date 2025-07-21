@@ -679,6 +679,15 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           إدارة التكامل
                         </DropdownMenuItem>
                       </Link>
+
+                      <DropdownMenuSeparator />
+
+                      <Link href="/comprehensive-lists">
+                        <DropdownMenuItem>
+                          <Database className="mr-2 h-4 w-4" />
+                          تحرير القوائم
+                        </DropdownMenuItem>
+                      </Link>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}

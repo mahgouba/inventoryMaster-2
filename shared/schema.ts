@@ -474,6 +474,58 @@ export const lowStockAlerts = pgTable("low_stock_alerts", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Import types table for managing import types
+export const importTypes = pgTable("import_types", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Vehicle statuses table for managing status options
+export const vehicleStatuses = pgTable("vehicle_statuses", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  color: text("color").default("#6b7280"), // Default gray color
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Ownership types table for managing ownership options
+export const ownershipTypes = pgTable("ownership_types", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Insert schemas for new tables
+export const insertImportTypeSchema = createInsertSchema(importTypes).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertVehicleStatusSchema = createInsertSchema(vehicleStatuses).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertOwnershipTypeSchema = createInsertSchema(ownershipTypes).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Additional types
+export type InsertImportType = z.infer<typeof insertImportTypeSchema>;
+export type ImportType = typeof importTypes.$inferSelect;
+export type InsertVehicleStatus = z.infer<typeof insertVehicleStatusSchema>;
+export type VehicleStatus = typeof vehicleStatuses.$inferSelect;
+export type InsertOwnershipType = z.infer<typeof insertOwnershipTypeSchema>;
+export type OwnershipType = typeof ownershipTypes.$inferSelect;
+
 // Stock level settings table
 export const stockSettings = pgTable("stock_settings", {
   id: serial("id").primaryKey(),
