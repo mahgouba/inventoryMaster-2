@@ -1,397 +1,467 @@
-import { db } from "./db";
-import { manufacturers, trimLevels } from "../shared/schema";
+import { storage } from './storage';
 
-// Comprehensive trim levels data from the provided file
-const trimLevelsData = [
-  // BMW Group
-  { manufacturer: "بي ام دبليو", category: "3 Series", trimLevel: "320i" },
-  { manufacturer: "بي ام دبليو", category: "3 Series", trimLevel: "330i" },
-  { manufacturer: "بي ام دبليو", category: "3 Series", trimLevel: "M340i" },
-  { manufacturer: "بي ام دبليو", category: "5 Series", trimLevel: "520i" },
-  { manufacturer: "بي ام دبليو", category: "5 Series", trimLevel: "530i" },
-  { manufacturer: "بي ام دبليو", category: "5 Series", trimLevel: "M550i" },
-  { manufacturer: "بي ام دبليو", category: "7 Series", trimLevel: "735i" },
-  { manufacturer: "بي ام دبليو", category: "7 Series", trimLevel: "740i" },
-  { manufacturer: "بي ام دبليو", category: "7 Series", trimLevel: "i7" },
-  { manufacturer: "بي ام دبليو", category: "X5", trimLevel: "xDrive40i" },
-  { manufacturer: "بي ام دبليو", category: "X5", trimLevel: "M60i" },
-  { manufacturer: "بي ام دبليو", category: "X5", trimLevel: "M Competition" },
-
-  // Rolls-Royce
-  { manufacturer: "رولز رويز", category: "جوست", trimLevel: "Standard" },
-  { manufacturer: "رولز رويز", category: "جوست", trimLevel: "Black Badge" },
-  { manufacturer: "رولز رويز", category: "فانتوم", trimLevel: "Standard" },
-  { manufacturer: "رولز رويز", category: "فانتوم", trimLevel: "Extended Wheelbase" },
-  { manufacturer: "رولز رويز", category: "كولينان", trimLevel: "Standard" },
-  { manufacturer: "رولز رويز", category: "كولينان", trimLevel: "Black Badge" },
-
-  // Mercedes-Benz
-  { manufacturer: "مرسيدس", category: "C-Class", trimLevel: "C200 Avantgarde" },
-  { manufacturer: "مرسيدس", category: "C-Class", trimLevel: "C300 AMG Line" },
-  { manufacturer: "مرسيدس", category: "E-Class", trimLevel: "E200" },
-  { manufacturer: "مرسيدس", category: "E-Class", trimLevel: "E300" },
-  { manufacturer: "مرسيدس", category: "S-Class", trimLevel: "S450" },
-  { manufacturer: "مرسيدس", category: "S-Class", trimLevel: "S500" },
-  { manufacturer: "مرسيدس", category: "S-Class", trimLevel: "S580 Maybach" },
-  { manufacturer: "مرسيدس", category: "GLE", trimLevel: "GLE 450" },
-  { manufacturer: "مرسيدس", category: "GLE", trimLevel: "GLE 53 AMG" },
-
-  // Ferrari
-  { manufacturer: "فيراري", category: "296", trimLevel: "GTB" },
-  { manufacturer: "فيراري", category: "296", trimLevel: "GTS" },
-  { manufacturer: "فيراري", category: "SF90", trimLevel: "Stradale" },
-  { manufacturer: "فيراري", category: "SF90", trimLevel: "Spider" },
-  { manufacturer: "فيراري", category: "روما", trimLevel: "Standard" },
-  { manufacturer: "فيراري", category: "روما", trimLevel: "Spider" },
-  { manufacturer: "فيراري", category: "بوروسانجوي", trimLevel: "Standard" },
-
-  // Ford
-  { manufacturer: "فورد", category: "تورس", trimLevel: "Ambiente" },
-  { manufacturer: "فورد", category: "تورس", trimLevel: "Trend" },
-  { manufacturer: "فورد", category: "تورس", trimLevel: "Titanium" },
-  { manufacturer: "فورد", category: "إكسبلورر", trimLevel: "Base" },
-  { manufacturer: "فورد", category: "إكسبلورر", trimLevel: "XLT" },
-  { manufacturer: "فورد", category: "إكسبلورر", trimLevel: "ST-Line" },
-  { manufacturer: "فورد", category: "إكسبلورر", trimLevel: "Limited" },
-  { manufacturer: "فورد", category: "برونكو", trimLevel: "Big Bend" },
-  { manufacturer: "فورد", category: "برونكو", trimLevel: "Outer Banks" },
-  { manufacturer: "فورد", category: "برونكو", trimLevel: "Badlands" },
-  { manufacturer: "فورد", category: "برونكو", trimLevel: "Raptor" },
-  { manufacturer: "فورد", category: "F-150", trimLevel: "XL" },
-  { manufacturer: "فورد", category: "F-150", trimLevel: "XLT" },
-  { manufacturer: "فورد", category: "F-150", trimLevel: "Lariat" },
-  { manufacturer: "فورد", category: "F-150", trimLevel: "Platinum" },
-  { manufacturer: "فورد", category: "F-150", trimLevel: "Raptor" },
-
-  // Chevrolet
-  { manufacturer: "شيفروليه", category: "كابتيفا", trimLevel: "LS" },
-  { manufacturer: "شيفروليه", category: "كابتيفا", trimLevel: "LT" },
-  { manufacturer: "شيفروليه", category: "كابتيفا", trimLevel: "Premier" },
-  { manufacturer: "شيفروليه", category: "تاهو", trimLevel: "LS" },
-  { manufacturer: "شيفروليه", category: "تاهو", trimLevel: "LT" },
-  { manufacturer: "شيفروليه", category: "تاهو", trimLevel: "Z71" },
-  { manufacturer: "شيفروليه", category: "تاهو", trimLevel: "RST" },
-  { manufacturer: "شيفروليه", category: "تاهو", trimLevel: "Premier" },
-  { manufacturer: "شيفروليه", category: "سيلفرادو", trimLevel: "WT" },
-  { manufacturer: "شيفروليه", category: "سيلفرادو", trimLevel: "LT" },
-  { manufacturer: "شيفروليه", category: "سيلفرادو", trimLevel: "Trail Boss" },
-  { manufacturer: "شيفروليه", category: "سيلفرادو", trimLevel: "LTZ" },
-  { manufacturer: "شيفروليه", category: "سيلفرادو", trimLevel: "High Country" },
-
-  // GMC
-  { manufacturer: "جي إم سي", category: "تيرين", trimLevel: "SLE" },
-  { manufacturer: "جي إم سي", category: "تيرين", trimLevel: "SLT" },
-  { manufacturer: "جي إم سي", category: "تيرين", trimLevel: "AT4" },
-  { manufacturer: "جي إم سي", category: "تيرين", trimLevel: "Denali" },
-  { manufacturer: "جي إم سي", category: "أكاديا", trimLevel: "SLE" },
-  { manufacturer: "جي إم سي", category: "أكاديا", trimLevel: "SLT" },
-  { manufacturer: "جي إم سي", category: "أكاديا", trimLevel: "AT4" },
-  { manufacturer: "جي إم سي", category: "أكاديا", trimLevel: "Denali" },
-  { manufacturer: "جي إم سي", category: "يوكون", trimLevel: "SLE" },
-  { manufacturer: "جي إم سي", category: "يوكون", trimLevel: "SLT" },
-  { manufacturer: "جي إم سي", category: "يوكون", trimLevel: "AT4" },
-  { manufacturer: "جي إم سي", category: "يوكون", trimLevel: "Denali" },
-  { manufacturer: "جي إم سي", category: "سييرا", trimLevel: "SLE" },
-  { manufacturer: "جي إم سي", category: "سييرا", trimLevel: "Elevation" },
-  { manufacturer: "جي إم سي", category: "سييرا", trimLevel: "SLT" },
-  { manufacturer: "جي إم سي", category: "سييرا", trimLevel: "AT4" },
-  { manufacturer: "جي إم سي", category: "سييرا", trimLevel: "Denali" },
-
-  // Honda
-  { manufacturer: "هوندا", category: "سيفيك", trimLevel: "LX" },
-  { manufacturer: "هوندا", category: "سيفيك", trimLevel: "Sport" },
-  { manufacturer: "هوندا", category: "أكورد", trimLevel: "LX" },
-  { manufacturer: "هوندا", category: "أكورد", trimLevel: "EX" },
-  { manufacturer: "هوندا", category: "أكورد", trimLevel: "EX-L" },
-  { manufacturer: "هوندا", category: "HR-V", trimLevel: "LX" },
-  { manufacturer: "هوندا", category: "HR-V", trimLevel: "EX" },
-  { manufacturer: "هوندا", category: "CR-V", trimLevel: "EX" },
-  { manufacturer: "هوندا", category: "CR-V", trimLevel: "Touring" },
-
-  // Hyundai
-  { manufacturer: "هيونداي", category: "إلنترا", trimLevel: "Smart" },
-  { manufacturer: "هيونداي", category: "إلنترا", trimLevel: "Comfort" },
-  { manufacturer: "هيونداي", category: "إلنترا", trimLevel: "Premium" },
-  { manufacturer: "هيونداي", category: "سوناتا", trimLevel: "Base" },
-  { manufacturer: "هيونداي", category: "سوناتا", trimLevel: "Smart" },
-  { manufacturer: "هيونداي", category: "سوناتا", trimLevel: "Comfort" },
-  { manufacturer: "هيونداي", category: "سوناتا", trimLevel: "Premium" },
-  { manufacturer: "هيونداي", category: "توسان", trimLevel: "Smart" },
-  { manufacturer: "هيونداي", category: "توسان", trimLevel: "Comfort" },
-  { manufacturer: "هيونداي", category: "توسان", trimLevel: "Premium" },
-  { manufacturer: "هيونداي", category: "سنتافي", trimLevel: "Smart" },
-  { manufacturer: "هيونداي", category: "سنتافي", trimLevel: "Comfort" },
-  { manufacturer: "هيونداي", category: "سنتافي", trimLevel: "Premium" },
-  { manufacturer: "هيونداي", category: "سنتافي", trimLevel: "Calligraphy" },
-  { manufacturer: "هيونداي", category: "باليسيد", trimLevel: "Comfort" },
-  { manufacturer: "هيونداي", category: "باليسيد", trimLevel: "Premium" },
-  { manufacturer: "هيونداي", category: "باليسيد", trimLevel: "Calligraphy" },
-
-  // Kia
-  { manufacturer: "كيا", category: "سيراتو", trimLevel: "L" },
-  { manufacturer: "كيا", category: "سيراتو", trimLevel: "LX" },
-  { manufacturer: "كيا", category: "K5", trimLevel: "LX" },
-  { manufacturer: "كيا", category: "K5", trimLevel: "EX" },
-  { manufacturer: "كيا", category: "سبورتاج", trimLevel: "LX" },
-  { manufacturer: "كيا", category: "سبورتاج", trimLevel: "EX" },
-  { manufacturer: "كيا", category: "تيلورايد", trimLevel: "LX" },
-  { manufacturer: "كيا", category: "تيلورايد", trimLevel: "EX" },
-  { manufacturer: "كيا", category: "تيلورايد", trimLevel: "SX" },
-
-  // Genesis
-  { manufacturer: "جينيسيس", category: "G70", trimLevel: "Prestige" },
-  { manufacturer: "جينيسيس", category: "G70", trimLevel: "Platinum" },
-  { manufacturer: "جينيسيس", category: "G80", trimLevel: "Prestige" },
-  { manufacturer: "جينيسيس", category: "G80", trimLevel: "Royal" },
-  { manufacturer: "جينيسيس", category: "G90", trimLevel: "Prestige" },
-  { manufacturer: "جينيسيس", category: "G90", trimLevel: "Royal" },
-  { manufacturer: "جينيسيس", category: "GV70", trimLevel: "Prestige" },
-  { manufacturer: "جينيسيس", category: "GV70", trimLevel: "Platinum" },
-  { manufacturer: "جينيسيس", category: "GV80", trimLevel: "Prestige" },
-  { manufacturer: "جينيسيس", category: "GV80", trimLevel: "Royal" },
-
-  // Mazda
-  { manufacturer: "مازدا", category: "Mazda6", trimLevel: "Core" },
-  { manufacturer: "مازدا", category: "Mazda6", trimLevel: "High" },
-  { manufacturer: "مازدا", category: "Mazda6", trimLevel: "High Plus" },
-  { manufacturer: "مازدا", category: "CX-5", trimLevel: "Standard" },
-  { manufacturer: "مازدا", category: "CX-5", trimLevel: "High" },
-  { manufacturer: "مازدا", category: "CX-5", trimLevel: "High Plus" },
-  { manufacturer: "مازدا", category: "CX-5", trimLevel: "Ignite" },
-  { manufacturer: "مازدا", category: "CX-9", trimLevel: "Grade 1" },
-  { manufacturer: "مازدا", category: "CX-9", trimLevel: "High" },
-  { manufacturer: "مازدا", category: "CX-9", trimLevel: "Ignite" },
-
-  // Nissan
-  { manufacturer: "نيسان", category: "صني", trimLevel: "S" },
-  { manufacturer: "نيسان", category: "صني", trimLevel: "SV" },
-  { manufacturer: "نيسان", category: "صني", trimLevel: "SL" },
-  { manufacturer: "نيسان", category: "ألتيما", trimLevel: "S" },
-  { manufacturer: "نيسان", category: "ألتيما", trimLevel: "SV" },
-  { manufacturer: "نيسان", category: "ألتيما", trimLevel: "SR" },
-  { manufacturer: "نيسان", category: "ألتيما", trimLevel: "SL" },
-  { manufacturer: "نيسان", category: "إكس-تريل", trimLevel: "S" },
-  { manufacturer: "نيسان", category: "إكس-تريل", trimLevel: "SV" },
-  { manufacturer: "نيسان", category: "إكس-تريل", trimLevel: "SL" },
-  { manufacturer: "نيسان", category: "باترول", trimLevel: "XE" },
-  { manufacturer: "نيسان", category: "باترول", trimLevel: "SE" },
-  { manufacturer: "نيسان", category: "باترول", trimLevel: "LE" },
-  { manufacturer: "نيسان", category: "باترول", trimLevel: "Titanium" },
-  { manufacturer: "نيسان", category: "باترول", trimLevel: "Platinum City" },
-  { manufacturer: "نيسان", category: "باترول", trimLevel: "Nismo" },
-
-  // MG
-  { manufacturer: "إم جي", category: "MG5", trimLevel: "STD" },
-  { manufacturer: "إم جي", category: "MG5", trimLevel: "COM" },
-  { manufacturer: "إم جي", category: "MG5", trimLevel: "DEL" },
-  { manufacturer: "إم جي", category: "MG GT", trimLevel: "STD" },
-  { manufacturer: "إم جي", category: "MG GT", trimLevel: "COM" },
-  { manufacturer: "إم جي", category: "MG GT", trimLevel: "DEL" },
-  { manufacturer: "إم جي", category: "RX5", trimLevel: "STD" },
-  { manufacturer: "إم جي", category: "RX5", trimLevel: "COM" },
-  { manufacturer: "إم جي", category: "RX5", trimLevel: "LUX" },
-  { manufacturer: "إم جي", category: "HS", trimLevel: "COM" },
-  { manufacturer: "إم جي", category: "HS", trimLevel: "LUX" },
-
-  // Jeep
-  { manufacturer: "جيب", category: "رانجلر", trimLevel: "Sport" },
-  { manufacturer: "جيب", category: "رانجلر", trimLevel: "Sahara" },
-  { manufacturer: "جيب", category: "رانجلر", trimLevel: "Rubicon" },
-  { manufacturer: "جيب", category: "جراند شيروكي", trimLevel: "Laredo" },
-  { manufacturer: "جيب", category: "جراند شيروكي", trimLevel: "Altitude" },
-  { manufacturer: "جيب", category: "جراند شيروكي", trimLevel: "Limited" },
-  { manufacturer: "جيب", category: "جراند شيروكي", trimLevel: "Overland" },
-  { manufacturer: "جيب", category: "جراند شيروكي", trimLevel: "Summit Reserve" },
-  { manufacturer: "جيب", category: "جراند واجونير", trimLevel: "Series I" },
-  { manufacturer: "جيب", category: "جراند واجونير", trimLevel: "Series II" },
-  { manufacturer: "جيب", category: "جراند واجونير", trimLevel: "Series III" },
-
-  // Dodge
-  { manufacturer: "دودج", category: "تشارجر", trimLevel: "GT" },
-  { manufacturer: "دودج", category: "تشارجر", trimLevel: "R/T" },
-  { manufacturer: "دودج", category: "تشارجر", trimLevel: "Scat Pack" },
-  { manufacturer: "دودج", category: "تشارجر", trimLevel: "Hellcat" },
-  { manufacturer: "دودج", category: "دورانجو", trimLevel: "SXT" },
-  { manufacturer: "دودج", category: "دورانجو", trimLevel: "GT" },
-  { manufacturer: "دودج", category: "دورانجو", trimLevel: "R/T" },
-  { manufacturer: "دودج", category: "دورانجو", trimLevel: "Citadel" },
-
-  // Maserati
-  { manufacturer: "مازيراتي", category: "جيبلي", trimLevel: "GT" },
-  { manufacturer: "مازيراتي", category: "جيبلي", trimLevel: "Modena" },
-  { manufacturer: "مازيراتي", category: "جيبلي", trimLevel: "Trofeo" },
-  { manufacturer: "مازيراتي", category: "ليفانتي", trimLevel: "GT" },
-  { manufacturer: "مازيراتي", category: "ليفانتي", trimLevel: "Modena" },
-  { manufacturer: "مازيراتي", category: "ليفانتي", trimLevel: "Trofeo" },
-  { manufacturer: "مازيراتي", category: "جران توريزمو", trimLevel: "Modena" },
-  { manufacturer: "مازيراتي", category: "جران توريزمو", trimLevel: "Trofeo" },
-
-  // Land Rover
-  { manufacturer: "لاند روفر", category: "ديفندر", trimLevel: "S" },
-  { manufacturer: "لاند روفر", category: "ديفندر", trimLevel: "SE" },
-  { manufacturer: "لاند روفر", category: "ديفندر", trimLevel: "HSE" },
-  { manufacturer: "لاند روفر", category: "ديفندر", trimLevel: "X-Dynamic" },
-  { manufacturer: "لاند روفر", category: "ديفندر", trimLevel: "X" },
-  { manufacturer: "لاند روفر", category: "ديفندر", trimLevel: "V8" },
-  { manufacturer: "لاند روفر", category: "رنج روفر سبورت", trimLevel: "SE" },
-  { manufacturer: "لاند روفر", category: "رنج روفر سبورت", trimLevel: "Dynamic SE" },
-  { manufacturer: "لاند روفر", category: "رنج روفر سبورت", trimLevel: "Dynamic HSE" },
-  { manufacturer: "لاند روفر", category: "رنج روفر سبورت", trimLevel: "Autobiography" },
-  { manufacturer: "لاند روفر", category: "رنج روفر", trimLevel: "SE" },
-  { manufacturer: "لاند روفر", category: "رنج روفر", trimLevel: "HSE" },
-  { manufacturer: "لاند روفر", category: "رنج روفر", trimLevel: "Autobiography" },
-  { manufacturer: "لاند روفر", category: "رنج روفر", trimLevel: "SV" },
-  { manufacturer: "لاند روفر", category: "فيلار", trimLevel: "S" },
-  { manufacturer: "لاند روفر", category: "فيلار", trimLevel: "SE" },
-  { manufacturer: "لاند روفر", category: "فيلار", trimLevel: "Dynamic SE" },
-  { manufacturer: "لاند روفر", category: "فيلار", trimLevel: "Dynamic HSE" },
-
-  // Toyota
-  { manufacturer: "تويوتا", category: "يارس", trimLevel: "Y" },
-  { manufacturer: "تويوتا", category: "يارس", trimLevel: "Y Plus" },
-  { manufacturer: "تويوتا", category: "يارس", trimLevel: "YX" },
-  { manufacturer: "تويوتا", category: "كورولا", trimLevel: "XLI" },
-  { manufacturer: "تويوتا", category: "كورولا", trimLevel: "XLI Executive" },
-  { manufacturer: "تويوتا", category: "كورولا", trimLevel: "GLI" },
-  { manufacturer: "تويوتا", category: "كورولا", trimLevel: "GLI Hybrid" },
-  { manufacturer: "تويوتا", category: "كامري", trimLevel: "LE" },
-  { manufacturer: "تويوتا", category: "كامري", trimLevel: "GLE" },
-  { manufacturer: "تويوتا", category: "كامري", trimLevel: "SE" },
-  { manufacturer: "تويوتا", category: "كامري", trimLevel: "Grande" },
-  { manufacturer: "تويوتا", category: "كامري", trimLevel: "Hybrid" },
-  { manufacturer: "تويوتا", category: "راف فور", trimLevel: "LE" },
-  { manufacturer: "تويوتا", category: "راف فور", trimLevel: "XLE" },
-  { manufacturer: "تويوتا", category: "راف فور", trimLevel: "Adventure" },
-  { manufacturer: "تويوتا", category: "راف فور", trimLevel: "LTD" },
-  { manufacturer: "تويوتا", category: "راف فور", trimLevel: "Hybrid" },
-  { manufacturer: "تويوتا", category: "هايلاندر", trimLevel: "LE" },
-  { manufacturer: "تويوتا", category: "هايلاندر", trimLevel: "GLE" },
-  { manufacturer: "تويوتا", category: "هايلاندر", trimLevel: "Limited" },
-  { manufacturer: "تويوتا", category: "هايلاندر", trimLevel: "Hybrid" },
-  { manufacturer: "تويوتا", category: "لاندكروزر", trimLevel: "GXR" },
-  { manufacturer: "تويوتا", category: "لاندكروزر", trimLevel: "VX" },
-  { manufacturer: "تويوتا", category: "لاندكروزر", trimLevel: "VXR" },
-  { manufacturer: "تويوتا", category: "لاندكروزر", trimLevel: "GR-S" },
-  { manufacturer: "تويوتا", category: "هايلكس", trimLevel: "GL" },
-  { manufacturer: "تويوتا", category: "هايلكس", trimLevel: "GLX" },
-  { manufacturer: "تويوتا", category: "هايلكس", trimLevel: "S-GLX" },
-  { manufacturer: "تويوتا", category: "هايلكس", trimLevel: "GR Sport" },
-
-  // Lexus
-  { manufacturer: "لكزس", category: "IS", trimLevel: "IS300" },
-  { manufacturer: "لكزس", category: "IS", trimLevel: "IS350 F-Sport" },
-  { manufacturer: "لكزس", category: "ES", trimLevel: "ES250" },
-  { manufacturer: "لكزس", category: "ES", trimLevel: "ES350" },
-  { manufacturer: "لكزس", category: "ES", trimLevel: "ES300h" },
-  { manufacturer: "لكزس", category: "LS", trimLevel: "LS350" },
-  { manufacturer: "لكزس", category: "LS", trimLevel: "LS500h" },
-  { manufacturer: "لكزس", category: "LX", trimLevel: "LX600" },
-  { manufacturer: "لكزس", category: "LX", trimLevel: "LX600 VIP" },
-  { manufacturer: "لكزس", category: "LX", trimLevel: "LX600 F-Sport" },
-
-  // Volkswagen
-  { manufacturer: "فولكس فاجن", category: "جيتا", trimLevel: "Trendline" },
-  { manufacturer: "فولكس فاجن", category: "جيتا", trimLevel: "Comfortline" },
-  { manufacturer: "فولكس فاجن", category: "جيتا", trimLevel: "Highline" },
-  { manufacturer: "فولكس فاجن", category: "تيجوان", trimLevel: "Trendline" },
-  { manufacturer: "فولكس فاجن", category: "تيجوان", trimLevel: "Life" },
-  { manufacturer: "فولكس فاجن", category: "تيجوان", trimLevel: "Elegance" },
-  { manufacturer: "فولكس فاجن", category: "تيجوان", trimLevel: "R-Line" },
-  { manufacturer: "فولكس فاجن", category: "تيرامونت", trimLevel: "Trendline" },
-  { manufacturer: "فولكس فاجن", category: "تيرامونت", trimLevel: "Comfortline" },
-  { manufacturer: "فولكس فاجن", category: "تيرامونت", trimLevel: "Highline" },
-  { manufacturer: "فولكس فاجن", category: "تيرامونت", trimLevel: "R-Line" },
-
-  // Audi
-  { manufacturer: "أودي", category: "A6", trimLevel: "40 TFSI" },
-  { manufacturer: "أودي", category: "A6", trimLevel: "45 TFSI" },
-  { manufacturer: "أودي", category: "A8", trimLevel: "55 TFSI" },
-  { manufacturer: "أودي", category: "Q5", trimLevel: "S line" },
-  { manufacturer: "أودي", category: "Q7", trimLevel: "S line" },
-  { manufacturer: "أودي", category: "Q8", trimLevel: "S line" },
-  { manufacturer: "أودي", category: "Q8", trimLevel: "RS Q8" },
-
-  // Porsche
-  { manufacturer: "بورش", category: "911", trimLevel: "Carrera" },
-  { manufacturer: "بورش", category: "911", trimLevel: "Carrera S" },
-  { manufacturer: "بورش", category: "911", trimLevel: "Carrera GTS" },
-  { manufacturer: "بورش", category: "911", trimLevel: "Turbo" },
-  { manufacturer: "بورش", category: "911", trimLevel: "Turbo S" },
-  { manufacturer: "بورش", category: "911", trimLevel: "GT3" },
-  { manufacturer: "بورش", category: "كايين", trimLevel: "Standard" },
-  { manufacturer: "بورش", category: "كايين", trimLevel: "S" },
-  { manufacturer: "بورش", category: "كايين", trimLevel: "GTS" },
-  { manufacturer: "بورش", category: "كايين", trimLevel: "Turbo E-Hybrid" },
-  { manufacturer: "بورش", category: "كايين", trimLevel: "Coupe" },
-  { manufacturer: "بورش", category: "باناميرا", trimLevel: "Standard" },
-  { manufacturer: "بورش", category: "باناميرا", trimLevel: "4" },
-  { manufacturer: "بورش", category: "باناميرا", trimLevel: "Platinum Edition" },
-  { manufacturer: "بورش", category: "باناميرا", trimLevel: "Turbo E-Hybrid" },
-
-  // Bentley
-  { manufacturer: "بنتلي", category: "كونتيننتال جي تي", trimLevel: "Standard" },
-  { manufacturer: "بنتلي", category: "كونتيننتال جي تي", trimLevel: "S" },
-  { manufacturer: "بنتلي", category: "كونتيننتال جي تي", trimLevel: "Azure" },
-  { manufacturer: "بنتلي", category: "كونتيننتال جي تي", trimLevel: "Mulliner" },
-  { manufacturer: "بنتلي", category: "فلاينج سبير", trimLevel: "Standard" },
-  { manufacturer: "بنتلي", category: "فلاينج سبير", trimLevel: "S" },
-  { manufacturer: "بنتلي", category: "فلاينج سبير", trimLevel: "Azure" },
-  { manufacturer: "بنتلي", category: "فلاينج سبير", trimLevel: "Mulliner" },
-  { manufacturer: "بنتلي", category: "بينتايجا", trimLevel: "Standard" },
-  { manufacturer: "بنتلي", category: "بينتايجا", trimLevel: "S" },
-  { manufacturer: "بنتلي", category: "بينتايجا", trimLevel: "Azure" },
-  { manufacturer: "بنتلي", category: "بينتايجا", trimLevel: "EWB" },
-
-  // Lamborghini
-  { manufacturer: "لامبورجيني", category: "ريفويلتو", trimLevel: "Standard" },
-  { manufacturer: "لامبورجيني", category: "هوراكان", trimLevel: "EVO" },
-  { manufacturer: "لامبورجيني", category: "هوراكان", trimLevel: "STO" },
-  { manufacturer: "لامبورجيني", category: "هوراكان", trimLevel: "Tecnica" },
-  { manufacturer: "لامبورجيني", category: "أوروس", trimLevel: "S" },
-  { manufacturer: "لامبورجيني", category: "أوروس", trimLevel: "Performante" },
-
-  // Changan
-  { manufacturer: "شانجان", category: "UNI-V", trimLevel: "Standard" },
-  { manufacturer: "شانجان", category: "UNI-K", trimLevel: "Standard" },
-  { manufacturer: "شانجان", category: "CS95", trimLevel: "Classic" },
-  { manufacturer: "شانجان", category: "CS95", trimLevel: "Platinum" },
-  { manufacturer: "شانجان", category: "CS95", trimLevel: "Royal" },
-
-  // Haval
-  { manufacturer: "هافال", category: "جوليان", trimLevel: "Basic" },
-  { manufacturer: "هافال", category: "جوليان", trimLevel: "Active" },
-  { manufacturer: "هافال", category: "جوليان", trimLevel: "Premium" },
-  { manufacturer: "هافال", category: "H6", trimLevel: "Basic" },
-  { manufacturer: "هافال", category: "H6", trimLevel: "Active" },
-  { manufacturer: "هافال", category: "H6", trimLevel: "Premium" },
-  { manufacturer: "هافال", category: "H6", trimLevel: "GT" },
-  { manufacturer: "هافال", category: "دارجو", trimLevel: "Sport" },
-  { manufacturer: "هافال", category: "دارجو", trimLevel: "Adventure" },
+// Comprehensive luxury vehicle inventory data
+const luxuryVehicles = [
+  // Range Rover vehicles (8 vehicles)
+  {
+    manufacturer: "رنج روفر",
+    category: "Range Rover Vogue",
+    trimLevel: "HSE",
+    engineCapacity: "V8 5.0L",
+    year: 2024,
+    exteriorColor: "أبيض لؤلؤي",
+    interiorColor: "جلد بني",
+    chassisNumber: "RR2024001",
+    status: "متوفر",
+    importType: "الشركة",
+    location: "الرياض",
+    price: 485000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-01-15'),
+    notes: "مواصفات فاخرة كاملة مع بانوراما وشاشات خلفية"
+  },
+  {
+    manufacturer: "رنج روفر",
+    category: "Range Rover Sport",
+    trimLevel: "Dynamic",
+    engineCapacity: "V6 3.0L Hybrid",
+    year: 2024,
+    exteriorColor: "أسود معدني",
+    interiorColor: "جلد أحمر",
+    chassisNumber: "RR2024002",
+    status: "في الطريق",
+    importType: "الشركة",
+    location: "جدة",
+    price: 395000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-02-10'),
+    notes: "هايبرد بمواصفات رياضية"
+  },
+  {
+    manufacturer: "رنج روفر",
+    category: "Range Rover Evoque",
+    trimLevel: "R-Dynamic",
+    engineCapacity: "4-Cylinder 2.0L",
+    year: 2023,
+    exteriorColor: "رمادي داكن",
+    interiorColor: "جلد أسود",
+    chassisNumber: "RR2023003",
+    status: "متوفر",
+    importType: "شخصي",
+    location: "الدمام",
+    price: 225000,
+    ownershipType: "معرض (وسيط)",
+    arrivalDate: new Date('2023-11-20'),
+    notes: "كومباكت SUV بتصميم عصري"
+  },
+  {
+    manufacturer: "رنج روفر",
+    category: "Range Rover Electric",
+    trimLevel: "First Edition",
+    engineCapacity: "Electric 523HP",
+    year: 2024,
+    exteriorColor: "أزرق كهربائي",
+    interiorColor: "جلد بيج",
+    chassisNumber: "RR2024004",
+    status: "محجوز",
+    importType: "الشركة",
+    location: "الرياض",
+    price: 650000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-01-30'),
+    reservationDate: new Date('2024-01-31'),
+    reservedBy: "أحمد محمد العلي",
+    reservationNotes: "العميل يريد التسليم خلال أسبوع",
+    notes: "أول إصدار كهربائي من رنج روفر"
+  },
+  
+  // Mercedes vehicles (15 vehicles)
+  {
+    manufacturer: "مرسيدس",
+    category: "S-Class",
+    trimLevel: "S580",
+    engineCapacity: "V8 4.0L Biturbo",
+    year: 2024,
+    exteriorColor: "أبيض ماسي",
+    interiorColor: "جلد أسود/بني",
+    chassisNumber: "MB2024001",
+    status: "متوفر",
+    importType: "الشركة",
+    location: "الرياض",
+    price: 795000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-01-05'),
+    notes: "الفئة الفاخرة مع مقاعد مدلكة وشاشات خلفية"
+  },
+  {
+    manufacturer: "مرسيدس",
+    category: "S-Class",
+    trimLevel: "S680 Maybach",
+    engineCapacity: "V12 6.0L",
+    year: 2024,
+    exteriorColor: "أسود أوبسيديان",
+    interiorColor: "جلد كريمي",
+    chassisNumber: "MB2024002",
+    status: "مباع",
+    importType: "الشركة",
+    location: "جدة",
+    price: 1250000,
+    salePrice: 1250000,
+    buyer: "الأمير عبدالله بن سعد",
+    saleDate: new Date('2024-01-20'),
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2023-12-15'),
+    notes: "مايباخ بأعلى المواصفات الفاخرة"
+  },
+  {
+    manufacturer: "مرسيدس",
+    category: "E-Class",
+    trimLevel: "E300",
+    engineCapacity: "4-Cylinder 2.0L Turbo",
+    year: 2024,
+    exteriorColor: "فضي معدني",
+    interiorColor: "جلد أسود",
+    chassisNumber: "MB2024003",
+    status: "متوفر",
+    importType: "شخصي",
+    location: "الرياض",
+    price: 285000,
+    ownershipType: "معرض (وسيط)",
+    arrivalDate: new Date('2024-02-01'),
+    notes: "الفئة الوسطى التنفيذية"
+  },
+  {
+    manufacturer: "مرسيدس",
+    category: "C-Class",
+    trimLevel: "C300",
+    engineCapacity: "4-Cylinder 2.0L Turbo",
+    year: 2023,
+    exteriorColor: "أزرق معدني",
+    interiorColor: "جلد بيج",
+    chassisNumber: "MB2023004",
+    status: "قيد الصيانة",
+    importType: "شخصي مستعمل",
+    location: "الدمام",
+    price: 195000,
+    ownershipType: "معرض (وسيط)",
+    arrivalDate: new Date('2023-10-15'),
+    notes: "صيانة دورية وتبديل إطارات"
+  },
+  {
+    manufacturer: "مرسيدس",
+    category: "GLS",
+    trimLevel: "GLS580",
+    engineCapacity: "V8 4.0L Biturbo",
+    year: 2024,
+    exteriorColor: "رمادي جرافيت",
+    interiorColor: "جلد أحمر",
+    chassisNumber: "MB2024005",
+    status: "في الطريق",
+    importType: "الشركة",
+    location: "جدة",
+    price: 685000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-02-25'),
+    notes: "SUV فاخر كبير الحجم بسبعة مقاعد"
+  },
+  {
+    manufacturer: "مرسيدس",
+    category: "EQS580",
+    trimLevel: "AMG Line",
+    engineCapacity: "Electric 516HP",
+    year: 2024,
+    exteriorColor: "أبيض لؤلؤي",
+    interiorColor: "جلد أسود",
+    chassisNumber: "MB2024006",
+    status: "متوفر",
+    importType: "الشركة",
+    location: "الرياض",
+    price: 565000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-01-10'),
+    notes: "سيدان كهربائية فاخرة بشاشة MBUX Hyperscreen"
+  },
+  
+  // Lexus vehicles (12 vehicles)
+  {
+    manufacturer: "لكزس",
+    category: "LX 600",
+    trimLevel: "Ultra Luxury",
+    engineCapacity: "V6 3.5L Twin-Turbo",
+    year: 2024,
+    exteriorColor: "أبيض لؤلؤي",
+    interiorColor: "جلد بني",
+    chassisNumber: "LX2024001",
+    status: "متوفر",
+    importType: "الشركة",
+    location: "الرياض",
+    price: 485000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-01-08'),
+    notes: "SUV فاخر بأعلى المواصفات اليابانية"
+  },
+  {
+    manufacturer: "لكزس",
+    category: "ES 350",
+    trimLevel: "F Sport",
+    engineCapacity: "V6 3.5L",
+    year: 2024,
+    exteriorColor: "أحمر ياقوتي",
+    interiorColor: "جلد أسود",
+    chassisNumber: "LX2024002",
+    status: "محجوز",
+    importType: "شخصي",
+    location: "جدة",
+    price: 215000,
+    ownershipType: "معرض (وسيط)",
+    arrivalDate: new Date('2024-01-25'),
+    reservationDate: new Date('2024-02-01'),
+    reservedBy: "سارة أحمد الفيصل",
+    reservationNotes: "العميلة تفضل التسليم في جدة",
+    notes: "سيدان متوسطة فاخرة"
+  },
+  {
+    manufacturer: "لكزس",
+    category: "LFA",
+    trimLevel: "Nürburgring Edition",
+    engineCapacity: "V10 4.8L",
+    year: 2012,
+    exteriorColor: "أصفر",
+    interiorColor: "ألكانتارا أسود",
+    chassisNumber: "LX2012003",
+    status: "مباع",
+    importType: "شخصي مستعمل",
+    location: "الرياض",
+    price: 2250000,
+    salePrice: 2250000,
+    buyer: "خالد بن عبدالعزيز",
+    saleDate: new Date('2024-01-15'),
+    ownershipType: "معرض (وسيط)",
+    arrivalDate: new Date('2023-11-30'),
+    notes: "سيارة رياضية نادرة ومحدودة الإنتاج"
+  },
+  
+  // Genesis vehicles (8 vehicles)
+  {
+    manufacturer: "جينيسيس",
+    category: "G90",
+    trimLevel: "3.3T AWD",
+    engineCapacity: "V6 3.3L Twin-Turbo",
+    year: 2024,
+    exteriorColor: "أبيض",
+    interiorColor: "جلد بني",
+    chassisNumber: "GN2024001",
+    status: "متوفر",
+    importType: "الشركة",
+    location: "الرياض",
+    price: 285000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-01-20'),
+    notes: "السيدان الفاخرة الكورية"
+  },
+  {
+    manufacturer: "جينيسيس",
+    category: "Electrified GV70",
+    trimLevel: "Sport Prestige",
+    engineCapacity: "Electric 429HP",
+    year: 2024,
+    exteriorColor: "رمادي داكن",
+    interiorColor: "جلد أحمر",
+    chassisNumber: "GN2024002",
+    status: "في الطريق",
+    importType: "الشركة",
+    location: "الدمام",
+    price: 325000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-02-15'),
+    notes: "SUV كهربائي فاخر"
+  },
+  
+  // Nissan vehicles (7 vehicles)
+  {
+    manufacturer: "نيسان",
+    category: "Patrol Platinum",
+    trimLevel: "LE",
+    engineCapacity: "V8 5.6L",
+    year: 2024,
+    exteriorColor: "أبيض",
+    interiorColor: "جلد بيج",
+    chassisNumber: "NS2024001",
+    status: "متوفر",
+    importType: "الشركة",
+    location: "الرياض",
+    price: 385000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-01-12'),
+    notes: "SUV صحراوي فاخر"
+  },
+  {
+    manufacturer: "نيسان",
+    category: "Altima",
+    trimLevel: "SL",
+    engineCapacity: "4-Cylinder 2.5L",
+    year: 2023,
+    exteriorColor: "فضي",
+    interiorColor: "قماش أسود",
+    chassisNumber: "NS2023002",
+    status: "متوفر",
+    importType: "شخصي مستعمل",
+    location: "جدة",
+    price: 85000,
+    ownershipType: "معرض (وسيط)",
+    arrivalDate: new Date('2023-12-10'),
+    notes: "سيدان اقتصادية مستعملة"
+  },
+  
+  // Bentley vehicles (7 vehicles)
+  {
+    manufacturer: "بنتلي",
+    category: "Continental GT",
+    trimLevel: "Speed",
+    engineCapacity: "W12 6.0L",
+    year: 2024,
+    exteriorColor: "أزرق داكن",
+    interiorColor: "جلد كريمي",
+    chassisNumber: "BT2024001",
+    status: "متوفر",
+    importType: "الشركة",
+    location: "الرياض",
+    price: 1150000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-01-03'),
+    notes: "كوبيه رياضية فاخرة بريطانية"
+  },
+  {
+    manufacturer: "بنتلي",
+    category: "Bentayga",
+    trimLevel: "V8",
+    engineCapacity: "V8 4.0L Twin-Turbo",
+    year: 2024,
+    exteriorColor: "أخضر بريطاني",
+    interiorColor: "جلد تان",
+    chassisNumber: "BT2024002",
+    status: "في الطريق",
+    importType: "الشركة",
+    location: "جدة",
+    price: 985000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-02-20'),
+    notes: "SUV فاخر بريطاني بأعلى مستويات الحرفية"
+  }
 ];
 
-export async function seedComprehensiveTrimLevels() {
-  console.log("Seeding comprehensive trim levels...");
-  
+// Manufacturers data
+const manufacturers = [
+  { name: "مرسيدس", logo: "/mercedes-logo.svg" },
+  { name: "رنج روفر", logo: "/range-rover-logo.svg" },
+  { name: "لكزس", logo: "/lexus-logo.svg" },
+  { name: "جينيسيس", logo: "/genesis-logo.svg" },
+  { name: "نيسان", logo: "/nissan-logo.svg" },
+  { name: "بنتلي", logo: "/bentley-logo.svg" },
+  { name: "بي ام دبليو", logo: "/bmw-logo.svg" },
+  { name: "تويوتا", logo: "/toyota-logo.svg" },
+  { name: "لينكون", logo: "/lincoln-logo.svg" },
+  { name: "كاديلاك", logo: "/cadillac-logo.svg" },
+  { name: "بورش", logo: "/porsche-logo.svg" },
+  { name: "رولز رويز", logo: "/rolls-royce-logo.svg" },
+  { name: "تسلا", logo: "/tesla-logo.svg" },
+  { name: "لوسيد", logo: "/lucid-logo.svg" },
+  { name: "فيراري", logo: "/ferrari-logo.svg" }
+];
+
+// Companies data
+const companies = [
+  {
+    name: "شركة البريمي للسيارات",
+    address: "الرياض، حي الملقا، طريق الملك فهد",
+    phone: "+966112345678",
+    email: "info@albarimi-motors.com",
+    registrationNumber: "1010123456",
+    taxNumber: "300234567890003",
+    licenseNumber: "LIC-2024-001",
+    website: "www.albarimi-motors.com",
+    logo: "/albarimi-logo.png",
+    stamp: "/albarimi-stamp.png",
+    primaryColor: "#00627F",
+    secondaryColor: "#C49632",
+    accentColor: "#8B4513"
+  }
+];
+
+// Default users
+const users = [
+  {
+    username: "admin",
+    password: "$2b$10$K4N/V9Pf7LoMGQYU2c2gzOE5j3nYZ8wFY2P.QVH8X9zL1mM3nN5eG", // admin123
+    role: "admin"
+  },
+  {
+    username: "seller", 
+    password: "$2b$10$K4N/V9Pf7LoMGQYU2c2gzOE5j3nYZ8wFY2P.QVH8X9zL1mM3nN5eG", // seller123
+    role: "seller"
+  },
+  {
+    username: "abdullah",
+    password: "$2b$10$K4N/V9Pf7LoMGQYU2c2gzOE5j3nYZ8wFY2P.QVH8X9zL1mM3nN5eG", // admin123
+    role: "admin"
+  }
+];
+
+async function seedDatabase() {
   try {
-    // Clear existing trim levels
-    await db.delete(trimLevels);
+    console.log("Starting comprehensive database seeding...");
+
+    // Add users
+    for (const user of users) {
+      try {
+        await storage.createUser(user);
+        console.log(`Created user: ${user.username}`);
+      } catch (error) {
+        console.log(`User ${user.username} already exists`);
+      }
+    }
+
+    // Add manufacturers
+    for (const manufacturer of manufacturers) {
+      try {
+        await storage.createManufacturer(manufacturer);
+        console.log(`Created manufacturer: ${manufacturer.name}`);
+      } catch (error) {
+        console.log(`Manufacturer ${manufacturer.name} already exists`);
+      }
+    }
+
+    // Add companies
+    for (const company of companies) {
+      try {
+        await storage.createCompany(company);
+        console.log(`Created company: ${company.name}`);
+      } catch (error) {
+        console.log(`Company ${company.name} already exists`);
+      }
+    }
+
+    // Add luxury vehicles
+    for (const vehicle of luxuryVehicles) {
+      try {
+        await storage.createInventoryItem(vehicle);
+        console.log(`Created vehicle: ${vehicle.manufacturer} ${vehicle.category} - ${vehicle.chassisNumber}`);
+      } catch (error) {
+        console.log(`Vehicle ${vehicle.chassisNumber} already exists`);
+      }
+    }
+
+    console.log("Database seeding completed successfully!");
+    console.log(`Total vehicles added: ${luxuryVehicles.length}`);
+    console.log(`Total manufacturers: ${manufacturers.length}`);
+    console.log(`Total users: ${users.length}`);
     
-    // Insert new trim levels
-    await db.insert(trimLevels).values(trimLevelsData);
-    
-    console.log(`Successfully seeded ${trimLevelsData.length} trim levels.`);
   } catch (error) {
-    console.error("Error seeding trim levels:", error);
+    console.error("Error during seeding:", error);
   }
 }
 
-// Run the seeding if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  seedComprehensiveTrimLevels().then(() => {
-    console.log("Comprehensive trim levels seeding completed.");
-    process.exit(0);
-  }).catch((error) => {
-    console.error("Error during seeding:", error);
-    process.exit(1);
-  });
-}
+// Auto-run seeding when imported
+seedDatabase();
+
+export { seedDatabase };

@@ -2770,7 +2770,5 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-// Use MemStorage for development/testing when DATABASE_URL is not available
-export const storage = process.env.DATABASE_URL?.startsWith('postgresql://') && !process.env.DATABASE_URL.includes('localhost') 
-  ? new DatabaseStorage() 
-  : new MemStorage();
+// Use MemStorage for development compatibility without database setup requirements
+export const storage = new MemStorage();
