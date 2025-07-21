@@ -85,6 +85,11 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
       notes: "",
       price: "",
       isSold: false,
+      detailedSpecifications: "",
+      soldDate: null,
+      reservationDate: null,
+      reservedBy: "",
+      reservationNote: "",
     },
   });
 
@@ -120,6 +125,11 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
         notes: editItem.notes || "",
         price: editItem.price || "",
         isSold: editItem.isSold || false,
+        detailedSpecifications: (editItem as any).detailedSpecifications || "",
+        soldDate: (editItem as any).soldDate || null,
+        reservationDate: (editItem as any).reservationDate || null,
+        reservedBy: (editItem as any).reservedBy || "",
+        reservationNote: (editItem as any).reservationNote || "",
       };
       
       form.reset(formData);
@@ -439,7 +449,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                     <FormControl>
                       <EditableSelect
                         options={editableOwnershipTypes}
-                        value={field.value}
+                        value={field.value || ""}
                         onValueChange={field.onChange}
                         onAddOption={(newType) => {
                           setEditableOwnershipTypes([...editableOwnershipTypes, newType]);
@@ -532,23 +542,63 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 )}
               />
 
-              {/* Ownership Type */}
+              {/* Is Sold Status */}
               <FormField
                 control={form.control}
-                name="ownershipType"
+                name="isSold"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>نوع الملكية</FormLabel>
+                    <FormLabel>حالة البيع</FormLabel>
                     <FormControl>
-                      <EditableSelect
-                        options={editableOwnershipTypes}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        onAddOption={(newType) => {
-                          setEditableOwnershipTypes([...editableOwnershipTypes, newType]);
-                        }}
-                        placeholder="اختر نوع الملكية"
-                        className="w-full"
+                      <Select onValueChange={(value) => field.onChange(value === "true")} 
+                              value={field.value ? "true" : "false"}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر حالة البيع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="false">متوفر</SelectItem>
+                          <SelectItem value="true">مباع</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Sold Date - Only show if sold */}
+              {form.watch("isSold") && (
+                <FormField
+                  control={form.control}
+                  name="soldDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>تاريخ البيع</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="date"
+                          value={field.value ? new Date(field.value).toISOString().split('T')[0] : ""}
+                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {/* Reservation Date */}
+              <FormField
+                control={form.control}
+                name="reservationDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>تاريخ الحجز</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="date"
+                        value={field.value ? new Date(field.value).toISOString().split('T')[0] : ""}
+                        onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -556,17 +606,75 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 )}
               />
 
+              {/* Reserved By */}
+              <FormField
+                control={form.control}
+                name="reservedBy"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>محجوز بواسطة</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="اسم العميل الذي حجز السيارة"
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
+              {/* Reservation Note */}
+              <FormField
+                control={form.control}
+                name="reservationNote"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>ملاحظة الحجز</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="تفاصيل الحجز والملاحظات الخاصة بالعميل..."
+                        className="min-h-[80px]"
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
+              {/* Detailed Specifications */}
+              <FormField
+                control={form.control}
+                name="detailedSpecifications"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>المواصفات التفصيلية</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="المواصفات التفصيلية الخاصة بهذه السيارة (المحرك، الأداء، المميزات، إلخ)..."
+                        className="min-h-[120px]"
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* General Notes */}
               <FormField
                 control={form.control}
                 name="notes"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
-                    <FormLabel>الملاحظات</FormLabel>
+                    <FormLabel>الملاحظات العامة</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="أدخل الملاحظات هنا..."
+                        placeholder="أدخل الملاحظات العامة هنا..."
                         className="min-h-[100px]"
                         value={field.value || ""}
                         onChange={field.onChange}

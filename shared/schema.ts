@@ -314,6 +314,11 @@ export const insertInventoryItemSchema = createInsertSchema(inventoryItems).omit
   chassisNumber: z.string().min(1, "رقم الهيكل مطلوب"),
   exteriorColor: z.string().min(1, "اللون الخارجي مطلوب"),
   importType: z.string().min(1, "نوع الاستيراد مطلوب"),
+  detailedSpecifications: z.string().optional(),
+  soldDate: z.date().nullable().optional(),
+  reservationDate: z.date().nullable().optional(),
+  reservedBy: z.string().optional(),
+  reservationNote: z.string().optional(),
 });
 
 export const insertManufacturerSchema = createInsertSchema(manufacturers).omit({
