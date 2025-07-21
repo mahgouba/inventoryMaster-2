@@ -521,6 +521,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     <Button
                       onClick={handleSaveSpecification}
                       disabled={isUpdating}
+                      className="text-[#c49633]"
                     >
                       <Save className="h-4 w-4 ml-1" />
                       {isUpdating ? "جاري الحفظ..." : "حفظ"}
