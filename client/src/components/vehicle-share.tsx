@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,36 @@ interface VehicleShareProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
+// Utility function to copy text to clipboard with fallback
+const copyToClipboard = async (text: string): Promise<void> => {
+  try {
+    // First try the modern clipboard API
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    
+    // Fallback method using deprecated execCommand
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+    } finally {
+      document.body.removeChild(textArea);
+    }
+  } catch (error) {
+    console.error('Failed to copy text to clipboard:', error);
+    throw error;
+  }
+};
 
 export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleShareProps) {
   const { toast } = useToast();
@@ -149,7 +179,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     return shareText;
   };
 
-  const handleCopyImageLinks = () => {
+  const handleCopyImageLinks = async () => {
     if (!vehicle.images || vehicle.images.length === 0) {
       toast({
         title: "لا توجد صور",
@@ -160,37 +190,48 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     }
 
     const imageLinks = vehicle.images.join('\n');
-    navigator.clipboard.writeText(imageLinks).then(() => {
-      toast({
-        title: "تم نسخ روابط الصور",
-        description: `تم نسخ ${vehicle.images.length} رابط صورة إلى الحافظة`,
-      });
+    await copyToClipboard(imageLinks);
+    toast({
+      title: "تم نسخ روابط الصور",
+      description: `تم نسخ ${vehicle.images.length} رابط صورة إلى الحافظة`,
     });
   };
 
-  const handleCopyText = () => {
+  const handleCopyText = async () => {
     const shareText = generateShareText();
-    navigator.clipboard.writeText(shareText).then(() => {
+    try {
+      await copyToClipboard(shareText);
       toast({
         title: "تم النسخ بنجاح",
         description: "تم نسخ بيانات السيارة إلى الحافظة",
       });
-    });
+    } catch (error) {
+      toast({
+        title: "خطأ في النسخ",
+        description: "لم تتمكن من نسخ النص إلى الحافظة",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     const shareText = generateShareText();
     
     if (navigator.share) {
-      navigator.share({
-        title: `${vehicle.manufacturer} ${vehicle.category}`,
-        text: shareText,
-      }).catch((error) => {
-        console.error("Error sharing:", error);
-        handleCopyText();
-      });
+      try {
+        await navigator.share({
+          title: `${vehicle.manufacturer} ${vehicle.category}`,
+          text: shareText,
+        });
+      } catch (error) {
+        // If share is cancelled or fails, fall back to copy
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.error("Error sharing:", error);
+          await handleCopyText();
+        }
+      }
     } else {
-      handleCopyText();
+      await handleCopyText();
     }
   };
 
@@ -202,6 +243,9 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
             <Share2 className="h-5 w-5" />
             مشاركة السيارة
           </DialogTitle>
+          <DialogDescription>
+            اختر البيانات التي تريد مشاركتها وقم بنسخها أو مشاركتها مباشرة
+          </DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="h-[75vh]">
