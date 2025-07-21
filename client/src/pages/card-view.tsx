@@ -12,6 +12,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { getStatusColor } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
 import QuickQuoteGenerator from "@/components/quick-quote-generator";
+import { ManufacturerLogo } from "@/components/manufacturer-logo";
 
 
 interface CardViewPageProps {
@@ -251,17 +252,11 @@ export default function CardViewPage({ userRole }: CardViewPageProps) {
                         <div className="flex items-center space-x-6 space-x-reverse">
                           {/* Manufacturer Logo */}
                           <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center border-2 border-slate-200 shadow-sm">
-                            {logo ? (
-                              <img 
-                                src={logo} 
-                                alt={manufacturer}
-                                className="w-16 h-16 object-contain rounded-full"
-                              />
-                            ) : (
-                              <span className="text-2xl font-bold text-slate-600">
-                                {manufacturer.charAt(0)}
-                              </span>
-                            )}
+                            <ManufacturerLogo 
+                              manufacturerName={manufacturer} 
+                              size="lg" 
+                              className="w-16 h-16" 
+                            />
                           </div>
                           
                           {/* Manufacturer Name and Count */}

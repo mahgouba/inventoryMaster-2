@@ -48,6 +48,7 @@ import InventoryFormSimple from "@/components/inventory-form-simple";
 import VehicleShare from "@/components/vehicle-share";
 import SpecificationsManagement from "@/components/specifications-management";
 import QuotationManagement from "@/components/quotation-management";
+import { ManufacturerLogo } from "@/components/manufacturer-logo";
 
 import type { InventoryItem } from "@shared/schema";
 
@@ -1072,17 +1073,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                       {/* Manufacturer Logo with Interactive Hover Effect */}
                       <div className="relative group">
                         <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center border-2 border-slate-200 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:border-custom-primary group-hover:bg-gradient-to-br group-hover:from-blue-50 group-hover:to-blue-50">
-                          {logo ? (
-                            <img 
-                              src={logo} 
-                              alt={manufacturer}
-                              className="w-12 h-12 object-contain transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-md"
-                            />
-                          ) : (
-                            <span className="text-xl font-bold text-slate-600 transition-all duration-300 group-hover:text-custom-primary-dark group-hover:scale-110">
-                              {manufacturer.charAt(0)}
-                            </span>
-                          )}
+                          <ManufacturerLogo 
+                            manufacturerName={manufacturer} 
+                            size="lg" 
+                            className="w-12 h-12 transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-md" 
+                          />
                         </div>
                         
                         {/* Hover Ring Effect */}

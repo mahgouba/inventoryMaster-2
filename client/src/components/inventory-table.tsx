@@ -10,6 +10,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { getStatusColor } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
 import InventoryForm from "./inventory-form";
+import { ManufacturerLogo } from "./manufacturer-logo";
 
 
 interface InventoryTableProps {
@@ -328,7 +329,12 @@ export default function InventoryTable({
             ) : (
               filteredAndSortedItems.map((item: InventoryItem) => (
                 <TableRow key={item.id} className={`hover:bg-slate-50 ${item.isSold ? 'bg-red-50 border-l-4 border-red-500' : ''}`}>
-                  <TableCell className="text-sm text-slate-800">{item.manufacturer}</TableCell>
+                  <TableCell className="text-sm text-slate-800">
+                    <div className="flex items-center gap-2">
+                      <ManufacturerLogo manufacturerName={item.manufacturer} size="sm" />
+                      <span>{item.manufacturer}</span>
+                    </div>
+                  </TableCell>
 
                   <TableCell className="text-sm text-slate-800">{item.category}</TableCell>
                   <TableCell className="text-sm text-slate-800">{item.trimLevel || '-'}</TableCell>
