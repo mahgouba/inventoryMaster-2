@@ -216,6 +216,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                   onCheckedChange={(checked) => {
                     setIncludeFields(prev => Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: !!checked }), {} as typeof prev));
                   }}
+                  className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                 />
                 اختيار البيانات للمشاركة
               </CardTitle>
@@ -229,6 +230,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     onCheckedChange={(checked) => {
                       setIncludeFields(prev => ({ ...prev, manufacturer: !!checked, category: !!checked }));
                     }}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
                   <Label htmlFor="manufacturer" className="text-sm">الصانع والفئة</Label>
                   <span className="text-xs text-gray-500">({vehicle.manufacturer} {vehicle.category})</span>
@@ -239,6 +241,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="trimLevel"
                     checked={includeFields.trimLevel}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, trimLevel: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
                   <Label htmlFor="trimLevel" className="text-sm">درجة التجهيز</Label>
                   <span className="text-xs text-gray-500">({vehicle.trimLevel || "غير محدد"})</span>
@@ -249,6 +252,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="year"
                     checked={includeFields.year}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, year: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
                   <Label htmlFor="year" className="text-sm">السنة</Label>
                   <span className="text-xs text-gray-500">({vehicle.year})</span>
@@ -259,6 +263,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="engineCapacity"
                     checked={includeFields.engineCapacity}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, engineCapacity: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
                   <Label htmlFor="engineCapacity" className="text-sm">سعة المحرك</Label>
                   <span className="text-xs text-gray-500">({vehicle.engineCapacity})</span>
@@ -269,6 +274,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="exteriorColor"
                     checked={includeFields.exteriorColor}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, exteriorColor: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
                   <Label htmlFor="exteriorColor" className="text-sm">اللون الخارجي</Label>
                   <span className="text-xs text-gray-500">({vehicle.exteriorColor})</span>
@@ -279,6 +285,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="interiorColor"
                     checked={includeFields.interiorColor}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, interiorColor: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
                   <Label htmlFor="interiorColor" className="text-sm">اللون الداخلي</Label>
                   <span className="text-xs text-gray-500">({vehicle.interiorColor})</span>
@@ -289,6 +296,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="specifications"
                     checked={includeFields.specifications}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, specifications: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
                   <Label htmlFor="specifications" className="text-sm">المواصفات التفصيلية</Label>
                   <span className="text-xs text-gray-500">
@@ -302,6 +310,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                       id="images"
                       checked={includeFields.images}
                       onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, images: !!checked }))}
+                      className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                     />
                     <Label htmlFor="images" className="text-sm">الصور</Label>
                     <span className="text-xs text-gray-500">({vehicle.images.length} صورة)</span>
@@ -319,6 +328,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                   <Checkbox 
                     checked={includeFields.price}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, price: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
                   <Calculator className="h-5 w-5" />
                   تفاصيل السعر
