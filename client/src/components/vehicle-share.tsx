@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -59,6 +59,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
   const [sharePrice, setSharePrice] = useState(vehicle.price || "");
   const [isEditingPrice, setIsEditingPrice] = useState(false);
   const [taxRate, setTaxRate] = useState("15"); // Default VAT rate 15%
+  const [linkedImageUrl, setLinkedImageUrl] = useState<string>("");
   
   // Checkbox states for what to include in sharing
   const [includeFields, setIncludeFields] = useState({
@@ -72,8 +73,43 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     status: false, // Hide status by default
     price: true,
     specifications: true,
-    images: true
+    images: true,
+    linkedImage: true // Include linked image from image management system
   });
+
+  // Fetch linked image for this vehicle
+  const fetchLinkedImage = async () => {
+    try {
+      const response = await fetch('/api/image-links');
+      if (response.ok) {
+        const imageLinks = await response.json();
+        
+        // Find matching image link based on vehicle specifications
+        const matchingImage = imageLinks.find((link: any) => 
+          link.manufacturer === vehicle.manufacturer &&
+          link.category === vehicle.category &&
+          (link.trimLevel === vehicle.trimLevel || !link.trimLevel) &&
+          link.year === vehicle.year &&
+          (link.exteriorColor === vehicle.exteriorColor || !link.exteriorColor) &&
+          (link.interiorColor === vehicle.interiorColor || !link.interiorColor) &&
+          (link.engineCapacity === vehicle.engineCapacity || !link.engineCapacity)
+        );
+        
+        if (matchingImage) {
+          setLinkedImageUrl(matchingImage.imageUrl);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching linked image:', error);
+    }
+  };
+
+  // Fetch linked image when dialog opens
+  React.useEffect(() => {
+    if (open) {
+      fetchLinkedImage();
+    }
+  }, [open, vehicle]);
 
   // Calculate tax breakdown
   const calculatePriceBreakdown = () => {
@@ -166,9 +202,18 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
       }
     }
 
+    // Add linked image URL if available and selected
+    if (includeFields.linkedImage && linkedImageUrl) {
+      shareText += `\n🖼️ رابط الصورة: ${linkedImageUrl}`;
+    }
+
     // Add images info if available and selected
     if (includeFields.images && vehicle.images && vehicle.images.length > 0) {
       shareText += `\n📸 الصور المرفقة: ${vehicle.images.length} صورة`;
+      // Include image URLs
+      vehicle.images.forEach((imageUrl, index) => {
+        shareText += `\n   📷 صورة ${index + 1}: ${imageUrl}`;
+      });
     }
 
     // Add specifications if available and selected
@@ -348,6 +393,23 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                   </span>
                 </div>
                 
+                {/* Linked Image from Image Management */}
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Checkbox 
+                    id="linkedImage"
+                    checked={includeFields.linkedImage}
+                    onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, linkedImage: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                  />
+                  <Label htmlFor="linkedImage" className="text-sm">رابط الصورة المرتبط</Label>
+                  <span className="text-xs text-gray-500">
+                    ({linkedImageUrl ? "متوفر" : "غير متوفر"})
+                  </span>
+                  {linkedImageUrl && (
+                    <Link size={12} className="text-blue-500" />
+                  )}
+                </div>
+
                 {vehicle.images && vehicle.images.length > 0 && (
                   <div className="flex items-center space-x-2 space-x-reverse">
                     <Checkbox 
@@ -356,7 +418,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                       onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, images: !!checked }))}
                       className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                     />
-                    <Label htmlFor="images" className="text-sm">الصور</Label>
+                    <Label htmlFor="images" className="text-sm">الصور المرفقة</Label>
                     <span className="text-xs text-gray-500">({vehicle.images.length} صورة)</span>
                   </div>
                 )}
@@ -572,49 +634,78 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
               </Button>
             </div>
             
-            {/* Image sharing buttons - only show if images are selected and available */}
-            {includeFields.images && vehicle.images && vehicle.images.length > 0 && (
-              <div className="flex gap-3">
+            {/* Image sharing buttons */}
+            <div className="space-y-2">
+              {/* Linked Image Button - show if linked image is available */}
+              {linkedImageUrl && includeFields.linkedImage && (
                 <Button
                   variant="secondary"
-                  onClick={handleCopyImageLinks}
-                  className="flex-1"
+                  onClick={async () => {
+                    try {
+                      await copyToClipboard(linkedImageUrl);
+                      toast({
+                        title: "تم نسخ رابط الصورة",
+                        description: "تم نسخ رابط الصورة المرتبط إلى الحافظة",
+                      });
+                    } catch (error) {
+                      toast({
+                        title: "خطأ في النسخ",
+                        description: "لم تتمكن من نسخ رابط الصورة",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  className="w-full"
                 >
                   <Link className="h-4 w-4 ml-1" />
-                  نسخ روابط الصور ({vehicle.images.length})
+                  نسخ رابط الصورة المرتبط
                 </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    const shareText = `${generateShareText()}\n\nالصور:\n${vehicle.images.join('\n')}`;
-                    if (navigator.share) {
-                      navigator.share({
-                        title: `${vehicle.manufacturer} ${vehicle.category}`,
-                        text: shareText,
-                      }).catch(() => {
+              )}
+              
+              {/* Regular images buttons - only show if images are selected and available */}
+              {includeFields.images && vehicle.images && vehicle.images.length > 0 && (
+                <div className="flex gap-3">
+                  <Button
+                    variant="secondary"
+                    onClick={handleCopyImageLinks}
+                    className="flex-1"
+                  >
+                    <Link className="h-4 w-4 ml-1" />
+                    نسخ روابط الصور المرفقة ({vehicle.images.length})
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      const shareText = `${generateShareText()}\n\nالصور:\n${vehicle.images.join('\n')}`;
+                      if (navigator.share) {
+                        navigator.share({
+                          title: `${vehicle.manufacturer} ${vehicle.category}`,
+                          text: shareText,
+                        }).catch(() => {
+                          navigator.clipboard.writeText(shareText).then(() => {
+                            toast({
+                              title: "تم النسخ",
+                              description: "تم نسخ النص مع روابط الصور",
+                            });
+                          });
+                        });
+                      } else {
                         navigator.clipboard.writeText(shareText).then(() => {
                           toast({
                             title: "تم النسخ",
                             description: "تم نسخ النص مع روابط الصور",
                           });
                         });
-                      });
-                    } else {
-                      navigator.clipboard.writeText(shareText).then(() => {
-                        toast({
-                          title: "تم النسخ",
-                          description: "تم نسخ النص مع روابط الصور",
-                        });
-                      });
-                    }
-                  }}
-                  className="flex-1"
-                >
-                  <Image className="h-4 w-4 ml-1" />
-                  مشاركة مع الصور
-                </Button>
-              </div>
-            )}
+                      }
+                    }}
+                    className="flex-1"
+                  >
+                    <Image className="h-4 w-4 ml-1" />
+                    مشاركة مع الصور المرفقة
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         </ScrollArea>
