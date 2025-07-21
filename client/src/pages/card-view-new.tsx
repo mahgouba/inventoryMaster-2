@@ -63,7 +63,6 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [voiceChatOpen, setVoiceChatOpen] = useState(false);
-  const [selectedManufacturer, setSelectedManufacturer] = useState<string>("الكل");
   const [expandedManufacturer, setExpandedManufacturer] = useState<string | null>(null);
   const [itemToDelete, setItemToDelete] = useState<InventoryItem | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -72,15 +71,18 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [reservingItemId, setReservingItemId] = useState<number | null>(null);
   const [cancelingReservationId, setCancelingReservationId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("الكل");
-  const [selectedTrimLevel, setSelectedTrimLevel] = useState<string>("الكل");
-  const [selectedYear, setSelectedYear] = useState<string>("الكل");
-  const [selectedEngineCapacity, setSelectedEngineCapacity] = useState<string>("الكل");
-  const [selectedInteriorColor, setSelectedInteriorColor] = useState<string>("الكل");
-  const [selectedExteriorColor, setSelectedExteriorColor] = useState<string>("الكل");
-  const [selectedStatus, setSelectedStatus] = useState<string>("الكل");
-  const [selectedImportType, setSelectedImportType] = useState<string>("الكل");
-  const [selectedOwnershipType, setSelectedOwnershipType] = useState<string>("الكل");
+  
+  // Multiple selection filter arrays
+  const [selectedManufacturer, setSelectedManufacturer] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
+  const [selectedTrimLevel, setSelectedTrimLevel] = useState<string[]>([]);
+  const [selectedYear, setSelectedYear] = useState<string[]>([]);
+  const [selectedEngineCapacity, setSelectedEngineCapacity] = useState<string[]>([]);
+  const [selectedInteriorColor, setSelectedInteriorColor] = useState<string[]>([]);
+  const [selectedExteriorColor, setSelectedExteriorColor] = useState<string[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [selectedImportType, setSelectedImportType] = useState<string[]>([]);
+  const [selectedOwnershipType, setSelectedOwnershipType] = useState<string[]>([]);
   const [showSoldCars, setShowSoldCars] = useState<boolean>(false);
   const [shareVehicle, setShareVehicle] = useState<InventoryItem | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -99,6 +101,19 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [showStatusFilter, setShowStatusFilter] = useState(false);
   const [showImportTypeFilter, setShowImportTypeFilter] = useState(false);
   const [showOwnershipTypeFilter, setShowOwnershipTypeFilter] = useState(false);
+
+  // Toggle filter function for multiple selection
+  const toggleFilter = (
+    filterArray: string[], 
+    setFilterArray: React.Dispatch<React.SetStateAction<string[]>>, 
+    value: string
+  ) => {
+    if (filterArray.includes(value)) {
+      setFilterArray(filterArray.filter(item => item !== value));
+    } else {
+      setFilterArray([...filterArray, value]);
+    }
+  };
 
   const { data: inventoryData = [], isLoading } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory"],
@@ -410,23 +425,23 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   
   // Reset category filter when manufacturer changes
   const handleManufacturerChange = (value: string) => {
-    setSelectedManufacturer(value);
-    setSelectedCategory("الكل");
+    toggleFilter(selectedManufacturer, setSelectedManufacturer, value);
+    setSelectedCategory([]);
   };
 
-  // Apply all filters
+  // Apply all multiple selection filters
   const filteredItems = searchFilteredItems.filter(item => {
     return (
-      (selectedManufacturer === "الكل" || item.manufacturer === selectedManufacturer) &&
-      (selectedCategory === "الكل" || item.category === selectedCategory) &&
-      (selectedTrimLevel === "الكل" || item.trimLevel === selectedTrimLevel) &&
-      (selectedYear === "الكل" || item.year?.toString() === selectedYear) &&
-      (selectedEngineCapacity === "الكل" || item.engineCapacity === selectedEngineCapacity) &&
-      (selectedInteriorColor === "الكل" || item.interiorColor === selectedInteriorColor) &&
-      (selectedExteriorColor === "الكل" || item.exteriorColor === selectedExteriorColor) &&
-      (selectedStatus === "الكل" || item.status === selectedStatus) &&
-      (selectedImportType === "الكل" || item.importType === selectedImportType) &&
-      (selectedOwnershipType === "الكل" || item.ownershipType === selectedOwnershipType)
+      (selectedManufacturer.length === 0 || selectedManufacturer.includes(item.manufacturer || "")) &&
+      (selectedCategory.length === 0 || selectedCategory.includes(item.category || "")) &&
+      (selectedTrimLevel.length === 0 || selectedTrimLevel.includes(item.trimLevel || "")) &&
+      (selectedYear.length === 0 || selectedYear.includes(String(item.year))) &&
+      (selectedEngineCapacity.length === 0 || selectedEngineCapacity.includes(item.engineCapacity || "")) &&
+      (selectedInteriorColor.length === 0 || selectedInteriorColor.includes(item.interiorColor || "")) &&
+      (selectedExteriorColor.length === 0 || selectedExteriorColor.includes(item.exteriorColor || "")) &&
+      (selectedStatus.length === 0 || selectedStatus.includes(item.status || "")) &&
+      (selectedImportType.length === 0 || selectedImportType.includes(item.importType || "")) &&
+      (selectedOwnershipType.length === 0 || selectedOwnershipType.includes(item.ownershipType || ""))
     );
   });
 

@@ -34,16 +34,16 @@ interface InventoryPageProps {
 
 export default function InventoryPage({ userRole, username, onLogout }: InventoryPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [manufacturerFilter, setManufacturerFilter] = useState("جميع الصناع");
-  const [categoryFilter, setCategoryFilter] = useState("جميع الفئات");
-  const [trimLevelFilter, setTrimLevelFilter] = useState("جميع درجات التجهيز");
-  const [yearFilter, setYearFilter] = useState("جميع السنوات");
-  const [engineCapacityFilter, setEngineCapacityFilter] = useState("جميع السعات");
-  const [interiorColorFilter, setInteriorColorFilter] = useState("جميع الألوان الداخلية");
-  const [exteriorColorFilter, setExteriorColorFilter] = useState("جميع الألوان الخارجية");
-  const [statusFilter, setStatusFilter] = useState("جميع الحالات");
-  const [importTypeFilter, setImportTypeFilter] = useState("جميع الأنواع");
-  const [ownershipTypeFilter, setOwnershipTypeFilter] = useState("جميع أنواع الملكية");
+  const [manufacturerFilter, setManufacturerFilter] = useState<string[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const [trimLevelFilter, setTrimLevelFilter] = useState<string[]>([]);
+  const [yearFilter, setYearFilter] = useState<string[]>([]);
+  const [engineCapacityFilter, setEngineCapacityFilter] = useState<string[]>([]);
+  const [interiorColorFilter, setInteriorColorFilter] = useState<string[]>([]);
+  const [exteriorColorFilter, setExteriorColorFilter] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [importTypeFilter, setImportTypeFilter] = useState<string[]>([]);
+  const [ownershipTypeFilter, setOwnershipTypeFilter] = useState<string[]>([]);
   const [locationFilter, setLocationFilter] = useState("");
   const [showSoldCars, setShowSoldCars] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -164,34 +164,39 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     return values;
   };
   
+  // Helper function to apply multiple selection filters
+  const applyMultiSelectFilter = (itemValue: any, filterArray: string[]) => {
+    if (filterArray.length === 0) return true;
+    return filterArray.includes(String(itemValue));
+  };
+
   // Get categories based on selected manufacturer from actual inventory data
   const getAvailableCategories = () => {
-    if (!manufacturerFilter || manufacturerFilter === "جميع الصناع") {
+    if (manufacturerFilter.length === 0) {
       // Return all categories from actual inventory data
-      return ["جميع الفئات", ...getUniqueValues("category")];
+      return getUniqueValues("category");
     }
     // Return categories for specific manufacturer from actual inventory data
     const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
     const manufacturerCats = availableData
-      .filter(item => item.manufacturer === manufacturerFilter)
+      .filter(item => manufacturerFilter.includes(item.manufacturer || ""))
       .map(item => item.category)
       .filter((category, index, self) => category && self.indexOf(category) === index)
       .sort();
-    return ["جميع الفئات", ...manufacturerCats];
+    return manufacturerCats;
   };
   
-  const categories = getAvailableCategories();
-
-  // Get available manufacturers from inventory data
+  // Get available manufacturers from inventory data  
   const getAvailableManufacturers = () => {
     const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
     const manufacturers = availableData
       .map(item => item.manufacturer)
       .filter((manufacturer, index, self) => manufacturer && self.indexOf(manufacturer) === index)
       .sort();
-    return ["جميع الصناع", ...manufacturers];
+    return manufacturers;
   };
 
+  const categories = getAvailableCategories();
   const manufacturers = getAvailableManufacturers();
   
   // Helper functions for ImageManagement component
@@ -266,87 +271,87 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
       
       if (field === "category") {
         // Apply manufacturer filter if set
-        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
         return true;
       }
       
       if (field === "trimLevel") {
         // Apply manufacturer and category filters
-        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
-        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
         return true;
       }
       
       if (field === "year") {
         // Apply manufacturer, category, trimLevel filters
-        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
-        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
-        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
         return true;
       }
       
       if (field === "engineCapacity") {
         // Apply all previous filters
-        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
-        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
-        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
-        if (yearFilter !== "جميع السنوات" && String(item.year) !== yearFilter) return false;
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        if (yearFilter.length > 0 && !yearFilter.includes(String(item.year))) return false;
         return true;
       }
       
       if (field === "exteriorColor") {
-        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
-        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
-        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
-        if (yearFilter !== "جميع السنوات" && String(item.year) !== yearFilter) return false;
-        if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        if (yearFilter.length > 0 && !yearFilter.includes(String(item.year))) return false;
+        if (engineCapacityFilter.length > 0 && !engineCapacityFilter.includes(item.engineCapacity || "")) return false;
         return true;
       }
       
       if (field === "interiorColor") {
-        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
-        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
-        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
-        if (yearFilter !== "جميع السنوات" && String(item.year) !== yearFilter) return false;
-        if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
-        if (exteriorColorFilter !== "جميع الألوان الخارجية" && item.exteriorColor !== exteriorColorFilter) return false;
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        if (yearFilter.length > 0 && !yearFilter.includes(String(item.year))) return false;
+        if (engineCapacityFilter.length > 0 && !engineCapacityFilter.includes(item.engineCapacity || "")) return false;
+        if (exteriorColorFilter.length > 0 && !exteriorColorFilter.includes(item.exteriorColor || "")) return false;
         return true;
       }
       
       if (field === "status") {
-        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
-        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
-        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
-        if (yearFilter !== "جميع السنوات" && String(item.year) !== yearFilter) return false;
-        if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
-        if (exteriorColorFilter !== "جميع الألوان الخارجية" && item.exteriorColor !== exteriorColorFilter) return false;
-        if (interiorColorFilter !== "جميع الألوان الداخلية" && item.interiorColor !== interiorColorFilter) return false;
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        if (yearFilter.length > 0 && !yearFilter.includes(String(item.year))) return false;
+        if (engineCapacityFilter.length > 0 && !engineCapacityFilter.includes(item.engineCapacity || "")) return false;
+        if (exteriorColorFilter.length > 0 && !exteriorColorFilter.includes(item.exteriorColor || "")) return false;
+        if (interiorColorFilter.length > 0 && !interiorColorFilter.includes(item.interiorColor || "")) return false;
         return true;
       }
       
       if (field === "importType") {
         // Apply all previous filters
-        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
-        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
-        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
-        if (yearFilter !== "جميع السنوات" && String(item.year) !== yearFilter) return false;
-        if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
-        if (exteriorColorFilter !== "جميع الألوان الخارجية" && item.exteriorColor !== exteriorColorFilter) return false;
-        if (interiorColorFilter !== "جميع الألوان الداخلية" && item.interiorColor !== interiorColorFilter) return false;
-        if (statusFilter !== "جميع الحالات" && item.status !== statusFilter) return false;
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        if (yearFilter.length > 0 && !yearFilter.includes(String(item.year))) return false;
+        if (engineCapacityFilter.length > 0 && !engineCapacityFilter.includes(item.engineCapacity || "")) return false;
+        if (exteriorColorFilter.length > 0 && !exteriorColorFilter.includes(item.exteriorColor || "")) return false;
+        if (interiorColorFilter.length > 0 && !interiorColorFilter.includes(item.interiorColor || "")) return false;
+        if (statusFilter.length > 0 && !statusFilter.includes(item.status || "")) return false;
         return true;
       }
       
       if (field === "ownershipType") {
-        if (manufacturerFilter !== "جميع الصناع" && item.manufacturer !== manufacturerFilter) return false;
-        if (categoryFilter !== "جميع الفئات" && item.category !== categoryFilter) return false;
-        if (trimLevelFilter !== "جميع درجات التجهيز" && item.trimLevel !== trimLevelFilter) return false;
-        if (yearFilter !== "جميع السنوات" && String(item.year) !== yearFilter) return false;
-        if (engineCapacityFilter !== "جميع السعات" && item.engineCapacity !== engineCapacityFilter) return false;
-        if (exteriorColorFilter !== "جميع الألوان الخارجية" && item.exteriorColor !== exteriorColorFilter) return false;
-        if (interiorColorFilter !== "جميع الألوان الداخلية" && item.interiorColor !== interiorColorFilter) return false;
-        if (statusFilter !== "جميع الحالات" && item.status !== statusFilter) return false;
-        if (importTypeFilter !== "جميع الأنواع" && item.importType !== importTypeFilter) return false;
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        if (yearFilter.length > 0 && !yearFilter.includes(String(item.year))) return false;
+        if (engineCapacityFilter.length > 0 && !engineCapacityFilter.includes(item.engineCapacity || "")) return false;
+        if (exteriorColorFilter.length > 0 && !exteriorColorFilter.includes(item.exteriorColor || "")) return false;
+        if (interiorColorFilter.length > 0 && !interiorColorFilter.includes(item.interiorColor || "")) return false;
+        if (statusFilter.length > 0 && !statusFilter.includes(item.status || "")) return false;
+        if (importTypeFilter.length > 0 && !importTypeFilter.includes(item.importType || "")) return false;
         return true;
       }
       
@@ -368,10 +373,24 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     return filteredData.filter(item => item[field] === value).length;
   };
   
-  // Reset category filter when manufacturer changes
+  // Helper function to toggle filter selection
+  const toggleFilter = (
+    filterArray: string[], 
+    setFilterArray: React.Dispatch<React.SetStateAction<string[]>>, 
+    value: string
+  ) => {
+    if (filterArray.includes(value)) {
+      setFilterArray(filterArray.filter(item => item !== value));
+    } else {
+      setFilterArray([...filterArray, value]);
+    }
+  };
+
+  // Reset dependent filters when parent filter changes
   const handleManufacturerChange = (value: string) => {
-    setManufacturerFilter(value);
-    setCategoryFilter("جميع الفئات");
+    toggleFilter(manufacturerFilter, setManufacturerFilter, value);
+    // Reset category filter when manufacturer changes
+    setCategoryFilter([]);
   };
 
   // Get dynamic filter arrays based on currently applied filters
@@ -768,44 +787,55 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           {/* Enhanced Filter Controls with Button Design */}
                           <div className="space-y-6 animate-in fade-in duration-300">
                             
-                            {/* Slider Filter Component */}
+                            {/* Multi-Select Filter Component */}
                             {(() => {
-                              const FilterSlider = ({ title, items, currentFilter, onFilterChange, getCount, showToggle, toggleState, onToggleChange }) => (
+                              const MultiSelectFilter = ({ title, items, selectedFilters, onFilterToggle, getCount, showToggle, toggleState, onToggleChange }) => (
                                 <div className="space-y-2">
                                   <div className="flex items-center justify-between">
                                     <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => onToggleChange(!toggleState)}
-                                      className="p-2 h-8 w-8 hover:bg-blue-100 dark:hover:bg-blue-900/30"
-                                    >
-                                      {toggleState ? (
-                                        <Eye size={16} className="text-blue-600 dark:text-blue-400" />
-                                      ) : (
-                                        <EyeOff size={16} className="text-slate-400 dark:text-slate-500" />
-                                      )}
-                                    </Button>
+                                    <div className="flex items-center space-x-2 space-x-reverse">
+                                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                                        {selectedFilters.length > 0 ? `(${selectedFilters.length} محدد)` : ""}
+                                      </span>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => onToggleChange(!toggleState)}
+                                        className="p-2 h-8 w-8 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                                      >
+                                        {toggleState ? (
+                                          <Eye size={16} className="text-blue-600 dark:text-blue-400" />
+                                        ) : (
+                                          <EyeOff size={16} className="text-slate-400 dark:text-slate-500" />
+                                        )}
+                                      </Button>
+                                    </div>
                                   </div>
                                   {toggleState && (
                                     <div className="relative group">
                                       <ScrollArea className="w-full">
                                         <div className="flex space-x-2 space-x-reverse pb-2">
-                                          {items.map((item) => (
-                                            <Button
-                                              key={item}
-                                              variant={currentFilter === item ? "default" : "outline"}
-                                              size="sm"
-                                              onClick={() => onFilterChange(item)}
-                                              className={`transition-all duration-200 whitespace-nowrap ${
-                                                currentFilter === item
-                                                  ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                                                  : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
-                                              }`}
-                                            >
-                                              {item} ({getCount(item)})
-                                            </Button>
-                                          ))}
+                                          {items.map((item) => {
+                                            const isSelected = selectedFilters.includes(item);
+                                            return (
+                                              <Button
+                                                key={item}
+                                                variant={isSelected ? "default" : "outline"}
+                                                size="sm"
+                                                onClick={() => onFilterToggle(item)}
+                                                className={`transition-all duration-200 whitespace-nowrap relative ${
+                                                  isSelected
+                                                    ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
+                                                    : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                                                }`}
+                                              >
+                                                {isSelected && (
+                                                  <span className="absolute top-0 left-0 w-2 h-2 bg-green-400 rounded-full transform -translate-x-1 -translate-y-1"></span>
+                                                )}
+                                                {item} ({getCount(item)})
+                                              </Button>
+                                            );
+                                          })}
                                         </div>
                                       </ScrollArea>
                                       {/* Navigation Arrows */}
@@ -871,94 +901,94 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                     </Button>
                                   </div>
                                   
-                                  {/* Individual Filters with Toggles */}
+                                  {/* Individual Multiple Selection Filters */}
                                   <div className="space-y-3">
-                                    <FilterSlider 
+                                    <MultiSelectFilter 
                                       title="الصانع" 
                                       items={manufacturers} 
-                                      currentFilter={manufacturerFilter} 
-                                      onFilterChange={handleManufacturerChange} 
+                                      selectedFilters={manufacturerFilter} 
+                                      onFilterToggle={(item) => toggleFilter(manufacturerFilter, setManufacturerFilter, item)} 
                                       getCount={(item) => getFilterCount("manufacturer", item)} 
                                       toggleState={showManufacturerFilter}
                                       onToggleChange={setShowManufacturerFilter}
                                     />
-                                    <FilterSlider 
+                                    <MultiSelectFilter 
                                       title="الفئة" 
                                       items={categories} 
-                                      currentFilter={categoryFilter} 
-                                      onFilterChange={setCategoryFilter} 
+                                      selectedFilters={categoryFilter} 
+                                      onFilterToggle={(item) => toggleFilter(categoryFilter, setCategoryFilter, item)} 
                                       getCount={(item) => getFilterCount("category", item)} 
                                       toggleState={showCategoryFilter}
                                       onToggleChange={setShowCategoryFilter}
                                     />
-                                    <FilterSlider 
+                                    <MultiSelectFilter 
                                       title="درجة التجهيز" 
                                       items={availableTrimLevels} 
-                                      currentFilter={trimLevelFilter} 
-                                      onFilterChange={setTrimLevelFilter} 
+                                      selectedFilters={trimLevelFilter} 
+                                      onFilterToggle={(item) => toggleFilter(trimLevelFilter, setTrimLevelFilter, item)} 
                                       getCount={(item) => getFilterCount("trimLevel", item)} 
                                       toggleState={showTrimLevelFilter}
                                       onToggleChange={setShowTrimLevelFilter}
                                     />
-                                    <FilterSlider 
+                                    <MultiSelectFilter 
                                       title="السنة" 
                                       items={availableYears} 
-                                      currentFilter={yearFilter} 
-                                      onFilterChange={setYearFilter} 
+                                      selectedFilters={yearFilter} 
+                                      onFilterToggle={(item) => toggleFilter(yearFilter, setYearFilter, item)} 
                                       getCount={(item) => getFilterCount("year", item)} 
                                       toggleState={showYearFilter}
                                       onToggleChange={setShowYearFilter}
                                     />
-                                    <FilterSlider 
+                                    <MultiSelectFilter 
                                       title="سعة المحرك" 
                                       items={availableEngineCapacities} 
-                                      currentFilter={engineCapacityFilter} 
-                                      onFilterChange={setEngineCapacityFilter} 
+                                      selectedFilters={engineCapacityFilter} 
+                                      onFilterToggle={(item) => toggleFilter(engineCapacityFilter, setEngineCapacityFilter, item)} 
                                       getCount={(item) => getFilterCount("engineCapacity", item)} 
                                       toggleState={showEngineCapacityFilter}
                                       onToggleChange={setShowEngineCapacityFilter}
                                     />
-                                    <FilterSlider 
+                                    <MultiSelectFilter 
                                       title="اللون الخارجي" 
                                       items={availableExteriorColors} 
-                                      currentFilter={exteriorColorFilter} 
-                                      onFilterChange={setExteriorColorFilter} 
+                                      selectedFilters={exteriorColorFilter} 
+                                      onFilterToggle={(item) => toggleFilter(exteriorColorFilter, setExteriorColorFilter, item)} 
                                       getCount={(item) => getFilterCount("exteriorColor", item)} 
                                       toggleState={showExteriorColorFilter}
                                       onToggleChange={setShowExteriorColorFilter}
                                     />
-                                    <FilterSlider 
+                                    <MultiSelectFilter 
                                       title="اللون الداخلي" 
                                       items={availableInteriorColors} 
-                                      currentFilter={interiorColorFilter} 
-                                      onFilterChange={setInteriorColorFilter} 
+                                      selectedFilters={interiorColorFilter} 
+                                      onFilterToggle={(item) => toggleFilter(interiorColorFilter, setInteriorColorFilter, item)} 
                                       getCount={(item) => getFilterCount("interiorColor", item)} 
                                       toggleState={showInteriorColorFilter}
                                       onToggleChange={setShowInteriorColorFilter}
                                     />
-                                    <FilterSlider 
+                                    <MultiSelectFilter 
                                       title="الحالة" 
                                       items={availableStatuses} 
-                                      currentFilter={statusFilter} 
-                                      onFilterChange={setStatusFilter} 
+                                      selectedFilters={statusFilter} 
+                                      onFilterToggle={(item) => toggleFilter(statusFilter, setStatusFilter, item)} 
                                       getCount={(item) => getFilterCount("status", item)} 
                                       toggleState={showStatusFilter}
                                       onToggleChange={setShowStatusFilter}
                                     />
-                                    <FilterSlider 
+                                    <MultiSelectFilter 
                                       title="نوع الاستيراد" 
                                       items={availableImportTypes} 
-                                      currentFilter={importTypeFilter} 
-                                      onFilterChange={setImportTypeFilter} 
+                                      selectedFilters={importTypeFilter} 
+                                      onFilterToggle={(item) => toggleFilter(importTypeFilter, setImportTypeFilter, item)} 
                                       getCount={(item) => getFilterCount("importType", item)} 
                                       toggleState={showImportTypeFilter}
                                       onToggleChange={setShowImportTypeFilter}
                                     />
-                                    <FilterSlider 
+                                    <MultiSelectFilter 
                                       title="نوع الملكية" 
                                       items={availableOwnershipTypes} 
-                                      currentFilter={ownershipTypeFilter} 
-                                      onFilterChange={setOwnershipTypeFilter} 
+                                      selectedFilters={ownershipTypeFilter} 
+                                      onFilterToggle={(item) => toggleFilter(ownershipTypeFilter, setOwnershipTypeFilter, item)} 
                                       getCount={(item) => getFilterCount("ownershipType", item)} 
                                       toggleState={showOwnershipTypeFilter}
                                       onToggleChange={setShowOwnershipTypeFilter}
@@ -974,20 +1004,24 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      setManufacturerFilter("جميع الصناع");
-                      setCategoryFilter("جميع الفئات");
-                      setTrimLevelFilter("جميع درجات التجهيز");
-                      setYearFilter("جميع السنوات");
-                      setEngineCapacityFilter("جميع السعات");
-                      setInteriorColorFilter("جميع الألوان الداخلية");
-                      setExteriorColorFilter("جميع الألوان الخارجية");
-                      setStatusFilter("جميع الحالات");
-                      setImportTypeFilter("جميع الأنواع");
-                      setOwnershipTypeFilter("جميع أنواع الملكية");
+                      setManufacturerFilter([]);
+                      setCategoryFilter([]);
+                      setTrimLevelFilter([]);
+                      setYearFilter([]);
+                      setEngineCapacityFilter([]);
+                      setInteriorColorFilter([]);
+                      setExteriorColorFilter([]);
+                      setStatusFilter([]);
+                      setImportTypeFilter([]);
+                      setOwnershipTypeFilter([]);
                     }}
                     className="hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20"
                   >
-                    إعادة تعيين الفلاتر
+                    إعادة تعيين جميع الفلاتر ({
+                      (manufacturerFilter?.length || 0) + (categoryFilter?.length || 0) + (trimLevelFilter?.length || 0) + 
+                      (yearFilter?.length || 0) + (engineCapacityFilter?.length || 0) + (exteriorColorFilter?.length || 0) + 
+                      (interiorColorFilter?.length || 0) + (statusFilter?.length || 0) + (importTypeFilter?.length || 0) + (ownershipTypeFilter?.length || 0)
+                    } نشط)
                   </Button>
                 </div>
                           </div>
