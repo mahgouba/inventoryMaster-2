@@ -39,7 +39,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     engineCapacity: true,
     exteriorColor: true,
     interiorColor: true,
-    status: true,
+    status: false, // Hide status by default
     price: true,
     specifications: true,
     images: true
@@ -286,16 +286,6 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                 
                 <div className="flex items-center space-x-2 space-x-reverse">
                   <Checkbox 
-                    id="status"
-                    checked={includeFields.status}
-                    onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, status: !!checked }))}
-                  />
-                  <Label htmlFor="status" className="text-sm">الحالة</Label>
-                  <Badge variant="secondary" className="text-xs">{vehicle.status}</Badge>
-                </div>
-                
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <Checkbox 
                     id="specifications"
                     checked={includeFields.specifications}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, specifications: !!checked }))}
@@ -408,83 +398,84 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
             </CardContent>
           </Card>
 
-          {/* Specifications Section - Only show if has specifications or form is open */}
-          {(vehicle.detailedSpecifications || showSpecificationForm) && (
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">المواصفات التفصيلية</CardTitle>
-                  {!vehicle.detailedSpecifications && !showSpecificationForm && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowSpecificationForm(true)}
-                      className="text-blue-600 border-blue-300 hover:bg-blue-50"
-                    >
-                      <Plus className="h-4 w-4 ml-1" />
-                      إضافة الوصف
-                    </Button>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                {vehicle.detailedSpecifications ? (
-                  <div className="space-y-3">
+          {/* Specifications Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">المواصفات التفصيلية</CardTitle>
+                {!showSpecificationForm && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowSpecificationForm(true)}
+                    className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                  >
+                    {vehicle.detailedSpecifications ? (
+                      <>
+                        <Edit2 className="h-4 w-4 ml-1" />
+                        تعديل
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4 ml-1" />
+                        إضافة الوصف
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {!showSpecificationForm ? (
+                <div className="space-y-3">
+                  {vehicle.detailedSpecifications ? (
                     <div className="p-4 bg-slate-50 rounded-lg">
                       <p className="text-sm whitespace-pre-wrap">{vehicle.detailedSpecifications}</p>
                     </div>
-                    <div className="flex justify-end">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSpecificationDescription(vehicle.detailedSpecifications || "");
-                          setShowSpecificationForm(true);
-                        }}
-                        className="text-blue-600 hover:bg-blue-50"
-                      >
-                        <Edit2 className="h-4 w-4 ml-1" />
-                        تعديل
-                      </Button>
+                  ) : (
+                    <div className="text-center py-6">
+                      <div className="text-slate-400 text-4xl mb-2">📋</div>
+                      <p className="text-sm text-slate-600">لا توجد مواصفات مضافة لهذه السيارة</p>
+                      <p className="text-xs text-slate-500 mt-1">يمكنك إضافة مواصفات مخصصة لهذه السيارة فقط</p>
                     </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="specification">الوصف التفصيلي لهذه السيارة</Label>
+                    <Textarea
+                      id="specification"
+                      placeholder="اكتب الوصف التفصيلي لهذه السيارة المحددة..."
+                      value={specificationDescription}
+                      onChange={(e) => setSpecificationDescription(e.target.value)}
+                      className="mt-2"
+                      rows={4}
+                    />
                   </div>
-                ) : showSpecificationForm ? (
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="specification">الوصف التفصيلي لهذه السيارة</Label>
-                      <Textarea
-                        id="specification"
-                        placeholder="اكتب الوصف التفصيلي لهذه السيارة المحددة..."
-                        value={specificationDescription}
-                        onChange={(e) => setSpecificationDescription(e.target.value)}
-                        className="mt-2"
-                        rows={4}
-                      />
-                    </div>
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setShowSpecificationForm(false);
-                          setSpecificationDescription(vehicle.detailedSpecifications || "");
-                        }}
-                      >
-                        <X className="h-4 w-4 ml-1" />
-                        إلغاء
-                      </Button>
-                      <Button
-                        onClick={handleSaveSpecification}
-                        disabled={isUpdating}
-                      >
-                        <Save className="h-4 w-4 ml-1" />
-                        {isUpdating ? "جاري الحفظ..." : "حفظ"}
-                      </Button>
-                    </div>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowSpecificationForm(false);
+                        setSpecificationDescription(vehicle.detailedSpecifications || "");
+                      }}
+                    >
+                      <X className="h-4 w-4 ml-1" />
+                      إلغاء
+                    </Button>
+                    <Button
+                      onClick={handleSaveSpecification}
+                      disabled={isUpdating}
+                    >
+                      <Save className="h-4 w-4 ml-1" />
+                      {isUpdating ? "جاري الحفظ..." : "حفظ"}
+                    </Button>
                   </div>
-                ) : null}
-              </CardContent>
-            </Card>
-          )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Share Preview */}
           <Card>
