@@ -37,7 +37,6 @@ const AVAILABLE_COLUMNS = [
   { id: 'chassisNumber', label: 'رقم الهيكل' },
   { id: 'price', label: 'السعر' },
   { id: 'ownershipType', label: 'نوع الملكية' },
-  { id: 'engineer', label: 'المهندس' },
   { id: 'entryDate', label: 'تاريخ الوصول' },
   { id: 'notes', label: 'الملاحظات' }
 ];

@@ -241,10 +241,10 @@ export function printTableWithSettings(settings: PrintSettings) {
         }
         
         th {
-          background: #f0f0f0 !important;
+          background: #C49632 !important;
           font-weight: 700;
           font-size: 9pt;
-          color: #000 !important;
+          color: white !important;
           text-align: center;
         }
         
@@ -331,7 +331,31 @@ export function printTableWithSettings(settings: PrintSettings) {
         ` : ''}
         
         <!-- Simple Table Only -->
-        ${tableElement.outerHTML.replace(/<svg[^>]*>.*?<\/svg>/g, '').replace(/class="[^"]*"/g, '').replace(/<button[^>]*>.*?<\/button>/g, '')}
+        ${(() => {
+          let tableHTML = tableElement.outerHTML;
+          
+          // Remove all SVG icons
+          tableHTML = tableHTML.replace(/<svg[^>]*>.*?<\/svg>/gs, '');
+          
+          // Remove all buttons
+          tableHTML = tableHTML.replace(/<button[^>]*>.*?<\/button>/gs, '');
+          
+          // Remove the actions column header
+          tableHTML = tableHTML.replace(/<th[^>]*>\s*الإجراءات\s*<\/th>/g, '');
+          
+          // Remove actions column cells (multiple patterns to catch all variations)
+          tableHTML = tableHTML.replace(/<td[^>]*data-actions[^>]*>.*?<\/td>/gs, '');
+          tableHTML = tableHTML.replace(/<td[^>]*>\s*<div[^>]*space-x-2[^>]*>.*?<\/div>\s*<\/td>/gs, '');
+          tableHTML = tableHTML.replace(/<td[^>]*>\s*<div[^>]*flex[^>]*gap[^>]*>.*?<\/div>\s*<\/td>/gs, '');
+          
+          // Remove all remaining class attributes for clean printing
+          tableHTML = tableHTML.replace(/class="[^"]*"/g, '');
+          
+          // Ensure table headers have golden background
+          tableHTML = tableHTML.replace(/<th([^>]*)>/g, '<th$1 style="background-color: #C49632 !important; color: white !important;">');
+          
+          return tableHTML;
+        })()}
     </body>
     </html>
   `;
@@ -351,7 +375,7 @@ export function printTableWithSettings(settings: PrintSettings) {
 // Keep the original function for backward compatibility
 export function printTable() {
   const defaultSettings: PrintSettings = {
-    visibleColumns: ['manufacturer', 'category', 'trimLevel', 'engineCapacity', 'year', 'exteriorColor', 'interiorColor', 'status', 'importType', 'location', 'chassisNumber', 'price', 'ownershipType', 'engineer', 'entryDate', 'notes'],
+    visibleColumns: ['manufacturer', 'category', 'trimLevel', 'engineCapacity', 'year', 'exteriorColor', 'interiorColor', 'status', 'importType', 'location', 'chassisNumber', 'price', 'ownershipType', 'entryDate', 'notes'],
     orientation: 'landscape',
     colorTheme: 'default',
     fontSize: 'medium',
