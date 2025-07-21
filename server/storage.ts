@@ -31,6 +31,7 @@ export interface IStorage {
   createInventoryItem(item: InsertInventoryItem): Promise<InventoryItem>;
   updateInventoryItem(id: number, item: Partial<InsertInventoryItem>): Promise<InventoryItem | undefined>;
   deleteInventoryItem(id: number): Promise<boolean>;
+  clearAllInventoryItems(): Promise<boolean>;
   searchInventoryItems(query: string): Promise<InventoryItem[]>;
   filterInventoryItems(filters: { 
     category?: string; 
@@ -650,6 +651,12 @@ export class MemStorage implements IStorage {
 
   async deleteInventoryItem(id: number): Promise<boolean> {
     return this.inventoryItems.delete(id);
+  }
+
+  async clearAllInventoryItems(): Promise<boolean> {
+    this.inventoryItems.clear();
+    this.currentInventoryId = 1;
+    return true;
   }
 
   async searchInventoryItems(query: string): Promise<InventoryItem[]> {

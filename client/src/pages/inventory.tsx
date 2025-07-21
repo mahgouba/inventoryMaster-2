@@ -106,6 +106,28 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     },
   });
 
+  // Mutation for clearing all inventory items
+  const clearAllItemsMutation = useMutation({
+    mutationFn: () => apiRequest("DELETE", "/api/inventory/clear-all", {}),
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ["/api/inventory"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
+      toast({
+        title: "تم حذف جميع العناصر",
+        description: "تم حذف جميع العناصر من المخزون بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ في حذف العناصر",
+        description: "فشل حذف جميع العناصر من المخزون",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Dynamic manufacturers from inventory data - removed hardcoded list
   
   // Generate categories based on selected manufacturer
@@ -492,6 +514,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
   const handleImportCarsData = () => {
     importCarsMutation.mutate();
+  };
+
+  const handleClearAllItems = () => {
+    if (confirm("هل أنت متأكد من حذف جميع العناصر من المخزون؟ لا يمكن التراجع عن هذا الإجراء.")) {
+      clearAllItemsMutation.mutate();
+    }
   };
 
 
@@ -994,6 +1022,15 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     >
                       <FileSpreadsheet className="w-4 h-4 ml-2" />
                       استيراد من Excel
+                    </Button>
+                    <Button 
+                      onClick={handleClearAllItems}
+                      variant="outline"
+                      className="border-red-500 text-red-600 hover:bg-red-50 hover:border-red-600 w-full sm:w-auto"
+                      disabled={clearAllItemsMutation.isPending}
+                    >
+                      <Database className="w-4 h-4 ml-2" />
+                      {clearAllItemsMutation.isPending ? "جاري الحذف..." : "حذف جميع العناصر"}
                     </Button>
 
                   </>

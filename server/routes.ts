@@ -714,6 +714,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clear all inventory items
+  app.delete("/api/inventory/clear-all", async (req, res) => {
+    try {
+      const success = await storage.clearAllInventoryItems();
+      if (!success) {
+        return res.status(500).json({ message: "Failed to clear inventory items" });
+      }
+      
+      res.json({ message: "All inventory items cleared successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to clear inventory items" });
+    }
+  });
+
   // Cancel reservation
   app.post("/api/inventory/:id/cancel-reservation", async (req, res) => {
     try {
