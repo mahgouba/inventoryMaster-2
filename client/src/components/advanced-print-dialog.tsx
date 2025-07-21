@@ -122,6 +122,7 @@ export function AdvancedPrintDialog({ open, onOpenChange }: AdvancedPrintDialogP
                       id={column.id}
                       checked={settings.visibleColumns.includes(column.id)}
                       onCheckedChange={() => handleColumnToggle(column.id)}
+                      className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                     />
                     <Label
                       htmlFor={column.id}

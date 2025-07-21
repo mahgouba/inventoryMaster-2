@@ -3,6 +3,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global checkbox and radio button styling */
+input[type="checkbox"], 
+input[type="radio"] {
+  accent-color: #C49632;
+}
+
+/* Additional styling for better visual consistency */
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  background-color: #C49632;
+  border-color: #C49632;
+}
+
+/* RadioGroup styling for shadcn components */
+button[data-state="checked"][role="radio"] {
+  background-color: #C49632 !important;
+  border-color: #C49632 !important;
+}
+
+button[data-state="checked"][role="radio"] span {
+  background-color: #C49632 !important;
+}
+
 /* Custom colors for the application */
 .bg-custom-primary {
   background-color: #00627F !important;

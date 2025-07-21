@@ -134,6 +134,7 @@ export function PrintCustomizationDialog({ open, onOpenChange, onPrint }: PrintC
                       id={column.id}
                       checked={settings.visibleColumns.includes(column.id)}
                       onCheckedChange={(checked) => handleColumnToggle(column.id, !!checked)}
+                      className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                     />
                     <Label
                       htmlFor={column.id}
@@ -247,6 +248,7 @@ export function PrintCustomizationDialog({ open, onOpenChange, onPrint }: PrintC
                     id="includeHeader"
                     checked={settings.includeHeader}
                     onCheckedChange={(checked) => setSettings(prev => ({ ...prev, includeHeader: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
                   <Label htmlFor="includeHeader">
                     تضمين العنوان الرئيسي
@@ -258,6 +260,7 @@ export function PrintCustomizationDialog({ open, onOpenChange, onPrint }: PrintC
                     id="includeDate"
                     checked={settings.includeDate}
                     onCheckedChange={(checked) => setSettings(prev => ({ ...prev, includeDate: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
                   <Label htmlFor="includeDate">
                     تضمين تاريخ الطباعة

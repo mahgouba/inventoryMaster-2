@@ -1921,7 +1921,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                       id="isVATInclusive"
                       checked={pricingDetails.isVATInclusive}
                       onChange={(e) => setPricingDetails(prev => ({ ...prev, isVATInclusive: e.target.checked }))}
-                      className="rounded"
+                      className="rounded accent-[#C49632]"
                     />
                     <Label htmlFor="isVATInclusive">السعر شامل الضريبة</Label>
                   </div>
@@ -1935,7 +1935,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                       id="includeLicensePlate"
                       checked={pricingDetails.includeLicensePlate}
                       onChange={(e) => setPricingDetails(prev => ({ ...prev, includeLicensePlate: e.target.checked }))}
-                      className="rounded"
+                      className="rounded accent-[#C49632]"
                     />
                     <Label htmlFor="includeLicensePlate">تشمل اللوحات</Label>
                   </div>
@@ -1957,7 +1957,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                           id="licensePlateSubjectToTax"
                           checked={pricingDetails.licensePlateSubjectToTax}
                           onChange={(e) => setPricingDetails(prev => ({ ...prev, licensePlateSubjectToTax: e.target.checked }))}
-                          className="rounded"
+                          className="rounded accent-[#C49632]"
                         />
                         <Label htmlFor="licensePlateSubjectToTax">اللوحات خاضعة للضريبة</Label>
                       </div>

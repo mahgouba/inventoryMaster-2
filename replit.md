@@ -276,6 +276,20 @@ The application uses PostgreSQL for persistent data storage with proper database
   - All filter dropdowns now display only available options from existing inventory items
   - Improved data filtering to exclude sold cars unless specifically requested to show them
 
+### System-Wide Golden Checkbox Styling Implementation (July 21, 2025)
+- ✅ Applied golden color (#C49632) to ALL checkboxes and radio buttons throughout the entire system per user request
+- ✅ Updated vehicle-share.tsx component with golden checkbox styling for all field selection options
+- ✅ Updated quotation-creation.tsx with golden styling for VAT and license plate checkboxes
+- ✅ Updated quotation-edit.tsx with golden styling for license plate checkbox and radio buttons
+- ✅ Updated advanced-print-dialog.tsx with golden styling for column selection checkboxes
+- ✅ Updated print-customization-dialog.tsx with golden styling for all checkboxes and additional options
+- ✅ Added global CSS rules in index.css to ensure consistent golden color for all checkbox/radio elements:
+  - Native HTML checkbox/radio elements use accent-color: #C49632
+  - Shadcn/ui Checkbox components use data-[state=checked] styling
+  - RadioGroup components use button[role="radio"] styling
+- ✅ Ensured system-wide consistency across all forms, dialogs, and interactive components
+- ✅ Both native HTML form elements and shadcn/ui components now display golden color when selected
+
 ### Enhanced Manufacturer Logo Management - Full Coverage System (July 20, 2025)
 - ✅ Enhanced manufacturer logo management to include ALL manufacturers from inventory data
 - ✅ Added comprehensive "الصناع من المخزون" section showing auto-detected manufacturers
