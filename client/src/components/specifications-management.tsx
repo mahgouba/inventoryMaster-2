@@ -28,6 +28,7 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
   const [selectedTrimLevel, setSelectedTrimLevel] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedEngineCapacity, setSelectedEngineCapacity] = useState("");
+  const [selectedChassisNumber, setSelectedChassisNumber] = useState("");
   const [description, setDescription] = useState("");
 
   // Fetch all specifications
@@ -191,6 +192,7 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     setSelectedTrimLevel("");
     setSelectedYear("");
     setSelectedEngineCapacity("");
+    setSelectedChassisNumber("");
     setDescription("");
   };
 
@@ -209,6 +211,7 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
       trimLevel: selectedTrimLevel,
       year: parseInt(selectedYear),
       engineCapacity: selectedEngineCapacity,
+      chassisNumber: selectedChassisNumber || undefined,
       detailedDescription: description,
     };
 
@@ -226,6 +229,7 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     setSelectedTrimLevel(spec.trimLevel);
     setSelectedYear(spec.year.toString());
     setSelectedEngineCapacity(String(spec.engineCapacity || ''));
+    setSelectedChassisNumber(spec.chassisNumber || '');
     setDescription(spec.detailedDescription);
     setShowForm(true);
   };
@@ -245,6 +249,7 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     setSelectedTrimLevel("");
     setSelectedYear("");
     setSelectedEngineCapacity("");
+    setSelectedChassisNumber("");
   };
 
   const handleCategoryChange = (value: string) => {
@@ -253,6 +258,7 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     setSelectedTrimLevel("");
     setSelectedYear("");
     setSelectedEngineCapacity("");
+    setSelectedChassisNumber("");
   };
 
   return (
@@ -379,6 +385,20 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                 </div>
 
                 <div>
+                  <Label htmlFor="chassisNumber">رقم الهيكل (اختياري)</Label>
+                  <Input
+                    id="chassisNumber"
+                    value={selectedChassisNumber}
+                    onChange={(e) => setSelectedChassisNumber(e.target.value)}
+                    placeholder="رقم الهيكل للربط بسيارة معينة"
+                    dir="ltr"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    إذا كنت تريد ربط المواصفات بسيارة معينة، أدخل رقم الهيكل
+                  </p>
+                </div>
+
+                <div>
                   <Label htmlFor="description">الوصف التفصيلي</Label>
                   <Textarea
                     id="description"
@@ -435,6 +455,11 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                             <Badge variant="outline">{spec.trimLevel}</Badge>
                             <Badge variant="outline">{spec.year}</Badge>
                             <Badge variant="outline">{String(spec.engineCapacity || '')}</Badge>
+                            {spec.chassisNumber && (
+                              <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
+                                هيكل: {spec.chassisNumber}
+                              </Badge>
+                            )}
                           </div>
                         </div>
                         <div className="flex gap-2">

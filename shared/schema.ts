@@ -128,6 +128,7 @@ export const specifications = pgTable("specifications", {
   trimLevel: text("trim_level"), // درجة التجهيز
   year: integer("year").notNull(), // السنة
   engineCapacity: text("engine_capacity").notNull(), // سعة المحرك
+  chassisNumber: text("chassis_number"), // رقم الهيكل (اختياري لربط المواصفات بسيارة معينة)
   
   // Engine & Performance Specifications
   engineType: text("engine_type"), // نوع المحرك
@@ -439,6 +440,27 @@ export const insertUserSessionSchema = createInsertSchema(userSessions).omit({
   isActive: true,
 });
 
+// Image links table for linking images to vehicle specifications
+export const imageLinks = pgTable("image_links", {
+  id: serial("id").primaryKey(),
+  manufacturer: text("manufacturer").notNull(), // الصانع
+  category: text("category").notNull(), // الفئة
+  trimLevel: text("trim_level"), // درجة التجهيز
+  year: integer("year").notNull(), // السنة
+  exteriorColor: text("exterior_color").notNull(), // اللون الخارجي
+  interiorColor: text("interior_color").notNull(), // اللون الداخلي
+  engineCapacity: text("engine_capacity"), // سعة المحرك
+  chassisNumber: text("chassis_number"), // رقم الهيكل (اختياري لربط الصورة بسيارة معينة)
+  imageUrl: text("image_url").notNull(), // رابط الصورة
+  description: text("description"), // وصف الصورة
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertImageLinkSchema = createInsertSchema(imageLinks).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({
   id: true,
   timestamp: true,
@@ -462,6 +484,9 @@ export type InsertUserSession = z.infer<typeof insertUserSessionSchema>;
 export type UserSession = typeof userSessions.$inferSelect;
 export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
 export type ActivityLog = typeof activityLogs.$inferSelect;
+
+export type InsertImageLink = z.infer<typeof insertImageLinkSchema>;
+export type ImageLink = typeof imageLinks.$inferSelect;
 
 export type InsertQuotation = z.infer<typeof insertQuotationSchema>;
 export type Quotation = typeof quotations.$inferSelect;

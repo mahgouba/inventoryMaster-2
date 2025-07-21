@@ -309,6 +309,7 @@ export class MemStorage implements IStorage {
       trimLevel: specificationData.trimLevel,
       year: specificationData.year,
       engineCapacity: specificationData.engineCapacity,
+      chassisNumber: specificationData.chassisNumber,
       detailedDescription: specificationData.detailedDescription,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -323,6 +324,7 @@ export class MemStorage implements IStorage {
     
     const updated: Specification = {
       ...existing,
+      ...specificationData,
       ...specificationData,
       updatedAt: new Date()
     };

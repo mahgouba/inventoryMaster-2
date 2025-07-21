@@ -18,6 +18,7 @@ interface ImageLink {
   exteriorColor: string;
   interiorColor: string;
   engineCapacity?: string;
+  chassisNumber?: string;
   imageUrl: string;
   description?: string;
   createdAt: Date;
@@ -41,6 +42,7 @@ export default function ImageManagement({ open, onOpenChange, manufacturers, cat
   const [selectedExteriorColor, setSelectedExteriorColor] = useState<string>('');
   const [selectedInteriorColor, setSelectedInteriorColor] = useState<string>('');
   const [selectedEngineCapacity, setSelectedEngineCapacity] = useState<string>('');
+  const [selectedChassisNumber, setSelectedChassisNumber] = useState<string>('');
   const [imageUrl, setImageUrl] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -96,6 +98,7 @@ export default function ImageManagement({ open, onOpenChange, manufacturers, cat
       exteriorColor: selectedExteriorColor,
       interiorColor: selectedInteriorColor,
       engineCapacity: (selectedManufacturer === 'رنج روفر' && selectedEngineCapacity) ? selectedEngineCapacity : undefined,
+      chassisNumber: selectedChassisNumber || undefined,
       imageUrl,
       description: description || undefined,
       createdAt: new Date()
@@ -141,6 +144,7 @@ export default function ImageManagement({ open, onOpenChange, manufacturers, cat
     setSelectedExteriorColor(imageLink.exteriorColor);
     setSelectedInteriorColor(imageLink.interiorColor);
     setSelectedEngineCapacity(imageLink.engineCapacity || '');
+    setSelectedChassisNumber(imageLink.chassisNumber || '');
     setImageUrl(imageLink.imageUrl);
     setDescription(imageLink.description || '');
     setEditingId(imageLink.id);
@@ -179,6 +183,7 @@ export default function ImageManagement({ open, onOpenChange, manufacturers, cat
     setSelectedExteriorColor('');
     setSelectedInteriorColor('');
     setSelectedEngineCapacity('');
+    setSelectedChassisNumber('');
     setImageUrl('');
     setDescription('');
     setEditingId(null);
@@ -319,6 +324,20 @@ export default function ImageManagement({ open, onOpenChange, manufacturers, cat
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="chassisNumber">رقم الهيكل (اختياري)</Label>
+                  <Input
+                    id="chassisNumber"
+                    value={selectedChassisNumber}
+                    onChange={(e) => setSelectedChassisNumber(e.target.value)}
+                    placeholder="رقم الهيكل للربط بسيارة معينة"
+                    dir="ltr"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    إذا كنت تريد ربط الصورة بسيارة معينة، أدخل رقم الهيكل
+                  </p>
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="imageUrl">رابط الصورة *</Label>
                   <Input
                     id="imageUrl"
@@ -383,6 +402,9 @@ export default function ImageManagement({ open, onOpenChange, manufacturers, cat
                               <span>الداخلي: {link.interiorColor}</span>
                               {link.engineCapacity && (
                                 <span>المحرك: {link.engineCapacity}</span>
+                              )}
+                              {link.chassisNumber && (
+                                <span>الهيكل: {link.chassisNumber}</span>
                               )}
                             </div>
                             {link.description && (

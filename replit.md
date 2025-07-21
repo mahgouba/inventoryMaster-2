@@ -258,6 +258,16 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Price ranges from 85,000 SAR (used Nissan Altima) to 2,250,000 SAR (limited edition Lexus LFA)
 - ✅ Includes special editions and electric vehicles: Mercedes EQS580, Genesis Electrified GV70, Range Rover Electric
 
+### VIN-Based Vehicle Linking System Implementation (July 21, 2025)
+- ✅ Added chassis number (VIN) field to specifications management system for vehicle-specific linking
+- ✅ Enhanced specifications database schema to include optional chassisNumber field with proper TypeScript integration
+- ✅ Updated specifications management component with VIN input field and visual indicators showing linked chassis numbers
+- ✅ Added chassis number field to image management system for linking images to specific vehicles
+- ✅ Enhanced image links database schema and UI to support VIN-based image associations
+- ✅ Updated MemStorage implementation to handle chassis number data in CRUD operations
+- ✅ Visual enhancements: specifications display blue badges for linked VIN numbers, image management shows chassis numbers in details
+- ✅ Both systems now support optional vehicle-specific linking while maintaining general specification/image management functionality
+
 ### Image Management System Implementation (July 20, 2025)
 - ✅ Created comprehensive Image Management component for linking images to vehicle specifications
 - ✅ Added "إدارة الصور" button next to "إدارة المواصفات" in main inventory page admin section
