@@ -123,18 +123,13 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
             "اللون الخارجي": "exteriorColor",
             "اللون الداخلي": "interiorColor",
             "الحالة": "status",
-            "نوع الاستيراد": "importType",
             "الموقع": "location",
+            "الإستيراد": "importType",
             "رقم الهيكل": "chassisNumber",
+            "نوع الملكية": "ownershipType",
+            "تاريخ الدخول": "entryDate",
             "السعر": "price",
-            "المهندس": "engineer",
-            "تاريخ الوصول": "arrivalDate",
-            "تاريخ البيع": "saleDate",
-            "المشتري": "buyer",
-            "سعر البيع": "salePrice",
-            "الربح": "profit",
-            "الملاحظات": "notes",
-            "مباع": "isSold"
+            "الملاحظات": "notes"
           };
           
           // Convert rows to inventory items
@@ -180,7 +175,7 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
         } catch (error) {
           toast({
             title: "خطأ في معالجة الملف",
-            description: error.message || "تأكد من صحة تنسيق الملف واتباع النموذج المحدد",
+            description: error instanceof Error ? error.message : "تأكد من صحة تنسيق الملف واتباع النموذج المحدد",
             variant: "destructive",
           });
           setIsProcessing(false);
@@ -208,32 +203,28 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
   };
 
   const downloadTemplate = () => {
-    // Create a comprehensive CSV template for Excel with all inventory fields
+    // Create CSV template with only the specified columns
     const headers = [
       "الصانع", "الفئة", "درجة التجهيز", "سعة المحرك", "السنة", "اللون الخارجي", 
-      "اللون الداخلي", "الحالة", "نوع الاستيراد", "الموقع", "رقم الهيكل", 
-      "السعر", "المهندس", "تاريخ الوصول", "تاريخ البيع", "المشتري", 
-      "سعر البيع", "الربح", "الملاحظات", "مباع"
+      "اللون الداخلي", "الحالة", "الموقع", "الإستيراد", "رقم الهيكل", 
+      "نوع الملكية", "تاريخ الدخول", "السعر", "الملاحظات"
     ];
     
     const sampleRows = [
       [
         "مرسيدس", "E200", "Avantgarde", "2.0L", "2025", "أسود", 
-        "بيج", "متوفر", "شخصي", "المعرض", "WDB2130461A123456", 
-        "150000", "أحمد محمد", "2024-01-15", "", "", 
-        "", "", "سيارة جديدة - حالة ممتازة", "لا"
+        "بيج", "متوفر", "المعرض", "شخصي", "WDB2130461A123456", 
+        "ملك الشركة", "2024-01-15", "150000", "سيارة جديدة - حالة ممتازة"
       ],
       [
         "بي ام دبليو", "X5", "xDrive40i", "3.0L", "2024", "أبيض", 
-        "أسود", "في الطريق", "شركة", "الميناء", "WBAFR9C50KC123457", 
-        "200000", "سالم أحمد", "2024-02-20", "", "", 
-        "", "", "موديل حديث - فل أوبشن", "لا"
+        "أسود", "في الطريق", "الميناء", "شركة", "WBAFR9C50KC123457", 
+        "معرض (وسيط)", "2024-02-20", "200000", "موديل حديث - فل أوبشن"
       ],
       [
         "تويوتا", "كامري", "Grande", "2.5L", "2024", "فضي", 
-        "رمادي", "مباع", "مستعمل شخصي", "المعرض", "4T1BF1FK0GU123458", 
-        "80000", "محمد سالم", "2023-12-01", "2024-01-10", "خالد العلي", 
-        "85000", "5000", "حالة جيدة - تم البيع", "نعم"
+        "رمادي", "متوفر", "المعرض", "مستعمل شخصي", "4T1BF1FK0GU123458", 
+        "ملك الشركة", "2023-12-01", "80000", "حالة جيدة"
       ]
     ];
     
@@ -271,7 +262,7 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
             <CardHeader className="pb-3">
               <CardTitle className="text-base">تحميل النموذج</CardTitle>
               <CardDescription>
-                احصل على نموذج Excel شامل يحتوي على جميع حقول المخزون: الصانع، الفئة، درجة التجهيز، سعة المحرك، السنة، الألوان، الحالة، نوع الاستيراد، الموقع، رقم الهيكل، السعر، المهندس، التواريخ، بيانات البيع والملاحظات
+                احصل على نموذج Excel يحتوي على الأعمدة المطلوبة: الصانع، الفئة، درجة التجهيز، سعة المحرك، السنة، اللون الخارجي، اللون الداخلي، الحالة، الموقع، الإستيراد، رقم الهيكل، نوع الملكية، تاريخ الدخول، السعر، الملاحظات
               </CardDescription>
             </CardHeader>
             <CardContent>
