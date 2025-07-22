@@ -35,7 +35,7 @@ export default function ReservationsPage() {
 
   const sellMutation = useMutation({
     mutationFn: async (itemId: number) => {
-      return apiRequest(`/api/inventory/${itemId}/sell-reserved`, "PUT");
+      return apiRequest("PUT", `/api/inventory/${itemId}/sell-reserved`, {});
     },
     onSuccess: () => {
       toast({
@@ -58,7 +58,7 @@ export default function ReservationsPage() {
 
   const cancelReservationMutation = useMutation({
     mutationFn: async (itemId: number) => {
-      return apiRequest(`/api/inventory/${itemId}/cancel-reservation`, "PUT");
+      return apiRequest("PUT", `/api/inventory/${itemId}/cancel-reservation`, {});
     },
     onSuccess: () => {
       toast({
