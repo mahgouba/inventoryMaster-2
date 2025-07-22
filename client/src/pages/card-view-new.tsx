@@ -1153,17 +1153,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <img src="/interior-color.svg" alt="Interior Color" className="w-6 h-6" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.interiorColor}</span>
                             </div>
-                            <div className="flex flex-col gap-1">
-                              <div className="flex items-center gap-1">
-                                <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-6 h-6" />
-                                <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.importType}</span>
-                              </div>
-                              {item.chassisNumber && (
-                                <div className="flex items-center gap-2">
-                                  <span className="font-bold text-xs" style={{color: '#00627F'}}>VIN:</span>
-                                  <span className="font-medium font-latin text-slate-700 dark:text-slate-300 text-xs">{item.chassisNumber}</span>
-                                </div>
-                              )}
+                            <div className="flex items-center gap-1">
+                              <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-6 h-6" />
+                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.importType}</span>
                             </div>
                             {item.ownershipType && (
                               <div className="flex items-center gap-1">
@@ -1173,10 +1165,19 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             )}
                           </div>
                           
-                          {/* Row 3: Location */}
-                          <div className="flex items-center gap-1">
-                            <img src="/location.svg" alt="Location" className="w-6 h-6" style={{filter: 'brightness(0) saturate(100%) invert(25%) sepia(78%) saturate(1058%) hue-rotate(180deg) brightness(96%) contrast(96%)'}} />
-                            <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.location}</span>
+                          {/* Row 3: Location and Chassis Number */}
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="flex items-center gap-1">
+                              <img src="/location.svg" alt="Location" className="w-6 h-6" style={{filter: 'brightness(0) saturate(100%) invert(25%) sepia(78%) saturate(1058%) hue-rotate(180deg) brightness(96%) contrast(96%)'}} />
+                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.location}</span>
+                            </div>
+                            {item.chassisNumber && (
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-xs" style={{color: '#00627F'}}>VIN:</span>
+                                <span className="font-medium font-latin text-slate-700 dark:text-slate-300 text-xs">{item.chassisNumber}</span>
+                              </div>
+                            )}
+                            <div></div> {/* Empty cell for alignment */}
                           </div>
                           
                           {item.price && (
