@@ -1154,7 +1154,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.importType}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <img src="/import-type.svg" alt="Ownership Type" className="w-4 h-4" />
+                              <img src="/اللون-الخارجي.svg" alt="Exterior Color" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.ownershipType}</span>
                             </div>
                           </div>
