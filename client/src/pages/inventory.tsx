@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react";
+import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Eye, EyeOff, Calendar, ShoppingCart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -222,9 +222,9 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
     const trimLevels = availableData
       .map(item => item.trimLevel)
-      .filter((trimLevel, index, self) => trimLevel && self.indexOf(trimLevel) === index)
+      .filter((trimLevel, index, self) => trimLevel != null && self.indexOf(trimLevel) === index)
       .sort();
-    return trimLevels;
+    return trimLevels as string[];
   };
   
   const getSimpleColors = (): string[] => {
@@ -804,7 +804,16 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                             
                             {/* Multi-Select Filter Component */}
                             {(() => {
-                              const MultiSelectFilter = ({ title, items, selectedFilters, onFilterToggle, getCount, showToggle, toggleState, onToggleChange }) => (
+                              const MultiSelectFilter = ({ title, items, selectedFilters, onFilterToggle, getCount, showToggle, toggleState, onToggleChange }: {
+                                title: string;
+                                items: any[];
+                                selectedFilters: string[];
+                                onFilterToggle: (item: any) => void;
+                                getCount: (item: any) => number;
+                                showToggle: boolean;
+                                toggleState: boolean;
+                                onToggleChange: (state: boolean) => void;
+                              }) => (
                                 <div className="space-y-2">
                                   <div className="flex items-center justify-between">
                                     <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
@@ -892,6 +901,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                       selectedFilters={manufacturerFilter} 
                                       onFilterToggle={(item) => toggleFilter(manufacturerFilter, setManufacturerFilter, item)} 
                                       getCount={(item) => getFilterCount("manufacturer", item)} 
+                                      showToggle={true}
                                       toggleState={showManufacturerFilter}
                                       onToggleChange={setShowManufacturerFilter}
                                     />
@@ -901,6 +911,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                       selectedFilters={categoryFilter} 
                                       onFilterToggle={(item) => toggleFilter(categoryFilter, setCategoryFilter, item)} 
                                       getCount={(item) => getFilterCount("category", item)} 
+                                      showToggle={true}
                                       toggleState={showCategoryFilter}
                                       onToggleChange={setShowCategoryFilter}
                                     />
@@ -910,6 +921,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                       selectedFilters={trimLevelFilter} 
                                       onFilterToggle={(item) => toggleFilter(trimLevelFilter, setTrimLevelFilter, item)} 
                                       getCount={(item) => getFilterCount("trimLevel", item)} 
+                                      showToggle={true}
                                       toggleState={showTrimLevelFilter}
                                       onToggleChange={setShowTrimLevelFilter}
                                     />
@@ -919,6 +931,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                       selectedFilters={yearFilter} 
                                       onFilterToggle={(item) => toggleFilter(yearFilter, setYearFilter, item)} 
                                       getCount={(item) => getFilterCount("year", item)} 
+                                      showToggle={true}
                                       toggleState={showYearFilter}
                                       onToggleChange={setShowYearFilter}
                                     />
@@ -928,6 +941,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                       selectedFilters={engineCapacityFilter} 
                                       onFilterToggle={(item) => toggleFilter(engineCapacityFilter, setEngineCapacityFilter, item)} 
                                       getCount={(item) => getFilterCount("engineCapacity", item)} 
+                                      showToggle={true}
                                       toggleState={showEngineCapacityFilter}
                                       onToggleChange={setShowEngineCapacityFilter}
                                     />
@@ -937,6 +951,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                       selectedFilters={exteriorColorFilter} 
                                       onFilterToggle={(item) => toggleFilter(exteriorColorFilter, setExteriorColorFilter, item)} 
                                       getCount={(item) => getFilterCount("exteriorColor", item)} 
+                                      showToggle={true}
                                       toggleState={showExteriorColorFilter}
                                       onToggleChange={setShowExteriorColorFilter}
                                     />
@@ -946,6 +961,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                       selectedFilters={interiorColorFilter} 
                                       onFilterToggle={(item) => toggleFilter(interiorColorFilter, setInteriorColorFilter, item)} 
                                       getCount={(item) => getFilterCount("interiorColor", item)} 
+                                      showToggle={true}
                                       toggleState={showInteriorColorFilter}
                                       onToggleChange={setShowInteriorColorFilter}
                                     />
@@ -955,6 +971,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                       selectedFilters={statusFilter} 
                                       onFilterToggle={(item) => toggleFilter(statusFilter, setStatusFilter, item)} 
                                       getCount={(item) => getFilterCount("status", item)} 
+                                      showToggle={true}
                                       toggleState={showStatusFilter}
                                       onToggleChange={setShowStatusFilter}
                                     />
@@ -964,6 +981,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                       selectedFilters={importTypeFilter} 
                                       onFilterToggle={(item) => toggleFilter(importTypeFilter, setImportTypeFilter, item)} 
                                       getCount={(item) => getFilterCount("importType", item)} 
+                                      showToggle={true}
                                       toggleState={showImportTypeFilter}
                                       onToggleChange={setShowImportTypeFilter}
                                     />
@@ -973,6 +991,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                       selectedFilters={ownershipTypeFilter} 
                                       onFilterToggle={(item) => toggleFilter(ownershipTypeFilter, setOwnershipTypeFilter, item)} 
                                       getCount={(item) => getFilterCount("ownershipType", item)} 
+                                      showToggle={true}
                                       toggleState={showOwnershipTypeFilter}
                                       onToggleChange={setShowOwnershipTypeFilter}
                                     />
