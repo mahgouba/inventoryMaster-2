@@ -216,6 +216,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Print now displays clean, professional table suitable for landscape printing with minimal styling
 - ✅ Updated manufacturer statistics display to use authentic manufacturer logos instead of emoji icons
 - ✅ Integrated manufacturer logo system from shared/manufacturer-logos.ts for professional branding display
+- ✅ Replaced chassis number icon with "VIN:" text label in card view per user request for better clarity
 
 ### Comprehensive Vehicle Edit Form Enhancement (July 21, 2025)
 - ✅ Enhanced vehicle edit form to display complete vehicle data instead of just basic inventory information

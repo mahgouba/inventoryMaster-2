@@ -1167,7 +1167,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           <div className="grid grid-cols-2 gap-3">
                             {item.chassisNumber && (
                               <div className="flex items-center gap-2">
-                                <img src="/chassis.svg" alt="Chassis Number" className="w-6 h-6" />
+                                <span className="text-slate-600 dark:text-slate-400 font-bold text-xs">VIN:</span>
                                 <span className="font-medium font-latin text-slate-700 dark:text-slate-300 text-xs">{item.chassisNumber}</span>
                               </div>
                             )}
