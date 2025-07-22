@@ -1110,28 +1110,27 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                       </CardHeader>
                       <CardContent className="pt-0">
                         <div className="space-y-3 text-sm">
-                          {/* Row 1: Category and Trim Level */}
+                          {/* Row 1: Category and Trim Level with Icons */}
                           <div className="grid grid-cols-2 gap-3">
-                            <div className="flex flex-col">
-                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">الفئة:</span>
+                            <div className="flex items-center gap-2">
+                              <img src="/car.svg" alt="Category" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.category}</span>
                             </div>
                             {item.trimLevel && (
                               <div className="flex flex-col">
-                                <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">درجة التجهيز:</span>
                                 <span className="font-semibold text-slate-800 dark:text-slate-200">{item.trimLevel}</span>
                               </div>
                             )}
                           </div>
                           
-                          {/* Row 2: Engine Capacity and Year */}
+                          {/* Row 2: Engine Capacity and Year with Icons */}
                           <div className="grid grid-cols-2 gap-3">
-                            <div className="flex flex-col">
-                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">سعة المحرك:</span>
+                            <div className="flex items-center gap-2">
+                              <img src="/car-engine.svg" alt="Engine" className="w-4 h-4" />
                               <span className="font-semibold font-latin text-slate-800 dark:text-slate-200">{item.engineCapacity}</span>
                             </div>
-                            <div className="flex flex-col">
-                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">السنة:</span>
+                            <div className="flex items-center gap-2">
+                              <img src="/year.svg" alt="Year" className="w-4 h-4" />
                               <span className="font-semibold font-latin text-slate-800 dark:text-slate-200">{item.year}</span>
                             </div>
                           </div>
