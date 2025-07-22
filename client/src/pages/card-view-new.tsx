@@ -1211,7 +1211,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="px-3 h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
+                                className="px-3 h-8 hover:bg-yellow-50 border-yellow-300"
+                                style={{color: '#BF9231'}}
                                 onClick={() => handleShareItem(item)}
                                 title="مشاركة"
                               >
