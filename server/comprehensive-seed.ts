@@ -2,10 +2,10 @@ import { storage } from './storage';
 
 // Comprehensive luxury vehicle inventory data
 const luxuryVehicles = [
-  // Range Rover vehicles (8 vehicles)
+  // Land Rover vehicles (8 vehicles)
   {
-    manufacturer: "رنج روفر",
-    category: "Range Rover Vogue",
+    manufacturer: "لاند روفر",
+    category: "رنج روفر فوغ",
     trimLevel: "HSE",
     engineCapacity: "V8 5.0L",
     year: 2024,
@@ -21,8 +21,8 @@ const luxuryVehicles = [
     notes: "مواصفات فاخرة كاملة مع بانوراما وشاشات خلفية"
   },
   {
-    manufacturer: "رنج روفر",
-    category: "Range Rover Sport",
+    manufacturer: "لاند روفر",
+    category: "رنج روفر سبورت",
     trimLevel: "Dynamic",
     engineCapacity: "V6 3.0L Hybrid",
     year: 2024,
@@ -38,8 +38,8 @@ const luxuryVehicles = [
     notes: "هايبرد بمواصفات رياضية"
   },
   {
-    manufacturer: "رنج روفر",
-    category: "Range Rover Evoque",
+    manufacturer: "لاند روفر",
+    category: "رنج روفر إيفوك",
     trimLevel: "R-Dynamic",
     engineCapacity: "4-Cylinder 2.0L",
     year: 2023,
@@ -55,8 +55,8 @@ const luxuryVehicles = [
     notes: "كومباكت SUV بتصميم عصري"
   },
   {
-    manufacturer: "رنج روفر",
-    category: "Range Rover Electric",
+    manufacturer: "لاند روفر",
+    category: "رنج روفر كهربائي",
     trimLevel: "First Edition",
     engineCapacity: "Electric 523HP",
     year: 2024,
@@ -73,6 +73,40 @@ const luxuryVehicles = [
     reservedBy: "أحمد محمد العلي",
     reservationNotes: "العميل يريد التسليم خلال أسبوع",
     notes: "أول إصدار كهربائي من رنج روفر"
+  },
+  {
+    manufacturer: "لاند روفر",
+    category: "دفيندر",
+    trimLevel: "110 X",
+    engineCapacity: "4-Cylinder 2.0L Turbo",
+    year: 2024,
+    exteriorColor: "أخضر زيتوني",
+    interiorColor: "جلد أسود",
+    chassisNumber: "LR2024005",
+    status: "متوفر",
+    importType: "شخصي",
+    location: "الدمام",
+    price: 285000,
+    ownershipType: "معرض (وسيط)",
+    arrivalDate: new Date('2024-01-20'),
+    notes: "دفيندر كلاسيك بمواصفات حديثة"
+  },
+  {
+    manufacturer: "لاند روفر",
+    category: "دفيندر",
+    trimLevel: "90 Hard Top",
+    engineCapacity: "4-Cylinder 2.0L Turbo",
+    year: 2023,
+    exteriorColor: "أبيض",
+    interiorColor: "مقاعد قماش",
+    chassisNumber: "LR2023006",
+    status: "في الطريق",
+    importType: "الشركة",
+    location: "جدة",
+    price: 245000,
+    ownershipType: "ملك الشركة",
+    arrivalDate: new Date('2024-02-15'),
+    notes: "إصدار العمل الشاق بدون سقف"
   },
   
   // Mercedes vehicles (15 vehicles)
@@ -353,7 +387,7 @@ const luxuryVehicles = [
 // Manufacturers data
 const manufacturers = [
   { name: "مرسيدس", logo: "/mercedes-logo.svg" },
-  { name: "رنج روفر", logo: "/range-rover-logo.svg" },
+  { name: "لاند روفر", logo: "/landrover.svg" },
   { name: "لكزس", logo: "/lexus-logo.svg" },
   { name: "جينيسيس", logo: "/genesis-logo.svg" },
   { name: "نيسان", logo: "/nissan-logo.svg" },
