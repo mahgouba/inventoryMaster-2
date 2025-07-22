@@ -1162,7 +1162,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 5: Location and Chassis Number with Icons */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center gap-2">
-                              <img src="/location.svg" alt="Location" className="w-4 h-4" />
+                              <img src="/اللون-الداخلي.svg" alt="Interior Color" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.location}</span>
                             </div>
                             {item.chassisNumber && (
