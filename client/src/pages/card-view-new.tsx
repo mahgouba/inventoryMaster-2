@@ -1147,7 +1147,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             </div>
                           </div>
                           
-                          {/* Row 2: Interior Color, Import Type, Location */}
+                          {/* Row 2: Interior Color, Import Type, Ownership Type */}
                           <div className="grid grid-cols-3 gap-2">
                             <div className="flex items-center gap-1">
                               <img src="/interior-color.svg" alt="Interior Color" className="w-6 h-6" />
@@ -1157,26 +1157,24 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-6 h-6" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.importType}</span>
                             </div>
+                            {item.ownershipType && (
+                              <div className="flex items-center gap-1">
+                                <img src="/logos/ownerchip.svg" alt="Ownership Type" className="w-6 h-6" />
+                                <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.ownershipType}</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Row 3: Location and Chassis Number */}
+                          <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center gap-1">
                               <img src="/location.svg" alt="Location" className="w-6 h-6" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.location}</span>
                             </div>
-                          </div>
-                          
-                          {/* Row 3: Chassis Number and Entry Date */}
-                          <div className="grid grid-cols-2 gap-3">
                             {item.chassisNumber && (
                               <div className="flex items-center gap-2">
                                 <span className="text-slate-600 dark:text-slate-400 font-bold text-xs">VIN:</span>
                                 <span className="font-medium font-latin text-slate-700 dark:text-slate-300 text-xs">{item.chassisNumber}</span>
-                              </div>
-                            )}
-                            {item.entryDate && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-slate-500 text-xs">تاريخ الإدخال:</span>
-                                <span className="font-medium text-slate-600 text-xs">
-                                  {new Date(item.entryDate).toLocaleDateString('en-US')}
-                                </span>
                               </div>
                             )}
                           </div>
