@@ -15,16 +15,16 @@ import { ManufacturerLogo } from "./manufacturer-logo";
 
 interface InventoryTableProps {
   searchQuery: string;
-  manufacturerFilter: string;
-  categoryFilter: string;
-  trimLevelFilter: string;
-  yearFilter: string;
-  engineCapacityFilter: string;
-  interiorColorFilter: string;
-  exteriorColorFilter: string;
-  statusFilter: string;
-  importTypeFilter: string;
-  ownershipTypeFilter: string;
+  manufacturerFilter: string[];
+  categoryFilter: string[];
+  trimLevelFilter: string[];
+  yearFilter: string[];
+  engineCapacityFilter: string[];
+  interiorColorFilter: string[];
+  exteriorColorFilter: string[];
+  statusFilter: string[];
+  importTypeFilter: string[];
+  ownershipTypeFilter: string[];
   showSoldCars: boolean;
   userRole: string;
   username: string;
@@ -196,16 +196,16 @@ export default function InventoryTable({
         Object.values(item).some(value => 
           value?.toString().toLowerCase().includes(searchQuery.toLowerCase())
         );
-      const matchesManufacturer = !manufacturerFilter || manufacturerFilter === "جميع الصناع" || item.manufacturer === manufacturerFilter;
-      const matchesCategory = !categoryFilter || categoryFilter === "جميع الفئات" || item.category === categoryFilter;
-      const matchesTrimLevel = !trimLevelFilter || trimLevelFilter === "جميع درجات التجهيز" || item.trimLevel === trimLevelFilter;
-      const matchesYear = !yearFilter || yearFilter === "جميع السنوات" || item.year?.toString() === yearFilter;
-      const matchesEngineCapacity = !engineCapacityFilter || engineCapacityFilter === "جميع السعات" || item.engineCapacity === engineCapacityFilter;
-      const matchesInteriorColor = !interiorColorFilter || interiorColorFilter === "جميع الألوان الداخلية" || item.interiorColor === interiorColorFilter;
-      const matchesExteriorColor = !exteriorColorFilter || exteriorColorFilter === "جميع الألوان الخارجية" || item.exteriorColor === exteriorColorFilter;
-      const matchesStatus = !statusFilter || statusFilter === "جميع الحالات" || item.status === statusFilter;
-      const matchesImportType = !importTypeFilter || importTypeFilter === "جميع الأنواع" || item.importType === importTypeFilter;
-      const matchesOwnershipType = !ownershipTypeFilter || ownershipTypeFilter === "جميع أنواع الملكية" || item.ownershipType === ownershipTypeFilter;
+      const matchesManufacturer = manufacturerFilter.length === 0 || manufacturerFilter.includes(item.manufacturer || "");
+      const matchesCategory = categoryFilter.length === 0 || categoryFilter.includes(item.category || "");
+      const matchesTrimLevel = trimLevelFilter.length === 0 || trimLevelFilter.includes(item.trimLevel || "");
+      const matchesYear = yearFilter.length === 0 || yearFilter.includes(String(item.year));
+      const matchesEngineCapacity = engineCapacityFilter.length === 0 || engineCapacityFilter.includes(item.engineCapacity || "");
+      const matchesInteriorColor = interiorColorFilter.length === 0 || interiorColorFilter.includes(item.interiorColor || "");
+      const matchesExteriorColor = exteriorColorFilter.length === 0 || exteriorColorFilter.includes(item.exteriorColor || "");
+      const matchesStatus = statusFilter.length === 0 || statusFilter.includes(item.status || "");
+      const matchesImportType = importTypeFilter.length === 0 || importTypeFilter.includes(item.importType || "");
+      const matchesOwnershipType = ownershipTypeFilter.length === 0 || ownershipTypeFilter.includes(item.ownershipType || "");
       // إذا كان إظهار السيارات المباعة مفعلاً، اعرض جميع السيارات
       // إذا كان مطفياً، اعرض فقط السيارات غير المباعة
       const matchesSoldFilter = showSoldCars ? true : item.status !== "مباع";
