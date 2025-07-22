@@ -136,9 +136,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
   // Function to get import type icon based on data
   const getImportTypeIcon = (importType: string) => {
-    if (importType.includes("شركة")) return "/logos/import-type-company.svg";
-    if (importType.includes("شخصي")) return "/logos/import-type-personal.svg"; 
-    if (importType.includes("مستعمل")) return "/logos/import-type-secondhand.svg";
+    if (importType.includes("شركة")) return "/import-type-company.svg";
+    if (importType.includes("شخصي")) return "/import-type-personal.svg"; 
+    if (importType.includes("مستعمل")) return "/import-type-secondhand.svg";
     return "/import-type.svg"; // fallback
   };
 
@@ -1146,11 +1146,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 3: Exterior Color and Interior Color with Icons */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center gap-2">
-                              <img src="/logos/exterior-color.svg" alt="Exterior Color" className="w-4 h-4" />
+                              <img src="/exterior-color.svg" alt="Exterior Color" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.exteriorColor}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <img src="/logos/interior-color.svg" alt="Interior Color" className="w-4 h-4" />
+                              <img src="/interior-color.svg" alt="Interior Color" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.interiorColor}</span>
                             </div>
                           </div>
