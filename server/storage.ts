@@ -1063,15 +1063,15 @@ export class MemStorage implements IStorage {
     return true;
   }
 
-  async getReservedItems(): Promise<InventoryItem[]> {
+  async getSoldItems(): Promise<InventoryItem[]> {
     return Array.from(this.inventoryItems.values()).filter(item => 
-      item.status === "محجوز" && !item.isSold
+      item.isSold === true && item.status === "مباع"
     );
   }
 
-  async getReservedItems(): Promise<InventoryItem[]> {
+  async getSoldItems(): Promise<InventoryItem[]> {
     return Array.from(this.inventoryItems.values()).filter(item => 
-      item.status === "محجوز" && !item.isSold
+      item.isSold === true && item.status === "مباع"
     );
   }
 

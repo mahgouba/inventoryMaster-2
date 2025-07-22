@@ -712,8 +712,14 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
                       <Link href="/reservations">
                         <DropdownMenuItem>
-                          <MessageSquare className="mr-2 h-4 w-4" />
+                          <Calendar className="mr-2 h-4 w-4" />
                           إدارة الحجوزات
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/sold-vehicles">
+                        <DropdownMenuItem>
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          السيارات المباعة
                         </DropdownMenuItem>
                       </Link>
                     </DropdownMenuContent>

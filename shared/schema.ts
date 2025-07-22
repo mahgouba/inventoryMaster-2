@@ -39,6 +39,13 @@ export const inventoryItems = pgTable("inventory_items", {
   customerName: text("customer_name"), // اسم العميل
   customerPhone: text("customer_phone"), // رقم جوال العميل
   paidAmount: decimal("paid_amount", { precision: 10, scale: 2 }), // المبلغ المدفوع
+  // Sale information fields
+  salePrice: decimal("sale_price", { precision: 10, scale: 2 }), // سعر البيع
+  paymentMethod: text("payment_method"), // طريقة الدفع (نقداً/بنك)
+  bankName: text("bank_name"), // اسم البنك
+  soldToCustomerName: text("sold_to_customer_name"), // اسم العميل المشتري
+  soldToCustomerPhone: text("sold_to_customer_phone"), // رقم جوال العميل المشتري
+  soldBySalesRep: text("sold_by_sales_rep"), // مندوب المبيعات الذي قام بالبيع
 });
 
 // Manufacturers table for storing manufacturer logos

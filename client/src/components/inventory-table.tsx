@@ -12,6 +12,7 @@ import type { InventoryItem } from "@shared/schema";
 import InventoryForm from "./inventory-form";
 import { ManufacturerLogo } from "./manufacturer-logo";
 import { ReservationDialog } from "./reservation-dialog";
+import { SellVehicleDialog } from "./sell-vehicle-dialog";
 
 
 interface InventoryTableProps {
@@ -420,16 +421,10 @@ export default function InventoryTable({
                           <Calendar className="h-4 w-4" />
                         </Button>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleSell(item.id)}
-                        className="text-green-600 hover:text-green-800 p-1"
-                        title="بيع"
-                        disabled={sellMutation.isPending || item.isSold}
-                      >
-                        <DollarSign className="h-4 w-4" />
-                      </Button>
+                      <SellVehicleDialog
+                        vehicleId={item.id}
+                        vehicleInfo={`${item.manufacturer} ${item.category} - ${item.year} - ${item.chassisNumber}`}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>

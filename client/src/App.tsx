@@ -24,6 +24,7 @@ import DynamicCompanyControl from "@/pages/dynamic-company-control";
 import IntegrationManagementPage from "@/pages/integration-management";
 import ComprehensiveListsPage from "@/pages/comprehensive-lists";
 import ReservationsPage from "@/pages/reservations";
+import SoldVehiclesPage from "@/pages/sold-vehicles";
 
 interface User {
   username: string;
@@ -51,6 +52,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
       <Route path="/invoice-management" component={InvoiceManagementPage} />
       <Route path="/locations" component={() => <LocationPage userRole={user.role} onLogout={onLogout} />} />
       <Route path="/reservations" component={() => <ReservationsPage />} />
+      <Route path="/sold-vehicles" component={() => <SoldVehiclesPage />} />
       {/* صفحات الأدمن فقط */}
       {user.role === "admin" && (
         <>

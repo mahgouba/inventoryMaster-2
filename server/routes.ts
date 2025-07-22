@@ -761,6 +761,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced sell vehicle with comprehensive sale information
+  app.put("/api/inventory/:id/sell", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { customerName, customerPhone, salesRepresentative, salePrice, paymentMethod, bankName } = req.body;
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid item ID" });
+      }
+      
+      if (!customerName || !customerPhone || !salesRepresentative || !salePrice || !paymentMethod) {
+        return res.status(400).json({ message: "Customer name, phone, sales representative, sale price and payment method are required" });
+      }
+      
+      const item = await storage.updateInventoryItem(id, {
+        status: "مباع",
+        isSold: true,
+        soldDate: new Date(),
+        soldToCustomerName: customerName,
+        soldToCustomerPhone: customerPhone,
+        soldBySalesRep: salesRepresentative,
+        salePrice: salePrice,
+        paymentMethod: paymentMethod,
+        bankName: paymentMethod === "بنك" ? bankName : null,
+        // Clear reservation data if it was reserved
+        reservationDate: null,
+        reservedBy: null,
+        customerName: null,
+        customerPhone: null,
+        paidAmount: null,
+        reservationNote: null,
+        salesRepresentative: null
+      });
+      
+      if (!item) {
+        return res.status(404).json({ message: "Item not found" });
+      }
+      
+      res.json(item);
+    } catch (error) {
+      console.error("Error selling inventory item:", error);
+      res.status(500).json({ message: "Failed to sell inventory item" });
+    }
+  });
+
+  // Get sold inventory items
+  app.get("/api/inventory/sold", async (req, res) => {
+    try {
+      const items = await storage.getSoldItems();
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching sold items:", error);
+      res.status(500).json({ message: "Failed to fetch sold items" });
+    }
+  });
+
   // Enhanced cancel reservation with customer data cleanup
   app.put("/api/inventory/:id/cancel-reservation", async (req, res) => {
     try {
@@ -776,7 +832,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customerName: null,
         customerPhone: null,
         paidAmount: null,
-        reservationNote: null
+        reservationNote: null,
+        salesRepresentative: null
       });
       
       if (!item) {
