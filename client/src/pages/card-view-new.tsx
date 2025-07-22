@@ -832,41 +832,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             
                             return (
                               <div className="space-y-4">
-                                {/* Master Filter Controls */}
-                                <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                                  <span className="text-sm font-semibold text-blue-800 dark:text-blue-200">التحكم في جميع الفلاتر</span>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => {
-                                      const allFiltersVisible = showManufacturerFilter && showCategoryFilter && showTrimLevelFilter && 
-                                        showYearFilter && showEngineCapacityFilter && showExteriorColorFilter && 
-                                        showInteriorColorFilter && showStatusFilter && showImportTypeFilter && showOwnershipTypeFilter;
-                                      
-                                      const newState = !allFiltersVisible;
-                                      setShowManufacturerFilter(newState);
-                                      setShowCategoryFilter(newState);
-                                      setShowTrimLevelFilter(newState);
-                                      setShowYearFilter(newState);
-                                      setShowEngineCapacityFilter(newState);
-                                      setShowExteriorColorFilter(newState);
-                                      setShowInteriorColorFilter(newState);
-                                      setShowStatusFilter(newState);
-                                      setShowImportTypeFilter(newState);
-                                      setShowOwnershipTypeFilter(newState);
-                                    }}
-                                    className="p-2 h-9 w-9 hover:bg-blue-100 dark:hover:bg-blue-900/30"
-                                  >
-                                    {(showManufacturerFilter || showCategoryFilter || showTrimLevelFilter || 
-                                      showYearFilter || showEngineCapacityFilter || showExteriorColorFilter || 
-                                      showInteriorColorFilter || showStatusFilter || showImportTypeFilter || showOwnershipTypeFilter) ? (
-                                      <Eye size={18} className="text-blue-600 dark:text-blue-400" />
-                                    ) : (
-                                      <EyeOff size={18} className="text-slate-400 dark:text-slate-500" />
-                                    )}
-                                  </Button>
-                                </div>
-                                
+
                                 {/* Individual Filters with Toggles */}
                                 <div className="space-y-3">
                                   <MultiSelectFilter 
