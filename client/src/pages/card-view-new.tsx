@@ -49,6 +49,7 @@ import VehicleShare from "@/components/vehicle-share";
 import SpecificationsManagement from "@/components/specifications-management";
 import QuotationManagement from "@/components/quotation-management";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
+import MultiSelectFilter from "@/components/multi-select-filter";
 
 import type { InventoryItem } from "@shared/schema";
 
@@ -167,74 +168,74 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
       
       if (field === "category") {
         // Apply manufacturer filter if set
-        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
+        if (selectedManufacturer.length > 0 && !selectedManufacturer.includes(item.manufacturer || "")) return false;
         return true;
       }
       
       if (field === "trimLevel") {
         // Apply manufacturer and category filters
-        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
-        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
+        if (selectedManufacturer.length > 0 && !selectedManufacturer.includes(item.manufacturer || "")) return false;
+        if (selectedCategory.length > 0 && !selectedCategory.includes(item.category || "")) return false;
         return true;
       }
       
       if (field === "year") {
         // Apply manufacturer, category, trimLevel filters
-        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
-        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
-        if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
+        if (selectedManufacturer.length > 0 && !selectedManufacturer.includes(item.manufacturer || "")) return false;
+        if (selectedCategory.length > 0 && !selectedCategory.includes(item.category || "")) return false;
+        if (selectedTrimLevel.length > 0 && !selectedTrimLevel.includes(item.trimLevel || "")) return false;
         return true;
       }
       
       if (field === "engineCapacity") {
         // Apply all previous filters
-        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
-        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
-        if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
-        if (selectedYear !== "الكل" && String(item.year) !== selectedYear) return false;
+        if (selectedManufacturer.length > 0 && !selectedManufacturer.includes(item.manufacturer || "")) return false;
+        if (selectedCategory.length > 0 && !selectedCategory.includes(item.category || "")) return false;
+        if (selectedTrimLevel.length > 0 && !selectedTrimLevel.includes(item.trimLevel || "")) return false;
+        if (selectedYear.length > 0 && !selectedYear.includes(String(item.year))) return false;
         return true;
       }
       
       if (field === "exteriorColor") {
-        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
-        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
-        if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
-        if (selectedYear !== "الكل" && String(item.year) !== selectedYear) return false;
-        if (selectedEngineCapacity !== "الكل" && item.engineCapacity !== selectedEngineCapacity) return false;
+        if (selectedManufacturer.length > 0 && !selectedManufacturer.includes(item.manufacturer || "")) return false;
+        if (selectedCategory.length > 0 && !selectedCategory.includes(item.category || "")) return false;
+        if (selectedTrimLevel.length > 0 && !selectedTrimLevel.includes(item.trimLevel || "")) return false;
+        if (selectedYear.length > 0 && !selectedYear.includes(String(item.year))) return false;
+        if (selectedEngineCapacity.length > 0 && !selectedEngineCapacity.includes(item.engineCapacity || "")) return false;
         return true;
       }
       
       if (field === "interiorColor") {
-        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
-        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
-        if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
-        if (selectedYear !== "الكل" && String(item.year) !== selectedYear) return false;
-        if (selectedEngineCapacity !== "الكل" && item.engineCapacity !== selectedEngineCapacity) return false;
-        if (selectedExteriorColor !== "الكل" && item.exteriorColor !== selectedExteriorColor) return false;
+        if (selectedManufacturer.length > 0 && !selectedManufacturer.includes(item.manufacturer || "")) return false;
+        if (selectedCategory.length > 0 && !selectedCategory.includes(item.category || "")) return false;
+        if (selectedTrimLevel.length > 0 && !selectedTrimLevel.includes(item.trimLevel || "")) return false;
+        if (selectedYear.length > 0 && !selectedYear.includes(String(item.year))) return false;
+        if (selectedEngineCapacity.length > 0 && !selectedEngineCapacity.includes(item.engineCapacity || "")) return false;
+        if (selectedExteriorColor.length > 0 && !selectedExteriorColor.includes(item.exteriorColor || "")) return false;
         return true;
       }
       
       if (field === "status") {
-        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
-        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
-        if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
-        if (selectedYear !== "الكل" && String(item.year) !== selectedYear) return false;
-        if (selectedEngineCapacity !== "الكل" && item.engineCapacity !== selectedEngineCapacity) return false;
-        if (selectedExteriorColor !== "الكل" && item.exteriorColor !== selectedExteriorColor) return false;
-        if (selectedInteriorColor !== "الكل" && item.interiorColor !== selectedInteriorColor) return false;
+        if (selectedManufacturer.length > 0 && !selectedManufacturer.includes(item.manufacturer || "")) return false;
+        if (selectedCategory.length > 0 && !selectedCategory.includes(item.category || "")) return false;
+        if (selectedTrimLevel.length > 0 && !selectedTrimLevel.includes(item.trimLevel || "")) return false;
+        if (selectedYear.length > 0 && !selectedYear.includes(String(item.year))) return false;
+        if (selectedEngineCapacity.length > 0 && !selectedEngineCapacity.includes(item.engineCapacity || "")) return false;
+        if (selectedExteriorColor.length > 0 && !selectedExteriorColor.includes(item.exteriorColor || "")) return false;
+        if (selectedInteriorColor.length > 0 && !selectedInteriorColor.includes(item.interiorColor || "")) return false;
         return true;
       }
       
       if (field === "importType") {
         // Apply all previous filters
-        if (selectedManufacturer !== "الكل" && item.manufacturer !== selectedManufacturer) return false;
-        if (selectedCategory !== "الكل" && item.category !== selectedCategory) return false;
-        if (selectedTrimLevel !== "الكل" && item.trimLevel !== selectedTrimLevel) return false;
-        if (selectedYear !== "الكل" && String(item.year) !== selectedYear) return false;
-        if (selectedEngineCapacity !== "الكل" && item.engineCapacity !== selectedEngineCapacity) return false;
-        if (selectedExteriorColor !== "الكل" && item.exteriorColor !== selectedExteriorColor) return false;
-        if (selectedInteriorColor !== "الكل" && item.interiorColor !== selectedInteriorColor) return false;
-        if (selectedStatus !== "الكل" && item.status !== selectedStatus) return false;
+        if (selectedManufacturer.length > 0 && !selectedManufacturer.includes(item.manufacturer || "")) return false;
+        if (selectedCategory.length > 0 && !selectedCategory.includes(item.category || "")) return false;
+        if (selectedTrimLevel.length > 0 && !selectedTrimLevel.includes(item.trimLevel || "")) return false;
+        if (selectedYear.length > 0 && !selectedYear.includes(String(item.year))) return false;
+        if (selectedEngineCapacity.length > 0 && !selectedEngineCapacity.includes(item.engineCapacity || "")) return false;
+        if (selectedExteriorColor.length > 0 && !selectedExteriorColor.includes(item.exteriorColor || "")) return false;
+        if (selectedInteriorColor.length > 0 && !selectedInteriorColor.includes(item.interiorColor || "")) return false;
+        if (selectedStatus.length > 0 && !selectedStatus.includes(item.status || "")) return false;
         return true;
       }
       
@@ -346,82 +347,36 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     return values;
   };
 
-  // Dynamic filter arrays based on previously applied filters
-  const manufacturers = ["الكل", ...getFilteredUniqueValues("manufacturer", {})];
+  // Get available options for filters based on current inventory
+  const getAvailableOptions = (field: keyof InventoryItem) => {
+    const availableData = showSoldCars ? inventoryData : inventoryData.filter(item => item.status !== "مباع");
+    const values = availableData
+      .map(item => field === "year" ? String(item[field]) : item[field])
+      .filter((value, index, self) => value && self.indexOf(value) === index)
+      .sort();
+    return values;
+  };
+
+  const availableManufacturers = getAvailableOptions("manufacturer");
+  const availableCategories = getAvailableOptions("category");
+  const availableTrimLevels = getAvailableOptions("trimLevel");
+  const availableYears = getAvailableOptions("year").sort((a, b) => parseInt(b) - parseInt(a));
+  const availableEngineCapacities = getAvailableOptions("engineCapacity");
+  const availableExteriorColors = getAvailableOptions("exteriorColor");
+  const availableInteriorColors = getAvailableOptions("interiorColor");
+  const availableStatuses = getAvailableOptions("status");
+  const availableImportTypes = getAvailableOptions("importType");
+  const availableOwnershipTypes = getAvailableOptions("ownershipType");
   
-  const categories = ["الكل", ...getFilteredUniqueValues("category", {
-    manufacturer: selectedManufacturer
-  })];
-  
-  const availableTrimLevels = ["الكل", ...getFilteredUniqueValues("trimLevel", {
-    manufacturer: selectedManufacturer,
-    category: selectedCategory
-  })];
-  
-  const yearValues = getFilteredUniqueValues("year", {
-    manufacturer: selectedManufacturer,
-    category: selectedCategory,
-    trimLevel: selectedTrimLevel
-  }).map(year => String(year)).sort((a, b) => parseInt(b) - parseInt(a)); // Sort years in descending order
-  
-  const availableYears = ["الكل", ...yearValues];
-  
-  const availableEngineCapacities = ["الكل", ...getFilteredUniqueValues("engineCapacity", {
-    manufacturer: selectedManufacturer,
-    category: selectedCategory,
-    trimLevel: selectedTrimLevel,
-    year: selectedYear
-  }).map(capacity => String(capacity))];
-  
-  const availableExteriorColors = ["الكل", ...getFilteredUniqueValues("exteriorColor", {
-    manufacturer: selectedManufacturer,
-    category: selectedCategory,
-    trimLevel: selectedTrimLevel,
-    year: selectedYear,
-    engineCapacity: selectedEngineCapacity
-  })];
-  
-  const availableInteriorColors = ["الكل", ...getFilteredUniqueValues("interiorColor", {
-    manufacturer: selectedManufacturer,
-    category: selectedCategory,
-    trimLevel: selectedTrimLevel,
-    year: selectedYear,
-    engineCapacity: selectedEngineCapacity,
-    exteriorColor: selectedExteriorColor
-  })];
-  
-  const availableStatuses = ["الكل", ...getFilteredUniqueValues("status", {
-    manufacturer: selectedManufacturer,
-    category: selectedCategory,
-    trimLevel: selectedTrimLevel,
-    year: selectedYear,
-    engineCapacity: selectedEngineCapacity,
-    exteriorColor: selectedExteriorColor,
-    interiorColor: selectedInteriorColor
-  })];
-  
-  const availableImportTypes = ["الكل", ...getFilteredUniqueValues("importType", {
-    manufacturer: selectedManufacturer,
-    category: selectedCategory,
-    trimLevel: selectedTrimLevel,
-    year: selectedYear,
-    engineCapacity: selectedEngineCapacity,
-    exteriorColor: selectedExteriorColor,
-    interiorColor: selectedInteriorColor,
-    status: selectedStatus
-  })];
-  
-  const availableOwnershipTypes = ["الكل", ...getFilteredUniqueValues("ownershipType", {
-    manufacturer: selectedManufacturer,
-    category: selectedCategory,
-    trimLevel: selectedTrimLevel,
-    year: selectedYear,
-    engineCapacity: selectedEngineCapacity,
-    exteriorColor: selectedExteriorColor,
-    interiorColor: selectedInteriorColor,
-    status: selectedStatus,
-    importType: selectedImportType
-  })];
+  // Count active filters
+  const getActiveFilterCount = () => {
+    return selectedManufacturer.length + selectedCategory.length + selectedTrimLevel.length + 
+           selectedYear.length + selectedEngineCapacity.length + selectedExteriorColor.length + 
+           selectedInteriorColor.length + selectedStatus.length + selectedImportType.length + 
+           selectedOwnershipType.length;
+  };
+
+  const activeFiltersCount = getActiveFilterCount();
   
   // Reset category filter when manufacturer changes
   const handleManufacturerChange = (value: string) => {
@@ -793,6 +748,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         >
                           <Filter size={16} />
                           الفلاتر
+                          {activeFiltersCount > 0 && (
+                            <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                              {activeFiltersCount}
+                            </span>
+                          )}
                           {filtersOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </Button>
                       </CollapsibleTrigger>
@@ -909,104 +869,104 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 
                                 {/* Individual Filters with Toggles */}
                                 <div className="space-y-3">
-                                  <FilterSlider 
+                                  <MultiSelectFilter 
                                     title="الصانع" 
-                                    items={manufacturers} 
-                                    currentFilter={selectedManufacturer} 
-                                    onFilterChange={handleManufacturerChange} 
-                                    getCount={(item) => getFilterCount("manufacturer", item)} 
-                                    toggleState={showManufacturerFilter}
-                                    onToggleChange={setShowManufacturerFilter}
+                                    items={availableManufacturers} 
+                                    selectedItems={selectedManufacturer} 
+                                    onSelectionChange={setSelectedManufacturer} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showManufacturerFilter}
+                                    onVisibilityChange={setShowManufacturerFilter}
                                   />
 
-                                  <FilterSlider 
+                                  <MultiSelectFilter 
                                     title="الفئة" 
-                                    items={categories} 
-                                    currentFilter={selectedCategory} 
-                                    onFilterChange={setSelectedCategory} 
-                                    getCount={(item) => getFilterCount("category", item)} 
-                                    toggleState={showCategoryFilter}
-                                    onToggleChange={setShowCategoryFilter}
+                                    items={availableCategories} 
+                                    selectedItems={selectedCategory} 
+                                    onSelectionChange={setSelectedCategory} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showCategoryFilter}
+                                    onVisibilityChange={setShowCategoryFilter}
                                   />
 
-                                  <FilterSlider 
+                                  <MultiSelectFilter 
                                     title="درجة التجهيز" 
                                     items={availableTrimLevels} 
-                                    currentFilter={selectedTrimLevel} 
-                                    onFilterChange={setSelectedTrimLevel} 
-                                    getCount={(item) => getFilterCount("trimLevel", item)} 
-                                    toggleState={showTrimLevelFilter}
-                                    onToggleChange={setShowTrimLevelFilter}
+                                    selectedItems={selectedTrimLevel} 
+                                    onSelectionChange={setSelectedTrimLevel} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showTrimLevelFilter}
+                                    onVisibilityChange={setShowTrimLevelFilter}
                                   />
 
-                                  <FilterSlider 
+                                  <MultiSelectFilter 
                                     title="السنة" 
                                     items={availableYears} 
-                                    currentFilter={selectedYear} 
-                                    onFilterChange={setSelectedYear} 
-                                    getCount={(item) => getFilterCount("year", item)} 
-                                    toggleState={showYearFilter}
-                                    onToggleChange={setShowYearFilter}
+                                    selectedItems={selectedYear} 
+                                    onSelectionChange={setSelectedYear} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showYearFilter}
+                                    onVisibilityChange={setShowYearFilter}
                                   />
 
-                                  <FilterSlider 
+                                  <MultiSelectFilter 
                                     title="سعة المحرك" 
                                     items={availableEngineCapacities} 
-                                    currentFilter={selectedEngineCapacity} 
-                                    onFilterChange={setSelectedEngineCapacity} 
-                                    getCount={(item) => getFilterCount("engineCapacity", item)} 
-                                    toggleState={showEngineCapacityFilter}
-                                    onToggleChange={setShowEngineCapacityFilter}
+                                    selectedItems={selectedEngineCapacity} 
+                                    onSelectionChange={setSelectedEngineCapacity} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showEngineCapacityFilter}
+                                    onVisibilityChange={setShowEngineCapacityFilter}
                                   />
 
-                                  <FilterSlider 
+                                  <MultiSelectFilter 
                                     title="اللون الخارجي" 
                                     items={availableExteriorColors} 
-                                    currentFilter={selectedExteriorColor} 
-                                    onFilterChange={setSelectedExteriorColor} 
-                                    getCount={(item) => getFilterCount("exteriorColor", item)} 
-                                    toggleState={showExteriorColorFilter}
-                                    onToggleChange={setShowExteriorColorFilter}
+                                    selectedItems={selectedExteriorColor} 
+                                    onSelectionChange={setSelectedExteriorColor} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showExteriorColorFilter}
+                                    onVisibilityChange={setShowExteriorColorFilter}
                                   />
 
-                                  <FilterSlider 
+                                  <MultiSelectFilter 
                                     title="اللون الداخلي" 
                                     items={availableInteriorColors} 
-                                    currentFilter={selectedInteriorColor} 
-                                    onFilterChange={setSelectedInteriorColor} 
-                                    getCount={(item) => getFilterCount("interiorColor", item)} 
-                                    toggleState={showInteriorColorFilter}
-                                    onToggleChange={setShowInteriorColorFilter}
+                                    selectedItems={selectedInteriorColor} 
+                                    onSelectionChange={setSelectedInteriorColor} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showInteriorColorFilter}
+                                    onVisibilityChange={setShowInteriorColorFilter}
                                   />
 
-                                  <FilterSlider 
+                                  <MultiSelectFilter 
                                     title="الحالة" 
                                     items={availableStatuses} 
-                                    currentFilter={selectedStatus} 
-                                    onFilterChange={setSelectedStatus} 
-                                    getCount={(item) => getFilterCount("status", item)} 
-                                    toggleState={showStatusFilter}
-                                    onToggleChange={setShowStatusFilter}
+                                    selectedItems={selectedStatus} 
+                                    onSelectionChange={setSelectedStatus} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showStatusFilter}
+                                    onVisibilityChange={setShowStatusFilter}
                                   />
 
-                                  <FilterSlider 
+                                  <MultiSelectFilter 
                                     title="نوع الاستيراد" 
                                     items={availableImportTypes} 
-                                    currentFilter={selectedImportType} 
-                                    onFilterChange={setSelectedImportType} 
-                                    getCount={(item) => getFilterCount("importType", item)} 
-                                    toggleState={showImportTypeFilter}
-                                    onToggleChange={setShowImportTypeFilter}
+                                    selectedItems={selectedImportType} 
+                                    onSelectionChange={setSelectedImportType} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showImportTypeFilter}
+                                    onVisibilityChange={setShowImportTypeFilter}
                                   />
 
-                                  <FilterSlider 
+                                  <MultiSelectFilter 
                                     title="نوع الملكية" 
                                     items={availableOwnershipTypes} 
-                                    currentFilter={selectedOwnershipType} 
-                                    onFilterChange={setSelectedOwnershipType} 
-                                    getCount={(item) => getFilterCount("ownershipType", item)} 
-                                    toggleState={showOwnershipTypeFilter}
-                                    onToggleChange={setShowOwnershipTypeFilter}
+                                    selectedItems={selectedOwnershipType} 
+                                    onSelectionChange={setSelectedOwnershipType} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showOwnershipTypeFilter}
+                                    onVisibilityChange={setShowOwnershipTypeFilter}
                                   />
 
                                   {/* Reset Filters Button */}
@@ -1015,16 +975,16 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                       variant="outline"
                                       size="sm"
                                       onClick={() => {
-                                        setSelectedManufacturer("الكل");
-                                        setSelectedCategory("الكل");
-                                        setSelectedTrimLevel("الكل");
-                                        setSelectedYear("الكل");
-                                        setSelectedEngineCapacity("الكل");
-                                        setSelectedInteriorColor("الكل");
-                                        setSelectedExteriorColor("الكل");
-                                        setSelectedStatus("الكل");
-                                        setSelectedImportType("الكل");
-                                        setSelectedOwnershipType("الكل");
+                                        setSelectedManufacturer([]);
+                                        setSelectedCategory([]);
+                                        setSelectedTrimLevel([]);
+                                        setSelectedYear([]);
+                                        setSelectedEngineCapacity([]);
+                                        setSelectedInteriorColor([]);
+                                        setSelectedExteriorColor([]);
+                                        setSelectedStatus([]);
+                                        setSelectedImportType([]);
+                                        setSelectedOwnershipType([]);
                                       }}
                                       className="hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20"
                                     >
@@ -1072,7 +1032,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         {/* Vehicle Cards by Manufacturer */}
         <div className="space-y-8">
           {Object.entries(groupedData)
-            .filter(([manufacturer]) => selectedManufacturer === "الكل" || manufacturer === selectedManufacturer)
+            .filter(([manufacturer]) => selectedManufacturer.length === 0 || selectedManufacturer.includes(manufacturer))
             .map(([manufacturer, data]) => {
             const logo = getManufacturerLogo(manufacturer);
             
