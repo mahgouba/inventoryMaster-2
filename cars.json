@@ -213,12 +213,12 @@
     ]
   },
   {
-    "brand_ar": "رنج روفر",
-    "brand_en": "Range Rover",
+    "brand_ar": "لاند روفر ",
+    "brand_en": "Land Rover",
     "models": [
       {
-        "model_ar": "رنج روفر",
-        "model_en": "Range Rover",
+        "model_ar": "رنج روفر فوج",
+        "model_en": "Range Rover vogue",
         "trims": [
           {"trim_ar": "SE", "trim_en": "SE"},
           {"trim_ar": "HSE", "trim_en": "HSE"},
