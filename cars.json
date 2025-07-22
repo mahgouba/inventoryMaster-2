@@ -661,6 +661,63 @@
     ]
   },
   {
+    "brand_ar": "لاند روفر",
+    "brand_en": "Land Rover",
+    "models": [
+      {
+        "model_ar": "رنج روفر فوغ",
+        "model_en": "Range Rover Vogue",
+        "trims": [
+          {"trim_ar": "HSE", "trim_en": "HSE"},
+          {"trim_ar": "SV", "trim_en": "SV"},
+          {"trim_ar": "Autobiography", "trim_en": "Autobiography"},
+          {"trim_ar": "P530", "trim_en": "P530"}
+        ]
+      },
+      {
+        "model_ar": "رنج روفر سبورت",
+        "model_en": "Range Rover Sport",
+        "trims": [
+          {"trim_ar": "Dynamic", "trim_en": "Dynamic"},
+          {"trim_ar": "HSE", "trim_en": "HSE"},
+          {"trim_ar": "SVR", "trim_en": "SVR"},
+          {"trim_ar": "P400e", "trim_en": "P400e"}
+        ]
+      },
+      {
+        "model_ar": "رنج روفر إيفوك",
+        "model_en": "Range Rover Evoque", 
+        "trims": [
+          {"trim_ar": "R-Dynamic", "trim_en": "R-Dynamic"},
+          {"trim_ar": "HSE", "trim_en": "HSE"},
+          {"trim_ar": "Autobiography", "trim_en": "Autobiography"},
+          {"trim_ar": "P300e", "trim_en": "P300e"}
+        ]
+      },
+      {
+        "model_ar": "رنج روفر كهربائي",
+        "model_en": "Range Rover Electric",
+        "trims": [
+          {"trim_ar": "First Edition", "trim_en": "First Edition"},
+          {"trim_ar": "SE", "trim_en": "SE"},
+          {"trim_ar": "HSE", "trim_en": "HSE"},
+          {"trim_ar": "Autobiography", "trim_en": "Autobiography"}
+        ]
+      },
+      {
+        "model_ar": "دفيندر",
+        "model_en": "Defender",
+        "trims": [
+          {"trim_ar": "90", "trim_en": "90"},
+          {"trim_ar": "110", "trim_en": "110"},
+          {"trim_ar": "110 X", "trim_en": "110 X"},
+          {"trim_ar": "90 Hard Top", "trim_en": "90 Hard Top"},
+          {"trim_ar": "130", "trim_en": "130"}
+        ]
+      }
+    ]
+  },
+  {
     "brand_ar": "لامبورجيني",
     "brand_en": "Lamborghini",
     "models": [
