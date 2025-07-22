@@ -134,6 +134,14 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   // Filter out sold cars from display unless showSoldCars is true
   const availableItems = showSoldCars ? inventoryData : inventoryData.filter(item => item.status !== "مباع");
 
+  // Function to get import type icon based on data
+  const getImportTypeIcon = (importType: string) => {
+    if (importType.includes("شركة")) return "/logos/import-type-company.svg";
+    if (importType.includes("شخصي")) return "/logos/import-type-personal.svg"; 
+    if (importType.includes("مستعمل")) return "/logos/import-type-secondhand.svg";
+    return "/import-type.svg"; // fallback
+  };
+
   // Get count for each filter option - dynamically based on previously applied filters
   const getFilterCount = (field: keyof InventoryItem, value: string) => {
     const availableData = showSoldCars ? inventoryData : inventoryData.filter(item => item.status !== "مباع");
@@ -1138,11 +1146,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 3: Exterior Color and Interior Color with Icons */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center gap-2">
-                              <img src="/color-palette.svg" alt="Exterior Color" className="w-4 h-4 text-blue-600" />
+                              <img src="/logos/exterior-color.svg" alt="Exterior Color" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.exteriorColor}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <img src="/color-palette.svg" alt="Interior Color" className="w-4 h-4 text-amber-600" />
+                              <img src="/logos/interior-color.svg" alt="Interior Color" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.interiorColor}</span>
                             </div>
                           </div>
@@ -1150,11 +1158,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 4: Import Type and Ownership Type with Icons */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center gap-2">
-                              <img src="/import-type.svg" alt="Import Type" className="w-4 h-4" />
+                              <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.importType}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <img src="/اللون-الخارجي.svg" alt="Exterior Color" className="w-4 h-4" />
+                              <img src="/import-type.svg" alt="Ownership Type" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.ownershipType}</span>
                             </div>
                           </div>
@@ -1162,7 +1170,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 5: Location and Chassis Number with Icons */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center gap-2">
-                              <img src="/اللون-الداخلي.svg" alt="Interior Color" className="w-4 h-4" />
+                              <img src="/location.svg" alt="Location" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.location}</span>
                             </div>
                             {item.chassisNumber && (
