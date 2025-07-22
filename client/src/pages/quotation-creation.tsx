@@ -449,14 +449,14 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [selectedVehicleFromDB, setSelectedVehicleFromDB] = useState<any>(null);
   
   // Filter states for vehicle selection dialog
-  const [filterCategory, setFilterCategory] = useState("");
-  const [filterTrimLevel, setFilterTrimLevel] = useState("");
-  const [filterYear, setFilterYear] = useState("");
-  const [filterEngineCapacity, setFilterEngineCapacity] = useState("");
-  const [filterImportType, setFilterImportType] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
-  const [filterExteriorColor, setFilterExteriorColor] = useState("");
-  const [filterInteriorColor, setFilterInteriorColor] = useState("");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [filterTrimLevel, setFilterTrimLevel] = useState("all");
+  const [filterYear, setFilterYear] = useState("all");
+  const [filterEngineCapacity, setFilterEngineCapacity] = useState("all");
+  const [filterImportType, setFilterImportType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterExteriorColor, setFilterExteriorColor] = useState("all");
+  const [filterInteriorColor, setFilterInteriorColor] = useState("all");
   
   // Get selected company object
   const selectedCompanyData = companies.find(c => c.id.toString() === selectedCompany);
@@ -2282,7 +2282,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     <SelectValue placeholder="الكل" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">الكل</SelectItem>
+                    <SelectItem value="all">الكل</SelectItem>
                     {Array.from(new Set(availableVehicles.map((v: any) => v.category))).map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
@@ -2299,7 +2299,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     <SelectValue placeholder="الكل" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">الكل</SelectItem>
+                    <SelectItem value="all">الكل</SelectItem>
                     {Array.from(new Set(availableVehicles.map((v: any) => v.trimLevel).filter(Boolean))).map((trimLevel) => (
                       <SelectItem key={trimLevel} value={trimLevel}>
                         {trimLevel}
@@ -2316,7 +2316,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     <SelectValue placeholder="الكل" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">الكل</SelectItem>
+                    <SelectItem value="all">الكل</SelectItem>
                     {Array.from(new Set(availableVehicles.map((v: any) => v.year.toString()))).sort((a, b) => parseInt(b) - parseInt(a)).map((year) => (
                       <SelectItem key={year} value={year}>
                         {year}
@@ -2333,7 +2333,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     <SelectValue placeholder="الكل" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">الكل</SelectItem>
+                    <SelectItem value="all">الكل</SelectItem>
                     {Array.from(new Set(availableVehicles.map((v: any) => v.engineCapacity).filter(Boolean))).map((capacity) => (
                       <SelectItem key={capacity} value={capacity}>
                         {capacity}
@@ -2350,7 +2350,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     <SelectValue placeholder="الكل" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">الكل</SelectItem>
+                    <SelectItem value="all">الكل</SelectItem>
                     {Array.from(new Set(availableVehicles.map((v: any) => v.importType).filter(Boolean))).map((importType) => (
                       <SelectItem key={importType} value={importType}>
                         {importType}
@@ -2367,7 +2367,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     <SelectValue placeholder="الكل" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">الكل</SelectItem>
+                    <SelectItem value="all">الكل</SelectItem>
                     {Array.from(new Set(availableVehicles.map((v: any) => v.status).filter(Boolean))).map((status) => (
                       <SelectItem key={status} value={status}>
                         {status}
@@ -2384,7 +2384,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     <SelectValue placeholder="الكل" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">الكل</SelectItem>
+                    <SelectItem value="all">الكل</SelectItem>
                     {Array.from(new Set(availableVehicles.map((v: any) => v.exteriorColor).filter(Boolean))).map((color) => (
                       <SelectItem key={color} value={color}>
                         {color}
@@ -2401,7 +2401,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     <SelectValue placeholder="الكل" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">الكل</SelectItem>
+                    <SelectItem value="all">الكل</SelectItem>
                     {Array.from(new Set(availableVehicles.map((v: any) => v.interiorColor).filter(Boolean))).map((color) => (
                       <SelectItem key={color} value={color}>
                         {color}
@@ -2417,14 +2417,14 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    setFilterCategory("");
-                    setFilterTrimLevel("");
-                    setFilterYear("");
-                    setFilterEngineCapacity("");
-                    setFilterImportType("");
-                    setFilterStatus("");
-                    setFilterExteriorColor("");
-                    setFilterInteriorColor("");
+                    setFilterCategory("all");
+                    setFilterTrimLevel("all");
+                    setFilterYear("all");
+                    setFilterEngineCapacity("all");
+                    setFilterImportType("all");
+                    setFilterStatus("all");
+                    setFilterExteriorColor("all");
+                    setFilterInteriorColor("all");
                     setVehicleSearchQuery("");
                   }}
                   className="h-8 text-red-600 hover:text-red-700"
@@ -2449,14 +2449,14 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     vehicle.engineCapacity?.toLowerCase().includes(vehicleSearchQuery.toLowerCase());
                   
                   // Filter conditions
-                  const categoryMatch = !filterCategory || vehicle.category === filterCategory;
-                  const trimLevelMatch = !filterTrimLevel || vehicle.trimLevel === filterTrimLevel;
-                  const yearMatch = !filterYear || vehicle.year.toString() === filterYear;
-                  const engineCapacityMatch = !filterEngineCapacity || vehicle.engineCapacity === filterEngineCapacity;
-                  const importTypeMatch = !filterImportType || vehicle.importType === filterImportType;
-                  const statusMatch = !filterStatus || vehicle.status === filterStatus;
-                  const exteriorColorMatch = !filterExteriorColor || vehicle.exteriorColor === filterExteriorColor;
-                  const interiorColorMatch = !filterInteriorColor || vehicle.interiorColor === filterInteriorColor;
+                  const categoryMatch = filterCategory === "all" || vehicle.category === filterCategory;
+                  const trimLevelMatch = filterTrimLevel === "all" || vehicle.trimLevel === filterTrimLevel;
+                  const yearMatch = filterYear === "all" || vehicle.year.toString() === filterYear;
+                  const engineCapacityMatch = filterEngineCapacity === "all" || vehicle.engineCapacity === filterEngineCapacity;
+                  const importTypeMatch = filterImportType === "all" || vehicle.importType === filterImportType;
+                  const statusMatch = filterStatus === "all" || vehicle.status === filterStatus;
+                  const exteriorColorMatch = filterExteriorColor === "all" || vehicle.exteriorColor === filterExteriorColor;
+                  const interiorColorMatch = filterInteriorColor === "all" || vehicle.interiorColor === filterInteriorColor;
                   
                   return searchMatch && categoryMatch && trimLevelMatch && yearMatch && 
                          engineCapacityMatch && importTypeMatch && statusMatch && 

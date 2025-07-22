@@ -11,9 +11,9 @@ import * as XLSX from 'xlsx';
 
 export default function SoldVehiclesPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [salesRepFilter, setSalesRepFilter] = useState("");
+  const [salesRepFilter, setSalesRepFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
-  const [paymentMethodFilter, setPaymentMethodFilter] = useState("");
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
 
   const { data: soldVehicles = [], isLoading } = useQuery({
     queryKey: ["/api/inventory/sold"],
@@ -45,11 +45,11 @@ export default function SoldVehiclesPage() {
       );
     }
 
-    if (salesRepFilter) {
+    if (salesRepFilter && salesRepFilter !== "all") {
       filtered = filtered.filter((item: any) => item.soldBySalesRep === salesRepFilter);
     }
 
-    if (paymentMethodFilter) {
+    if (paymentMethodFilter && paymentMethodFilter !== "all") {
       filtered = filtered.filter((item: any) => item.paymentMethod === paymentMethodFilter);
     }
 
@@ -272,7 +272,7 @@ export default function SoldVehiclesPage() {
                 <SelectValue placeholder="فلتر حسب مندوب المبيعات" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">جميع المندوبين</SelectItem>
+                <SelectItem value="all">جميع المندوبين</SelectItem>
                 {salesRepresentatives.map((rep) => (
                   <SelectItem key={rep} value={rep}>
                     {rep}
@@ -286,7 +286,7 @@ export default function SoldVehiclesPage() {
                 <SelectValue placeholder="فلتر حسب طريقة الدفع" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">جميع طرق الدفع</SelectItem>
+                <SelectItem value="all">جميع طرق الدفع</SelectItem>
                 <SelectItem value="نقداً">نقداً</SelectItem>
                 <SelectItem value="بنك">بنك</SelectItem>
               </SelectContent>
@@ -322,8 +322,8 @@ export default function SoldVehiclesPage() {
             <Button
               onClick={() => {
                 setSearchQuery("");
-                setSalesRepFilter("");
-                setPaymentMethodFilter("");
+                setSalesRepFilter("all");
+                setPaymentMethodFilter("all");
                 setDateFilter("");
               }}
               variant="outline"
