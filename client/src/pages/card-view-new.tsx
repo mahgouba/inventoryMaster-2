@@ -798,379 +798,146 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   <CollapsibleContent className="mt-4 w-full">
                     <Card className="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shadow-sm w-full">
                       <CardContent className="p-6 w-full">
-                        {/* Enhanced Filter Controls with Toggle Switches */}
+                        {/* Enhanced Filter Controls with Button Design */}
                         <div className="space-y-6 animate-in fade-in duration-300">
                           
-                          {/* Filter Slider Component */}
+                          {/* Multi-Select Filter Component */}
                           {(() => {
-                            const FilterSlider = ({ title, items, currentFilter, onFilterChange, getCount, toggleState, onToggleChange }) => (
+                            const MultiSelectFilter = ({ title, items, selectedFilters, onFilterToggle, getCount }) => (
                               <div className="space-y-2">
                                 <div className="flex items-center justify-between">
                                   <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => onToggleChange(!toggleState)}
-                                    className="p-2 h-8 w-8 hover:bg-blue-100 dark:hover:bg-blue-900/30"
-                                  >
-                                    {toggleState ? (
-                                      <Eye size={16} className="text-blue-600 dark:text-blue-400" />
-                                    ) : (
-                                      <EyeOff size={16} className="text-slate-400 dark:text-slate-500" />
-                                    )}
-                                  </Button>
+                                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                                    {selectedFilters.length > 0 ? `(${selectedFilters.length} محدد)` : ""}
+                                  </span>
                                 </div>
-                                {toggleState && (
-                                  <div className="relative group">
-                                    <ScrollArea className="w-full">
-                                      <div className="flex space-x-2 space-x-reverse pb-2">
-                                        {items.map((item) => (
+                                <div className="relative group">
+                                  <ScrollArea className="w-full">
+                                    <div className="flex space-x-2 space-x-reverse pb-2">
+                                      {items.map((item) => {
+                                        const isSelected = selectedFilters.includes(item);
+                                        return (
                                           <Button
-                                            key={String(item)}
-                                            variant={currentFilter === item ? "default" : "outline"}
+                                            key={item}
+                                            variant={isSelected ? "default" : "outline"}
                                             size="sm"
-                                            onClick={() => onFilterChange(String(item))}
-                                            className={`transition-all duration-200 whitespace-nowrap ${
-                                              currentFilter === item
+                                            onClick={() => onFilterToggle(item)}
+                                            className={`transition-all duration-200 whitespace-nowrap relative ${
+                                              isSelected
                                                 ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
                                                 : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
                                             }`}
                                           >
-                                            {String(item)} ({getCount(String(item))})
+                                            {isSelected && (
+                                              <span className="absolute top-0 left-0 w-2 h-2 bg-green-400 rounded-full transform -translate-x-1 -translate-y-1"></span>
+                                            )}
+                                            {item} ({getCount(item)})
                                           </Button>
-                                        ))}
-                                      </div>
-                                    </ScrollArea>
-                                    {/* Navigation Arrows */}
-                                    <button 
-                                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                                        if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
-                                      }}
-                                    >
-                                      <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
-                                    </button>
-                                    <button 
-                                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
-                                        if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
-                                      }}
-                                    >
-                                      <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
-                                    </button>
-                                  </div>
-                                )}
+                                        );
+                                      })}
+                                    </div>
+                                  </ScrollArea>
+                                  {/* Navigation Arrows */}
+                                  <button 
+                                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                                      if (scrollArea) scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                                    }}
+                                  >
+                                    <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+                                  </button>
+                                  <button 
+                                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      const scrollArea = e.currentTarget.parentElement?.querySelector('[data-radix-scroll-area-viewport]');
+                                      if (scrollArea) scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                                    }}
+                                  >
+                                    <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+                                  </button>
+                                </div>
                               </div>
                             );
                             
                             return (
                               <div className="space-y-4">
-
-                                {/* Interactive Cascading Filters */}
-                                <div className="space-y-4">
-                                  <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                                    <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-1">الفلاتر التفاعلية</h4>
-                                    <p className="text-xs text-blue-600 dark:text-blue-300">كل فلتر يعرض البيانات المتاحة حسب اختيارك في الفلتر السابق</p>
-                                  </div>
-
-                                  {/* Manufacturer Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      الصانع ({availableManufacturers.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableManufacturers.map(manufacturer => {
-                                        const count = getFilterCount('manufacturer', manufacturer);
-                                        const isSelected = selectedManufacturer.includes(manufacturer);
-                                        
-                                        return (
-                                          <Button
-                                            key={manufacturer}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedManufacturer, setSelectedManufacturer, manufacturer)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {manufacturer} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-
-                                  {/* Category Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      الفئة ({availableCategories.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableCategories.length > 0 ? availableCategories.map(category => {
-                                        const count = getFilterCount('category', category);
-                                        const isSelected = selectedCategory.includes(category);
-                                        
-                                        return (
-                                          <Button
-                                            key={category}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedCategory, setSelectedCategory, category)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {category} ({count})
-                                          </Button>
-                                        );
-                                      }) : (
-                                        <span className="text-xs text-slate-500 dark:text-slate-400 italic">اختر صانع أولاً لعرض الفئات المتاحة</span>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  {/* Trim Level Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      درجة التجهيز ({availableTrimLevels.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableTrimLevels.length > 0 ? availableTrimLevels.map(trimLevel => {
-                                        const count = getFilterCount('trimLevel', trimLevel);
-                                        const isSelected = selectedTrimLevel.includes(trimLevel);
-                                        
-                                        return (
-                                          <Button
-                                            key={trimLevel}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedTrimLevel, setSelectedTrimLevel, trimLevel)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {trimLevel} ({count})
-                                          </Button>
-                                        );
-                                      }) : (
-                                        <span className="text-xs text-slate-500 dark:text-slate-400 italic">اختر فئة أولاً لعرض درجات التجهيز المتاحة</span>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  {/* Year Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      السنة ({availableYears.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableYears.map(year => {
-                                        const count = getFilterCount('year', year);
-                                        const isSelected = selectedYear.includes(year);
-                                        
-                                        return (
-                                          <Button
-                                            key={year}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedYear, setSelectedYear, year)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {year} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-
-                                  {/* Engine Capacity Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      سعة المحرك ({availableEngineCapacities.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableEngineCapacities.map(engineCapacity => {
-                                        const count = getFilterCount('engineCapacity', engineCapacity);
-                                        const isSelected = selectedEngineCapacity.includes(engineCapacity);
-                                        
-                                        return (
-                                          <Button
-                                            key={engineCapacity}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedEngineCapacity, setSelectedEngineCapacity, engineCapacity)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {engineCapacity} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-
-                                  {/* Exterior Color Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      اللون الخارجي ({availableExteriorColors.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableExteriorColors.map(color => {
-                                        const count = getFilterCount('exteriorColor', color);
-                                        const isSelected = selectedExteriorColor.includes(color);
-                                        
-                                        return (
-                                          <Button
-                                            key={color}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedExteriorColor, setSelectedExteriorColor, color)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {color} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-
-                                  {/* Interior Color Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      اللون الداخلي ({availableInteriorColors.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableInteriorColors.map(color => {
-                                        const count = getFilterCount('interiorColor', color);
-                                        const isSelected = selectedInteriorColor.includes(color);
-                                        
-                                        return (
-                                          <Button
-                                            key={color}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedInteriorColor, setSelectedInteriorColor, color)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {color} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-
-                                  {/* Status Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      الحالة ({availableStatuses.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableStatuses.map(status => {
-                                        const count = getFilterCount('status', status);
-                                        const isSelected = selectedStatus.includes(status);
-                                        
-                                        return (
-                                          <Button
-                                            key={status}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedStatus, setSelectedStatus, status)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {status} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-
-                                  {/* Import Type Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      نوع الاستيراد ({availableImportTypes.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableImportTypes.map(importType => {
-                                        const count = getFilterCount('importType', importType);
-                                        const isSelected = selectedImportType.includes(importType);
-                                        
-                                        return (
-                                          <Button
-                                            key={importType}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedImportType, setSelectedImportType, importType)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {importType} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-
-                                  {/* Ownership Type Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      نوع الملكية ({availableOwnershipTypes.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableOwnershipTypes.map(ownershipType => {
-                                        const count = getFilterCount('ownershipType', ownershipType);
-                                        const isSelected = selectedOwnershipType.includes(ownershipType);
-                                        
-                                        return (
-                                          <Button
-                                            key={ownershipType}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedOwnershipType, setSelectedOwnershipType, ownershipType)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {ownershipType} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-
+                                
+                                {/* Individual Multiple Selection Filters */}
+                                <div className="space-y-3">
+                                  <MultiSelectFilter 
+                                    title="الصانع" 
+                                    items={availableManufacturers} 
+                                    selectedFilters={selectedManufacturer} 
+                                    onFilterToggle={(item) => toggleFilter(selectedManufacturer, setSelectedManufacturer, item)} 
+                                    getCount={(item) => getFilterCount("manufacturer", item)} 
+                                  />
+                                  <MultiSelectFilter 
+                                    title="الفئة" 
+                                    items={availableCategories} 
+                                    selectedFilters={selectedCategory} 
+                                    onFilterToggle={(item) => toggleFilter(selectedCategory, setSelectedCategory, item)} 
+                                    getCount={(item) => getFilterCount("category", item)} 
+                                  />
+                                  <MultiSelectFilter 
+                                    title="درجة التجهيز" 
+                                    items={availableTrimLevels} 
+                                    selectedFilters={selectedTrimLevel} 
+                                    onFilterToggle={(item) => toggleFilter(selectedTrimLevel, setSelectedTrimLevel, item)} 
+                                    getCount={(item) => getFilterCount("trimLevel", item)} 
+                                  />
+                                  <MultiSelectFilter 
+                                    title="السنة" 
+                                    items={availableYears} 
+                                    selectedFilters={selectedYear} 
+                                    onFilterToggle={(item) => toggleFilter(selectedYear, setSelectedYear, item)} 
+                                    getCount={(item) => getFilterCount("year", item)} 
+                                  />
+                                  <MultiSelectFilter 
+                                    title="سعة المحرك" 
+                                    items={availableEngineCapacities} 
+                                    selectedFilters={selectedEngineCapacity} 
+                                    onFilterToggle={(item) => toggleFilter(selectedEngineCapacity, setSelectedEngineCapacity, item)} 
+                                    getCount={(item) => getFilterCount("engineCapacity", item)} 
+                                  />
+                                  <MultiSelectFilter 
+                                    title="اللون الخارجي" 
+                                    items={availableExteriorColors} 
+                                    selectedFilters={selectedExteriorColor} 
+                                    onFilterToggle={(item) => toggleFilter(selectedExteriorColor, setSelectedExteriorColor, item)} 
+                                    getCount={(item) => getFilterCount("exteriorColor", item)} 
+                                  />
+                                  <MultiSelectFilter 
+                                    title="اللون الداخلي" 
+                                    items={availableInteriorColors} 
+                                    selectedFilters={selectedInteriorColor} 
+                                    onFilterToggle={(item) => toggleFilter(selectedInteriorColor, setSelectedInteriorColor, item)} 
+                                    getCount={(item) => getFilterCount("interiorColor", item)} 
+                                  />
+                                  <MultiSelectFilter 
+                                    title="الحالة" 
+                                    items={availableStatuses} 
+                                    selectedFilters={selectedStatus} 
+                                    onFilterToggle={(item) => toggleFilter(selectedStatus, setSelectedStatus, item)} 
+                                    getCount={(item) => getFilterCount("status", item)} 
+                                  />
+                                  <MultiSelectFilter 
+                                    title="نوع الاستيراد" 
+                                    items={availableImportTypes} 
+                                    selectedFilters={selectedImportType} 
+                                    onFilterToggle={(item) => toggleFilter(selectedImportType, setSelectedImportType, item)} 
+                                    getCount={(item) => getFilterCount("importType", item)} 
+                                  />
+                                  <MultiSelectFilter 
+                                    title="نوع الملكية" 
+                                    items={availableOwnershipTypes} 
+                                    selectedFilters={selectedOwnershipType} 
+                                    onFilterToggle={(item) => toggleFilter(selectedOwnershipType, setSelectedOwnershipType, item)} 
+                                    getCount={(item) => getFilterCount("ownershipType", item)} 
+                                  />
+                                  
                                   {/* Reset Filters Button */}
                                   <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
                                     <Button
