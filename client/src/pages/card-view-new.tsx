@@ -1153,9 +1153,17 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <img src="/interior-color.svg" alt="Interior Color" className="w-6 h-6" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.interiorColor}</span>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-6 h-6" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.importType}</span>
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-1">
+                                <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-6 h-6" />
+                                <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.importType}</span>
+                              </div>
+                              {item.chassisNumber && (
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-xs" style={{color: '#00627F'}}>VIN:</span>
+                                  <span className="font-medium font-latin text-slate-700 dark:text-slate-300 text-xs">{item.chassisNumber}</span>
+                                </div>
+                              )}
                             </div>
                             {item.ownershipType && (
                               <div className="flex items-center gap-1">
@@ -1165,18 +1173,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             )}
                           </div>
                           
-                          {/* Row 3: Location and Chassis Number */}
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="flex items-center gap-1">
-                              <img src="/location.svg" alt="Location" className="w-6 h-6" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.location}</span>
-                            </div>
-                            {item.chassisNumber && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-slate-600 dark:text-slate-400 font-bold text-xs">VIN:</span>
-                                <span className="font-medium font-latin text-slate-700 dark:text-slate-300 text-xs">{item.chassisNumber}</span>
-                              </div>
-                            )}
+                          {/* Row 3: Location */}
+                          <div className="flex items-center gap-1">
+                            <img src="/location.svg" alt="Location" className="w-6 h-6" style={{filter: 'brightness(0) saturate(100%) invert(25%) sepia(78%) saturate(1058%) hue-rotate(180deg) brightness(96%) contrast(96%)'}} />
+                            <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.location}</span>
                           </div>
                           
                           {item.price && (
@@ -1204,15 +1204,15 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             </div>
                           )}
 
-                          {/* Action Buttons */}
-                          <div className="pt-3 mt-3 border-t border-slate-200 space-y-2">
-                            {/* Share, Quote and Reserve buttons */}
-                            <div className="flex gap-2">
+                          {/* Action Buttons - Single Row Icons Only */}
+                          <div className="pt-3 mt-3 border-t border-slate-200">
+                            <div className="flex justify-center gap-2">
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="px-3 h-9 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
+                                className="px-3 h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
                                 onClick={() => handleShareItem(item)}
+                                title="مشاركة"
                               >
                                 <Share2 size={14} />
                               </Button>
@@ -1220,7 +1220,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="px-3 h-9 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
+                                className="px-3 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
                                 onClick={() => handleCreateQuote(item)}
                                 title="إنشاء عرض سعر"
                               >
@@ -1228,74 +1228,55 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               </Button>
 
                               {item.status === "محجوز" ? (
-                                userRole === "admin" ? (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="flex-1 h-9 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
-                                    onClick={() => handleCancelReservation(item)}
-                                    disabled={cancelingReservationId === item.id}
-                                  >
-                                    <X size={14} className="ml-1" />
-                                    {cancelingReservationId === item.id ? "جاري الإلغاء..." : "إلغاء الحجز"}
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="flex-1 h-9 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
-                                    onClick={() => {
-                                      toast({
-                                        title: "غير مسموح",
-                                        description: "لا يمكنك إلغاء الحجز إلا إذا كنت مديرًا بكامل الصلاحيات.",
-                                        variant: "destructive",
-                                      });
-                                    }}
-                                  >
-                                    <X size={14} className="ml-1" />
-                                    إلغاء الحجز
-                                  </Button>
-                                )
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="px-3 h-8 text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
+                                  onClick={() => handleCancelReservation(item)}
+                                  disabled={cancelingReservationId === item.id}
+                                  title="إلغاء الحجز"
+                                >
+                                  <X size={14} />
+                                </Button>
                               ) : (
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="flex-1 h-9 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
+                                  className="px-3 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
                                   onClick={() => handleReserveItem(item)}
                                   disabled={reservingItemId === item.id || item.status !== "متوفر" || item.isSold}
+                                  title="حجز"
                                 >
-                                  <Calendar size={14} className="ml-1" />
-                                  {reservingItemId === item.id ? "جاري الحجز..." : "حجز"}
+                                  <Calendar size={14} />
                                 </Button>
                               )}
-                            </div>
 
-                            {/* Edit and Delete buttons (Admin only) */}
-                            {userRole === "admin" && (
-                              <div className="flex gap-2 mt-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1 h-9 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
-                                  onClick={() => {
-                                    setEditingItem(item);
-                                    setShowEditDialog(true);
-                                  }}
-                                >
-                                  <Edit2 size={14} className="ml-1" />
-                                  تحرير
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1 h-9 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300"
-                                  onClick={() => setItemToDelete(item)}
-                                >
-                                  <Trash2 size={14} className="ml-1" />
-                                  حذف
-                                </Button>
-                              </div>
-                            )}
+                              {userRole === "admin" && (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="px-3 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
+                                    onClick={() => {
+                                      setEditingItem(item);
+                                      setShowEditDialog(true);
+                                    }}
+                                    title="تحرير"
+                                  >
+                                    <Edit2 size={14} />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="px-3 h-8 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300"
+                                    onClick={() => setItemToDelete(item)}
+                                    title="حذف"
+                                  >
+                                    <Trash2 size={14} />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </CardContent>
