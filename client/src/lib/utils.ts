@@ -209,6 +209,16 @@ export function printTableWithSettings(settings: PrintSettings) {
           margin-bottom: 10mm;
           padding-bottom: 5mm;
           border-bottom: 2px solid #000;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        .print-header .company-logo {
+          width: 60px;
+          height: 60px;
+          object-fit: contain;
+          margin-bottom: 5mm;
         }
         
         .print-header h1 {
@@ -325,7 +335,9 @@ export function printTableWithSettings(settings: PrintSettings) {
     <body>
         ${settings.includeHeader ? `
         <div class="print-header">
-          <h1>جدول المخزون</h1>
+          <img src="/copmany logo.svg" alt="شعار الشركة" class="company-logo" />
+          <h1>شركة البريمي للسيارات</h1>
+          <h2 style="font-size: 14pt; margin-bottom: 3mm; color: #000;">جدول المخزون</h2>
           ${settings.includeDate ? `<div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</div>` : ''}
         </div>
         ` : ''}
