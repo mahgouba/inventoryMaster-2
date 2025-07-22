@@ -803,15 +803,30 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           
                           {/* Multi-Select Filter Component */}
                           {(() => {
-                            const MultiSelectFilter = ({ title, items, selectedFilters, onFilterToggle, getCount }) => (
+                            const MultiSelectFilter = ({ title, items, selectedFilters, onFilterToggle, getCount, toggleState, onToggleChange }) => (
                               <div className="space-y-2">
                                 <div className="flex items-center justify-between">
                                   <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
-                                  <span className="text-xs text-slate-500 dark:text-slate-400">
-                                    {selectedFilters.length > 0 ? `(${selectedFilters.length} محدد)` : ""}
-                                  </span>
+                                  <div className="flex items-center space-x-2 space-x-reverse">
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                                      {selectedFilters.length > 0 ? `(${selectedFilters.length} محدد)` : ""}
+                                    </span>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => onToggleChange(!toggleState)}
+                                      className="p-2 h-8 w-8 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                                    >
+                                      {toggleState ? (
+                                        <Eye size={16} className="text-blue-600 dark:text-blue-400" />
+                                      ) : (
+                                        <EyeOff size={16} className="text-slate-400 dark:text-slate-500" />
+                                      )}
+                                    </Button>
+                                  </div>
                                 </div>
-                                <div className="relative group">
+                                {toggleState && (
+                                  <div className="relative group">
                                   <ScrollArea className="w-full">
                                     <div className="flex space-x-2 space-x-reverse pb-2">
                                       {items.map((item) => {
@@ -859,6 +874,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
                                   </button>
                                 </div>
+                                )}
                               </div>
                             );
                             
@@ -873,6 +889,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     selectedFilters={selectedManufacturer} 
                                     onFilterToggle={(item) => toggleFilter(selectedManufacturer, setSelectedManufacturer, item)} 
                                     getCount={(item) => getFilterCount("manufacturer", item)} 
+                                    toggleState={showManufacturerFilter}
+                                    onToggleChange={setShowManufacturerFilter}
                                   />
                                   <MultiSelectFilter 
                                     title="الفئة" 
@@ -880,6 +898,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     selectedFilters={selectedCategory} 
                                     onFilterToggle={(item) => toggleFilter(selectedCategory, setSelectedCategory, item)} 
                                     getCount={(item) => getFilterCount("category", item)} 
+                                    toggleState={showCategoryFilter}
+                                    onToggleChange={setShowCategoryFilter}
                                   />
                                   <MultiSelectFilter 
                                     title="درجة التجهيز" 
@@ -887,6 +907,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     selectedFilters={selectedTrimLevel} 
                                     onFilterToggle={(item) => toggleFilter(selectedTrimLevel, setSelectedTrimLevel, item)} 
                                     getCount={(item) => getFilterCount("trimLevel", item)} 
+                                    toggleState={showTrimLevelFilter}
+                                    onToggleChange={setShowTrimLevelFilter}
                                   />
                                   <MultiSelectFilter 
                                     title="السنة" 
@@ -894,6 +916,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     selectedFilters={selectedYear} 
                                     onFilterToggle={(item) => toggleFilter(selectedYear, setSelectedYear, item)} 
                                     getCount={(item) => getFilterCount("year", item)} 
+                                    toggleState={showYearFilter}
+                                    onToggleChange={setShowYearFilter}
                                   />
                                   <MultiSelectFilter 
                                     title="سعة المحرك" 
@@ -901,6 +925,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     selectedFilters={selectedEngineCapacity} 
                                     onFilterToggle={(item) => toggleFilter(selectedEngineCapacity, setSelectedEngineCapacity, item)} 
                                     getCount={(item) => getFilterCount("engineCapacity", item)} 
+                                    toggleState={showEngineCapacityFilter}
+                                    onToggleChange={setShowEngineCapacityFilter}
                                   />
                                   <MultiSelectFilter 
                                     title="اللون الخارجي" 
@@ -908,6 +934,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     selectedFilters={selectedExteriorColor} 
                                     onFilterToggle={(item) => toggleFilter(selectedExteriorColor, setSelectedExteriorColor, item)} 
                                     getCount={(item) => getFilterCount("exteriorColor", item)} 
+                                    toggleState={showExteriorColorFilter}
+                                    onToggleChange={setShowExteriorColorFilter}
                                   />
                                   <MultiSelectFilter 
                                     title="اللون الداخلي" 
@@ -915,6 +943,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     selectedFilters={selectedInteriorColor} 
                                     onFilterToggle={(item) => toggleFilter(selectedInteriorColor, setSelectedInteriorColor, item)} 
                                     getCount={(item) => getFilterCount("interiorColor", item)} 
+                                    toggleState={showInteriorColorFilter}
+                                    onToggleChange={setShowInteriorColorFilter}
                                   />
                                   <MultiSelectFilter 
                                     title="الحالة" 
@@ -922,6 +952,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     selectedFilters={selectedStatus} 
                                     onFilterToggle={(item) => toggleFilter(selectedStatus, setSelectedStatus, item)} 
                                     getCount={(item) => getFilterCount("status", item)} 
+                                    toggleState={showStatusFilter}
+                                    onToggleChange={setShowStatusFilter}
                                   />
                                   <MultiSelectFilter 
                                     title="نوع الاستيراد" 
@@ -929,6 +961,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     selectedFilters={selectedImportType} 
                                     onFilterToggle={(item) => toggleFilter(selectedImportType, setSelectedImportType, item)} 
                                     getCount={(item) => getFilterCount("importType", item)} 
+                                    toggleState={showImportTypeFilter}
+                                    onToggleChange={setShowImportTypeFilter}
                                   />
                                   <MultiSelectFilter 
                                     title="نوع الملكية" 
@@ -936,6 +970,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     selectedFilters={selectedOwnershipType} 
                                     onFilterToggle={(item) => toggleFilter(selectedOwnershipType, setSelectedOwnershipType, item)} 
                                     getCount={(item) => getFilterCount("ownershipType", item)} 
+                                    toggleState={showOwnershipTypeFilter}
+                                    onToggleChange={setShowOwnershipTypeFilter}
                                   />
                                   
                                   {/* Reset Filters Button */}
