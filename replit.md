@@ -211,7 +211,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Implemented intelligent icon selection for import types: company, personal, and used vehicles get specific icons based on data
 - ✅ Enhanced visual data representation with contextually appropriate icons throughout the card interface
 - ✅ Adjusted icon sizes in card view to medium size (w-6 h-6) for optimal balance between visibility and layout
-- ✅ Reorganized card layout into optimized rows: Engine/Year/Exterior Color, Interior Color/Import Type/Location, Chassis Number/Entry Date for better mobile display
+- ✅ Reorganized card layout: moved Engine/Year/Exterior Color to header next to status badge, optimized remaining rows for better space utilization
 - ✅ Enhanced print functionality per user request: simple table layout without icons, landscape orientation
 - ✅ Print now displays clean, professional table suitable for landscape printing with minimal styling
 - ✅ Updated manufacturer statistics display to use authentic manufacturer logos instead of emoji icons

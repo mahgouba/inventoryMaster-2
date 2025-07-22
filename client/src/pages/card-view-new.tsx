@@ -1110,7 +1110,23 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   {data.items.map((item) => (
                     <Card key={item.id} className="card-dynamic">
                       <CardHeader className="pb-3">
-                        <div className="flex items-center justify-end">
+                        <div className="flex items-center justify-between">
+                          {/* Engine, Year, Exterior Color Row */}
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              <img src="/car-engine.svg" alt="Engine" className="w-4 h-4" />
+                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.engineCapacity}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <img src="/year.svg" alt="Year" className="w-4 h-4" />
+                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.year}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <img src="/exterior-color.svg" alt="Exterior Color" className="w-4 h-4" />
+                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.exteriorColor}</span>
+                            </div>
+                          </div>
+                          
                           <Badge variant="secondary" className={`${getStatusColor(item.status)} text-xs`}>
                             {item.status}
                           </Badge>
@@ -1131,23 +1147,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             )}
                           </div>
                           
-                          {/* Row 1: Engine Capacity, Year, Exterior Color */}
-                          <div className="grid grid-cols-3 gap-2">
-                            <div className="flex items-center gap-1">
-                              <img src="/car-engine.svg" alt="Engine" className="w-6 h-6" />
-                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.engineCapacity}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <img src="/year.svg" alt="Year" className="w-6 h-6" />
-                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.year}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <img src="/exterior-color.svg" alt="Exterior Color" className="w-6 h-6" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.exteriorColor}</span>
-                            </div>
-                          </div>
-                          
-                          {/* Row 2: Interior Color, Import Type, Location */}
+                          {/* Row 1: Interior Color, Import Type, Location */}
                           <div className="grid grid-cols-3 gap-2">
                             <div className="flex items-center gap-1">
                               <img src="/interior-color.svg" alt="Interior Color" className="w-6 h-6" />
@@ -1163,7 +1163,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             </div>
                           </div>
                           
-                          {/* Row 3: Chassis Number and Entry Date */}
+                          {/* Row 2: Chassis Number and Entry Date */}
                           <div className="grid grid-cols-2 gap-3">
                             {item.chassisNumber && (
                               <div className="flex items-center gap-2">
