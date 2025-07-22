@@ -11,6 +11,7 @@ import { getStatusColor } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
 import InventoryForm from "./inventory-form";
 import { ManufacturerLogo } from "./manufacturer-logo";
+import { ReservationDialog } from "./reservation-dialog";
 
 
 interface InventoryTableProps {
@@ -52,6 +53,8 @@ export default function InventoryTable({
   const [formOpen, setFormOpen] = useState(false);
   const [sortColumn, setSortColumn] = useState<string>("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [reserveItem, setReserveItem] = useState<InventoryItem | undefined>();
+  const [reserveDialogOpen, setReserveDialogOpen] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -174,20 +177,28 @@ export default function InventoryTable({
     }
   };
 
-  const handleReserve = (id: number) => {
-    if (window.confirm("هل أنت متأكد من حجز هذه السيارة؟")) {
-      reserveMutation.mutate({
-        id,
-        reservedBy: username,
-        reservationNote: `حجز بواسطة ${username} - ${new Date().toLocaleDateString('en-US')}`
-      });
-    }
-  };
+
 
   const handleCancelReservation = (id: number) => {
     if (window.confirm("هل أنت متأكد من إلغاء حجز هذه السيارة؟")) {
       cancelReservationMutation.mutate(id);
     }
+  };
+
+  const handleReserve = (id: number) => {
+    const item = items.find(item => item.id === id);
+    if (item) {
+      setReserveItem(item);
+      setReserveDialogOpen(true);
+    }
+  };
+
+  const handleReservationSuccess = () => {
+    setReserveDialogOpen(false);
+    setReserveItem(undefined);
+    queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/inventory/stats"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
   };
 
   const filteredAndSortedItems = items
@@ -218,8 +229,10 @@ export default function InventoryTable({
       const aValue = a[sortColumn as keyof InventoryItem];
       const bValue = b[sortColumn as keyof InventoryItem];
       
-      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+      if (aValue && bValue) {
+        if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+        if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+      }
       return 0;
     });
 
@@ -435,6 +448,13 @@ export default function InventoryTable({
           if (!open) setEditItem(undefined);
         }}
         editItem={editItem}
+      />
+
+      <ReservationDialog
+        open={reserveDialogOpen}
+        onOpenChange={setReserveDialogOpen}
+        item={reserveItem}
+        onSuccess={handleReservationSuccess}
       />
     </div>
   );

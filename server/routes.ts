@@ -717,6 +717,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get reserved inventory items
+  app.get("/api/inventory/reserved", async (req, res) => {
+    try {
+      const items = await storage.getReservedItems();
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching reserved items:", error);
+      res.status(500).json({ message: "Failed to fetch reserved items" });
+    }
+  });
+
+  // Sell reserved item with customer data
+  app.put("/api/inventory/:id/sell-reserved", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid item ID" });
+      }
+
+      const item = await storage.updateInventoryItem(id, {
+        status: "مباع",
+        isSold: true,
+        soldDate: new Date()
+      });
+      
+      if (!item) {
+        return res.status(404).json({ message: "Item not found" });
+      }
+      
+      res.json(item);
+    } catch (error) {
+      console.error("Error selling reserved inventory item:", error);
+      res.status(500).json({ message: "Failed to sell inventory item" });
+    }
+  });
+
+  // Enhanced cancel reservation with customer data cleanup
+  app.put("/api/inventory/:id/cancel-reservation", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid item ID" });
+      }
+
+      const item = await storage.updateInventoryItem(id, {
+        status: "متوفر",
+        reservationDate: null,
+        reservedBy: null,
+        customerName: null,
+        customerPhone: null,
+        paidAmount: null,
+        reservationNote: null
+      });
+      
+      if (!item) {
+        return res.status(404).json({ message: "Item not found" });
+      }
+      
+      res.json(item);
+    } catch (error) {
+      console.error("Error canceling reservation:", error);
+      res.status(500).json({ message: "Failed to cancel reservation" });
+    }
+  });
+
   // Clear all inventory items
   app.delete("/api/inventory/clear-all", async (req, res) => {
     try {

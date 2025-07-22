@@ -84,6 +84,7 @@ export interface IStorage {
   markAsSold(id: number): Promise<boolean>;
   reserveItem(id: number, reservedBy: string, reservationNote?: string): Promise<boolean>;
   cancelReservation(id: number): Promise<boolean>;
+  getReservedItems(): Promise<InventoryItem[]>;
   
   // Manufacturer methods
   getAllManufacturers(): Promise<Manufacturer[]>;
@@ -1028,10 +1029,25 @@ export class MemStorage implements IStorage {
       status: "متوفر",
       reservationDate: null,
       reservedBy: null,
-      reservationNote: null
+      reservationNote: null,
+      customerName: null,
+      customerPhone: null,
+      paidAmount: null
     };
     this.inventoryItems.set(id, updated);
     return true;
+  }
+
+  async getReservedItems(): Promise<InventoryItem[]> {
+    return Array.from(this.inventoryItems.values()).filter(item => 
+      item.status === "محجوز" && !item.isSold
+    );
+  }
+
+  async getReservedItems(): Promise<InventoryItem[]> {
+    return Array.from(this.inventoryItems.values()).filter(item => 
+      item.status === "محجوز" && !item.isSold
+    );
   }
 
   // Terms and conditions methods for MemStorage  

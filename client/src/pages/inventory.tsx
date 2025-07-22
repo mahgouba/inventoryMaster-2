@@ -707,6 +707,15 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           تحرير القوائم
                         </DropdownMenuItem>
                       </Link>
+
+                      <DropdownMenuSeparator />
+
+                      <Link href="/reservations">
+                        <DropdownMenuItem>
+                          <MessageSquare className="mr-2 h-4 w-4" />
+                          إدارة الحجوزات
+                        </DropdownMenuItem>
+                      </Link>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}

@@ -35,6 +35,9 @@ export const inventoryItems = pgTable("inventory_items", {
   reservationDate: timestamp("reservation_date"), // تاريخ الحجز
   reservedBy: text("reserved_by"), // المستخدم الذي حجز
   reservationNote: text("reservation_note"), // ملاحظة الحجز
+  customerName: text("customer_name"), // اسم العميل
+  customerPhone: text("customer_phone"), // رقم جوال العميل
+  paidAmount: decimal("paid_amount", { precision: 10, scale: 2 }), // المبلغ المدفوع
 });
 
 // Manufacturers table for storing manufacturer logos

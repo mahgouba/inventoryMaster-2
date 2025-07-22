@@ -23,6 +23,7 @@ import InvoiceManagementPage from "@/pages/invoice-management";
 import DynamicCompanyControl from "@/pages/dynamic-company-control";
 import IntegrationManagementPage from "@/pages/integration-management";
 import ComprehensiveListsPage from "@/pages/comprehensive-lists";
+import ReservationsPage from "@/pages/reservations";
 
 interface User {
   username: string;
@@ -49,6 +50,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
       <Route path="/quotation-management" component={QuotationManagementPage} />
       <Route path="/invoice-management" component={InvoiceManagementPage} />
       <Route path="/locations" component={() => <LocationPage userRole={user.role} onLogout={onLogout} />} />
+      <Route path="/reservations" component={() => <ReservationsPage />} />
       {/* صفحات الأدمن فقط */}
       {user.role === "admin" && (
         <>
