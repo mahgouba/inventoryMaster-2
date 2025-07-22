@@ -50,6 +50,7 @@ import SpecificationsManagement from "@/components/specifications-management";
 import QuotationManagement from "@/components/quotation-management";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import MultiSelectFilter from "@/components/multi-select-filter";
+import { ReservationDialog } from "@/components/reservation-dialog";
 
 import type { InventoryItem } from "@shared/schema";
 
@@ -69,8 +70,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [sellingItemId, setSellingItemId] = useState<number | null>(null);
-  const [reservingItemId, setReservingItemId] = useState<number | null>(null);
   const [cancelingReservationId, setCancelingReservationId] = useState<number | null>(null);
+  const [reserveItem, setReserveItem] = useState<InventoryItem | undefined>();
+  const [reserveDialogOpen, setReserveDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   
   // Multiple selection filter arrays
@@ -528,32 +530,12 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   });
 
   // Reserve item mutation
-  const reserveItemMutation = useMutation({
-    mutationFn: (data: { id: number; reservedBy: string; reservationNote?: string }) => {
-      setReservingItemId(data.id);
-      return apiRequest("POST", `/api/inventory/${data.id}/reserve`, {
-        reservedBy: data.reservedBy,
-        reservationNote: data.reservationNote
-      });
-    },
-    onSuccess: () => {
-      toast({
-        title: "تم الحجز بنجاح",
-        description: "تم حجز المركبة",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
-      setReservingItemId(null);
-    },
-    onError: () => {
-      toast({
-        title: "خطأ",
-        description: "فشل في حجز المركبة",
-        variant: "destructive",
-      });
-      setReservingItemId(null);
-    }
-  });
+  // Reservation success handler
+  const handleReservationSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/inventory/stats"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
+  };
 
   // Cancel reservation mutation
   const cancelReservationMutation = useMutation({
@@ -594,12 +576,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
   // Handle reserve item
   const handleReserveItem = (item: InventoryItem) => {
-    if (reservingItemId !== null) return;
-    reserveItemMutation.mutate({
-      id: item.id,
-      reservedBy: username,
-      reservationNote: `حجز بواسطة ${username} من واجهة البطاقات - ${new Date().toLocaleDateString('en-US')}`
-    });
+    setReserveItem(item);
+    setReserveDialogOpen(true);
   };
 
   // Handle cancel reservation
@@ -1246,7 +1224,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                   variant="outline"
                                   className="px-3 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
                                   onClick={() => handleReserveItem(item)}
-                                  disabled={reservingItemId === item.id || item.status !== "متوفر" || item.isSold}
+                                  disabled={item.status === "محجوز" || item.isSold}
                                   title="حجز"
                                 >
                                   <Calendar size={14} />
@@ -1389,6 +1367,14 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
       <QuotationManagement
         open={quotationManagementOpen}
         onOpenChange={setQuotationManagementOpen}
+      />
+
+      {/* Reservation Dialog */}
+      <ReservationDialog
+        open={reserveDialogOpen}
+        onOpenChange={setReserveDialogOpen}
+        item={reserveItem}
+        onSuccess={handleReservationSuccess}
       />
     </div>
   );
