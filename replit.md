@@ -210,6 +210,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Updated card view icons: connected icons to actual data with exterior-color.svg, interior-color.svg, and dynamic import type icons
 - ✅ Implemented intelligent icon selection for import types: company, personal, and used vehicles get specific icons based on data
 - ✅ Enhanced visual data representation with contextually appropriate icons throughout the card interface
+- ✅ Increased icon sizes in card view to 3 times larger (w-12 h-12) for better visibility and user experience
 - ✅ Enhanced print functionality per user request: simple table layout without icons, landscape orientation
 - ✅ Print now displays clean, professional table suitable for landscape printing with minimal styling
 - ✅ Updated manufacturer statistics display to use authentic manufacturer logos instead of emoji icons

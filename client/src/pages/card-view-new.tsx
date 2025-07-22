@@ -1121,7 +1121,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 1: Category and Trim Level with Icons */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center gap-2">
-                              <img src="/car.svg" alt="Category" className="w-4 h-4" />
+                              <img src="/car.svg" alt="Category" className="w-12 h-12" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.category}</span>
                             </div>
                             {item.trimLevel && (
@@ -1134,11 +1134,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 2: Engine Capacity and Year with Icons */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center gap-2">
-                              <img src="/car-engine.svg" alt="Engine" className="w-4 h-4" />
+                              <img src="/car-engine.svg" alt="Engine" className="w-12 h-12" />
                               <span className="font-semibold font-latin text-slate-800 dark:text-slate-200">{item.engineCapacity}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <img src="/year.svg" alt="Year" className="w-4 h-4" />
+                              <img src="/year.svg" alt="Year" className="w-12 h-12" />
                               <span className="font-semibold font-latin text-slate-800 dark:text-slate-200">{item.year}</span>
                             </div>
                           </div>
@@ -1146,11 +1146,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 3: Exterior Color and Interior Color with Icons */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center gap-2">
-                              <img src="/exterior-color.svg" alt="Exterior Color" className="w-4 h-4" />
+                              <img src="/exterior-color.svg" alt="Exterior Color" className="w-12 h-12" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.exteriorColor}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <img src="/interior-color.svg" alt="Interior Color" className="w-4 h-4" />
+                              <img src="/interior-color.svg" alt="Interior Color" className="w-12 h-12" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.interiorColor}</span>
                             </div>
                           </div>
@@ -1158,11 +1158,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 4: Import Type and Ownership Type with Icons */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center gap-2">
-                              <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-4 h-4" />
+                              <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-12 h-12" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.importType}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <img src="/import-type.svg" alt="Ownership Type" className="w-4 h-4" />
+                              <img src="/import-type.svg" alt="Ownership Type" className="w-12 h-12" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.ownershipType}</span>
                             </div>
                           </div>
@@ -1170,12 +1170,12 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 5: Location and Chassis Number with Icons */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center gap-2">
-                              <img src="/location.svg" alt="Location" className="w-4 h-4" />
+                              <img src="/location.svg" alt="Location" className="w-12 h-12" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.location}</span>
                             </div>
                             {item.chassisNumber && (
                               <div className="flex items-center gap-2">
-                                <img src="/chassis.svg" alt="Chassis Number" className="w-4 h-4" />
+                                <img src="/chassis.svg" alt="Chassis Number" className="w-12 h-12" />
                                 <span className="font-medium font-latin text-slate-700 dark:text-slate-300 text-xs">{item.chassisNumber}</span>
                               </div>
                             )}
