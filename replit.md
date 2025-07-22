@@ -231,6 +231,12 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Fixed API endpoints for cars/trims to properly return Land Rover model trim levels
 - ✅ Verified all Land Rover models now return correct trim level data via API
 
+### Vehicle Reservation Enhancement - Allow Booking Vehicles On The Road (July 22, 2025)
+- ✅ Updated vehicle reservation logic to allow booking cars regardless of status except for sold or already reserved vehicles
+- ✅ Modified frontend validation in inventory table to permit reservations for vehicles with status "في الطريق" (on the road)
+- ✅ Changed reservation button disable condition from `item.status !== "متوفر"` to `item.status === "محجوز"`
+- ✅ Users can now reserve vehicles that are in transit, in maintenance, or have any status other than already reserved or sold
+
 ### Comprehensive Vehicle Edit Form Enhancement (July 21, 2025)
 - ✅ Enhanced vehicle edit form to display complete vehicle data instead of just basic inventory information
 - ✅ Added comprehensive fields: detailed specifications, sale status, sold date, reservation date, reserved by, reservation notes

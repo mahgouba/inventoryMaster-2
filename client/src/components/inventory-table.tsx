@@ -415,7 +415,7 @@ export default function InventoryTable({
                           onClick={() => handleReserve(item.id)}
                           className="text-blue-600 hover:text-blue-800 p-1"
                           title="حجز"
-                          disabled={reserveMutation.isPending || item.status !== "متوفر" || item.isSold}
+                          disabled={reserveMutation.isPending || item.status === "محجوز" || item.isSold}
                         >
                           <Calendar className="h-4 w-4" />
                         </Button>
