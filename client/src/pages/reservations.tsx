@@ -16,15 +16,15 @@ export default function ReservationsPage() {
 
   const { data: reservedItems = [], isLoading } = useQuery({
     queryKey: ["/api/inventory/reserved"],
-    queryFn: () => apiRequest("/api/inventory/reserved"),
   });
 
   // Filter reserved items based on search query
   const filteredReservations = useMemo(() => {
-    if (!searchQuery.trim()) return reservedItems;
+    const items = reservedItems as any[];
+    if (!searchQuery.trim()) return items;
     
     const query = searchQuery.toLowerCase();
-    return reservedItems.filter((item: any) =>
+    return items.filter((item: any) =>
       item.customerName?.toLowerCase().includes(query) ||
       item.customerPhone?.toLowerCase().includes(query) ||
       item.manufacturer?.toLowerCase().includes(query) ||
@@ -35,9 +35,7 @@ export default function ReservationsPage() {
 
   const sellMutation = useMutation({
     mutationFn: async (itemId: number) => {
-      return apiRequest(`/api/inventory/${itemId}/sell-reserved`, {
-        method: "PUT"
-      });
+      return apiRequest(`/api/inventory/${itemId}/sell-reserved`, "PUT");
     },
     onSuccess: () => {
       toast({
@@ -60,9 +58,7 @@ export default function ReservationsPage() {
 
   const cancelReservationMutation = useMutation({
     mutationFn: async (itemId: number) => {
-      return apiRequest(`/api/inventory/${itemId}/cancel-reservation`, {
-        method: "PUT"
-      });
+      return apiRequest(`/api/inventory/${itemId}/cancel-reservation`, "PUT");
     },
     onSuccess: () => {
       toast({
@@ -136,14 +132,14 @@ export default function ReservationsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-custom-primary">{reservedItems.length}</div>
+                <div className="text-2xl font-bold text-custom-primary">{(reservedItems as any[]).length}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">إجمالي الحجوزات</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-green-600">
-                  {reservedItems.reduce((sum: number, item: any) => sum + (parseFloat(item.paidAmount) || 0), 0).toLocaleString('ar-SA')}
+                  {(reservedItems as any[]).reduce((sum: number, item: any) => sum + (parseFloat(item.paidAmount) || 0), 0).toLocaleString('ar-SA')}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">إجمالي المبالغ المدفوعة</div>
               </CardContent>
@@ -177,7 +173,7 @@ export default function ReservationsPage() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <ManufacturerLogo manufacturer={item.manufacturer} size="sm" />
+                      <ManufacturerLogo manufacturerName={item.manufacturer} size="sm" />
                       <CardTitle className="text-lg">{item.manufacturer}</CardTitle>
                     </div>
                     <Badge variant="secondary" className="bg-custom-primary/10 text-custom-primary">
