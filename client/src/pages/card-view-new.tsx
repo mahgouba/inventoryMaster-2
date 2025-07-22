@@ -1135,39 +1135,39 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             </div>
                           </div>
                           
-                          {/* Row 3: Exterior Color and Interior Color */}
+                          {/* Row 3: Exterior Color and Interior Color with Icons */}
                           <div className="grid grid-cols-2 gap-3">
-                            <div className="flex flex-col">
-                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">اللون الخارجي:</span>
+                            <div className="flex items-center gap-2">
+                              <img src="/color-palette.svg" alt="Exterior Color" className="w-4 h-4 text-blue-600" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.exteriorColor}</span>
                             </div>
-                            <div className="flex flex-col">
-                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">اللون الداخلي:</span>
+                            <div className="flex items-center gap-2">
+                              <img src="/color-palette.svg" alt="Interior Color" className="w-4 h-4 text-amber-600" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.interiorColor}</span>
                             </div>
                           </div>
                           
-                          {/* Row 4: Import Type and Ownership Type */}
+                          {/* Row 4: Import Type and Ownership Type with Icons */}
                           <div className="grid grid-cols-2 gap-3">
-                            <div className="flex flex-col">
-                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">نوع الاستيراد:</span>
+                            <div className="flex items-center gap-2">
+                              <img src="/import-type.svg" alt="Import Type" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.importType}</span>
                             </div>
-                            <div className="flex flex-col">
-                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">نوع الملكية:</span>
+                            <div className="flex items-center gap-2">
+                              <img src="/import-type.svg" alt="Ownership Type" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.ownershipType}</span>
                             </div>
                           </div>
                           
-                          {/* Row 5: Location and Chassis Number */}
+                          {/* Row 5: Location and Chassis Number with Icons */}
                           <div className="grid grid-cols-2 gap-3">
-                            <div className="flex flex-col">
-                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">الموقع:</span>
+                            <div className="flex items-center gap-2">
+                              <img src="/location.svg" alt="Location" className="w-4 h-4" />
                               <span className="font-semibold text-slate-800 dark:text-slate-200">{item.location}</span>
                             </div>
                             {item.chassisNumber && (
-                              <div className="flex flex-col">
-                                <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">رقم الهيكل:</span>
+                              <div className="flex items-center gap-2">
+                                <img src="/chassis.svg" alt="Chassis Number" className="w-4 h-4" />
                                 <span className="font-medium font-latin text-slate-700 dark:text-slate-300 text-xs">{item.chassisNumber}</span>
                               </div>
                             )}
