@@ -583,7 +583,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     <Button
                       onClick={handleSaveSpecification}
                       disabled={isUpdating}
-                      className="text-[#c49633]"
+                      className="bg-[#BF9231] text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 flex-1"
                     >
                       <Save className="h-4 w-4 ml-1" />
                       {isUpdating ? "جاري الحفظ..." : "حفظ"}
