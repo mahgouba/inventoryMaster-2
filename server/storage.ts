@@ -82,7 +82,14 @@ export interface IStorage {
   getLocationTransfers(inventoryItemId?: number): Promise<LocationTransfer[]>;
   createLocationTransfer(transfer: InsertLocationTransfer): Promise<LocationTransfer>;
   markAsSold(id: number): Promise<boolean>;
-  reserveItem(id: number, reservedBy: string, reservationNote?: string): Promise<boolean>;
+  reserveItem(id: number, data: {
+    reservedBy?: string;
+    salesRepresentative?: string;
+    customerName?: string;
+    customerPhone?: string;
+    paidAmount?: string;
+    reservationNote?: string;
+  }): Promise<boolean>;
   cancelReservation(id: number): Promise<boolean>;
   getReservedItems(): Promise<InventoryItem[]>;
   
@@ -795,11 +802,28 @@ export class MemStorage implements IStorage {
     return true;
   }
 
-  async reserveItem(id: number): Promise<boolean> {
+  async reserveItem(id: number, data: {
+    reservedBy?: string;
+    salesRepresentative?: string;
+    customerName?: string;
+    customerPhone?: string;
+    paidAmount?: string;
+    reservationNote?: string;
+  }): Promise<boolean> {
     const item = this.inventoryItems.get(id);
     if (!item) return false;
     
-    const updatedItem = { ...item, status: "محجوز", reservationDate: new Date() };
+    const updatedItem = { 
+      ...item, 
+      status: "محجوز", 
+      reservationDate: new Date(),
+      reservedBy: data.reservedBy || null,
+      salesRepresentative: data.salesRepresentative || null,
+      customerName: data.customerName || null,
+      customerPhone: data.customerPhone || null,
+      paidAmount: data.paidAmount || null,
+      reservationNote: data.reservationNote || null
+    };
     this.inventoryItems.set(id, updatedItem);
     return true;
   }
@@ -1029,6 +1053,7 @@ export class MemStorage implements IStorage {
       status: "متوفر",
       reservationDate: null,
       reservedBy: null,
+      salesRepresentative: null,
       reservationNote: null,
       customerName: null,
       customerPhone: null,
@@ -1484,14 +1509,25 @@ export class DatabaseStorage implements IStorage {
     return (result.rowCount ?? 0) > 0;
   }
 
-  async reserveItem(id: number, reservedBy: string, reservationNote?: string): Promise<boolean> {
+  async reserveItem(id: number, data: {
+    reservedBy?: string;
+    salesRepresentative?: string;
+    customerName?: string;
+    customerPhone?: string;
+    paidAmount?: string;
+    reservationNote?: string;
+  }): Promise<boolean> {
     const result = await db
       .update(inventoryItems)
       .set({ 
         status: "محجوز", 
         reservationDate: new Date(),
-        reservedBy: reservedBy,
-        reservationNote: reservationNote || null
+        reservedBy: data.reservedBy || null,
+        salesRepresentative: data.salesRepresentative || null,
+        customerName: data.customerName || null,
+        customerPhone: data.customerPhone || null,
+        paidAmount: data.paidAmount || null,
+        reservationNote: data.reservationNote || null
       })
       .where(eq(inventoryItems.id, id));
     return (result.rowCount ?? 0) > 0;
@@ -1504,6 +1540,10 @@ export class DatabaseStorage implements IStorage {
         status: "متوفر", 
         reservationDate: null,
         reservedBy: null,
+        salesRepresentative: null,
+        customerName: null,
+        customerPhone: null,
+        paidAmount: null,
         reservationNote: null
       })
       .where(eq(inventoryItems.id, id));

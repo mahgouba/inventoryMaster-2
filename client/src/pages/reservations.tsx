@@ -214,6 +214,14 @@ export default function ReservationsPage() {
                         <Phone className="w-3 h-3 text-gray-400" />
                         <span dir="ltr">{item.customerPhone}</span>
                       </div>
+                      {item.salesRepresentative && (
+                        <div className="flex items-center gap-2">
+                          <User className="w-3 h-3 text-blue-400" />
+                          <span className="text-blue-600 font-medium">
+                            مندوب المبيعات: {item.salesRepresentative}
+                          </span>
+                        </div>
+                      )}
                       <div className="flex items-center gap-2">
                         <CreditCard className="w-3 h-3 text-gray-400" />
                         <span className="font-semibold text-green-600">

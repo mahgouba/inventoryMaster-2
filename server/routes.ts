@@ -692,27 +692,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Reserve item
-  app.post("/api/inventory/:id/reserve", async (req, res) => {
+  // Reserve item with customer and sales rep data
+  app.put("/api/inventory/:id/reserve", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const { reservedBy, reservationNote } = req.body;
+      const { customerName, customerPhone, salesRepresentative, paidAmount, reservationNote } = req.body;
       
       if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid item ID" });
       }
       
-      if (!reservedBy) {
-        return res.status(400).json({ message: "Reserved by is required" });
+      if (!customerName || !customerPhone || !salesRepresentative || !paidAmount) {
+        return res.status(400).json({ message: "Customer name, phone, sales representative and paid amount are required" });
       }
       
-      const success = await storage.reserveItem(id, reservedBy, reservationNote);
+      const success = await storage.reserveItem(id, {
+        customerName,
+        customerPhone,
+        salesRepresentative,
+        paidAmount,
+        reservationNote
+      });
+      
       if (!success) {
         return res.status(404).json({ message: "Item not found" });
       }
       
       res.json({ message: "Item reserved successfully" });
     } catch (error) {
+      console.error("Reservation error:", error);
       res.status(500).json({ message: "Failed to reserve item" });
     }
   });

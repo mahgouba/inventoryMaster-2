@@ -20,6 +20,7 @@ interface ReservationDialogProps {
 export function ReservationDialog({ open, onOpenChange, item, onSuccess }: ReservationDialogProps) {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [salesRepresentative, setSalesRepresentative] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
   const [reservationNote, setReservationNote] = useState("");
   
@@ -63,6 +64,7 @@ export function ReservationDialog({ open, onOpenChange, item, onSuccess }: Reser
   const resetForm = () => {
     setCustomerName("");
     setCustomerPhone("");
+    setSalesRepresentative("");
     setPaidAmount("");
     setReservationNote("");
   };
@@ -70,10 +72,10 @@ export function ReservationDialog({ open, onOpenChange, item, onSuccess }: Reser
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!customerName.trim() || !customerPhone.trim() || !paidAmount.trim()) {
+    if (!customerName.trim() || !customerPhone.trim() || !salesRepresentative.trim() || !paidAmount.trim()) {
       toast({
         title: "بيانات ناقصة",
-        description: "يرجى إدخال اسم العميل ورقم الجوال والمبلغ المدفوع",
+        description: "يرجى إدخال اسم العميل ورقم الجوال ومندوب المبيعات والمبلغ المدفوع",
         variant: "destructive",
       });
       return;
@@ -82,6 +84,7 @@ export function ReservationDialog({ open, onOpenChange, item, onSuccess }: Reser
     reserveMutation.mutate({
       customerName: customerName.trim(),
       customerPhone: customerPhone.trim(),
+      salesRepresentative: salesRepresentative.trim(),
       paidAmount: paidAmount.trim(),
       reservationNote: reservationNote.trim(),
     });
@@ -130,6 +133,22 @@ export function ReservationDialog({ open, onOpenChange, item, onSuccess }: Reser
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 placeholder="أدخل رقم جوال العميل"
+                required
+                className="text-right"
+                dir="rtl"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="salesRepresentative" className="flex items-center gap-2 justify-end">
+                <span>مندوب المبيعات</span>
+                <User className="w-4 h-4" />
+              </Label>
+              <Input
+                id="salesRepresentative"
+                value={salesRepresentative}
+                onChange={(e) => setSalesRepresentative(e.target.value)}
+                placeholder="أدخل اسم مندوب المبيعات"
                 required
                 className="text-right"
                 dir="rtl"
