@@ -1118,7 +1118,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                       </CardHeader>
                       <CardContent className="pt-0">
                         <div className="space-y-3 text-sm">
-                          {/* Row 1: Category and Trim Level with Icons */}
+                          {/* Header: Category and Trim Level */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center gap-2">
                               <img src="/car.svg" alt="Category" className="w-6 h-6" />
@@ -1131,52 +1131,52 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             )}
                           </div>
                           
-                          {/* Row 2: Engine Capacity and Year with Icons */}
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="flex items-center gap-2">
+                          {/* Row 1: Engine Capacity, Year, Exterior Color */}
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="flex items-center gap-1">
                               <img src="/car-engine.svg" alt="Engine" className="w-6 h-6" />
-                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200">{item.engineCapacity}</span>
+                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.engineCapacity}</span>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
                               <img src="/year.svg" alt="Year" className="w-6 h-6" />
-                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200">{item.year}</span>
+                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.year}</span>
                             </div>
-                          </div>
-                          
-                          {/* Row 3: Exterior Color and Interior Color with Icons */}
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
                               <img src="/exterior-color.svg" alt="Exterior Color" className="w-6 h-6" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.exteriorColor}</span>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.exteriorColor}</span>
                             </div>
-                            <div className="flex items-center gap-2">
+                          </div>
+                          
+                          {/* Row 2: Interior Color, Import Type, Location */}
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="flex items-center gap-1">
                               <img src="/interior-color.svg" alt="Interior Color" className="w-6 h-6" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.interiorColor}</span>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.interiorColor}</span>
                             </div>
-                          </div>
-                          
-                          {/* Row 4: Import Type and Ownership Type with Icons */}
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
                               <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-6 h-6" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.importType}</span>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.importType}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <img src="/import-type.svg" alt="Ownership Type" className="w-6 h-6" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.ownershipType}</span>
+                            <div className="flex items-center gap-1">
+                              <img src="/location.svg" alt="Location" className="w-6 h-6" />
+                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.location}</span>
                             </div>
                           </div>
                           
-                          {/* Row 5: Location and Chassis Number with Icons */}
+                          {/* Row 3: Chassis Number and Entry Date */}
                           <div className="grid grid-cols-2 gap-3">
-                            <div className="flex items-center gap-2">
-                              <img src="/location.svg" alt="Location" className="w-6 h-6" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.location}</span>
-                            </div>
                             {item.chassisNumber && (
                               <div className="flex items-center gap-2">
                                 <img src="/chassis.svg" alt="Chassis Number" className="w-6 h-6" />
                                 <span className="font-medium font-latin text-slate-700 dark:text-slate-300 text-xs">{item.chassisNumber}</span>
+                              </div>
+                            )}
+                            {item.entryDate && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-slate-500 text-xs">تاريخ الإدخال:</span>
+                                <span className="font-medium text-slate-600 text-xs">
+                                  {new Date(item.entryDate).toLocaleDateString('en-US')}
+                                </span>
                               </div>
                             )}
                           </div>
@@ -1188,15 +1188,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             </div>
                           )}
 
-                          
-                          {item.entryDate && (
-                            <div className="flex justify-between text-xs pt-2 border-t border-slate-100 mt-2">
-                              <span className="text-slate-500">تاريخ الإدخال:</span>
-                              <span className="font-medium text-slate-600">
-                                {new Date(item.entryDate).toLocaleDateString('en-US')}
-                              </span>
-                            </div>
-                          )}
+
                           
                           {item.reservationDate && (
                             <div className="flex justify-between text-xs pt-2 border-t border-blue-100 mt-2 bg-blue-50 p-2 rounded">
