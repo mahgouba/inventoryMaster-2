@@ -213,52 +213,6 @@
     ]
   },
   {
-    "brand_ar": "لاند روفر ",
-    "brand_en": "Land Rover",
-    "models": [
-      {
-        "model_ar": "رنج روفر فوج",
-        "model_en": "Range Rover vogue",
-        "trims": [
-          {"trim_ar": "SE", "trim_en": "SE"},
-          {"trim_ar": "HSE", "trim_en": "HSE"},
-          {"trim_ar": "أوتوبيوغرافي", "trim_en": "Autobiography"},
-          {"trim_ar": "SV", "trim_en": "SV"}
-        ]
-      },
-      {
-        "model_ar": "رنج روفر سبورت",
-        "model_en": "Range Rover Sport",
-        "trims": [
-          {"trim_ar": "SE", "trim_en": "SE"},
-          {"trim_ar": "ديناميك SE", "trim_en": "Dynamic SE"},
-          {"trim_ar": "ديناميك HSE", "trim_en": "Dynamic HSE"},
-          {"trim_ar": "أوتوبيوغرافي", "trim_en": "Autobiography"},
-          {"trim_ar": "SV", "trim_en": "SV"}
-        ]
-      },
-      {
-        "model_ar": "رنج روفر فيلار",
-        "model_en": "Range Rover Velar",
-        "trims": [
-          {"trim_ar": "S", "trim_en": "S"},
-          {"trim_ar": "ديناميك SE", "trim_en": "Dynamic SE"},
-          {"trim_ar": "ديناميك HSE", "trim_en": "Dynamic HSE"},
-          {"trim_ar": "SV أوتوبيوغرافي ديناميك إيديشن", "trim_en": "SVAutobiography Dynamic Edition"}
-        ]
-      },
-      {
-        "model_ar": "رنج روفر إيفوك",
-        "model_en": "Range Rover Evoque",
-        "trims": [
-          {"trim_ar": "S", "trim_en": "S"},
-          {"trim_ar": "ديناميك SE", "trim_en": "Dynamic SE"},
-          {"trim_ar": "ديناميك HSE", "trim_en": "Dynamic HSE"}
-        ]
-      }
-    ]
-  },
-  {
     "brand_ar": "دفندر",
     "brand_en": "Defender",
     "models": [
