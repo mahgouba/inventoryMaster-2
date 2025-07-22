@@ -388,10 +388,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     
     const values = filteredData
       .map(item => field === "year" ? String(item[field]) : item[field])
-      .filter((value, index, self) => value != null && value !== "" && self.indexOf(value) === index)
+      .filter((value, index, self) => value != null && value !== "" && self.indexOf(value) === index) as string[]
       .sort();
       
-    return values as string[];
+    return values;
   };
 
   const availableManufacturers = getFilteredAvailableOptions("manufacturer");
@@ -870,306 +870,107 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             return (
                               <div className="space-y-4">
 
-                                {/* Interactive Cascading Filters */}
-                                <div className="space-y-4">
-                                  <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                                    <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-1">الفلاتر التفاعلية</h4>
-                                    <p className="text-xs text-blue-600 dark:text-blue-300">كل فلتر يعرض البيانات المتاحة حسب اختيارك في الفلتر السابق</p>
-                                  </div>
+                                {/* Individual Filters with Toggles */}
+                                <div className="space-y-3">
+                                  <MultiSelectFilter 
+                                    title="الصانع" 
+                                    items={availableManufacturers} 
+                                    selectedItems={selectedManufacturer} 
+                                    onSelectionChange={setSelectedManufacturer} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showManufacturerFilter}
+                                    onVisibilityChange={setShowManufacturerFilter}
+                                  />
 
-                                  {/* Manufacturer Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      الصانع ({availableManufacturers.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableManufacturers.map(manufacturer => {
-                                        const count = getFilterCount('manufacturer', manufacturer);
-                                        const isSelected = selectedManufacturer.includes(manufacturer);
-                                        
-                                        return (
-                                          <Button
-                                            key={manufacturer}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedManufacturer, setSelectedManufacturer, manufacturer)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {manufacturer} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
+                                  <MultiSelectFilter 
+                                    title="الفئة" 
+                                    items={availableCategories} 
+                                    selectedItems={selectedCategory} 
+                                    onSelectionChange={setSelectedCategory} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showCategoryFilter}
+                                    onVisibilityChange={setShowCategoryFilter}
+                                  />
 
-                                  {/* Category Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      الفئة ({availableCategories.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableCategories.length > 0 ? availableCategories.map(category => {
-                                        const count = getFilterCount('category', category);
-                                        const isSelected = selectedCategory.includes(category);
-                                        
-                                        return (
-                                          <Button
-                                            key={category}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedCategory, setSelectedCategory, category)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {category} ({count})
-                                          </Button>
-                                        );
-                                      }) : (
-                                        <span className="text-xs text-slate-500 dark:text-slate-400 italic">اختر صانع أولاً لعرض الفئات المتاحة</span>
-                                      )}
-                                    </div>
-                                  </div>
+                                  <MultiSelectFilter 
+                                    title="درجة التجهيز" 
+                                    items={availableTrimLevels} 
+                                    selectedItems={selectedTrimLevel} 
+                                    onSelectionChange={setSelectedTrimLevel} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showTrimLevelFilter}
+                                    onVisibilityChange={setShowTrimLevelFilter}
+                                  />
 
-                                  {/* Trim Level Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      درجة التجهيز ({availableTrimLevels.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableTrimLevels.length > 0 ? availableTrimLevels.map(trimLevel => {
-                                        const count = getFilterCount('trimLevel', trimLevel);
-                                        const isSelected = selectedTrimLevel.includes(trimLevel);
-                                        
-                                        return (
-                                          <Button
-                                            key={trimLevel}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedTrimLevel, setSelectedTrimLevel, trimLevel)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {trimLevel} ({count})
-                                          </Button>
-                                        );
-                                      }) : (
-                                        <span className="text-xs text-slate-500 dark:text-slate-400 italic">اختر فئة أولاً لعرض درجات التجهيز المتاحة</span>
-                                      )}
-                                    </div>
-                                  </div>
+                                  <MultiSelectFilter 
+                                    title="السنة" 
+                                    items={availableYears} 
+                                    selectedItems={selectedYear} 
+                                    onSelectionChange={setSelectedYear} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showYearFilter}
+                                    onVisibilityChange={setShowYearFilter}
+                                  />
 
-                                  {/* Year Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      السنة ({availableYears.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableYears.map(year => {
-                                        const count = getFilterCount('year', year);
-                                        const isSelected = selectedYear.includes(year);
-                                        
-                                        return (
-                                          <Button
-                                            key={year}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedYear, setSelectedYear, year)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {year} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
+                                  <MultiSelectFilter 
+                                    title="سعة المحرك" 
+                                    items={availableEngineCapacities} 
+                                    selectedItems={selectedEngineCapacity} 
+                                    onSelectionChange={setSelectedEngineCapacity} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showEngineCapacityFilter}
+                                    onVisibilityChange={setShowEngineCapacityFilter}
+                                  />
 
-                                  {/* Engine Capacity Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      سعة المحرك ({availableEngineCapacities.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableEngineCapacities.map(engineCapacity => {
-                                        const count = getFilterCount('engineCapacity', engineCapacity);
-                                        const isSelected = selectedEngineCapacity.includes(engineCapacity);
-                                        
-                                        return (
-                                          <Button
-                                            key={engineCapacity}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedEngineCapacity, setSelectedEngineCapacity, engineCapacity)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {engineCapacity} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
+                                  <MultiSelectFilter 
+                                    title="اللون الخارجي" 
+                                    items={availableExteriorColors} 
+                                    selectedItems={selectedExteriorColor} 
+                                    onSelectionChange={setSelectedExteriorColor} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showExteriorColorFilter}
+                                    onVisibilityChange={setShowExteriorColorFilter}
+                                  />
 
-                                  {/* Exterior Color Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      اللون الخارجي ({availableExteriorColors.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableExteriorColors.map(color => {
-                                        const count = getFilterCount('exteriorColor', color);
-                                        const isSelected = selectedExteriorColor.includes(color);
-                                        
-                                        return (
-                                          <Button
-                                            key={color}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedExteriorColor, setSelectedExteriorColor, color)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {color} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
+                                  <MultiSelectFilter 
+                                    title="اللون الداخلي" 
+                                    items={availableInteriorColors} 
+                                    selectedItems={selectedInteriorColor} 
+                                    onSelectionChange={setSelectedInteriorColor} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showInteriorColorFilter}
+                                    onVisibilityChange={setShowInteriorColorFilter}
+                                  />
 
-                                  {/* Interior Color Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      اللون الداخلي ({availableInteriorColors.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableInteriorColors.map(color => {
-                                        const count = getFilterCount('interiorColor', color);
-                                        const isSelected = selectedInteriorColor.includes(color);
-                                        
-                                        return (
-                                          <Button
-                                            key={color}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedInteriorColor, setSelectedInteriorColor, color)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {color} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
+                                  <MultiSelectFilter 
+                                    title="الحالة" 
+                                    items={availableStatuses} 
+                                    selectedItems={selectedStatus} 
+                                    onSelectionChange={setSelectedStatus} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showStatusFilter}
+                                    onVisibilityChange={setShowStatusFilter}
+                                  />
 
-                                  {/* Status Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      الحالة ({availableStatuses.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableStatuses.map(status => {
-                                        const count = getFilterCount('status', status);
-                                        const isSelected = selectedStatus.includes(status);
-                                        
-                                        return (
-                                          <Button
-                                            key={status}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedStatus, setSelectedStatus, status)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {status} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
+                                  <MultiSelectFilter 
+                                    title="نوع الاستيراد" 
+                                    items={availableImportTypes} 
+                                    selectedItems={selectedImportType} 
+                                    onSelectionChange={setSelectedImportType} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showImportTypeFilter}
+                                    onVisibilityChange={setShowImportTypeFilter}
+                                  />
 
-                                  {/* Import Type Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      نوع الاستيراد ({availableImportTypes.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableImportTypes.map(importType => {
-                                        const count = getFilterCount('importType', importType);
-                                        const isSelected = selectedImportType.includes(importType);
-                                        
-                                        return (
-                                          <Button
-                                            key={importType}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedImportType, setSelectedImportType, importType)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {importType} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-
-                                  {/* Ownership Type Filter */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-600 pb-1">
-                                      نوع الملكية ({availableOwnershipTypes.length} متاح)
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                      {availableOwnershipTypes.map(ownershipType => {
-                                        const count = getFilterCount('ownershipType', ownershipType);
-                                        const isSelected = selectedOwnershipType.includes(ownershipType);
-                                        
-                                        return (
-                                          <Button
-                                            key={ownershipType}
-                                            variant={isSelected ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => toggleFilter(selectedOwnershipType, setSelectedOwnershipType, ownershipType)}
-                                            className={`text-xs h-8 px-3 whitespace-nowrap transition-all duration-200 ${
-                                              isSelected 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                                                : 'hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-700 dark:text-slate-300'
-                                            }`}
-                                          >
-                                            {ownershipType} ({count})
-                                          </Button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
+                                  <MultiSelectFilter 
+                                    title="نوع الملكية" 
+                                    items={availableOwnershipTypes} 
+                                    selectedItems={selectedOwnershipType} 
+                                    onSelectionChange={setSelectedOwnershipType} 
+                                    toggleFilter={toggleFilter}
+                                    isVisible={showOwnershipTypeFilter}
+                                    onVisibilityChange={setShowOwnershipTypeFilter}
+                                  />
 
                                   {/* Reset Filters Button */}
                                   <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -1188,9 +989,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                         setSelectedImportType([]);
                                         setSelectedOwnershipType([]);
                                       }}
-                                      className="w-full hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20"
+                                      className="hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20"
                                     >
-                                      إعادة تعيين جميع الفلاتر
+                                      إعادة تعيين الفلاتر
                                     </Button>
                                   </div>
                                 </div>
