@@ -1111,20 +1111,17 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     <Card key={item.id} className="card-dynamic">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
-                          {/* Engine, Year, Exterior Color Row */}
+                          {/* Category and Trim Level Row */}
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1">
-                              <img src="/car-engine.svg" alt="Engine" className="w-4 h-4" />
-                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.engineCapacity}</span>
+                              <img src="/car.svg" alt="Category" className="w-4 h-4" />
+                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.category}</span>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <img src="/year.svg" alt="Year" className="w-4 h-4" />
-                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.year}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <img src="/exterior-color.svg" alt="Exterior Color" className="w-4 h-4" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.exteriorColor}</span>
-                            </div>
+                            {item.trimLevel && (
+                              <div className="flex items-center gap-1">
+                                <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.trimLevel}</span>
+                              </div>
+                            )}
                           </div>
                           
                           <Badge variant="secondary" className={`${getStatusColor(item.status)} text-xs`}>
@@ -1134,20 +1131,23 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                       </CardHeader>
                       <CardContent className="pt-0">
                         <div className="space-y-3 text-sm">
-                          {/* Header: Category and Trim Level */}
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="flex items-center gap-2">
-                              <img src="/car.svg" alt="Category" className="w-6 h-6" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.category}</span>
+                          {/* Row 1: Engine Capacity, Year, Exterior Color */}
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="flex items-center gap-1">
+                              <img src="/car-engine.svg" alt="Engine" className="w-6 h-6" />
+                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.engineCapacity}</span>
                             </div>
-                            {item.trimLevel && (
-                              <div className="flex flex-col">
-                                <span className="font-semibold text-slate-800 dark:text-slate-200">{item.trimLevel}</span>
-                              </div>
-                            )}
+                            <div className="flex items-center gap-1">
+                              <img src="/year.svg" alt="Year" className="w-6 h-6" />
+                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.year}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <img src="/exterior-color.svg" alt="Exterior Color" className="w-6 h-6" />
+                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.exteriorColor}</span>
+                            </div>
                           </div>
                           
-                          {/* Row 1: Interior Color, Import Type, Location */}
+                          {/* Row 2: Interior Color, Import Type, Location */}
                           <div className="grid grid-cols-3 gap-2">
                             <div className="flex items-center gap-1">
                               <img src="/interior-color.svg" alt="Interior Color" className="w-6 h-6" />
@@ -1163,7 +1163,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             </div>
                           </div>
                           
-                          {/* Row 2: Chassis Number and Entry Date */}
+                          {/* Row 3: Chassis Number and Entry Date */}
                           <div className="grid grid-cols-2 gap-3">
                             {item.chassisNumber && (
                               <div className="flex items-center gap-2">
