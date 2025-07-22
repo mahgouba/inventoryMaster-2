@@ -1102,48 +1102,76 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   {data.items.map((item) => (
                     <Card key={item.id} className="card-dynamic">
                       <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg font-bold text-slate-800 dark:text-slate-200">{item.category}</CardTitle>
+                        <div className="flex items-center justify-end">
                           <Badge variant="secondary" className={`${getStatusColor(item.status)} text-xs`}>
                             {item.status}
                           </Badge>
                         </div>
                       </CardHeader>
                       <CardContent className="pt-0">
-                        <div className="space-y-2 text-sm">
-                          {item.trimLevel && (
-                            <div className="flex justify-between">
-                              <span className="text-slate-600 dark:text-slate-400 font-medium">درجة التجهيز:</span>
-                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.trimLevel}</span>
+                        <div className="space-y-3 text-sm">
+                          {/* Row 1: Category and Trim Level */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col">
+                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">الفئة:</span>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.category}</span>
                             </div>
-                          )}
-                          <div className="flex justify-between">
-                            <span className="text-slate-600 dark:text-slate-400 font-medium">سعة المحرك:</span>
-                            <span className="font-semibold font-latin text-slate-800 dark:text-slate-200">{item.engineCapacity}</span>
+                            {item.trimLevel && (
+                              <div className="flex flex-col">
+                                <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">درجة التجهيز:</span>
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">{item.trimLevel}</span>
+                              </div>
+                            )}
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-600 dark:text-slate-400 font-medium">السنة:</span>
-                            <span className="font-semibold font-latin text-slate-800 dark:text-slate-200">{item.year}</span>
+                          
+                          {/* Row 2: Engine Capacity and Year */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col">
+                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">سعة المحرك:</span>
+                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200">{item.engineCapacity}</span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">السنة:</span>
+                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200">{item.year}</span>
+                            </div>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-600 dark:text-slate-400 font-medium">اللون الخارجي:</span>
-                            <span className="font-semibold text-slate-800 dark:text-slate-200">{item.exteriorColor}</span>
+                          
+                          {/* Row 3: Exterior Color and Interior Color */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col">
+                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">اللون الخارجي:</span>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.exteriorColor}</span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">اللون الداخلي:</span>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.interiorColor}</span>
+                            </div>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-600 dark:text-slate-400 font-medium">اللون الداخلي:</span>
-                            <span className="font-semibold text-slate-800 dark:text-slate-200">{item.interiorColor}</span>
+                          
+                          {/* Row 4: Import Type and Ownership Type */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col">
+                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">نوع الاستيراد:</span>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.importType}</span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">نوع الملكية:</span>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.ownershipType}</span>
+                            </div>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-600 dark:text-slate-400 font-medium">نوع الاستيراد:</span>
-                            <span className="font-semibold text-slate-800 dark:text-slate-200">{item.importType}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-600 dark:text-slate-400 font-medium">نوع الملكية:</span>
-                            <span className="font-semibold text-slate-800 dark:text-slate-200">{item.ownershipType}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-600 dark:text-slate-400 font-medium">الموقع:</span>
-                            <span className="font-semibold text-slate-800 dark:text-slate-200">{item.location}</span>
+                          
+                          {/* Row 5: Location and Chassis Number */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col">
+                              <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">الموقع:</span>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200">{item.location}</span>
+                            </div>
+                            {item.chassisNumber && (
+                              <div className="flex flex-col">
+                                <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">رقم الهيكل:</span>
+                                <span className="font-medium font-latin text-slate-700 dark:text-slate-300 text-xs">{item.chassisNumber}</span>
+                              </div>
+                            )}
                           </div>
                           
                           {item.price && (
@@ -1152,13 +1180,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <span className="font-bold font-latin text-teal-700 dark:text-teal-400">{item.price}</span>
                             </div>
                           )}
-                          
-                          {item.chassisNumber && (
-                            <div className="flex justify-between">
-                              <span className="text-slate-600 font-medium">رقم الهيكل:</span>
-                              <span className="font-medium font-latin text-xs text-slate-700">{item.chassisNumber}</span>
-                            </div>
-                          )}
+
                           
                           {item.entryDate && (
                             <div className="flex justify-between text-xs pt-2 border-t border-slate-100 mt-2">
