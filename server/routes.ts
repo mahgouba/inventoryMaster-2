@@ -788,21 +788,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid item ID" });
       }
 
+      console.log("Update request - ID:", id, "Body:", req.body);
+      
       const validation = insertInventoryItemSchema.partial().safeParse(req.body);
       if (!validation.success) {
+        console.log("Validation failed:", validation.error.errors);
         return res.status(400).json({ 
           message: "Invalid data", 
           errors: validation.error.errors 
         });
       }
 
+      console.log("Validated data:", validation.data);
       const item = await storage.updateInventoryItem(id, validation.data);
       if (!item) {
+        console.log("Item not found for ID:", id);
         return res.status(404).json({ message: "Item not found" });
       }
       
+      console.log("Updated item:", item);
       res.json(item);
     } catch (error) {
+      console.error("Update error:", error);
+      res.status(500).json({ message: "Failed to update inventory item" });
+    }
+  });
+
+  // Update inventory item (PUT endpoint)
+  app.put("/api/inventory/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid item ID" });
+      }
+
+      console.log("PUT Update request - ID:", id, "Body:", req.body);
+      
+      const validation = insertInventoryItemSchema.partial().safeParse(req.body);
+      if (!validation.success) {
+        console.log("PUT Validation failed:", validation.error.errors);
+        return res.status(400).json({ 
+          message: "Invalid data", 
+          errors: validation.error.errors 
+        });
+      }
+
+      console.log("PUT Validated data:", validation.data);
+      const item = await storage.updateInventoryItem(id, validation.data);
+      if (!item) {
+        console.log("PUT Item not found for ID:", id);
+        return res.status(404).json({ message: "Item not found" });
+      }
+      
+      console.log("PUT Updated item:", item);
+      res.json(item);
+    } catch (error) {
+      console.error("PUT Update error:", error);
       res.status(500).json({ message: "Failed to update inventory item" });
     }
   });
