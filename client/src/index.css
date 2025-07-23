@@ -83,6 +83,20 @@ button[data-state="checked"][role="radio"] span {
     background: white;
   }
   
+  /* Remove all shadows when printing */
+  * {
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  [data-pdf-export="quotation"] {
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+  }
+  
   .print-page {
     width: 210mm;
     min-height: 297mm;

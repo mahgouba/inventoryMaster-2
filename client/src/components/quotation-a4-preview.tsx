@@ -205,6 +205,9 @@ export default function QuotationA4Preview({
               -webkit-font-smoothing: antialiased;
               -moz-osx-font-smoothing: grayscale;
               text-rendering: optimizeLegibility;
+              box-shadow: none !important;
+              -webkit-box-shadow: none !important;
+              -moz-box-shadow: none !important;
             }
             img {
               image-rendering: -webkit-optimize-contrast;
@@ -221,11 +224,22 @@ export default function QuotationA4Preview({
               transform: none !important;
               zoom: 1 !important;
               box-sizing: border-box !important;
+              box-shadow: none !important;
+              -webkit-box-shadow: none !important;
+              -moz-box-shadow: none !important;
             }
             @media print {
               [data-pdf-export="quotation"] {
                 width: ${A4_WIDTH_PX / 4}px !important;
                 height: ${A4_HEIGHT_PX / 4}px !important;
+                box-shadow: none !important;
+                -webkit-box-shadow: none !important;
+                -moz-box-shadow: none !important;
+              }
+              * {
+                box-shadow: none !important;
+                -webkit-box-shadow: none !important;
+                -moz-box-shadow: none !important;
               }
             }
           `;
@@ -273,9 +287,17 @@ export default function QuotationA4Preview({
           onclone: (clonedDoc) => {
             const style = clonedDoc.createElement('style');
             style.textContent = `
+              * {
+                box-shadow: none !important;
+                -webkit-box-shadow: none !important;
+                -moz-box-shadow: none !important;
+              }
               [data-pdf-export="quotation"] {
                 width: ${A4_WIDTH_PX / 2}px !important;
                 height: ${A4_HEIGHT_PX / 2}px !important;
+                box-shadow: none !important;
+                -webkit-box-shadow: none !important;
+                -moz-box-shadow: none !important;
               }
             `;
             clonedDoc.head.appendChild(style);
@@ -323,7 +345,7 @@ export default function QuotationA4Preview({
       <div 
         ref={previewRef}
         data-pdf-export="quotation"
-        className="mx-auto text-black shadow-2xl border border-slate-200 overflow-hidden relative"
+        className="mx-auto text-black shadow-2xl print:shadow-none border border-slate-200 overflow-hidden relative"
         style={{
           width: '210mm',
           height: '297mm',
