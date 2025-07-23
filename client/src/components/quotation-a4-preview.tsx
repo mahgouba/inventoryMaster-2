@@ -575,7 +575,7 @@ export default function QuotationA4Preview({
 
           {/* Stamp Section */}
           <div className="flex justify-end mb-6">
-            <div className="bg-transparent border border-gray-300 p-4 rounded shadow-sm w-64">
+            <div className="bg-transparent border border-gray-300 p-4 rounded shadow-sm w-64 pl-[2px] pr-[2px] pt-[2px] pb-[2px]">
               <div className="border-2 border-dashed border-gray-300 h-32 flex items-center justify-center rounded bg-transparent">
                 {companyStamp ? (
                   <img 
