@@ -4,13 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Calendar, Car, CreditCard, Phone, Search, ShoppingCart, User, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, Car, CreditCard, Phone, Search, ShoppingCart, User, X, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
 
 export default function ReservationsPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [salesRepFilter, setSalesRepFilter] = useState("all");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -18,20 +20,42 @@ export default function ReservationsPage() {
     queryKey: ["/api/inventory/reserved"],
   });
 
-  // Filter reserved items based on search query
+  // Get unique sales representatives for filter
+  const salesRepresentatives = useMemo(() => {
+    const items = reservedItems as any[];
+    const reps = items
+      .map((item: any) => item.salesRepresentative)
+      .filter((rep: string) => rep && rep.trim())
+      .filter((rep: string, index: number, arr: string[]) => arr.indexOf(rep) === index)
+      .sort();
+    return reps;
+  }, [reservedItems]);
+
+  // Filter reserved items based on search query and sales representative
   const filteredReservations = useMemo(() => {
     const items = reservedItems as any[];
-    if (!searchQuery.trim()) return items;
+    let filtered = items;
     
-    const query = searchQuery.toLowerCase();
-    return items.filter((item: any) =>
-      item.customerName?.toLowerCase().includes(query) ||
-      item.customerPhone?.toLowerCase().includes(query) ||
-      item.manufacturer?.toLowerCase().includes(query) ||
-      item.category?.toLowerCase().includes(query) ||
-      item.chassisNumber?.toLowerCase().includes(query)
-    );
-  }, [reservedItems, searchQuery]);
+    // Filter by sales representative
+    if (salesRepFilter !== "all") {
+      filtered = filtered.filter((item: any) => item.salesRepresentative === salesRepFilter);
+    }
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((item: any) =>
+        item.customerName?.toLowerCase().includes(query) ||
+        item.customerPhone?.toLowerCase().includes(query) ||
+        item.manufacturer?.toLowerCase().includes(query) ||
+        item.category?.toLowerCase().includes(query) ||
+        item.chassisNumber?.toLowerCase().includes(query) ||
+        item.salesRepresentative?.toLowerCase().includes(query)
+      );
+    }
+    
+    return filtered;
+  }, [reservedItems, searchQuery, salesRepFilter]);
 
   const sellMutation = useMutation({
     mutationFn: async (itemId: number) => {
@@ -117,17 +141,72 @@ export default function ReservationsPage() {
           </p>
         </div>
 
-        {/* Search and Stats */}
+        {/* Search and Filters */}
         <div className="mb-6 space-y-4">
-          <div className="relative">
-            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="البحث في طلبات الحجز..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pr-10 text-right"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="relative">
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="البحث في طلبات الحجز..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pr-10 text-right"
+              />
+            </div>
+            
+            <div className="relative">
+              <Filter className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Select value={salesRepFilter} onValueChange={setSalesRepFilter}>
+                <SelectTrigger className="pr-10 text-right">
+                  <SelectValue placeholder="فلترة بإسم المندوب" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">جميع المندوبين</SelectItem>
+                  {salesRepresentatives.map((rep: string) => (
+                    <SelectItem key={rep} value={rep}>
+                      {rep}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+          
+          {/* Active Filters Display */}
+          {(searchQuery || salesRepFilter !== "all") && (
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="text-sm text-gray-600 dark:text-gray-400">الفلاتر النشطة:</span>
+              {searchQuery && (
+                <Badge variant="secondary" className="gap-1">
+                  البحث: {searchQuery}
+                  <X 
+                    className="w-3 h-3 cursor-pointer" 
+                    onClick={() => setSearchQuery("")}
+                  />
+                </Badge>
+              )}
+              {salesRepFilter !== "all" && (
+                <Badge variant="secondary" className="gap-1">
+                  المندوب: {salesRepFilter}
+                  <X 
+                    className="w-3 h-3 cursor-pointer" 
+                    onClick={() => setSalesRepFilter("all")}
+                  />
+                </Badge>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSalesRepFilter("all");
+                }}
+                className="text-xs h-6"
+              >
+                مسح جميع الفلاتر
+              </Button>
+            </div>
+          )}
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
