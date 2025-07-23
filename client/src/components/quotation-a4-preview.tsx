@@ -425,7 +425,7 @@ export default function QuotationA4Preview({
 
             {/* Vehicle Information */}
             {selectedVehicle && (
-              <div className="relative bg-white/90 p-4 w-full mt-[166px] mb-[16px] overflow-hidden">
+              <div className="relative p-4 w-full mt-[166px] mb-[16px] overflow-hidden bg-[#fafafa12]">
                 {/* Manufacturer Logo Watermark */}
                 {manufacturerLogo && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
