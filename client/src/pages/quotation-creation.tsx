@@ -622,7 +622,8 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [showWhatsappDialog, setShowWhatsappDialog] = useState(false);
   const [termsRefreshTrigger, setTermsRefreshTrigger] = useState(0);
-  const [companyStamp, setCompanyStamp] = useState<string | null>(null);
+  const [companyStamp, setCompanyStamp] = useState<string | null>("/company-stamp.png");
+  const [showStamp, setShowStamp] = useState(true);
   const [downloadLoading, setDownloadLoading] = useState(false);
   
 
@@ -1453,36 +1454,24 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 شروط
               </Button>
               
-              <Button
-                variant="outline"
-                onClick={() => {
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = 'image/*';
-                  input.onchange = (e) => {
-                    const file = (e.target as HTMLInputElement).files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = (event) => {
-                        const result = event.target?.result as string;
-                        if (result) {
-                          setCompanyStamp(result);
-                          toast({
-                            title: "تم رفع الختم بنجاح",
-                            description: "تم إضافة ختم الشركة إلى العرض",
-                          });
-                        }
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  };
-                  input.click();
-                }}
-                className="border-red-500 text-red-600 hover:bg-red-50"
-              >
-                <Upload size={16} className="ml-2" />
-                {companyStamp ? "تغيير الختم" : "إضافة ختم"}
-              </Button>
+              {/* Toggle Switch for Stamp Visibility */}
+              <div className="flex items-center space-x-2 space-x-reverse border border-red-500 rounded-lg px-3 py-2 bg-white">
+                <Label htmlFor="stamp-visibility" className="text-sm font-medium text-red-600">
+                  {showStamp ? "إخفاء الختم" : "إظهار الختم"}
+                </Label>
+                <Switch
+                  id="stamp-visibility"
+                  checked={showStamp}
+                  onCheckedChange={(checked) => {
+                    setShowStamp(checked);
+                    toast({
+                      title: checked ? "تم إظهار الختم" : "تم إخفاء الختم",
+                      description: checked ? "سيظهر ختم الشركة في العرض" : "لن يظهر ختم الشركة في العرض",
+                    });
+                  }}
+                  className="data-[state=checked]:bg-red-500"
+                />
+              </div>
               
 
               
@@ -2187,7 +2176,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
           representativePosition={representatives.find(r => r.id === selectedRepresentative)?.position || "غير محدد"}
           notes={notes}
           termsRefreshTrigger={termsRefreshTrigger}
-          companyStamp={companyStamp}
+          companyStamp={showStamp ? companyStamp : null}
           isInvoiceMode={isInvoiceMode}
           invoiceNumber={invoiceNumber}
         />

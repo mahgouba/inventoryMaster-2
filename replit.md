@@ -254,6 +254,12 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Fixed quotation creation page: removed "لا توجد بيانات سيارة" (No vehicle data) conditional message that was blocking access to quotation form
 - ✅ Quotation creation now always displays vehicle data form allowing manual selection of vehicle parameters instead of showing error message
 - ✅ Enhanced quotation workflow to ensure users can always access the vehicle selection form regardless of initial data state
+- ✅ Added default company stamp image (company-stamp.png) to quotation system with automatic loading
+- ✅ Replaced stamp upload button with toggle switch to show/hide stamp functionality  
+- ✅ Enhanced stamp control with red-themed toggle switch and Arabic labels (إظهار الختم / إخفاء الختم)
+- ✅ Updated vehicle selection dialog to use complete cars database from cars.json instead of inventory only
+- ✅ Created new API endpoint /api/cars/all-vehicles to generate comprehensive vehicle data from cars.json
+- ✅ Enhanced quotation creation with access to all available vehicle combinations from complete database
 
 ### Complete Docker Setup and Database Organization (July 22, 2025)
 - ✅ Organized comprehensive Docker deployment system with PostgreSQL database integration
