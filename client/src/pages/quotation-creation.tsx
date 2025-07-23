@@ -2845,33 +2845,23 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
           </div>
         </div>
 
-        {/* Representative Information */}
-        <div className="print-section">
-          <h3>بيانات المندوب</h3>
-          {(() => {
-            const rep = representatives.find(r => r.id === selectedRepresentative);
-            return rep ? (
-              <>
-                <div className="print-row">
-                  <span className="print-label">الاسم:</span>
-                  <span className="print-value">{rep.name}</span>
-                </div>
-                <div className="print-row">
-                  <span className="print-label">المنصب:</span>
-                  <span className="print-value">{rep.position}</span>
-                </div>
-                <div className="print-row">
-                  <span className="print-label">رقم الهاتف:</span>
-                  <span className="print-value">{rep.phone}</span>
-                </div>
-                <div className="print-row">
-                  <span className="print-label">البريد الإلكتروني:</span>
-                  <span className="print-value">{rep.email}</span>
-                </div>
-              </>
-            ) : null;
-          })()}
-        </div>
+        {/* Representative Information - Hidden if no representative selected */}
+        {(() => {
+          const rep = representatives.find(r => r.id === selectedRepresentative);
+          return rep ? (
+            <div className="print-section">
+              <h3>بيانات المندوب</h3>
+              <div className="print-row">
+                <span className="print-label">الاسم:</span>
+                <span className="print-value">{rep.name}</span>
+              </div>
+              <div className="print-row">
+                <span className="print-label">رقم الهاتف:</span>
+                <span className="print-value">{rep.phone}</span>
+              </div>
+            </div>
+          ) : null;
+        })()}
 
         {/* Vehicle Information */}
         <div className="print-section">
