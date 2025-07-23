@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useTheme } from "@/hooks/useTheme";
 import InventoryPage from "@/pages/inventory";
 import CardViewPage from "@/pages/card-view-new";
+import FinancingCalculatorPage from "@/pages/financing-calculator";
 
 import AppearancePage from "@/pages/appearance";
 import PdfAppearanceManagement from "@/pages/pdf-appearance-management";
@@ -54,6 +55,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
       <Route path="/locations" component={() => <LocationPage userRole={user.role} onLogout={onLogout} />} />
       <Route path="/reservations" component={() => <ReservationsPage />} />
       <Route path="/sold-vehicles" component={() => <SoldVehiclesPage />} />
+      <Route path="/financing-calculator" component={FinancingCalculatorPage} />
       {/* صفحات الأدمن فقط */}
       {user.role === "admin" && (
         <>

@@ -598,6 +598,37 @@ export type InsertLowStockAlert = z.infer<typeof insertLowStockAlertSchema>;
 export type StockSettings = typeof stockSettings.$inferSelect;
 export type InsertStockSettings = z.infer<typeof insertStockSettingsSchema>;
 
+// Financing calculations table
+export const financingCalculations = pgTable("financing_calculations", {
+  id: serial("id").primaryKey(),
+  customerName: text("customer_name").notNull(),
+  vehiclePrice: decimal("vehicle_price", { precision: 10, scale: 2 }).notNull(),
+  downPayment: decimal("down_payment", { precision: 10, scale: 2 }).notNull(),
+  finalPayment: decimal("final_payment", { precision: 10, scale: 2 }).default("0").notNull(),
+  bankName: text("bank_name").notNull(),
+  interestRate: decimal("interest_rate", { precision: 5, scale: 2 }).notNull(), // APR percentage
+  financingYears: integer("financing_years").notNull(),
+  administrativeFees: decimal("administrative_fees", { precision: 10, scale: 2 }).default("0").notNull(),
+  insuranceRate: decimal("insurance_rate", { precision: 5, scale: 2 }).default("5.0").notNull(), // Insurance percentage per year
+  monthlyPayment: decimal("monthly_payment", { precision: 10, scale: 2 }).notNull(),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  totalInterest: decimal("total_interest", { precision: 10, scale: 2 }).notNull(),
+  totalInsurance: decimal("total_insurance", { precision: 10, scale: 2 }).notNull(),
+  chassisNumber: text("chassis_number"),
+  vehicleManufacturer: text("vehicle_manufacturer"),
+  vehicleCategory: text("vehicle_category"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertFinancingCalculationSchema = createInsertSchema(financingCalculations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type FinancingCalculation = typeof financingCalculations.$inferSelect;
+export type InsertFinancingCalculation = z.infer<typeof insertFinancingCalculationSchema>;
+
 export type Company = typeof companies.$inferSelect;
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 

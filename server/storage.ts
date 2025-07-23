@@ -1,7 +1,7 @@
 import { 
   users, inventoryItems, manufacturers, companies, locations, locationTransfers, 
   lowStockAlerts, stockSettings, appearanceSettings, specifications, trimLevels, quotations, invoices, pdfAppearanceSettings,
-  importTypes, vehicleStatuses, ownershipTypes,
+  importTypes, vehicleStatuses, ownershipTypes, financingCalculations,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Manufacturer, type InsertManufacturer, 
@@ -13,7 +13,8 @@ import {
   type AppearanceSettings, type InsertAppearanceSettings,
   type Specification, type InsertSpecification,
   type TrimLevel, type InsertTrimLevel,
-  type Quotation, type InsertQuotation
+  type Quotation, type InsertQuotation,
+  type FinancingCalculation, type InsertFinancingCalculation
 } from "@shared/schema";
 import { db, pool } from "./db";
 import { eq } from "drizzle-orm";
@@ -204,6 +205,13 @@ export interface IStorage {
   getSystemSettings(): Promise<Array<{key: string, value: string}>>;
   updateSystemSetting(key: string, value: string): Promise<{key: string, value: string}>;
   getDefaultCompanyId(): Promise<number | null>;
+  
+  // Financing calculations methods
+  getAllFinancingCalculations(): Promise<FinancingCalculation[]>;
+  getFinancingCalculation(id: number): Promise<FinancingCalculation | undefined>;
+  createFinancingCalculation(calculation: InsertFinancingCalculation): Promise<FinancingCalculation>;
+  updateFinancingCalculation(id: number, calculation: Partial<InsertFinancingCalculation>): Promise<FinancingCalculation | undefined>;
+  deleteFinancingCalculation(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -216,6 +224,7 @@ export class MemStorage implements IStorage {
   private trimLevels: Map<number, TrimLevel>;
   private quotations: Map<number, Quotation>;
   private invoices: Map<number, any> = new Map();
+  private financingCalculations: Map<number, FinancingCalculation> = new Map();
   private currentUserId: number;
   private currentInventoryId: number;
   private currentManufacturerId: number;
@@ -225,6 +234,7 @@ export class MemStorage implements IStorage {
   private currentTrimLevelId: number;
   private currentQuotationId: number;
   private currentInvoiceId: number = 1;
+  private currentFinancingCalculationId: number = 1;
   private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
   private systemSettings: Map<string, string> = new Map();
   private companies: Map<number, Company> = new Map();
@@ -240,6 +250,7 @@ export class MemStorage implements IStorage {
     this.trimLevels = new Map();
     this.quotations = new Map();
     this.invoices = new Map();
+    this.financingCalculations = new Map();
     this.currentUserId = 1;
     this.currentInventoryId = 1;
     this.currentManufacturerId = 1;
@@ -249,6 +260,7 @@ export class MemStorage implements IStorage {
     this.currentTrimLevelId = 1;
     this.currentQuotationId = 1;
     this.currentInvoiceId = 1;
+    this.currentFinancingCalculationId = 1;
     this.storedTermsConditions = [];
     this.systemSettings = new Map();
     this.companies = new Map();
@@ -473,6 +485,40 @@ export class MemStorage implements IStorage {
   async getDefaultCompanyId(): Promise<number | null> {
     const defaultCompanyId = this.systemSettings.get('default_company_id');
     return defaultCompanyId ? parseInt(defaultCompanyId) : null;
+  }
+
+  // Financing calculations methods
+  async getAllFinancingCalculations(): Promise<FinancingCalculation[]> {
+    return Array.from(this.financingCalculations.values());
+  }
+
+  async getFinancingCalculation(id: number): Promise<FinancingCalculation | undefined> {
+    return this.financingCalculations.get(id);
+  }
+
+  async createFinancingCalculation(calculationData: InsertFinancingCalculation): Promise<FinancingCalculation> {
+    const id = this.currentFinancingCalculationId++;
+    const calculation: FinancingCalculation = {
+      id,
+      ...calculationData,
+      createdAt: new Date()
+    };
+    this.financingCalculations.set(id, calculation);
+    return calculation;
+  }
+
+  async updateFinancingCalculation(id: number, calculationData: Partial<InsertFinancingCalculation>): Promise<FinancingCalculation | undefined> {
+    const existing = this.financingCalculations.get(id);
+    if (existing) {
+      const updated = { ...existing, ...calculationData };
+      this.financingCalculations.set(id, updated);
+      return updated;
+    }
+    return undefined;
+  }
+
+  async deleteFinancingCalculation(id: number): Promise<boolean> {
+    return this.financingCalculations.delete(id);
   }
 
   // Company methods

@@ -14,7 +14,8 @@ import {
   insertPdfAppearanceSchema,
   insertImportTypeSchema,
   insertVehicleStatusSchema,
-  insertOwnershipTypeSchema
+  insertOwnershipTypeSchema,
+  insertFinancingCalculationSchema
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -2732,6 +2733,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete ownership type" });
+    }
+  });
+
+  // Financing calculations endpoints
+  app.get("/api/financing-calculations", async (req, res) => {
+    try {
+      const calculations = await storage.getAllFinancingCalculations();
+      res.json(calculations);
+    } catch (error) {
+      console.error("Error fetching financing calculations:", error);
+      res.status(500).json({ message: "Failed to fetch financing calculations" });
+    }
+  });
+
+  app.get("/api/financing-calculations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid calculation ID" });
+      }
+
+      const calculation = await storage.getFinancingCalculation(id);
+      if (!calculation) {
+        return res.status(404).json({ message: "Financing calculation not found" });
+      }
+
+      res.json(calculation);
+    } catch (error) {
+      console.error("Error fetching financing calculation:", error);
+      res.status(500).json({ message: "Failed to fetch financing calculation" });
+    }
+  });
+
+  app.post("/api/financing-calculations", async (req, res) => {
+    try {
+      const calculationData = insertFinancingCalculationSchema.parse(req.body);
+      const calculation = await storage.createFinancingCalculation(calculationData);
+      res.status(201).json(calculation);
+    } catch (error) {
+      console.error("Error creating financing calculation:", error);
+      if (error.errors) {
+        res.status(400).json({ message: "Invalid calculation data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to create financing calculation" });
+      }
+    }
+  });
+
+  app.put("/api/financing-calculations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid calculation ID" });
+      }
+
+      const calculationData = insertFinancingCalculationSchema.partial().parse(req.body);
+      const calculation = await storage.updateFinancingCalculation(id, calculationData);
+      
+      if (!calculation) {
+        return res.status(404).json({ message: "Financing calculation not found" });
+      }
+
+      res.json(calculation);
+    } catch (error) {
+      console.error("Error updating financing calculation:", error);
+      res.status(500).json({ message: "Failed to update financing calculation" });
+    }
+  });
+
+  app.delete("/api/financing-calculations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid calculation ID" });
+      }
+
+      const success = await storage.deleteFinancingCalculation(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Financing calculation not found" });
+      }
+
+      res.json({ message: "Financing calculation deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting financing calculation:", error);
+      res.status(500).json({ message: "Failed to delete financing calculation" });
     }
   });
 

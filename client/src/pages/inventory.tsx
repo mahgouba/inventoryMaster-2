@@ -668,6 +668,13 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         إدارة الصور
                       </DropdownMenuItem>
 
+                      <Link href="/financing-calculator">
+                        <DropdownMenuItem>
+                          <DollarSign className="mr-2 h-4 w-4" />
+                          حاسبة التمويل
+                        </DropdownMenuItem>
+                      </Link>
+
                       <DropdownMenuSeparator />
 
                       <DropdownMenuItem 
