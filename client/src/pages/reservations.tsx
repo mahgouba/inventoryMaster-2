@@ -9,10 +9,13 @@ import { Calendar, Car, CreditCard, Phone, Search, ShoppingCart, User, X, Filter
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
+import { EnhancedSaleDialog } from "@/components/enhanced-sale-dialog";
 
 export default function ReservationsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [salesRepFilter, setSalesRepFilter] = useState("all");
+  const [selectedVehicleForSale, setSelectedVehicleForSale] = useState<any>(null);
+  const [isEnhancedSaleDialogOpen, setIsEnhancedSaleDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -58,14 +61,16 @@ export default function ReservationsPage() {
   }, [reservedItems, searchQuery, salesRepFilter]);
 
   const sellMutation = useMutation({
-    mutationFn: async (itemId: number) => {
-      return apiRequest("PUT", `/api/inventory/${itemId}/sell-reserved`, {});
+    mutationFn: async ({ itemId, saleData }: { itemId: number; saleData: any }) => {
+      return apiRequest("PUT", `/api/inventory/${itemId}/sell-reserved`, saleData);
     },
     onSuccess: () => {
       toast({
         title: "تم البيع بنجاح",
-        description: "تم بيع السيارة بناءً على بيانات الحجز",
+        description: "تم بيع السيارة مع حفظ جميع بيانات البيع والعميل ومندوب المبيعات",
       });
+      setIsEnhancedSaleDialogOpen(false);
+      setSelectedVehicleForSale(null);
       queryClient.invalidateQueries({ queryKey: ["/api/inventory/reserved"] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory/stats"] });
@@ -79,6 +84,20 @@ export default function ReservationsPage() {
       });
     },
   });
+
+  const handleSellVehicle = (vehicle: any) => {
+    setSelectedVehicleForSale(vehicle);
+    setIsEnhancedSaleDialogOpen(true);
+  };
+
+  const handleConfirmSale = (saleData: any) => {
+    if (selectedVehicleForSale) {
+      sellMutation.mutate({ 
+        itemId: selectedVehicleForSale.id, 
+        saleData 
+      });
+    }
+  };
 
   const cancelReservationMutation = useMutation({
     mutationFn: async (itemId: number) => {
@@ -113,7 +132,7 @@ export default function ReservationsPage() {
 
   const formatDate = (date: string | null | undefined) => {
     if (!date) return "غير محدد";
-    return new Date(date).toLocaleDateString('ar-SA');
+    return new Date(date).toLocaleDateString('en-US'); // Use Gregorian calendar
   };
 
   if (isLoading) {
@@ -321,7 +340,7 @@ export default function ReservationsPage() {
                     <Button
                       size="sm"
                       className="flex-1 bg-green-600 hover:bg-green-700"
-                      onClick={() => sellMutation.mutate(item.id)}
+                      onClick={() => handleSellVehicle(item)}
                       disabled={sellMutation.isPending || cancelReservationMutation.isPending}
                     >
                       <ShoppingCart className="w-3 h-3 mr-1" />
@@ -342,6 +361,20 @@ export default function ReservationsPage() {
               </Card>
             ))}
           </div>
+        )}
+
+        {/* Enhanced Sale Dialog */}
+        {selectedVehicleForSale && (
+          <EnhancedSaleDialog
+            isOpen={isEnhancedSaleDialogOpen}
+            onClose={() => {
+              setIsEnhancedSaleDialogOpen(false);
+              setSelectedVehicleForSale(null);
+            }}
+            onConfirm={handleConfirmSale}
+            vehicleData={selectedVehicleForSale}
+            isLoading={sellMutation.isPending}
+          />
         )}
       </div>
     </div>

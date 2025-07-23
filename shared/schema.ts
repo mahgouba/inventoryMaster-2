@@ -46,6 +46,7 @@ export const inventoryItems = pgTable("inventory_items", {
   soldToCustomerName: text("sold_to_customer_name"), // اسم العميل المشتري
   soldToCustomerPhone: text("sold_to_customer_phone"), // رقم جوال العميل المشتري
   soldBySalesRep: text("sold_by_sales_rep"), // مندوب المبيعات الذي قام بالبيع
+  saleNotes: text("sale_notes"), // ملاحظات البيع
 });
 
 // Manufacturers table for storing manufacturer logos

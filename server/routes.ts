@@ -737,18 +737,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Sell reserved item with customer data
+  // Sell reserved item with comprehensive sale data
   app.put("/api/inventory/:id/sell-reserved", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      const { 
+        salePrice, 
+        saleDate, 
+        customerName, 
+        customerPhone, 
+        salesRepresentative, 
+        saleNotes 
+      } = req.body;
+      
       if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid item ID" });
       }
 
+      if (!salePrice) {
+        return res.status(400).json({ message: "Sale price is required" });
+      }
+
+      // Use provided sale date or current date (Gregorian calendar)
+      const soldDate = saleDate ? new Date(saleDate) : new Date();
+
       const item = await storage.updateInventoryItem(id, {
         status: "مباع",
         isSold: true,
-        soldDate: new Date()
+        soldDate: soldDate,
+        salePrice: salePrice.toString(),
+        customerName: customerName || "",
+        customerPhone: customerPhone || "",
+        salesRepresentative: salesRepresentative || "",
+        saleNotes: saleNotes || ""
       });
       
       if (!item) {
