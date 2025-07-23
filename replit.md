@@ -250,6 +250,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Implemented active filter display with removable badges and clear all filters functionality
 - ✅ Improved reservation management interface with better organization and Arabic RTL support
 - ✅ Removed "ختم العرض" header text from quotation stamp section per user request - stamp box now displays cleanly without header
+- ✅ Removed "الشروط والأحكام" header text from terms and conditions section per user request - section now displays content without header
 
 ### Complete Docker Setup and Database Organization (July 22, 2025)
 - ✅ Organized comprehensive Docker deployment system with PostgreSQL database integration
