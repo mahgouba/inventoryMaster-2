@@ -573,19 +573,21 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
-          {/* Representative Information - Moved below Terms & Conditions */}
-          <div className="bg-white/90 border border-gray-300 p-4 rounded mb-6 shadow-sm">
-            <h3 className="text-sm font-bold mb-3 text-blue-800 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>
-              بيانات المندوب
-            </h3>
-            <div className="space-y-2 text-xs text-black">
-              <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
-                <span className="font-semibold text-gray-700">الاسم:</span>
-                <span>{representativeName || "غير محدد"}</span>
-              </div>
-              <div className="flex justify-between text-[16px] ml-[0px] mr-[0px]">
-                <span className="font-semibold text-gray-700">المنصب:</span>
-                <span>{representativePosition || "غير محدد"}</span>
+          {/* Representative Information - Small box on the right */}
+          <div className="flex justify-end mb-6">
+            <div className="bg-white/90 border border-gray-300 p-3 rounded shadow-sm w-64">
+              <h3 className="text-xs font-bold mb-2 text-blue-800 border-b border-gray-200 pb-1" style={{fontFamily: 'Cairo, sans-serif'}}>
+                بيانات المندوب
+              </h3>
+              <div className="space-y-1 text-xs text-black">
+                <div className="flex justify-between">
+                  <span className="font-semibold text-gray-700">الاسم:</span>
+                  <span>{representativeName || "غير محدد"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold text-gray-700">المنصب:</span>
+                  <span>{representativePosition || "غير محدد"}</span>
+                </div>
               </div>
             </div>
           </div>
