@@ -443,7 +443,80 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   
   const [quotesViewOpen, setQuotesViewOpen] = useState(false);
   const [vehicleEditOpen, setVehicleEditOpen] = useState(false);
-  const [editableVehicle, setEditableVehicle] = useState<InventoryItem | null>(selectedVehicle);
+  const [editableVehicle, setEditableVehicle] = useState<InventoryItem>(() => {
+    // If editing existing quotation, use its data
+    if (editingQuotation) {
+      return {
+        id: Date.now(),
+        manufacturer: editingQuotation.manufacturer || "",
+        category: editingQuotation.category || "",
+        trimLevel: editingQuotation.trimLevel || "",
+        year: parseInt(editingQuotation.year) || new Date().getFullYear(),
+        engineCapacity: editingQuotation.engineCapacity || "",
+        exteriorColor: editingQuotation.exteriorColor || "",
+        interiorColor: editingQuotation.interiorColor || "",
+        chassisNumber: editingQuotation.chassisNumber || "",
+        price: parseFloat(editingQuotation.basePrice) || 0,
+        status: "",
+        location: "",
+        importType: "",
+        ownershipType: "",
+        entryDate: new Date(),
+        isSold: false,
+        notes: "",
+        images: [],
+        logo: null,
+        detailedSpecifications: null,
+        soldDate: null,
+        soldPrice: null,
+        profit: null,
+        buyer: null,
+        soldBySalesRep: null,
+        reservedBy: null,
+        reservationDate: null,
+        reservationNotes: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      } as InventoryItem;
+    }
+    
+    // If coming from selected vehicle, use its data
+    if (selectedVehicle) return selectedVehicle;
+    
+    // For new quotation (عرض جديد), always start with empty fields
+    return {
+      id: Date.now(),
+      manufacturer: "",
+      category: "",
+      trimLevel: "",
+      year: new Date().getFullYear(),
+      engineCapacity: "",
+      exteriorColor: "",
+      interiorColor: "",
+      chassisNumber: "",
+      price: 0,
+      status: "",
+      location: "",
+      importType: "",
+      ownershipType: "",
+      entryDate: new Date(),
+      isSold: false,
+      notes: "",
+      images: [],
+      logo: null,
+      detailedSpecifications: null,
+      soldDate: null,
+      soldPrice: null,
+      profit: null,
+      buyer: null,
+      soldBySalesRep: null,
+      reservedBy: null,
+      reservationDate: null,
+      reservationNotes: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    } as InventoryItem;
+  });
   const [vehicleDescriptionOpen, setVehicleDescriptionOpen] = useState(false);
   const [vehicleSearchQuery, setVehicleSearchQuery] = useState("");
   const [selectedVehicleFromDB, setSelectedVehicleFromDB] = useState<any>(null);
@@ -1351,28 +1424,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
     }
   };
 
-  // Initialize editableVehicle if it doesn't exist to ensure we always show the form
-  if (!editableVehicle) {
-    setEditableVehicle({
-      id: Date.now(),
-      manufacturer: vehicleManufacturer || "",
-      category: vehicleCategory || "",
-      trimLevel: vehicleTrimLevel || "",
-      year: parseInt(vehicleYear) || new Date().getFullYear(),
-      engineCapacity: vehicleEngineCapacity || "",
-      exteriorColor: vehicleExteriorColor || "",
-      interiorColor: vehicleInteriorColor || "",
-      chassisNumber: vehicleChassisNumber || "",
-      price: vehiclePrice || 0,
-      status: "",
-      location: "",
-      importType: "",
-      ownershipType: "",
-      entryDate: new Date(),
-      isSold: false,
-      notes: ""
-    } as InventoryItem);
-  }
+
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-black">
