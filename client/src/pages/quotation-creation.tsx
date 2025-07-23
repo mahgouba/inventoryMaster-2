@@ -430,10 +430,9 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     queryKey: ["/api/engine-capacities"]
   });
 
-  // Query for all available vehicles
+  // Query for all available vehicles from cars database (not just inventory)
   const { data: availableVehicles = [] } = useQuery({
-    queryKey: ["/api/inventory"],
-    select: (data) => data.filter((vehicle: any) => vehicle.status !== "مباع")
+    queryKey: ["/api/cars/all-vehicles"]
   });
   
 
@@ -2373,9 +2372,9 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       <Dialog open={vehicleDescriptionOpen} onOpenChange={setVehicleDescriptionOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" dir="rtl">
           <DialogHeader>
-            <DialogTitle>اختيار سيارة من المخزون</DialogTitle>
+            <DialogTitle>اختيار سيارة من قاعدة البيانات</DialogTitle>
             <DialogDescription>
-              يمكنك البحث واختيار سيارة من المخزون المتاح لإنشاء عرض السعر
+              يمكنك البحث واختيار أي سيارة من قاعدة البيانات الكاملة لإنشاء عرض السعر
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6">

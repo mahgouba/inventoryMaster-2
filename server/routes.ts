@@ -2480,6 +2480,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all available vehicles from cars.json for quotation selection
+  app.get("/api/cars/all-vehicles", async (req, res) => {
+    try {
+      const carsData = JSON.parse(readFileSync(join(process.cwd(), "cars.json"), "utf8"));
+      const allVehicles: any[] = [];
+      
+      // Generate all possible vehicle combinations from cars.json
+      carsData.forEach((brand: any) => {
+        brand.models.forEach((model: any) => {
+          model.trims.forEach((trim: any) => {
+            // Create vehicle entries for multiple years and engine capacities
+            const years = [2024, 2025, 2023, 2022, 2021];
+            const engines = ["V6", "V8", "2.0T", "3.0T", "4.0T", "5.0T"];
+            const exteriorColors = ["أبيض", "أسود", "فضي", "رمادي", "أزرق", "أحمر", "بني"];
+            const interiorColors = ["بيج", "أسود", "بني", "رمادي"];
+            const importTypes = ["شخصي", "شركة", "مستعمل شخصي"];
+            const statuses = ["متوفر", "في الطريق", "قيد الصيانة"];
+            
+            // Create multiple variants for each trim
+            for (let i = 0; i < 3; i++) {
+              allVehicles.push({
+                id: `${brand.brand_ar}-${model.model_ar}-${trim.trim_ar}-${i}`,
+                manufacturer: brand.brand_ar,
+                category: model.model_ar,
+                trimLevel: trim.trim_ar,
+                year: years[Math.floor(Math.random() * years.length)],
+                engineCapacity: engines[Math.floor(Math.random() * engines.length)],
+                exteriorColor: exteriorColors[Math.floor(Math.random() * exteriorColors.length)],
+                interiorColor: interiorColors[Math.floor(Math.random() * interiorColors.length)],
+                chassisNumber: `${brand.brand_en.toUpperCase()}${Math.random().toString(36).substring(2, 15).toUpperCase()}`,
+                price: Math.floor(Math.random() * 500000) + 50000, // Random price between 50k-550k
+                status: statuses[Math.floor(Math.random() * statuses.length)],
+                location: "الرياض",
+                importType: importTypes[Math.floor(Math.random() * importTypes.length)],
+                ownershipType: Math.random() > 0.5 ? "ملك الشركة" : "معرض (وسيط)",
+                entryDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000), // Random date within last year
+                isSold: false,
+                notes: "",
+                images: [],
+                logo: null
+              });
+            }
+          });
+        });
+      });
+      
+      res.json(allVehicles);
+    } catch (error) {
+      console.error("Error generating all vehicles data:", error);
+      res.status(500).json({ message: "Failed to load all vehicles data" });
+    }
+  });
+
   // Import cars data to database
   app.post("/api/cars/import", async (req, res) => {
     try {
