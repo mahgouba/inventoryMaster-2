@@ -584,22 +584,20 @@ export default function QuotationA4Preview({
             )}
           </div>
 
-          {/* Stamp Section */}
-          <div className="flex justify-end mb-6">
-            <div className="bg-transparent border border-gray-300 p-4 rounded shadow-sm w-64 pl-[2px] pr-[2px] pt-[2px] pb-[2px]">
-              <div className="border-2 border-dashed border-gray-300 h-32 flex items-center justify-center rounded bg-transparent">
-                {companyStamp ? (
+          {/* Stamp Section - Only show if companyStamp is provided */}
+          {companyStamp && (
+            <div className="flex justify-end mb-6">
+              <div className="bg-transparent border border-gray-300 p-4 rounded shadow-sm w-64 pl-[2px] pr-[2px] pt-[2px] pb-[2px]">
+                <div className="border-2 border-dashed border-gray-300 h-32 flex items-center justify-center rounded bg-transparent">
                   <img 
                     src={companyStamp} 
                     alt="ختم الشركة" 
                     className="max-w-full max-h-full object-contain"
                   />
-                ) : (
-                  <span className="text-xs text-gray-400">منطقة الختم</span>
-                )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
 
         </div>
