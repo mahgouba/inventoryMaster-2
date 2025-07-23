@@ -560,9 +560,6 @@ export default function QuotationA4Preview({
             
             {/* Stamp Section */}
             <div className={`bg-transparent border border-gray-300 p-4 rounded shadow-sm ${isInvoiceMode ? 'w-full' : 'w-64'}`}>
-              <h3 className="text-sm font-bold mb-3 text-center text-amber-600 border-b border-gray-200 pb-2" style={{fontFamily: 'Cairo, sans-serif'}}>
-                {isInvoiceMode ? 'ختم الفاتورة' : 'ختم العرض'}
-              </h3>
               <div className="border-2 border-dashed border-gray-300 h-32 flex items-center justify-center rounded bg-transparent">
                 {companyStamp ? (
                   <img 
