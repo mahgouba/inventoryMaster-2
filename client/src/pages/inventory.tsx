@@ -597,32 +597,27 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 </Link>
               </div>
 
-              {/* Admin Management Buttons - Admin Only */}
-              {userRole === "admin" && (
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <Link href="/appearance">
-                    <Button variant="outline" size="sm" className="text-custom-primary hover:text-custom-primary-dark hover:bg-blue-50 border-teal-200 transition-colors">
-                      <Palette size={16} className="ml-1" />
-                      <span className="hidden sm:inline">إدارة المظهر</span>
-                      <span className="sm:hidden">المظهر</span>
-                    </Button>
-                  </Link>
-                  
-                  <Link href="/user-management">
-                    <Button variant="outline" size="sm" className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 border-purple-200 transition-colors">
-                      <Users size={16} className="ml-1" />
-                      <span className="hidden sm:inline">إدارة المستخدمين</span>
-                      <span className="sm:hidden">المستخدمين</span>
-                    </Button>
-                  </Link>
-
-                </div>
-              )}
-
-
-
               {/* User Actions */}
-              <div className="flex items-center space-x-1 space-x-reverse">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                {/* Quick Action Buttons - Admin Only */}
+                {userRole === "admin" && (
+                  <div className="hidden lg:flex items-center space-x-2 space-x-reverse">
+                    <Link href="/financing-calculator">
+                      <Button variant="outline" size="sm" className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 transition-colors">
+                        <DollarSign size={16} className="ml-1" />
+                        <span className="hidden xl:inline">حاسبة التمويل</span>
+                      </Button>
+                    </Link>
+                    
+                    <Link href="/appearance">
+                      <Button variant="outline" size="sm" className="text-custom-primary hover:text-custom-primary-dark hover:bg-blue-50 border-blue-200 transition-colors">
+                        <Palette size={16} className="ml-1" />
+                        <span className="hidden xl:inline">إدارة المظهر</span>
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+
                 {/* Dark Mode Toggle */}
                 <Button 
                   variant="ghost" 
@@ -633,18 +628,25 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 >
                   {darkMode ? <Sun size={18} /> : <Moon size={18} />}
                 </Button>
-                
 
-                
                 {/* Admin Dropdown Menu */}
                 {userRole === "admin" && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800">
+                      <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100">
                         <Settings size={18} />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
+                      <Link href="/financing-calculator">
+                        <DropdownMenuItem>
+                          <DollarSign className="mr-2 h-4 w-4" />
+                          حاسبة التمويل
+                        </DropdownMenuItem>
+                      </Link>
+
+                      <DropdownMenuSeparator />
+
                       <Link href="/appearance">
                         <DropdownMenuItem>
                           <Palette className="mr-2 h-4 w-4" />
@@ -659,6 +661,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         </DropdownMenuItem>
                       </Link>
 
+                      <DropdownMenuSeparator />
+
                       <DropdownMenuItem onClick={() => setSpecificationsManagerOpen(true)}>
                         <Settings className="mr-2 h-4 w-4" />
                         إدارة المواصفات
@@ -667,13 +671,6 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         <FileText className="mr-2 h-4 w-4" />
                         إدارة الصور
                       </DropdownMenuItem>
-
-                      <Link href="/financing-calculator">
-                        <DropdownMenuItem>
-                          <DollarSign className="mr-2 h-4 w-4" />
-                          حاسبة التمويل
-                        </DropdownMenuItem>
-                      </Link>
 
                       <DropdownMenuSeparator />
 
@@ -1043,91 +1040,130 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
               </div>
               
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                {/* Admin-only buttons */}
-                {userRole === "admin" && (
-                  <>
+              <div className="space-y-3">
+                {/* Primary Actions Row */}
+                <div className="flex flex-wrap gap-2">
+                  {/* Essential Actions */}
+                  {userRole === "admin" && (
                     <Button 
                       onClick={() => setFormOpen(true)}
-                      className="bg-custom-primary hover:bg-custom-primary-dark text-white w-full sm:w-auto"
+                      className="bg-custom-primary hover:bg-custom-primary-dark text-white"
+                      size="sm"
                     >
                       <Plus className="w-4 h-4 ml-2" />
                       إضافة عنصر
                     </Button>
+                  )}
+                  
+                  <Link href="/quotation-creation">
                     <Button 
-                      onClick={() => setSpecificationsManagerOpen(true)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
+                      className="bg-orange-600 hover:bg-orange-700 text-white"
+                      size="sm"
                     >
                       <FileText className="w-4 h-4 ml-2" />
+                      إنشاء عرض سعر
+                    </Button>
+                  </Link>
+
+                  <Link href="/financing-calculator">
+                    <Button 
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      size="sm"
+                    >
+                      <DollarSign className="w-4 h-4 ml-2" />
+                      حاسبة التمويل
+                    </Button>
+                  </Link>
+                </div>
+
+                {/* Secondary Actions Row */}
+                <div className="flex flex-wrap gap-2">
+                  {/* Export & Print Actions */}
+                  <Button 
+                    onClick={handleExport}
+                    variant="outline"
+                    size="sm"
+                    className="border-slate-300 text-slate-600 hover:bg-slate-50"
+                  >
+                    <Download className="w-4 h-4 ml-2" />
+                    تصدير CSV
+                  </Button>
+                  
+                  <Button 
+                    onClick={handlePrint}
+                    variant="outline"
+                    size="sm"
+                    className="border-slate-300 text-slate-600 hover:bg-slate-50"
+                  >
+                    <Printer className="w-4 h-4 ml-2" />
+                    طباعة مخصصة
+                  </Button>
+
+                  {/* Admin Management Actions */}
+                  {userRole === "admin" && (
+                    <>
+                      <Button 
+                        onClick={() => setIsExcelImportOpen(true)}
+                        variant="outline"
+                        size="sm"
+                        className="border-green-300 text-green-600 hover:bg-green-50"
+                      >
+                        <FileSpreadsheet className="w-4 h-4 ml-2" />
+                        استيراد Excel
+                      </Button>
+
+                      <Button 
+                        onClick={() => setShowSoldCars(!showSoldCars)}
+                        variant={showSoldCars ? "default" : "outline"}
+                        size="sm"
+                        className={showSoldCars ? "bg-red-600 hover:bg-red-700 text-white" : "border-red-300 text-red-600 hover:bg-red-50"}
+                      >
+                        <Eye className="w-4 h-4 ml-2" />
+                        {showSoldCars ? "إخفاء المباعة" : "إظهار المباعة"}
+                        {stats?.sold && stats.sold > 0 && (
+                          <span className="mr-2 px-2 py-1 text-xs font-semibold rounded-full bg-white bg-opacity-20">
+                            {stats.sold}
+                          </span>
+                        )}
+                      </Button>
+                    </>
+                  )}
+                </div>
+
+                {/* Admin Advanced Actions Row */}
+                {userRole === "admin" && (
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+                    <Button 
+                      onClick={() => setSpecificationsManagerOpen(true)}
+                      variant="outline"
+                      size="sm"
+                      className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                    >
+                      <Settings className="w-4 h-4 ml-2" />
                       إدارة المواصفات
                     </Button>
+                    
                     <Button 
                       onClick={() => setImageManagementOpen(true)}
-                      className="bg-purple-600 hover:bg-purple-700 text-white w-full sm:w-auto"
+                      variant="outline"
+                      size="sm"
+                      className="border-purple-300 text-purple-600 hover:bg-purple-50"
                     >
                       <FileText className="w-4 h-4 ml-2" />
                       إدارة الصور
                     </Button>
-                    <Button 
-                      onClick={() => setIsExcelImportOpen(true)}
-                      className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
-                    >
-                      <FileSpreadsheet className="w-4 h-4 ml-2" />
-                      استيراد من Excel
-                    </Button>
+
                     <Button 
                       onClick={handleClearAllItems}
                       variant="outline"
-                      className="border-red-500 text-red-600 hover:bg-red-50 hover:border-red-600 w-full sm:w-auto"
+                      size="sm"
+                      className="border-red-500 text-red-600 hover:bg-red-50 hover:border-red-600"
                       disabled={clearAllItemsMutation.isPending}
                     >
                       <Database className="w-4 h-4 ml-2" />
-                      {clearAllItemsMutation.isPending ? "جاري الحذف..." : "حذف جميع العناصر"}
+                      {clearAllItemsMutation.isPending ? "جاري الحذف..." : "حذف الكل"}
                     </Button>
-
-                  </>
-                )}
-                
-
-                <Link href="/quotation-creation">
-                  <Button 
-                    className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto"
-                  >
-                    <FileText className="w-4 h-4 ml-2" />
-                    إنشاء عرض سعر جديد
-                  </Button>
-                </Link>
-                <Button 
-                  onClick={handleExport}
-                  variant="outline"
-                  className="border-slate-300 text-slate-600 hover:bg-slate-50 w-full sm:w-auto"
-                >
-                  <Download className="w-4 h-4 ml-2" />
-                  تصدير CSV
-                </Button>
-                <Button 
-                  onClick={handlePrint}
-                  variant="outline"
-                  className="border-slate-300 text-slate-600 hover:bg-slate-50 w-full sm:w-auto"
-                >
-                  <Printer className="w-4 h-4 ml-2" />
-                  طباعة مخصصة
-                </Button>
-                {/* Show Sold Cars Button - Admin Only */}
-                {userRole === "admin" && (
-                  <Button 
-                    onClick={() => setShowSoldCars(!showSoldCars)}
-                    variant={showSoldCars ? "default" : "outline"}
-                    className={showSoldCars ? "bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto" : "border-red-300 text-red-600 hover:bg-red-50 w-full sm:w-auto"}
-                  >
-                    <DollarSign className="w-4 h-4 ml-2" />
-                    {showSoldCars ? "إخفاء السيارات المباعة" : "إظهار السيارات المباعة"}
-                    {stats?.sold && stats.sold > 0 && (
-                      <span className="mr-2 px-2 py-1 text-xs font-semibold rounded-full bg-white bg-opacity-20">
-                        {stats.sold}
-                      </span>
-                    )}
-                  </Button>
+                  </div>
                 )}
               </div>
             </div>
