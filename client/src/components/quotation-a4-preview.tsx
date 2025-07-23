@@ -425,9 +425,19 @@ export default function QuotationA4Preview({
 
             {/* Vehicle Information */}
             {selectedVehicle && (
-              <div className="bg-white/90 p-4 w-full mt-[166px] mb-[16px]">
+              <div className="relative bg-white/90 p-4 w-full mt-[166px] mb-[16px] overflow-hidden">
+                {/* Manufacturer Logo Watermark */}
+                {manufacturerLogo && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <img 
+                      src={manufacturerLogo} 
+                      alt={`${selectedVehicle.manufacturer} logo`}
+                      className="w-48 h-48 object-contain opacity-5 grayscale"
+                    />
+                  </div>
+                )}
                 
-                <div className="text-xs text-black">
+                <div className="relative z-10 text-xs text-black">
                   {/* Vehicle Information Grid - Properly Aligned */}
                   <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-[13px]">
                     <div className="flex justify-between">
