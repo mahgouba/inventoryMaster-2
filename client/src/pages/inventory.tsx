@@ -1082,6 +1082,14 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 )}
                 
 
+                <Link href="/quotation-creation">
+                  <Button 
+                    className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto"
+                  >
+                    <FileText className="w-4 h-4 ml-2" />
+                    إنشاء عرض سعر جديد
+                  </Button>
+                </Link>
                 <Button 
                   onClick={handleExport}
                   variant="outline"
