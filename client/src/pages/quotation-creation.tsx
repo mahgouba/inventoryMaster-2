@@ -1351,26 +1351,27 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
     }
   };
 
+  // Initialize editableVehicle if it doesn't exist to ensure we always show the form
   if (!editableVehicle) {
-    return (
-      <div className="min-h-screen bg-slate-50 dark:bg-black p-4">
-        <div className="max-w-4xl mx-auto">
-          <Card>
-            <CardContent className="p-8 text-center">
-              <FileText size={48} className="mx-auto text-slate-400 mb-4" />
-              <h2 className="text-xl font-semibold text-slate-600 mb-2">لا توجد بيانات سيارة</h2>
-              <p className="text-slate-500 mb-4">يرجى اختيار سيارة لإنشاء عرض سعر لها</p>
-              <Link href="/card-view">
-                <Button>
-                  <ArrowLeft size={16} className="ml-2" />
-                  العودة لعرض البطاقات
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
+    setEditableVehicle({
+      id: Date.now(),
+      manufacturer: vehicleManufacturer || "",
+      category: vehicleCategory || "",
+      trimLevel: vehicleTrimLevel || "",
+      year: parseInt(vehicleYear) || new Date().getFullYear(),
+      engineCapacity: vehicleEngineCapacity || "",
+      exteriorColor: vehicleExteriorColor || "",
+      interiorColor: vehicleInteriorColor || "",
+      chassisNumber: vehicleChassisNumber || "",
+      price: vehiclePrice || 0,
+      status: "",
+      location: "",
+      importType: "",
+      ownershipType: "",
+      entryDate: new Date(),
+      isSold: false,
+      notes: ""
+    } as InventoryItem);
   }
 
   return (
