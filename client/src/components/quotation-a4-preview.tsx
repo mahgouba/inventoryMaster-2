@@ -573,24 +573,26 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
-          {/* Representative Information - Small box on the right */}
-          <div className="flex justify-end mb-6">
-            <div className="bg-white/90 border border-gray-300 p-3 rounded shadow-sm w-64">
-              <h3 className="text-xs font-bold mb-2 text-blue-800 border-b border-gray-200 pb-1" style={{fontFamily: 'Cairo, sans-serif'}}>
-                بيانات المندوب
-              </h3>
-              <div className="space-y-1 text-xs text-black">
-                <div className="flex justify-between">
-                  <span className="font-semibold text-gray-700">الاسم:</span>
-                  <span>{representativeName || "غير محدد"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-semibold text-gray-700">المنصب:</span>
-                  <span>{representativePosition || "غير محدد"}</span>
+          {/* Representative Information - Small box on the right - Hidden if no representative selected */}
+          {representativeName && (
+            <div className="flex justify-end mb-6">
+              <div className="bg-white/90 border border-gray-300 p-3 rounded shadow-sm w-64">
+                <h3 className="text-xs font-bold mb-2 text-blue-800 border-b border-gray-200 pb-1" style={{fontFamily: 'Cairo, sans-serif'}}>
+                  بيانات المندوب
+                </h3>
+                <div className="space-y-1 text-xs text-black">
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-700">الاسم:</span>
+                    <span>{representativeName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-700">الجوال:</span>
+                    <span>{representativePhone || "غير محدد"}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
 
         </div>
