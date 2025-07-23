@@ -593,7 +593,7 @@ export default function QuotationA4Preview({
                     src={companyStamp} 
                     alt="ختم الشركة" 
                     className="w-full h-full object-contain"
-                    style={{ transform: 'scale(1.15)' }}
+                    style={{ transform: 'scale(0.92)' }}
                   />
                 </div>
               </div>
