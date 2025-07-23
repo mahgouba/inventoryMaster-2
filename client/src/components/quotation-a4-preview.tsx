@@ -533,7 +533,7 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
-          {/* Terms & Conditions and Stamp Section */}
+          {/* Representative Information and Terms & Conditions Section */}
           <div className="flex gap-6 mb-6">
             {/* Terms & Conditions Section - Hidden in invoice mode */}
             {!isInvoiceMode && (
@@ -553,25 +553,8 @@ export default function QuotationA4Preview({
               </div>
             )}
             
-            {/* Stamp Section */}
-            <div className={`bg-transparent border border-gray-300 p-4 rounded shadow-sm ${isInvoiceMode ? 'w-full' : 'w-64'}`}>
-              <div className="border-2 border-dashed border-gray-300 h-32 flex items-center justify-center rounded bg-transparent">
-                {companyStamp ? (
-                  <img 
-                    src={companyStamp} 
-                    alt="ختم الشركة" 
-                    className="max-w-full max-h-full object-contain"
-                  />
-                ) : (
-                  <span className="text-xs text-gray-400">منطقة الختم</span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Representative Information - Small box on the right - Hidden if no representative selected */}
-          {representativeName && (
-            <div className="flex justify-end mb-6">
+            {/* Representative Information - Small box on the right - Hidden if no representative selected */}
+            {representativeName && (
               <div className="bg-white/90 border border-gray-300 p-3 rounded shadow-sm w-64">
                 <h3 className="text-xs font-bold mb-2 text-blue-800 border-b border-gray-200 pb-1" style={{fontFamily: 'Cairo, sans-serif'}}>
                   بيانات المندوب
@@ -587,8 +570,25 @@ export default function QuotationA4Preview({
                   </div>
                 </div>
               </div>
+            )}
+          </div>
+
+          {/* Stamp Section */}
+          <div className="flex justify-end mb-6">
+            <div className="bg-transparent border border-gray-300 p-4 rounded shadow-sm w-64">
+              <div className="border-2 border-dashed border-gray-300 h-32 flex items-center justify-center rounded bg-transparent">
+                {companyStamp ? (
+                  <img 
+                    src={companyStamp} 
+                    alt="ختم الشركة" 
+                    className="max-w-full max-h-full object-contain"
+                  />
+                ) : (
+                  <span className="text-xs text-gray-400">منطقة الختم</span>
+                )}
+              </div>
             </div>
-          )}
+          </div>
 
 
         </div>
