@@ -1252,42 +1252,103 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       return specs.join(' • ');
     };
 
-    const quotationData: InsertQuotation = {
-      quoteNumber,
-      inventoryItemId: editableVehicle.id || 0,
-      manufacturer: editableVehicle.manufacturer,
-      category: editableVehicle.category,
-      trimLevel: editableVehicle.trimLevel || "",
-      year: editableVehicle.year,
-      exteriorColor: editableVehicle.exteriorColor,
-      interiorColor: editableVehicle.interiorColor,
-      chassisNumber: editableVehicle.chassisNumber,
-      engineCapacity: editableVehicle.engineCapacity,
-      specifications: formatSpecifications(),
-      basePrice: pricingDetails.basePrice.toString() || "0",
-      finalPrice: totals.finalTotal.toString() || "0",
-      customerName: customerName.trim() || "غير محدد",
-      customerPhone: customerPhone.trim(),
-      customerEmail: customerEmail.trim(),
-      customerTitle: customerTitle.trim(),
-      notes: notes.trim(),
-      validUntil: validUntilDate.toISOString(),
-      status: "مسودة",
-      createdBy: "admin", // This should be the current user
-      companyData: JSON.stringify(selectedCompanyData),
-      representativeData: JSON.stringify(selectedRepData),
-      quoteAppearance: JSON.stringify(quoteAppearance),
-      pricingDetails: JSON.stringify({
-        ...pricingDetails,
-        subtotal: totals.subtotal,
-        taxAmount: totals.taxAmount,
-        finalTotal: totals.finalTotal,
-        licensePlateTotal: totals.licensePlateTotal
-      }),
-      qrCodeData: generateQRData()
-    };
+    if (isInvoiceMode) {
+      // Save as invoice
+      const invoiceData = {
+        quoteNumber,
+        invoiceNumber: invoiceNumber || generateInvoiceNumber(),
+        inventoryItemId: editableVehicle.id || 0,
+        manufacturer: editableVehicle.manufacturer,
+        category: editableVehicle.category,
+        trimLevel: editableVehicle.trimLevel || "",
+        year: editableVehicle.year,
+        exteriorColor: editableVehicle.exteriorColor,
+        interiorColor: editableVehicle.interiorColor,
+        chassisNumber: editableVehicle.chassisNumber,
+        engineCapacity: editableVehicle.engineCapacity,
+        specifications: formatSpecifications(),
+        basePrice: pricingDetails.basePrice.toString() || "0",
+        finalPrice: totals.finalTotal.toString() || "0",
+        customerName: customerName.trim() || "غير محدد",
+        customerPhone: customerPhone.trim(),
+        customerEmail: customerEmail.trim(),
+        customerTitle: customerTitle.trim(),
+        notes: notes.trim(),
+        validUntil: validUntilDate.toISOString(),
+        status: "مسودة",
+        paymentStatus: "غير مدفوع",
+        remainingAmount: totals.finalTotal.toString(),
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        createdBy: "admin",
+        companyData: JSON.stringify(selectedCompanyData),
+        representativeData: JSON.stringify(selectedRepData),
+        quoteAppearance: JSON.stringify(quoteAppearance),
+        pricingDetails: JSON.stringify({
+          ...pricingDetails,
+          subtotal: totals.subtotal,
+          taxAmount: totals.taxAmount,
+          finalTotal: totals.finalTotal,
+          licensePlateTotal: totals.licensePlateTotal
+        }),
+        qrCodeData: generateQRData()
+      };
 
-    createQuotationMutation.mutate(quotationData);
+      // Use a separate API call for invoices
+      apiRequest('POST', '/api/invoices', invoiceData)
+        .then(() => {
+          toast({
+            title: "تم حفظ الفاتورة",
+            description: "تم حفظ الفاتورة بنجاح",
+          });
+          queryClient.invalidateQueries({ queryKey: ['/api/invoices'] });
+          queryClient.refetchQueries({ queryKey: ['/api/invoices'] });
+        })
+        .catch((error) => {
+          toast({
+            title: "خطأ في حفظ الفاتورة",
+            description: "حدث خطأ أثناء حفظ الفاتورة",
+            variant: "destructive",
+          });
+        });
+    } else {
+      // Save as quotation
+      const quotationData: InsertQuotation = {
+        quoteNumber,
+        inventoryItemId: editableVehicle.id || 0,
+        manufacturer: editableVehicle.manufacturer,
+        category: editableVehicle.category,
+        trimLevel: editableVehicle.trimLevel || "",
+        year: editableVehicle.year,
+        exteriorColor: editableVehicle.exteriorColor,
+        interiorColor: editableVehicle.interiorColor,
+        chassisNumber: editableVehicle.chassisNumber,
+        engineCapacity: editableVehicle.engineCapacity,
+        specifications: formatSpecifications(),
+        basePrice: pricingDetails.basePrice.toString() || "0",
+        finalPrice: totals.finalTotal.toString() || "0",
+        customerName: customerName.trim() || "غير محدد",
+        customerPhone: customerPhone.trim(),
+        customerEmail: customerEmail.trim(),
+        customerTitle: customerTitle.trim(),
+        notes: notes.trim(),
+        validUntil: validUntilDate.toISOString(),
+        status: "مسودة",
+        createdBy: "admin", // This should be the current user
+        companyData: JSON.stringify(selectedCompanyData),
+        representativeData: JSON.stringify(selectedRepData),
+        quoteAppearance: JSON.stringify(quoteAppearance),
+        pricingDetails: JSON.stringify({
+          ...pricingDetails,
+          subtotal: totals.subtotal,
+          taxAmount: totals.taxAmount,
+          finalTotal: totals.finalTotal,
+          licensePlateTotal: totals.licensePlateTotal
+        }),
+        qrCodeData: generateQRData()
+      };
+
+      createQuotationMutation.mutate(quotationData);
+    }
   };
 
   if (!editableVehicle) {
@@ -1384,11 +1445,12 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               
               <Button
                 variant="outline"
-                onClick={saveQuotation}
+                onClick={handleSaveQuotation}
+                disabled={createQuotationMutation.isPending}
                 className="border-green-500 text-green-600 hover:bg-green-50"
               >
                 <Save size={16} className="ml-2" />
-                حفظ {isInvoiceMode ? "الفاتورة" : "العرض"}
+                {createQuotationMutation.isPending ? "جاري الحفظ..." : `حفظ ${isInvoiceMode ? "الفاتورة" : "العرض"}`}
               </Button>
               
               {/* Toggle Switch for Invoice/Quotation Mode */}
