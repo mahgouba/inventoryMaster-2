@@ -427,40 +427,36 @@ export default function QuotationA4Preview({
             {selectedVehicle && (
               <div className="bg-white/90 p-4 w-full mt-[166px] mb-[16px]">
                 
-                <div className="space-y-3 text-xs text-black">
-                  {/* First Row: Manufacturer, Category, Trim Level, Year */}
-                  <div className="flex gap-6 items-center text-[13px] text-right">
-                    <div className="text-right">
-                      <span className="font-semibold text-gray-700">الصانع: </span>
-                      <span>{selectedVehicle.manufacturer}</span>
+                <div className="text-xs text-black">
+                  {/* Vehicle Information Grid - Properly Aligned */}
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-[13px]">
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-gray-700">الصانع:</span>
+                      <span className="text-right">{selectedVehicle.manufacturer}</span>
                     </div>
-                    <div className="text-right">
-                      <span className="font-semibold text-gray-700">الفئة: </span>
-                      <span>{selectedVehicle.category}</span>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-gray-700">الفئة:</span>
+                      <span className="text-right">{selectedVehicle.category}</span>
                     </div>
-                    <div className="text-right">
-                      <span className="font-semibold text-gray-700">درجة التجهيز: </span>
-                      <span>{selectedVehicle.trimLevel || "غير محدد"}</span>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-gray-700">درجة التجهيز:</span>
+                      <span className="text-right">{selectedVehicle.trimLevel || "غير محدد"}</span>
                     </div>
-                    <div className="text-right">
-                      <span className="font-semibold text-gray-700">السنة: </span>
-                      <span>{selectedVehicle.year}</span>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-gray-700">السنة:</span>
+                      <span className="text-right">{selectedVehicle.year}</span>
                     </div>
-                  </div>
-                  
-                  {/* Second Row: Exterior Color, Interior Color, Chassis Number */}
-                  <div className="flex gap-6 items-center text-[13px] text-right">
-                    <div className="text-right">
-                      <span className="font-semibold text-gray-700">اللون الخارجي: </span>
-                      <span>{selectedVehicle.exteriorColor}</span>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-gray-700">اللون الخارجي:</span>
+                      <span className="text-right">{selectedVehicle.exteriorColor}</span>
                     </div>
-                    <div className="text-right">
-                      <span className="font-semibold text-gray-700">اللون الداخلي: </span>
-                      <span>{selectedVehicle.interiorColor}</span>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-gray-700">اللون الداخلي:</span>
+                      <span className="text-right">{selectedVehicle.interiorColor}</span>
                     </div>
-                    <div className="text-right">
-                      <span className="font-semibold text-gray-700">رقم الهيكل: </span>
-                      <span>{selectedVehicle.chassisNumber}</span>
+                    <div className="flex justify-between col-span-2">
+                      <span className="font-semibold text-gray-700">رقم الهيكل:</span>
+                      <span className="text-right">{selectedVehicle.chassisNumber}</span>
                     </div>
                   </div>
                 </div>
