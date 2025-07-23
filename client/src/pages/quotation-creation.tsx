@@ -1154,25 +1154,27 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
   const createQuotationMutation = useMutation({
     mutationFn: async (data: InsertQuotation) => {
       const response = await apiRequest('POST', '/api/quotations', data);
-      return response.json();
+      return response;
     },
     onSuccess: (response) => {
       toast({
         title: "تم حفظ عرض السعر",
-        description: "تم حفظ عرض السعر بنجاح. سيتم تحويلك لصفحة التعديل",
+        description: "تم حفظ عرض السعر بنجاح ويمكنك الآن رؤيته في صفحة العروض",
       });
+      // Invalidate quotations cache to refresh the quotations list
       queryClient.invalidateQueries({ queryKey: ['/api/quotations'] });
-      // Navigate to edit page with the new quotation ID
+      queryClient.refetchQueries({ queryKey: ['/api/quotations'] });
+      
+      // Set the saved quotation for preview
       if (response.id) {
-        navigate(`/quotation-edit/${response.id}`);
-      } else {
-        navigate('/card-view');
+        // Store the quotation ID for future reference
+        localStorage.setItem('lastSavedQuotationId', response.id.toString());
       }
     },
     onError: (error) => {
       toast({
-        title: "خطأ في إنشاء عرض السعر",
-        description: "حدث خطأ أثناء إنشاء عرض السعر. يرجى المحاولة مرة أخرى.",
+        title: "خطأ في حفظ عرض السعر",
+        description: "حدث خطأ أثناء حفظ عرض السعر. يرجى المحاولة مرة أخرى.",
         variant: "destructive",
       });
     }

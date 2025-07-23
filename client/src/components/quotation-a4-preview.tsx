@@ -262,12 +262,8 @@ export default function QuotationA4Preview({
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      // Add image with 2mm margins on all sides
-      const marginMM = 2; // 2mm margins on all sides
-      const contentWidth = pdfWidth - (2 * marginMM);
-      const contentHeight = pdfHeight - (2 * marginMM);
-      
-      pdf.addImage(imgData, 'PNG', marginMM, marginMM, contentWidth, contentHeight, '', 'NONE');
+      // Add image with no margins (full page)
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, '', 'NONE');
       
       const fileName = isInvoiceMode ? `فاتورة_${invoiceNumber}.pdf` : `عرض_سعر_${quoteNumber}.pdf`;
       pdf.save(fileName);
@@ -313,12 +309,8 @@ export default function QuotationA4Preview({
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
         
-        // Add image with 2mm margins on all sides (fallback)
-        const marginMM = 2; // 2mm margins on all sides
-        const contentWidth = pdfWidth - (2 * marginMM);
-        const contentHeight = pdfHeight - (2 * marginMM);
-        
-        pdf.addImage(imgData, 'JPEG', marginMM, marginMM, contentWidth, contentHeight);
+        // Add image with no margins (fallback)
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         
         const fileName = isInvoiceMode ? `فاتورة_${invoiceNumber}.pdf` : `عرض_سعر_${quoteNumber}.pdf`;
         pdf.save(fileName);
