@@ -714,7 +714,7 @@ export class MemStorage implements IStorage {
         iban: 'SA8080000575608010000904',
         type: 'شركة',
         isActive: true,
-        logo: '/public/alrajhi-logo.svg'
+        logo: '/rajhi.png'
       },
       {
         name: 'البنك الأهلي السعودي',
@@ -724,7 +724,7 @@ export class MemStorage implements IStorage {
         iban: 'SA5110000025268400000102',
         type: 'شركة',
         isActive: true,
-        logo: '/public/snb-logo.svg'
+        logo: '/snb.png'
       },
       {
         name: 'بنك الجزيرة',
@@ -734,7 +734,7 @@ export class MemStorage implements IStorage {
         iban: 'SA7060100030495028555001',
         type: 'شركة',
         isActive: true,
-        logo: '/public/aljazira-logo.svg'
+        logo: '/jazira.png'
       },
       {
         name: 'بنك البلاد',
@@ -744,7 +744,7 @@ export class MemStorage implements IStorage {
         iban: 'SA1315000448888888780008',
         type: 'شركة',
         isActive: true,
-        logo: '/public/albilad-logo.svg'
+        logo: '/albilad.png'
       },
       {
         name: 'البنك العربي الوطني',
@@ -754,7 +754,7 @@ export class MemStorage implements IStorage {
         iban: 'SA9301000000108095322110019',
         type: 'شركة',
         isActive: true,
-        logo: '/public/anb-logo.svg'
+        logo: '/anb.png'
       },
       {
         name: 'بنك الإمارات دبي الوطني',
@@ -764,7 +764,7 @@ export class MemStorage implements IStorage {
         iban: 'SA4095000001016050175301',
         type: 'شركة',
         isActive: true,
-        logo: '/public/emiratesnbd-logo.svg'
+        logo: '/nbd.png'
       },
       {
         name: 'بنك الرياض',
@@ -774,7 +774,7 @@ export class MemStorage implements IStorage {
         iban: 'SA1420000002383212779940',
         type: 'شركة',
         isActive: true,
-        logo: '/public/riyadbank-logo.svg'
+        logo: '/riyad.png'
       },
       {
         name: 'مصرف الإنماء',
@@ -784,7 +784,7 @@ export class MemStorage implements IStorage {
         iban: 'SA9605000068201863704000',
         type: 'شركة',
         isActive: true,
-        logo: '/public/alinma-logo.svg'
+        logo: '/alinma.png'
       },
       {
         name: 'البنك السعودي الأول',
@@ -794,7 +794,7 @@ export class MemStorage implements IStorage {
         iban: 'SA6445000000822173787001',
         type: 'شركة',
         isActive: true,
-        logo: '/public/saib-logo.svg'
+        logo: '/sab.png'
       },
       {
         name: 'البنك السعودي الفرنسي',
@@ -804,7 +804,7 @@ export class MemStorage implements IStorage {
         iban: 'SA5655000000097844900167',
         type: 'شركة',
         isActive: true,
-        logo: '/public/bsf-logo.svg'
+        logo: '/french.png'
       }
     ];
 
