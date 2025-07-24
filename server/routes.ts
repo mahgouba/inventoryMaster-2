@@ -15,7 +15,8 @@ import {
   insertImportTypeSchema,
   insertVehicleStatusSchema,
   insertOwnershipTypeSchema,
-  insertFinancingCalculationSchema
+  insertFinancingCalculationSchema,
+  insertBankSchema
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -2873,6 +2874,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting financing calculation:", error);
       res.status(500).json({ message: "Failed to delete financing calculation" });
+    }
+  });
+
+  // Bank Management API Routes
+  app.get("/api/banks", async (req, res) => {
+    try {
+      const banks = await storage.getAllBanks();
+      res.json(banks);
+    } catch (error) {
+      console.error("Error fetching banks:", error);
+      res.status(500).json({ message: "Failed to fetch banks" });
+    }
+  });
+
+  app.get("/api/banks/type/:type", async (req, res) => {
+    try {
+      const { type } = req.params;
+      if (type !== "شخصي" && type !== "شركة") {
+        return res.status(400).json({ message: "Invalid bank type" });
+      }
+      
+      const banks = await storage.getBanksByType(type as "شخصي" | "شركة");
+      res.json(banks);
+    } catch (error) {
+      console.error("Error fetching banks by type:", error);
+      res.status(500).json({ message: "Failed to fetch banks by type" });
+    }
+  });
+
+  app.get("/api/banks/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid bank ID" });
+      }
+
+      const bank = await storage.getBank(id);
+      if (!bank) {
+        return res.status(404).json({ message: "Bank not found" });
+      }
+
+      res.json(bank);
+    } catch (error) {
+      console.error("Error fetching bank:", error);
+      res.status(500).json({ message: "Failed to fetch bank" });
+    }
+  });
+
+  app.post("/api/banks", async (req, res) => {
+    try {
+      const bankData = insertBankSchema.parse(req.body);
+      const bank = await storage.createBank(bankData);
+      res.status(201).json(bank);
+    } catch (error) {
+      console.error("Error creating bank:", error);
+      res.status(500).json({ message: "Failed to create bank" });
+    }
+  });
+
+  app.put("/api/banks/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid bank ID" });
+      }
+
+      const bankData = insertBankSchema.partial().parse(req.body);
+      const bank = await storage.updateBank(id, bankData);
+      
+      if (!bank) {
+        return res.status(404).json({ message: "Bank not found" });
+      }
+
+      res.json(bank);
+    } catch (error) {
+      console.error("Error updating bank:", error);
+      res.status(500).json({ message: "Failed to update bank" });
+    }
+  });
+
+  app.delete("/api/banks/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid bank ID" });
+      }
+
+      const success = await storage.deleteBank(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Bank not found" });
+      }
+
+      res.json({ message: "Bank deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting bank:", error);
+      res.status(500).json({ message: "Failed to delete bank" });
     }
   });
 

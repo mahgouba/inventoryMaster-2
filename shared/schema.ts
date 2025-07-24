@@ -50,6 +50,20 @@ export const inventoryItems = pgTable("inventory_items", {
   mileage: integer("mileage"), // ممشي السيارة بالكيلومتر (للسيارات المستعملة فقط)
 });
 
+// Banks table for storing bank information
+export const banks = pgTable("banks", {
+  id: serial("id").primaryKey(),
+  logo: text("logo"), // شعار البنك (Base64 أو URL)
+  bankName: text("bank_name").notNull(), // اسم البنك
+  accountName: text("account_name").notNull(), // اسم الحساب
+  accountNumber: text("account_number").notNull(), // رقم الحساب
+  iban: text("iban").notNull(), // رقم الآيبان
+  type: text("type").notNull(), // النوع: "شخصي" أو "شركة"
+  isActive: boolean("is_active").default(true).notNull(), // نشط
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Manufacturers table for storing manufacturer logos
 export const manufacturers = pgTable("manufacturers", {
   id: serial("id").primaryKey(),
@@ -336,6 +350,12 @@ export const insertInventoryItemSchema = createInsertSchema(inventoryItems).omit
   mileage: z.number().positive("يجب أن يكون الممشي رقم موجب").optional(),
 });
 
+export const insertBankSchema = createInsertSchema(banks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertManufacturerSchema = createInsertSchema(manufacturers).omit({
   id: true,
   createdAt: true,
@@ -483,6 +503,8 @@ export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertInventoryItem = z.infer<typeof insertInventoryItemSchema>;
+export type InsertBank = z.infer<typeof insertBankSchema>;
+export type Bank = typeof banks.$inferSelect;
 export type InventoryItem = typeof inventoryItems.$inferSelect;
 export type InsertManufacturer = z.infer<typeof insertManufacturerSchema>;
 export type Manufacturer = typeof manufacturers.$inferSelect;

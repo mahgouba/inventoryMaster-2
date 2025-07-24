@@ -26,6 +26,9 @@ import IntegrationManagementPage from "@/pages/integration-management";
 import ComprehensiveListsPage from "@/pages/comprehensive-lists";
 import ReservationsPage from "@/pages/reservations";
 import SoldVehiclesPage from "@/pages/sold-vehicles";
+import BankManagement from "@/pages/bank-management";
+import PersonalBanks from "@/pages/banks-personal";
+import CompanyBanks from "@/pages/banks-company";
 
 interface User {
   username: string;
@@ -56,6 +59,11 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
       <Route path="/reservations" component={() => <ReservationsPage />} />
       <Route path="/sold-vehicles" component={() => <SoldVehiclesPage />} />
       <Route path="/financing-calculator" component={FinancingCalculatorPage} />
+      
+      {/* صفحات البنوك العامة */}
+      <Route path="/banks-personal" component={PersonalBanks} />
+      <Route path="/banks-company" component={CompanyBanks} />
+      
       {/* صفحات الأدمن فقط */}
       {user.role === "admin" && (
         <>
@@ -63,6 +71,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           <Route path="/pdf-appearance" component={() => <PdfAppearanceManagement userRole={user.role} onLogout={onLogout} />} />
           <Route path="/user-management" component={() => <UserManagementPage onLogout={onLogout} />} />
           <Route path="/company-management" component={() => <CompanyManagementPage />} />
+          <Route path="/bank-management" component={BankManagement} />
           <Route path="/dynamic-company-control" component={() => <DynamicCompanyControl />} />
           <Route path="/integration-management" component={() => <IntegrationManagementPage />} />
           <Route path="/comprehensive-lists" component={ComprehensiveListsPage} />

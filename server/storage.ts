@@ -1,7 +1,7 @@
 import { 
   users, inventoryItems, manufacturers, companies, locations, locationTransfers, 
   lowStockAlerts, stockSettings, appearanceSettings, specifications, trimLevels, quotations, invoices, pdfAppearanceSettings,
-  importTypes, vehicleStatuses, ownershipTypes, financingCalculations,
+  importTypes, vehicleStatuses, ownershipTypes, financingCalculations, banks,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Manufacturer, type InsertManufacturer, 
@@ -14,7 +14,8 @@ import {
   type Specification, type InsertSpecification,
   type TrimLevel, type InsertTrimLevel,
   type Quotation, type InsertQuotation,
-  type FinancingCalculation, type InsertFinancingCalculation
+  type FinancingCalculation, type InsertFinancingCalculation,
+  type Bank, type InsertBank
 } from "@shared/schema";
 import { db, pool } from "./db";
 import { eq } from "drizzle-orm";
@@ -212,6 +213,14 @@ export interface IStorage {
   createFinancingCalculation(calculation: InsertFinancingCalculation): Promise<FinancingCalculation>;
   updateFinancingCalculation(id: number, calculation: Partial<InsertFinancingCalculation>): Promise<FinancingCalculation | undefined>;
   deleteFinancingCalculation(id: number): Promise<boolean>;
+
+  // Bank management methods
+  getAllBanks(): Promise<Bank[]>;
+  getBank(id: number): Promise<Bank | undefined>;
+  getBanksByType(type: "شخصي" | "شركة"): Promise<Bank[]>;
+  createBank(bank: InsertBank): Promise<Bank>;
+  updateBank(id: number, bank: Partial<InsertBank>): Promise<Bank | undefined>;
+  deleteBank(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -225,6 +234,7 @@ export class MemStorage implements IStorage {
   private quotations: Map<number, Quotation>;
   private invoices: Map<number, any> = new Map();
   private financingCalculations: Map<number, FinancingCalculation> = new Map();
+  private banks: Map<number, Bank> = new Map();
   private currentUserId: number;
   private currentInventoryId: number;
   private currentManufacturerId: number;
@@ -235,6 +245,7 @@ export class MemStorage implements IStorage {
   private currentQuotationId: number;
   private currentInvoiceId: number = 1;
   private currentFinancingCalculationId: number = 1;
+  private currentBankId: number = 1;
   private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
   private systemSettings: Map<string, string> = new Map();
   private companies: Map<number, Company> = new Map();
@@ -251,6 +262,7 @@ export class MemStorage implements IStorage {
     this.quotations = new Map();
     this.invoices = new Map();
     this.financingCalculations = new Map();
+    this.banks = new Map();
     this.currentUserId = 1;
     this.currentInventoryId = 1;
     this.currentManufacturerId = 1;
@@ -261,6 +273,7 @@ export class MemStorage implements IStorage {
     this.currentQuotationId = 1;
     this.currentInvoiceId = 1;
     this.currentFinancingCalculationId = 1;
+    this.currentBankId = 1;
     this.storedTermsConditions = [];
     this.systemSettings = new Map();
     this.companies = new Map();
@@ -2871,6 +2884,48 @@ export class DatabaseStorage implements IStorage {
       console.error('Delete image link error:', error);
       return false;
     }
+  }
+
+  // Bank management implementations
+  async getAllBanks(): Promise<Bank[]> {
+    return Array.from(this.banks.values());
+  }
+
+  async getBank(id: number): Promise<Bank | undefined> {
+    return this.banks.get(id);
+  }
+
+  async getBanksByType(type: "شخصي" | "شركة"): Promise<Bank[]> {
+    return Array.from(this.banks.values()).filter(bank => bank.type === type && bank.isActive);
+  }
+
+  async createBank(bankData: InsertBank): Promise<Bank> {
+    const id = this.currentBankId++;
+    const bank: Bank = {
+      id,
+      ...bankData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.banks.set(id, bank);
+    return bank;
+  }
+
+  async updateBank(id: number, bankData: Partial<InsertBank>): Promise<Bank | undefined> {
+    const existingBank = this.banks.get(id);
+    if (!existingBank) return undefined;
+
+    const updatedBank: Bank = {
+      ...existingBank,
+      ...bankData,
+      updatedAt: new Date(),
+    };
+    this.banks.set(id, updatedBank);
+    return updatedBank;
+  }
+
+  async deleteBank(id: number): Promise<boolean> {
+    return this.banks.delete(id);
   }
 }
 
