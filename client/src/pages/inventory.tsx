@@ -199,43 +199,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const categories = getAvailableCategories();
   const manufacturers = getAvailableManufacturers();
   
-  // Helper functions for ImageManagement component
-  const getSimpleManufacturers = (): string[] => {
-    const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
-    const manufacturers = availableData
-      .map(item => item.manufacturer)
-      .filter((manufacturer, index, self) => manufacturer && self.indexOf(manufacturer) === index)
-      .sort();
-    return manufacturers;
-  };
-  
-  const getSimpleCategories = (): string[] => {
-    const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
-    const categories = availableData
-      .map(item => item.category)
-      .filter((category, index, self) => category && self.indexOf(category) === index)
-      .sort();
-    return categories;
-  };
-  
-  const getSimpleTrimLevels = (): string[] => {
-    const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
-    const trimLevels = availableData
-      .map(item => item.trimLevel)
-      .filter((trimLevel, index, self) => trimLevel != null && self.indexOf(trimLevel) === index)
-      .sort();
-    return trimLevels as string[];
-  };
-  
-  const getSimpleColors = (): string[] => {
-    const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
-    const exteriorColors = availableData.map(item => item.exteriorColor);
-    const interiorColors = availableData.map(item => item.interiorColor);
-    const allColors = [...exteriorColors, ...interiorColors]
-      .filter((color, index, self) => color && self.indexOf(color) === index)
-      .sort();
-    return allColors;
-  };
+
 
   // Get count for each filter option - dynamically based on previously applied filters
   const getFilterCount = (field: keyof InventoryItem, value: string) => {
@@ -1299,10 +1263,6 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
       <ImageManagement
         open={imageManagementOpen}
         onOpenChange={setImageManagementOpen}
-        manufacturers={getSimpleManufacturers()}
-        categories={getSimpleCategories()}
-        trimLevels={getSimpleTrimLevels()}
-        colors={getSimpleColors()}
       />
     </div>
   );

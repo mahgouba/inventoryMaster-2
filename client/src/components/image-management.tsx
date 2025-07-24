@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,13 +28,9 @@ interface ImageLink {
 interface ImageManagementProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  manufacturers: string[];
-  categories: string[];
-  trimLevels: string[];
-  colors: string[];
 }
 
-export default function ImageManagement({ open, onOpenChange, manufacturers, categories, trimLevels, colors }: ImageManagementProps) {
+export default function ImageManagement({ open, onOpenChange }: ImageManagementProps) {
   const [imageLinks, setImageLinks] = useState<ImageLink[]>([]);
   const [selectedManufacturer, setSelectedManufacturer] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -49,8 +46,58 @@ export default function ImageManagement({ open, onOpenChange, manufacturers, cat
   const [activeTab, setActiveTab] = useState('add');
   const { toast } = useToast();
 
+  // Fetch manufacturers from cars.json
+  const { data: carsManufacturers = [] } = useQuery<any[]>({
+    queryKey: ["/api/cars/manufacturers"],
+    enabled: open,
+  });
+
+  // Fetch manufacturers from database
+  const { data: manufacturersData = [] } = useQuery<any[]>({
+    queryKey: ["/api/manufacturers"],
+    enabled: open,
+  });
+
+  // Fetch categories/models from cars.json for selected manufacturer
+  const { data: carsModels = [] } = useQuery<any[]>({
+    queryKey: [`/api/cars/models/${selectedManufacturer}`],
+    enabled: open && !!selectedManufacturer,
+  });
+
+  // Fetch trim levels from cars.json for selected manufacturer and category
+  const { data: carsTrims = [] } = useQuery<any[]>({
+    queryKey: [`/api/cars/trims/${selectedManufacturer}/${selectedCategory}`],
+    enabled: open && !!selectedManufacturer && !!selectedCategory,
+  });
+
+  // Fetch engines from cars.json
+  const { data: carsEngines = [] } = useQuery<any[]>({
+    queryKey: ["/api/cars/engines"],
+    enabled: open,
+  });
+
+  // Get all manufacturers (combine database and cars.json)
+  const allManufacturers = [
+    ...carsManufacturers.map(m => m.name_ar),
+    ...manufacturersData.map(m => m.name)
+  ].filter((value, index, self) => self.indexOf(value) === index);
+
+  // Get categories for selected manufacturer from cars.json
+  const categories = carsModels.map(model => model.model_ar) || [];
+
+  // Get trim levels from cars.json
+  const trimLevels = carsTrims.map(trim => trim.trim_ar) || [];
+
+  // Get engine capacities from cars.json
+  const engineCapacities = carsEngines.map(engine => engine.engine) || [];
+
   // Generate years from 2020 to current year + 2
   const years = Array.from({ length: new Date().getFullYear() - 2018 }, (_, i) => 2020 + i);
+
+  // Common colors (could be moved to API later)
+  const colors = [
+    "أبيض", "أسود", "فضي", "رمادي", "أزرق", "أحمر", "بني", "ذهبي", "أخضر", "برتقالي"
+  ];
 
   useEffect(() => {
     loadImageLinks();
@@ -220,7 +267,7 @@ export default function ImageManagement({ open, onOpenChange, manufacturers, cat
                         <SelectValue placeholder="اختر الصانع" />
                       </SelectTrigger>
                       <SelectContent>
-                        {manufacturers.map((manufacturer) => (
+                        {allManufacturers.map((manufacturer) => (
                           <SelectItem key={manufacturer} value={manufacturer}>
                             {manufacturer}
                           </SelectItem>
