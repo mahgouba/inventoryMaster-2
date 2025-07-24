@@ -751,7 +751,7 @@ export class MemStorage implements IStorage {
         nameEn: 'Arab National Bank',
         accountName: 'شركة البريمي للسيارات',
         accountNumber: '0108095322110019',
-        iban: '',
+        iban: 'SA9301000000108095322110019',
         type: 'شركة',
         isActive: true,
         logo: '/public/anb-logo.svg'
@@ -808,7 +808,53 @@ export class MemStorage implements IStorage {
       }
     ];
 
+    // Add company banks
     sampleBanks.forEach(bankData => {
+      const id = this.currentBankId++;
+      const bank = {
+        id,
+        ...bankData,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.banks.set(id, bank);
+    });
+
+    // Add some personal bank accounts
+    const personalBanks: InsertBank[] = [
+      {
+        name: 'مصرف الراجحي',
+        nameEn: 'Al Rajhi Bank',
+        accountName: 'أحمد البريمي',
+        accountNumber: '575608010001234',
+        iban: 'SA8080000575608010001234',
+        type: 'شخصي',
+        isActive: true,
+        logo: '/rajhi.png'
+      },
+      {
+        name: 'البنك الأهلي السعودي',
+        nameEn: 'Saudi National Bank',
+        accountName: 'محمد البريمي',
+        accountNumber: '25268400005678',
+        iban: 'SA5110000025268400005678',
+        type: 'شخصي',
+        isActive: true,
+        logo: '/snb.png'
+      },
+      {
+        name: 'بنك الرياض',
+        nameEn: 'Riyad Bank',
+        accountName: 'عبدالله البريمي',
+        accountNumber: '2383212779999',
+        iban: 'SA1420000002383212779999',
+        type: 'شخصي',
+        isActive: true,
+        logo: '/riyad.png'
+      }
+    ];
+
+    personalBanks.forEach(bankData => {
       const id = this.currentBankId++;
       const bank = {
         id,

@@ -2880,7 +2880,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Bank Management API Routes
   app.get("/api/banks", async (req, res) => {
     try {
-      const banks = await storage.getAllBanks();
+      // Access the banks directly from the storage instance
+      const banks = Array.from((storage as any).banks.values());
       res.json(banks);
     } catch (error) {
       console.error("Error fetching banks:", error);
@@ -2895,7 +2896,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid bank type" });
       }
       
-      const banks = await storage.getBanksByType(type as "شخصي" | "شركة");
+      // Access the banks directly from the storage instance
+      const allBanks = Array.from((storage as any).banks.values());
+      const banks = allBanks.filter((bank: any) => bank.type === type && bank.isActive);
+      
       res.json(banks);
     } catch (error) {
       console.error("Error fetching banks by type:", error);
