@@ -631,9 +631,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   }
 
   return (
-    <div className="bg-slate-50 dark:bg-black min-h-screen" dir="rtl">
+    <div className="glass-background" dir="rtl">
       {/* Header */}
-      <header className="bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
+      <header className="glass-container glass-header sticky top-0 z-50 border-b border-white/20 dark:border-slate-700/30">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
           <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Logo and Company Name */}
@@ -809,8 +809,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     </div>
                   
                   <CollapsibleContent className="mt-4 w-full">
-                    <Card className="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shadow-sm w-full">
-                      <CardContent className="p-6 w-full">
+                    <Card className="glass-container border border-white/20 dark:border-slate-700/30 shadow-xl w-full">
+                      <CardContent className="glass-container p-6 w-full">
                         {/* Enhanced Filter Controls with Button Design */}
                         <div className="space-y-6 animate-in fade-in duration-300">
                           
@@ -1066,7 +1066,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               <div key={manufacturer} className="space-y-4 relative z-10">
                 {/* Manufacturer Header - Clickable */}
                 <div 
-                  className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6 cursor-pointer hover:shadow-md hover:border-custom-primary transition-all duration-200"
+                  className="glass-card dark:glass-card-dark rounded-lg p-6 cursor-pointer border-0 transition-all duration-200"
                   onClick={() => toggleManufacturer(manufacturer)}
                 >
                   <div className="flex items-center justify-between">
@@ -1090,14 +1090,14 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                       
                       {/* Manufacturer Name and Count */}
                       <div className="flex flex-col">
-                        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-2">{manufacturer}</h2>
+                        <h2 className="text-2xl font-bold text-white dark:text-white mb-2 drop-shadow-lg">{manufacturer}</h2>
                         <div className="flex items-center space-x-3 space-x-reverse">
-                          <Badge variant="secondary" className="bg-dynamic-card text-dynamic-primary dark:text-slate-300 px-3 py-1 text-sm font-semibold">
+                          <Badge variant="secondary" className="bg-white/20 text-white dark:text-white px-3 py-1 text-sm font-semibold backdrop-blur-sm border border-white/30">
                             {showSoldCars 
                               ? allGroupedData[manufacturer]?.items.length || 0 
                               : allGroupedData[manufacturer]?.items.filter(item => item.status !== "مباع").length || 0} مركبة
                           </Badge>
-                          <Badge variant="outline" className="border-green-200 dark:border-green-700 text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-3 py-1 text-sm font-semibold">
+                          <Badge variant="outline" className="border-green-300/40 text-green-200 bg-green-500/20 dark:bg-green-900/40 backdrop-blur-sm px-3 py-1 text-sm font-semibold">
                             {data.items.filter(item => item.status === "متوفر").length} متوفر
                           </Badge>
                         </div>
@@ -1105,11 +1105,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     </div>
 
                     {/* Expand/Collapse Icon */}
-                    <div className="text-slate-400">
+                    <div className="text-white/60">
                       {expandedManufacturer === manufacturer ? (
-                        <ChevronUp size={24} className="text-dynamic-primary" />
+                        <ChevronUp size={24} className="text-white drop-shadow-lg" />
                       ) : (
-                        <ChevronDown size={24} />
+                        <ChevronDown size={24} className="text-white/80 drop-shadow-lg" />
                       )}
                     </div>
                   </div>
@@ -1319,10 +1319,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
         {/* Empty State */}
         {Object.keys(groupedData).length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-slate-400 text-6xl mb-4">🚗</div>
-            <h3 className="text-xl font-semibold text-slate-600 mb-2">لا توجد مركبات متوفرة</h3>
-            <p className="text-slate-500">قم بإضافة مركبات جديدة لعرضها هنا</p>
+          <div className="text-center py-12 relative z-10">
+            <div className="text-white/60 text-6xl mb-4 drop-shadow-lg">🚗</div>
+            <h3 className="text-xl font-semibold text-white mb-2 drop-shadow-lg">لا توجد مركبات متوفرة</h3>
+            <p className="text-white/80 drop-shadow-sm">قم بإضافة مركبات جديدة لعرضها هنا</p>
           </div>
         )}
       </div>
