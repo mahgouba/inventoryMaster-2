@@ -214,6 +214,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Fixed icon path issue: corrected secondhand icon path from /logos/ to root public directory
 - ✅ Migration checklist completed with all items marked as done
 - ✅ Project ready for continued development and deployment
+- ✅ Enhanced quotation to invoice conversion: hidden "صالح حتى" date in invoice mode and replaced customer title row with "بناءً على طلبكم رقم:" format
 
 ### Previous Migration to Replit Environment (July 23, 2025)
 - ✅ Successfully completed full migration from Replit Agent to standard Replit environment

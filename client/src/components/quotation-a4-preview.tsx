@@ -412,8 +412,12 @@ export default function QuotationA4Preview({
                 <div className="text-xs text-black">
                   <span className="font-semibold">الإصدار:      </span>
                   <span>{new Date().toLocaleDateString('en-GB')}</span>
-                  <span className="font-semibold ml-4">صالح حتى: </span>
-                  <span>{validUntil.toLocaleDateString('en-GB')}</span>
+                  {!isInvoiceMode && (
+                    <>
+                      <span className="font-semibold ml-4">صالح حتى: </span>
+                      <span>{validUntil.toLocaleDateString('en-GB')}</span>
+                    </>
+                  )}
                 </div>
               </div>
               
@@ -421,7 +425,11 @@ export default function QuotationA4Preview({
               <div className="mt-4 bg-white/90 p-3 pt-[1px] pb-[1px] text-[13px] text-right">
                 <div className="space-y-2 text-xs text-black">
                   <div className="text-right text-[16px] font-semibold">
-                    <span>{customerTitle} / {customerName || "غير محدد"} &nbsp;&nbsp;&nbsp; الموقرين</span>
+                    {isInvoiceMode ? (
+                      <span>بناءً على طلبكم رقم: {invoiceNumber || quoteNumber}</span>
+                    ) : (
+                      <span>{customerTitle} / {customerName || "غير محدد"} &nbsp;&nbsp;&nbsp; الموقرين</span>
+                    )}
                   </div>
                 </div>
               </div>
