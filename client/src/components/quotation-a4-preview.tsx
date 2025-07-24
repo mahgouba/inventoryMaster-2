@@ -437,44 +437,44 @@ export default function QuotationA4Preview({
             {/* Vehicle Information */}
             {selectedVehicle && (
               <div className="relative p-4 w-full mt-[166px] mb-[16px] overflow-hidden bg-[#fafafa12]">
-                {/* Repeated Manufacturer Logo Watermark Pattern */}
+                {/* Systematic Manufacturer Logo Watermark Pattern */}
                 {selectedVehicle && (() => {
                   const manufacturerLogo = getManufacturerLogo(selectedVehicle.manufacturer);
                   return manufacturerLogo && (
                     <div className="absolute inset-0 pointer-events-none">
-                      {/* Create a grid pattern of logos */}
-                      <div className="grid grid-cols-3 gap-4 h-full opacity-5">
-                        {Array.from({ length: 6 }).map((_, index) => (
+                      {/* Organized grid pattern with systematic layout */}
+                      <div className="grid grid-cols-4 grid-rows-3 gap-6 h-full w-full p-4">
+                        {Array.from({ length: 12 }).map((_, index) => (
                           <div key={index} className="flex items-center justify-center">
                             <img 
                               src={manufacturerLogo} 
                               alt={`${selectedVehicle.manufacturer} logo`}
-                              className="w-20 h-20 object-contain grayscale transform rotate-12"
+                              className="w-16 h-16 object-contain opacity-20"
+                              style={{
+                                filter: 'sepia(1) saturate(2) hue-rotate(25deg) brightness(1.2)',
+                                color: '#C79C45'
+                              }}
                             />
                           </div>
                         ))}
                       </div>
-                      {/* Additional scattered logos for better coverage */}
-                      <div className="absolute top-4 right-8">
-                        <img 
-                          src={manufacturerLogo} 
-                          alt={`${selectedVehicle.manufacturer} logo`}
-                          className="w-16 h-16 object-contain opacity-30 grayscale transform -rotate-12"
-                        />
-                      </div>
-                      <div className="absolute bottom-8 left-12">
-                        <img 
-                          src={manufacturerLogo} 
-                          alt={`${selectedVehicle.manufacturer} logo`}
-                          className="w-16 h-16 object-contain opacity-30 grayscale transform rotate-45"
-                        />
-                      </div>
+                      
+                      {/* Central focal logo with golden color */}
                       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <img 
-                          src={manufacturerLogo} 
-                          alt={`${selectedVehicle.manufacturer} logo`}
-                          className="w-32 h-32 object-contain opacity-10 grayscale"
-                        />
+                        <div 
+                          className="w-24 h-24 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: 'rgba(199, 156, 69, 0.1)' }}
+                        >
+                          <img 
+                            src={manufacturerLogo} 
+                            alt={`${selectedVehicle.manufacturer} logo`}
+                            className="w-20 h-20 object-contain opacity-30"
+                            style={{
+                              filter: 'sepia(1) saturate(2) hue-rotate(25deg) brightness(1.2)',
+                              color: '#C79C45'
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
                   );
