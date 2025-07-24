@@ -285,8 +285,6 @@ export default function CompanyBanks() {
           </Link>
         </div>
       </div>
-
-
     </div>
   );
 }
