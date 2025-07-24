@@ -753,72 +753,17 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   // Convert quotation to invoice
   const convertToInvoice = async () => {
     try {
-      // Generate invoice number with 6-digit serial format
-      const newInvoiceNumber = generateInvoiceNumber();
+      // Generate invoice number if not exists
+      const newInvoiceNumber = invoiceNumber || generateInvoiceNumber();
       
-      // Switch to invoice mode
+      // Switch to invoice mode and set invoice number
       setIsInvoiceMode(true);
       setInvoiceNumber(newInvoiceNumber);
       
-      // Calculate totals (with fallback for empty data)
-      const totals = calculateTotals();
-      
-      // Get current vehicle data (from selected vehicle or form inputs)
-      const currentVehicle = selectedVehicle || editableVehicle || {
-        id: Date.now(),
-        manufacturer: vehicleManufacturer || "غير محدد",
-        category: vehicleCategory || "غير محدد",
-        trimLevel: vehicleTrimLevel || "",
-        year: parseInt(vehicleYear) || new Date().getFullYear(),
-        exteriorColor: vehicleExteriorColor || "",
-        interiorColor: vehicleInteriorColor || "",
-        chassisNumber: vehicleChassisNumber || "",
-        engineCapacity: vehicleEngineCapacity || "",
-        price: vehiclePrice || 0
-      };
-      
-      // Prepare invoice data with fallback values for missing fields
-      const invoiceData = {
-        invoiceNumber: newInvoiceNumber,
-        quoteNumber: quoteNumber || generateQuoteNumber(),
-        inventoryItemId: currentVehicle.id || null,
-        manufacturer: currentVehicle.manufacturer || "غير محدد",
-        category: currentVehicle.category || "غير محدد",
-        trimLevel: currentVehicle.trimLevel || "",
-        year: currentVehicle.year || new Date().getFullYear(),
-        exteriorColor: currentVehicle.exteriorColor || "",
-        interiorColor: currentVehicle.interiorColor || "",
-        chassisNumber: currentVehicle.chassisNumber || "",
-        engineCapacity: currentVehicle.engineCapacity || "",
-        specifications: vehicleSpecs?.detailedDescription || "",
-        basePrice: pricingDetails.basePrice.toString(),
-        finalPrice: totals.finalTotal.toString(),
-        customerName: customerName || "عميل غير محدد",
-        customerPhone: customerPhone || "",
-        customerEmail: customerEmail || "",
-        notes: notes || "",
-        status: "مسودة",
-        paymentStatus: "غير مدفوع",
-        remainingAmount: totals.finalTotal.toString(),
-        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-        createdBy: "system", // Should be current user
-        companyData: JSON.stringify(selectedCompanyData || {}),
-        representativeData: JSON.stringify(representatives.find(r => r.id === selectedRepresentative) || {}),
-        pricingDetails: JSON.stringify(pricingDetails),
-        qrCodeData: JSON.stringify({ invoiceNumber: newInvoiceNumber, customerName: customerName || "عميل غير محدد", finalPrice: totals.finalTotal }),
-        authorizationNumber: authorizationNumber || ""
-      };
-
-      // Create invoice via API
-      const response = await apiRequest('POST', '/api/invoices', invoiceData);
-      
       toast({
-        title: "تم التحويل بنجاح",
+        title: "تم التحويل بنجاح", 
         description: `تم تحويل العرض إلى فاتورة رقم ${newInvoiceNumber}`,
       });
-
-      // Store invoice data for potential future use
-      localStorage.setItem('lastInvoiceData', JSON.stringify(response));
       
     } catch (error) {
       console.error("Error converting to invoice:", error);
@@ -1287,6 +1232,35 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
     }
   });
 
+  // Create invoice mutation 
+  const createInvoiceMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/invoices', data);
+      return response;
+    },
+    onSuccess: (response) => {
+      toast({
+        title: "تم حفظ الفاتورة",
+        description: "تم حفظ الفاتورة بنجاح ويمكنك الآن رؤيتها في صفحة الفواتير",
+      });
+      // Invalidate invoices cache to refresh the invoices list
+      queryClient.invalidateQueries({ queryKey: ['/api/invoices'] });
+      queryClient.refetchQueries({ queryKey: ['/api/invoices'] });
+      
+      // Set the saved invoice for preview
+      if (response.id) {
+        localStorage.setItem('lastSavedInvoiceId', response.id.toString());
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ في حفظ الفاتورة",
+        description: "حدث خطأ أثناء حفظ الفاتورة. يرجى المحاولة مرة أخرى.",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleSaveQuotation = () => {
     if (!editableVehicle) {
       toast({
@@ -1397,26 +1371,11 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
           finalTotal: totals.finalTotal,
           licensePlateTotal: totals.licensePlateTotal
         }),
-        qrCodeData: generateQRData()
+        qrCodeData: `Invoice: ${newInvoiceNumber}\nCustomer: ${customerName || 'عميل غير محدد'}\nVehicle: ${editableVehicle?.manufacturer || 'غير محدد'} ${editableVehicle?.category || 'غير محدد'}${editableVehicle?.trimLevel ? ' ' + editableVehicle.trimLevel : ''}\nTotal: ${totals.finalTotal.toLocaleString()} SAR\nDate: ${new Date().toLocaleDateString('en-GB')}`
       };
 
-      // Use a separate API call for invoices
-      apiRequest('POST', '/api/invoices', invoiceData)
-        .then(() => {
-          toast({
-            title: "تم حفظ الفاتورة",
-            description: "تم حفظ الفاتورة بنجاح",
-          });
-          queryClient.invalidateQueries({ queryKey: ['/api/invoices'] });
-          queryClient.refetchQueries({ queryKey: ['/api/invoices'] });
-        })
-        .catch((error) => {
-          toast({
-            title: "خطأ في حفظ الفاتورة",
-            description: "حدث خطأ أثناء حفظ الفاتورة",
-            variant: "destructive",
-          });
-        });
+      // Save invoice when in invoice mode
+      createInvoiceMutation.mutate(invoiceData);
     } else {
       // Save as quotation
       const quotationData: InsertQuotation = {
@@ -1451,7 +1410,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
           finalTotal: totals.finalTotal,
           licensePlateTotal: totals.licensePlateTotal
         }),
-        qrCodeData: generateQRData()
+        qrCodeData: `Quote: ${quoteNumber}\nCustomer: ${customerName || 'عميل غير محدد'}\nVehicle: ${editableVehicle?.manufacturer || 'غير محدد'} ${editableVehicle?.category || 'غير محدد'}${editableVehicle?.trimLevel ? ' ' + editableVehicle.trimLevel : ''}\nTotal: ${totals.finalTotal.toLocaleString()} SAR\nDate: ${new Date().toLocaleDateString('en-GB')}`
       };
 
       createQuotationMutation.mutate(quotationData);
