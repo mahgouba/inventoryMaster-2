@@ -632,3 +632,96 @@ button[data-state="checked"][role="radio"] span {
     min-height: 44px;
   }
 }
+
+/* Global checkbox and radio styling with golden color */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: #C49632;
+}
+
+/* Shadcn UI Checkbox styling */
+[data-state="checked"] {
+  background-color: #C49632 !important;
+  border-color: #C49632 !important;
+}
+
+/* RadioGroup styling */
+button[role="radio"][data-state="checked"] {
+  background-color: #C49632 !important;
+  border-color: #C49632 !important;
+}
+
+/* Enhanced toggle switch styles */
+.modern-switch {
+  position: relative;
+  display: inline-flex;
+  height: 28px;
+  width: 48px;
+  cursor: pointer;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+}
+
+.modern-switch:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modern-switch[data-state="checked"] {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+}
+
+.modern-switch-thumb {
+  position: relative;
+  display: block;
+  height: 20px;
+  width: 20px;
+  border-radius: 9999px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(2px);
+}
+
+.modern-switch[data-state="checked"] .modern-switch-thumb {
+  transform: translateX(22px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Modern toggle button styles */
+.modern-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  border: 1px solid #e2e8f0;
+}
+
+.modern-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.modern-toggle[data-state="on"] {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border-color: #1d4ed8;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+.dark .modern-toggle {
+  background: linear-gradient(135deg, #374151, #1f2937);
+  border-color: #4b5563;
+}
+
+.dark .modern-toggle[data-state="on"] {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-color: #1d4ed8;
+}
