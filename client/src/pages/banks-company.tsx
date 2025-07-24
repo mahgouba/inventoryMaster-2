@@ -73,19 +73,33 @@ export default function CompanyBanks() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#00627f] flex items-center justify-center">
-        <div className="text-white text-xl">جاري التحميل...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-blue-800 to-purple-900 relative overflow-hidden">
+        {/* Animated Mesh Background */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+          <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-gradient-to-r from-teal-500 to-green-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+        </div>
+        <div className="text-white text-xl font-semibold">جاري التحميل...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#00627f] transition-colors duration-200" dir="rtl">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-blue-800 to-purple-900 relative overflow-hidden" dir="rtl">
+      {/* Animated Mesh Background */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-gradient-to-r from-teal-500 to-green-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+        <div className="absolute bottom-10 right-20 w-72 h-72 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-6000"></div>
+      </div>
+
+      <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <Link href="/">
-            <Button variant="ghost" className="text-white hover:bg-white/10">
+            <Button variant="ghost" className="text-white hover:bg-white/10 backdrop-blur-sm border border-white/20">
               <ArrowLeft className="w-4 h-4 ml-2" />
               العودة للرئيسية
             </Button>
@@ -95,7 +109,7 @@ export default function CompanyBanks() {
             <img 
               src="/albarimi.png" 
               alt="شعار الشركة" 
-              className="w-35 h-35 object-contain"
+              className="w-35 h-35 object-contain drop-shadow-2xl"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
@@ -108,142 +122,143 @@ export default function CompanyBanks() {
 
         {/* Page Title */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2 flex items-center justify-center gap-3">
-            <Building2 className="w-8 h-8" />
+          <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3 drop-shadow-lg">
+            <Building2 className="w-10 h-10" />
             بنوك الشركات
           </h1>
-          <p className="text-white/80">معلومات الحسابات البنكية للشركات</p>
+          <p className="text-white/80 text-lg">معلومات الحسابات البنكية للشركات</p>
         </div>
 
         {/* Banks Grid */}
         {banks.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {banks.map((bank) => {
               const isExpanded = expandedBanks.has(bank.id);
               
               return (
                 <Card 
                   key={bank.id} 
-                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
+                  className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:bg-white/15"
                 >
-                  <CardContent className="p-4">
-                    <div className="flex flex-col space-y-3">
-                      {/* Bank Header */}
+                  <CardContent className="p-6">
+                    <div className="flex flex-col space-y-4">
+                      {/* Bank Header - Dropdown Style */}
                       <div 
-                        className="w-full flex justify-between items-center cursor-pointer"
+                        className="w-full flex justify-between items-center cursor-pointer group"
                         onClick={() => toggleExpanded(bank.id)}
                       >
-                        {bank.logo ? (
-                          <img 
-                            src={bank.logo} 
-                            alt={bank.bankName} 
-                            className="h-12 w-12 object-contain"
-                          />
-                        ) : (
-                          <div className="h-12 w-12 bg-gray-200 rounded flex items-center justify-center">
-                            <Building2 className="w-6 h-6 text-gray-400" />
+                        <div className="flex items-center space-x-4 space-x-reverse">
+                          {bank.logo ? (
+                            <img 
+                              src={bank.logo} 
+                              alt={bank.bankName} 
+                              className="h-18 w-18 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
+                              style={{ height: '4.5rem', width: '4.5rem' }}
+                            />
+                          ) : (
+                            <div className="h-18 w-18 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
+                              <Building2 className="w-8 h-8 text-white" />
+                            </div>
+                          )}
+                          <div className="text-right">
+                            <h3 className="text-lg font-bold text-white drop-shadow-md">
+                              {bank.bankName}
+                            </h3>
+                            <Badge className="bg-blue-500/20 text-blue-300 border border-blue-400/30 backdrop-blur-sm">
+                              <Building2 className="w-3 h-3 ml-1" />
+                              {bank.type}
+                            </Badge>
                           </div>
-                        )}
+                        </div>
                         
                         {isExpanded ? (
-                          <ChevronUp className="w-4 h-4 text-[#00627F] transform transition-transform duration-200" />
+                          <ChevronUp className="w-6 h-6 text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
                         ) : (
-                          <ChevronDown className="w-4 h-4 text-[#00627F] transform transition-transform duration-200" />
+                          <ChevronDown className="w-6 h-6 text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
                         )}
                       </div>
 
-                      {/* Expanded Content */}
+                      {/* Expanded Content - Dropdown */}
                       {isExpanded && (
-                        <div className="w-full space-y-3">
-                          {/* Account Name */}
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between">
-                              <span className="text-base font-bold text-[#00627F]">اسم الحساب</span>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyToClipboard(bank.accountName, "اسم الحساب");
-                                }}
-                                className="p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1"
-                              >
-                                <Copy className="w-4 h-4 text-[#00627F]" />
-                                <span className="text-xs text-[#00627F]">نسخ</span>
-                              </Button>
+                        <div className="w-full space-y-4 animate-in slide-in-from-top-2 duration-300">
+                          <Separator className="bg-white/30" />
+
+                          {/* Glass Container for Bank Details */}
+                          <div className="backdrop-blur-md bg-white/5 rounded-xl p-4 border border-white/20">
+                            {/* Account Name */}
+                            <div className="space-y-2 mb-4">
+                              <div className="flex items-center justify-between">
+                                <span className="text-base font-bold text-white drop-shadow-sm">اسم الحساب</span>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(bank.accountName, "اسم الحساب");
+                                  }}
+                                  className="p-2 hover:bg-white/20 rounded-lg transition-all duration-300 flex items-center gap-1 backdrop-blur-sm border border-white/20"
+                                >
+                                  <Copy className="w-4 h-4 text-white" />
+                                  <span className="text-xs text-white">نسخ</span>
+                                </Button>
+                              </div>
+                              <p className="text-sm text-white/90 bg-white/10 rounded-lg p-2 backdrop-blur-sm">{bank.accountName}</p>
                             </div>
-                            <p className="text-sm text-[#00627F]">{bank.accountName}</p>
+
+                            {/* Account Number */}
+                            <div className="space-y-2 mb-4">
+                              <div className="flex items-center justify-between">
+                                <span className="text-base font-bold text-white drop-shadow-sm">رقم الحساب</span>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(bank.accountNumber, "رقم الحساب");
+                                  }}
+                                  className="p-2 hover:bg-white/20 rounded-lg transition-all duration-300 flex items-center gap-1 backdrop-blur-sm border border-white/20"
+                                >
+                                  <Copy className="w-4 h-4 text-white" />
+                                  <span className="text-xs text-white">نسخ</span>
+                                </Button>
+                              </div>
+                              <p className="text-sm text-white/90 bg-white/10 rounded-lg p-2 backdrop-blur-sm">{bank.accountNumber}</p>
+                            </div>
+
+                            {/* IBAN */}
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-base font-bold text-white drop-shadow-sm">الآيبان</span>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(bank.iban, "الآيبان");
+                                  }}
+                                  className="p-2 hover:bg-white/20 rounded-lg transition-all duration-300 flex items-center gap-1 backdrop-blur-sm border border-white/20"
+                                >
+                                  <Copy className="w-4 h-4 text-white" />
+                                  <span className="text-xs text-white">نسخ</span>
+                                </Button>
+                              </div>
+                              <p className="text-sm break-all text-white/90 bg-white/10 rounded-lg p-2 backdrop-blur-sm">{bank.iban}</p>
+                            </div>
                           </div>
 
-                          <Separator />
-
-                          {/* Account Number */}
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between">
-                              <span className="text-base font-bold text-[#00627F]">رقم الحساب</span>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyToClipboard(bank.accountNumber, "رقم الحساب");
-                                }}
-                                className="p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1"
-                              >
-                                <Copy className="w-4 h-4 text-[#00627F]" />
-                                <span className="text-xs text-[#00627F]">نسخ</span>
-                              </Button>
-                            </div>
-                            <p className="text-sm text-[#00627F]">{bank.accountNumber}</p>
-                          </div>
-
-                          <Separator />
-
-                          {/* IBAN */}
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between">
-                              <span className="text-base font-bold text-[#00627F]">الآيبان</span>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyToClipboard(bank.iban, "الآيبان");
-                                }}
-                                className="p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1"
-                              >
-                                <Copy className="w-4 h-4 text-[#00627F]" />
-                                <span className="text-xs text-[#00627F]">نسخ</span>
-                              </Button>
-                            </div>
-                            <p className="text-sm break-all text-[#00627F]">{bank.iban}</p>
-                          </div>
-
-                          <Separator />
-
-                          {/* Bank Name */}
-                          <h3 className="text-lg font-bold text-center text-[#00627F]">
-                            {bank.bankName}
-                          </h3>
-
-                          <Badge className="bg-blue-100 text-blue-800 justify-center">
-                            <Building2 className="w-3 h-3 ml-1" />
-                            {bank.type}
-                          </Badge>
+                          {/* Share Button */}
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              shareBank(bank);
+                            }}
+                            className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm border border-white/20"
+                          >
+                            <Share2 className="w-5 h-5" />
+                            <span className="font-semibold">مشاركة</span>
+                          </Button>
                         </div>
                       )}
-
-                      {/* Share Button */}
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          shareBank(bank);
-                        }}
-                        className="w-full mt-3 bg-[#00627F] text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#005266] active:scale-95 transition duration-300 animate-pulse hover:animate-none"
-                      >
-                        <Share2 className="w-4 h-4" />
-                        <span>مشاركة</span>
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -251,25 +266,27 @@ export default function CompanyBanks() {
             })}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <Building2 className="w-16 h-16 text-white/50 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">لا توجد بنوك شركات</h3>
-            <p className="text-white/70">لم يتم إضافة أي بنوك شركات حتى الآن</p>
+          <div className="text-center py-16 backdrop-blur-xl bg-white/10 rounded-2xl border border-white/20">
+            <Building2 className="w-20 h-20 text-white/50 mx-auto mb-6 drop-shadow-lg" />
+            <h3 className="text-2xl font-semibold text-white mb-4 drop-shadow-md">لا توجد بنوك شركات</h3>
+            <p className="text-white/70 text-lg">لم يتم إضافة أي بنوك شركات حتى الآن</p>
           </div>
         )}
 
         {/* Quick Links */}
-        <div className="mt-8 flex justify-center">
+        <div className="mt-12 flex justify-center">
           <Link href="/banks-personal">
             <Button 
               variant="outline" 
-              className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+              className="backdrop-blur-xl bg-white/10 text-white border-white/30 hover:bg-white/20 px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               عرض البنوك الشخصية
             </Button>
           </Link>
         </div>
       </div>
+
+
     </div>
   );
 }
