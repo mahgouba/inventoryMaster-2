@@ -325,6 +325,13 @@ export default function CardViewPage({ userRole }: CardViewPageProps) {
                                       <span className="text-slate-600">اللون الخارجي:</span>
                                       <span className="font-medium">{item.exteriorColor}</span>
                                     </div>
+                                    {/* Mileage - Only show for used vehicles */}
+                                    {(item.importType === "مستعمل" || item.importType === "مستعمل شخصي") && (item as any).mileage && (
+                                      <div className="flex justify-between">
+                                        <span className="text-slate-600">ممشي السيارة:</span>
+                                        <span className="font-medium text-orange-600">{(item as any).mileage?.toLocaleString()} كم</span>
+                                      </div>
+                                    )}
                                     <div className="flex justify-between">
                                       <span className="text-slate-600">الموقع:</span>
                                       <span className="font-medium">{item.location}</span>
