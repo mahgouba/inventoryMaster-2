@@ -23,7 +23,7 @@ args = "npm run dev"
 waitForPort = 5000
 
 [nix]
-channel = "stable-25_05"
+channel = "stable-24_05"
 packages = ["postgresql"]
 
 [[ports]]
