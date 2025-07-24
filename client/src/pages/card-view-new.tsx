@@ -1047,14 +1047,22 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         )}
 
         {/* Vehicle Cards by Manufacturer */}
-        <div className="space-y-8">
+        <div className="space-y-8 glass-background min-h-screen">
+          {/* Background Gradient Blobs */}
+          <div className="fixed inset-0 pointer-events-none z-0">
+            <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+            <div className="absolute top-40 right-20 w-72 h-72 bg-gradient-to-r from-yellow-400 to-pink-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+            <div className="absolute bottom-20 left-20 w-72 h-72 bg-gradient-to-r from-green-400 to-blue-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob2 animation-delay-4000"></div>
+            <div className="absolute bottom-40 right-10 w-72 h-72 bg-gradient-to-r from-pink-400 to-red-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob2 animation-delay-6000"></div>
+          </div>
+          
           {Object.entries(groupedData)
             .filter(([manufacturer]) => selectedManufacturer.length === 0 || selectedManufacturer.includes(manufacturer))
             .map(([manufacturer, data]) => {
             const logo = getManufacturerLogo(manufacturer);
             
             return (
-              <div key={manufacturer} className="space-y-4">
+              <div key={manufacturer} className="space-y-4 relative z-10">
                 {/* Manufacturer Header - Clickable */}
                 <div 
                   className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6 cursor-pointer hover:shadow-md hover:border-custom-primary transition-all duration-200"
@@ -1112,18 +1120,18 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-in slide-in-from-top-2 fade-in duration-300"
                   >
                   {data.items.map((item) => (
-                    <Card key={item.id} className="card-dynamic">
-                      <CardHeader className="pb-3">
+                    <Card key={item.id} className="glass-card dark:glass-card-dark rounded-2xl overflow-hidden border-0 relative">
+                      <CardHeader className="pb-3 relative z-10">
                         <div className="flex items-center justify-between">
                           {/* Category and Trim Level Row */}
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1">
                               <img src="/car.svg" alt="Category" className="w-9 h-9" style={{filter: 'brightness(0) saturate(100%) invert(45%) sepia(71%) saturate(1078%) hue-rotate(28deg) brightness(96%) contrast(88%)'}} />
-                              <span className="font-bold text-sm" style={{color: '#BF9231'}}>{item.category}</span>
+                              <span className="font-bold text-sm text-yellow-300 drop-shadow-sm">{item.category}</span>
                             </div>
                             {item.trimLevel && (
                               <div className="flex items-center gap-1">
-                                <span className="font-bold text-sm" style={{color: '#BF9231'}}>{item.trimLevel}</span>
+                                <span className="font-bold text-sm text-yellow-300 drop-shadow-sm">{item.trimLevel}</span>
                               </div>
                             )}
                           </div>
@@ -1133,38 +1141,38 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           </Badge>
                         </div>
                       </CardHeader>
-                      <CardContent className="pt-0">
+                      <CardContent className="pt-0 relative z-10">
                         <div className="space-y-3 text-sm">
                           {/* Row 1: Engine Capacity, Year, Exterior Color */}
                           <div className="grid grid-cols-3 gap-2">
                             <div className="flex items-center gap-1">
-                              <img src="/car-engine.svg" alt="Engine" className="w-6 h-6" />
-                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.engineCapacity}</span>
+                              <img src="/car-engine.svg" alt="Engine" className="w-6 h-6 filter drop-shadow-sm" />
+                              <span className="font-semibold font-latin text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.engineCapacity}</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <img src="/year.svg" alt="Year" className="w-5 h-5" />
-                              <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.year}</span>
+                              <img src="/year.svg" alt="Year" className="w-5 h-5 filter drop-shadow-sm" />
+                              <span className="font-semibold font-latin text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.year}</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <img src="/exterior-color.svg" alt="Exterior Color" className="w-6 h-6" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.exteriorColor}</span>
+                              <img src="/exterior-color.svg" alt="Exterior Color" className="w-6 h-6 filter drop-shadow-sm" />
+                              <span className="font-semibold text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.exteriorColor}</span>
                             </div>
                           </div>
                           
                           {/* Row 2: Interior Color, Import Type, Ownership Type */}
                           <div className="grid grid-cols-3 gap-2">
                             <div className="flex items-center gap-1">
-                              <img src="/interior-color.svg" alt="Interior Color" className="w-6 h-6" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.interiorColor}</span>
+                              <img src="/interior-color.svg" alt="Interior Color" className="w-6 h-6 filter drop-shadow-sm" />
+                              <span className="font-semibold text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.interiorColor}</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-6 h-6" />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.importType}</span>
+                              <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-6 h-6 filter drop-shadow-sm" />
+                              <span className="font-semibold text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.importType}</span>
                             </div>
                             {item.ownershipType && (
                               <div className="flex items-center gap-1">
-                                <img src="/logos/ownerchip.svg" alt="Ownership Type" className="w-6 h-6" />
-                                <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.ownershipType}</span>
+                                <img src="/logos/ownerchip.svg" alt="Ownership Type" className="w-6 h-6 filter drop-shadow-sm" />
+                                <span className="font-semibold text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.ownershipType}</span>
                               </div>
                             )}
                           </div>
@@ -1172,13 +1180,13 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 3: Location and Chassis Number */}
                           <div className="grid grid-cols-3 gap-2">
                             <div className="flex items-center gap-1">
-                              <img src="/location.svg" alt="Location" className="w-6 h-6" style={{filter: 'brightness(0) saturate(100%) invert(25%) sepia(78%) saturate(1058%) hue-rotate(180deg) brightness(96%) contrast(96%)'}} />
-                              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{item.location}</span>
+                              <img src="/location.svg" alt="Location" className="w-6 h-6 filter drop-shadow-sm" style={{filter: 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%) drop-shadow(0 1px 2px rgba(0,0,0,0.3))'}} />
+                              <span className="font-semibold text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.location}</span>
                             </div>
                             {item.chassisNumber && (
                               <div className="flex items-center gap-2">
-                                <span className="font-bold text-xs" style={{color: '#00627F'}}>VIN:</span>
-                                <span className="font-medium font-latin text-slate-700 dark:text-slate-300 text-xs">{item.chassisNumber}</span>
+                                <span className="font-bold text-xs text-white drop-shadow-sm">VIN:</span>
+                                <span className="font-medium font-latin text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.chassisNumber}</span>
                               </div>
                             )}
                             <div></div> {/* Empty cell for alignment */}
@@ -1188,17 +1196,17 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           
                           {/* Price and Mileage Row */}
                           {(item.price || ((item.importType === "مستعمل" || item.importType === "مستعمل شخصي") && (item as any).mileage)) && (
-                            <div className="flex justify-between items-center py-2 border-t border-slate-200 dark:border-slate-700 mt-3">
+                            <div className="flex justify-between items-center py-2 border-t border-white/20 dark:border-slate-500/20 mt-3">
                               {item.price && (
                                 <div className="flex items-center gap-1">
-                                  <span className="text-slate-600 dark:text-slate-400 font-medium text-sm">السعر:</span>
-                                  <span className="font-bold font-latin text-teal-700 dark:text-teal-400 text-sm">{item.price}</span>
+                                  <span className="text-white/80 dark:text-slate-300 font-medium text-sm drop-shadow-sm">السعر:</span>
+                                  <span className="font-bold font-latin text-yellow-300 dark:text-yellow-300 text-sm drop-shadow-sm">{item.price}</span>
                                 </div>
                               )}
                               {(item.importType === "مستعمل" || item.importType === "مستعمل شخصي") && (item as any).mileage && (
                                 <div className="flex items-center gap-1">
-                                  <span className="text-slate-600 dark:text-slate-400 font-medium text-sm">ممشي:</span>
-                                  <span className="font-bold text-orange-600 dark:text-orange-400 text-sm">{(item as any).mileage?.toLocaleString()} كم</span>
+                                  <span className="text-white/80 dark:text-slate-300 font-medium text-sm drop-shadow-sm">ممشي:</span>
+                                  <span className="font-bold text-orange-300 dark:text-orange-300 text-sm drop-shadow-sm">{(item as any).mileage?.toLocaleString()} كم</span>
                                 </div>
                               )}
                             </div>
