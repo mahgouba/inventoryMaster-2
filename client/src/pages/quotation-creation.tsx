@@ -3520,9 +3520,6 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   setVehicleChassisNumber(editingVehicleData.chassisNumber);
                   setVehiclePrice(editingVehicleData.price);
                   
-                  // Update vehicle specifications automatically from database
-                  setVehicleSpecs(editingVehicleSpecs);
-                  
                   setVehicleEditOpen(false);
                   
                   toast({
