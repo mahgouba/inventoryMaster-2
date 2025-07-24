@@ -1445,103 +1445,6 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
             </div>
             
             <div className="flex items-center space-x-2 space-x-reverse flex-wrap gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowTermsDialog(true)}
-                className="border-orange-500 text-orange-600 hover:bg-orange-50"
-              >
-                <Settings2 size={16} className="ml-2" />
-                شروط
-              </Button>
-              
-              {/* Toggle Switch for Stamp Visibility - RTL Design */}
-              <div className="flex items-center gap-3 border border-red-500 rounded-lg px-4 py-3 bg-white">
-                <div className="relative">
-                  <div 
-                    className={`w-11 h-6 rounded-full cursor-pointer transition-all duration-300 ${
-                      showStamp ? 'bg-red-500' : 'bg-red-200'
-                    }`}
-                    onClick={() => {
-                      const newValue = !showStamp;
-                      setShowStamp(newValue);
-                      toast({
-                        title: newValue ? "تم إظهار الختم" : "تم إخفاء الختم",
-                        description: newValue ? "سيظهر ختم الشركة في العرض" : "لن يظهر ختم الشركة في العرض",
-                      });
-                    }}
-                  >
-                    <div 
-                      className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ease-in-out ${
-                        showStamp ? 'right-1' : 'right-6'
-                      }`}
-                    />
-                  </div>
-                </div>
-                <Label className="text-sm font-medium text-red-600 cursor-pointer select-none">
-                  {showStamp ? "إخفاء الختم" : "إظهار الختم"}
-                </Label>
-              </div>
-              
-
-              
-              <Button
-                variant="outline"
-                onClick={() => setShowWhatsappDialog(true)}
-                className="border-emerald-500 text-emerald-600 hover:bg-emerald-50"
-              >
-                <MessageCircle size={16} className="ml-2" />
-                واتساب
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={handleSaveQuotation}
-                disabled={createQuotationMutation.isPending}
-                className="border-green-500 text-green-600 hover:bg-green-50"
-              >
-                <Save size={16} className="ml-2" />
-                {createQuotationMutation.isPending ? "جاري الحفظ..." : `حفظ ${isInvoiceMode ? "الفاتورة" : "العرض"}`}
-              </Button>
-              
-              {/* Toggle Switch for Invoice/Quotation Mode - RTL Design */}
-              <div className="flex items-center gap-3 border border-purple-500 rounded-lg px-4 py-3 bg-white">
-                <FileUp size={16} className="text-purple-600" />
-                <div className="relative">
-                  <div 
-                    className={`w-11 h-6 rounded-full cursor-pointer transition-all duration-300 ${
-                      isInvoiceMode ? 'bg-purple-600' : 'bg-purple-200'
-                    }`}
-                    onClick={() => {
-                      const newValue = !isInvoiceMode;
-                      setIsInvoiceMode(newValue);
-                      if (newValue) {
-                        // Generate invoice number when switching to invoice mode
-                        const newInvoiceNumber = generateInvoiceNumber();
-                        setInvoiceNumber(newInvoiceNumber);
-                        toast({
-                          title: "تم التبديل إلى وضع الفاتورة",
-                          description: `رقم الفاتورة: ${newInvoiceNumber}`,
-                        });
-                      } else {
-                        toast({
-                          title: "تم التبديل إلى وضع عرض السعر",
-                          description: "يمكنك الآن إنشاء عرض سعر",
-                        });
-                      }
-                    }}
-                  >
-                    <div 
-                      className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ease-in-out ${
-                        isInvoiceMode ? 'right-1' : 'right-6'
-                      }`}
-                    />
-                  </div>
-                </div>
-                <Label className="text-sm font-medium text-purple-600 cursor-pointer select-none">
-                  {isInvoiceMode ? "فاتورة" : "عرض سعر"}
-                </Label>
-              </div>
-              
               <Link href="/quotation-management">
                 <Button
                   variant="outline"
@@ -2137,6 +2040,104 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 <CardTitle>إدارة بيانات العرض</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                {/* Terms and Conditions Button */}
+                <Button
+                  variant="outline"
+                  onClick={() => setShowTermsDialog(true)}
+                  className="w-full border-orange-500 text-orange-600 hover:bg-orange-50"
+                >
+                  <Settings2 size={16} className="ml-2" />
+                  شروط وأحكام
+                </Button>
+                
+                {/* Save Button */}
+                <Button
+                  variant="outline"
+                  onClick={handleSaveQuotation}
+                  disabled={createQuotationMutation.isPending}
+                  className="w-full border-green-500 text-green-600 hover:bg-green-50"
+                >
+                  <Save size={16} className="ml-2" />
+                  {createQuotationMutation.isPending ? "جاري الحفظ..." : `حفظ ${isInvoiceMode ? "الفاتورة" : "العرض"}`}
+                </Button>
+                
+                {/* WhatsApp Share Button */}
+                <Button
+                  variant="outline"
+                  onClick={() => setShowWhatsappDialog(true)}
+                  className="w-full border-emerald-500 text-emerald-600 hover:bg-emerald-50"
+                >
+                  <MessageCircle size={16} className="ml-2" />
+                  مشاركة واتساب
+                </Button>
+                
+                {/* Toggle Switch for Stamp Visibility - RTL Design */}
+                <div className="flex items-center gap-3 border border-red-500 rounded-lg px-4 py-3 bg-white">
+                  <div className="relative">
+                    <div 
+                      className={`w-11 h-6 rounded-full cursor-pointer transition-all duration-300 ${
+                        showStamp ? 'bg-red-500' : 'bg-red-200'
+                      }`}
+                      onClick={() => {
+                        const newValue = !showStamp;
+                        setShowStamp(newValue);
+                        toast({
+                          title: newValue ? "تم إظهار الختم" : "تم إخفاء الختم",
+                          description: newValue ? "سيظهر ختم الشركة في العرض" : "لن يظهر ختم الشركة في العرض",
+                        });
+                      }}
+                    >
+                      <div 
+                        className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ease-in-out ${
+                          showStamp ? 'right-1' : 'right-6'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                  <Label className="text-sm font-medium text-red-600 cursor-pointer select-none">
+                    {showStamp ? "إخفاء الختم" : "إظهار الختم"}
+                  </Label>
+                </div>
+                
+                {/* Toggle Switch for Invoice/Quotation Mode - RTL Design */}
+                <div className="flex items-center gap-3 border border-purple-500 rounded-lg px-4 py-3 bg-white">
+                  <FileUp size={16} className="text-purple-600" />
+                  <div className="relative">
+                    <div 
+                      className={`w-11 h-6 rounded-full cursor-pointer transition-all duration-300 ${
+                        isInvoiceMode ? 'bg-purple-600' : 'bg-purple-200'
+                      }`}
+                      onClick={() => {
+                        const newValue = !isInvoiceMode;
+                        setIsInvoiceMode(newValue);
+                        if (newValue) {
+                          // Generate invoice number when switching to invoice mode
+                          const newInvoiceNumber = generateInvoiceNumber();
+                          setInvoiceNumber(newInvoiceNumber);
+                          toast({
+                            title: "تم التبديل إلى وضع الفاتورة",
+                            description: `رقم الفاتورة: ${newInvoiceNumber}`,
+                          });
+                        } else {
+                          toast({
+                            title: "تم التبديل إلى وضع عرض السعر",
+                            description: "يمكنك الآن إنشاء عرض سعر",
+                          });
+                        }
+                      }}
+                    >
+                      <div 
+                        className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ease-in-out ${
+                          isInvoiceMode ? 'right-1' : 'right-6'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                  <Label className="text-sm font-medium text-purple-600 cursor-pointer select-none">
+                    {isInvoiceMode ? "فاتورة" : "عرض سعر"}
+                  </Label>
+                </div>
+                
                 <Button 
                   onClick={handleDownloadPDF}
                   className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
