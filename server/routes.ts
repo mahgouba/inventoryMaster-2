@@ -2502,6 +2502,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all available engine capacities from cars database
+  app.get("/api/cars/engines", async (req, res) => {
+    try {
+      const carsData = JSON.parse(readFileSync(join(process.cwd(), "cars.json"), "utf8"));
+      const engines = new Set<string>();
+      
+      // Extract all unique engine capacities from cars data
+      carsData.forEach((brand: any) => {
+        brand.models.forEach((model: any) => {
+          model.trims.forEach((trim: any) => {
+            if (trim.engine) {
+              engines.add(trim.engine);
+            }
+          });
+        });
+      });
+      
+      // Add common engine capacities
+      const commonEngines = ["V6", "V8", "2.0T", "3.0T", "4.0T", "5.0T", "2.5L", "3.5L", "4.0L", "5.0L"];
+      commonEngines.forEach(engine => engines.add(engine));
+      
+      const engineArray = Array.from(engines).map(engine => ({
+        engine_ar: engine,
+        engine: engine
+      }));
+      
+      res.json(engineArray);
+    } catch (error) {
+      console.error("Error reading engines data:", error);
+      res.status(500).json({ message: "Failed to load engines data" });
+    }
+  });
+
   // Get all available vehicles from cars.json for quotation selection
   app.get("/api/cars/all-vehicles", async (req, res) => {
     try {
