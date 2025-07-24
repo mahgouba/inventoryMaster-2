@@ -1158,22 +1158,23 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             <div></div> {/* Empty cell for alignment */}
                           </div>
                           
-                          {/* Mileage Row - Only show for used vehicles */}
-                          {(item.importType === "مستعمل" || item.importType === "مستعمل شخصي") && (item as any).mileage && (
-                            <div className="grid grid-cols-3 gap-2">
-                              <div className="flex items-center gap-1">
-                                <span className="text-orange-600 font-bold text-xs">🛣️</span>
-                                <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">ممشي: {(item as any).mileage?.toLocaleString()} كم</span>
-                              </div>
-                              <div></div> {/* Empty cell for alignment */}
-                              <div></div> {/* Empty cell for alignment */}
-                            </div>
-                          )}
+
                           
-                          {item.price && (
-                            <div className="flex justify-between py-2 border-t border-slate-200 dark:border-slate-700 mt-3">
-                              <span className="text-slate-600 dark:text-slate-400 font-medium">السعر:</span>
-                              <span className="font-bold font-latin text-teal-700 dark:text-teal-400">{item.price}</span>
+                          {/* Price and Mileage Row */}
+                          {(item.price || ((item.importType === "مستعمل" || item.importType === "مستعمل شخصي") && (item as any).mileage)) && (
+                            <div className="flex justify-between items-center py-2 border-t border-slate-200 dark:border-slate-700 mt-3">
+                              {item.price && (
+                                <div className="flex items-center gap-1">
+                                  <span className="text-slate-600 dark:text-slate-400 font-medium text-sm">السعر:</span>
+                                  <span className="font-bold font-latin text-teal-700 dark:text-teal-400 text-sm">{item.price}</span>
+                                </div>
+                              )}
+                              {(item.importType === "مستعمل" || item.importType === "مستعمل شخصي") && (item as any).mileage && (
+                                <div className="flex items-center gap-1">
+                                  <span className="text-slate-600 dark:text-slate-400 font-medium text-sm">ممشي:</span>
+                                  <span className="font-bold text-orange-600 dark:text-orange-400 text-sm">{(item as any).mileage?.toLocaleString()} كم</span>
+                                </div>
+                              )}
                             </div>
                           )}
 
