@@ -203,17 +203,23 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Added sold cars count badge next to "إظهار السيارات المباعة" button for admin users
 - ✅ Enhanced inventory statistics to show sold count only where appropriate (next to show sold cars button)
 
-### Replit Environment Migration Completed (July 24, 2025)
+### Latest Replit Environment Migration (July 24, 2025)
 - ✅ Successfully completed migration from Replit Agent to standard Replit environment
 - ✅ All required packages installed and verified working (Node.js 20, tsx, all dependencies)
 - ✅ Application running smoothly with Express server on port 5000
 - ✅ Using in-memory storage for development compatibility
 - ✅ All functionality verified - inventory system, appearance management, and complete feature set operational
-- ✅ Fixed card view icon sizes: reduced year icon from w-6 h-6 to w-5 h-5 per user request
-- ✅ Enhanced import type icon logic: "مستعمل شخصي" now correctly displays secondhand icon (/import-type-secondhand.svg)
-- ✅ Fixed icon path issue: corrected secondhand icon path from /logos/ to root public directory
-- ✅ Migration checklist completed with all items marked as done
-- ✅ Project ready for continued development and deployment
+- ✅ Enhanced company logo animation: made animations slower and changed background color to #00627F per user request
+  - Changed bounce animation from 1s to 3s duration for uploaded company logos
+  - Changed spin animation from default to 4s duration for default logo
+  - Replaced gradient background with solid #00627F color
+  - Updated both inventory and card-view pages consistently
+- ✅ Added bank visibility toggle feature in bank management page per user request
+  - Added eye/eye-off icon buttons next to edit and delete buttons for each bank
+  - Banks can be hidden from display pages while remaining in management interface
+  - Hidden banks show with reduced opacity and dashed borders for visual distinction
+  - Toast notifications confirm hide/show actions
+  - Separate counters for visible vs all banks in statistics
 - ✅ Enhanced quotation to invoice conversion: hidden "صالح حتى" date in invoice mode and replaced customer title row with "بناءً على طلبكم رقم:" format
 - ✅ Reorganized quotation creation interface: moved all management buttons from header to "إدارة بيانات العرض" section for better organization
 - ✅ Added comprehensive Saudi bank data integration with 10 major banks including Al Rajhi, SNB, Bank Al Jazira, Bank Al Bilad, ANB, Emirates NBD, Riyad Bank, Alinma Bank, SAIB, and BSF

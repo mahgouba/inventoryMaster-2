@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Edit, Plus, Building2, User, Landmark } from "lucide-react";
+import { Trash2, Edit, Plus, Building2, User, Landmark, Eye, EyeOff } from "lucide-react";
 import type { Bank, InsertBank } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -20,6 +20,7 @@ export default function BankManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBank, setEditingBank] = useState<Bank | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [hiddenBanks, setHiddenBanks] = useState<Set<number>>(new Set());
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -170,9 +171,34 @@ export default function BankManagement() {
     }
   };
 
+  const toggleBankVisibility = (bankId: number) => {
+    setHiddenBanks(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(bankId)) {
+        newSet.delete(bankId);
+        toast({
+          title: "تم إظهار البنك",
+          description: "أصبح البنك مرئياً في الصفحة",
+        });
+      } else {
+        newSet.add(bankId);
+        toast({
+          title: "تم إخفاء البنك",
+          description: "تم إخفاء البنك من صفحة العرض",
+        });
+      }
+      return newSet;
+    });
+  };
+
   const activeBanks = banks.filter(bank => bank.isActive);
-  const personalBanks = activeBanks.filter(bank => bank.type === "شخصي");
-  const companyBanks = activeBanks.filter(bank => bank.type === "شركة");
+  const visibleBanks = activeBanks.filter(bank => !hiddenBanks.has(bank.id));
+  const personalBanks = visibleBanks.filter(bank => bank.type === "شخصي");
+  const companyBanks = visibleBanks.filter(bank => bank.type === "شركة");
+  
+  // For management view - show all banks including hidden ones
+  const allPersonalBanks = activeBanks.filter(bank => bank.type === "شخصي");
+  const allCompanyBanks = activeBanks.filter(bank => bank.type === "شركة");
 
   return (
     <div className="container mx-auto p-6 space-y-6" dir="rtl">
@@ -357,13 +383,13 @@ export default function BankManagement() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-blue-600" />
-                بنوك الشركات ({companyBanks.length})
+                بنوك الشركات ({allCompanyBanks.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {companyBanks.map((bank) => (
-                  <Card key={bank.id} className="border border-blue-200">
+                {allCompanyBanks.map((bank) => (
+                  <Card key={bank.id} className={`border border-blue-200 ${hiddenBanks.has(bank.id) ? 'opacity-50 border-dashed' : ''}`}>
                     <CardContent className="p-4">
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
@@ -375,6 +401,18 @@ export default function BankManagement() {
                             />
                           )}
                           <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => toggleBankVisibility(bank.id)}
+                              title={hiddenBanks.has(bank.id) ? "إظهار البنك" : "إخفاء البنك"}
+                            >
+                              {hiddenBanks.has(bank.id) ? (
+                                <EyeOff className="w-3 h-3" />
+                              ) : (
+                                <Eye className="w-3 h-3" />
+                              )}
+                            </Button>
                             <Button
                               size="sm"
                               variant="outline"
@@ -411,7 +449,7 @@ export default function BankManagement() {
                 ))}
               </div>
               
-              {companyBanks.length === 0 && (
+              {allCompanyBanks.length === 0 && (
                 <Alert>
                   <AlertDescription>
                     لا توجد بنوك شركات مضافة حالياً
@@ -426,13 +464,13 @@ export default function BankManagement() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="w-5 h-5 text-green-600" />
-                البنوك الشخصية ({personalBanks.length})
+                البنوك الشخصية ({allPersonalBanks.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {personalBanks.map((bank) => (
-                  <Card key={bank.id} className="border border-green-200">
+                {allPersonalBanks.map((bank) => (
+                  <Card key={bank.id} className={`border border-green-200 ${hiddenBanks.has(bank.id) ? 'opacity-50 border-dashed' : ''}`}>
                     <CardContent className="p-4">
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
@@ -444,6 +482,18 @@ export default function BankManagement() {
                             />
                           )}
                           <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => toggleBankVisibility(bank.id)}
+                              title={hiddenBanks.has(bank.id) ? "إظهار البنك" : "إخفاء البنك"}
+                            >
+                              {hiddenBanks.has(bank.id) ? (
+                                <EyeOff className="w-3 h-3" />
+                              ) : (
+                                <Eye className="w-3 h-3" />
+                              )}
+                            </Button>
                             <Button
                               size="sm"
                               variant="outline"
@@ -480,7 +530,7 @@ export default function BankManagement() {
                 ))}
               </div>
               
-              {personalBanks.length === 0 && (
+              {allPersonalBanks.length === 0 && (
                 <Alert>
                   <AlertDescription>
                     لا توجد بنوك شخصية مضافة حالياً
