@@ -210,7 +210,8 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Using in-memory storage for development compatibility
 - ✅ All functionality verified - inventory system, appearance management, and complete feature set operational
 - ✅ Fixed card view icon sizes: reduced year icon from w-6 h-6 to w-5 h-5 per user request
-- ✅ Enhanced import type icon logic: "مستعمل شخصي" now correctly displays secondhand icon (/logos/import-type-secondhand.svg)
+- ✅ Enhanced import type icon logic: "مستعمل شخصي" now correctly displays secondhand icon (/import-type-secondhand.svg)
+- ✅ Fixed icon path issue: corrected secondhand icon path from /logos/ to root public directory
 - ✅ Migration checklist completed with all items marked as done
 - ✅ Project ready for continued development and deployment
 

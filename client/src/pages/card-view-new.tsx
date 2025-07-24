@@ -138,7 +138,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
   // Function to get import type icon based on data
   const getImportTypeIcon = (importType: string) => {
-    if (importType.includes("مستعمل")) return "/logos/import-type-secondhand.svg";
+    if (importType.includes("مستعمل")) return "/import-type-secondhand.svg";
     if (importType.includes("شركة")) return "/import-type-company.svg";
     if (importType.includes("شخصي")) return "/import-type-personal.svg"; 
     return "/import-type.svg"; // fallback
