@@ -281,6 +281,7 @@ export class MemStorage implements IStorage {
     
     // Initialize with some sample data
     this.initializeInventoryData();
+    this.initializeBankData();
   }
 
   // Add missing implementations for MemStorage (placeholder methods)
@@ -700,6 +701,115 @@ export class MemStorage implements IStorage {
 
     sampleItems.forEach(item => {
       this.createInventoryItem(item);
+    });
+  }
+
+  private initializeBankData() {
+    const sampleBanks: InsertBank[] = [
+      {
+        name: 'مصرف الراجحي',
+        nameEn: 'Al Rajhi Bank',
+        accountName: 'شركة البريمي للسيارات',
+        accountNumber: '575608010000904',
+        iban: 'SA8080000575608010000904',
+        type: 'شركة',
+        isActive: true,
+        logo: '/public/alrajhi-logo.svg'
+      },
+      {
+        name: 'البنك الأهلي السعودي',
+        nameEn: 'Saudi National Bank',
+        accountName: 'شركة البريمي للسيارات',
+        accountNumber: '25268400000102',
+        iban: 'SA5110000025268400000102',
+        type: 'شركة',
+        isActive: true,
+        logo: '/public/snb-logo.svg'
+      },
+      {
+        name: 'بنك الجزيرة',
+        nameEn: 'Bank Al Jazira',
+        accountName: 'شركة البريمي للسيارات',
+        accountNumber: '030495028555001',
+        iban: 'SA7060100030495028555001',
+        type: 'شركة',
+        isActive: true,
+        logo: '/public/aljazira-logo.svg'
+      },
+      {
+        name: 'بنك البلاد',
+        nameEn: 'Banque Saudi Fransi',
+        accountName: 'شركة البريمي للسيارات',
+        accountNumber: '448888888780008',
+        iban: 'SA1315000448888888780008',
+        type: 'شركة',
+        isActive: true,
+        logo: '/public/albilad-logo.svg'
+      },
+      {
+        name: 'البنك العربي الوطني',
+        nameEn: 'Arab National Bank',
+        accountName: 'شركة البريمي للسيارات',
+        accountNumber: '0108095322110019',
+        iban: '',
+        type: 'شركة',
+        isActive: true,
+        logo: '/public/anb-logo.svg'
+      },
+      {
+        name: 'بنك الإمارات دبي الوطني',
+        nameEn: 'Emirates NBD Bank',
+        accountName: 'شركة البريمي للسيارات',
+        accountNumber: '1016050175301',
+        iban: 'SA4095000001016050175301',
+        type: 'شركة',
+        isActive: true,
+        logo: '/public/emiratesnbd-logo.svg'
+      },
+      {
+        name: 'بنك الرياض',
+        nameEn: 'Riyad Bank',
+        accountName: 'شركة البريمي للسيارات',
+        accountNumber: '2383212779940',
+        iban: 'SA1420000002383212779940',
+        type: 'شركة',
+        isActive: true,
+        logo: '/public/riyadbank-logo.svg'
+      },
+      {
+        name: 'مصرف الإنماء',
+        nameEn: 'Alinma Bank',
+        accountName: 'شركة البريمي للسيارات',
+        accountNumber: '68201863704000',
+        iban: 'SA9605000068201863704000',
+        type: 'شركة',
+        isActive: true,
+        logo: '/public/alinma-logo.svg'
+      },
+      {
+        name: 'البنك السعودي الأول',
+        nameEn: 'The Saudi Investment Bank',
+        accountName: 'شركة معرض البريمي للسيارات',
+        accountNumber: '822173787001',
+        iban: 'SA6445000000822173787001',
+        type: 'شركة',
+        isActive: true,
+        logo: '/public/saib-logo.svg'
+      },
+      {
+        name: 'البنك السعودي الفرنسي',
+        nameEn: 'Banque Saudi Fransi',
+        accountName: 'شركة البريمي للسيارات',
+        accountNumber: '97844900167',
+        iban: 'SA5655000000097844900167',
+        type: 'شركة',
+        isActive: true,
+        logo: '/public/bsf-logo.svg'
+      }
+    ];
+
+    sampleBanks.forEach(bank => {
+      this.createBank(bank);
     });
   }
 

@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Account Grid</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body class="bg-[#00627f] min-h-screen transition-colors duration-200">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Logo Section -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex-1"></div>
+            <div class="flex-1 flex justify-center">
+                <img src="./images/albarimi.png" alt="Bank Logo" class="w-35 h-35 object-contain">
+            </div>
+            <div class="flex-1 flex justify-end"></div>
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
+            
+            <!-- 1. Al Rajhi Bank - #00627F -->
+            <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="flex flex-col items-center space-y-3">
+                    <div class="w-full flex justify-between items-center cursor-pointer" onclick="toggleDropdown(this)">
+                        <img src="./images/rajhi.png" alt="مصرف الراجحي" class="h-30 w-30 object-contain">
+                        <i data-lucide="chevron-down" class="w-4 h-4 transform transition-transform duration-200" style="color: #00627F;"></i>
+                    </div>
+                    <div class="w-full space-y-2 hidden dropdown-content">
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">اسم الحساب</span>
+                            <button onclick="copyToClipboard('شركة البريمي للسيارات')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">شركة البريمي للسيارات</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">رقم الحساب</span>
+                            <button onclick="copyToClipboard('575608010000904')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">575608010000904</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">الآيبان</span>
+                            <button onclick="copyToClipboard('SA8080000575608010000904')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm break-all" style="color: #00627F;">SA8080000575608010000904</p>
+
+                        <h3 class="text-lg font-bold text-center mt-3" style="color: #00627F;">مصرف الراجحي</h3>
+                    </div>
+                </div>
+                <!-- زر مشاركة مصرف الراجحي -->
+<button onclick="shareRajhi()" class="w-full mt-3 bg-[#00627F] text-[#00627F] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#005266] active:scale-95 transition duration-300 animate-pulse hover:animate-none">
+    <i data-lucide="share-2" class="w-4 h-4"></i>
+    <span>مشاركة</span>
+</button>
+
+            </div>
+
+            <!-- 2. NCB Bank - #004433 -->
+            <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="flex flex-col items-center space-y-3">
+                    <div class="w-full flex justify-between items-center cursor-pointer" onclick="toggleDropdown(this)">
+                        <img src="./images/snb.png" alt="البنك الأهلي السعودي" class="h-30 w-30 object-contain">
+                        <i data-lucide="chevron-down" class="w-4 h-4 transform transition-transform duration-200" style="color: #004433;"></i>
+                    </div>
+                    <div class="w-full space-y-2 hidden dropdown-content">
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">اسم الحساب</span>
+                            <button onclick="copyToClipboard('شركة البريمي للسيارات')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">شركة البريمي للسيارات</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">رقم الحساب</span>
+                            <button onclick="copyToClipboard('25268400000102')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #004433;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">25268400000102</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">الآيبان</span>
+                            <button onclick="copyToClipboard('SA5110000025268400000102')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm break-all" style="color: #00627F;">SA5110000025268400000102</p>
+
+                        <h3 class="text-lg font-bold text-center mt-3" style="color: #00627F;">البنك الأهلي السعودي</h3>
+                    </div>
+                </div>
+                <!-- زر مشاركة البنك الأهلي -->
+<button onclick="shareAhli()" class="w-full mt-3 bg-[#00627F] text-[#00627F] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#005266] active:scale-95 transition duration-300 animate-pulse hover:animate-none">
+    <i data-lucide="share-2" class="w-4 h-4"></i>
+    <span>مشاركة</span>
+</button>
+            </div>
+
+            <!-- 3. Riyad Bank - #00627F -->
+            <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="flex flex-col items-center space-y-3">
+                    <div class="w-full flex justify-between items-center cursor-pointer" onclick="toggleDropdown(this)">
+                        <img src="./images/riyad.png" alt="بنك الرياض" class="h-30 w-30 object-contain">
+                        <i data-lucide="chevron-down" class="w-4 h-4 transform transition-transform duration-200" style="color: #00627F;"></i>
+                    </div>
+                    <div class="w-full space-y-2 hidden dropdown-content">
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">اسم الحساب</span>
+                            <button onclick="copyToClipboard('شركة البريمي للسيارات')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">شركة البريمي للسيارات</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">رقم الحساب</span>
+                            <button onclick="copyToClipboard('2383212779940')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">2383212779940</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">الآيبان</span>
+                            <button onclick="copyToClipboard('SA1420000002383212779940')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm break-all" style="color: #00627F;">SA1420000002383212779940</p>
+
+                        <h3 class="text-lg font-bold text-center mt-3" style="color: #00627F;">بنك الرياض</h3>
+                    </div>
+                </div>
+                <!-- زر مشاركة بنك الرياض -->
+<button onclick="shareRiyad()" class="w-full mt-3 bg-[#00627F] text-[#00627F] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#005266] active:scale-95 transition duration-300 animate-pulse hover:animate-none">
+    <i data-lucide="share-2" class="w-4 h-4"></i>
+    <span>مشاركة</span>
+</button>
+            </div>
+
+            <!-- 4. Bank Albilad - #00627F -->
+            <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="flex flex-col items-center space-y-3">
+                    <div class="w-full flex justify-between items-center cursor-pointer" onclick="toggleDropdown(this)">
+                        <img src="./images/albilad.png" alt="بنك البلاد" class="h-30 w-30 object-contain">
+                        <i data-lucide="chevron-down" class="w-4 h-4 transform transition-transform duration-200" style="color: #00627F;"></i>
+                    </div>
+                    <div class="w-full space-y-2 hidden dropdown-content">
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">اسم الحساب</span>
+                            <button onclick="copyToClipboard('شركة البريمي للسيارات')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">شركة البريمي للسيارات</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">رقم الحساب</span>
+                            <button onclick="copyToClipboard('448888888780008')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">448888888780008</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">الآيبان</span>
+                            <button onclick="copyToClipboard('SA1315000448888888780008')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm break-all" style="color: #00627F;">SA1315000448888888780008</p>
+
+                        <h3 class="text-lg font-bold text-center mt-3" style="color: #00627F;">بنك البلاد</h3>
+                    </div>
+                </div>
+                <!-- زر مشاركة بنك البلاد -->
+<button onclick="shareBilad()" class="w-full mt-3 bg-[#00627F] text-[#00627F] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#005266] active:scale-95 transition duration-300 animate-pulse hover:animate-none">
+    <i data-lucide="share-2" class="w-4 h-4"></i>
+    <span>مشاركة</span>
+</button>
+            </div>
+
+            <!-- 5. Alinma Bank - #00627F -->
+            <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="flex flex-col items-center space-y-3">
+                    <div class="w-full flex justify-between items-center cursor-pointer" onclick="toggleDropdown(this)">
+                        <img src="./images/alinma.png" alt="مصرف الإنماء" class="h-30 w-30 object-contain">
+                        <i data-lucide="chevron-down" class="w-4 h-4 transform transition-transform duration-200" style="color: #00627F;"></i>
+                    </div>
+                    <div class="w-full space-y-2 hidden dropdown-content">
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">اسم الحساب</span>
+                            <button onclick="copyToClipboard('شركة البريمي للسيارات')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">شركة البريمي للسيارات</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">رقم الحساب</span>
+                            <button onclick="copyToClipboard('68201863704000')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">68201863704000</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">الآيبان</span>
+                            <button onclick="copyToClipboard('SA9605000068201863704000')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm break-all" style="color: #00627F;">SA9605000068201863704000</p>
+
+                        <h3 class="text-lg font-bold text-center mt-3" style="color: #00627F;">مصرف الإنماء</h3>
+                    </div>
+                </div>
+                <!-- زر مشاركة مصرف الإنماء -->
+<button onclick="shareInma()" class="w-full mt-3 bg-[#00627F] text-[#00627F] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#005266] active:scale-95 transition duration-300 animate-pulse hover:animate-none">
+    <i data-lucide="share-2" class="w-4 h-4"></i>
+    <span>مشاركة</span>
+</button>
+            </div>
+
+            <!-- 6. Saudi French Bank - #00627F -->
+            <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="flex flex-col items-center space-y-3">
+                    <div class="w-full flex justify-between items-center cursor-pointer" onclick="toggleDropdown(this)">
+                        <img src="./images/french.png" alt="البنك السعودي الفرنسي" class="h-30 w-30 object-contain">
+                        <i data-lucide="chevron-down" class="w-4 h-4 transform transition-transform duration-200" style="color: #00627F;"></i>
+                    </div>
+                    <div class="w-full space-y-2 hidden dropdown-content">
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">اسم الحساب</span>
+                            <button onclick="copyToClipboard('شركة البريمي للسيارات')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">شركة البريمي للسيارات</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">رقم الحساب</span>
+                            <button onclick="copyToClipboard('97844900167')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">97844900167</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">الآيبان</span>
+                            <button onclick="copyToClipboard('SA5655000000097844900167')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm break-all" style="color: #00627F;">SA5655000000097844900167</p>
+
+                        <h3 class="text-lg font-bold text-center mt-3" style="color: #00627F;">البنك السعودي الفرنسي</h3>
+                    </div>
+                </div>
+                <!-- زر مشاركة البنك الفرنسي -->
+<button onclick="shareFransi()" class="w-full mt-3 bg-[#00627F] text-[#00627F] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#005266] active:scale-95 transition duration-300 animate-pulse hover:animate-none">
+    <i data-lucide="share-2" class="w-4 h-4"></i>
+    <span>مشاركة</span>
+</button>
+            </div>
+
+            <!-- 7. Al Jazira Bank - #00627F -->
+            <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="flex flex-col items-center space-y-3">
+                    <div class="w-full flex justify-between items-center cursor-pointer" onclick="toggleDropdown(this)">
+                        <img src="./images/jazira.png" alt="بنك الجزيرة" class="h-30 w-30 object-contain">
+                        <i data-lucide="chevron-down" class="w-4 h-4 transform transition-transform duration-200" style="color: #00627F;"></i>
+                    </div>
+                    <div class="w-full space-y-2 hidden dropdown-content">
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">اسم الحساب</span>
+                            <button onclick="copyToClipboard('شركة البريمي للسيارات')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">شركة البريمي للسيارات</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">رقم الحساب</span>
+                            <button onclick="copyToClipboard('030495028555001')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">030495028555001</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">الآيبان</span>
+                            <button onclick="copyToClipboard('SA7060100030495028555001')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm break-all" style="color: #00627F;">SA7060100030495028555001</p>
+
+                        <h3 class="text-lg font-bold text-center mt-3" style="color: #00627F;">بنك الجزيرة</h3>
+                    </div>
+                </div>
+                <!-- زر مشاركة بنك الجزيرة -->
+<button onclick="shareJazira()" class="w-full mt-3 bg-[#00627F] text-[#00627F] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#005266] active:scale-95 transition duration-300 animate-pulse hover:animate-none">
+    <i data-lucide="share-2" class="w-4 h-4"></i>
+    <span>مشاركة</span>
+</button>
+
+            </div>
+
+            <!-- 8. ANB Bank - #00627F -->
+            <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="flex flex-col items-center space-y-3">
+                    <div class="w-full flex justify-between items-center cursor-pointer" onclick="toggleDropdown(this)">
+                        <img src="./images/anb.png" alt="البنك العربي الوطني" class="h-30 w-30 object-contain">
+                        <i data-lucide="chevron-down" class="w-4 h-4 transform transition-transform duration-200" style="color: #00627F;"></i>
+                    </div>
+                    <div class="w-full space-y-2 hidden dropdown-content">
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">اسم الحساب</span>
+                            <button onclick="copyToClipboard('شركة البريمي للسيارات')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">شركة البريمي للسيارات</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">رقم الحساب</span>
+                            <button onclick="copyToClipboard('0108095322110019')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">0108095322110019</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">الآيبان</span>
+                            <button onclick="copyToClipboard('---------------')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm break-all" style="color: #00627F;">------------</p>
+
+                        <h3 class="text-lg font-bold text-center mt-3" style="color: #00627F;">البنك العربي الوطني</h3>
+                    </div>
+                </div>
+                <!-- زر مشاركة البنك العربي الوطني -->
+<button onclick="shareAnb()" class="w-full mt-3 bg-[#00627F] text-[#00627F] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#005266] active:scale-95 transition duration-300 animate-pulse hover:animate-none">
+    <i data-lucide="share-2" class="w-4 h-4"></i>
+    <span>مشاركة</span>
+</button>
+            </div>
+
+            <!-- 9. Saudi Awwal Bank - #00627F -->
+            <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="flex flex-col items-center space-y-3">
+                    <div class="w-full flex justify-between items-center cursor-pointer" onclick="toggleDropdown(this)">
+                        <img src="./images/sab.png" alt="البنك السعودي الأول"class="h-30 w-30 object-contain">
+                        <i data-lucide="chevron-down" class="w-4 h-4 transform transition-transform duration-200" style="color: #00627F;"></i>
+                    </div>
+                    <div class="w-full space-y-2 hidden dropdown-content">
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">اسم الحساب</span>
+                            <button onclick="copyToClipboard('شركة معرض البريمي للسيارات')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">شركة معرض البريمي للسيارات</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">رقم الحساب</span>
+                            <button onclick="copyToClipboard('822173787001')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">822173787001</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">الآيبان</span>
+                            <button onclick="copyToClipboard('SA6445000000822173787001')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm break-all" style="color: #00627F;">SA6445000000822173787001</p>
+                        <h3 class="text-lg font-bold text-center mt-3" style="color: #00627F;">البنك السعودي الأول</h3>
+                    </div>
+                </div>
+                <!-- زر مشاركة البنك السعودي الأول -->
+<button onclick="shareSabb()" class="w-full mt-3 bg-[#00627F] text-[#00627F] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#005266] active:scale-95 transition duration-300 animate-pulse hover:animate-none">
+    <i data-lucide="share-2" class="w-4 h-4"></i>
+    <span>مشاركة</span>
+</button>
+            </div>
+              <!-- 9. Emirates nbd - #00627F -->
+            <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="flex flex-col items-center space-y-3">
+                    <div class="w-full flex justify-between items-center cursor-pointer" onclick="toggleDropdown(this)">
+                        <img src="./images/nbd.png" alt="بنك الإمارات دبي الوطني"class="h-30 w-30 object-contain">
+                        <i data-lucide="chevron-down" class="w-4 h-4 transform transition-transform duration-200" style="color: #00627F;"></i>
+                    </div>
+                    <div class="w-full space-y-2 hidden dropdown-content">
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">اسم الحساب</span>
+                            <button onclick="copyToClipboard('شركةالبريمي للسيارات')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">شركةالبريمي للسيارات</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">رقم الحساب</span>
+                            <button onclick="copyToClipboard('1016050175301')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm" style="color: #00627F;">1016050175301</p>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-base font-bold" style="color: #00627F;">الآيبان</span>
+                            <button onclick="copyToClipboard('SA4095000001016050175301')" class="copy-btn p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-300 flex items-center gap-1">
+                                <i data-lucide="clipboard" class="w-4 h-4" style="color: #00627F;"></i>
+                                <span class="text-xs" style="color: #00627F;">نسخ</span>
+                            </button>
+                        </div>
+                        <p class="text-sm break-all" style="color: #00627F;">SA4095000001016050175301</p>
+                        <h3 class="text-lg font-bold text-center mt-3" style="color: #00627F;">بنك الإأمارات دبي الوطني </h3>
+                    </div>
+                </div>
+                <!-- زر مشاركة بنك الإمارات دبي الوطني -->
+<button onclick="shareEmiratesNBD()" class="w-full mt-3 bg-[#00627F] text-[#00627F] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#005266] active:scale-95 transition duration-300 animate-pulse hover:animate-none">
+    <i data-lucide="share-2" class="w-4 h-4"></i>
+    <span>مشاركة</span>
+</button>
+            </div>
+            <!-- Repeat this card structure for other banks -->
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+    <style>
+        .toast-message {
+            background-color: #22c55e;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(-100%);
+            animation: toastSlideIn 0.3s forwards;
+            direction: rtl;
+        }
+
+        @keyframes toastSlideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes toastSlideOut {
+            to {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+        }
+
+        .text-accent {
+            color: #6D7074;
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Adjust container max-width for better desktop view */
+        @media (min-width: 1280px) {
+            .container {
+                max-width: 1280px;
+            }
+        }
+
+        @media (min-width: 1536px) {
+            .container {
+                max-width: 1536px;
+            }
+        }
+    </style>
+    <script>
+       function shareRajhi() {
+    const accountName = 'شركة البريمي للسيارات';
+    const accountNumber = '575608010009094';
+    const iban = 'SA8080000575608010000904';
+    const bank = 'مصرف الراجحي';
+
+    const shareData = {
+        title: 'معلومات حساب بنكي',
+        text: `اسم الحساب: ${accountName}\nرقم الحساب: ${accountNumber}\nالآيبان: ${iban}\nالبنك: ${bank}`
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(console.error);
+    } else {
+        alert("المشاركة غير مدعومة في هذا المتصفح.");
+    }
+}
+
+function shareAhli() {
+    const accountName = 'شركة البريمي للسيارات';
+    const accountNumber = '25268400000102';
+    const iban = 'SA5110000025268400000102';
+    const bank = 'البنك الأهلي السعودي';
+
+    const shareData = {
+        title: 'معلومات حساب بنكي',
+        text: `اسم الحساب: ${accountName}\nرقم الحساب: ${accountNumber}\nالآيبان: ${iban}\nالبنك: ${bank}`
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(console.error);
+    } else {
+        alert("المشاركة غير مدعومة في هذا المتصفح.");
+    }
+}
+
+function shareRiyad() {
+    const accountName = 'شركة البريمي للسيارات';
+    const accountNumber = '2383212779940';
+    const iban = 'SA1420000002383212779940';
+    const bank = 'بنك الرياض';
+
+    const shareData = {
+        title: 'معلومات حساب بنكي',
+        text: `اسم الحساب: ${accountName}\nرقم الحساب: ${accountNumber}\nالآيبان: ${iban}\nالبنك: ${bank}`
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(console.error);
+    } else {
+        alert("المشاركة غير مدعومة في هذا المتصفح.");
+    }
+}
+
+function shareBilad() {
+    const accountName = 'شركة البريمي للسيارات';
+    const accountNumber = '448888888780008';
+    const iban = 'SA1315000448888888780008';
+    const bank = 'بنك البلاد';
+
+    const shareData = {
+        title: 'معلومات حساب بنكي',
+        text: `اسم الحساب: ${accountName}\nرقم الحساب: ${accountNumber}\nالآيبان: ${iban}\nالبنك: ${bank}`
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(console.error);
+    } else {
+        alert("المشاركة غير مدعومة في هذا المتصفح.");
+    }
+}
+
+function shareInma() {
+    const accountName = 'شركة البريمي للسيارات';
+    const accountNumber = '68201863704000';
+    const iban = 'SA9605000068201863704000';
+    const bank = 'مصرف الإنماء';
+
+    const shareData = {
+        title: 'معلومات حساب بنكي',
+        text: `اسم الحساب: ${accountName}\nرقم الحساب: ${accountNumber}\nالآيبان: ${iban}\nالبنك: ${bank}`
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(console.error);
+    } else {
+        alert("المشاركة غير مدعومة في هذا المتصفح.");
+    }
+}
+
+function shareFransi() {
+    const accountName = 'شركة البريمي للسيارات';
+    const accountNumber = '97844900167';
+    const iban = 'SA5655000000097844900167';
+    const bank = 'البنك السعودي الفرنسي';
+
+    const shareData = {
+        title: 'معلومات حساب بنكي',
+        text: `اسم الحساب: ${accountName}\nرقم الحساب: ${accountNumber}\nالآيبان: ${iban}\nالبنك: ${bank}`
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(console.error);
+    } else {
+        alert("المشاركة غير مدعومة في هذا المتصفح.");
+    }
+}
+
+function shareJazira() {
+    const accountName = 'شركة البريمي للسيارات';
+    const accountNumber = '030495028555001';
+    const iban = 'SA7060100030495028555001';
+    const bank = 'بنك الجزيرة';
+
+    const shareData = {
+        title: 'معلومات حساب بنكي',
+        text: `اسم الحساب: ${accountName}\nرقم الحساب: ${accountNumber}\nالآيبان: ${iban}\nالبنك: ${bank}`
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(console.error);
+    } else {
+        alert("المشاركة غير مدعومة في هذا المتصفح.");
+    }
+}
+
+function shareAnb() {
+    const accountName = 'شركة البريمي للسيارات';
+    const accountNumber = '0108095322110019';
+    const iban = '------------';
+    const bank = 'البنك العربي الوطني';
+
+    const shareData = {
+        title: 'معلومات حساب بنكي',
+        text: `اسم الحساب: ${accountName}\nرقم الحساب: ${accountNumber}\nالآيبان: ${iban}\nالبنك: ${bank}`
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(console.error);
+    } else {
+        alert("المشاركة غير مدعومة في هذا المتصفح.");
+    }
+}
+
+function shareSabb() {
+    const accountName = 'شركة معرض البريمي للسيارات';
+    const accountNumber = '822173787001';
+    const iban = 'SA6445000000822173787001';
+    const bank = 'البنك السعودي الأول';
+
+    const shareData = {
+        title: 'معلومات حساب بنكي',
+        text: `اسم الحساب: ${accountName}\nرقم الحساب: ${accountNumber}\nالآيبان: ${iban}\nالبنك: ${bank}`
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(console.error);
+    } else {
+        alert("المشاركة غير مدعومة في هذا المتصفح.");
+    }
+}
+
+function shareEmiratesNBD() {
+    const accountName = 'شركةالبريمي للسيارات';
+    const accountNumber = '1016050175301';
+    const iban = 'SA4095000001016050175301';
+    const bank = 'بنك الإمارات دبي الوطني';
+
+    const shareData = {
+        title: 'معلومات حساب بنكي',
+        text: `اسم الحساب: ${accountName}\nرقم الحساب: ${accountNumber}\nالآيبان: ${iban}\nالبنك: ${bank}`
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(console.error);
+    } else {
+        alert("المشاركة غير مدعومة في هذا المتصفح.");
+    }
+}
+
+        lucide.createIcons();
+        
+        function showToast(message) {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            
+            const icon = document.createElement('i');
+            icon.setAttribute('data-lucide', 'check-circle');
+            icon.className = 'w-4 h-4';
+            
+            const text = document.createElement('span');
+            text.textContent = message;
+            
+            toast.appendChild(icon);
+            toast.appendChild(text);
+            toastContainer.appendChild(toast);
+            
+            lucide.createIcons({
+                icons: {
+                    'check-circle': icon
+                }
+            });
+
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideOut 0.3s forwards';
+                setTimeout(() => {
+                    toastContainer.removeChild(toast);
+                }, 300);
+            }, 2000);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('تم النسخ');
+            });
+        }
+
+        function toggleDropdown(element) {
+            const content = element.parentElement.querySelector('.dropdown-content');
+            const chevron = element.querySelector('[data-lucide="chevron-down"]');
+            content.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
