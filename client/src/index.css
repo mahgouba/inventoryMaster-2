@@ -9,6 +9,19 @@ input[type="radio"] {
   accent-color: #C49632;
 }
 
+/* RTL Toggle Switch Styling */
+[dir="rtl"] .rtl-toggle {
+  direction: rtl;
+}
+
+[dir="rtl"] .rtl-toggle [data-state="checked"] {
+  transform: translateX(-1.5rem);
+}
+
+[dir="rtl"] .rtl-toggle [data-state="unchecked"] {
+  transform: translateX(0.25rem);
+}
+
 /* Additional styling for better visual consistency */
 input[type="checkbox"]:checked,
 input[type="radio"]:checked {

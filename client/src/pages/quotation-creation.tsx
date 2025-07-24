@@ -1454,23 +1454,32 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 شروط
               </Button>
               
-              {/* Toggle Switch for Stamp Visibility */}
-              <div className="flex items-center space-x-2 space-x-reverse border border-red-500 rounded-lg px-3 py-2 bg-white">
-                <Label htmlFor="stamp-visibility" className="text-sm font-medium text-red-600">
+              {/* Toggle Switch for Stamp Visibility - RTL Design */}
+              <div className="flex items-center gap-3 border border-red-500 rounded-lg px-4 py-3 bg-white">
+                <div className="relative">
+                  <div 
+                    className={`w-11 h-6 rounded-full cursor-pointer transition-all duration-300 ${
+                      showStamp ? 'bg-red-500' : 'bg-red-200'
+                    }`}
+                    onClick={() => {
+                      const newValue = !showStamp;
+                      setShowStamp(newValue);
+                      toast({
+                        title: newValue ? "تم إظهار الختم" : "تم إخفاء الختم",
+                        description: newValue ? "سيظهر ختم الشركة في العرض" : "لن يظهر ختم الشركة في العرض",
+                      });
+                    }}
+                  >
+                    <div 
+                      className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ease-in-out ${
+                        showStamp ? 'right-1' : 'right-6'
+                      }`}
+                    />
+                  </div>
+                </div>
+                <Label className="text-sm font-medium text-red-600 cursor-pointer select-none">
                   {showStamp ? "إخفاء الختم" : "إظهار الختم"}
                 </Label>
-                <Switch
-                  id="stamp-visibility"
-                  checked={showStamp}
-                  onCheckedChange={(checked) => {
-                    setShowStamp(checked);
-                    toast({
-                      title: checked ? "تم إظهار الختم" : "تم إخفاء الختم",
-                      description: checked ? "سيظهر ختم الشركة في العرض" : "لن يظهر ختم الشركة في العرض",
-                    });
-                  }}
-                  className="data-[state=checked]:bg-red-500 data-[state=unchecked]:bg-red-100"
-                />
               </div>
               
 
