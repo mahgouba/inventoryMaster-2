@@ -65,13 +65,21 @@ export default function CompanyBanksPage() {
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-[#00627F] rounded-full flex items-center justify-center">
-                      <CreditCard className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md border">
+                      {bank.logo ? (
+                        <img 
+                          src={bank.logo} 
+                          alt={bank.bankName} 
+                          className="w-10 h-10 object-contain"
+                        />
+                      ) : (
+                        <CreditCard className="w-6 h-6 text-[#00627F]" />
+                      )}
                     </div>
                     <div>
-                      <CardTitle className="text-lg text-right">{bank.name}</CardTitle>
+                      <CardTitle className="text-lg text-right">{bank.bankName}</CardTitle>
                       <CardDescription className="text-sm text-right">
-                        {bank.nameEn}
+                        حساب الشركة
                       </CardDescription>
                     </div>
                   </div>
