@@ -1469,7 +1469,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                       description: checked ? "سيظهر ختم الشركة في العرض" : "لن يظهر ختم الشركة في العرض",
                     });
                   }}
-                  className="data-[state=checked]:bg-red-500"
+                  className="data-[state=checked]:bg-red-500 data-[state=unchecked]:bg-red-100"
                 />
               </div>
               
