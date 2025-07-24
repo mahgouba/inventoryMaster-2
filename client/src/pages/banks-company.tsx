@@ -80,7 +80,7 @@ export default function CompanyBanks() {
           <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
           <div className="absolute -bottom-8 left-20 w-72 h-72 bg-gradient-to-r from-teal-500 to-green-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
         </div>
-        <div className="text-white text-xl font-semibold">جاري التحميل...</div>
+        <div className="text-white text-xl font-semibold drop-shadow-lg">جاري التحميل...</div>
       </div>
     );
   }
@@ -109,7 +109,7 @@ export default function CompanyBanks() {
             <img 
               src="/albarimi.png" 
               alt="شعار الشركة" 
-              className="w-35 h-35 object-contain drop-shadow-2xl"
+              className="w-32 h-32 object-contain drop-shadow-2xl"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
@@ -138,7 +138,7 @@ export default function CompanyBanks() {
               return (
                 <Card 
                   key={bank.id} 
-                  className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:bg-white/15"
+                  className="glass-card dark:glass-card-dark rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 border-0"
                 >
                   <CardContent className="p-6">
                     <div className="flex flex-col space-y-4">
