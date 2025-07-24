@@ -90,6 +90,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
       reservationDate: null,
       reservedBy: "",
       reservationNote: "",
+      mileage: undefined,
     },
   });
 
@@ -130,6 +131,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
         reservationDate: (editItem as any).reservationDate || null,
         reservedBy: (editItem as any).reservedBy || "",
         reservationNote: (editItem as any).reservationNote || "",
+        mileage: (editItem as any).mileage || undefined,
       };
       
       form.reset(formData);
@@ -155,6 +157,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
         notes: "",
         price: "",
         isSold: false,
+        mileage: undefined,
       });
       setSelectedManufacturer("");
       setAvailableCategories([]);
@@ -439,6 +442,29 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                   </FormItem>
                 )}
               />
+
+              {/* Mileage - Only show for used vehicles */}
+              {(form.watch("importType") === "مستعمل" || form.watch("importType") === "مستعمل شخصي") && (
+                <FormField
+                  control={form.control}
+                  name="mileage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ممشي السيارة (كم)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="أدخل عدد الكيلومترات" 
+                          type="number"
+                          min="0"
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}

@@ -47,6 +47,7 @@ export const inventoryItems = pgTable("inventory_items", {
   soldToCustomerPhone: text("sold_to_customer_phone"), // رقم جوال العميل المشتري
   soldBySalesRep: text("sold_by_sales_rep"), // مندوب المبيعات الذي قام بالبيع
   saleNotes: text("sale_notes"), // ملاحظات البيع
+  mileage: integer("mileage"), // ممشي السيارة بالكيلومتر (للسيارات المستعملة فقط)
 });
 
 // Manufacturers table for storing manufacturer logos
@@ -332,6 +333,7 @@ export const insertInventoryItemSchema = createInsertSchema(inventoryItems).omit
   reservationDate: z.date().nullable().optional(),
   reservedBy: z.string().optional(),
   reservationNote: z.string().optional(),
+  mileage: z.number().positive("يجب أن يكون الممشي رقم موجب").optional(),
 });
 
 export const insertManufacturerSchema = createInsertSchema(manufacturers).omit({

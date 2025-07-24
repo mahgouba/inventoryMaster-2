@@ -103,6 +103,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
       images: [],
       notes: "",
       isSold: false,
+      mileage: undefined,
     },
   });
 
@@ -607,6 +608,29 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                     </FormItem>
                   )}
                 />
+
+                {/* Mileage - Only show for used vehicles */}
+                {(form.watch("importType") === "مستعمل" || form.watch("importType") === "مستعمل شخصي") && (
+                  <FormField
+                    control={form.control}
+                    name="mileage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ممشي السيارة (كم)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="أدخل عدد الكيلومترات" 
+                            type="number"
+                            min="0"
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 {/* Location */}
                 <FormField
