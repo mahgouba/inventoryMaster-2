@@ -138,9 +138,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
   // Function to get import type icon based on data
   const getImportTypeIcon = (importType: string) => {
+    if (importType.includes("مستعمل")) return "/logos/import-type-secondhand.svg";
     if (importType.includes("شركة")) return "/import-type-company.svg";
     if (importType.includes("شخصي")) return "/import-type-personal.svg"; 
-    if (importType.includes("مستعمل")) return "/import-type-secondhand.svg";
     return "/import-type.svg"; // fallback
   };
 
@@ -1116,7 +1116,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.engineCapacity}</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <img src="/year.svg" alt="Year" className="w-6 h-6" />
+                              <img src="/year.svg" alt="Year" className="w-5 h-5" />
                               <span className="font-semibold font-latin text-slate-800 dark:text-slate-200 text-xs">{item.year}</span>
                             </div>
                             <div className="flex items-center gap-1">
