@@ -27,8 +27,8 @@ import ComprehensiveListsPage from "@/pages/comprehensive-lists";
 import ReservationsPage from "@/pages/reservations";
 import SoldVehiclesPage from "@/pages/sold-vehicles";
 import BankManagement from "@/pages/bank-management";
-import PersonalBanks from "@/pages/banks-personal";
-import CompanyBanks from "@/pages/banks-company";
+import PersonalBanks from "@/pages/personal-banks";
+import CompanyBanks from "@/pages/company-banks";
 
 interface User {
   username: string;

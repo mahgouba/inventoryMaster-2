@@ -808,8 +808,15 @@ export class MemStorage implements IStorage {
       }
     ];
 
-    sampleBanks.forEach(bank => {
-      this.createBank(bank);
+    sampleBanks.forEach(bankData => {
+      const id = this.currentBankId++;
+      const bank = {
+        id,
+        ...bankData,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.banks.set(id, bank);
     });
   }
 

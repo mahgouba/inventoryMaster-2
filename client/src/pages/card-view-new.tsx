@@ -33,7 +33,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
-  EyeOff
+  EyeOff,
+  CreditCard
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -715,6 +716,20 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
+
+              {/* Bank Header Icons */}
+              <div className="flex items-center space-x-1 space-x-reverse">
+                <Link href="/banks-company">
+                  <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" title="بنوك الشركة">
+                    <Building2 size={18} />
+                  </Button>
+                </Link>
+                <Link href="/banks-personal">
+                  <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" title="البنوك الشخصية">
+                    <CreditCard size={18} />
+                  </Button>
+                </Link>
+              </div>
 
               {/* Dark Mode Toggle */}
               <Button 
