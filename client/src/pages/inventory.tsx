@@ -23,6 +23,7 @@ import SpecificationsManager from "@/components/specifications-manager";
 import SpecificationsManagement from "@/components/specifications-management";
 import ImageManagement from "@/components/image-management";
 import { AdvancedPrintDialog } from "@/components/advanced-print-dialog";
+import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import { exportToCSV, exportToExcel, printTable, printTableWithSettings } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
 
@@ -510,14 +511,15 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const totalPages = Math.ceil(items.length / itemsPerPage);
 
   return (
-    <div className="bg-slate-50 dark:bg-black min-h-screen">
-      {/* Header */}
-      <header className="bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-          <div className="flex justify-between items-center h-14 sm:h-16">
-            {/* Logo and Company Name */}
-            <div className="flex items-center space-x-3 space-x-reverse">
-              <div className="relative">
+    <SystemGlassWrapper>
+      <div className={`min-h-screen ${darkMode ? 'dark' : ''}`} dir="rtl">
+        {/* Header */}
+        <header className="glass-nav shadow-sm sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+            <div className="flex justify-between items-center h-14 sm:h-16">
+              {/* Logo and Company Name */}
+              <div className="flex items-center space-x-3 space-x-reverse">
+                <div className="relative">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center shadow-lg overflow-hidden hover:scale-110 transition-all duration-300" style={{ backgroundColor: '#00627F' }}>
                   {companyLogo ? (
                     <img 
@@ -540,43 +542,43 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-200 hover:text-amber-600 transition-colors duration-300">{companyName}</h1>
-                <span className="text-xs text-slate-500 dark:text-slate-400 font-latin">Inventory System</span>
+                <h1 className="text-lg sm:text-xl font-bold text-white hover:text-amber-400 transition-colors duration-300">{companyName}</h1>
+                <span className="text-xs text-white/70 font-latin">Inventory System</span>
               </div>
-            </div>
-            {/* Mobile and Desktop Navigation */}
-            <div className="flex items-center space-x-2 sm:space-x-4 space-x-reverse">
-              {/* Navigation Tabs - Hidden on mobile */}
-              <div className="hidden md:flex items-center space-x-2 space-x-reverse border border-slate-200 rounded-lg p-1">
-                <Button variant="default" size="sm" className="bg-custom-primary hover:bg-custom-primary-dark text-white">
-                  <Table size={14} className="ml-1" />
-                  <span className="hidden lg:inline">جدول</span>
-                </Button>
-                <Link href="/cards">
-                  <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-800">
-                    <LayoutGrid size={14} className="ml-1" />
-                    <span className="hidden lg:inline">بطاقات</span>
+              </div>
+              {/* Mobile and Desktop Navigation */}
+              <div className="flex items-center space-x-2 sm:space-x-4 space-x-reverse">
+                {/* Navigation Tabs - Hidden on mobile */}
+                <div className="hidden md:flex items-center space-x-2 space-x-reverse border border-slate-200 rounded-lg p-1">
+                  <Button variant="default" size="sm" className="bg-custom-primary hover:bg-custom-primary-dark text-white">
+                    <Table size={14} className="ml-1" />
+                    <span className="hidden lg:inline">جدول</span>
                   </Button>
-                </Link>
-              </div>
+                  <Link href="/cards">
+                    <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-800">
+                      <LayoutGrid size={14} className="ml-1" />
+                      <span className="hidden lg:inline">بطاقات</span>
+                    </Button>
+                  </Link>
+                </div>
               
-              {/* Mobile Navigation Icons */}
-              <div className="flex md:hidden items-center space-x-1 space-x-reverse">
-                <Button variant="default" size="sm" className="bg-custom-primary hover:bg-custom-primary-dark text-white p-2">
-                  <Table size={16} />
-                </Button>
-                <Link href="/cards">
-                  <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-800 p-2">
-                    <LayoutGrid size={16} />
+                {/* Mobile Navigation Icons */}
+                <div className="flex md:hidden items-center space-x-1 space-x-reverse">
+                  <Button variant="default" size="sm" className="bg-custom-primary hover:bg-custom-primary-dark text-white p-2">
+                    <Table size={16} />
                   </Button>
-                </Link>
-              </div>
+                  <Link href="/cards">
+                    <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-800 p-2">
+                      <LayoutGrid size={16} />
+                    </Button>
+                  </Link>
+                </div>
 
-              {/* User Actions */}
-              <div className="flex items-center space-x-2 space-x-reverse">
-                {/* Quick Action Buttons - Admin Only */}
-                {userRole === "admin" && (
-                  <div className="hidden lg:flex items-center space-x-2 space-x-reverse">
+                {/* User Actions */}
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  {/* Quick Action Buttons - Admin Only */}
+                  {userRole === "admin" && (
+                    <div className="hidden lg:flex items-center space-x-2 space-x-reverse">
                     <Link href="/financing-calculator">
                       <Button variant="outline" size="sm" className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 transition-colors">
                         <DollarSign size={16} className="ml-1" />
@@ -590,22 +592,22 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         <span className="hidden xl:inline">إدارة المظهر</span>
                       </Button>
                     </Link>
-                  </div>
-                )}
+                    </div>
+                  )}
 
-                {/* Bank Header Icons */}
-                <div className="flex items-center space-x-1 space-x-reverse">
-                  <Link href="/banks-company">
-                    <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" title="بنوك الشركة">
-                      <Building2 size={18} />
-                    </Button>
-                  </Link>
-                  <Link href="/banks-personal">
-                    <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" title="البنوك الشخصية">
-                      <CreditCard size={18} />
-                    </Button>
-                  </Link>
-                </div>
+                  {/* Bank Header Icons */}
+                  <div className="flex items-center space-x-1 space-x-reverse">
+                    <Link href="/banks-company">
+                      <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" title="بنوك الشركة">
+                        <Building2 size={18} />
+                      </Button>
+                    </Link>
+                    <Link href="/banks-personal">
+                      <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" title="البنوك الشخصية">
+                        <CreditCard size={18} />
+                      </Button>
+                    </Link>
+                  </div>
 
                 {/* Dark Mode Toggle */}
                 <Button 
@@ -729,7 +731,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 {/* User Dropdown Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800">
+                    <Button variant="ghost" size="sm" className="p-2 text-white/80 hover:text-white">
                       <UserCircle size={18} />
                     </Button>
                   </DropdownMenuTrigger>
@@ -748,11 +750,11 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
 
 
@@ -762,7 +764,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         <InventoryStats />
 
         {/* Controls */}
-        <Card className="mb-8 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+        <Card className="glass-container mb-8">
           <CardContent className="p-6">
             <div className="flex flex-col gap-4">
               {/* Search Bar and Filter Toggle */}
@@ -797,7 +799,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       </div>
                     
                     <CollapsibleContent className="mt-4 w-full">
-                      <Card className="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shadow-sm w-full">
+                      <Card className="glass-form w-full">
                         <CardContent className="p-6">
                           {/* Enhanced Filter Controls with Button Design */}
                           <div className="space-y-6 animate-in fade-in duration-300">
@@ -1296,6 +1298,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         open={imageManagementOpen}
         onOpenChange={setImageManagementOpen}
       />
-    </div>
+      </div>
+    </SystemGlassWrapper>
   );
 }

@@ -239,19 +239,19 @@ export default function InventoryTable({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+      <div className="glass-container overflow-hidden">
         <div className="p-8 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto"></div>
-          <p className="mt-2 text-slate-600">جاري التحميل...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white/60 mx-auto"></div>
+          <p className="mt-2 text-white/80">جاري التحميل...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+    <div className="glass-container overflow-hidden">
       <div className="overflow-x-auto">
-        <Table data-table="inventory-table">
+        <Table data-table="inventory-table" className="glass-table">
           <TableHeader className="bg-custom-primary">
             <TableRow>
               <TableHead className="text-white text-right">
@@ -337,45 +337,45 @@ export default function InventoryTable({
             {filteredAndSortedItems.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={14} className="text-center py-8">
-                  <p className="text-slate-500">لا توجد عناصر للعرض</p>
+                  <p className="text-white/70">لا توجد عناصر للعرض</p>
                 </TableCell>
               </TableRow>
             ) : (
               filteredAndSortedItems.map((item: InventoryItem) => (
-                <TableRow key={item.id} className={`hover:bg-slate-50 ${item.isSold ? 'bg-red-50 border-l-4 border-red-500' : ''}`}>
-                  <TableCell className="text-sm text-slate-800">
+                <TableRow key={item.id} className={`hover:bg-white/10 ${item.isSold ? 'bg-red-500/20 border-l-4 border-red-400' : ''}`}>
+                  <TableCell className="text-sm text-white">
                     <div className="flex items-center gap-2">
                       <ManufacturerLogo manufacturerName={item.manufacturer} size="sm" />
                       <span>{item.manufacturer}</span>
                     </div>
                   </TableCell>
 
-                  <TableCell className="text-sm text-slate-800">{item.category}</TableCell>
-                  <TableCell className="text-sm text-slate-800">{item.trimLevel || '-'}</TableCell>
-                  <TableCell className="text-sm text-slate-800 font-latin">{item.engineCapacity}</TableCell>
-                  <TableCell className="text-sm text-slate-800 font-latin">{item.year}</TableCell>
-                  <TableCell className="text-sm text-slate-800">{item.exteriorColor}</TableCell>
-                  <TableCell className="text-sm text-slate-800">{item.interiorColor}</TableCell>
+                  <TableCell className="text-sm text-white">{item.category}</TableCell>
+                  <TableCell className="text-sm text-white">{item.trimLevel || '-'}</TableCell>
+                  <TableCell className="text-sm text-white font-latin">{item.engineCapacity}</TableCell>
+                  <TableCell className="text-sm text-white font-latin">{item.year}</TableCell>
+                  <TableCell className="text-sm text-white">{item.exteriorColor}</TableCell>
+                  <TableCell className="text-sm text-white">{item.interiorColor}</TableCell>
                   <TableCell>
                     <Badge variant="secondary" className={getStatusColor(item.status)}>
                       {item.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-slate-800">{item.location}</TableCell>
-                  <TableCell className="text-sm text-slate-800">{item.importType}</TableCell>
-                  <TableCell className="text-sm text-slate-600 font-latin">{item.chassisNumber}</TableCell>
-                  <TableCell className="text-sm text-slate-800">{item.ownershipType}</TableCell>
-                  <TableCell className="text-sm text-slate-600 font-latin">
+                  <TableCell className="text-sm text-white">{item.location}</TableCell>
+                  <TableCell className="text-sm text-white">{item.importType}</TableCell>
+                  <TableCell className="text-sm text-white/80 font-latin">{item.chassisNumber}</TableCell>
+                  <TableCell className="text-sm text-white">{item.ownershipType}</TableCell>
+                  <TableCell className="text-sm text-white/80 font-latin">
                     {new Date(item.entryDate).toLocaleDateString('en-GB', {
                       day: '2-digit',
                       month: '2-digit',
                       year: 'numeric'
                     })}
                   </TableCell>
-                  <TableCell className="text-sm text-slate-800 font-latin">
+                  <TableCell className="text-sm text-white font-latin">
                     {item.price ? `${parseFloat(item.price).toLocaleString()} ر.س` : '-'}
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600">{item.notes || '-'}</TableCell>
+                  <TableCell className="text-sm text-white/80">{item.notes || '-'}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-1 space-x-reverse">
                       <Button

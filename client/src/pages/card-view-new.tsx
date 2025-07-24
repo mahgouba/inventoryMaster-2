@@ -52,6 +52,7 @@ import QuotationManagement from "@/components/quotation-management";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import MultiSelectFilter from "@/components/multi-select-filter";
 import { ReservationDialog } from "@/components/reservation-dialog";
+import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
 import type { InventoryItem } from "@shared/schema";
 

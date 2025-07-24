@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useTheme } from "@/hooks/useTheme";
+import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import InventoryPage from "@/pages/inventory";
 import CardViewPage from "@/pages/card-view-new";
 import FinancingCalculatorPage from "@/pages/financing-calculator";
@@ -44,13 +45,14 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
   return (
-    <Switch>
+    <SystemGlassWrapper>
+      <Switch>
       <Route path="/" component={() => <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
       <Route path="/inventory" component={() => <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
       <Route path="/cards" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
       <Route path="/card-view" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
       <Route path="/card-view-new" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-      <Route path="/quotation-creation" component={QuotationCreationPage} />
+      <Route path="/quotation-creation" component={() => <QuotationCreationPage />} />
 
       <Route path="/quotation-edit/:id" component={QuotationEditPage} />
       <Route path="/quotation-management" component={QuotationManagementPage} />
@@ -69,7 +71,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
         <>
           <Route path="/appearance" component={() => <AppearancePage userRole={user.role} onLogout={onLogout} />} />
           <Route path="/pdf-appearance" component={() => <PdfAppearanceManagement userRole={user.role} onLogout={onLogout} />} />
-          <Route path="/user-management" component={() => <UserManagementPage onLogout={onLogout} />} />
+          <Route path="/user-management" component={() => <UserManagementPage />} />
           <Route path="/company-management" component={() => <CompanyManagementPage />} />
           <Route path="/bank-management" component={BankManagement} />
           <Route path="/dynamic-company-control" component={() => <DynamicCompanyControl />} />
@@ -78,7 +80,8 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
         </>
       )}
       <Route component={NotFound} />
-    </Switch>
+      </Switch>
+    </SystemGlassWrapper>
   );
 }
 

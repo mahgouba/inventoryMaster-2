@@ -30,18 +30,18 @@ export default function InventoryStats() {
       <div className="space-y-6 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={i} className="glass-container animate-pulse">
               <CardContent className="p-6">
-                <div className="h-16 bg-gray-200 rounded"></div>
+                <div className="h-16 bg-white/10 rounded"></div>
               </CardContent>
             </Card>
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={i} className="glass-container animate-pulse">
               <CardContent className="p-6">
-                <div className="h-24 bg-gray-200 rounded"></div>
+                <div className="h-24 bg-white/10 rounded"></div>
               </CardContent>
             </Card>
           ))}
@@ -112,14 +112,14 @@ export default function InventoryStats() {
       {/* Main Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {mainStatsData.map((stat, index) => (
-          <Card key={index} className="border border-slate-200">
+          <Card key={index} className="glass-container">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-600">{stat.title}</p>
-                  <p className="text-3xl font-bold text-slate-800">{stat.value}</p>
+                  <p className="text-sm font-medium text-white/80">{stat.title}</p>
+                  <p className="text-3xl font-bold text-white">{stat.value}</p>
                 </div>
-                <div className={`p-3 rounded-full ${stat.color}`}>
+                <div className={`p-3 rounded-full ${stat.color} backdrop-blur-sm`}>
                   <stat.icon className="text-xl" size={24} />
                 </div>
               </div>
@@ -132,14 +132,14 @@ export default function InventoryStats() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Reserved box first */}
         {secondRowStatsData.map((stat, index) => (
-          <Card key={index} className="border border-slate-200">
+          <Card key={index} className="glass-container">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-600">{stat.title}</p>
-                  <p className="text-3xl font-bold text-slate-800">{stat.value}</p>
+                  <p className="text-sm font-medium text-white/80">{stat.title}</p>
+                  <p className="text-3xl font-bold text-white">{stat.value}</p>
                 </div>
-                <div className={`p-3 rounded-full ${stat.color}`}>
+                <div className={`p-3 rounded-full ${stat.color} backdrop-blur-sm`}>
                   <stat.icon className="text-xl" size={24} />
                 </div>
               </div>
@@ -148,14 +148,14 @@ export default function InventoryStats() {
         ))}
         {/* Then import type stats */}
         {importStatsData.map((stat, index) => (
-          <Card key={index} className="border border-slate-200">
+          <Card key={index} className="glass-container">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-slate-800">{stat.value}</p>
+                  <p className="text-sm font-medium text-white/80">{stat.title}</p>
+                  <p className="text-2xl font-bold text-white">{stat.value}</p>
                 </div>
-                <div className={`p-3 rounded-full ${stat.color}`}>
+                <div className={`p-3 rounded-full ${stat.color} backdrop-blur-sm`}>
                   <stat.icon className="text-xl" size={20} />
                 </div>
               </div>
@@ -169,9 +169,9 @@ export default function InventoryStats() {
         {(Array.isArray(manufacturerStats) ? manufacturerStats : []).slice(0, 6).map((manufacturer: any, index: number) => {
           const logoPath = getManufacturerLogo(manufacturer.manufacturer);
           return (
-            <Card key={index} className="border border-slate-200">
+            <Card key={index} className="glass-container">
               <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg">
+                <CardTitle className="flex items-center gap-2 text-lg text-white">
                   {logoPath ? (
                     <img 
                       src={logoPath} 
@@ -179,8 +179,8 @@ export default function InventoryStats() {
                       className="w-8 h-8 object-contain rounded"
                     />
                   ) : (
-                    <div className="w-8 h-8 bg-slate-200 rounded flex items-center justify-center">
-                      <span className="text-xs text-slate-500">N/A</span>
+                    <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
+                      <span className="text-xs text-white/60">N/A</span>
                     </div>
                   )}
                   {manufacturer.manufacturer}
@@ -189,20 +189,20 @@ export default function InventoryStats() {
               <CardContent className="pt-0">
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm text-slate-600">إجمالي:</span>
-                    <span className="font-semibold">{manufacturer.total}</span>
+                    <span className="text-sm text-white/80">إجمالي:</span>
+                    <span className="font-semibold text-white">{manufacturer.total}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-slate-600">شخصي:</span>
-                    <span className="font-medium text-blue-600">{manufacturer.personal}</span>
+                    <span className="text-sm text-white/80">شخصي:</span>
+                    <span className="font-medium text-blue-400">{manufacturer.personal}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-slate-600">شركة:</span>
-                    <span className="font-medium text-purple-600">{manufacturer.company}</span>
+                    <span className="text-sm text-white/80">شركة:</span>
+                    <span className="font-medium text-purple-400">{manufacturer.company}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-slate-600">مستعمل:</span>
-                    <span className="font-medium text-orange-600">{manufacturer.usedPersonal}</span>
+                    <span className="text-sm text-white/80">مستعمل:</span>
+                    <span className="font-medium text-orange-400">{manufacturer.usedPersonal}</span>
                   </div>
                 </div>
               </CardContent>

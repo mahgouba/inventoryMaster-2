@@ -112,29 +112,230 @@ button[data-state="checked"][role="radio"] span {
     0 8px 24px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Gradient Background for Card Container */
-.glass-background {
+/* System-Wide Glass Background */
+.glass-background, .system-glass-background {
   background: linear-gradient(135deg, 
-    rgba(20, 30, 48, 0.95) 0%,
-    rgba(25, 25, 45, 0.95) 25%,
-    rgba(30, 20, 40, 0.95) 50%,
-    rgba(35, 25, 35, 0.95) 75%,
-    rgba(40, 30, 50, 0.95) 100%);
+    rgba(10, 15, 25, 0.98) 0%,
+    rgba(15, 20, 35, 0.98) 20%,
+    rgba(20, 10, 30, 0.98) 40%,
+    rgba(25, 15, 25, 0.98) 60%,
+    rgba(30, 20, 40, 0.98) 80%,
+    rgba(35, 25, 45, 0.98) 100%);
   position: relative;
   overflow: hidden;
   min-height: 100vh;
 }
 
-.glass-background::before {
+.glass-background::before, .system-glass-background::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.05)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.05)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.03)"/><circle cx="20" cy="80" r="0.5" fill="rgba(255,255,255,0.03)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-  opacity: 0.3;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  z-index: 0;
   pointer-events: none;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 60% 60%, rgba(255, 170, 120, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 90% 90%, rgba(170, 255, 120, 0.15) 0%, transparent 50%);
+  animation: gradient-shift 15s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 60% 60%, rgba(255, 170, 120, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 90% 90%, rgba(170, 255, 120, 0.15) 0%, transparent 50%);
+  }
+  25% {
+    background: 
+      radial-gradient(circle at 60% 20%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 20% 60%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(120, 219, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 10% 10%, rgba(255, 170, 120, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 40% 90%, rgba(170, 255, 120, 0.15) 0%, transparent 50%);
+  }
+  50% {
+    background: 
+      radial-gradient(circle at 90% 60%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 30% 90%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 70% 10%, rgba(120, 219, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(255, 170, 120, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 10% 30%, rgba(170, 255, 120, 0.15) 0%, transparent 50%);
+  }
+  75% {
+    background: 
+      radial-gradient(circle at 30% 30%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 70% 70%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 20% 90%, rgba(120, 219, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 90% 20%, rgba(255, 170, 120, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(170, 255, 120, 0.15) 0%, transparent 50%);
+  }
+}
+
+/* System-Wide Glass Components */
+.glass-container {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.4),
+    0 4px 16px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
+}
+
+/* Override default shadcn card styles */
+.card.glass-container,
+.card-header.glass-header,
+.card-content.glass-container,
+[data-sonner-toast].glass-container {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+}
+
+/* Glass table styling */
+.glass-table {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.glass-table th {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.glass-table td {
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-table tr:hover td {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.glass-container:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 12px 40px 0 rgba(0, 0, 0, 0.6),
+    0 8px 24px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.glass-header {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 2;
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(0, 98, 127, 0.6) !important;
+  box-shadow: 0 0 0 2px rgba(0, 98, 127, 0.3) !important;
+}
+
+.glass-button {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Glass form styling */
+.glass-form {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Glass select and dropdown styling */
+.glass-select,
+.glass-select > div {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+}
+
+.glass-select:hover > div {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Glass navigation and header styling */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Glass card view styling */
+.glass-card-view {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.4),
+    0 4px 16px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-view:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 16px 48px 0 rgba(0, 0, 0, 0.6),
+    0 8px 24px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-4px);
 }
 
 /* Mesh Animation for Background Blobs */
