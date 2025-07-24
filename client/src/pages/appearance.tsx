@@ -793,10 +793,20 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                     <Label className="text-base font-medium">تفعيل النظام الليلي</Label>
                     <p className="text-sm text-muted-foreground">تشغيل النظام الليلي للصفحة الحالية</p>
                   </div>
-                  <Switch
-                    checked={darkMode}
-                    onCheckedChange={setDarkMode}
-                  />
+                  <div className="relative">
+                    <div 
+                      className={`w-11 h-6 rounded-full cursor-pointer transition-all duration-300 ${
+                        darkMode ? 'bg-slate-800' : 'bg-slate-300'
+                      }`}
+                      onClick={() => setDarkMode(!darkMode)}
+                    >
+                      <div 
+                        className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ease-in-out ${
+                          darkMode ? 'right-1' : 'right-6'
+                        }`}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Dark Primary Colors */}
@@ -1215,10 +1225,20 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                     <Label className="text-base font-medium">الاتجاه من اليمين إلى اليسار</Label>
                     <p className="text-sm text-muted-foreground">تخطيط النص والواجهة بالاتجاه العربي</p>
                   </div>
-                  <Switch
-                    checked={rtlLayout}
-                    onCheckedChange={setRtlLayout}
-                  />
+                  <div className="relative">
+                    <div 
+                      className={`w-11 h-6 rounded-full cursor-pointer transition-all duration-300 ${
+                        rtlLayout ? 'bg-blue-600' : 'bg-blue-200'
+                      }`}
+                      onClick={() => setRtlLayout(!rtlLayout)}
+                    >
+                      <div 
+                        className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ease-in-out ${
+                          rtlLayout ? 'right-1' : 'right-6'
+                        }`}
+                      />
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

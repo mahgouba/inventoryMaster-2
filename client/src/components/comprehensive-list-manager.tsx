@@ -349,12 +349,20 @@ export default function ComprehensiveListManager() {
                         <div className="flex items-center gap-2">
                           {item.hasOwnProperty('isActive') && (
                             <div className="flex items-center gap-2">
-                              <Switch
-                                checked={item.isActive}
-                                onCheckedChange={(checked) => 
-                                  toggleActiveMutation.mutate({ id: item.id, isActive: checked })
-                                }
-                              />
+                              <div className="relative">
+                                <div 
+                                  className={`w-9 h-5 rounded-full cursor-pointer transition-all duration-300 ${
+                                    item.isActive ? 'bg-green-500' : 'bg-gray-300'
+                                  }`}
+                                  onClick={() => toggleActiveMutation.mutate({ id: item.id, isActive: !item.isActive })}
+                                >
+                                  <div 
+                                    className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ease-in-out ${
+                                      item.isActive ? 'right-0.5' : 'right-4'
+                                    }`}
+                                  />
+                                </div>
+                              </div>
                               {item.isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                             </div>
                           )}

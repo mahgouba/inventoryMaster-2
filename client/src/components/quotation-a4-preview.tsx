@@ -325,16 +325,25 @@ export default function QuotationA4Preview({
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
-      {/* Background Toggle Switch */}
+      {/* Background Toggle Switch - RTL Design */}
       <div className="mb-4 flex justify-center items-center gap-4">
-        <div className="flex items-center space-x-2">
-          <span className="bg-[#cf9b46] text-[#fcfcfc] text-[15px]">البريمي </span>
-          <Switch 
-            checked={useAlbarimi2Background} 
-            onCheckedChange={setUseAlbarimi2Background}
-            className="mx-2"
-          />
-          <span className="text-sm text-gray-600">خلفية 2</span>
+        <div className="flex items-center gap-3 border border-yellow-600 rounded-lg px-4 py-3 bg-white">
+          <span className="bg-[#cf9b46] text-[#fcfcfc] text-[15px] px-2 py-1 rounded">البريمي</span>
+          <div className="relative">
+            <div 
+              className={`w-11 h-6 rounded-full cursor-pointer transition-all duration-300 ${
+                useAlbarimi2Background ? 'bg-yellow-600' : 'bg-yellow-200'
+              }`}
+              onClick={() => setUseAlbarimi2Background(!useAlbarimi2Background)}
+            >
+              <div 
+                className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ease-in-out ${
+                  useAlbarimi2Background ? 'right-1' : 'right-6'
+                }`}
+              />
+            </div>
+          </div>
+          <span className="text-sm text-yellow-700 font-medium">خلفية 2</span>
         </div>
       </div>
       <div className="mb-4 flex justify-center">

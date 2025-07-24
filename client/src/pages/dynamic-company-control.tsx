@@ -264,12 +264,21 @@ export default function DynamicCompanyControl() {
                 <p className="text-sm text-gray-500">الشركة الأولى</p>
               </div>
               
-              <div className="flex items-center space-x-4">
-                <Switch
-                  checked={selectedCompanyIndex === 1}
-                  onCheckedChange={handleCompanySwitch}
-                  className="data-[state=checked]:bg-purple-600"
-                />
+              <div className="flex items-center justify-center">
+                <div className="relative">
+                  <div 
+                    className={`w-11 h-6 rounded-full cursor-pointer transition-all duration-300 ${
+                      selectedCompanyIndex === 1 ? 'bg-purple-600' : 'bg-purple-200'
+                    }`}
+                    onClick={() => handleCompanySwitch(selectedCompanyIndex !== 1)}
+                  >
+                    <div 
+                      className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ease-in-out ${
+                        selectedCompanyIndex === 1 ? 'right-1' : 'right-6'
+                      }`}
+                    />
+                  </div>
+                </div>
               </div>
               
               <div className="text-left">

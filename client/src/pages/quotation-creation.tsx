@@ -1503,34 +1503,43 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 {createQuotationMutation.isPending ? "جاري الحفظ..." : `حفظ ${isInvoiceMode ? "الفاتورة" : "العرض"}`}
               </Button>
               
-              {/* Toggle Switch for Invoice/Quotation Mode */}
-              <div className="flex items-center space-x-2 space-x-reverse border border-purple-500 rounded-lg px-3 py-2 bg-white">
-                <Label htmlFor="invoice-mode" className="text-sm font-medium text-purple-600">
+              {/* Toggle Switch for Invoice/Quotation Mode - RTL Design */}
+              <div className="flex items-center gap-3 border border-purple-500 rounded-lg px-4 py-3 bg-white">
+                <FileUp size={16} className="text-purple-600" />
+                <div className="relative">
+                  <div 
+                    className={`w-11 h-6 rounded-full cursor-pointer transition-all duration-300 ${
+                      isInvoiceMode ? 'bg-purple-600' : 'bg-purple-200'
+                    }`}
+                    onClick={() => {
+                      const newValue = !isInvoiceMode;
+                      setIsInvoiceMode(newValue);
+                      if (newValue) {
+                        // Generate invoice number when switching to invoice mode
+                        const newInvoiceNumber = generateInvoiceNumber();
+                        setInvoiceNumber(newInvoiceNumber);
+                        toast({
+                          title: "تم التبديل إلى وضع الفاتورة",
+                          description: `رقم الفاتورة: ${newInvoiceNumber}`,
+                        });
+                      } else {
+                        toast({
+                          title: "تم التبديل إلى وضع عرض السعر",
+                          description: "يمكنك الآن إنشاء عرض سعر",
+                        });
+                      }
+                    }}
+                  >
+                    <div 
+                      className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ease-in-out ${
+                        isInvoiceMode ? 'right-1' : 'right-6'
+                      }`}
+                    />
+                  </div>
+                </div>
+                <Label className="text-sm font-medium text-purple-600 cursor-pointer select-none">
                   {isInvoiceMode ? "فاتورة" : "عرض سعر"}
                 </Label>
-                <Switch
-                  id="invoice-mode"
-                  checked={isInvoiceMode}
-                  onCheckedChange={(checked) => {
-                    setIsInvoiceMode(checked);
-                    if (checked) {
-                      // Generate invoice number when switching to invoice mode
-                      const newInvoiceNumber = generateInvoiceNumber();
-                      setInvoiceNumber(newInvoiceNumber);
-                      toast({
-                        title: "تم التبديل إلى وضع الفاتورة",
-                        description: `رقم الفاتورة: ${newInvoiceNumber}`,
-                      });
-                    } else {
-                      toast({
-                        title: "تم التبديل إلى وضع عرض السعر",
-                        description: "يمكنك الآن إنشاء عرض سعر",
-                      });
-                    }
-                  }}
-                  className="data-[state=checked]:bg-purple-600"
-                />
-                <FileUp size={16} className="text-purple-600" />
               </div>
               
               <Link href="/quotation-management">
