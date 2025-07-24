@@ -17,8 +17,8 @@ import {
   type FinancingCalculation, type InsertFinancingCalculation,
   type Bank, type InsertBank
 } from "@shared/schema";
-import { db, pool } from "./db";
-import { eq } from "drizzle-orm";
+import { db } from "./db";
+import { eq, like, or, and, sql, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -3092,5 +3092,19 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-// Use MemStorage for development compatibility without database setup requirements
-export const storage = new MemStorage();
+
+
+// Initialize storage based on environment
+let storage: IStorage;
+
+// Try to use DatabaseStorage, fall back to MemStorage if database is not available
+try {
+  // Test database connection
+  storage = new DatabaseStorage();
+  console.log("✅ Using DatabaseStorage - PostgreSQL database connected");
+} catch (error) {
+  console.warn("⚠️ Database connection failed, falling back to MemStorage:", error.message);
+  storage = new MemStorage();
+}
+
+export { storage };

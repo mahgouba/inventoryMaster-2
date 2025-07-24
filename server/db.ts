@@ -1,30 +1,16 @@
-import { Pool } from 'pg';
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import ws from "ws";
 import * as schema from "@shared/schema";
 
-let pool: Pool;
-let db: any;
+neonConfig.webSocketConstructor = ws;
 
+// For development compatibility, use a fallback or handle missing DATABASE_URL gracefully
 if (!process.env.DATABASE_URL) {
-  console.warn("DATABASE_URL not set. Using in-memory storage instead.");
-  // Create a dummy connection for compatibility
-  pool = new Pool({ connectionString: "postgresql://dummy:dummy@localhost:5432/dummy" });
-  db = drizzle(pool, { schema });
-} else {
-  try {
-    pool = new Pool({ 
-      connectionString: process.env.DATABASE_URL,
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-    });
-    
-    db = drizzle(pool, { schema });
-    console.log("Connected to PostgreSQL database");
-  } catch (error) {
-    console.error("Database connection failed:", error);
-    // Fallback to dummy connection
-    pool = new Pool({ connectionString: "postgresql://dummy:dummy@localhost:5432/dummy" });
-    db = drizzle(pool, { schema });
-  }
+  console.warn("DATABASE_URL not set. Using fallback database configuration for development.");
+  // You can set a fallback URL or handle this gracefully
+  process.env.DATABASE_URL = "postgresql://localhost:5432/inventory_dev";
 }
 
-export { pool, db };
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const db = drizzle({ client: pool, schema });
