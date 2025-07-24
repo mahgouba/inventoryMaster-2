@@ -518,19 +518,21 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
             {/* Logo and Company Name */}
             <div className="flex items-center space-x-3 space-x-reverse">
               <div className="relative">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-lg flex items-center justify-center shadow-lg overflow-hidden animate-pulse hover:animate-none hover:scale-110 transition-all duration-300">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center shadow-lg overflow-hidden hover:scale-110 transition-all duration-300" style={{ backgroundColor: '#00627F' }}>
                   {companyLogo ? (
                     <img 
                       src={companyLogo} 
                       alt="شعار الشركة" 
-                      className="w-full h-full object-contain animate-bounce hover:animate-none transition-all duration-300"
+                      className="w-full h-full object-contain hover:animate-none transition-all duration-[3000ms]"
+                      style={{ animation: 'bounce 3s infinite' }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <img 
                         src="/copmany logo.svg" 
                         alt="شعار البريمي للسيارات" 
-                        className="w-8 h-8 sm:w-10 sm:h-10 object-contain animate-spin hover:animate-none transition-all duration-500"
+                        className="w-8 h-8 sm:w-10 sm:h-10 object-contain hover:animate-none transition-all duration-[3000ms]"
+                        style={{ animation: 'spin 4s linear infinite' }}
                       />
                     </div>
                   )}
