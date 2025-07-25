@@ -403,74 +403,22 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     return values;
   };
 
-  // Dynamic filter arrays based on previously applied filters
-  const availableStatuses = ["جميع الحالات", ...getFilteredUniqueValues("status", {
-    manufacturer: manufacturerFilter,
-    category: categoryFilter,
-    trimLevel: trimLevelFilter,
-    year: yearFilter,
-    engineCapacity: engineCapacityFilter,
-    exteriorColor: exteriorColorFilter,
-    interiorColor: interiorColorFilter
-  })];
+  // Simple filter arrays - just get unique values from data
+  const availableStatuses = ["جميع الحالات", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.status).filter(Boolean))).sort()];
   
-  const availableImportTypes = ["جميع الأنواع", ...getFilteredUniqueValues("importType", {
-    manufacturer: manufacturerFilter,
-    category: categoryFilter,
-    trimLevel: trimLevelFilter,
-    year: yearFilter,
-    engineCapacity: engineCapacityFilter,
-    exteriorColor: exteriorColorFilter,
-    interiorColor: interiorColorFilter,
-    status: statusFilter
-  })];
+  const availableImportTypes = ["جميع الأنواع", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.importType).filter(Boolean))).sort()];
 
-  const availableOwnershipTypes = ["جميع أنواع الملكية", ...getFilteredUniqueValues("ownershipType", {
-    manufacturer: manufacturerFilter,
-    category: categoryFilter,
-    trimLevel: trimLevelFilter,
-    year: yearFilter,
-    engineCapacity: engineCapacityFilter,
-    exteriorColor: exteriorColorFilter,
-    interiorColor: interiorColorFilter,
-    status: statusFilter,
-    importType: importTypeFilter
-  })];
+  const availableOwnershipTypes = ["جميع أنواع الملكية", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.ownershipType).filter(Boolean))).sort()];
   
-  const availableEngineCapacities = ["جميع السعات", ...getFilteredUniqueValues("engineCapacity", {
-    manufacturer: manufacturerFilter,
-    category: categoryFilter,
-    trimLevel: trimLevelFilter,
-    year: yearFilter
-  })];
+  const availableEngineCapacities = ["جميع السعات", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.engineCapacity).filter(Boolean))).sort()];
   
-  const availableExteriorColors = ["جميع الألوان الخارجية", ...getFilteredUniqueValues("exteriorColor", {
-    manufacturer: manufacturerFilter,
-    category: categoryFilter,
-    trimLevel: trimLevelFilter,
-    year: yearFilter,
-    engineCapacity: engineCapacityFilter
-  })];
+  const availableExteriorColors = ["جميع الألوان الخارجية", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.exteriorColor).filter(Boolean))).sort()];
   
-  const availableInteriorColors = ["جميع الألوان الداخلية", ...getFilteredUniqueValues("interiorColor", {
-    manufacturer: manufacturerFilter,
-    category: categoryFilter,
-    trimLevel: trimLevelFilter,
-    year: yearFilter,
-    engineCapacity: engineCapacityFilter,
-    exteriorColor: exteriorColorFilter
-  })];
+  const availableInteriorColors = ["جميع الألوان الداخلية", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.interiorColor).filter(Boolean))).sort()];
   
-  const availableTrimLevels = ["جميع درجات التجهيز", ...getFilteredUniqueValues("trimLevel", {
-    manufacturer: manufacturerFilter,
-    category: categoryFilter
-  })];
+  const availableTrimLevels = ["جميع درجات التجهيز", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.trimLevel).filter(Boolean))).sort()];
   
-  const yearValues = getFilteredUniqueValues("year", {
-    manufacturer: manufacturerFilter,
-    category: categoryFilter,
-    trimLevel: trimLevelFilter
-  }).map(year => String(year)).sort((a, b) => parseInt(b) - parseInt(a)); // Sort years in descending order
+  const yearValues = Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => String(item.year)).filter(Boolean))).sort((a, b) => parseInt(b) - parseInt(a));
   
   const availableYears = ["جميع السنوات", ...yearValues];
   
@@ -1118,9 +1066,9 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       >
                         <Eye className="w-4 h-4 ml-2" />
                         {showSoldCars ? "إخفاء المباعة" : "إظهار المباعة"}
-                        {stats?.sold && stats.sold > 0 && (
+                        {(stats as any)?.sold && (stats as any).sold > 0 && (
                           <span className="glass-badge mr-2 px-2 py-1 text-xs font-semibold rounded-full">
-                            {stats.sold}
+                            {(stats as any).sold}
                           </span>
                         )}
                       </Button>
@@ -1225,7 +1173,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
       {/* Animated Floating Action Button */}
       <InventoryFAB
-        onAddItem={userRole === "admin" ? () => setFormOpen(true) : undefined}
+        onAddItem={userRole === "admin" ? () => setFormOpen(true) : () => {}}
         onSearch={() => {
           // Focus on search input if visible, or scroll to search area
           const searchInput = document.querySelector('input[placeholder*="البحث"]') as HTMLInputElement;
@@ -1237,7 +1185,6 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         onExport={handleExport}
         onPrint={handlePrint}
         onVoiceChat={() => setVoiceChatOpen(true)}
-        userRole={userRole}
       />
 
       {/* Add/Edit Form */}

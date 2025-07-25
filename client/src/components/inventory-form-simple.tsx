@@ -366,10 +366,10 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                 قوائم
               </Button>
             </div>
+            <DialogDescription className="text-xs text-white/70 mb-3">
+              {editItem ? "تحرير البيانات" : "إدخال بيانات المركبة"}
+            </DialogDescription>
           </DialogHeader>
-          <DialogDescription className="text-xs text-white/70 mb-3">
-            {editItem ? "تحرير البيانات" : "إدخال بيانات المركبة"}
-          </DialogDescription>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
