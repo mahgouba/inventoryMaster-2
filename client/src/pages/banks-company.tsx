@@ -126,9 +126,15 @@ export default function CompanyBanks() {
                 }}
               />
             ) : (
-              <div className="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
-                <Building2 className="w-16 h-16 text-white" />
-              </div>
+              <img 
+                src="/company-logo.svg" 
+                alt="شعار شركة البريمي للسيارة" 
+                className="w-32 h-32 object-contain drop-shadow-2xl"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
+              />
             )}
           </div>
           
@@ -139,7 +145,7 @@ export default function CompanyBanks() {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3 drop-shadow-lg">
             <Building2 className="w-10 h-10" />
-            بنوك الشركات
+            شركة البريمي للسيارة
           </h1>
           <p className="text-white/80 text-lg">معلومات الحسابات البنكية للشركات</p>
         </div>
