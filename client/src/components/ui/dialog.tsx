@@ -51,6 +51,7 @@ const DialogContent = React.forwardRef<
     if (!isHeaderArea) return;
     
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(true);
     
     const rect = contentRef.current?.getBoundingClientRect();
@@ -66,6 +67,7 @@ const DialogContent = React.forwardRef<
     if (!isDragging || !draggable) return;
     
     e.preventDefault();
+    e.stopPropagation();
     
     const newPosition = {
       x: e.clientX - dragStart.x,
@@ -84,7 +86,9 @@ const DialogContent = React.forwardRef<
     setPosition(newPosition);
   }, [isDragging, dragStart, draggable]);
 
-  const handleMouseUp = React.useCallback(() => {
+  const handleMouseUp = React.useCallback((e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setIsDragging(false);
   }, []);
 
@@ -125,7 +129,7 @@ const DialogContent = React.forwardRef<
         onMouseDown={handleMouseDown}
         {...props}
       >
-        <div ref={contentRef}>
+        <div ref={contentRef} style={{ pointerEvents: isDragging ? 'none' : 'auto' }}>
           {children}
         </div>
         <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground glass-button">
