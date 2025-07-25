@@ -748,12 +748,88 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               {/* Bank Header Icons */}
               <div className="flex items-center space-x-1 space-x-reverse">
                 <Link href="/banks-company">
-                  <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2" title="بنوك الشركة">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="glass-button glass-text-primary p-2" 
+                    title="بنوك الشركة"
+                    onMouseDown={(e) => {
+                      const longPressTimer = setTimeout(() => {
+                        const currentUrl = window.location.origin + "/banks-company";
+                        if (navigator.share) {
+                          navigator.share({
+                            title: "بنوك الشركة",
+                            text: "صفحة بنوك الشركة",
+                            url: currentUrl
+                          }).catch(() => {
+                            navigator.clipboard.writeText(currentUrl);
+                            toast({
+                              title: "تم نسخ الرابط",
+                              description: "تم نسخ رابط صفحة بنوك الشركة"
+                            });
+                          });
+                        } else {
+                          navigator.clipboard.writeText(currentUrl);
+                          toast({
+                            title: "تم نسخ الرابط",
+                            description: "تم نسخ رابط صفحة بنوك الشركة"
+                          });
+                        }
+                      }, 800);
+                      
+                      const clearTimer = () => {
+                        clearTimeout(longPressTimer);
+                        document.removeEventListener('mouseup', clearTimer);
+                        document.removeEventListener('mouseleave', clearTimer);
+                      };
+                      
+                      document.addEventListener('mouseup', clearTimer);
+                      document.addEventListener('mouseleave', clearTimer);
+                    }}
+                  >
                     <Building2 size={18} />
                   </Button>
                 </Link>
                 <Link href="/banks-personal">
-                  <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2" title="البنوك الشخصية">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="glass-button glass-text-primary p-2" 
+                    title="البنوك الشخصية"
+                    onMouseDown={(e) => {
+                      const longPressTimer = setTimeout(() => {
+                        const currentUrl = window.location.origin + "/banks-personal";
+                        if (navigator.share) {
+                          navigator.share({
+                            title: "البنوك الشخصية",
+                            text: "صفحة البنوك الشخصية",
+                            url: currentUrl
+                          }).catch(() => {
+                            navigator.clipboard.writeText(currentUrl);
+                            toast({
+                              title: "تم نسخ الرابط",
+                              description: "تم نسخ رابط صفحة البنوك الشخصية"
+                            });
+                          });
+                        } else {
+                          navigator.clipboard.writeText(currentUrl);
+                          toast({
+                            title: "تم نسخ الرابط",
+                            description: "تم نسخ رابط صفحة البنوك الشخصية"
+                          });
+                        }
+                      }, 800);
+                      
+                      const clearTimer = () => {
+                        clearTimeout(longPressTimer);
+                        document.removeEventListener('mouseup', clearTimer);
+                        document.removeEventListener('mouseleave', clearTimer);
+                      };
+                      
+                      document.addEventListener('mouseup', clearTimer);
+                      document.addEventListener('mouseleave', clearTimer);
+                    }}
+                  >
                     <CreditCard size={18} />
                   </Button>
                 </Link>

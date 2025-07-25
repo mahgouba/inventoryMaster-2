@@ -218,7 +218,7 @@ export default function PersonalBanks() {
                                   <span className="text-xs text-white">نسخ</span>
                                 </Button>
                               </div>
-                              <p className="text-sm text-white/90 p-2">{bank.accountName}</p>
+                              <p className="text-sm text-white/90">{bank.accountName}</p>
                             </div>
 
                             {/* Account Number */}
@@ -238,7 +238,7 @@ export default function PersonalBanks() {
                                   <span className="text-xs text-white">نسخ</span>
                                 </Button>
                               </div>
-                              <p className="text-sm text-white/90 p-2">{bank.accountNumber}</p>
+                              <p className="text-sm text-white/90">{bank.accountNumber}</p>
                             </div>
 
                             {/* IBAN */}
@@ -258,7 +258,7 @@ export default function PersonalBanks() {
                                   <span className="text-xs text-white">نسخ</span>
                                 </Button>
                               </div>
-                              <p className="text-sm break-all text-white/90 p-2">{bank.iban}</p>
+                              <p className="text-sm break-all text-white/90">{bank.iban}</p>
                             </div>
                           </div>
 
