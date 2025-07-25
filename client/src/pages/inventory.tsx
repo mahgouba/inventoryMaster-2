@@ -459,10 +459,9 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const totalPages = Math.ceil(items.length / itemsPerPage);
 
   return (
-    <SystemGlassWrapper>
-      <div className={`glass-background min-h-screen ${darkMode ? 'dark' : ''}`} dir="rtl">
+    <div className={`min-h-screen bg-slate-900 ${darkMode ? 'dark' : ''}`} dir="rtl">
         {/* Header */}
-        <header className="glass-header shadow-lg sticky top-0 z-50">
+        <header className="glass-container shadow-lg sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
             <div className="flex justify-between items-center h-14 sm:h-16">
               {/* Logo and Company Name */}
@@ -1324,6 +1323,5 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         onOpenChange={setImageManagementOpen}
       />
       </div>
-    </SystemGlassWrapper>
   );
 }

@@ -419,8 +419,8 @@ button[data-state="checked"][role="radio"] span {
     0 8px 24px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Single Glass Background */
-.glass-background {
+/* Glass Container - Single Layer Only */
+.glass-container {
   background: rgba(15, 23, 42, 0.4);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);

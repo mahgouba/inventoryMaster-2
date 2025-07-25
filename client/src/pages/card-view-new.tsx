@@ -632,9 +632,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   }
 
   return (
-    <div className="glass-background" dir="rtl">
+    <div className="min-h-screen bg-slate-900" dir="rtl">
       {/* Header */}
-      <header className="glass-container glass-header sticky top-0 z-50 border-b border-white/20 dark:border-slate-700/30">
+      <header className="glass-container sticky top-0 z-50 border-b border-white/20 dark:border-slate-700/30">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
           <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Logo and Company Name */}
@@ -1148,14 +1148,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         )}
 
         {/* Vehicle Cards by Manufacturer */}
-        <div className="space-y-8 glass-background min-h-screen">
-          {/* Background Gradient Blobs */}
-          <div className="fixed inset-0 pointer-events-none z-0">
-            <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-blue-500 to-purple-700 rounded-full mix-blend-screen filter blur-xl opacity-10 animate-blob"></div>
-            <div className="absolute top-40 right-20 w-72 h-72 bg-gradient-to-r from-yellow-500 to-pink-700 rounded-full mix-blend-screen filter blur-xl opacity-10 animate-blob animation-delay-2000"></div>
-            <div className="absolute bottom-20 left-20 w-72 h-72 bg-gradient-to-r from-green-500 to-blue-700 rounded-full mix-blend-screen filter blur-xl opacity-10 animate-blob2 animation-delay-4000"></div>
-            <div className="absolute bottom-40 right-10 w-72 h-72 bg-gradient-to-r from-pink-500 to-red-700 rounded-full mix-blend-screen filter blur-xl opacity-10 animate-blob2 animation-delay-6000"></div>
-          </div>
+        <div className="space-y-8 p-6">
           
           {Object.entries(groupedData)
             .filter(([manufacturer]) => selectedManufacturer.length === 0 || selectedManufacturer.includes(manufacturer))
