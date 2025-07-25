@@ -1286,6 +1286,18 @@ span.badge,
 .animation-delay-6000 {
   animation-delay: 15s;
 }
+
+.animation-delay-8000 {
+  animation-delay: 20s;
+}
+
+.glass-card-hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-5px);
+  box-shadow: 
+    0 12px 40px 0 rgba(31, 38, 135, 0.6),
+    0 8px 24px 0 rgba(0, 0, 0, 0.3);
+}
 .text-custom-gold {
   color: #C49632 !important;
 }
