@@ -26,7 +26,7 @@ import {
   Search,
   Calculator,
   Printer,
-  Download,
+  Download,  
   FileDown,
   MessageCircle,
   FileUp,
@@ -38,6 +38,8 @@ import { Link, useLocation } from "wouter";
 import { useTheme } from "@/hooks/useTheme";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import GlassBackground from "@/components/glass-background";
+import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
 import type { InventoryItem, Specification, InsertQuotation, Company, TermsAndConditions } from "@shared/schema";
 import { numberToArabic } from "@/utils/number-to-arabic";
@@ -1420,28 +1422,26 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
 
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-black">
-
-      
+    <SystemGlassWrapper>
       {/* Header */}
-      <header className="dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50 no-print mt-[8px] mb-[8px] pt-[37px] pb-[37px] pl-[-9px] pr-[-9px] bg-[#ffffff]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+      <GlassBackground variant="header" className="glass-header sticky top-0 z-50 no-print">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4 space-x-reverse">
               <Link href="/card-view">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="glass-button text-white border-white/20 hover:bg-white/20">
                   <ArrowLeft size={16} className="ml-2" />
                   العودة
                 </Button>
               </Link>
-              <h1 className="text-xl font-bold text-slate-800 dark:text-slate-200">إنشاء عرض سعر</h1>
+              <h1 className="text-xl font-bold text-white drop-shadow-lg">إنشاء عرض سعر</h1>
             </div>
             
             <div className="flex items-center space-x-2 space-x-reverse flex-wrap gap-2">
               <Link href="/quotation-management">
                 <Button
                   variant="outline"
-                  className="border-green-500 text-green-600 hover:bg-green-50"
+                  className="glass-button text-white border-white/20 hover:bg-white/20"
                 >
                   <FileText size={16} className="ml-2" />
                   العروض
@@ -1451,7 +1451,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               <Link href="/invoice-management">
                 <Button
                   variant="outline"
-                  className="border-cyan-500 text-cyan-600 hover:bg-cyan-50"
+                  className="glass-button text-white border-white/20 hover:bg-white/20"
                 >
                   <FileText size={16} className="ml-2" />
                   الفواتير
@@ -1460,7 +1460,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
             </div>
           </div>
         </div>
-      </header>
+      </GlassBackground>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -1470,19 +1470,18 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
           <div className="space-y-6">
             
             {/* Vehicle Selection Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
+            <GlassBackground variant="container" className="glass-container">
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-white drop-shadow-md mb-4 flex items-center">
                   <FileText className="ml-2" size={20} />
                   {selectedVehicle ? "بيانات السيارة المختارة" : "اختيار بيانات السيارة"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+                </h3>
+                <div>
                 {selectedVehicle ? (
                   // Existing Vehicle Display
                   <div className="flex items-start space-x-4 space-x-reverse">
                     {/* Manufacturer Logo */}
-                    <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
+                    <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center overflow-hidden border border-white/20">
                       {manufacturerData?.logo ? (
                         <img 
                           src={manufacturerData.logo} 
@@ -1490,7 +1489,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                           className="w-full h-full object-contain"
                         />
                       ) : (
-                        <span className="text-2xl font-bold text-slate-600 dark:text-slate-300">
+                        <span className="text-2xl font-bold text-white drop-shadow-md">
                           {editableVehicle.manufacturer?.charAt(0)}
                         </span>
                       )}
@@ -1499,7 +1498,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     {/* Vehicle Details */}
                     <div className="flex-1">
                       <div className="flex justify-between items-start">
-                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
+                        <h3 className="text-lg font-semibold text-white drop-shadow-md">
                           {editableVehicle.manufacturer} {editableVehicle.category}
                         </h3>
                         <Button
@@ -1520,7 +1519,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                             });
                             setVehicleEditOpen(true);
                           }}
-                          className="text-blue-600 hover:text-blue-700"
+                          className="glass-button text-white border-white/20 hover:bg-white/20"
                         >
                           <Edit3 size={14} className="ml-1" />
                           تعديل
@@ -1528,31 +1527,31 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                       </div>
                       <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
                         <div>
-                          <span className="text-slate-500">السنة:</span>
-                          <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.year}</span>
+                          <span className="text-white/70">السنة:</span>
+                          <span className="font-medium text-white ml-2 drop-shadow-sm">{editableVehicle.year}</span>
                         </div>
                         <div>
-                          <span className="text-slate-500">سعة المحرك:</span>
-                          <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.engineCapacity}</span>
+                          <span className="text-white/70">سعة المحرك:</span>
+                          <span className="font-medium text-white ml-2 drop-shadow-sm">{editableVehicle.engineCapacity}</span>
                         </div>
                         <div>
-                          <span className="text-slate-500">اللون الخارجي:</span>
-                          <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.exteriorColor}</span>
+                          <span className="text-white/70">اللون الخارجي:</span>
+                          <span className="font-medium text-white ml-2 drop-shadow-sm">{editableVehicle.exteriorColor}</span>
                         </div>
                         <div>
-                          <span className="text-slate-500">اللون الداخلي:</span>
-                          <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.interiorColor}</span>
+                          <span className="text-white/70">اللون الداخلي:</span>
+                          <span className="font-medium text-white ml-2 drop-shadow-sm">{editableVehicle.interiorColor}</span>
                         </div>
                         {editableVehicle.chassisNumber && (
                           <div className="col-span-2">
-                            <span className="text-slate-500">رقم الهيكل:</span>
-                            <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">{editableVehicle.chassisNumber}</span>
+                            <span className="text-white/70">رقم الهيكل:</span>
+                            <span className="font-medium text-white ml-2 drop-shadow-sm">{editableVehicle.chassisNumber}</span>
                           </div>
                         )}
                         {editableVehicle.price && (
                           <div className="col-span-2">
-                            <span className="text-slate-500">السعر الأساسي:</span>
-                            <span className="font-medium text-slate-700 dark:text-slate-300 ml-2">
+                            <span className="text-white/70">السعر الأساسي:</span>
+                            <span className="font-medium text-white ml-2 drop-shadow-sm">
                               {editableVehicle.price.toLocaleString()} ريال
                             </span>
                           </div>
@@ -1767,37 +1766,39 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     )}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+                </div>
+              </div>
+            </GlassBackground>
 
             {/* Customer Information Form or Authorization */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{isInvoiceMode ? "تخويل الفاتورة" : "بيانات العميل"}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <GlassBackground variant="container" className="glass-container">
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-white drop-shadow-md mb-4">
+                  {isInvoiceMode ? "تخويل الفاتورة" : "بيانات العميل"}
+                </h3>
+                <div className="space-y-4">
                 {isInvoiceMode ? (
                   // Authorization number field for invoice mode
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="invoiceNumber">رقم الفاتورة</Label>
+                        <Label htmlFor="invoiceNumber" className="text-white/90">رقم الفاتورة</Label>
                         <Input
                           id="invoiceNumber"
                           value={invoiceNumber}
                           readOnly
-                          className="bg-slate-50 dark:bg-slate-800"
+                          className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50"
                           placeholder="INV-123456"
                         />
                       </div>
                       <div>
-                        <Label htmlFor="authorizationNumber">بناء على تخويدكم رقم:</Label>
+                        <Label htmlFor="authorizationNumber" className="text-white/90">بناء على تخويدكم رقم:</Label>
                         <Input
                           id="authorizationNumber"
                           value={authorizationNumber}
                           onChange={(e) => setAuthorizationNumber(e.target.value)}
                           placeholder="أدخل رقم التخويل"
-                          className="font-medium"
+                          className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50 font-medium"
                         />
                       </div>
                     </div>
@@ -1891,40 +1892,42 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
 
                   </div>
                 )}
-              </CardContent>
-            </Card>
+                </div>
+              </div>
+            </GlassBackground>
 
             {/* Pricing Details Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
+            <GlassBackground variant="container" className="glass-container">
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-white drop-shadow-md mb-4 flex items-center">
                   <Calculator className="ml-2" size={20} />
                   تفاصيل التسعير
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+                </h3>
+                <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="basePrice">السعر الأساسي</Label>
+                    <Label htmlFor="basePrice" className="text-white/90">السعر الأساسي</Label>
                     <Input
                       id="basePrice"
                       type="number"
                       value={pricingDetails.basePrice}
                       onChange={(e) => setPricingDetails(prev => ({ ...prev, basePrice: parseFloat(e.target.value) || 0 }))}
+                      className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="quantity">الكمية</Label>
+                    <Label htmlFor="quantity" className="text-white/90">الكمية</Label>
                     <Input
                       id="quantity"
                       type="number"
                       min="1"
                       value={pricingDetails.quantity}
                       onChange={(e) => setPricingDetails(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+                      className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="taxRate">معدل الضريبة (%)</Label>
+                    <Label htmlFor="taxRate" className="text-white/90">معدل الضريبة (%)</Label>
                     <Input
                       id="taxRate"
                       type="number"
@@ -1932,6 +1935,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                       max="100"
                       value={pricingDetails.taxRate}
                       onChange={(e) => setPricingDetails(prev => ({ ...prev, taxRate: parseFloat(e.target.value) || 0 }))}
+                      className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50"
                     />
                   </div>
                   <div className="flex items-center space-x-2 space-x-reverse pt-6">
@@ -1942,12 +1946,12 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                       onChange={(e) => setPricingDetails(prev => ({ ...prev, isVATInclusive: e.target.checked }))}
                       className="rounded accent-[#C49632]"
                     />
-                    <Label htmlFor="isVATInclusive">السعر شامل الضريبة</Label>
+                    <Label htmlFor="isVATInclusive" className="text-white/90">السعر شامل الضريبة</Label>
                   </div>
                 </div>
 
                 {/* License Plate Section */}
-                <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+                <div className="border-t border-white/20 pt-4">
                   <div className="flex items-center space-x-2 space-x-reverse mb-3">
                     <input
                       type="checkbox"
@@ -1956,18 +1960,19 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                       onChange={(e) => setPricingDetails(prev => ({ ...prev, includeLicensePlate: e.target.checked }))}
                       className="rounded accent-[#C49632]"
                     />
-                    <Label htmlFor="includeLicensePlate">تشمل اللوحات</Label>
+                    <Label htmlFor="includeLicensePlate" className="text-white/90">تشمل اللوحات</Label>
                   </div>
                   
                   {pricingDetails.includeLicensePlate && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6">
                       <div>
-                        <Label htmlFor="licensePlatePrice">سعر اللوحات</Label>
+                        <Label htmlFor="licensePlatePrice" className="text-white/90">سعر اللوحات</Label>
                         <Input
                           id="licensePlatePrice"
                           type="number"
                           value={pricingDetails.licensePlatePrice}
                           onChange={(e) => setPricingDetails(prev => ({ ...prev, licensePlatePrice: parseFloat(e.target.value) || 0 }))}
+                          className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50"
                         />
                       </div>
                       <div className="flex items-center space-x-2 space-x-reverse pt-6">
@@ -1978,15 +1983,15 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                           onChange={(e) => setPricingDetails(prev => ({ ...prev, licensePlateSubjectToTax: e.target.checked }))}
                           className="rounded accent-[#C49632]"
                         />
-                        <Label htmlFor="licensePlateSubjectToTax">اللوحات خاضعة للضريبة</Label>
+                        <Label htmlFor="licensePlateSubjectToTax" className="text-white/90">اللوحات خاضعة للضريبة</Label>
                       </div>
                     </div>
                   )}
                 </div>
 
                 {/* Pricing Summary */}
-                <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-                  <h4 className="font-semibold mb-3">ملخص التسعير</h4>
+                <div className="border-t border-white/20 pt-4">
+                  <h4 className="font-semibold mb-3 text-white drop-shadow-md">ملخص التسعير</h4>
                   {(() => {
                     const totals = calculateTotals();
                     return (
@@ -2020,24 +2025,24 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     );
                   })()}
                 </div>
-              </CardContent>
-            </Card>
+                </div>
+              </div>
+            </GlassBackground>
           </div>
 
           {/* Right Column - Management Windows */}
           <div className="space-y-6">
             
             {/* Management Options */}
-            <Card>
-              <CardHeader>
-                <CardTitle>إدارة بيانات العرض</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+            <GlassBackground variant="container" className="glass-container">
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-white drop-shadow-md mb-4">إدارة بيانات العرض</h3>
+                <div className="space-y-3">
                 {/* Terms and Conditions Button */}
                 <Button
                   variant="outline"
                   onClick={() => setShowTermsDialog(true)}
-                  className="w-full border-orange-500 text-orange-600 hover:bg-orange-50"
+                  className="w-full glass-button border-orange-500/50 text-orange-300 hover:bg-orange-500/20 bg-white/10"
                 >
                   <Settings2 size={16} className="ml-2" />
                   شروط وأحكام
@@ -2048,7 +2053,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   variant="outline"
                   onClick={handleSaveQuotation}
                   disabled={createQuotationMutation.isPending}
-                  className="w-full border-green-500 text-green-600 hover:bg-green-50"
+                  className="w-full glass-button border-green-500/50 text-green-300 hover:bg-green-500/20 bg-white/10"
                 >
                   <Save size={16} className="ml-2" />
                   {createQuotationMutation.isPending ? "جاري الحفظ..." : `حفظ ${isInvoiceMode ? "الفاتورة" : "العرض"}`}
@@ -2058,18 +2063,18 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 <Button
                   variant="outline"
                   onClick={() => setShowWhatsappDialog(true)}
-                  className="w-full border-emerald-500 text-emerald-600 hover:bg-emerald-50"
+                  className="w-full glass-button border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/20 bg-white/10"
                 >
                   <MessageCircle size={16} className="ml-2" />
                   مشاركة واتساب
                 </Button>
                 
                 {/* Toggle Switch for Stamp Visibility - RTL Design */}
-                <div className="flex items-center gap-3 border border-red-500 rounded-lg px-4 py-3 bg-white">
+                <div className="flex items-center gap-3 border border-red-500/50 rounded-lg px-4 py-3 bg-white/10 backdrop-blur-sm">
                   <div className="relative">
                     <div 
                       className={`w-11 h-6 rounded-full cursor-pointer transition-all duration-300 ${
-                        showStamp ? 'bg-red-500' : 'bg-red-200'
+                        showStamp ? 'bg-red-500' : 'bg-red-300/50'
                       }`}
                       onClick={() => {
                         const newValue = !showStamp;
@@ -2087,18 +2092,18 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                       />
                     </div>
                   </div>
-                  <Label className="text-sm font-medium text-red-600 cursor-pointer select-none">
+                  <Label className="text-sm font-medium text-red-300 cursor-pointer select-none drop-shadow-sm">
                     {showStamp ? "إخفاء الختم" : "إظهار الختم"}
                   </Label>
                 </div>
                 
                 {/* Toggle Switch for Invoice/Quotation Mode - RTL Design */}
-                <div className="flex items-center gap-3 border border-purple-500 rounded-lg px-4 py-3 bg-white">
-                  <FileUp size={16} className="text-purple-600" />
+                <div className="flex items-center gap-3 border border-purple-500/50 rounded-lg px-4 py-3 bg-white/10 backdrop-blur-sm">
+                  <FileUp size={16} className="text-purple-300" />
                   <div className="relative">
                     <div 
                       className={`w-11 h-6 rounded-full cursor-pointer transition-all duration-300 ${
-                        isInvoiceMode ? 'bg-purple-600' : 'bg-purple-200'
+                        isInvoiceMode ? 'bg-purple-600' : 'bg-purple-300/50'
                       }`}
                       onClick={() => {
                         const newValue = !isInvoiceMode;
@@ -2126,14 +2131,14 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                       />
                     </div>
                   </div>
-                  <Label className="text-sm font-medium text-purple-600 cursor-pointer select-none">
+                  <Label className="text-sm font-medium text-purple-300 cursor-pointer select-none drop-shadow-sm">
                     {isInvoiceMode ? "فاتورة" : "عرض سعر"}
                   </Label>
                 </div>
                 
                 <Button 
                   onClick={handleDownloadPDF}
-                  className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="w-full glass-button bg-gradient-to-r from-green-500/70 to-green-600/70 hover:from-green-600/80 hover:to-green-700/80 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl backdrop-blur-sm"
                   disabled={downloadLoading}
                 >
                   {downloadLoading ? (
@@ -2152,13 +2157,14 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 <Button 
                   onClick={handlePrintQuotation}
                   variant="outline"
-                  className="w-full"
+                  className="w-full glass-button border-white/20 text-white hover:bg-white/20 bg-white/10"
                 >
                   <Printer size={16} className="ml-2" />
                   طباعة العرض
                 </Button>
-              </CardContent>
-            </Card>
+                </div>
+              </div>
+            </GlassBackground>
 
 
           </div>
@@ -3540,6 +3546,6 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         </DialogContent>
       </Dialog>
 
-    </div>
+    </SystemGlassWrapper>
   );
 }
