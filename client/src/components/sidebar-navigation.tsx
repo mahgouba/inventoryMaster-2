@@ -183,14 +183,14 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
         <button
           onClick={item.onClick}
           className={cn(
-            "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200",
-            "hover:bg-slate-100 dark:hover:bg-slate-800",
-            active && "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+            "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 backdrop-blur-sm",
+            "hover:bg-white/10 text-white/90 hover:text-white",
+            active && "bg-gradient-to-r from-blue-500/30 to-blue-600/30 text-white border border-blue-400/30 shadow-lg"
           )}
         >
-          <item.icon className="h-5 w-5 flex-shrink-0" />
+          <item.icon className="h-5 w-5 flex-shrink-0 drop-shadow-sm" />
           {!isCollapsed && (
-            <span className="text-right flex-1">{item.title}</span>
+            <span className="text-right flex-1 drop-shadow-sm">{item.title}</span>
           )}
         </button>
       );
@@ -200,14 +200,14 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
       <Link href={item.href}>
         <a
           className={cn(
-            "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200",
-            "hover:bg-slate-100 dark:hover:bg-slate-800",
-            active && "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+            "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 backdrop-blur-sm",
+            "hover:bg-white/10 text-white/90 hover:text-white",
+            active && "bg-gradient-to-r from-blue-500/30 to-blue-600/30 text-white border border-blue-400/30 shadow-lg"
           )}
         >
-          <item.icon className="h-5 w-5 flex-shrink-0" />
+          <item.icon className="h-5 w-5 flex-shrink-0 drop-shadow-sm" />
           {!isCollapsed && (
-            <span className="text-right flex-1">{item.title}</span>
+            <span className="text-right flex-1 drop-shadow-sm">{item.title}</span>
           )}
         </a>
       </Link>
@@ -216,20 +216,20 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
 
   return (
     <div className={cn(
-      "fixed right-0 top-0 h-full bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 transition-all duration-300 z-50",
+      "fixed right-0 top-0 h-full backdrop-blur-xl bg-white/10 dark:bg-black/10 border-l border-white/20 dark:border-white/10 transition-all duration-300 z-50 shadow-2xl",
       isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
-      <div className="p-4 border-b border-slate-200 dark:border-slate-800">
+      <div className="p-4 border-b border-white/20 dark:border-white/10 backdrop-blur-sm">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">ش</span>
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg backdrop-blur-sm">
+                <span className="text-white font-bold text-sm drop-shadow-sm">ش</span>
               </div>
               <div className="text-right">
-                <div className="font-semibold text-sm">شركة البريمي</div>
-                <div className="text-xs text-slate-500">للسيارات</div>
+                <div className="font-semibold text-sm text-white drop-shadow-sm">شركة البريمي</div>
+                <div className="text-xs text-white/70 drop-shadow-sm">للسيارات</div>
               </div>
             </div>
           )}
@@ -237,9 +237,9 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
             variant="ghost"
             size="sm"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="h-8 w-8 p-0"
+            className="h-8 w-8 p-0 backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 text-white"
           >
-            {isCollapsed ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            {isCollapsed ? <ChevronLeft className="h-4 w-4 drop-shadow-sm" /> : <ChevronRight className="h-4 w-4 drop-shadow-sm" />}
           </Button>
         </div>
       </div>
@@ -249,7 +249,7 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
         {/* Overview Section */}
         <div className="mb-6">
           {!isCollapsed && (
-            <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 text-right">
+            <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-3 text-right drop-shadow-sm">
               النظرة العامة
             </h3>
           )}
@@ -264,7 +264,7 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
         {adminItems.length > 0 && (
           <div className="mb-6">
             {!isCollapsed && (
-              <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 text-right">
+              <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-3 text-right drop-shadow-sm">
                 إدارة النظام
               </h3>
             )}
@@ -279,7 +279,7 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
         {/* Account Section */}
         <div className="mb-6">
           {!isCollapsed && (
-            <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 text-right">
+            <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-3 text-right drop-shadow-sm">
               الحساب
             </h3>
           )}
@@ -291,11 +291,11 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
             {/* Logout Button */}
             <button
               onClick={onLogout}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 backdrop-blur-sm hover:bg-red-500/20 text-red-300 hover:text-red-200 border border-red-400/20 hover:border-red-400/40"
             >
-              <LogOut className="h-5 w-5 flex-shrink-0" />
+              <LogOut className="h-5 w-5 flex-shrink-0 drop-shadow-sm" />
               {!isCollapsed && (
-                <span className="text-right flex-1">تسجيل الخروج</span>
+                <span className="text-right flex-1 drop-shadow-sm">تسجيل الخروج</span>
               )}
             </button>
           </nav>
@@ -303,20 +303,20 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
       </div>
 
       {/* Bottom Section */}
-      <div className="p-4 border-t border-slate-200 dark:border-slate-800">
+      <div className="p-4 border-t border-white/20 dark:border-white/10 backdrop-blur-sm">
         {/* Theme Toggle */}
         <div className="mb-4">
           <button
             onClick={toggleDarkMode}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 backdrop-blur-sm hover:bg-white/10 text-white/90 hover:text-white border border-white/20 hover:border-white/30"
           >
             {isDarkMode ? (
-              <Sun className="h-5 w-5 flex-shrink-0" />
+              <Sun className="h-5 w-5 flex-shrink-0 drop-shadow-sm" />
             ) : (
-              <Moon className="h-5 w-5 flex-shrink-0" />
+              <Moon className="h-5 w-5 flex-shrink-0 drop-shadow-sm" />
             )}
             {!isCollapsed && (
-              <span className="text-right flex-1">
+              <span className="text-right flex-1 drop-shadow-sm">
                 {isDarkMode ? "الوضع النهاري" : "الوضع الليلي"}
               </span>
             )}
@@ -324,16 +324,16 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
         </div>
 
         {/* User Info */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 p-3 rounded-lg backdrop-blur-sm bg-white/5 border border-white/20">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-blue-600 text-white">
+            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg">
               {user.username.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           {!isCollapsed && (
             <div className="flex-1 text-right min-w-0">
-              <div className="text-sm font-medium truncate">{user.username}</div>
-              <div className="text-xs text-slate-500 dark:text-slate-400">
+              <div className="text-sm font-medium truncate text-white drop-shadow-sm">{user.username}</div>
+              <div className="text-xs text-white/60 drop-shadow-sm">
                 {user.role === "admin" ? "مدير النظام" : "موظف مبيعات"}
               </div>
             </div>
