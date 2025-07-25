@@ -1127,12 +1127,12 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Category and Trim Level Row */}
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1">
-                              <img src="/car.svg" alt="Category" className="w-9 h-9" style={{filter: 'brightness(0) saturate(100%) invert(45%) sepia(71%) saturate(1078%) hue-rotate(28deg) brightness(96%) contrast(88%)'}} />
-                              <span className="font-bold text-sm text-yellow-300 drop-shadow-sm">{item.category}</span>
+                              <img src="/car.svg" alt="Category" className="w-9 h-9" style={{filter: 'brightness(0) saturate(100%) invert(53%) sepia(82%) saturate(423%) hue-rotate(9deg) brightness(98%) contrast(88%)'}} />
+                              <span className="font-bold text-sm drop-shadow-sm" style={{color: '#C49632'}}>{item.category}</span>
                             </div>
                             {item.trimLevel && (
                               <div className="flex items-center gap-1">
-                                <span className="font-bold text-sm text-yellow-300 drop-shadow-sm">{item.trimLevel}</span>
+                                <span className="font-bold text-sm drop-shadow-sm" style={{color: '#C49632'}}>{item.trimLevel}</span>
                               </div>
                             )}
                           </div>
