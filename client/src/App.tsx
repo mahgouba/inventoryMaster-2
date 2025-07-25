@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useTheme } from "@/hooks/useTheme";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
+import UniversalGlass from "@/components/universal-glass";
 import InventoryPage from "@/pages/inventory";
 import CardViewPage from "@/pages/card-view-new";
 import FinancingCalculatorPage from "@/pages/financing-calculator";
@@ -123,6 +124,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
+        <UniversalGlass />
         <TooltipProvider>
           <div dir="rtl" className="font-arabic">
             <Toaster />

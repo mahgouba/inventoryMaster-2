@@ -283,7 +283,94 @@ button[data-state="checked"][role="radio"] span {
   box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* Glass form styling */
+/* Enhanced Glass Button Styling */
+.glass-button, 
+button.glass-button,
+.btn-glass,
+[role="button"].glass-button {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
+  font-weight: 500 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 
+    0 4px 16px 0 rgba(0, 0, 0, 0.3),
+    0 2px 8px 0 rgba(255, 255, 255, 0.1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.glass-button:hover,
+button.glass-button:hover,
+.btn-glass:hover,
+[role="button"].glass-button:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 
+    0 8px 24px 0 rgba(0, 0, 0, 0.5),
+    0 4px 12px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.glass-button:active,
+button.glass-button:active,
+.btn-glass:active {
+  transform: translateY(-1px) !important;
+  box-shadow: 
+    0 4px 12px 0 rgba(0, 0, 0, 0.4),
+    0 2px 6px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Glass Dialog and Modal Styling */
+.glass-dialog,
+[role="dialog"].glass-dialog,
+.dialog-content.glass-dialog {
+  background: rgba(10, 15, 25, 0.95) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow: 
+    0 16px 48px 0 rgba(0, 0, 0, 0.7),
+    0 8px 24px 0 rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.glass-dialog::before,
+[role="dialog"].glass-dialog::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 30% 20%, rgba(120, 119, 198, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 70% 80%, rgba(255, 119, 198, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 20% 70%, rgba(120, 219, 255, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glass-dialog > *,
+[role="dialog"].glass-dialog > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Glass Overlay Styling */
+.glass-overlay,
+[data-overlay].glass-overlay {
+  background: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* Glass Form Styling */
 .glass-form {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px);
@@ -293,18 +380,219 @@ button[data-state="checked"][role="radio"] span {
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* Glass select and dropdown styling */
+/* Enhanced Glass Select and Dropdown Styling */
 .glass-select,
-.glass-select > div {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(15px) !important;
-  -webkit-backdrop-filter: blur(15px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+.glass-select > div,
+[role="combobox"].glass-select,
+.select-trigger.glass-select {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 
+    0 4px 12px 0 rgba(0, 0, 0, 0.3),
+    0 2px 6px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-select:hover > div,
+.glass-select:hover,
+[role="combobox"].glass-select:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 
+    0 6px 16px 0 rgba(0, 0, 0, 0.4),
+    0 3px 8px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Glass Dropdown Content */
+.glass-dropdown-content,
+[role="listbox"].glass-dropdown-content,
+.dropdown-content.glass-dropdown-content {
+  background: rgba(10, 15, 25, 0.95) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 12px !important;
+  box-shadow: 
+    0 12px 32px 0 rgba(0, 0, 0, 0.6),
+    0 6px 16px 0 rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  padding: 8px !important;
+}
+
+.glass-dropdown-content [role="option"],
+.glass-dropdown-content .dropdown-item {
+  color: white !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
+}
+
+.glass-dropdown-content [role="option"]:hover,
+.glass-dropdown-content .dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Universal Glass Application - Apply to ALL buttons and interactive elements */
+button:not(.btn-primary):not(.btn-secondary):not(.btn-destructive),
+[role="button"]:not(.btn-primary):not(.btn-secondary):not(.btn-destructive),
+.btn,
+input[type="submit"],
+input[type="button"] {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 
+    0 4px 16px 0 rgba(0, 0, 0, 0.3),
+    0 2px 8px 0 rgba(255, 255, 255, 0.1) !important;
+  position: relative !important;
+}
+
+button:hover:not(.btn-primary):not(.btn-secondary):not(.btn-destructive),
+[role="button"]:hover:not(.btn-primary):not(.btn-secondary):not(.btn-destructive),
+.btn:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 
+    0 8px 24px 0 rgba(0, 0, 0, 0.5),
+    0 4px 12px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Universal Glass Dialog Application */
+[role="dialog"],
+.dialog-content,
+.modal,
+.popover-content,
+[data-radix-popper-content-wrapper] {
+  background: rgba(10, 15, 25, 0.95) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow: 
+    0 16px 48px 0 rgba(0, 0, 0, 0.7),
+    0 8px 24px 0 rgba(255, 255, 255, 0.1) !important;
   color: white !important;
 }
 
-.glass-select:hover > div {
+/* Universal Glass Form Controls */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+textarea,
+select {
   background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+textarea:focus,
+select:focus {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(0, 98, 127, 0.6) !important;
+  box-shadow: 0 0 0 2px rgba(0, 98, 127, 0.3) !important;
+}
+
+/* Glass Badge and Chip Styling */
+.badge,
+.chip,
+span.badge,
+.inline-badge {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border-radius: 20px !important;
+  padding: 4px 12px !important;
+  font-size: 0.875rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.badge:hover,
+.chip:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Glass Toast and Notification Styling */
+[data-sonner-toast],
+.toast,
+.notification {
+  background: rgba(10, 15, 25, 0.95) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 12px !important;
+  color: white !important;
+  box-shadow: 
+    0 12px 32px 0 rgba(0, 0, 0, 0.6),
+    0 6px 16px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Glass Accordion and Collapsible Styling */
+[data-state="open"],
+[data-state="closed"],
+.accordion-content,
+.collapsible-content {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 12px !important;
+}
+
+/* Override shadcn specific components */
+.lucide,
+.lucide-react {
+  color: white !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Glass Tab Styling */
+[role="tab"],
+.tab-trigger,
+[data-state="active"][role="tab"] {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  transition: all 0.3s ease !important;
+}
+
+[role="tab"]:hover,
+.tab-trigger:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+[data-state="active"][role="tab"] {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
 }
 
 /* Glass navigation and header styling */
