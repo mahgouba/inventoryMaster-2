@@ -288,18 +288,16 @@ button[data-state="checked"][role="radio"] span {
 button.glass-button,
 .btn-glass,
 [role="button"].glass-button {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(15px) !important;
-  -webkit-backdrop-filter: blur(15px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: white !important;
-  font-weight: 400 !important;
-  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  font-weight: 400;
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: 
     0 2px 8px 0 rgba(0, 0, 0, 0.2),
-    0 1px 4px 0 rgba(255, 255, 255, 0.05) !important;
-  position: relative !important;
-  overflow: hidden !important;
+    0 1px 4px 0 rgba(255, 255, 255, 0.05);
 }
 
 .glass-button:hover,
@@ -435,43 +433,39 @@ button.glass-button:active,
   background: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Universal Glass Application - Slower and Lighter */
-button:not(.btn-primary):not(.btn-secondary):not(.btn-destructive),
-[role="button"]:not(.btn-primary):not(.btn-secondary):not(.btn-destructive),
-.btn,
-input[type="submit"],
-input[type="button"] {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(15px) !important;
-  -webkit-backdrop-filter: blur(15px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: white !important;
-  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+/* Universal Glass Application - CSS-only approach */
+.universal-glass-enabled button:not(.btn-primary):not(.btn-secondary):not(.btn-destructive),
+.universal-glass-enabled [role="button"]:not(.btn-primary):not(.btn-secondary):not(.btn-destructive),
+.glass-button {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: 
     0 2px 8px 0 rgba(0, 0, 0, 0.2),
-    0 1px 4px 0 rgba(255, 255, 255, 0.05) !important;
-  position: relative !important;
+    0 1px 4px 0 rgba(255, 255, 255, 0.05);
 }
 
-button:hover:not(.btn-primary):not(.btn-secondary):not(.btn-destructive),
-[role="button"]:hover:not(.btn-primary):not(.btn-secondary):not(.btn-destructive),
-.btn:hover,
-input[type="submit"]:hover,
-input[type="button"]:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(255, 255, 255, 0.25) !important;
-  transform: translateY(-1px) !important;
+.universal-glass-enabled button:not(.btn-primary):not(.btn-secondary):not(.btn-destructive):hover,
+.universal-glass-enabled [role="button"]:not(.btn-primary):not(.btn-secondary):not(.btn-destructive):hover,
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
   box-shadow: 
     0 4px 16px 0 rgba(0, 0, 0, 0.3),
-    0 2px 8px 0 rgba(255, 255, 255, 0.1) !important;
+    0 2px 8px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* Universal Glass Dialog Application */
-[role="dialog"],
-.dialog-content,
-.modal,
-.popover-content,
-[data-radix-popper-content-wrapper] {
+.universal-glass-enabled [role="dialog"],
+.universal-glass-enabled .dialog-content,
+.universal-glass-enabled .modal,
+.universal-glass-enabled .popover-content,
+.universal-glass-enabled [data-radix-popper-content-wrapper],
+.glass-dialog {
   background: rgba(10, 15, 25, 0.95) !important;
   backdrop-filter: blur(30px) !important;
   -webkit-backdrop-filter: blur(30px) !important;
@@ -484,15 +478,16 @@ input[type="button"]:hover {
 }
 
 /* Universal Glass Form Controls - Slower and Lighter */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="tel"],
-input[type="url"],
-input[type="search"],
-textarea,
-select {
+.universal-glass-enabled input[type="text"],
+.universal-glass-enabled input[type="email"],
+.universal-glass-enabled input[type="password"],
+.universal-glass-enabled input[type="number"],
+.universal-glass-enabled input[type="tel"],
+.universal-glass-enabled input[type="url"],
+.universal-glass-enabled input[type="search"],
+.universal-glass-enabled textarea,
+.universal-glass-enabled select,
+.glass-input {
   background: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
