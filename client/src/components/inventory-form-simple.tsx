@@ -114,18 +114,18 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   });
 
   // Get manufacturers from API - no state needed, use data directly
-  const carsManufacturerNames = carsManufacturers.map((m: any) => m.name_ar);
-  const allManufacturers = [...manufacturers, ...carsManufacturerNames];
+  const carsManufacturerNames = (carsManufacturers as any[]).map((m: any) => m.name_ar);
+  const allManufacturers = Array.from(new Set([...manufacturers, ...carsManufacturerNames]));
   
   // Get categories from API - use data directly 
-  const carsModelNames = carsModels.map((m: any) => m.model_ar);
+  const carsModelNames = (carsModels as any[]).map((m: any) => m.model_ar);
   const dynamicCategories = selectedManufacturer ? carsModelNames : [];
-  const allCategories = [...availableCategories, ...dynamicCategories];
+  const allCategories = Array.from(new Set([...availableCategories, ...dynamicCategories]));
   
   // Get trim levels from API - use data directly
-  const carsTrimsNames = carsTrims.map((t: any) => t.trim_ar);
+  const carsTrimsNames = (carsTrims as any[]).map((t: any) => t.trim_ar);
   const dynamicTrimLevels = selectedCategory ? carsTrimsNames : [];
-  const allTrimLevels = [...availableTrimLevels, ...dynamicTrimLevels];
+  const allTrimLevels = Array.from(new Set([...availableTrimLevels, ...dynamicTrimLevels]));
 
   const handleManufacturerChange = (manufacturer: string) => {
     setSelectedManufacturer(manufacturer);
@@ -346,7 +346,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-screen overflow-y-auto w-[95vw] sm:w-full">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full flex flex-col justify-center mx-auto my-auto">
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle className="text-lg font-semibold text-slate-800">
@@ -451,7 +451,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                       <FormItem>
                         <FormLabel>درجة التجهيز</FormLabel>
                         <FormControl>
-                          <Select value={field.value} onValueChange={field.onChange} disabled={!selectedManufacturer || !selectedCategory}>
+                          <Select value={field.value || ""} onValueChange={field.onChange} disabled={!selectedManufacturer || !selectedCategory}>
                             <SelectTrigger>
                               <SelectValue placeholder="اختر درجة التجهيز" />
                             </SelectTrigger>
