@@ -198,9 +198,9 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
 
     return (
       <Link href={item.href}>
-        <a
+        <div
           className={cn(
-            "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 backdrop-blur-sm",
+            "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 backdrop-blur-sm cursor-pointer",
             "hover:bg-white/10 text-white/90 hover:text-white",
             active && "bg-gradient-to-r from-blue-500/30 to-blue-600/30 text-white border border-blue-400/30 shadow-lg"
           )}
@@ -209,14 +209,14 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
           {!isCollapsed && (
             <span className="text-right flex-1 drop-shadow-sm">{item.title}</span>
           )}
-        </a>
+        </div>
       </Link>
     );
   };
 
   return (
     <div className={cn(
-      "fixed right-0 top-0 h-full backdrop-blur-xl bg-white/10 dark:bg-black/10 border-l border-white/20 dark:border-white/10 transition-all duration-300 z-50 shadow-2xl",
+      "fixed right-0 top-0 h-screen backdrop-blur-xl bg-white/10 dark:bg-black/10 border-l border-white/20 dark:border-white/10 transition-all duration-300 z-50 shadow-2xl flex flex-col",
       isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
@@ -245,7 +245,7 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 p-4 overflow-y-auto">
+      <div className="flex-1 p-4 overflow-y-auto overflow-x-hidden max-h-screen">
         {/* Overview Section */}
         <div className="mb-6">
           {!isCollapsed && (

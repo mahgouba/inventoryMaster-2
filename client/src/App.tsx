@@ -61,13 +61,13 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
   const shouldShowSidebar = !pagesWithoutSidebar.includes(location);
 
   return (
-    <div className="min-h-screen bg-slate-900 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-900 relative overflow-x-hidden">
       {shouldShowSidebar && (
         <SidebarNavigation user={user} onLogout={onLogout} />
       )}
       
       <div className={cn(
-        "min-h-screen",
+        "min-h-screen transition-all duration-300",
         shouldShowSidebar ? "mr-64" : ""
       )}>
         <SystemGlassWrapper>
