@@ -71,7 +71,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
       )}
       
       <div className={cn(
-        "transition-all duration-300",
+        "transition-all duration-300 min-h-screen",
         shouldShowSidebar ? "mr-64" : ""
       )}>
         <SystemGlassWrapper>
