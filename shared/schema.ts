@@ -341,13 +341,22 @@ export const insertInventoryItemSchema = createInsertSchema(inventoryItems).omit
   engineCapacity: z.string().min(1, "الموديل مطلوب"),
   chassisNumber: z.string().min(1, "رقم الهيكل مطلوب"),
   exteriorColor: z.string().min(1, "اللون الخارجي مطلوب"),
+  interiorColor: z.string().min(1, "اللون الداخلي مطلوب"),
+  status: z.string().min(1, "الحالة مطلوبة"),
   importType: z.string().min(1, "نوع الاستيراد مطلوب"),
+  ownershipType: z.string().min(1, "نوع الملكية مطلوب"),
+  location: z.string().min(1, "الموقع مطلوب"),
+  year: z.number().min(1900, "السنة غير صحيحة").max(2030, "السنة غير صحيحة"),
   detailedSpecifications: z.string().optional(),
   soldDate: z.date().nullable().optional(),
   reservationDate: z.date().nullable().optional(),
   reservedBy: z.string().optional(),
   reservationNote: z.string().optional(),
   mileage: z.number().positive("يجب أن يكون الممشي رقم موجب").optional(),
+  price: z.string().optional(),
+  notes: z.string().optional(),
+  images: z.array(z.string()).optional().default([]),
+  isSold: z.boolean().optional().default(false),
 });
 
 export const insertBankSchema = createInsertSchema(banks).omit({
