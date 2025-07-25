@@ -34,7 +34,8 @@ import {
   ChevronRight,
   Eye,
   EyeOff,
-  CreditCard
+  CreditCard,
+  Plus
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -667,6 +668,21 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
             {/* Navigation */}
             <div className="flex items-center space-x-2 space-x-reverse">
+              {/* Add Item Button */}
+              <Button 
+                variant="default" 
+                size="sm" 
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => {
+                  setEditingItem(null);
+                  setShowEditDialog(true);
+                }}
+              >
+                <Plus size={16} className="ml-1" />
+                <span className="hidden sm:inline">إضافة عنصر</span>
+                <span className="sm:hidden">إضافة</span>
+              </Button>
+
               {/* Home Button */}
               <Link href="/">
                 <Button variant="outline" size="sm" className="glass-button glass-text-primary">

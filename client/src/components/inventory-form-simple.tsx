@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -364,6 +364,9 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
               </Button>
             </div>
           </DialogHeader>
+          <DialogDescription className="text-sm text-slate-600 mb-4">
+            {editItem ? "قم بتحرير بيانات المركبة وحفظ التغييرات" : "أدخل بيانات المركبة الجديدة لإضافتها للمخزون"}
+          </DialogDescription>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
