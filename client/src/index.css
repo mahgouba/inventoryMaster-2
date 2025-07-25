@@ -74,6 +74,39 @@ button[data-state="checked"][role="radio"] span {
   background-color: #A67C28 !important;
 }
 
+/* Slower animations for all dialogs and modals */
+.dialog-animation-slow {
+  animation-duration: 1500ms !important;
+  transition-duration: 1500ms !important;
+}
+
+/* Slower fade and zoom animations */
+[data-state=open] {
+  animation-duration: 1200ms !important;
+}
+
+[data-state=closed] {
+  animation-duration: 1200ms !important;
+}
+
+/* Slow transitions for all interactive elements */
+.transition-slow {
+  transition-duration: 800ms !important;
+}
+
+/* Override Tailwind animation durations */
+.animate-in {
+  animation-duration: 1200ms !important;
+}
+
+.animate-out {
+  animation-duration: 1200ms !important;
+}
+
+.duration-200 {
+  transition-duration: 1000ms !important;
+}
+
 /* Glass Morphism for Vehicle Cards */
 .glass-card {
   background: rgba(255, 255, 255, 0.08);
