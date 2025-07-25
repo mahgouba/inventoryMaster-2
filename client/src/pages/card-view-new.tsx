@@ -1073,7 +1073,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     <div className="flex items-center space-x-6 space-x-reverse">
                       {/* Manufacturer Logo with Interactive Hover Effect */}
                       <div className="relative group">
-                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center border-2 border-slate-200 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:border-custom-primary group-hover:bg-gradient-to-br group-hover:from-blue-50 group-hover:to-blue-50">
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg">
                           <ManufacturerLogo 
                             manufacturerName={manufacturer} 
                             size="lg" 
