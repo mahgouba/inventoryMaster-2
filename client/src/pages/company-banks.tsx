@@ -76,12 +76,12 @@ export default function CompanyBanksPage() {
               <div className="pb-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-18 h-18 bg-white/20 rounded-full flex items-center justify-center shadow-lg border border-white/30">
+                    <div className="flex items-center justify-center">
                       {bank.logo ? (
                         <img 
                           src={bank.logo} 
                           alt={bank.bankName} 
-                          className="w-16 h-16 object-contain"
+                          className="w-16 h-16 object-contain drop-shadow-lg"
                         />
                       ) : (
                         <CreditCard className="w-8 h-8 text-white drop-shadow-lg" />
