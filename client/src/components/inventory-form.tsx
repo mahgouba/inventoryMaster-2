@@ -11,8 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertInventoryItemSchema, type InsertInventoryItem, type InventoryItem } from "@shared/schema";
-import { CloudUpload } from "lucide-react";
-import { Settings } from "lucide-react";
+import { CloudUpload, Settings, Move } from "lucide-react";
 import OptionsEditor from "@/components/options-editor";
 import EditableSelect from "@/components/editable-select";
 
@@ -221,12 +220,15 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full flex flex-col justify-center mx-auto my-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full flex flex-col justify-center mx-auto my-auto" draggable={true}>
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-lg font-semibold text-slate-800">
-              {editItem ? "تحرير العنصر" : "إضافة عنصر جديد"}
-            </DialogTitle>
+            <div className="flex items-center gap-2">
+              <Move className="h-4 w-4 text-gray-400" />
+              <DialogTitle className="text-lg font-semibold text-slate-800">
+                {editItem ? "تحرير العنصر" : "إضافة عنصر جديد"}
+              </DialogTitle>
+            </div>
           </div>
           <DialogDescription className="text-sm text-slate-600">
             {editItem ? "قم بتحرير بيانات المركبة وحفظ التغييرات" : "أدخل بيانات المركبة الجديدة لإضافتها للمخزون"}

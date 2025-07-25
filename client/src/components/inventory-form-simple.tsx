@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertInventoryItemSchema, type InsertInventoryItem, type InventoryItem, type TrimLevel } from "@shared/schema";
-import { CloudUpload, Settings, Camera } from "lucide-react";
+import { CloudUpload, Settings, Camera, Move } from "lucide-react";
 import ListManagerSimple from "@/components/list-manager-simple";
 import ManufacturerCategoriesButton from "@/components/manufacturer-categories-button";
 import ChassisNumberScanner from "@/components/chassis-number-scanner";
@@ -346,12 +346,15 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full flex flex-col justify-center mx-auto my-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full flex flex-col justify-center mx-auto my-auto" draggable={true}>
           <DialogHeader>
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-lg font-semibold text-slate-800">
-                {editItem ? "تحرير العنصر" : "إضافة عنصر جديد"}
-              </DialogTitle>
+              <div className="flex items-center gap-2">
+                <Move className="h-4 w-4 text-gray-400" />
+                <DialogTitle className="text-lg font-semibold text-slate-800">
+                  {editItem ? "تحرير العنصر" : "إضافة عنصر جديد"}
+                </DialogTitle>
+              </div>
               <Button
                 type="button"
                 variant="outline"
