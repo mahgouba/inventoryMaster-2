@@ -10,6 +10,7 @@ import type { Bank } from "@shared/schema";
 
 export default function PersonalBanks() {
   const [expandedBanks, setExpandedBanks] = useState<Set<number>>(new Set());
+  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   const { data: banks = [], isLoading } = useQuery({
@@ -77,6 +78,24 @@ export default function PersonalBanks() {
       }
     } else {
       await copyToClipboard(shareText, "بيانات البنك");
+    }
+  };
+
+  const handleLongPressStart = (bank: Bank) => {
+    const timer = setTimeout(() => {
+      shareBank(bank);
+      toast({
+        title: "تم مشاركة البيانات",
+        description: `تمت مشاركة بيانات ${bank.bankName}`,
+      });
+    }, 800); // 800ms for long press
+    setLongPressTimer(timer);
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
     }
   };
 
@@ -174,8 +193,32 @@ export default function PersonalBanks() {
                               <img 
                                 src={bank.logo} 
                                 alt={bank.bankName} 
-                                className="h-18 w-18 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
+                                className="h-18 w-18 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110 cursor-pointer"
                                 style={{ height: '4.5rem', width: '4.5rem' }}
+                                onMouseDown={(e) => {
+                                  e.stopPropagation();
+                                  handleLongPressStart(bank);
+                                }}
+                                onMouseUp={(e) => {
+                                  e.stopPropagation();
+                                  handleLongPressEnd();
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.stopPropagation();
+                                  handleLongPressEnd();
+                                }}
+                                onTouchStart={(e) => {
+                                  e.stopPropagation();
+                                  handleLongPressStart(bank);
+                                }}
+                                onTouchEnd={(e) => {
+                                  e.stopPropagation();
+                                  handleLongPressEnd();
+                                }}
+                                onTouchCancel={(e) => {
+                                  e.stopPropagation();
+                                  handleLongPressEnd();
+                                }}
                               />
                               <h3 className="text-lg font-bold text-white drop-shadow-md">
                                 {bank.bankName}
@@ -183,7 +226,33 @@ export default function PersonalBanks() {
                             </div>
                           ) : (
                             <div className="flex items-center space-x-3 space-x-reverse">
-                              <div className="h-18 w-18 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
+                              <div 
+                                className="h-18 w-18 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30 cursor-pointer"
+                                onMouseDown={(e) => {
+                                  e.stopPropagation();
+                                  handleLongPressStart(bank);
+                                }}
+                                onMouseUp={(e) => {
+                                  e.stopPropagation();
+                                  handleLongPressEnd();
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.stopPropagation();
+                                  handleLongPressEnd();
+                                }}
+                                onTouchStart={(e) => {
+                                  e.stopPropagation();
+                                  handleLongPressStart(bank);
+                                }}
+                                onTouchEnd={(e) => {
+                                  e.stopPropagation();
+                                  handleLongPressEnd();
+                                }}
+                                onTouchCancel={(e) => {
+                                  e.stopPropagation();
+                                  handleLongPressEnd();
+                                }}
+                              >
                                 <User className="w-8 h-8 text-white" />
                               </div>
                               <h3 className="text-lg font-bold text-white drop-shadow-md">
