@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Building2, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
 import { useState } from "react";
@@ -19,6 +18,16 @@ export default function CompanyBanks() {
       const response = await fetch("/api/banks/type/شركة");
       if (!response.ok) throw new Error("Failed to fetch company banks");
       return response.json() as Promise<Bank[]>;
+    }
+  });
+
+  // Fetch company logo from appearance settings
+  const { data: appearance } = useQuery({
+    queryKey: ["/api/appearance"],
+    queryFn: async () => {
+      const response = await fetch("/api/appearance");
+      if (!response.ok) throw new Error("Failed to fetch appearance settings");
+      return response.json();
     }
   });
 
@@ -106,15 +115,21 @@ export default function CompanyBanks() {
           </Link>
           
           <div className="flex-1 flex justify-center">
-            <img 
-              src="/albarimi.png" 
-              alt="شعار الشركة" 
-              className="w-32 h-32 object-contain drop-shadow-2xl"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-              }}
-            />
+            {appearance?.companyLogo ? (
+              <img 
+                src={appearance.companyLogo} 
+                alt="شعار الشركة" 
+                className="w-32 h-32 object-contain drop-shadow-2xl"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
+              />
+            ) : (
+              <div className="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
+                <Building2 className="w-16 h-16 text-white" />
+              </div>
+            )}
           </div>
           
           <div className="flex-1"></div>
@@ -149,26 +164,27 @@ export default function CompanyBanks() {
                       >
                         <div className="flex items-center space-x-4 space-x-reverse">
                           {bank.logo ? (
-                            <img 
-                              src={bank.logo} 
-                              alt={bank.bankName} 
-                              className="h-18 w-18 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
-                              style={{ height: '4.5rem', width: '4.5rem' }}
-                            />
+                            <div className="flex items-center space-x-3 space-x-reverse">
+                              <img 
+                                src={bank.logo} 
+                                alt={bank.bankName} 
+                                className="h-18 w-18 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
+                                style={{ height: '4.5rem', width: '4.5rem' }}
+                              />
+                              <h3 className="text-lg font-bold text-white drop-shadow-md">
+                                {bank.bankName}
+                              </h3>
+                            </div>
                           ) : (
-                            <div className="h-18 w-18 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
-                              <Building2 className="w-8 h-8 text-white" />
+                            <div className="flex items-center space-x-3 space-x-reverse">
+                              <div className="h-18 w-18 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
+                                <Building2 className="w-8 h-8 text-white" />
+                              </div>
+                              <h3 className="text-lg font-bold text-white drop-shadow-md">
+                                {bank.bankName}
+                              </h3>
                             </div>
                           )}
-                          <div className="text-right">
-                            <h3 className="text-lg font-bold text-white drop-shadow-md">
-                              {bank.bankName}
-                            </h3>
-                            <Badge className="bg-blue-500/20 text-blue-300 border border-blue-400/30 backdrop-blur-sm">
-                              <Building2 className="w-3 h-3 ml-1" />
-                              {bank.type}
-                            </Badge>
-                          </div>
                         </div>
                         
                         {isExpanded ? (
@@ -183,8 +199,8 @@ export default function CompanyBanks() {
                         <div className="w-full space-y-4 animate-in slide-in-from-top-2 duration-300">
                           <Separator className="bg-white/30" />
 
-                          {/* Glass Container for Bank Details */}
-                          <div className="backdrop-blur-md bg-white/5 rounded-xl p-4 border border-white/20">
+                          {/* Bank Details Container - Remove borders */}
+                          <div className="space-y-4">
                             {/* Account Name */}
                             <div className="space-y-2 mb-4">
                               <div className="flex items-center justify-between">
@@ -202,7 +218,7 @@ export default function CompanyBanks() {
                                   <span className="text-xs text-white">نسخ</span>
                                 </Button>
                               </div>
-                              <p className="text-sm text-white/90 bg-white/10 rounded-lg p-2 backdrop-blur-sm">{bank.accountName}</p>
+                              <p className="text-sm text-white/90 p-2">{bank.accountName}</p>
                             </div>
 
                             {/* Account Number */}
@@ -222,7 +238,7 @@ export default function CompanyBanks() {
                                   <span className="text-xs text-white">نسخ</span>
                                 </Button>
                               </div>
-                              <p className="text-sm text-white/90 bg-white/10 rounded-lg p-2 backdrop-blur-sm">{bank.accountNumber}</p>
+                              <p className="text-sm text-white/90 p-2">{bank.accountNumber}</p>
                             </div>
 
                             {/* IBAN */}
@@ -242,7 +258,7 @@ export default function CompanyBanks() {
                                   <span className="text-xs text-white">نسخ</span>
                                 </Button>
                               </div>
-                              <p className="text-sm break-all text-white/90 bg-white/10 rounded-lg p-2 backdrop-blur-sm">{bank.iban}</p>
+                              <p className="text-sm break-all text-white/90 p-2">{bank.iban}</p>
                             </div>
                           </div>
 
