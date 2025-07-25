@@ -227,6 +227,9 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Removed white background from manufacturer logos in card view per user request - logos now display with transparent background for better integration with glass morphism design
 - ✅ Updated all data icons in card view to white color per user request - applied white color filter to engine, year, exterior color, interior color, import type, ownership type, and location icons for better visibility on glass morphism background
 - ✅ Changed category icon and category/trim level text color to golden (#C49632) per user request - provides better visual hierarchy and matches the golden accent theme
+- ✅ Fixed modal dialog issues - added proper overlay for click-outside closing functionality and removed glass morphism styling from dialogs per user request
+- ✅ Resolved CSS warnings by replacing duration-[3000ms] with duration-[3s] for logo animations
+- ✅ Removed circular backgrounds from bank logos in both company and personal bank pages per user request
 
 ### PostgreSQL Database Integration (July 24, 2025)
 - ✅ Created comprehensive DatabaseStorage implementation with full CRUD operations
