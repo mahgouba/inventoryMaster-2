@@ -346,7 +346,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full" draggable={true}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" draggable={true}>
           <DialogHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
