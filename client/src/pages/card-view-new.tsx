@@ -1147,15 +1147,15 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 1: Engine Capacity, Year, Exterior Color */}
                           <div className="grid grid-cols-3 gap-2">
                             <div className="flex items-center gap-1">
-                              <img src="/car-engine.svg" alt="Engine" className="w-6 h-6 filter drop-shadow-sm" />
+                              <img src="/car-engine.svg" alt="Engine" className="w-6 h-6 filter drop-shadow-sm" style={{filter: 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%) drop-shadow(0 1px 2px rgba(0,0,0,0.3))'}} />
                               <span className="font-semibold font-latin text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.engineCapacity}</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <img src="/year.svg" alt="Year" className="w-5 h-5 filter drop-shadow-sm" />
+                              <img src="/year.svg" alt="Year" className="w-5 h-5 filter drop-shadow-sm" style={{filter: 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%) drop-shadow(0 1px 2px rgba(0,0,0,0.3))'}} />
                               <span className="font-semibold font-latin text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.year}</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <img src="/exterior-color.svg" alt="Exterior Color" className="w-6 h-6 filter drop-shadow-sm" />
+                              <img src="/exterior-color.svg" alt="Exterior Color" className="w-6 h-6 filter drop-shadow-sm" style={{filter: 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%) drop-shadow(0 1px 2px rgba(0,0,0,0.3))'}} />
                               <span className="font-semibold text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.exteriorColor}</span>
                             </div>
                           </div>
@@ -1163,16 +1163,16 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Row 2: Interior Color, Import Type, Ownership Type */}
                           <div className="grid grid-cols-3 gap-2">
                             <div className="flex items-center gap-1">
-                              <img src="/interior-color.svg" alt="Interior Color" className="w-6 h-6 filter drop-shadow-sm" />
+                              <img src="/interior-color.svg" alt="Interior Color" className="w-6 h-6 filter drop-shadow-sm" style={{filter: 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%) drop-shadow(0 1px 2px rgba(0,0,0,0.3))'}} />
                               <span className="font-semibold text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.interiorColor}</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-6 h-6 filter drop-shadow-sm" />
+                              <img src={getImportTypeIcon(item.importType)} alt="Import Type" className="w-6 h-6 filter drop-shadow-sm" style={{filter: 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%) drop-shadow(0 1px 2px rgba(0,0,0,0.3))'}} />
                               <span className="font-semibold text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.importType}</span>
                             </div>
                             {item.ownershipType && (
                               <div className="flex items-center gap-1">
-                                <img src="/logos/ownerchip.svg" alt="Ownership Type" className="w-6 h-6 filter drop-shadow-sm" />
+                                <img src="/logos/ownerchip.svg" alt="Ownership Type" className="w-6 h-6 filter drop-shadow-sm" style={{filter: 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%) drop-shadow(0 1px 2px rgba(0,0,0,0.3))'}} />
                                 <span className="font-semibold text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.ownershipType}</span>
                               </div>
                             )}
