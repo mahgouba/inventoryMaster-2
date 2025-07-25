@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
+import { cn } from "@/lib/utils";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -7,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useTheme } from "@/hooks/useTheme";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import UniversalGlass from "@/components/universal-glass";
+import SidebarNavigation from "@/components/sidebar-navigation";
 import InventoryPage from "@/pages/inventory";
 import CardViewPage from "@/pages/card-view-new";
 import FinancingCalculatorPage from "@/pages/financing-calculator";
@@ -45,44 +47,68 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 }
 
 function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
-  return (
-    <SystemGlassWrapper>
-      <Switch>
-      <Route path="/" component={() => <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-      <Route path="/inventory" component={() => <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-      <Route path="/cards" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-      <Route path="/card-view" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-      <Route path="/card-view-new" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-      <Route path="/quotation-creation" component={() => <QuotationCreationPage />} />
+  const [location] = useLocation();
+  
+  // Pages that should not show sidebar (bank pages and card view)
+  const pagesWithoutSidebar = [
+    '/banks-personal', 
+    '/banks-company', 
+    '/card-view', 
+    '/card-view-new', 
+    '/cards'
+  ];
+  
+  const shouldShowSidebar = !pagesWithoutSidebar.includes(location);
 
-      <Route path="/quotation-edit/:id" component={QuotationEditPage} />
-      <Route path="/quotation-management" component={QuotationManagementPage} />
-      <Route path="/invoice-management" component={InvoiceManagementPage} />
-      <Route path="/locations" component={() => <LocationPage userRole={user.role} onLogout={onLogout} />} />
-      <Route path="/reservations" component={() => <ReservationsPage />} />
-      <Route path="/sold-vehicles" component={() => <SoldVehiclesPage />} />
-      <Route path="/financing-calculator" component={FinancingCalculatorPage} />
-      
-      {/* صفحات البنوك العامة */}
-      <Route path="/banks-personal" component={PersonalBanks} />
-      <Route path="/banks-company" component={CompanyBanks} />
-      
-      {/* صفحات الأدمن فقط */}
-      {user.role === "admin" && (
-        <>
-          <Route path="/appearance" component={() => <AppearancePage userRole={user.role} onLogout={onLogout} />} />
-          <Route path="/pdf-appearance" component={() => <PdfAppearanceManagement userRole={user.role} onLogout={onLogout} />} />
-          <Route path="/user-management" component={() => <UserManagementPage />} />
-          <Route path="/company-management" component={() => <CompanyManagementPage />} />
-          <Route path="/bank-management" component={BankManagement} />
-          <Route path="/dynamic-company-control" component={() => <DynamicCompanyControl />} />
-          <Route path="/integration-management" component={() => <IntegrationManagementPage />} />
-          <Route path="/comprehensive-lists" component={ComprehensiveListsPage} />
-        </>
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      {shouldShowSidebar && (
+        <SidebarNavigation user={user} onLogout={onLogout} />
       )}
-      <Route component={NotFound} />
-      </Switch>
-    </SystemGlassWrapper>
+      
+      <div className={cn(
+        "transition-all duration-300",
+        shouldShowSidebar ? "mr-64" : ""
+      )}>
+        <SystemGlassWrapper>
+          <Switch>
+            <Route path="/" component={() => <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+            <Route path="/inventory" component={() => <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+            <Route path="/cards" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+            <Route path="/card-view" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+            <Route path="/card-view-new" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+            <Route path="/quotation-creation" component={() => <QuotationCreationPage />} />
+
+            <Route path="/quotation-edit/:id" component={QuotationEditPage} />
+            <Route path="/quotation-management" component={QuotationManagementPage} />
+            <Route path="/invoice-management" component={InvoiceManagementPage} />
+            <Route path="/locations" component={() => <LocationPage userRole={user.role} onLogout={onLogout} />} />
+            <Route path="/reservations" component={() => <ReservationsPage />} />
+            <Route path="/sold-vehicles" component={() => <SoldVehiclesPage />} />
+            <Route path="/financing-calculator" component={FinancingCalculatorPage} />
+            
+            {/* صفحات البنوك العامة */}
+            <Route path="/banks-personal" component={PersonalBanks} />
+            <Route path="/banks-company" component={CompanyBanks} />
+            
+            {/* صفحات الأدمن فقط */}
+            {user.role === "admin" && (
+              <>
+                <Route path="/appearance" component={() => <AppearancePage userRole={user.role} onLogout={onLogout} />} />
+                <Route path="/pdf-appearance" component={() => <PdfAppearanceManagement userRole={user.role} onLogout={onLogout} />} />
+                <Route path="/user-management" component={() => <UserManagementPage />} />
+                <Route path="/company-management" component={() => <CompanyManagementPage />} />
+                <Route path="/bank-management" component={BankManagement} />
+                <Route path="/dynamic-company-control" component={() => <DynamicCompanyControl />} />
+                <Route path="/integration-management" component={() => <IntegrationManagementPage />} />
+                <Route path="/comprehensive-lists" component={ComprehensiveListsPage} />
+              </>
+            )}
+            <Route component={NotFound} />
+          </Switch>
+        </SystemGlassWrapper>
+      </div>
+    </div>
   );
 }
 
