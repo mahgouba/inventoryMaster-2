@@ -4,132 +4,118 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Palette, Upload, Eye, FileText, Save, Image } from "lucide-react";
+import { ArrowLeft, Palette, Upload, Eye, Image, Sparkles, Layers } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-interface PdfAppearanceSettings {
-  id?: number;
-  // Header Colors
-  headerBackgroundColor: string;
-  headerTextColor: string;
-  logoBackgroundColor: string;
-  
-  // Table Colors
-  tableHeaderBackgroundColor: string;
-  tableHeaderTextColor: string;
-  tableRowBackgroundColor: string;
-  tableRowTextColor: string;
-  tableAlternateRowBackgroundColor: string;
-  tableBorderColor: string;
-  
-  // Text Colors
-  primaryTextColor: string;
-  secondaryTextColor: string;
-  priceTextColor: string;
-  totalTextColor: string;
-  
-  // Border and Background Colors
-  borderColor: string;
-  backgroundColor: string;
-  sectionBackgroundColor: string;
-  
-  // Company Logo and Stamp
-  companyStamp: string | null;
-  watermarkOpacity: number;
-  
-  // Footer Colors
-  footerBackgroundColor: string;
-  footerTextColor: string;
-  
-  // QR Code Settings
-  qrCodeBackgroundColor: string;
-  qrCodeForegroundColor: string;
+interface BackgroundTheme {
+  id: string;
+  name: string;
+  type: 'solid' | 'gradient' | 'neumorphism' | 'aurora';
+  css: string;
+  preview: string;
 }
 
-interface PdfAppearanceManagementProps {
+interface AppearanceSettings {
+  id?: number;
+  backgroundTheme: string;
+  primaryColor: string;
+  secondaryColor: string;
+  accentColor: string;
+  companyLogo: string | null;
+}
+
+interface Manufacturer {
+  id: number;
+  name: string;
+  logo: string | null;
+}
+
+interface AppearanceManagementProps {
   userRole: string;
   onLogout: () => void;
 }
 
-export default function PdfAppearanceManagement({ userRole, onLogout }: PdfAppearanceManagementProps) {
+export default function AppearanceManagement({ userRole, onLogout }: AppearanceManagementProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // PDF Appearance Settings State
-  const [headerBackgroundColor, setHeaderBackgroundColor] = useState("#0f766e");
-  const [headerTextColor, setHeaderTextColor] = useState("#ffffff");
-  const [logoBackgroundColor, setLogoBackgroundColor] = useState("#ffffff");
-  
-  const [tableHeaderBackgroundColor, setTableHeaderBackgroundColor] = useState("#f8fafc");
-  const [tableHeaderTextColor, setTableHeaderTextColor] = useState("#1e293b");
-  const [tableRowBackgroundColor, setTableRowBackgroundColor] = useState("#ffffff");
-  const [tableRowTextColor, setTableRowTextColor] = useState("#1e293b");
-  const [tableAlternateRowBackgroundColor, setTableAlternateRowBackgroundColor] = useState("#f8fafc");
-  const [tableBorderColor, setTableBorderColor] = useState("#e2e8f0");
-  
-  const [primaryTextColor, setPrimaryTextColor] = useState("#1e293b");
-  const [secondaryTextColor, setSecondaryTextColor] = useState("#64748b");
-  const [priceTextColor, setPriceTextColor] = useState("#059669");
-  const [totalTextColor, setTotalTextColor] = useState("#dc2626");
-  
-  const [borderColor, setBorderColor] = useState("#e2e8f0");
-  const [backgroundColor, setBackgroundColor] = useState("#ffffff");
-  const [sectionBackgroundColor, setSectionBackgroundColor] = useState("#f8fafc");
-  
-  const [companyStamp, setCompanyStamp] = useState<string | null>(null);
-  const [watermarkOpacity, setWatermarkOpacity] = useState(0.1);
-  
-  const [footerBackgroundColor, setFooterBackgroundColor] = useState("#f8fafc");
-  const [footerTextColor, setFooterTextColor] = useState("#64748b");
-  
-  const [qrCodeBackgroundColor, setQrCodeBackgroundColor] = useState("#ffffff");
-  const [qrCodeForegroundColor, setQrCodeForegroundColor] = useState("#000000");
+  // Background theme state
+  const [selectedTheme, setSelectedTheme] = useState("glass-morphism");
+  const [primaryColor, setPrimaryColor] = useState("#00627F");
+  const [secondaryColor, setSecondaryColor] = useState("#0A0A0A");
+  const [accentColor, setAccentColor] = useState("#C49632");
 
-  // Fetch current PDF appearance settings
-  const { data: pdfSettings } = useQuery<PdfAppearanceSettings>({
-    queryKey: ["/api/pdf-appearance"],
+  // Manufacturer logo management state
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [selectedManufacturer, setSelectedManufacturer] = useState<string>("");
+  const [newManufacturerName, setNewManufacturerName] = useState("");
+
+  // Background themes
+  const backgroundThemes: BackgroundTheme[] = [
+    {
+      id: "glass-morphism",
+      name: "Glass Morphism",
+      type: "gradient",
+      css: "background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);",
+      preview: "bg-gradient-to-br from-gray-900 to-black"
+    },
+    {
+      id: "neumorphism",
+      name: "Neumorphism",
+      type: "neumorphism",
+      css: "background: #e0e5ec; box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;",
+      preview: "bg-gray-200 shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff]"
+    },
+    {
+      id: "aurora",
+      name: "Aurora",
+      type: "aurora",
+      css: "background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: aurora 15s ease infinite;",
+      preview: "bg-gradient-to-br from-orange-400 via-pink-500 to-cyan-500 animate-pulse"
+    },
+    {
+      id: "solid-dark",
+      name: "Solid Dark",
+      type: "solid",
+      css: "background: #1a1a1a;",
+      preview: "bg-gray-800"
+    },
+    {
+      id: "solid-light",
+      name: "Solid Light", 
+      type: "solid",
+      css: "background: #ffffff;",
+      preview: "bg-white border border-gray-200"
+    }
+  ];
+
+  // Fetch current appearance settings
+  const { data: appearanceSettings } = useQuery<AppearanceSettings>({
+    queryKey: ["/api/appearance"],
+  });
+
+  // Fetch manufacturers
+  const { data: manufacturers = [] } = useQuery<Manufacturer[]>({
+    queryKey: ["/api/manufacturers"],
   });
 
   // Update state when settings are loaded
   useEffect(() => {
-    if (pdfSettings) {
-      setHeaderBackgroundColor(pdfSettings.headerBackgroundColor || "#0f766e");
-      setHeaderTextColor(pdfSettings.headerTextColor || "#ffffff");
-      setLogoBackgroundColor(pdfSettings.logoBackgroundColor || "#ffffff");
-      
-      setTableHeaderBackgroundColor(pdfSettings.tableHeaderBackgroundColor || "#f8fafc");
-      setTableHeaderTextColor(pdfSettings.tableHeaderTextColor || "#1e293b");
-      setTableRowBackgroundColor(pdfSettings.tableRowBackgroundColor || "#ffffff");
-      setTableRowTextColor(pdfSettings.tableRowTextColor || "#1e293b");
-      setTableAlternateRowBackgroundColor(pdfSettings.tableAlternateRowBackgroundColor || "#f8fafc");
-      setTableBorderColor(pdfSettings.tableBorderColor || "#e2e8f0");
-      
-      setPrimaryTextColor(pdfSettings.primaryTextColor || "#1e293b");
-      setSecondaryTextColor(pdfSettings.secondaryTextColor || "#64748b");
-      setPriceTextColor(pdfSettings.priceTextColor || "#059669");
-      setTotalTextColor(pdfSettings.totalTextColor || "#dc2626");
-      
-      setBorderColor(pdfSettings.borderColor || "#e2e8f0");
-      setBackgroundColor(pdfSettings.backgroundColor || "#ffffff");
-      setSectionBackgroundColor(pdfSettings.sectionBackgroundColor || "#f8fafc");
-      
-      setCompanyStamp(pdfSettings.companyStamp || null);
-      setWatermarkOpacity(pdfSettings.watermarkOpacity || 0.1);
-      
-      setFooterBackgroundColor(pdfSettings.footerBackgroundColor || "#f8fafc");
-      setFooterTextColor(pdfSettings.footerTextColor || "#64748b");
-      
-      setQrCodeBackgroundColor(pdfSettings.qrCodeBackgroundColor || "#ffffff");
-      setQrCodeForegroundColor(pdfSettings.qrCodeForegroundColor || "#000000");
+    if (appearanceSettings) {
+      setSelectedTheme(appearanceSettings.backgroundTheme || "glass-morphism");
+      setPrimaryColor(appearanceSettings.primaryColor || "#00627F");
+      setSecondaryColor(appearanceSettings.secondaryColor || "#0A0A0A");
+      setAccentColor(appearanceSettings.accentColor || "#C49632");
     }
-  }, [pdfSettings]);
+  }, [appearanceSettings]);
 
-  // Save PDF appearance settings mutation
-  const savePdfAppearanceMutation = useMutation({
-    mutationFn: async (settings: Partial<PdfAppearanceSettings>) => {
-      const response = await fetch("/api/pdf-appearance", {
+  // Save appearance settings mutation
+  const saveAppearanceMutation = useMutation({
+    mutationFn: async (settings: Partial<AppearanceSettings>) => {
+      const response = await fetch("/api/appearance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -137,66 +123,111 @@ export default function PdfAppearanceManagement({ userRole, onLogout }: PdfAppea
         body: JSON.stringify(settings),
       });
       if (!response.ok) {
-        throw new Error("Failed to save PDF appearance settings");
+        throw new Error("Failed to save appearance settings");
       }
       return response.json();
     },
     onSuccess: () => {
       toast({
-        title: "تم حفظ إعدادات PDF بنجاح",
-        description: "تم تطبيق إعدادات مظهر عرض السعر الجديدة",
+        title: "تم حفظ إعدادات المظهر بنجاح",
+        description: "تم تطبيق الإعدادات الجديدة",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/pdf-appearance"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/appearance"] });
     },
     onError: (error) => {
       toast({
-        title: "خطأ في حفظ إعدادات PDF",
-        description: "حدث خطأ أثناء حفظ إعدادات مظهر عرض السعر",
+        title: "خطأ في حفظ الإعدادات",
+        description: "حدث خطأ أثناء حفظ إعدادات المظهر",
         variant: "destructive",
       });
     },
   });
 
-  // Handle saving PDF settings
-  const handleSavePdfSettings = () => {
-    const settings = {
-      headerBackgroundColor,
-      headerTextColor,
-      logoBackgroundColor,
-      tableHeaderBackgroundColor,
-      tableHeaderTextColor,
-      tableRowBackgroundColor,
-      tableRowTextColor,
-      tableAlternateRowBackgroundColor,
-      tableBorderColor,
-      primaryTextColor,
-      secondaryTextColor,
-      priceTextColor,
-      totalTextColor,
-      borderColor,
-      backgroundColor,
-      sectionBackgroundColor,
-      companyStamp,
-      watermarkOpacity,
-      footerBackgroundColor,
-      footerTextColor,
-      qrCodeBackgroundColor,
-      qrCodeForegroundColor,
-    };
-    savePdfAppearanceMutation.mutate(settings);
+  // Upload manufacturer logo mutation
+  const uploadLogoMutation = useMutation({
+    mutationFn: async ({ manufacturerId, logoData }: { manufacturerId: string; logoData: string }) => {
+      const response = await fetch(`/api/manufacturers/${manufacturerId}/logo`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ logo: logoData }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to upload logo");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "تم رفع الشعار بنجاح",
+        description: "تم حفظ شعار الشركة المصنعة",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/manufacturers"] });
+      setLogoFile(null);
+      setSelectedManufacturer("");
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ في رفع الشعار",
+        description: "حدث خطأ أثناء رفع شعار الشركة",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handle theme change
+  const handleThemeChange = (themeId: string) => {
+    setSelectedTheme(themeId);
+    saveAppearanceMutation.mutate({
+      backgroundTheme: themeId,
+      primaryColor,
+      secondaryColor,
+      accentColor,
+    });
   };
 
-  // Handle stamp upload
-  const handleStampUpload = (file: File) => {
+  // Handle color change
+  const handleColorChange = (colorType: 'primary' | 'secondary' | 'accent', color: string) => {
+    const updates = { backgroundTheme: selectedTheme, primaryColor, secondaryColor, accentColor };
+    
+    if (colorType === 'primary') {
+      setPrimaryColor(color);
+      updates.primaryColor = color;
+    } else if (colorType === 'secondary') {
+      setSecondaryColor(color);
+      updates.secondaryColor = color;
+    } else {
+      setAccentColor(color);
+      updates.accentColor = color;
+    }
+    
+    saveAppearanceMutation.mutate(updates);
+  };
+
+  // Handle logo upload
+  const handleLogoUpload = () => {
+    if (!logoFile || !selectedManufacturer) {
+      toast({
+        title: "بيانات ناقصة",
+        description: "يرجى اختيار الشركة المصنعة وملف الشعار",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = () => {
-      setCompanyStamp(reader.result as string);
+      uploadLogoMutation.mutate({
+        manufacturerId: selectedManufacturer,
+        logoData: reader.result as string,
+      });
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(logoFile);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4" dir="rtl">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -208,103 +239,148 @@ export default function PdfAppearanceManagement({ userRole, onLogout }: PdfAppea
               </Button>
             </Link>
             <h1 className="text-2xl font-bold flex items-center gap-2">
-              <FileText size={24} />
-              إدارة مظهر عرض السعر PDF
+              <Palette size={24} />
+              إدارة المظهر
             </h1>
           </div>
-          <Button 
-            onClick={handleSavePdfSettings}
-            disabled={savePdfAppearanceMutation.isPending}
-            size="sm"
-          >
-            <Save size={16} />
-            حفظ الإعدادات
-          </Button>
         </div>
 
-        <Tabs defaultValue="header-colors" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="header-colors">
-              <Palette size={16} className="mr-2" />
-              ألوان الرأس
+        <Tabs defaultValue="background-themes" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="background-themes" className="flex items-center gap-2">
+              <Sparkles size={16} />
+              ألوان الخلفية والسمات
             </TabsTrigger>
-            <TabsTrigger value="table-colors">
-              <FileText size={16} className="mr-2" />
-              ألوان الجدول
-            </TabsTrigger>
-            <TabsTrigger value="text-colors">
-              <Eye size={16} className="mr-2" />
-              ألوان النص
-            </TabsTrigger>
-            <TabsTrigger value="background-colors">
-              <Palette size={16} className="mr-2" />
-              ألوان الخلفية
-            </TabsTrigger>
-            <TabsTrigger value="logo-stamp">
-              <Image size={16} className="mr-2" />
-              اللوجو والختم
+            <TabsTrigger value="manufacturer-logos" className="flex items-center gap-2">
+              <Image size={16} />
+              شعارات الشركات المصنعة
             </TabsTrigger>
           </TabsList>
 
-          {/* Header Colors */}
-          <TabsContent value="header-colors" className="space-y-6">
+          {/* Background Themes Tab */}
+          <TabsContent value="background-themes" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Palette size={20} />
-                  ألوان رأس عرض السعر
+                  <Layers size={20} />
+                  سمات الخلفية
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <Label>لون خلفية الرأس</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={headerBackgroundColor}
-                        onChange={(e) => setHeaderBackgroundColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={headerBackgroundColor}
-                        onChange={(e) => setHeaderBackgroundColor(e.target.value)}
-                        className="flex-1"
-                      />
+                {/* Theme Selection */}
+                <div className="space-y-4">
+                  <Label className="text-base font-semibold">اختيار السمة</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {backgroundThemes.map((theme) => (
+                      <div
+                        key={theme.id}
+                        className={`relative cursor-pointer rounded-lg border-2 p-4 transition-all hover:scale-105 ${
+                          selectedTheme === theme.id
+                            ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                            : "border-gray-200 dark:border-gray-700"
+                        }`}
+                        onClick={() => handleThemeChange(theme.id)}
+                      >
+                        <div className={`h-24 w-full rounded-md ${theme.preview} mb-3`} />
+                        <h3 className="font-semibold text-center">{theme.name}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 text-center mt-1">
+                          {theme.type === 'neumorphism' && 'مظهر ثلاثي الأبعاد'}
+                          {theme.type === 'aurora' && 'مظهر الشفق القطبي'}
+                          {theme.type === 'gradient' && 'تدرج لوني'}
+                          {theme.type === 'solid' && 'لون صلب'}
+                        </p>
+                        {selectedTheme === theme.id && (
+                          <div className="absolute top-2 right-2">
+                            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                              <Eye size={12} className="text-white" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Color Customization */}
+                <div className="space-y-4">
+                  <Label className="text-base font-semibold">تخصيص الألوان</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label>اللون الأساسي</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="color"
+                          value={primaryColor}
+                          onChange={(e) => handleColorChange('primary', e.target.value)}
+                          className="w-16 h-10 rounded border-0 cursor-pointer"
+                        />
+                        <Input
+                          type="text"
+                          value={primaryColor}
+                          onChange={(e) => handleColorChange('primary', e.target.value)}
+                          className="flex-1"
+                          placeholder="#00627F"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>اللون الثانوي</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="color"
+                          value={secondaryColor}
+                          onChange={(e) => handleColorChange('secondary', e.target.value)}
+                          className="w-16 h-10 rounded border-0 cursor-pointer"
+                        />
+                        <Input
+                          type="text"
+                          value={secondaryColor}
+                          onChange={(e) => handleColorChange('secondary', e.target.value)}
+                          className="flex-1"
+                          placeholder="#0A0A0A"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>لون الإبراز</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="color"
+                          value={accentColor}
+                          onChange={(e) => handleColorChange('accent', e.target.value)}
+                          className="w-16 h-10 rounded border-0 cursor-pointer"
+                        />
+                        <Input
+                          type="text"
+                          value={accentColor}
+                          onChange={(e) => handleColorChange('accent', e.target.value)}
+                          className="flex-1"
+                          placeholder="#C49632"
+                        />
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <Label>لون نص الرأس</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={headerTextColor}
-                        onChange={(e) => setHeaderTextColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={headerTextColor}
-                        onChange={(e) => setHeaderTextColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>لون خلفية اللوجو</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={logoBackgroundColor}
-                        onChange={(e) => setLogoBackgroundColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={logoBackgroundColor}
-                        onChange={(e) => setLogoBackgroundColor(e.target.value)}
-                        className="flex-1"
-                      />
+                </div>
+
+                {/* Preview Section */}
+                <div className="space-y-2">
+                  <Label className="text-base font-semibold">معاينة السمة</Label>
+                  <div 
+                    className="h-32 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center"
+                    style={{
+                      background: backgroundThemes.find(t => t.id === selectedTheme)?.css.replace('background: ', '') || '#ffffff',
+                      color: primaryColor
+                    }}
+                  >
+                    <div className="text-center">
+                      <h3 className="text-lg font-bold" style={{ color: primaryColor }}>
+                        معاينة السمة المختارة
+                      </h3>
+                      <p style={{ color: accentColor }}>
+                        هذا نص تجريبي بلون الإبراز
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -312,422 +388,83 @@ export default function PdfAppearanceManagement({ userRole, onLogout }: PdfAppea
             </Card>
           </TabsContent>
 
-          {/* Table Colors */}
-          <TabsContent value="table-colors" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText size={20} />
-                  ألوان جدول الأسعار
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <Label>خلفية رأس الجدول</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={tableHeaderBackgroundColor}
-                        onChange={(e) => setTableHeaderBackgroundColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={tableHeaderBackgroundColor}
-                        onChange={(e) => setTableHeaderBackgroundColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>نص رأس الجدول</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={tableHeaderTextColor}
-                        onChange={(e) => setTableHeaderTextColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={tableHeaderTextColor}
-                        onChange={(e) => setTableHeaderTextColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>خلفية صفوف الجدول</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={tableRowBackgroundColor}
-                        onChange={(e) => setTableRowBackgroundColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={tableRowBackgroundColor}
-                        onChange={(e) => setTableRowBackgroundColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>نص صفوف الجدول</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={tableRowTextColor}
-                        onChange={(e) => setTableRowTextColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={tableRowTextColor}
-                        onChange={(e) => setTableRowTextColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>الصفوف المتناوبة</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={tableAlternateRowBackgroundColor}
-                        onChange={(e) => setTableAlternateRowBackgroundColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={tableAlternateRowBackgroundColor}
-                        onChange={(e) => setTableAlternateRowBackgroundColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>حدود الجدول</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={tableBorderColor}
-                        onChange={(e) => setTableBorderColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={tableBorderColor}
-                        onChange={(e) => setTableBorderColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Text Colors */}
-          <TabsContent value="text-colors" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Eye size={20} />
-                  ألوان النصوص
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <Label>النص الأساسي</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={primaryTextColor}
-                        onChange={(e) => setPrimaryTextColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={primaryTextColor}
-                        onChange={(e) => setPrimaryTextColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>النص الثانوي</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={secondaryTextColor}
-                        onChange={(e) => setSecondaryTextColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={secondaryTextColor}
-                        onChange={(e) => setSecondaryTextColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>لون الأسعار</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={priceTextColor}
-                        onChange={(e) => setPriceTextColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={priceTextColor}
-                        onChange={(e) => setPriceTextColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>لون الإجمالي</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={totalTextColor}
-                        onChange={(e) => setTotalTextColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={totalTextColor}
-                        onChange={(e) => setTotalTextColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Background Colors */}
-          <TabsContent value="background-colors" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette size={20} />
-                  ألوان الخلفية والحدود
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <Label>خلفية الصفحة</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={backgroundColor}
-                        onChange={(e) => setBackgroundColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={backgroundColor}
-                        onChange={(e) => setBackgroundColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>خلفية الأقسام</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={sectionBackgroundColor}
-                        onChange={(e) => setSectionBackgroundColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={sectionBackgroundColor}
-                        onChange={(e) => setSectionBackgroundColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>لون الحدود</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={borderColor}
-                        onChange={(e) => setBorderColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={borderColor}
-                        onChange={(e) => setBorderColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>خلفية التذييل</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={footerBackgroundColor}
-                        onChange={(e) => setFooterBackgroundColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={footerBackgroundColor}
-                        onChange={(e) => setFooterBackgroundColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>نص التذييل</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="color"
-                        value={footerTextColor}
-                        onChange={(e) => setFooterTextColor(e.target.value)}
-                        className="w-12 h-10 rounded border"
-                      />
-                      <Input
-                        value={footerTextColor}
-                        onChange={(e) => setFooterTextColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>شفافية العلامة المائية</Label>
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.1"
-                        value={watermarkOpacity}
-                        onChange={(e) => setWatermarkOpacity(parseFloat(e.target.value))}
-                        className="flex-1"
-                      />
-                      <Input
-                        type="number"
-                        value={watermarkOpacity}
-                        onChange={(e) => setWatermarkOpacity(parseFloat(e.target.value))}
-                        className="w-20"
-                        min="0"
-                        max="1"
-                        step="0.1"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Logo and Stamp */}
-          <TabsContent value="logo-stamp" className="space-y-6">
+          {/* Manufacturer Logos Tab */}
+          <TabsContent value="manufacturer-logos" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Image size={20} />
-                  اللوجو والختم
+                  إدارة شعارات الشركات المصنعة
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">ختم الشركة</h3>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                      {companyStamp ? (
-                        <div className="space-y-4">
-                          <img 
-                            src={companyStamp} 
-                            alt="Company Stamp" 
-                            className="max-w-full h-32 object-contain mx-auto"
-                          />
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => setCompanyStamp(null)}
-                          >
-                            إزالة الختم
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          <Upload size={48} className="mx-auto text-gray-400" />
-                          <p className="text-gray-500">اسحب الختم هنا أو اختر ملف</p>
-                          <label className="cursor-pointer">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                  handleStampUpload(file);
-                                }
-                              }}
-                            />
-                            <Button variant="outline">
-                              <Upload size={16} />
-                              اختر ملف الختم
-                            </Button>
-                          </label>
-                        </div>
-                      )}
+                {/* Upload Section */}
+                <div className="space-y-4">
+                  <Label className="text-base font-semibold">رفع شعار جديد</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>اختيار الشركة المصنعة</Label>
+                      <Select value={selectedManufacturer} onValueChange={setSelectedManufacturer}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر الشركة المصنعة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {manufacturers.map((manufacturer) => (
+                            <SelectItem key={manufacturer.id} value={manufacturer.id.toString()}>
+                              {manufacturer.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>اختيار ملف الشعار</Label>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
+                        className="cursor-pointer"
+                      />
                     </div>
                   </div>
                   
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">إعدادات QR Code</h3>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label>خلفية QR Code</Label>
-                        <div className="flex items-center space-x-3 space-x-reverse">
-                          <input
-                            type="color"
-                            value={qrCodeBackgroundColor}
-                            onChange={(e) => setQrCodeBackgroundColor(e.target.value)}
-                            className="w-12 h-10 rounded border"
+                  <Button 
+                    onClick={handleLogoUpload}
+                    disabled={uploadLogoMutation.isPending || !logoFile || !selectedManufacturer}
+                    className="w-full md:w-auto"
+                  >
+                    <Upload size={16} />
+                    رفع الشعار
+                  </Button>
+                </div>
+
+                {/* Existing Logos */}
+                <div className="space-y-4">
+                  <Label className="text-base font-semibold">الشعارات الحالية</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {manufacturers.map((manufacturer) => (
+                      <div
+                        key={manufacturer.id}
+                        className="border rounded-lg p-4 text-center space-y-2"
+                      >
+                        {manufacturer.logo ? (
+                          <img
+                            src={manufacturer.logo}
+                            alt={manufacturer.name}
+                            className="w-16 h-16 object-contain mx-auto"
                           />
-                          <Input
-                            value={qrCodeBackgroundColor}
-                            onChange={(e) => setQrCodeBackgroundColor(e.target.value)}
-                            className="flex-1"
-                          />
-                        </div>
+                        ) : (
+                          <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center mx-auto">
+                            <Image size={24} className="text-gray-400" />
+                          </div>
+                        )}
+                        <p className="text-sm font-medium">{manufacturer.name}</p>
+                        {!manufacturer.logo && (
+                          <p className="text-xs text-gray-500">لا يوجد شعار</p>
+                        )}
                       </div>
-                      
-                      <div className="space-y-2">
-                        <Label>لون QR Code</Label>
-                        <div className="flex items-center space-x-3 space-x-reverse">
-                          <input
-                            type="color"
-                            value={qrCodeForegroundColor}
-                            onChange={(e) => setQrCodeForegroundColor(e.target.value)}
-                            className="w-12 h-10 rounded border"
-                          />
-                          <Input
-                            value={qrCodeForegroundColor}
-                            onChange={(e) => setQrCodeForegroundColor(e.target.value)}
-                            className="flex-1"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </CardContent>
