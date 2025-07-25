@@ -14,20 +14,7 @@ const DialogPortal = DialogPrimitive.Portal
 
 const DialogClose = DialogPrimitive.Close
 
-const DialogOverlay = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Overlay
-    ref={ref}
-    className={cn(
-      "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm glass-overlay",
-      className
-    )}
-    {...props}
-  />
-))
-DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+// Overlay component removed - no background overlay needed
 
 interface DialogContentProps extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
   draggable?: boolean;
@@ -117,7 +104,6 @@ const DialogContent = React.forwardRef<
 
   return (
     <DialogPortal>
-      <DialogOverlay />
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
@@ -201,7 +187,6 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 export {
   Dialog,
   DialogPortal,
-  DialogOverlay,
   DialogClose,
   DialogTrigger,
   DialogContent,

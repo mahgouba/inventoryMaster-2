@@ -561,32 +561,7 @@ button.glass-button:active,
   animation: slideOutToBottom 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
 
-/* Overlay Animation for Dialog Background */
-.dialog-overlay {
-  animation: fadeIn 0.4s ease-out forwards;
-}
-
-.dialog-overlay.dialog-exit {
-  animation: fadeOut 0.3s ease-in forwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
+/* Remove overlay animations since we're not using overlay */
 
 /* Glass Overlay Styling */
 .glass-overlay,
