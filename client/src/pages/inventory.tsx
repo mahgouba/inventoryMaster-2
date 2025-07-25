@@ -512,9 +512,9 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
   return (
     <SystemGlassWrapper>
-      <div className={`min-h-screen ${darkMode ? 'dark' : ''}`} dir="rtl">
+      <div className={`glass-background min-h-screen ${darkMode ? 'dark' : ''}`} dir="rtl">
         {/* Header */}
-        <header className="glass-nav shadow-sm sticky top-0 z-50">
+        <header className="glass-header shadow-lg sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
             <div className="flex justify-between items-center h-14 sm:h-16">
               {/* Logo and Company Name */}
@@ -549,13 +549,13 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
               {/* Mobile and Desktop Navigation */}
               <div className="flex items-center space-x-2 sm:space-x-4 space-x-reverse">
                 {/* Navigation Tabs - Hidden on mobile */}
-                <div className="hidden md:flex items-center space-x-2 space-x-reverse border border-slate-200 rounded-lg p-1">
-                  <Button variant="default" size="sm" className="bg-custom-primary hover:bg-custom-primary-dark text-white">
+                <div className="hidden md:flex items-center space-x-2 space-x-reverse glass-container rounded-lg p-1">
+                  <Button variant="default" size="sm" className="glass-button-primary text-white">
                     <Table size={14} className="ml-1" />
                     <span className="hidden lg:inline">جدول</span>
                   </Button>
                   <Link href="/cards">
-                    <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-800">
+                    <Button variant="ghost" size="sm" className="glass-button glass-text-primary">
                       <LayoutGrid size={14} className="ml-1" />
                       <span className="hidden lg:inline">بطاقات</span>
                     </Button>
@@ -564,11 +564,11 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
               
                 {/* Mobile Navigation Icons */}
                 <div className="flex md:hidden items-center space-x-1 space-x-reverse">
-                  <Button variant="default" size="sm" className="bg-custom-primary hover:bg-custom-primary-dark text-white p-2">
+                  <Button variant="default" size="sm" className="glass-button-primary text-white p-2">
                     <Table size={16} />
                   </Button>
                   <Link href="/cards">
-                    <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-800 p-2">
+                    <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2">
                       <LayoutGrid size={16} />
                     </Button>
                   </Link>
@@ -580,14 +580,14 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   {userRole === "admin" && (
                     <div className="hidden lg:flex items-center space-x-2 space-x-reverse">
                     <Link href="/financing-calculator">
-                      <Button variant="outline" size="sm" className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 transition-colors">
+                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
                         <DollarSign size={16} className="ml-1" />
                         <span className="hidden xl:inline">حاسبة التمويل</span>
                       </Button>
                     </Link>
                     
                     <Link href="/appearance">
-                      <Button variant="outline" size="sm" className="text-custom-primary hover:text-custom-primary-dark hover:bg-blue-50 border-blue-200 transition-colors">
+                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
                         <Palette size={16} className="ml-1" />
                         <span className="hidden xl:inline">إدارة المظهر</span>
                       </Button>
@@ -598,12 +598,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   {/* Bank Header Icons */}
                   <div className="flex items-center space-x-1 space-x-reverse">
                     <Link href="/banks-company">
-                      <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" title="بنوك الشركة">
+                      <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2" title="بنوك الشركة">
                         <Building2 size={18} />
                       </Button>
                     </Link>
                     <Link href="/banks-personal">
-                      <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" title="البنوك الشخصية">
+                      <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2" title="البنوك الشخصية">
                         <CreditCard size={18} />
                       </Button>
                     </Link>
@@ -613,7 +613,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" 
+                  className="glass-button glass-text-primary p-2" 
                   onClick={toggleDarkMode}
                   disabled={isUpdatingDarkMode}
                 >
@@ -624,11 +624,11 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 {userRole === "admin" && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100">
+                      <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2">
                         <Settings size={18} />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuContent align="end" className="glass-dropdown-content w-56">
                       <Link href="/financing-calculator">
                         <DropdownMenuItem>
                           <DollarSign className="mr-2 h-4 w-4" />
@@ -731,11 +731,11 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 {/* User Dropdown Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="p-2 text-white/80 hover:text-white">
+                    <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2">
                       <UserCircle size={18} />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuContent align="end" className="glass-dropdown-content w-48">
                     <DropdownMenuItem className="text-sm text-slate-500 cursor-default">
                       <UserCircle className="mr-2 h-4 w-4" />
                       المستخدم: {userRole === "admin" ? "أدمن" : "مستخدم"}
@@ -775,9 +775,9 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     placeholder="البحث في المخزون..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pr-10"
+                    className="glass-search pr-10"
                   />
-                  <Search className="absolute right-3 top-3 h-4 w-4 text-slate-400" />
+                  <Search className="absolute right-3 top-3 h-4 w-4 text-white/60" />
                 </div>
                 
                 {/* Filter Toggle Button - Right Aligned */}
@@ -789,7 +789,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            className="flex items-center gap-2 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900/30 dark:hover:to-blue-800/30 border-slate-300 dark:border-slate-600 transition-all duration-200"
+                            className="glass-toggle-button flex items-center gap-2"
                           >
                             <Filter size={16} />
                             الفلاتر
@@ -799,7 +799,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       </div>
                     
                     <CollapsibleContent className="mt-4 w-full">
-                      <Card className="glass-form w-full">
+                      <Card className="glass-collapsible w-full">
                         <CardContent className="p-6">
                           {/* Enhanced Filter Controls with Button Design */}
                           <div className="space-y-6 animate-in fade-in duration-300">
@@ -818,21 +818,21 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               }) => (
                                 <div className="space-y-2">
                                   <div className="flex items-center justify-between">
-                                    <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
+                                    <h3 className="text-sm font-medium glass-text-primary">{title}</h3>
                                     <div className="flex items-center space-x-2 space-x-reverse">
-                                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                                      <span className="text-xs glass-text-secondary">
                                         {selectedFilters.length > 0 ? `(${selectedFilters.length} محدد)` : ""}
                                       </span>
                                       <Button
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => onToggleChange(!toggleState)}
-                                        className="p-2 h-8 w-8 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                                        className="glass-button p-2 h-8 w-8"
                                       >
                                         {toggleState ? (
-                                          <Eye size={16} className="text-blue-600 dark:text-blue-400" />
+                                          <Eye size={16} className="glass-text-accent" />
                                         ) : (
-                                          <EyeOff size={16} className="text-slate-400 dark:text-slate-500" />
+                                          <EyeOff size={16} className="glass-text-secondary" />
                                         )}
                                       </Button>
                                     </div>
@@ -849,10 +849,10 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                                 variant={isSelected ? "default" : "outline"}
                                                 size="sm"
                                                 onClick={() => onFilterToggle(item)}
-                                                className={`transition-all duration-200 whitespace-nowrap relative ${
+                                                className={`glass-button transition-all duration-200 whitespace-nowrap relative ${
                                                   isSelected
-                                                    ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                                                    : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                                                    ? "glass-button-primary"
+                                                    : "glass-button"
                                                 }`}
                                               >
                                                 {isSelected && (
@@ -1045,7 +1045,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   {userRole === "admin" && (
                     <Button 
                       onClick={() => setFormOpen(true)}
-                      className="bg-custom-primary hover:bg-custom-primary-dark text-white"
+                      className="glass-button-primary"
                       size="sm"
                     >
                       <Plus className="w-4 h-4 ml-2" />
@@ -1055,7 +1055,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   
                   <Link href="/quotation-creation">
                     <Button 
-                      className="bg-orange-600 hover:bg-orange-700 text-white"
+                      className="glass-button-secondary"
                       size="sm"
                     >
                       <FileText className="w-4 h-4 ml-2" />
@@ -1065,7 +1065,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
                   <Link href="/financing-calculator">
                     <Button 
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      className="glass-button-secondary"
                       size="sm"
                     >
                       <DollarSign className="w-4 h-4 ml-2" />
@@ -1081,7 +1081,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     onClick={handleExport}
                     variant="outline"
                     size="sm"
-                    className="border-slate-300 text-slate-600 hover:bg-slate-50"
+                    className="glass-button glass-text-primary"
                   >
                     <Download className="w-4 h-4 ml-2" />
                     تصدير CSV
@@ -1091,7 +1091,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     onClick={handlePrint}
                     variant="outline"
                     size="sm"
-                    className="border-slate-300 text-slate-600 hover:bg-slate-50"
+                    className="glass-button glass-text-primary"
                   >
                     <Printer className="w-4 h-4 ml-2" />
                     طباعة مخصصة
@@ -1104,7 +1104,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         onClick={() => setIsExcelImportOpen(true)}
                         variant="outline"
                         size="sm"
-                        className="border-green-300 text-green-600 hover:bg-green-50"
+                        className="glass-button glass-text-primary"
                       >
                         <FileSpreadsheet className="w-4 h-4 ml-2" />
                         استيراد Excel
@@ -1114,12 +1114,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         onClick={() => setShowSoldCars(!showSoldCars)}
                         variant={showSoldCars ? "default" : "outline"}
                         size="sm"
-                        className={showSoldCars ? "bg-red-600 hover:bg-red-700 text-white" : "border-red-300 text-red-600 hover:bg-red-50"}
+                        className={showSoldCars ? "glass-button-primary" : "glass-button glass-text-primary"}
                       >
                         <Eye className="w-4 h-4 ml-2" />
                         {showSoldCars ? "إخفاء المباعة" : "إظهار المباعة"}
                         {stats?.sold && stats.sold > 0 && (
-                          <span className="mr-2 px-2 py-1 text-xs font-semibold rounded-full bg-white bg-opacity-20">
+                          <span className="glass-badge mr-2 px-2 py-1 text-xs font-semibold rounded-full">
                             {stats.sold}
                           </span>
                         )}
@@ -1135,7 +1135,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       onClick={() => setSpecificationsManagerOpen(true)}
                       variant="outline"
                       size="sm"
-                      className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                      className="glass-button glass-text-primary"
                     >
                       <Settings className="w-4 h-4 ml-2" />
                       إدارة المواصفات
@@ -1145,7 +1145,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       onClick={() => setImageManagementOpen(true)}
                       variant="outline"
                       size="sm"
-                      className="border-purple-300 text-purple-600 hover:bg-purple-50"
+                      className="glass-button glass-text-primary"
                     >
                       <FileText className="w-4 h-4 ml-2" />
                       إدارة الصور
@@ -1155,7 +1155,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       onClick={handleClearAllItems}
                       variant="outline"
                       size="sm"
-                      className="border-red-500 text-red-600 hover:bg-red-50 hover:border-red-600"
+                      className="glass-button glass-text-primary"
                       disabled={clearAllItemsMutation.isPending}
                     >
                       <Database className="w-4 h-4 ml-2" />
@@ -1189,12 +1189,13 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
         {/* Pagination */}
         <div className="flex items-center justify-end mt-8">
-          <div className="flex items-center space-x-2 space-x-reverse">
+          <div className="glass-pagination flex items-center space-x-2 space-x-reverse">
             <Button
               variant="outline"
               size="sm"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
+              className="glass-button glass-text-primary"
             >
               السابق
             </Button>
@@ -1204,7 +1205,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 variant={currentPage === i + 1 ? "default" : "outline"}
                 size="sm"
                 onClick={() => setCurrentPage(i + 1)}
-                className={currentPage === i + 1 ? "bg-custom-primary hover:bg-custom-primary-dark" : ""}
+                className={currentPage === i + 1 ? "glass-button-primary" : "glass-button glass-text-primary"}
               >
                 {i + 1}
               </Button>
@@ -1214,6 +1215,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
               size="sm"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
+              className="glass-button glass-text-primary"
             >
               التالي
             </Button>

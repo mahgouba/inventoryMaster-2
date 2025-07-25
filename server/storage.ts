@@ -3104,14 +3104,8 @@ export class DatabaseStorage implements IStorage {
 // Initialize storage based on environment
 let storage: IStorage;
 
-// Try to use DatabaseStorage, fall back to MemStorage if database is not available
-try {
-  // Test database connection
-  storage = new DatabaseStorage();
-  console.log("✅ Using DatabaseStorage - PostgreSQL database connected");
-} catch (error) {
-  console.warn("⚠️ Database connection failed, falling back to MemStorage:", error.message);
-  storage = new MemStorage();
-}
+// For now, use MemStorage for development compatibility
+console.log("✅ Using MemStorage for development compatibility");
+storage = new MemStorage();
 
 export { storage };

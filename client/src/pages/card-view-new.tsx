@@ -669,7 +669,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
             <div className="flex items-center space-x-2 space-x-reverse">
               {/* Home Button */}
               <Link href="/">
-                <Button variant="outline" size="sm" className="text-slate-600 hover:text-slate-800">
+                <Button variant="outline" size="sm" className="glass-button glass-text-primary">
                   <Home size={16} className="ml-1" />
                   <span className="hidden sm:inline">الرئيسية</span>
                 </Button>
@@ -678,7 +678,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               {/* Appearance Management Button - Admin Only */}
               {userRole === "admin" && (
                 <Link href="/appearance">
-                  <Button variant="outline" size="sm" className="text-dynamic-primary hover:text-dynamic-primary-hover hover:bg-dynamic-card border-dynamic hover:border-dynamic">
+                  <Button variant="outline" size="sm" className="glass-button glass-text-primary">
                     <Palette size={16} className="ml-1" />
                     <span className="hidden sm:inline">إدارة المظهر</span>
                     <span className="sm:hidden">المظهر</span>
@@ -690,11 +690,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               {userRole === "admin" && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800">
+                    <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2">
                       <Settings size={18} />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent align="end" className="glass-dropdown-content w-56">
                     <Link href="/appearance">
                       <DropdownMenuItem>
                         <Palette className="mr-2 h-4 w-4" />
@@ -732,12 +732,12 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               {/* Bank Header Icons */}
               <div className="flex items-center space-x-1 space-x-reverse">
                 <Link href="/banks-company">
-                  <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" title="بنوك الشركة">
+                  <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2" title="بنوك الشركة">
                     <Building2 size={18} />
                   </Button>
                 </Link>
                 <Link href="/banks-personal">
-                  <Button variant="ghost" size="sm" className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" title="البنوك الشخصية">
+                  <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2" title="البنوك الشخصية">
                     <CreditCard size={18} />
                   </Button>
                 </Link>
@@ -747,7 +747,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" 
+                className="glass-button glass-text-primary p-2" 
                 onClick={toggleDarkMode}
                 disabled={isUpdatingDarkMode}
               >
@@ -755,7 +755,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               </Button>
 
               {/* Logout Button */}
-              <Button onClick={onLogout} variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
+              <Button onClick={onLogout} variant="outline" size="sm" className="glass-button glass-text-primary">
                 <LogOut size={16} className="ml-1" />
                 <span className="hidden sm:inline">تسجيل الخروج</span>
               </Button>
@@ -781,7 +781,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   placeholder="البحث في رقم الهيكل، الفئة، درجة التجهيز، اللون، الموقع..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-10 pl-4 py-2 w-full border-slate-300 focus:border-custom-primary focus:ring-custom-primary text-right"
+                  className="glass-search pr-10 pl-4 py-2 w-full text-right"
                 />
               </div>
               
@@ -794,12 +794,12 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="flex items-center gap-2 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900/30 dark:hover:to-blue-800/30 border-slate-300 dark:border-slate-600 transition-all duration-200"
+                          className="glass-toggle-button flex items-center gap-2"
                         >
                           <Filter size={16} />
                           الفلاتر
                           {activeFiltersCount > 0 && (
-                            <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                            <span className="glass-badge text-xs px-2 py-1 rounded-full">
                               {activeFiltersCount}
                             </span>
                           )}
@@ -809,8 +809,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     </div>
                   
                   <CollapsibleContent className="mt-4 w-full">
-                    <Card className="glass-container border border-white/20 dark:border-slate-700/30 shadow-xl w-full">
-                      <CardContent className="glass-container p-6 w-full">
+                    <Card className="glass-collapsible w-full">
+                      <CardContent className="p-6 w-full">
                         {/* Enhanced Filter Controls with Button Design */}
                         <div className="space-y-6 animate-in fade-in duration-300">
                           

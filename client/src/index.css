@@ -421,11 +421,335 @@ button.glass-button:active,
   padding: 8px !important;
 }
 
+/* Complete System-Wide Glass Morphism for All UI Elements */
+
+/* Glass Filter Buttons */
+.glass-filter-button,
+.glass-filter-button-active {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  border-radius: 8px !important;
+  box-shadow: 
+    0 2px 8px 0 rgba(0, 0, 0, 0.2),
+    0 1px 4px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.glass-filter-button-active {
+  background: rgba(0, 98, 127, 0.3) !important;
+  border-color: rgba(0, 98, 127, 0.5) !important;
+  box-shadow: 
+    0 4px 16px 0 rgba(0, 98, 127, 0.4),
+    0 2px 8px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-filter-button:hover,
+.glass-filter-button-active:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 
+    0 4px 16px 0 rgba(0, 0, 0, 0.3),
+    0 2px 8px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Glass Navigation and Header Elements */
+.glass-nav,
+.glass-header-element {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: white !important;
+  transition: all 0.6s ease !important;
+  box-shadow: 
+    0 4px 16px 0 rgba(0, 0, 0, 0.3),
+    0 2px 8px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Glass Action Buttons (Primary/Secondary) */
+.glass-action-primary {
+  background: rgba(0, 98, 127, 0.2) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(0, 98, 127, 0.4) !important;
+  color: white !important;
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  box-shadow: 
+    0 4px 16px 0 rgba(0, 98, 127, 0.3),
+    0 2px 8px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.glass-action-primary:hover {
+  background: rgba(0, 98, 127, 0.3) !important;
+  border-color: rgba(0, 98, 127, 0.6) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 
+    0 6px 24px 0 rgba(0, 98, 127, 0.4),
+    0 3px 12px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-action-secondary {
+  background: rgba(196, 150, 50, 0.2) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(196, 150, 50, 0.4) !important;
+  color: white !important;
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  box-shadow: 
+    0 4px 16px 0 rgba(196, 150, 50, 0.3),
+    0 2px 8px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.glass-action-secondary:hover {
+  background: rgba(196, 150, 50, 0.3) !important;
+  border-color: rgba(196, 150, 50, 0.6) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 
+    0 6px 24px 0 rgba(196, 150, 50, 0.4),
+    0 3px 12px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Glass Dialog and Modal with Fixed Scroll */
+.glass-dialog-fixed-scroll,
+.glass-modal-scroll {
+  background: rgba(10, 15, 25, 0.95) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow: 
+    0 16px 48px 0 rgba(0, 0, 0, 0.7),
+    0 8px 24px 0 rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  position: relative !important;
+  overflow: hidden !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Custom Scrollbar for Glass Elements */
+.glass-dialog-fixed-scroll::-webkit-scrollbar,
+.glass-modal-scroll::-webkit-scrollbar,
+.glass-scroll::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.glass-dialog-fixed-scroll::-webkit-scrollbar-track,
+.glass-modal-scroll::-webkit-scrollbar-track,
+.glass-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 4px !important;
+}
+
+.glass-dialog-fixed-scroll::-webkit-scrollbar-thumb,
+.glass-modal-scroll::-webkit-scrollbar-thumb,
+.glass-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-dialog-fixed-scroll::-webkit-scrollbar-thumb:hover,
+.glass-modal-scroll::-webkit-scrollbar-thumb:hover,
+.glass-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Glass Dropdown Content with Fixed Scroll */
+.glass-dropdown-content,
+[role="listbox"].glass-dropdown-content,
+.dropdown-content.glass-dropdown-content {
+  background: rgba(10, 15, 25, 0.95) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 12px !important;
+  box-shadow: 
+    0 12px 32px 0 rgba(0, 0, 0, 0.6),
+    0 6px 16px 0 rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  padding: 8px !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1) !important;
+}
+
 .glass-dropdown-content [role="option"],
 .glass-dropdown-content .dropdown-item {
   color: white !important;
   border-radius: 6px !important;
-  transition: all 0.2s ease !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  margin: 2px 0 !important;
+  transition: all 0.3s ease !important;
+}
+
+.glass-dropdown-content [role="option"]:hover,
+.glass-dropdown-content .dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  transform: translateX(4px) !important;
+}
+
+/* System-Wide Glass Text and Content */
+.glass-text-primary {
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+.glass-text-secondary {
+  color: rgba(255, 255, 255, 0.8) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+.glass-text-accent {
+  color: rgba(0, 98, 127, 1) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Glass Badge and Tag Styling */
+.glass-badge {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  transition: all 0.4s ease !important;
+}
+
+.glass-badge:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Glass Search Input */
+.glass-search {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+  border-radius: 12px !important;
+  padding: 12px 16px !important;
+  transition: all 0.6s ease !important;
+  box-shadow: 
+    0 4px 16px 0 rgba(0, 0, 0, 0.2),
+    0 2px 8px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.glass-search:focus {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(0, 98, 127, 0.6) !important;
+  box-shadow: 
+    0 6px 24px 0 rgba(0, 98, 127, 0.3),
+    0 3px 12px 0 rgba(255, 255, 255, 0.1) !important;
+  outline: none !important;
+}
+
+.glass-search::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Glass Collapsible and Toggle Elements */
+.glass-collapsible {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  box-shadow: 
+    0 4px 16px 0 rgba(0, 0, 0, 0.3),
+    0 2px 8px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.glass-toggle-button {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  border-radius: 8px !important;
+}
+
+.glass-toggle-button:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 
+    0 4px 16px 0 rgba(0, 0, 0, 0.3),
+    0 2px 8px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Glass Statistics Cards */
+.glass-stats-card {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 16px !important;
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.4),
+    0 4px 16px 0 rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  color: white !important;
+}
+
+.glass-stats-card:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  transform: translateY(-5px) scale(1.02) !important;
+  box-shadow: 
+    0 16px 48px 0 rgba(0, 0, 0, 0.6),
+    0 8px 24px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Glass Manufacturer Cards */
+.glass-manufacturer-card {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 20px !important;
+  box-shadow: 
+    0 12px 40px 0 rgba(0, 0, 0, 0.5),
+    0 6px 20px 0 rgba(255, 255, 255, 0.08) !important;
+  transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  color: white !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.glass-manufacturer-card:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-8px) scale(1.05) !important;
+  box-shadow: 
+    0 20px 60px 0 rgba(0, 0, 0, 0.7),
+    0 10px 30px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+.glass-manufacturer-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 30% 20%, rgba(0, 98, 127, 0.1) 0%, transparent 60%),
+    radial-gradient(circle at 70% 80%, rgba(196, 150, 50, 0.1) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glass-manufacturer-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .glass-dropdown-content [role="option"]:hover,
@@ -598,6 +922,73 @@ span.badge,
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Advanced Glass Morphism Classes with Enhanced Scroll Handling */
+.glass-pagination {
+  @apply bg-white/20 dark:bg-slate-800/20 backdrop-blur-sm border border-white/30 dark:border-slate-700/30 rounded-lg p-3;
+}
+
+/* Enhanced Dialog and Modal Scroll Handling */
+.glass-modal {
+  @apply backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border border-white/20 dark:border-slate-700/30 shadow-2xl rounded-xl;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+/* Glass scrollbar styling */
+.glass-modal::-webkit-scrollbar,
+.glass-dialog::-webkit-scrollbar,
+.glass-collapsible::-webkit-scrollbar {
+  width: 8px;
+}
+
+.glass-modal::-webkit-scrollbar-track,
+.glass-dialog::-webkit-scrollbar-track,
+.glass-collapsible::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.glass-modal::-webkit-scrollbar-thumb,
+.glass-dialog::-webkit-scrollbar-thumb,
+.glass-collapsible::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  backdrop-filter: blur(10px);
+}
+
+.glass-modal::-webkit-scrollbar-thumb:hover,
+.glass-dialog::-webkit-scrollbar-thumb:hover,
+.glass-collapsible::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Glass collapsible containers */
+.glass-collapsible {
+  @apply bg-white/10 dark:bg-slate-800/10 backdrop-blur-lg border border-white/20 dark:border-slate-700/30 rounded-xl shadow-2xl;
+  max-height: 70vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Glass toggle buttons */
+.glass-toggle-button {
+  @apply bg-white/20 dark:bg-slate-800/20 backdrop-blur-md border border-white/30 dark:border-slate-700/30 text-white dark:text-slate-200 hover:bg-white/30 dark:hover:bg-slate-700/30 transition-all duration-300 rounded-lg;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Glass search input */
+.glass-search {
+  @apply bg-white/20 dark:bg-slate-800/20 backdrop-blur-md border border-white/30 dark:border-slate-700/30 text-slate-800 dark:text-slate-200 placeholder-slate-500 dark:placeholder-slate-400;
+  @apply focus:border-white/50 dark:focus:border-slate-600/50 focus:ring-white/30 dark:focus:ring-slate-600/30;
+}
+
+/* Glass dropdown styling */
+.glass-dropdown-content {
+  @apply bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-white/30 dark:border-slate-700/50 shadow-2xl rounded-lg;
 }
 
 /* Glass card view styling */
