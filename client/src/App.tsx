@@ -61,11 +61,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
   const shouldShowSidebar = !pagesWithoutSidebar.includes(location);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative overflow-hidden">
-      {/* Glassmorphism Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.3),transparent_50%)]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(120,198,162,0.2),transparent_50%)]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_70%,rgba(198,158,120,0.2),transparent_50%)]"></div>
+    <div className="min-h-screen bg-slate-900 relative overflow-hidden">
       {shouldShowSidebar && (
         <SidebarNavigation user={user} onLogout={onLogout} />
       )}

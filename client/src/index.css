@@ -13,16 +13,16 @@
   --text-muted: rgba(255, 255, 255, 0.5);
 }
 
-/* Global Dark Background */
+/* Global Single Dark Background */
 html, body {
-  background: var(--dark-bg-primary) !important;
+  background: #0f172a !important;
   color: var(--text-primary) !important;
   min-height: 100vh;
 }
 
-/* Root with Static Dark Background */
+/* Root with Single Dark Background */
 #root {
-  background: var(--dark-bg-primary);
+  background: #0f172a;
   min-height: 100vh;
 }
 
@@ -419,12 +419,9 @@ button[data-state="checked"][role="radio"] span {
     0 8px 24px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Unified Glass Background System */
+/* Single Glass Background */
 .glass-background {
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.4) 0%, 
-    rgba(30, 41, 59, 0.3) 50%, 
-    rgba(15, 23, 42, 0.5) 100%);
+  background: rgba(15, 23, 42, 0.4);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
