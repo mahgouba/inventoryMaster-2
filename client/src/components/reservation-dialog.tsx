@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -97,6 +97,9 @@ export function ReservationDialog({ open, onOpenChange, item, onSuccess }: Reser
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-right">حجز السيارة</DialogTitle>
+          <DialogDescription className="text-right text-sm text-slate-600">
+            أدخل بيانات العميل لحجز هذه السيارة
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-4">

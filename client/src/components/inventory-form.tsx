@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -227,22 +227,27 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
             <DialogTitle className="text-lg font-semibold text-slate-800">
               {editItem ? "تحرير العنصر" : "إضافة عنصر جديد"}
             </DialogTitle>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditingOptions(!isEditingOptions)}
-              className="text-xs"
-            >
-              <Settings className="h-4 w-4 ml-1" />
-              {isEditingOptions ? "حفظ التعديلات" : "تحرير القوائم"}
-            </Button>
           </div>
+          <DialogDescription className="text-sm text-slate-600">
+            {editItem ? "قم بتحرير بيانات المركبة وحفظ التغييرات" : "أدخل بيانات المركبة الجديدة لإضافتها للمخزون"}
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2 flex items-center justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditingOptions(!isEditingOptions)}
+                  className="text-xs"
+                >
+                  <Settings className="h-4 w-4 ml-1" />
+                  {isEditingOptions ? "حفظ التعديلات" : "تحرير القوائم"}
+                </Button>
+              </div>
               {/* Manufacturer Field - First */}
               <FormField
                 control={form.control}

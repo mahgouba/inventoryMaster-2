@@ -816,7 +816,15 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           
                           {/* Multi-Select Filter Component */}
                           {(() => {
-                            const MultiSelectFilter = ({ title, items, selectedFilters, onFilterToggle, getCount, toggleState, onToggleChange }) => (
+                            const MultiSelectFilter = ({ title, items, selectedFilters, onFilterToggle, getCount, toggleState, onToggleChange }: {
+                              title: string;
+                              items: string[];
+                              selectedFilters: string[];
+                              onFilterToggle: (item: string) => void;
+                              getCount: (item: string) => number;
+                              toggleState: boolean;
+                              onToggleChange: (state: boolean) => void;
+                            }) => (
                               <div className="space-y-2">
                                 <div className="flex items-center justify-between">
                                   <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
