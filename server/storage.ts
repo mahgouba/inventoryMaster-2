@@ -94,6 +94,7 @@ export interface IStorage {
   }): Promise<boolean>;
   cancelReservation(id: number): Promise<boolean>;
   getReservedItems(): Promise<InventoryItem[]>;
+  getSoldItems(): Promise<InventoryItem[]>;
   
   // Manufacturer methods
   getAllManufacturers(): Promise<Manufacturer[]>;
@@ -1294,6 +1295,12 @@ export class MemStorage implements IStorage {
   async getReservedItems(): Promise<InventoryItem[]> {
     return Array.from(this.inventoryItems.values()).filter(item => 
       item.status === "محجوز"
+    );
+  }
+
+  async getSoldItems(): Promise<InventoryItem[]> {
+    return Array.from(this.inventoryItems.values()).filter(item => 
+      item.isSold === true || item.status === "مباع"
     );
   }
 

@@ -31,6 +31,9 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({
 // Voice command processing functions
 async function processVoiceCommand(command: string) {
   try {
+    if (!openai) {
+      throw new Error("OpenAI API not configured");
+    }
     const response = await openai.chat.completions.create({
       model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
       messages: [
@@ -329,7 +332,10 @@ async function handleReserveVehicle(entities: any) {
       };
     }
     
-    const success = await storage.reserveItem(vehicleId, "المساعد الصوتي", "تم الحجز عبر المساعد الصوتي");
+    const success = await storage.reserveItem(vehicleId, {
+      reservedBy: "المساعد الصوتي",
+      reservationNote: "تم الحجز عبر المساعد الصوتي"
+    });
     
     if (success) {
       return {
@@ -453,6 +459,9 @@ async function handleGetStats() {
 
 async function extractChassisNumberFromImage(imageData: string) {
   try {
+    if (!openai) {
+      throw new Error("OpenAI API not configured");
+    }
     const response = await openai.chat.completions.create({
       model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
       messages: [
@@ -807,15 +816,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         soldBySalesRep: salesRepresentative,
         salePrice: salePrice,
         paymentMethod: paymentMethod,
-        bankName: paymentMethod === "بنك" ? bankName : null,
+        bankName: paymentMethod === "بنك" ? bankName : undefined,
         // Clear reservation data if it was reserved
-        reservationDate: null,
-        reservedBy: null,
-        customerName: null,
-        customerPhone: null,
-        paidAmount: null,
-        reservationNote: null,
-        salesRepresentative: null
+        reservationDate: undefined,
+        reservedBy: undefined,
+        customerName: undefined,
+        customerPhone: undefined,
+        paidAmount: undefined,
+        reservationNote: undefined,
+        salesRepresentative: undefined
       });
       
       if (!item) {
@@ -850,13 +859,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const item = await storage.updateInventoryItem(id, {
         status: "متوفر",
-        reservationDate: null,
-        reservedBy: null,
-        customerName: null,
-        customerPhone: null,
-        paidAmount: null,
-        reservationNote: null,
-        salesRepresentative: null
+        reservationDate: undefined,
+        reservedBy: undefined,
+        customerName: undefined,
+        customerPhone: undefined,
+        paidAmount: undefined,
+        reservationNote: undefined,
+        salesRepresentative: undefined
       });
       
       if (!item) {
@@ -1324,6 +1333,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Call OpenAI Vision API to extract text from image
+      if (!openai) {
+        return res.status(500).json({ message: "OpenAI service not available" });
+      }
       const response = await openai.chat.completions.create({
         model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
