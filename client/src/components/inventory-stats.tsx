@@ -112,15 +112,15 @@ export default function InventoryStats() {
       {/* Main Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {mainStatsData.map((stat, index) => (
-          <Card key={index} className="glass-container h-24">
-            <CardContent className="p-4 h-full flex items-center">
-              <div className="flex items-center justify-between w-full">
+          <Card key={index} className="glass-container">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-white/80">{stat.title}</p>
-                  <p className="text-2xl font-bold text-white">{stat.value}</p>
+                  <p className="text-xs font-medium text-white/80">{stat.title}</p>
+                  <p className="text-xl font-bold text-white">{stat.value}</p>
                 </div>
                 <div className={`p-2 rounded-full ${stat.color} backdrop-blur-sm`}>
-                  <stat.icon className="text-xl" size={20} />
+                  <stat.icon size={16} />
                 </div>
               </div>
             </CardContent>
@@ -132,15 +132,15 @@ export default function InventoryStats() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Reserved box first */}
         {secondRowStatsData.map((stat, index) => (
-          <Card key={index} className="glass-container h-24">
-            <CardContent className="p-4 h-full flex items-center">
-              <div className="flex items-center justify-between w-full">
+          <Card key={index} className="glass-container">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-white/80">{stat.title}</p>
-                  <p className="text-2xl font-bold text-white">{stat.value}</p>
+                  <p className="text-xs font-medium text-white/80">{stat.title}</p>
+                  <p className="text-xl font-bold text-white">{stat.value}</p>
                 </div>
                 <div className={`p-2 rounded-full ${stat.color} backdrop-blur-sm`}>
-                  <stat.icon className="text-xl" size={20} />
+                  <stat.icon size={16} />
                 </div>
               </div>
             </CardContent>
@@ -148,15 +148,15 @@ export default function InventoryStats() {
         ))}
         {/* Then import type stats */}
         {importStatsData.map((stat, index) => (
-          <Card key={index} className="glass-container h-24">
-            <CardContent className="p-4 h-full flex items-center">
-              <div className="flex items-center justify-between w-full">
+          <Card key={index} className="glass-container">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-white/80">{stat.title}</p>
-                  <p className="text-2xl font-bold text-white">{stat.value}</p>
+                  <p className="text-xs font-medium text-white/80">{stat.title}</p>
+                  <p className="text-xl font-bold text-white">{stat.value}</p>
                 </div>
                 <div className={`p-2 rounded-full ${stat.color} backdrop-blur-sm`}>
-                  <stat.icon className="text-xl" size={20} />
+                  <stat.icon size={16} />
                 </div>
               </div>
             </CardContent>
@@ -169,40 +169,38 @@ export default function InventoryStats() {
         {(Array.isArray(manufacturerStats) ? manufacturerStats : []).slice(0, 6).map((manufacturer: any, index: number) => {
           const logoPath = getManufacturerLogo(manufacturer.manufacturer);
           return (
-            <Card key={index} className="glass-container h-40">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-base text-white">
+            <Card key={index} className="glass-container">
+              <CardContent className="p-3">
+                <div className="flex items-center gap-2 mb-2">
                   {logoPath ? (
                     <img 
                       src={logoPath} 
                       alt={manufacturer.manufacturer}
-                      className="w-6 h-6 object-contain rounded"
+                      className="w-5 h-5 object-contain rounded"
                     />
                   ) : (
-                    <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
+                    <div className="w-5 h-5 bg-white/20 rounded flex items-center justify-center">
                       <span className="text-xs text-white/60">N/A</span>
                     </div>
                   )}
-                  {manufacturer.manufacturer}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0 flex-1">
-                <div className="space-y-1.5">
+                  <span className="text-sm font-semibold text-white">{manufacturer.manufacturer}</span>
+                </div>
+                <div className="space-y-1">
                   <div className="flex justify-between">
                     <span className="text-xs text-white/80">إجمالي:</span>
-                    <span className="font-semibold text-white text-sm">{manufacturer.total}</span>
+                    <span className="font-semibold text-white text-xs">{manufacturer.total}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-xs text-white/80">شخصي:</span>
-                    <span className="font-medium text-blue-400 text-sm">{manufacturer.personal}</span>
+                    <span className="font-medium text-blue-400 text-xs">{manufacturer.personal}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-xs text-white/80">شركة:</span>
-                    <span className="font-medium text-purple-400 text-sm">{manufacturer.company}</span>
+                    <span className="font-medium text-purple-400 text-xs">{manufacturer.company}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-xs text-white/80">مستعمل:</span>
-                    <span className="font-medium text-orange-400 text-sm">{manufacturer.usedPersonal}</span>
+                    <span className="font-medium text-orange-400 text-xs">{manufacturer.usedPersonal}</span>
                   </div>
                 </div>
               </CardContent>
