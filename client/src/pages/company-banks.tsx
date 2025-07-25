@@ -171,21 +171,7 @@ export default function CompanyBanksPage() {
                   </div>
                 )}
 
-                {/* Status */}
-                <div className="pt-2 border-t border-white/20">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/80 drop-shadow-lg">
-                      حالة الحساب
-                    </span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm ${
-                      bank.isActive 
-                        ? 'bg-green-500/20 text-green-300 border border-green-400/30'
-                        : 'bg-red-500/20 text-red-300 border border-red-400/30'
-                    }`}>
-                      {bank.isActive ? 'نشط' : 'غير نشط'}
-                    </span>
-                  </div>
-                </div>
+
               </div>
             </div>
           ))}
