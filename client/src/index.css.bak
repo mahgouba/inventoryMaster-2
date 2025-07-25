@@ -26,20 +26,9 @@ html, body {
   min-height: 100vh;
 }
 
-/* Unified Glass Morphism System */
+/* Remove Global Animations */
 * {
   transition: none !important;
-}
-
-/* Global Glass Effect Classes */
-.glass-unified {
-  background: rgba(255, 255, 255, 0.04) !important;
-  backdrop-filter: blur(15px) !important;
-  -webkit-backdrop-filter: blur(15px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
 }
 
 /* Override Default Backgrounds to Dark */
@@ -283,7 +272,52 @@ button[data-state="checked"][role="radio"] span {
   background-color: #A67C28 !important;
 }
 
-/* Static Styles - No Animations */
+/* Unified Animation System */
+.animate-smooth {
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-fast {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-slow {
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Override all Tailwind transition durations */
+.duration-75,
+.duration-100,
+.duration-150,
+.duration-200,
+.duration-300,
+.duration-500,
+.duration-700,
+.duration-1000 {
+  transition-duration: 0.4s !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Dialog and Modal animations */
+[data-state=open],
+[data-state=closed] {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.animate-in,
+.animate-out {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Hover and interaction animations */
+.hover-animate {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-animate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
 
 /* Dark Glass Containers */
 .glass-container {
@@ -305,12 +339,40 @@ button[data-state="checked"][role="radio"] span {
 }
 
 /* Animated Gradient Mesh Background */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
 
+@keyframes mesh-move-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(100px, -50px) scale(1.1); }
+  66% { transform: translate(-50px, 100px) scale(0.9); }
+}
 
+@keyframes mesh-move-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-80px, 60px) scale(1.2); }
+  66% { transform: translate(120px, -80px) scale(0.8); }
+}
 
+@keyframes mesh-move-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(60px, 120px) scale(0.9); }
+  66% { transform: translate(-100px, -60px) scale(1.1); }
+}
 
+.mesh-blob-1 {
+  animation: mesh-move-1 15s ease-in-out infinite;
+}
 
+.mesh-blob-2 {
+  animation: mesh-move-2 18s ease-in-out infinite 2s;
+}
 
+.mesh-blob-3 {
+  animation: mesh-move-3 20s ease-in-out infinite 4s;
+}
 
 /* Text Color Overrides for Dark Theme */
 .text-slate-900,
@@ -448,8 +510,83 @@ button[data-state="checked"][role="radio"] span {
     radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.15) 0%, transparent 50%),
     radial-gradient(circle at 60% 60%, rgba(255, 170, 120, 0.15) 0%, transparent 50%),
     radial-gradient(circle at 90% 90%, rgba(170, 255, 120, 0.15) 0%, transparent 50%);
+  animation: gradient-shift 60s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
 }
 
+@keyframes gradient-shift {
+  0% {
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 60% 60%, rgba(255, 170, 120, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 90% 90%, rgba(170, 255, 120, 0.15) 0%, transparent 50%);
+  }
+  12.5% {
+    background: 
+      radial-gradient(circle at 40% 60%, rgba(135, 134, 213, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 70% 30%, rgba(255, 134, 213, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 60% 60%, rgba(135, 234, 255, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(255, 185, 135, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 70% 80%, rgba(185, 255, 135, 0.14) 0%, transparent 50%);
+  }
+  25% {
+    background: 
+      radial-gradient(circle at 60% 20%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 20% 60%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(120, 219, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 10% 10%, rgba(255, 170, 120, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 40% 90%, rgba(170, 255, 120, 0.15) 0%, transparent 50%);
+  }
+  37.5% {
+    background: 
+      radial-gradient(circle at 75% 40%, rgba(105, 104, 183, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 35% 75%, rgba(240, 104, 183, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 75% 65%, rgba(105, 204, 240, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 45% 35%, rgba(240, 155, 105, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 25% 75%, rgba(155, 240, 105, 0.14) 0%, transparent 50%);
+  }
+  50% {
+    background: 
+      radial-gradient(circle at 90% 60%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 30% 90%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 70% 10%, rgba(120, 219, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(255, 170, 120, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 10% 30%, rgba(170, 255, 120, 0.15) 0%, transparent 50%);
+  }
+  62.5% {
+    background: 
+      radial-gradient(circle at 60% 75%, rgba(135, 134, 213, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 45% 65%, rgba(255, 134, 213, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 55% 35%, rgba(135, 234, 255, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 65% 85%, rgba(255, 185, 135, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 25% 45%, rgba(185, 255, 135, 0.14) 0%, transparent 50%);
+  }
+  75% {
+    background: 
+      radial-gradient(circle at 30% 30%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 70% 70%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 20% 90%, rgba(120, 219, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 90% 20%, rgba(255, 170, 120, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(170, 255, 120, 0.15) 0%, transparent 50%);
+  }
+  87.5% {
+    background: 
+      radial-gradient(circle at 25% 55%, rgba(105, 104, 183, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 75% 45%, rgba(240, 104, 183, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 35% 65%, rgba(105, 204, 240, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 75% 55%, rgba(240, 155, 105, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 65% 75%, rgba(155, 240, 105, 0.14) 0%, transparent 50%);
+  }
+  100% {
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 60% 60%, rgba(255, 170, 120, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 90% 90%, rgba(170, 255, 120, 0.15) 0%, transparent 50%);
+  }
+}
 
 /* System-Wide Glass Components - Slower and Lighter */
 .glass-container {
@@ -608,6 +745,7 @@ button.glass-button:active,
   color: white !important;
   position: relative !important;
   overflow: hidden !important;
+  animation: slideInFromTop 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
 .glass-dialog::before,
@@ -643,6 +781,7 @@ button.glass-button:active,
     0 8px 40px 0 rgba(0, 0, 0, 0.6),
     0 4px 20px 0 rgba(255, 255, 255, 0.1) !important;
   max-width: 400px !important;
+  animation: slideInFromTop 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
 .glass-dialog-secondary::before {
@@ -713,7 +852,41 @@ button.glass-button:active,
 }
 
 /* Dialog Slide In/Out Animations */
+@keyframes slideInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-100vh) scale(0.8);
+    filter: blur(10px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(-20vh) scale(0.9);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+}
 
+@keyframes slideOutToBottom {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(20vh) scale(0.9);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) scale(0.8);
+    filter: blur(10px);
+  }
+}
 
 /* Dialog Exit Animation Classes */
 .glass-dialog.dialog-exit,
@@ -721,6 +894,7 @@ button.glass-button:active,
 [role="dialog"].glass-dialog.dialog-exit,
 [data-state="closed"].glass-dialog,
 [data-state="closed"].glass-dialog-secondary {
+  animation: slideOutToBottom 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
 
 /* Remove overlay animations since we're not using overlay */
@@ -1366,14 +1540,99 @@ span.badge,
   box-shadow: 
     0 8px 32px 0 rgba(0, 0, 0, 0.4),
     0 4px 16px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Static Background - No Animations */
+.glass-card-view:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 16px 48px 0 rgba(0, 0, 0, 0.6),
+    0 8px 24px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-4px);
+}
 
-/* Static Glass Cards */
+/* Mesh Animation for Background Blobs - Slower and Lighter */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+    filter: hue-rotate(0deg) saturate(100%);
+  }
+  20% {
+    transform: translate(8px, -12px) scale(1.02);
+    filter: hue-rotate(30deg) saturate(110%);
+  }
+  40% {
+    transform: translate(15px, -25px) scale(1.05);
+    filter: hue-rotate(60deg) saturate(120%);
+  }
+  60% {
+    transform: translate(5px, -8px) scale(1.03);
+    filter: hue-rotate(90deg) saturate(115%);
+  }
+  80% {
+    transform: translate(-10px, 10px) scale(0.95);
+    filter: hue-rotate(120deg) saturate(105%);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+    filter: hue-rotate(0deg) saturate(100%);
+  }
+}
+
+@keyframes blob2 {
+  0% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+    filter: hue-rotate(0deg) saturate(100%) brightness(100%);
+  }
+  25% {
+    transform: translate(-8px, 12px) scale(1.05) rotate(30deg);
+    filter: hue-rotate(45deg) saturate(110%) brightness(105%);
+  }
+  50% {
+    transform: translate(-15px, 25px) scale(1.1) rotate(60deg);
+    filter: hue-rotate(90deg) saturate(120%) brightness(110%);
+  }
+  75% {
+    transform: translate(10px, -10px) scale(0.9) rotate(120deg);
+    filter: hue-rotate(135deg) saturate(115%) brightness(108%);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1) rotate(180deg);
+    filter: hue-rotate(180deg) saturate(100%) brightness(100%);
+  }
+}
+
+.animate-blob {
+  animation: blob 45s infinite;
+}
+
+.animate-blob2 {
+  animation: blob2 50s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 5s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 10s;
+}
+
+.animation-delay-6000 {
+  animation-delay: 15s;
+}
+
+.animation-delay-8000 {
+  animation-delay: 20s;
+}
+
 .glass-card-hover {
   background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  transform: translateY(-5px);
+  box-shadow: 
+    0 12px 40px 0 rgba(31, 38, 135, 0.6),
+    0 8px 24px 0 rgba(0, 0, 0, 0.3);
 }
 .text-custom-gold {
   color: #C49632 !important;
@@ -1732,16 +1991,43 @@ span.badge,
 }
 
 /* Animated FAB Enhancements */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
 
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
 
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
 
 .fab-floating {
+  animation: float 3s ease-in-out infinite;
 }
 
 .fab-pulse-ring {
+  animation: pulse-ring 2s ease-out infinite;
 }
 
 .fab-ripple {
+  animation: ripple 0.6s ease-out;
 }
 
 .font-arabic {
