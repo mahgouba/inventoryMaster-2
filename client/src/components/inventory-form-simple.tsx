@@ -346,13 +346,13 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" draggable={true}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto w-[90vw] sm:w-full glass-dialog-secondary" draggable={true}>
           <DialogHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Move className="h-4 w-4 text-gray-400" />
-                <DialogTitle className="text-lg font-semibold text-slate-800">
-                  {editItem ? "تحرير العنصر" : "إضافة عنصر جديد"}
+                <DialogTitle className="text-sm font-medium text-white">
+                  {editItem ? "تحرير" : "إضافة جديد"}
                 </DialogTitle>
               </div>
               <Button
@@ -360,20 +360,20 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                 variant="outline"
                 size="sm"
                 onClick={() => setShowListManager(true)}
-                className="text-xs"
+                className="text-xs glass-button"
               >
-                <Settings className="h-4 w-4 ml-1" />
-                تحرير القوائم
+                <Settings className="h-3 w-3 ml-1" />
+                قوائم
               </Button>
             </div>
           </DialogHeader>
-          <DialogDescription className="text-sm text-slate-600 mb-4">
-            {editItem ? "قم بتحرير بيانات المركبة وحفظ التغييرات" : "أدخل بيانات المركبة الجديدة لإضافتها للمخزون"}
+          <DialogDescription className="text-xs text-white/70 mb-3">
+            {editItem ? "تحرير البيانات" : "إدخال بيانات المركبة"}
           </DialogDescription>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+              <div className="grid grid-cols-1 gap-3">
                 {/* Manufacturer Field */}
                 <FormField
                   control={form.control}
@@ -764,12 +764,12 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   control={form.control}
                   name="notes"
                   render={({ field }) => (
-                    <FormItem className="md:col-span-2">
+                    <FormItem>
                       <FormLabel>الملاحظات</FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="أدخل الملاحظات هنا..."
-                          className="min-h-[100px]"
+                          placeholder="ملاحظات..."
+                          className="min-h-[60px] text-sm"
                           value={field.value || ''}
                           onChange={field.onChange}
                         />
@@ -780,13 +780,13 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <div className="flex justify-end gap-2 pt-3">
+                <Button type="button" variant="outline" size="sm" onClick={() => onOpenChange(false)} className="glass-button">
                   إلغاء
                 </Button>
-                <Button type="submit" disabled={isLoading} className="bg-custom-gold hover:bg-custom-gold-dark text-white">
-                  <CloudUpload className="h-4 w-4 ml-2" />
-                  {isLoading ? "جاري الحفظ..." : editItem ? "تحديث" : "حفظ"}
+                <Button type="submit" size="sm" disabled={isLoading} className="bg-custom-gold hover:bg-custom-gold-dark text-white glass-button">
+                  <CloudUpload className="h-3 w-3 ml-1" />
+                  {isLoading ? "حفظ..." : editItem ? "تحديث" : "حفظ"}
                 </Button>
               </div>
             </form>
