@@ -645,7 +645,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     <img 
                       src={companyLogo} 
                       alt="شعار الشركة" 
-                      className="w-full h-full object-contain hover:animate-none transition-all duration-[3000ms]"
+                      className="w-full h-full object-contain hover:animate-none transition-all duration-[3s]"
                       style={{ animation: 'bounce 3s infinite' }}
                     />
                   ) : (
@@ -653,7 +653,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                       <img 
                         src="/copmany logo.svg" 
                         alt="شعار البريمي للسيارات" 
-                        className="w-8 h-8 sm:w-10 sm:h-10 object-contain hover:animate-none transition-all duration-[3000ms]"
+                        className="w-8 h-8 sm:w-10 sm:h-10 object-contain hover:animate-none transition-all duration-[3s]"
                         style={{ animation: 'spin 4s linear infinite' }}
                       />
                     </div>
