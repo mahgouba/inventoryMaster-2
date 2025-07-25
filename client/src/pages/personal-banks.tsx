@@ -90,7 +90,7 @@ export default function PersonalBanksPage() {
                     <div>
                       <h3 className="text-xl font-bold text-white drop-shadow-lg text-right">{bank.bankName}</h3>
                       <p className="text-sm text-white/80 drop-shadow-lg text-right">
-                        حساب شخصي
+                        {bank.bankName}
                       </p>
                     </div>
                   </div>

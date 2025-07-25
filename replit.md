@@ -234,6 +234,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Enhanced bank page functionality - removed borders around bank data sections for cleaner appearance
 - ✅ Added long-press functionality to bank navigation icons for page sharing with toast notifications
 - ✅ Removed account status field (حالة الحساب) from all bank cards per user request for simplified interface
+- ✅ Replaced "حساب الشركة" and "حساب شخصي" text with actual bank names for better consistency
 - ✅ Migration completed successfully with comprehensive Arabic inventory management system operational
 - ✅ All project features verified: glass morphism design, filtering systems, quotation management, user authentication, and database integration
 
