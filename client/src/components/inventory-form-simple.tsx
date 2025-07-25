@@ -223,7 +223,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
 
   const getOptionsForType = (type: string) => {
     switch (type) {
-      case "manufacturers": return [...new Set(allManufacturers)]; // Remove duplicates
+      case "manufacturers": return Array.from(new Set(allManufacturers)); // Remove duplicates
       case "engineCapacities": return engineCapacities;
       case "statuses": return statuses;
       case "importTypes": return importTypes;
@@ -346,7 +346,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full flex flex-col justify-center mx-auto my-auto" draggable={true}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full" draggable={true}>
           <DialogHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -390,7 +390,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                             <SelectValue placeholder="اختر الصانع" />
                           </SelectTrigger>
                           <SelectContent>
-                            {[...new Set(allManufacturers)].map((manufacturer) => (
+                            {Array.from(new Set(allManufacturers)).map((manufacturer) => (
                               <SelectItem key={manufacturer} value={manufacturer}>
                                 {manufacturer}
                               </SelectItem>
@@ -420,7 +420,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                               <SelectValue placeholder="اختر الفئة" />
                             </SelectTrigger>
                             <SelectContent>
-                              {[...new Set(allCategories)].map((category) => (
+                              {Array.from(new Set(allCategories)).map((category) => (
                                 <SelectItem key={category} value={category}>
                                   {category}
                                 </SelectItem>
@@ -459,7 +459,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                               <SelectValue placeholder="اختر درجة التجهيز" />
                             </SelectTrigger>
                             <SelectContent>
-                              {[...new Set(allTrimLevels)].map((trimLevel) => (
+                              {Array.from(new Set(allTrimLevels)).map((trimLevel) => (
                                 <SelectItem key={trimLevel} value={trimLevel}>
                                   {trimLevel}
                                 </SelectItem>
