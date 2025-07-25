@@ -118,8 +118,9 @@ html, body {
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-  height: auto;
-  min-height: fit-content;
+  height: auto !important;
+  min-height: 120px !important;
+  max-height: none !important;
 }
 
 /* Input and Form Elements */
@@ -132,8 +133,15 @@ input, textarea, select {
 /* Button Fixes */
 button, .button {
   height: auto !important;
-  min-height: fit-content !important;
+  min-height: 36px !important;
   padding: 8px 16px !important;
+}
+
+/* Header fixes */
+.header-container {
+  height: auto !important;
+  min-height: 60px !important;
+  padding: 12px 0 !important;
 }
 
 /* Navigation fixes */
