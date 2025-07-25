@@ -73,7 +73,7 @@ export default function CompanyBanks() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-blue-800 to-purple-900 relative overflow-hidden">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-blue-950 relative overflow-hidden">
         {/* Animated Mesh Background */}
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
@@ -86,7 +86,7 @@ export default function CompanyBanks() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-blue-800 to-purple-900 relative overflow-hidden" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-950 relative overflow-hidden" dir="rtl">
       {/* Animated Mesh Background */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
@@ -138,7 +138,7 @@ export default function CompanyBanks() {
               return (
                 <Card 
                   key={bank.id} 
-                  className="glass-card dark:glass-card-dark rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 border-0"
+                  className="backdrop-blur-xl bg-black/30 border border-white/20 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:bg-black/40"
                 >
                   <CardContent className="p-6">
                     <div className="flex flex-col space-y-4">
