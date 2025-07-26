@@ -64,7 +64,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
   const shouldShowSidebar = !pagesWithoutSidebar.includes(location);
 
   return (
-    <div className="min-h-screen bg-slate-900 relative overflow-x-hidden">
+    <div className="min-h-screen relative overflow-x-hidden">
       {shouldShowSidebar && (
         <SidebarNavigation user={user} onLogout={onLogout} />
       )}
