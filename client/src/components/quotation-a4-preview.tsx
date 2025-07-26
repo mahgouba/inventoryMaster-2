@@ -14,7 +14,7 @@ import html2canvas from "html2canvas";
 
 // Background images
 const backgroundImages = {
-  albarimi1: '/albarimi-1.jpg',
+  albarimi1: '/albarimi-1.svg',
   albarimi2: '/albarimi-2.jpg'
 };
 
