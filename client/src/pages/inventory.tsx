@@ -433,6 +433,22 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-purple-950 relative overflow-hidden" dir="rtl">
+      {/* Company Logo Background */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-5">
+        {companyLogo ? (
+          <img 
+            src={companyLogo} 
+            alt="شعار الشركة" 
+            className="w-96 h-96 object-contain"
+          />
+        ) : (
+          <img 
+            src="/copmany logo.svg" 
+            alt="شعار البريمي للسيارات" 
+            className="w-96 h-96 object-contain"
+          />
+        )}
+      </div>
       {/* Animated Mesh Background */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
