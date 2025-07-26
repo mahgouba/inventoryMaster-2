@@ -26,6 +26,9 @@ import {
 
 interface User {
   id: number;
+  name: string;
+  jobTitle: string;
+  phoneNumber: string;
   username: string;
   role: string;
   createdAt?: string;
@@ -40,6 +43,9 @@ export default function UserManagementSimple() {
 
   // Form states
   const [formData, setFormData] = useState({
+    name: "",
+    jobTitle: "",
+    phoneNumber: "",
     username: "",
     password: "",
     role: "seller"
@@ -53,7 +59,7 @@ export default function UserManagementSimple() {
 
   // Create user mutation
   const createUserMutation = useMutation({
-    mutationFn: async (userData: { username: string; password: string; role: string }) => {
+    mutationFn: async (userData: { name: string; jobTitle: string; phoneNumber: string; username: string; password: string; role: string }) => {
       const response = await apiRequest("POST", "/api/users", userData);
       return await response.json();
     },
@@ -63,7 +69,7 @@ export default function UserManagementSimple() {
         description: "تم إضافة المستخدم الجديد إلى النظام",
       });
       setNewUserOpen(false);
-      setFormData({ username: "", password: "", role: "seller" });
+      setFormData({ name: "", jobTitle: "", phoneNumber: "", username: "", password: "", role: "seller" });
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
     },
     onError: (error: any) => {
@@ -121,7 +127,7 @@ export default function UserManagementSimple() {
   });
 
   const handleCreateUser = () => {
-    if (!formData.username || !formData.password) {
+    if (!formData.name || !formData.jobTitle || !formData.phoneNumber || !formData.username || !formData.password) {
       toast({
         title: "خطأ في البيانات",
         description: "يرجى ملء جميع الحقول المطلوبة",
@@ -135,6 +141,9 @@ export default function UserManagementSimple() {
   const handleEditUser = (user: User) => {
     setSelectedUser(user);
     setFormData({
+      name: user.name,
+      jobTitle: user.jobTitle,
+      phoneNumber: user.phoneNumber,
       username: user.username,
       password: "",
       role: user.role
@@ -143,7 +152,7 @@ export default function UserManagementSimple() {
   };
 
   const handleUpdateUser = () => {
-    if (!formData.username || !selectedUser) {
+    if (!formData.name || !formData.jobTitle || !formData.phoneNumber || !formData.username || !selectedUser) {
       toast({
         title: "خطأ في البيانات",
         description: "يرجى ملء جميع الحقول المطلوبة",
@@ -154,6 +163,9 @@ export default function UserManagementSimple() {
 
     const updateData: any = {
       id: selectedUser.id,
+      name: formData.name,
+      jobTitle: formData.jobTitle,
+      phoneNumber: formData.phoneNumber,
       username: formData.username,
       role: formData.role
     };
@@ -251,6 +263,33 @@ export default function UserManagementSimple() {
                 </div>
                 <div className="space-y-4 mt-4">
                   <div>
+                    <Label htmlFor="name">الاسم</Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="أدخل الاسم الكامل"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="jobTitle">الوظيفة</Label>
+                    <Input
+                      id="jobTitle"
+                      value={formData.jobTitle}
+                      onChange={(e) => setFormData(prev => ({ ...prev, jobTitle: e.target.value }))}
+                      placeholder="أدخل المسمى الوظيفي"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phoneNumber">رقم الجوال</Label>
+                    <Input
+                      id="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                      placeholder="أدخل رقم الجوال"
+                    />
+                  </div>
+                  <div>
                     <Label htmlFor="username">اسم المستخدم</Label>
                     <Input
                       id="username"
@@ -270,13 +309,13 @@ export default function UserManagementSimple() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="role">نوع المستخدم</Label>
+                    <Label htmlFor="role">الصلاحيات</Label>
                     <Select
                       value={formData.role}
                       onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="اختر نوع المستخدم" />
+                        <SelectValue placeholder="اختر نوع الصلاحيات" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="seller">مستخدم عادي</SelectItem>
@@ -316,8 +355,11 @@ export default function UserManagementSimple() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>الاسم</TableHead>
+                    <TableHead>الوظيفة</TableHead>
+                    <TableHead>رقم الجوال</TableHead>
                     <TableHead>اسم المستخدم</TableHead>
-                    <TableHead>النوع</TableHead>
+                    <TableHead>الصلاحيات</TableHead>
                     <TableHead>تاريخ الإنشاء</TableHead>
                     <TableHead>الإجراءات</TableHead>
                   </TableRow>
@@ -325,7 +367,10 @@ export default function UserManagementSimple() {
                 <TableBody>
                   {(users as User[]).map((user) => (
                     <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.username}</TableCell>
+                      <TableCell className="font-medium">{user.name || 'غير محدد'}</TableCell>
+                      <TableCell>{user.jobTitle || 'غير محدد'}</TableCell>
+                      <TableCell>{user.phoneNumber || 'غير محدد'}</TableCell>
+                      <TableCell>{user.username}</TableCell>
                       <TableCell>{getRoleBadge(user.role)}</TableCell>
                       <TableCell>
                         {user.createdAt 
@@ -374,6 +419,33 @@ export default function UserManagementSimple() {
             </div>
             <div className="space-y-4 mt-4">
               <div>
+                <Label htmlFor="edit-name">الاسم</Label>
+                <Input
+                  id="edit-name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="أدخل الاسم الكامل"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-jobTitle">الوظيفة</Label>
+                <Input
+                  id="edit-jobTitle"
+                  value={formData.jobTitle}
+                  onChange={(e) => setFormData(prev => ({ ...prev, jobTitle: e.target.value }))}
+                  placeholder="أدخل المسمى الوظيفي"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-phoneNumber">رقم الجوال</Label>
+                <Input
+                  id="edit-phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                  placeholder="أدخل رقم الجوال"
+                />
+              </div>
+              <div>
                 <Label htmlFor="edit-username">اسم المستخدم</Label>
                 <Input
                   id="edit-username"
@@ -393,13 +465,13 @@ export default function UserManagementSimple() {
                 />
               </div>
               <div>
-                <Label htmlFor="edit-role">نوع المستخدم</Label>
+                <Label htmlFor="edit-role">الصلاحيات</Label>
                 <Select
                   value={formData.role}
                   onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="اختر نوع المستخدم" />
+                    <SelectValue placeholder="اختر نوع الصلاحيات" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="seller">مستخدم عادي</SelectItem>

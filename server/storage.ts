@@ -300,9 +300,7 @@ export class MemStorage implements IStorage {
   async getAppearanceSettings(): Promise<any> { return undefined; }
   async updateAppearanceSettings(settings: any): Promise<any> { return settings; }
   async updateManufacturerLogo(id: number, logo: string): Promise<any> { return undefined; }
-  async getAllUsers(): Promise<any[]> { return []; }
-  async updateUser(id: number, user: any): Promise<any> { return user; }
-  async deleteUser(id: number): Promise<boolean> { return true; }
+
   
   // Comprehensive List Management placeholder methods
   async getAllImportTypes(): Promise<any[]> { return []; }
@@ -882,6 +880,23 @@ export class MemStorage implements IStorage {
     const user: User = { ...insertUser, id };
     this.users.set(id, user);
     return user;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
+  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
+    const existingUser = this.users.get(id);
+    if (!existingUser) return undefined;
+    
+    const updatedUser: User = { ...existingUser, ...userData };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    return this.users.delete(id);
   }
 
   async getAllInventoryItems(): Promise<InventoryItem[]> {

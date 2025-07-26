@@ -5,9 +5,13 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  role: text("role").notNull().default("seller"), // 'admin' or 'seller'
+  name: text("name").notNull(), // الاسم
+  jobTitle: text("job_title").notNull(), // الوظيفة
+  phoneNumber: text("phone_number").notNull(), // رقم الجوال
+  username: text("username").notNull().unique(), // اسم المستخدم
+  password: text("password").notNull(), // كلمة المرور
+  role: text("role").notNull().default("seller"), // الصلاحيات: 'admin' or 'seller'
+  createdAt: timestamp("created_at").defaultNow().notNull(), // تاريخ الإنشاء
 });
 
 export const inventoryItems = pgTable("inventory_items", {
@@ -328,8 +332,12 @@ export const pdfAppearanceSettings = pgTable("pdf_appearance_settings", {
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
+  name: true,
+  jobTitle: true,
+  phoneNumber: true,
   username: true,
   password: true,
+  role: true,
 });
 
 export const insertInventoryItemSchema = createInsertSchema(inventoryItems).omit({
