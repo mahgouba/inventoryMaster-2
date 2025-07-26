@@ -16,7 +16,9 @@ import {
   Palette, 
   Image, 
   Users, 
-  Building 
+  Building,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -142,9 +144,23 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     <div className="glass-container fixed top-0 left-0 right-0 z-50 border-b border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
       <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-center items-center h-16 sm:h-20">
-          <div className="w-full">
+          <div className="w-full relative">
+            {/* Left Scroll Indicator */}
+            <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
+              <div className="glass-button p-1 rounded-full bg-white/20 backdrop-blur-sm">
+                <ChevronRight size={16} className="text-white/70" />
+              </div>
+            </div>
+            
+            {/* Right Scroll Indicator */}
+            <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
+              <div className="glass-button p-1 rounded-full bg-white/20 backdrop-blur-sm">
+                <ChevronLeft size={16} className="text-white/70" />
+              </div>
+            </div>
+
             <ScrollArea className="w-full whitespace-nowrap">
-              <div className="flex items-center space-x-2 space-x-reverse gap-1 px-4">
+              <div className="flex items-center space-x-2 space-x-reverse gap-1 px-12">
                 {allItems.map((item, index) => {
                   const active = isActive(item.href);
                   return (
@@ -166,6 +182,13 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
               </div>
               <ScrollBar orientation="horizontal" className="h-2 bg-white/10" />
             </ScrollArea>
+            
+            {/* Bottom Scroll Dots Indicator */}
+            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-1 pb-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-white/30"></div>
+              <div className="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+              <div className="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+            </div>
           </div>
         </div>
       </div>
