@@ -138,8 +138,8 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
               </div>
             </div>
 
-            {/* Page Content */}
-            <div className="relative z-10">
+            {/* Page Content with top padding for fixed navbar */}
+            <div className="relative z-10 pt-16 sm:pt-20">
               {renderPage()}
             </div>
           </div>

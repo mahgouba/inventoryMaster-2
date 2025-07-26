@@ -138,7 +138,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   };
 
   return (
-    <div className="glass-container sticky top-0 z-50 border-b border-white/20 dark:border-slate-700/30">
+    <div className="glass-container fixed top-0 left-0 right-0 z-50 border-b border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-center items-center h-16 sm:h-20">
           <div className="flex items-center justify-center w-full">
