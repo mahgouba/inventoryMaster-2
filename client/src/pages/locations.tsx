@@ -203,12 +203,7 @@ export default function LocationPage({ userRole, onLogout }: LocationPageProps) 
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <Link href="/appearance">
-                      <DropdownMenuItem>
-                        <Settings className="mr-2 h-4 w-4" />
-                        إدارة المظهر
-                      </DropdownMenuItem>
-                    </Link>
+
                     <Link href="/user-management">
                       <DropdownMenuItem>
                         <Users className="mr-2 h-4 w-4" />

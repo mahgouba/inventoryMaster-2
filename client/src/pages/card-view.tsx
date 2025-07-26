@@ -133,25 +133,12 @@ export default function CardViewPage({ userRole }: CardViewPageProps) {
                 </Button>
               </div>
 
-              {/* Appearance Management Button - Always Visible */}
-              <Link href="/appearance">
-                <Button variant="outline" size="sm" className="text-custom-primary hover:text-custom-primary-dark hover:bg-blue-50 border-teal-200 transition-colors">
-                  <Palette size={16} className="ml-1" />
-                  <span className="hidden sm:inline">إدارة المظهر</span>
-                  <span className="sm:hidden">المظهر</span>
-                </Button>
-              </Link>
+
 
               {/* Admin Management Buttons - Admin Only */}
               {userRole === "admin" && (
                 <div className="flex items-center space-x-2 space-x-reverse">
-                  <Link href="/appearance">
-                    <Button variant="outline" size="sm" className="text-custom-primary hover:text-custom-primary-dark hover:bg-blue-50 border-teal-200 transition-colors">
-                      <Palette size={16} className="ml-1" />
-                      <span className="hidden sm:inline">إدارة المظهر</span>
-                      <span className="sm:hidden">المظهر</span>
-                    </Button>
-                  </Link>
+
                   
                   <Link href="/user-management">
                     <Button variant="outline" size="sm" className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 border-purple-200 transition-colors">
@@ -178,12 +165,7 @@ export default function CardViewPage({ userRole }: CardViewPageProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
-                      <Link href="/appearance">
-                        <DropdownMenuItem>
-                          <Palette className="mr-2 h-4 w-4" />
-                          إدارة المظهر
-                        </DropdownMenuItem>
-                      </Link>
+
                       <Link href="/pdf-appearance">
                         <DropdownMenuItem>
                           <FileText className="mr-2 h-4 w-4" />

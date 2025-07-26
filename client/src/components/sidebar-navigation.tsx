@@ -112,12 +112,6 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
       description: "User Management"
     },
     { 
-      title: "إدارة الشركات", 
-      href: "/company-management", 
-      icon: Building,
-      description: "Company Management"
-    },
-    { 
       title: "إدارة البنوك", 
       href: "/bank-management", 
       icon: CreditCard,
@@ -128,12 +122,6 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
       href: "/manufacturer-logos", 
       icon: Image,
       description: "Manufacturer Logos"
-    },
-    { 
-      title: "إدارة المظهر", 
-      href: "/appearance", 
-      icon: Palette,
-      description: "Appearance"
     },
     { 
       title: "التحكم الديناميكي", 

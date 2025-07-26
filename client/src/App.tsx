@@ -14,7 +14,6 @@ import InventoryPage from "@/pages/inventory";
 import CardViewPage from "@/pages/card-view-new";
 import FinancingCalculatorPage from "@/pages/financing-calculator";
 
-import AppearancePage from "@/pages/appearance";
 import PdfAppearanceManagement from "@/pages/pdf-appearance-management";
 import ManufacturerLogosPage from "@/pages/manufacturer-logos";
 import LocationPage from "@/pages/locations";
@@ -25,7 +24,6 @@ import QuotationCreationPage from "@/pages/quotation-creation";
 
 import QuotationEditPage from "@/pages/quotation-edit";
 import QuotationManagementPage from "@/pages/quotation-management";
-import CompanyManagementPage from "@/pages/company-management";
 import InvoiceManagementPage from "@/pages/invoice-management";
 import DynamicCompanyControl from "@/pages/dynamic-company-control";
 import IntegrationManagementPage from "@/pages/integration-management";
@@ -103,11 +101,9 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
             {/* صفحات الأدمن فقط */}
             {user.role === "admin" && (
               <>
-                <Route path="/appearance" component={() => <AppearancePage userRole={user.role} onLogout={onLogout} />} />
                 <Route path="/pdf-appearance" component={() => <PdfAppearanceManagement userRole={user.role} onLogout={onLogout} />} />
                 <Route path="/manufacturer-logos" component={() => <ManufacturerLogosPage userRole={user.role} onLogout={onLogout} />} />
                 <Route path="/user-management" component={() => <UserManagementPage />} />
-                <Route path="/company-management" component={() => <CompanyManagementPage />} />
                 <Route path="/bank-management" component={BankManagement} />
                 <Route path="/dynamic-company-control" component={() => <DynamicCompanyControl />} />
                 <Route path="/integration-management" component={() => <IntegrationManagementPage />} />
