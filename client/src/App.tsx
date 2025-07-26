@@ -16,6 +16,7 @@ import FinancingCalculatorPage from "@/pages/financing-calculator";
 
 import AppearancePage from "@/pages/appearance";
 import PdfAppearanceManagement from "@/pages/pdf-appearance-management";
+import ManufacturerLogosPage from "@/pages/manufacturer-logos";
 import LocationPage from "@/pages/locations";
 import LoginPage from "@/pages/login";
 import UserManagementPage from "@/pages/user-management-simple";
@@ -104,6 +105,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
               <>
                 <Route path="/appearance" component={() => <AppearancePage userRole={user.role} onLogout={onLogout} />} />
                 <Route path="/pdf-appearance" component={() => <PdfAppearanceManagement userRole={user.role} onLogout={onLogout} />} />
+                <Route path="/manufacturer-logos" component={() => <ManufacturerLogosPage userRole={user.role} onLogout={onLogout} />} />
                 <Route path="/user-management" component={() => <UserManagementPage />} />
                 <Route path="/company-management" component={() => <CompanyManagementPage />} />
                 <Route path="/bank-management" component={BankManagement} />

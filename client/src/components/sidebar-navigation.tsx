@@ -125,7 +125,7 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
     },
     { 
       title: "إدارة شعارات الصناع", 
-      href: "/pdf-appearance", 
+      href: "/manufacturer-logos", 
       icon: Image,
       description: "Manufacturer Logos"
     },

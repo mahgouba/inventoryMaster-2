@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { 
   Palette, 
   Upload, 
@@ -13,12 +15,19 @@ import {
   Settings,
   Sun,
   Moon,
+  Building,
+  Image as ImageIcon,
+  Edit2,
+  Plus,
+  Trash2,
+  FileText,
   Home
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { AppearanceSettings } from "@/../../shared/schema";
-
+import { AppearanceSettings, Manufacturer } from "@/../../shared/schema";
+import { apiRequest } from "@/lib/queryClient";
 
 function hexToHsl(hex: string): string {
   const r = parseInt(hex.slice(1, 3), 16) / 255;
@@ -97,7 +106,14 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
   const [rtlLayout, setRtlLayout] = useState(true);
   const [themeStyle, setThemeStyle] = useState("glass");
   
-
+  // State for new manufacturer dialog
+  const [showNewManufacturerDialog, setShowNewManufacturerDialog] = useState(false);
+  const [newManufacturerName, setNewManufacturerName] = useState("");
+  const [newManufacturerLogo, setNewManufacturerLogo] = useState<string | null>(null);
+  
+  // State for editing manufacturer names
+  const [editingManufacturerId, setEditingManufacturerId] = useState<number | null>(null);
+  const [editingManufacturerName, setEditingManufacturerName] = useState("");
 
   const queryClient = useQueryClient();
 
@@ -106,7 +122,20 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
     queryKey: ["/api/appearance"],
   });
 
+  // Fetch manufacturers
+  const { data: manufacturers = [] } = useQuery<Manufacturer[]>({
+    queryKey: ["/api/manufacturers"],
+  });
 
+  // Fetch inventory data to get all manufacturers
+  const { data: inventoryData = [] } = useQuery<any[]>({
+    queryKey: ["/api/inventory"],
+  });
+
+  // Extract unique manufacturers from inventory
+  const inventoryManufacturers = inventoryData.length > 0 
+    ? [...new Set(inventoryData.map(item => item.manufacturer).filter(Boolean))]
+    : [];
 
   // Save appearance settings mutation
   const saveAppearanceMutation = useMutation({
@@ -139,7 +168,156 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
     },
   });
 
+  // Create new manufacturer mutation
+  const createManufacturerMutation = useMutation({
+    mutationFn: async (manufacturer: { name: string; logo?: string }) => {
+      console.log('Creating manufacturer:', manufacturer);
+      
+      const response = await fetch("/api/manufacturers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(manufacturer),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Failed to create manufacturer:', response.status, errorData);
+        throw new Error(`Failed to create manufacturer: ${response.status} - ${errorData.message || 'Unknown error'}`);
+      }
+      
+      const result = await response.json();
+      console.log('Manufacturer created successfully:', result);
+      return result;
+    },
+    onSuccess: (data) => {
+      console.log('Create manufacturer mutation success:', data);
+      toast({
+        title: "تم إضافة الشركة المصنعة بنجاح",
+        description: `تم إضافة ${data.name} إلى القائمة`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/manufacturers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
+      setShowNewManufacturerDialog(false);
+      setNewManufacturerName("");
+      setNewManufacturerLogo(null);
+    },
+    onError: (error) => {
+      console.error('Create manufacturer mutation error:', error);
+      
+      // Check if it's a duplicate name error
+      if (error.message.includes("409")) {
+        toast({
+          title: "خطأ - اسم مكرر",
+          description: "الشركة المصنعة موجودة بالفعل! يرجى اختيار اسم آخر",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "خطأ في إضافة الشركة المصنعة",
+          description: error.message || "حدث خطأ أثناء إضافة الشركة المصنعة",
+          variant: "destructive",
+        });
+      }
+    },
+  });
 
+  // Update manufacturer logo mutation
+  const updateManufacturerLogoMutation = useMutation({
+    mutationFn: async ({ id, logo }: { id: number; logo: string }) => {
+      console.log('Updating manufacturer logo for ID:', id, 'Logo length:', logo.length);
+      
+      const response = await fetch(`/api/manufacturers/${id}/logo`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ logo }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Logo update failed:', response.status, errorData);
+        throw new Error(`Failed to update manufacturer logo: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log('Logo update successful:', result);
+      return result;
+    },
+    onSuccess: (data) => {
+      console.log('Mutation onSuccess called:', data);
+      toast({
+        title: "تم تحديث الشعار بنجاح",
+        description: "تم تحديث شعار الشركة المصنعة",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/manufacturers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
+    },
+    onError: (error) => {
+      console.error('Mutation onError called:', error);
+      toast({
+        title: "خطأ في تحديث الشعار",
+        description: error.message || "حدث خطأ أثناء تحديث الشعار",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update manufacturer name mutation
+  const updateManufacturerNameMutation = useMutation({
+    mutationFn: async ({ id, name }: { id: number; name: string }) => {
+      console.log('Updating manufacturer name for ID:', id, 'New name:', name);
+      
+      const response = await fetch(`/api/manufacturers/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Name update failed:', response.status, errorData);
+        throw new Error(`Failed to update manufacturer name: ${response.status} - ${errorData.message || 'Unknown error'}`);
+      }
+      
+      const result = await response.json();
+      console.log('Name update successful:', result);
+      return result;
+    },
+    onSuccess: (data) => {
+      console.log('Name update mutation success:', data);
+      toast({
+        title: "تم تحديث اسم الشركة بنجاح",
+        description: `تم تحديث اسم الشركة إلى ${data.name}`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/manufacturers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
+      setEditingManufacturerId(null);
+      setEditingManufacturerName("");
+    },
+    onError: (error) => {
+      console.error('Name update mutation error:', error);
+      
+      // Check if it's a duplicate name error
+      if (error.message.includes("409")) {
+        toast({
+          title: "خطأ - اسم مكرر",
+          description: "الاسم موجود بالفعل! يرجى اختيار اسم آخر",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "خطأ في تحديث الاسم",
+          description: error.message || "حدث خطأ أثناء تحديث اسم الشركة",
+          variant: "destructive",
+        });
+      }
+    },
+  });
 
   // Update state when data is fetched
   useEffect(() => {
@@ -241,7 +419,15 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
     saveAppearanceMutation.mutate(settings);
   };
 
-
+  // Function to add new manufacturer
+  const handleAddManufacturer = () => {
+    if (newManufacturerName.trim()) {
+      createManufacturerMutation.mutate({
+        name: newManufacturerName.trim(),
+        logo: newManufacturerLogo || undefined,
+      });
+    }
+  };
 
   // Function to apply colors immediately for preview
   useEffect(() => {
@@ -792,7 +978,131 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
           </TabsContent>
         </Tabs>
 
+        {/* New Manufacturer Dialog */}
+        <Dialog open={showNewManufacturerDialog} onOpenChange={setShowNewManufacturerDialog}>
+          <DialogContent className="sm:max-w-md" dir="rtl">
+            <DialogHeader>
+              <DialogTitle>إضافة شركة مصنعة جديدة</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="manufacturerName">اسم الشركة المصنعة</Label>
+                <Input
+                  id="manufacturerName"
+                  value={newManufacturerName}
+                  onChange={(e) => setNewManufacturerName(e.target.value)}
+                  placeholder="مرسيدس"
+                />
+              </div>
 
+              <div className="space-y-2">
+                <Label>شعار الشركة (اختياري)</Label>
+                <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center">
+                  {newManufacturerLogo ? (
+                    <div className="space-y-2">
+                      <img
+                        src={newManufacturerLogo}
+                        alt="Logo Preview"
+                        className="max-h-16 mx-auto"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setNewManufacturerLogo(null)}
+                      >
+                        حذف الشعار
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="w-12 h-12 bg-slate-200 rounded mx-auto flex items-center justify-center">
+                        <ImageIcon size={20} className="text-slate-400" />
+                      </div>
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              console.log('New manufacturer file selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+                              
+                              // Check file type
+                              if (!file.type.startsWith('image/')) {
+                                toast({
+                                  title: "نوع ملف غير صحيح",
+                                  description: "يرجى اختيار ملف صورة صحيح (PNG, JPG, JPEG, GIF, WebP, SVG)",
+                                  variant: "destructive",
+                                });
+                                e.target.value = '';
+                                return;
+                              }
+                              
+                              // Check file size (limit to 5MB)
+                              if (file.size > 5 * 1024 * 1024) {
+                                toast({
+                                  title: "خطأ في حجم الملف",
+                                  description: "حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت",
+                                  variant: "destructive",
+                                });
+                                e.target.value = '';
+                                return;
+                              }
+
+                              const reader = new FileReader();
+                              reader.onload = (event) => {
+                                const result = event.target?.result as string;
+                                if (result) {
+                                  console.log('New manufacturer logo read successfully');
+                                  setNewManufacturerLogo(result);
+                                }
+                              };
+                              reader.onerror = (error) => {
+                                console.error('Error reading file:', error);
+                                toast({
+                                  title: "خطأ في قراءة الملف",
+                                  description: "حدث خطأ أثناء قراءة الصورة. يرجى المحاولة مرة أخرى",
+                                  variant: "destructive",
+                                });
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                            // Reset the input value to allow selecting the same file again
+                            e.target.value = '';
+                          }}
+                        />
+                        <Button variant="outline" size="sm">
+                          <Upload size={14} />
+                          اختر شعار
+                        </Button>
+                      </label>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-2 space-x-reverse pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowNewManufacturerDialog(false);
+                    setNewManufacturerName("");
+                    setNewManufacturerLogo(null);
+                  }}
+                >
+                  إلغاء
+                </Button>
+                <Button 
+                  onClick={handleAddManufacturer}
+                  disabled={!newManufacturerName.trim() || createManufacturerMutation.isPending}
+                >
+                  {createManufacturerMutation.isPending ? "جاري الإضافة..." : "إضافة"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
