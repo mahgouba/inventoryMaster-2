@@ -15,7 +15,8 @@ import {
   type TrimLevel, type InsertTrimLevel,
   type Quotation, type InsertQuotation,
   type FinancingCalculation, type InsertFinancingCalculation,
-  type Bank, type InsertBank
+  type Bank, type InsertBank,
+  type LeaveRequest, type InsertLeaveRequest
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, like, or, and, sql, desc } from "drizzle-orm";
@@ -222,6 +223,13 @@ export interface IStorage {
   createBank(bank: InsertBank): Promise<Bank>;
   updateBank(id: number, bank: Partial<InsertBank>): Promise<Bank | undefined>;
   deleteBank(id: number): Promise<boolean>;
+
+  // Leave request methods
+  getAllLeaveRequests(): Promise<LeaveRequest[]>;
+  getLeaveRequestById(id: number): Promise<LeaveRequest | undefined>;
+  createLeaveRequest(request: InsertLeaveRequest): Promise<LeaveRequest>;
+  updateLeaveRequestStatus(id: number, status: string, approvedBy?: number, approvedByName?: string, rejectionReason?: string): Promise<LeaveRequest | undefined>;
+  deleteLeaveRequest(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -236,6 +244,7 @@ export class MemStorage implements IStorage {
   private invoices: Map<number, any> = new Map();
   private financingCalculations: Map<number, FinancingCalculation> = new Map();
   private banks: Map<number, Bank> = new Map();
+  private leaveRequests: Map<number, LeaveRequest> = new Map();
   private currentUserId: number;
   private currentInventoryId: number;
   private currentManufacturerId: number;
@@ -247,6 +256,7 @@ export class MemStorage implements IStorage {
   private currentInvoiceId: number = 1;
   private currentFinancingCalculationId: number = 1;
   private currentBankId: number = 1;
+  private currentLeaveRequestId: number = 1;
   private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
   private systemSettings: Map<string, string> = new Map();
   private companies: Map<number, Company> = new Map();
@@ -264,6 +274,7 @@ export class MemStorage implements IStorage {
     this.invoices = new Map();
     this.financingCalculations = new Map();
     this.banks = new Map();
+    this.leaveRequests = new Map();
     this.currentUserId = 1;
     this.currentInventoryId = 1;
     this.currentManufacturerId = 1;
@@ -3111,6 +3122,54 @@ export class DatabaseStorage implements IStorage {
 
   async deleteBank(id: number): Promise<boolean> {
     return this.banks.delete(id);
+  }
+
+  // Leave request methods
+  async getAllLeaveRequests(): Promise<LeaveRequest[]> {
+    return Array.from(this.leaveRequests.values());
+  }
+
+  async getLeaveRequestById(id: number): Promise<LeaveRequest | undefined> {
+    return this.leaveRequests.get(id);
+  }
+
+  async createLeaveRequest(requestData: InsertLeaveRequest): Promise<LeaveRequest> {
+    const id = this.currentLeaveRequestId++;
+    const request: LeaveRequest = {
+      id,
+      ...requestData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.leaveRequests.set(id, request);
+    return request;
+  }
+
+  async updateLeaveRequestStatus(
+    id: number, 
+    status: string, 
+    approvedBy?: number, 
+    approvedByName?: string, 
+    rejectionReason?: string
+  ): Promise<LeaveRequest | undefined> {
+    const existingRequest = this.leaveRequests.get(id);
+    if (!existingRequest) return undefined;
+
+    const updatedRequest: LeaveRequest = {
+      ...existingRequest,
+      status,
+      approvedBy: approvedBy || null,
+      approvedByName: approvedByName || null,
+      approvedAt: status === "approved" || status === "rejected" ? new Date() : null,
+      rejectionReason: rejectionReason || null,
+      updatedAt: new Date(),
+    };
+    this.leaveRequests.set(id, updatedRequest);
+    return updatedRequest;
+  }
+
+  async deleteLeaveRequest(id: number): Promise<boolean> {
+    return this.leaveRequests.delete(id);
   }
 }
 

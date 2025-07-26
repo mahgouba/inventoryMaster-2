@@ -94,6 +94,12 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
       href: "/financing-calculator", 
       icon: Calculator,
       description: "Financing Calculator"
+    },
+    { 
+      title: "طلبات الإجازة", 
+      href: "/leave-requests", 
+      icon: UserCheck,
+      description: "Leave Requests"
     }
   ];
 

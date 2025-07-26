@@ -671,6 +671,37 @@ export const insertFinancingCalculationSchema = createInsertSchema(financingCalc
 export type FinancingCalculation = typeof financingCalculations.$inferSelect;
 export type InsertFinancingCalculation = z.infer<typeof insertFinancingCalculationSchema>;
 
+// Leave requests table
+export const leaveRequests = pgTable("leave_requests", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  userName: text("user_name").notNull(),
+  requestType: text("request_type").notNull(), // "إجازة" أو "استئذان"
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  duration: integer("duration").notNull(), // عدد الأيام أو الساعات
+  durationType: text("duration_type").notNull(), // "أيام" أو "ساعات"
+  reason: text("reason").notNull(),
+  status: text("status").notNull().default("pending"), // "pending", "approved", "rejected"
+  requestedBy: integer("requested_by").notNull(), // ID of user who created the request
+  requestedByName: text("requested_by_name").notNull(),
+  approvedBy: integer("approved_by"),
+  approvedByName: text("approved_by_name"),
+  approvedAt: timestamp("approved_at"),
+  rejectionReason: text("rejection_reason"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertLeaveRequestSchema = createInsertSchema(leaveRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertLeaveRequest = z.infer<typeof insertLeaveRequestSchema>;
+export type LeaveRequest = typeof leaveRequests.$inferSelect;
+
 export type Company = typeof companies.$inferSelect;
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 

@@ -34,6 +34,7 @@ import SoldVehiclesPage from "@/pages/sold-vehicles";
 import BankManagement from "@/pages/bank-management";
 import PersonalBanks from "@/pages/personal-banks";
 import CompanyBanks from "@/pages/company-banks";
+import LeaveRequestsPage from "@/pages/leave-requests";
 
 interface User {
   username: string;
@@ -46,7 +47,7 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
   useTheme();
   return (
     <>
-      <ThemeStyles />
+      <ThemeStyles themeStyle="glass" darkMode={false} />
       {children}
     </>
   );
@@ -92,6 +93,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
             <Route path="/reservations" component={() => <ReservationsPage />} />
             <Route path="/sold-vehicles" component={() => <SoldVehiclesPage />} />
             <Route path="/financing-calculator" component={FinancingCalculatorPage} />
+            <Route path="/leave-requests" component={() => <LeaveRequestsPage userRole={user.role} username={user.username} userId={user.id} />} />
             
             {/* صفحات البنوك العامة */}
             <Route path="/banks-personal" component={PersonalBanks} />
