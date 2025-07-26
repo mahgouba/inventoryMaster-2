@@ -10,27 +10,13 @@ import { ThemeStyles } from "@/components/theme-styles";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import UniversalGlass from "@/components/universal-glass";
 // import SidebarNavigation from "@/components/sidebar-navigation";
-import InventoryPage from "@/pages/inventory";
+import MainDashboard from "@/components/main-dashboard";
 import CardViewPage from "@/pages/card-view-new";
-import FinancingCalculatorPage from "@/pages/financing-calculator";
-
-import PdfAppearanceManagement from "@/pages/pdf-appearance-management";
-import ManufacturerLogosPage from "@/pages/manufacturer-logos";
-import LocationPage from "@/pages/locations";
 import LoginPage from "@/pages/login";
-import UserManagementPage from "@/pages/user-management-simple";
 import NotFound from "@/pages/not-found";
-import QuotationCreationPage from "@/pages/quotation-creation";
-
 import QuotationEditPage from "@/pages/quotation-edit";
-import InvoiceManagementPage from "@/pages/invoice-management";
-
-import ReservationsPage from "@/pages/reservations";
-import SoldVehiclesPage from "@/pages/sold-vehicles";
-import BankManagement from "@/pages/bank-management";
 import PersonalBanks from "@/pages/personal-banks";
 import CompanyBanks from "@/pages/company-banks";
-import LeaveRequestsPage from "@/pages/leave-requests";
 
 interface User {
   username: string;
@@ -67,35 +53,37 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
     <div className="min-h-screen">
       <SystemGlassWrapper>
         <Switch>
-          <Route path="/" component={() => <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-          <Route path="/inventory" component={() => <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+          {/* Main Dashboard Route - handles all internal pages */}
+          <Route path="/" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/inventory" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/quotation-creation" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/invoice-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/reservations" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/sold-vehicles" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/financing-calculator" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/leave-requests" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/locations" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          
+          {/* Admin Routes through Main Dashboard */}
+          {user.role === "admin" && (
+            <>
+              <Route path="/pdf-appearance" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+              <Route path="/manufacturer-logos" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+              <Route path="/user-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+              <Route path="/bank-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+            </>
+          )}
+
+          {/* External Pages - separate routes */}
           <Route path="/cards" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
           <Route path="/card-view" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
           <Route path="/card-view-new" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-          <Route path="/quotation-creation" component={() => <QuotationCreationPage />} />
-
-          <Route path="/quotation-edit/:id" component={QuotationEditPage} />
-          <Route path="/invoice-management" component={InvoiceManagementPage} />
-          <Route path="/locations" component={() => <LocationPage userRole={user.role} onLogout={onLogout} />} />
-          <Route path="/reservations" component={() => <ReservationsPage />} />
-          <Route path="/sold-vehicles" component={() => <SoldVehiclesPage />} />
-          <Route path="/financing-calculator" component={FinancingCalculatorPage} />
-          <Route path="/leave-requests" component={() => <LeaveRequestsPage userRole={user.role} username={user.username} userId={user.id} />} />
-          
-          {/* صفحات البنوك العامة */}
           <Route path="/banks-personal" component={PersonalBanks} />
           <Route path="/banks-company" component={CompanyBanks} />
           
-          {/* صفحات الأدمن فقط */}
-          {user.role === "admin" && (
-            <>
-              <Route path="/pdf-appearance" component={() => <PdfAppearanceManagement userRole={user.role} onLogout={onLogout} />} />
-              <Route path="/manufacturer-logos" component={() => <ManufacturerLogosPage userRole={user.role} onLogout={onLogout} />} />
-              <Route path="/user-management" component={() => <UserManagementPage />} />
-              <Route path="/bank-management" component={BankManagement} />
-
-            </>
-          )}
+          {/* Special Routes */}
+          <Route path="/quotation-edit/:id" component={QuotationEditPage} />
+          
           <Route component={NotFound} />
         </Switch>
       </SystemGlassWrapper>
