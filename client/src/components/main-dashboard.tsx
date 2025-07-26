@@ -88,16 +88,13 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
           </div>
 
           <div className="relative z-10" dir="rtl">
-            {/* Enhanced Header */}
-            <div className="glass-container border-b border-white/20 dark:border-slate-700/30">
+            {/* Fixed Navigation */}
+            <HorizontalNavigation userRole={user.role} />
+            
+            {/* Enhanced Header with User Controls */}
+            <div className="glass-container border-b border-white/20 dark:border-slate-700/30 fixed top-16 sm:top-20 left-0 right-0 z-40">
               <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-                <div className="flex justify-between items-center h-16 sm:h-20">
-                  
-                  {/* Horizontal Navigation */}
-                  <div className="flex-1">
-                    <HorizontalNavigation userRole={user.role} />
-                  </div>
-
+                <div className="flex justify-end items-center h-12">
                   {/* User Controls */}
                   <div className="flex items-center space-x-2 space-x-reverse mr-4">
                     {/* Dark Mode Toggle */}
@@ -139,7 +136,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
             </div>
 
             {/* Page Content with top padding for fixed navbar */}
-            <div className="relative z-10 pt-16 sm:pt-20">
+            <div className="relative z-10 pt-28 sm:pt-32">
               {renderPage()}
             </div>
           </div>

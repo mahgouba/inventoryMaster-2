@@ -16,7 +16,7 @@ import InventoryStats from "@/components/inventory-stats";
 import InventoryTable from "@/components/inventory-table";
 import InventoryFormSimple from "@/components/inventory-form-simple";
 import ExcelImport from "@/components/excel-import";
-import HorizontalNavigation from "@/components/horizontal-navigation";
+
 
 
 import { InventoryFAB } from "@/components/animated-fab";
@@ -434,8 +434,6 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-purple-950 relative overflow-hidden" dir="rtl">
-      {/* Fixed Horizontal Navigation */}
-      <HorizontalNavigation userRole={userRole} />
       
       {/* Company Logo Background */}
       <div className="absolute inset-0 flex items-center justify-center opacity-5">
