@@ -105,6 +105,9 @@ export default function InventoryIOSPicker({
           <DialogTitle className="text-center text-xl font-bold text-white mb-4">
             اختيار معايير السيارة - iOS Style
           </DialogTitle>
+          <div className="sr-only" aria-describedby="picker-description">
+            اختر معايير السيارة باستخدام المحدد العمودي بأسلوب iOS
+          </div>
         </DialogHeader>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 h-full">

@@ -50,7 +50,31 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     return;
   };
 
-  // Touch drag handlers with magnetic center stop
+  // Sound effect function
+  const playNavigationSound = () => {
+    try {
+      // Create audio context for sound generation
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
+      
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+    } catch (error) {
+      console.log('Audio not supported or blocked');
+    }
+  };
+
+  // Touch drag handlers with magnetic center stop and sound
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!scrollRef.current) return;
     setDragStartTime(Date.now());
@@ -64,14 +88,21 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     const x = e.touches[0].pageX - scrollRef.current.offsetLeft;
     const distance = Math.abs(x - startX);
     
-    // Only start dragging if moved more than 10px
+    // Only start dragging if moved more than 10px - HORIZONTAL ONLY
     if (distance > 10) {
       if (!isDragging) {
         setIsDragging(true);
+        playNavigationSound(); // Play sound when dragging starts
       }
       setHasMoved(true);
-      const walk = (x - startX) * 1.5; // Touch scroll speed
-      scrollRef.current.scrollLeft = scrollLeft - walk;
+      
+      // Smooth horizontal scrolling with iOS-style momentum
+      const walk = (x - startX) * 1.2; // Reduced for smoother movement
+      const newScrollLeft = scrollLeft - walk;
+      
+      // Apply smooth transition with momentum
+      scrollRef.current.style.transition = 'scroll-behavior: smooth';
+      scrollRef.current.scrollLeft = Math.max(0, newScrollLeft);
       
       // Check for magnetic snap to center
       snapToCenter();
@@ -79,6 +110,11 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   };
 
   const handleTouchEnd = () => {
+    // Add iOS-style deceleration animation
+    if (scrollRef.current && hasMoved) {
+      scrollRef.current.style.transition = 'scroll-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      playNavigationSound(); // Play sound when touch ends
+    }
     handleDragEnd();
   };
 
@@ -115,7 +151,9 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       const buttonCenter = buttonRect.left - containerRect.left + buttonRect.width / 2;
       const targetScrollLeft = container.scrollLeft + (buttonCenter - containerCenter);
       
-      // Smooth scroll to center
+      // iOS-style smooth scroll to center with sound
+      playNavigationSound();
+      container.style.transition = 'scroll-left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
       container.scrollTo({
         left: targetScrollLeft,
         behavior: 'smooth'
@@ -125,16 +163,31 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     }
   };
 
-  // Auto-navigate to center item when drag ends
+  // Auto-navigate to center item when drag ends with iOS-style animation
   const handleDragEnd = () => {
     setTimeout(() => {
       if (centerItem && hasMoved) {
-        // Navigate to the center item
-        if (centerItem.internal) {
-          setLocation(centerItem.href);
-        } else {
-          window.location.href = centerItem.href;
+        playNavigationSound(); // Play selection sound
+        
+        // Add selection feedback animation
+        if (scrollRef.current) {
+          scrollRef.current.style.transform = 'scale(0.98)';
+          setTimeout(() => {
+            if (scrollRef.current) {
+              scrollRef.current.style.transform = 'scale(1)';
+              scrollRef.current.style.transition = 'transform 0.2s ease-out';
+            }
+          }, 100);
         }
+        
+        // Navigate to the center item
+        setTimeout(() => {
+          if (centerItem.internal) {
+            setLocation(centerItem.href);
+          } else {
+            window.location.href = centerItem.href;
+          }
+        }, 200);
       }
       setIsDragging(false);
       setHasMoved(false);
@@ -308,9 +361,10 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                     size="sm"
                     onClick={() => handleNavigation(item)}
                     className={cn(
-                      "glass-button glass-text-primary transition-all duration-300 ease-in-out transform whitespace-nowrap flex-shrink-0",
-                      "hover:scale-110 hover:shadow-lg hover:bg-white/25",
-                      active && "bg-blue-600/40 border-blue-400/40 shadow-xl scale-110 text-white font-semibold"
+                      "glass-button glass-text-primary transition-all duration-300 ease-in-out transform whitespace-nowrap flex-shrink-0 ios-nav-button",
+                      "hover:scale-110 hover:shadow-lg hover:bg-white/25 hover:translate-y-[-1px]",
+                      "active:scale-95 active:translate-y-0",
+                      active && "bg-blue-600/40 border-blue-400/40 shadow-xl scale-110 text-white font-semibold ios-selection-ring"
                     )}
                   >
                     <item.icon 
