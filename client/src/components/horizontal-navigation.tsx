@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { 
   LayoutDashboard, 
   Package, 
@@ -16,7 +17,9 @@ import {
   Palette, 
   Image, 
   Users, 
-  Building
+  Building,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +29,19 @@ interface HorizontalNavigationProps {
 
 export default function HorizontalNavigation({ userRole }: HorizontalNavigationProps) {
   const [location, setLocation] = useLocation();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+    }
+  };
 
   const menuItems = [
     { 
@@ -140,30 +156,66 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
 
   return (
     <div className="glass-container fixed top-0 left-0 right-0 z-50 border-b border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex justify-center items-center h-16 sm:h-20">
-          <div className="flex items-center justify-center w-full">
-            <div className="flex items-center space-x-2 space-x-reverse flex-wrap gap-1">
-              {allItems.map((item, index) => {
-                const active = isActive(item.href);
-                return (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleNavigation(item)}
-                    className={cn(
-                      "glass-button glass-text-primary transition-all duration-200",
-                      active && "bg-blue-600/30 border-blue-400/30 shadow-lg"
-                    )}
-                  >
-                    <item.icon size={14} className="ml-1" />
-                    <span className="hidden sm:inline">{item.title}</span>
-                  </Button>
-                );
-              })}
-            </div>
+      <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
+        <div className="flex justify-center items-center h-16 sm:h-20 relative">
+          {/* Left Scroll Arrow */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={scrollLeft}
+            className="absolute left-2 z-10 glass-button rounded-full w-10 h-10 bg-white/20 hover:bg-white/30 border border-white/30"
+          >
+            <ChevronRight size={18} className="text-white" />
+          </Button>
+
+          {/* Navigation Items with Horizontal Scroll */}
+          <div className="flex-1 mx-12">
+            <ScrollArea className="w-full whitespace-nowrap" ref={scrollRef}>
+              <div className="flex items-center justify-start space-x-3 space-x-reverse px-4">
+                {allItems.map((item, index) => {
+                  const active = isActive(item.href);
+                  return (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleNavigation(item)}
+                      className={cn(
+                        "glass-button glass-text-primary transition-all duration-300 ease-in-out transform whitespace-nowrap flex-shrink-0",
+                        "hover:scale-110 hover:shadow-lg hover:bg-white/25",
+                        active && "bg-blue-600/40 border-blue-400/40 shadow-xl scale-110 text-white font-semibold"
+                      )}
+                    >
+                      <item.icon 
+                        size={active ? 18 : 14} 
+                        className={cn(
+                          "ml-1 transition-all duration-300",
+                          active && "drop-shadow-lg"
+                        )} 
+                      />
+                      <span className={cn(
+                        "text-sm transition-all duration-300",
+                        active && "font-bold drop-shadow-sm"
+                      )}>
+                        {item.title}
+                      </span>
+                    </Button>
+                  );
+                })}
+              </div>
+              <ScrollBar orientation="horizontal" className="h-1 bg-white/20 opacity-50" />
+            </ScrollArea>
           </div>
+
+          {/* Right Scroll Arrow */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={scrollRight}
+            className="absolute right-2 z-10 glass-button rounded-full w-10 h-10 bg-white/20 hover:bg-white/30 border border-white/30"
+          >
+            <ChevronLeft size={18} className="text-white" />
+          </Button>
         </div>
       </div>
     </div>
