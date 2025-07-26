@@ -4,13 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { QrCode, Phone, Mail, Globe, Building, Download } from "lucide-react";
+import { QrCode, Phone, Mail, Globe, Building } from "lucide-react";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import type { Company, InventoryItem, Specification } from "@shared/schema";
 import { getManufacturerLogo } from "@shared/manufacturer-logos";
 import QRCode from "qrcode";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+
 
 // Background images
 const backgroundImages = {
@@ -77,7 +76,7 @@ export default function QuotationA4Preview({
   const [termsConditions, setTermsConditions] = useState<Array<{ id: number; term_text: string; display_order: number }>>([]);
   const [manufacturerLogo, setManufacturerLogo] = useState<string | null>(null);
   const [qrCodeDataURL, setQrCodeDataURL] = useState<string | null>(null);
-  const [isDownloading, setIsDownloading] = useState(false);
+
   const [isEditingSpecs, setIsEditingSpecs] = useState(false);
   const [editableSpecs, setEditableSpecs] = useState<string>("");
   const [useAlbarimi2Background, setUseAlbarimi2Background] = useState(true); // Default to albarimi-2
@@ -169,160 +168,7 @@ export default function QuotationA4Preview({
   const grandTotal = isVATInclusive ? finalPrice : (finalPrice + (finalPrice * taxRate / 100));
   const taxAmount = isVATInclusive ? (finalPrice * taxRate / (100 + taxRate)) : (finalPrice * taxRate / 100);
 
-  // PDF Download Function with ultra-high quality settings and fixed dimensions
-  const downloadPDF = async () => {
-    if (!previewRef.current) return;
-    
-    setIsDownloading(true);
-    
-    try {
-      // Fixed A4 dimensions in pixels (300 DPI)
-      const A4_WIDTH_PX = 2480; // 210mm at 300 DPI
-      const A4_HEIGHT_PX = 3508; // 297mm at 300 DPI
-      
-      // Create high-resolution canvas with fixed A4 dimensions
-      const canvas = await html2canvas(previewRef.current, {
-        scale: 4, // Ultra-high resolution scale (4x)
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        allowTaint: true,
-        foreignObjectRendering: true,
-        imageTimeout: 30000, // Increased timeout for high-res processing
-        removeContainer: true,
-        logging: false,
-        width: A4_WIDTH_PX / 4, // Divide by scale to get proper dimensions
-        height: A4_HEIGHT_PX / 4,
-        x: 0,
-        y: 0,
-        windowWidth: A4_WIDTH_PX / 4,
-        windowHeight: A4_HEIGHT_PX / 4,
-        scrollX: 0,
-        scrollY: 0,
-        onclone: (clonedDoc) => {
-          // Enhance font rendering and fix dimensions in cloned document
-          const style = clonedDoc.createElement('style');
-          style.textContent = `
-            * {
-              -webkit-font-smoothing: antialiased;
-              -moz-osx-font-smoothing: grayscale;
-              text-rendering: optimizeLegibility;
-              box-shadow: none !important;
-              -webkit-box-shadow: none !important;
-              -moz-box-shadow: none !important;
-            }
-            img {
-              image-rendering: -webkit-optimize-contrast;
-              image-rendering: crisp-edges;
-              image-rendering: pixelated;
-            }
-            [data-pdf-export="quotation"] {
-              width: ${A4_WIDTH_PX / 4}px !important;
-              height: ${A4_HEIGHT_PX / 4}px !important;
-              min-width: ${A4_WIDTH_PX / 4}px !important;
-              min-height: ${A4_HEIGHT_PX / 4}px !important;
-              max-width: ${A4_WIDTH_PX / 4}px !important;
-              max-height: ${A4_HEIGHT_PX / 4}px !important;
-              transform: none !important;
-              zoom: 1 !important;
-              box-sizing: border-box !important;
-              box-shadow: none !important;
-              -webkit-box-shadow: none !important;
-              -moz-box-shadow: none !important;
-            }
-            @media print {
-              [data-pdf-export="quotation"] {
-                width: ${A4_WIDTH_PX / 4}px !important;
-                height: ${A4_HEIGHT_PX / 4}px !important;
-                box-shadow: none !important;
-                -webkit-box-shadow: none !important;
-                -moz-box-shadow: none !important;
-              }
-              * {
-                box-shadow: none !important;
-                -webkit-box-shadow: none !important;
-                -moz-box-shadow: none !important;
-              }
-            }
-          `;
-          clonedDoc.head.appendChild(style);
-        }
-      });
-      
-      // Convert to PNG first for maximum quality, then to high-quality JPEG
-      const imgData = canvas.toDataURL('image/png', 1.0); // Maximum PNG quality
-      
-      // Create PDF with high compression settings
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true,
-        precision: 16 // Higher precision for better quality
-      });
-      
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      // Add image with no margins (full page)
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, '', 'NONE');
-      
-      const fileName = isInvoiceMode ? `فاتورة_${invoiceNumber}.pdf` : `عرض_سعر_${quoteNumber}.pdf`;
-      pdf.save(fileName);
-      
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      // Fallback to lower quality with fixed dimensions if high-res fails
-      try {
-        const A4_WIDTH_PX = 2480; // 210mm at 300 DPI
-        const A4_HEIGHT_PX = 3508; // 297mm at 300 DPI
-        
-        const canvas = await html2canvas(previewRef.current, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: '#ffffff',
-          allowTaint: true,
-          width: A4_WIDTH_PX / 2,
-          height: A4_HEIGHT_PX / 2,
-          windowWidth: A4_WIDTH_PX / 2,
-          windowHeight: A4_HEIGHT_PX / 2,
-          onclone: (clonedDoc) => {
-            const style = clonedDoc.createElement('style');
-            style.textContent = `
-              * {
-                box-shadow: none !important;
-                -webkit-box-shadow: none !important;
-                -moz-box-shadow: none !important;
-              }
-              [data-pdf-export="quotation"] {
-                width: ${A4_WIDTH_PX / 2}px !important;
-                height: ${A4_HEIGHT_PX / 2}px !important;
-                box-shadow: none !important;
-                -webkit-box-shadow: none !important;
-                -moz-box-shadow: none !important;
-              }
-            `;
-            clonedDoc.head.appendChild(style);
-          }
-        });
-        
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        
-        // Add image with no margins (fallback)
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-        
-        const fileName = isInvoiceMode ? `فاتورة_${invoiceNumber}.pdf` : `عرض_سعر_${quoteNumber}.pdf`;
-        pdf.save(fileName);
-        
-      } catch (fallbackError) {
-        console.error('Fallback PDF generation failed:', fallbackError);
-      }
-    } finally {
-      setIsDownloading(false);
-    }
-  };
+
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
@@ -347,12 +193,7 @@ export default function QuotationA4Preview({
           <span className="text-sm text-yellow-700 font-medium">خلفية 2</span>
         </div>
       </div>
-      <div className="mb-4 flex justify-center">
-        <Button onClick={downloadPDF} disabled={isDownloading} className="bg-blue-600 hover:bg-blue-700">
-          <Download className="w-4 h-4 mr-2" />
-          {isDownloading ? 'جاري التحميل...' : 'تحميل PDF'}
-        </Button>
-      </div>
+
       <div 
         ref={previewRef}
         data-pdf-export="quotation"

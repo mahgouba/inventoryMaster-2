@@ -1438,16 +1438,6 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
             </div>
             
             <div className="flex items-center space-x-2 space-x-reverse flex-wrap gap-2">
-              <Link href="/quotation-management">
-                <Button
-                  variant="outline"
-                  className="glass-button text-white border-white/20 hover:bg-white/20"
-                >
-                  <FileText size={16} className="ml-2" />
-                  العروض
-                </Button>
-              </Link>
-              
               
             </div>
           </div>
