@@ -1,3 +1,4 @@
+import React from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { 
@@ -138,30 +139,79 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   };
 
   return (
-    <div className="glass-container fixed top-0 left-0 right-0 z-50 border-b border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex justify-center items-center h-16 sm:h-20">
-          <div className="flex items-center justify-center w-full">
-            <div className="flex items-center space-x-2 space-x-reverse flex-wrap gap-1">
-              {allItems.map((item, index) => {
-                const active = isActive(item.href);
-                return (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleNavigation(item)}
-                    className={cn(
-                      "glass-button glass-text-primary transition-all duration-200",
-                      active && "bg-blue-600/30 border-blue-400/30 shadow-lg"
-                    )}
-                  >
-                    <item.icon size={14} className="ml-1" />
-                    <span className="hidden sm:inline">{item.title}</span>
-                  </Button>
-                );
-              })}
-            </div>
+    <div className="fixed top-0 left-0 right-0 z-50">
+      {/* Curved Navigation Background */}
+      <div className="relative h-20 bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl border-b border-white/20">
+        {/* Curved shape for center button */}
+        <div className="absolute inset-x-0 top-0 h-full">
+          <svg 
+            viewBox="0 0 800 80" 
+            className="w-full h-full"
+            preserveAspectRatio="none"
+          >
+            <path 
+              d="M0,15 L300,15 Q350,15 375,40 Q400,55 425,40 Q450,15 500,15 L800,15 L800,80 L0,80 Z" 
+              className="fill-white/10 backdrop-blur-xl"
+              style={{ filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))' }}
+            />
+          </svg>
+        </div>
+        
+        {/* Navigation Items Container */}
+        <div className="relative h-full flex items-center justify-center px-4">
+          <div className="flex items-center justify-center space-x-6 space-x-reverse">
+            {allItems.slice(0, 2).map((item, index) => {
+              const active = isActive(item.href);
+              return (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleNavigation(item)}
+                  className={cn(
+                    "glass-button glass-text-primary transition-all duration-300 rounded-xl",
+                    active && "bg-blue-600/30 border border-blue-400/30 shadow-lg"
+                  )}
+                >
+                  <item.icon size={18} className="ml-1" />
+                  <span className="hidden sm:inline text-sm">{item.title}</span>
+                </Button>
+              );
+            })}
+            
+            {/* Center highlighted button */}
+            {allItems[2] && (
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => handleNavigation(allItems[2])}
+                className={cn(
+                  "relative rounded-full w-16 h-16 bg-white/20 border-white/30 text-white shadow-xl transition-all duration-300 hover:bg-white/25 hover:scale-105",
+                  isActive(allItems[2].href) && "bg-blue-600/40 border-blue-400/40"
+                )}
+              >
+                {React.createElement(allItems[2].icon, { size: 28 })}
+              </Button>
+            )}
+            
+            {allItems.slice(3, 5).map((item, index) => {
+              const active = isActive(item.href);
+              return (
+                <Button
+                  key={index + 3}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleNavigation(item)}
+                  className={cn(
+                    "glass-button glass-text-primary transition-all duration-300 rounded-xl",
+                    active && "bg-blue-600/30 border border-blue-400/30 shadow-lg"
+                  )}
+                >
+                  <item.icon size={18} className="ml-1" />
+                  <span className="hidden sm:inline text-sm">{item.title}</span>
+                </Button>
+              );
+            })}
           </div>
         </div>
       </div>
