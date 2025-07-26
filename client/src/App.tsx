@@ -9,7 +9,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeStyles } from "@/components/theme-styles";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import UniversalGlass from "@/components/universal-glass";
-import SidebarNavigation from "@/components/sidebar-navigation";
+// import SidebarNavigation from "@/components/sidebar-navigation";
 import InventoryPage from "@/pages/inventory";
 import CardViewPage from "@/pages/card-view-new";
 import FinancingCalculatorPage from "@/pages/financing-calculator";
@@ -51,7 +51,6 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
   const [location] = useLocation();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   // Pages that should not show sidebar (bank pages and card view)
   const pagesWithoutSidebar = [
@@ -65,54 +64,41 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
   const shouldShowSidebar = !pagesWithoutSidebar.includes(location);
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden">
-      {shouldShowSidebar && (
-        <SidebarNavigation 
-          user={user} 
-          onLogout={onLogout} 
-          onCollapseChange={setSidebarCollapsed}
-        />
-      )}
-      
-      <div className={cn(
-        "min-h-screen transition-all duration-300",
-        shouldShowSidebar ? (sidebarCollapsed ? "mr-16" : "mr-64") : ""
-      )}>
-        <SystemGlassWrapper>
-          <Switch>
-            <Route path="/" component={() => <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-            <Route path="/inventory" component={() => <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-            <Route path="/cards" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-            <Route path="/card-view" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-            <Route path="/card-view-new" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-            <Route path="/quotation-creation" component={() => <QuotationCreationPage />} />
+    <div className="min-h-screen">
+      <SystemGlassWrapper>
+        <Switch>
+          <Route path="/" component={() => <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+          <Route path="/inventory" component={() => <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+          <Route path="/cards" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+          <Route path="/card-view" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+          <Route path="/card-view-new" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+          <Route path="/quotation-creation" component={() => <QuotationCreationPage />} />
 
-            <Route path="/quotation-edit/:id" component={QuotationEditPage} />
-            <Route path="/invoice-management" component={InvoiceManagementPage} />
-            <Route path="/locations" component={() => <LocationPage userRole={user.role} onLogout={onLogout} />} />
-            <Route path="/reservations" component={() => <ReservationsPage />} />
-            <Route path="/sold-vehicles" component={() => <SoldVehiclesPage />} />
-            <Route path="/financing-calculator" component={FinancingCalculatorPage} />
-            <Route path="/leave-requests" component={() => <LeaveRequestsPage userRole={user.role} username={user.username} userId={user.id} />} />
-            
-            {/* صفحات البنوك العامة */}
-            <Route path="/banks-personal" component={PersonalBanks} />
-            <Route path="/banks-company" component={CompanyBanks} />
-            
-            {/* صفحات الأدمن فقط */}
-            {user.role === "admin" && (
-              <>
-                <Route path="/pdf-appearance" component={() => <PdfAppearanceManagement userRole={user.role} onLogout={onLogout} />} />
-                <Route path="/manufacturer-logos" component={() => <ManufacturerLogosPage userRole={user.role} onLogout={onLogout} />} />
-                <Route path="/user-management" component={() => <UserManagementPage />} />
-                <Route path="/bank-management" component={BankManagement} />
+          <Route path="/quotation-edit/:id" component={QuotationEditPage} />
+          <Route path="/invoice-management" component={InvoiceManagementPage} />
+          <Route path="/locations" component={() => <LocationPage userRole={user.role} onLogout={onLogout} />} />
+          <Route path="/reservations" component={() => <ReservationsPage />} />
+          <Route path="/sold-vehicles" component={() => <SoldVehiclesPage />} />
+          <Route path="/financing-calculator" component={FinancingCalculatorPage} />
+          <Route path="/leave-requests" component={() => <LeaveRequestsPage userRole={user.role} username={user.username} userId={user.id} />} />
+          
+          {/* صفحات البنوك العامة */}
+          <Route path="/banks-personal" component={PersonalBanks} />
+          <Route path="/banks-company" component={CompanyBanks} />
+          
+          {/* صفحات الأدمن فقط */}
+          {user.role === "admin" && (
+            <>
+              <Route path="/pdf-appearance" component={() => <PdfAppearanceManagement userRole={user.role} onLogout={onLogout} />} />
+              <Route path="/manufacturer-logos" component={() => <ManufacturerLogosPage userRole={user.role} onLogout={onLogout} />} />
+              <Route path="/user-management" component={() => <UserManagementPage />} />
+              <Route path="/bank-management" component={BankManagement} />
 
-              </>
-            )}
-            <Route component={NotFound} />
-          </Switch>
-        </SystemGlassWrapper>
-      </div>
+            </>
+          )}
+          <Route component={NotFound} />
+        </Switch>
+      </SystemGlassWrapper>
     </div>
   );
 }
