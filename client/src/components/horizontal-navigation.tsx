@@ -30,44 +30,74 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [dragStartTime, setDragStartTime] = useState(0);
+  const [hasMoved, setHasMoved] = useState(false);
 
   // Mouse drag handlers
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollRef.current) return;
-    setIsDragging(true);
+    setDragStartTime(Date.now());
+    setHasMoved(false);
     setStartX(e.pageX - scrollRef.current.offsetLeft);
     setScrollLeft(scrollRef.current.scrollLeft);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !scrollRef.current) return;
-    e.preventDefault();
+    if (!scrollRef.current) return;
     const x = e.pageX - scrollRef.current.offsetLeft;
-    const walk = (x - startX) * 2; // Scroll speed multiplier
-    scrollRef.current.scrollLeft = scrollLeft - walk;
+    const distance = Math.abs(x - startX);
+    
+    // Only start dragging if moved more than 5px or held for more than 100ms
+    if (distance > 5 || (Date.now() - dragStartTime > 100)) {
+      if (!isDragging) {
+        setIsDragging(true);
+      }
+      setHasMoved(true);
+      e.preventDefault();
+      const walk = (x - startX) * 2; // Scroll speed multiplier
+      scrollRef.current.scrollLeft = scrollLeft - walk;
+    }
   };
 
   const handleMouseUp = () => {
-    setIsDragging(false);
+    // Reset drag state after a short delay to allow click to process
+    setTimeout(() => {
+      setIsDragging(false);
+      setHasMoved(false);
+    }, 50);
   };
 
   // Touch drag handlers
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!scrollRef.current) return;
-    setIsDragging(true);
+    setDragStartTime(Date.now());
+    setHasMoved(false);
     setStartX(e.touches[0].pageX - scrollRef.current.offsetLeft);
     setScrollLeft(scrollRef.current.scrollLeft);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !scrollRef.current) return;
+    if (!scrollRef.current) return;
     const x = e.touches[0].pageX - scrollRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5; // Touch scroll speed
-    scrollRef.current.scrollLeft = scrollLeft - walk;
+    const distance = Math.abs(x - startX);
+    
+    // Only start dragging if moved more than 10px (more threshold for touch)
+    if (distance > 10) {
+      if (!isDragging) {
+        setIsDragging(true);
+      }
+      setHasMoved(true);
+      const walk = (x - startX) * 1.5; // Touch scroll speed
+      scrollRef.current.scrollLeft = scrollLeft - walk;
+    }
   };
 
   const handleTouchEnd = () => {
-    setIsDragging(false);
+    // Reset drag state after a short delay to allow click to process
+    setTimeout(() => {
+      setIsDragging(false);
+      setHasMoved(false);
+    }, 50);
   };
 
   // Cleanup mouse events
@@ -182,6 +212,11 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   const isActive = (href: string) => location === href;
 
   const handleNavigation = (item: any) => {
+    // Prevent navigation if user was dragging
+    if (hasMoved || isDragging) {
+      return;
+    }
+    
     if (item.internal) {
       // For internal pages, just update the URL without navigating away
       setLocation(item.href);
@@ -223,8 +258,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                     className={cn(
                       "glass-button glass-text-primary transition-all duration-300 ease-in-out transform whitespace-nowrap flex-shrink-0",
                       "hover:scale-110 hover:shadow-lg hover:bg-white/25",
-                      active && "bg-blue-600/40 border-blue-400/40 shadow-xl scale-110 text-white font-semibold",
-                      isDragging && "pointer-events-none" // Disable clicks while dragging
+                      active && "bg-blue-600/40 border-blue-400/40 shadow-xl scale-110 text-white font-semibold"
                     )}
                   >
                     <item.icon 
