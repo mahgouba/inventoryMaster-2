@@ -179,9 +179,7 @@ html, body {
   }
 }
 
-.sidebar-floating {
-  animation: sidebar-float 4s ease-in-out infinite;
-}
+/* Floating animation removed for fixed sidebar design */
 
 /* Active Item Pulse */
 @keyframes sidebar-pulse {

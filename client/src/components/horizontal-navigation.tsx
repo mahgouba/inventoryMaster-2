@@ -334,23 +334,23 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   };
 
   return (
-    <div className="fixed top-6 right-6 z-50 w-20 h-[calc(100vh-3rem)] bg-gradient-to-b from-white/15 via-white/10 to-white/5 backdrop-blur-2xl border border-white/30 rounded-2xl shadow-2xl overflow-hidden sidebar-floating sidebar-glass-container">
+    <div className="fixed top-0 right-0 z-50 w-24 h-screen bg-gradient-to-b from-white/15 via-white/10 to-white/5 backdrop-blur-2xl border-l border-white/30 shadow-2xl overflow-hidden sidebar-glass-container">
       {/* Header Section */}
-      <div className="p-4 border-b border-white/20">
-        <div className="w-12 h-12 mx-auto bg-gradient-to-br from-blue-400/30 to-purple-500/30 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/20 overflow-hidden">
+      <div className="p-6 border-b border-white/20">
+        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-400/30 to-purple-500/30 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/20 overflow-hidden">
           <img 
             src="/copmany logo.svg" 
             alt="شعار البريمي للسيارات" 
-            className="w-8 h-8 object-contain filter brightness-150"
+            className="w-10 h-10 object-contain filter brightness-150"
           />
         </div>
       </div>
 
       {/* Navigation Items */}
-      <div className="flex-1 p-3">
+      <div className="flex-1 p-4">
         <div 
           ref={scrollRef}
-          className="flex flex-col items-center space-y-3 h-full overflow-y-auto scrollbar-none"
+          className="flex flex-col items-center space-y-4 h-full overflow-y-auto scrollbar-none"
           style={{ 
             scrollbarWidth: 'none',
             msOverflowStyle: 'none'
@@ -370,7 +370,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                 key={index}
                 onClick={() => handleNavigation(item)}
                 className={cn(
-                  "group relative w-14 h-14 rounded-xl cursor-pointer transition-all duration-500 ease-out flex-shrink-0",
+                  "group relative w-16 h-16 rounded-xl cursor-pointer transition-all duration-500 ease-out flex-shrink-0",
                   "flex flex-col items-center justify-center sidebar-nav-item",
                   "before:absolute before:inset-0 before:rounded-xl before:transition-all before:duration-500",
                   active 
@@ -382,7 +382,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
               >
                 {/* Icon */}
                 <item.icon 
-                  size={active ? 20 : 16} 
+                  size={active ? 24 : 20} 
                   className={cn(
                     "transition-all duration-300 mb-1",
                     active 
@@ -393,7 +393,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                 
                 {/* Label */}
                 <span className={cn(
-                  "text-[8px] text-center leading-tight transition-all duration-300 font-medium",
+                  "text-[9px] text-center leading-tight transition-all duration-300 font-medium",
                   active 
                     ? "text-white font-bold drop-shadow-sm" 
                     : "text-white/70 group-hover:text-white/90"
@@ -403,7 +403,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
 
                 {/* Active Indicator */}
                 {active && (
-                  <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-400 to-purple-500 rounded-full shadow-lg"></div>
+                  <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-blue-400 to-purple-500 rounded-full shadow-lg"></div>
                 )}
               </div>
             );
@@ -412,7 +412,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       </div>
 
       {/* Footer Glow */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-blue-500/10 to-transparent pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-blue-500/10 to-transparent pointer-events-none"></div>
     </div>
   );
 }
