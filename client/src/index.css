@@ -470,11 +470,16 @@ button, .button {
   min-height: 40px !important;
 }
 
-/* Glass Background */
+/* Glass Background - Consolidated Definition */
 .glass-background {
-  background: #0f172a !important;
+  background: linear-gradient(135deg, 
+    rgba(15, 23, 42, 0.95) 0%, 
+    rgba(30, 41, 59, 0.90) 50%, 
+    rgba(15, 23, 42, 0.95) 100%) !important;
   min-height: 100vh !important;
   width: 100% !important;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Fix overflow and layout issues */
@@ -803,18 +808,7 @@ button[data-state="checked"][role="radio"] span {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Enhanced Glass Morphism System */
-.glass-background {
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.8) 0%, 
-    rgba(30, 41, 59, 0.6) 50%, 
-    rgba(15, 23, 42, 0.9) 100%);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  overflow: hidden;
-}
+/* Enhanced Glass Morphism System - Removed duplicate definition */
 
 
 
@@ -855,15 +849,20 @@ button[data-state="checked"][role="radio"] span {
     0 8px 24px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Glass Container - Single Layer Only */
+/* Glass Container - Main Definition */
 .glass-container {
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 
+    0 4px 24px 0 rgba(0, 0, 0, 0.3),
+    0 2px 12px 0 rgba(255, 255, 255, 0.03) !important;
   position: relative;
-  overflow: hidden;
-  min-height: 100vh;
+  z-index: 1;
+  height: fit-content !important;
+  min-height: fit-content !important;
 }
 
 .glass-background::before, .system-glass-background::before {
@@ -884,20 +883,7 @@ button[data-state="checked"][role="radio"] span {
 }
 
 
-/* System-Wide Glass Components - Slower and Lighter */
-.glass-container {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  box-shadow: 
-    0 4px 24px 0 rgba(0, 0, 0, 0.3),
-    0 2px 12px 0 rgba(255, 255, 255, 0.03);
-  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  position: relative;
-  z-index: 1;
-}
+/* System-Wide Glass Components - Removed duplicate definition */
 
 /* Override default shadcn card styles */
 .card.glass-container,
