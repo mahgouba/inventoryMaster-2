@@ -334,13 +334,13 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   };
 
   return (
-    <div className="fixed top-0 right-0 z-50 w-24 h-screen bg-gradient-to-b from-white/15 via-white/10 to-white/5 backdrop-blur-2xl border-l border-white/30 shadow-2xl overflow-hidden sidebar-glass-container">
+    <div className="fixed top-0 right-0 z-50 w-16 h-screen bg-gradient-to-b from-white/15 via-white/10 to-white/5 backdrop-blur-2xl border-l border-white/30 shadow-2xl overflow-hidden sidebar-glass-container">
       {/* Header Section */}
-      <div className="p-6 border-b border-white/20 flex items-center justify-center">
+      <div className="p-3 border-b border-white/20 flex items-center justify-center">
         <img 
           src="/copmany logo.svg" 
           alt="شعار البريمي للسيارات" 
-          className="w-12 h-12 object-contain filter brightness-150"
+          className="w-8 h-8 object-contain filter brightness-150"
         />
       </div>
 
@@ -364,10 +364,10 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       </div>
 
       {/* Navigation Items */}
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-2">
         <div 
           ref={scrollRef}
-          className="flex flex-col items-center space-y-6 h-full overflow-y-auto scrollbar-none"
+          className="flex flex-col items-center space-y-3 h-full overflow-y-auto scrollbar-none"
           style={{ 
             scrollbarWidth: 'none',
             msOverflowStyle: 'none'
@@ -380,7 +380,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                 key={index}
                 onClick={() => handleNavigation(item)}
                 className={cn(
-                  "group relative w-16 h-16 cursor-pointer transition-all duration-300 ease-out flex-shrink-0",
+                  "group relative w-12 h-12 cursor-pointer transition-all duration-300 ease-out flex-shrink-0",
                   "flex flex-col items-center justify-center",
                   active 
                     ? "text-white" 
@@ -390,7 +390,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
               >
                 {/* Icon */}
                 <item.icon 
-                  size={24} 
+                  size={18} 
                   className={cn(
                     "mb-1 transition-colors duration-300",
                     active 
@@ -401,7 +401,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                 
                 {/* Label */}
                 <span className={cn(
-                  "text-[9px] text-center leading-tight font-medium transition-colors duration-300",
+                  "text-[7px] text-center leading-tight font-medium transition-colors duration-300",
                   active 
                     ? "text-blue-400 font-bold" 
                     : "group-hover:text-blue-300"
@@ -411,7 +411,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
 
                 {/* Active Indicator */}
                 {active && (
-                  <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full shadow-lg"></div>
+                  <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full shadow-lg"></div>
                 )}
               </div>
             );
