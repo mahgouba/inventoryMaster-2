@@ -349,19 +349,11 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       {/* Navigation Items */}
       <div className="flex-1 p-4">
         <div 
-          ref={scrollRef}
-          className="flex flex-col items-center space-y-4 h-full overflow-y-auto scrollbar-none"
+          className="flex flex-col items-center space-y-6 h-full overflow-y-auto scrollbar-none"
           style={{ 
             scrollbarWidth: 'none',
             msOverflowStyle: 'none'
           }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
         >
           {allItems.map((item, index) => {
             const active = isActive(item.href);
@@ -370,40 +362,38 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                 key={index}
                 onClick={() => handleNavigation(item)}
                 className={cn(
-                  "group relative w-16 h-16 rounded-xl cursor-pointer transition-all duration-500 ease-out flex-shrink-0",
-                  "flex flex-col items-center justify-center sidebar-nav-item",
-                  "before:absolute before:inset-0 before:rounded-xl before:transition-all before:duration-500",
+                  "group relative w-16 h-16 cursor-pointer transition-all duration-300 ease-out flex-shrink-0",
+                  "flex flex-col items-center justify-center",
                   active 
-                    ? "bg-gradient-to-br from-blue-500/40 to-purple-600/40 border border-blue-400/50 shadow-xl shadow-blue-500/25 scale-105 sidebar-active-pulse" 
-                    : "bg-white/5 border border-white/10 hover:bg-white/15 hover:border-white/25 hover:scale-105 hover:shadow-lg hover:shadow-white/10",
-                  "before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent before:opacity-0 hover:before:opacity-100"
+                    ? "text-white" 
+                    : "text-white/70 hover:text-white"
                 )}
                 title={item.title}
               >
                 {/* Icon */}
                 <item.icon 
-                  size={active ? 24 : 20} 
+                  size={24} 
                   className={cn(
-                    "transition-all duration-300 mb-1",
+                    "mb-1 transition-colors duration-300",
                     active 
-                      ? "text-white drop-shadow-lg" 
-                      : "text-white/80 group-hover:text-white group-hover:drop-shadow-md"
+                      ? "text-blue-400 drop-shadow-lg" 
+                      : "group-hover:text-blue-300"
                   )} 
                 />
                 
                 {/* Label */}
                 <span className={cn(
-                  "text-[9px] text-center leading-tight transition-all duration-300 font-medium",
+                  "text-[9px] text-center leading-tight font-medium transition-colors duration-300",
                   active 
-                    ? "text-white font-bold drop-shadow-sm" 
-                    : "text-white/70 group-hover:text-white/90"
+                    ? "text-blue-400 font-bold" 
+                    : "group-hover:text-blue-300"
                 )}>
                   {item.title.split(' ')[0]}
                 </span>
 
                 {/* Active Indicator */}
                 {active && (
-                  <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-blue-400 to-purple-500 rounded-full shadow-lg"></div>
+                  <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full shadow-lg"></div>
                 )}
               </div>
             );
