@@ -14,10 +14,7 @@ import ManufacturerLogosPage from "@/pages/manufacturer-logos";
 import UserManagementPage from "@/pages/user-management-simple";
 import BankManagement from "@/pages/bank-management";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
-import { Button } from "@/components/ui/button";
-import { LogOut, Sun, Moon, UserCircle } from "lucide-react";
-import { useTheme } from "@/hooks/useTheme";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+
 
 interface MainDashboardProps {
   user: {
@@ -30,7 +27,6 @@ interface MainDashboardProps {
 
 export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
   const [location] = useLocation();
-  const { darkMode, toggleDarkMode, isUpdatingDarkMode } = useTheme();
 
   // Render the appropriate page based on current location
   const renderPage = () => {
@@ -90,53 +86,9 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
           <div className="relative z-10" dir="rtl">
             {/* Fixed Navigation */}
             <HorizontalNavigation userRole={user.role} />
-            
-            {/* Enhanced Header with User Controls */}
-            <div className="glass-container border-b border-white/20 dark:border-slate-700/30 fixed top-16 sm:top-20 left-0 right-0 z-40">
-              <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-                <div className="flex justify-end items-center h-12">
-                  {/* User Controls */}
-                  <div className="flex items-center space-x-2 space-x-reverse mr-4">
-                    {/* Dark Mode Toggle */}
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="glass-button glass-text-primary p-2" 
-                      onClick={toggleDarkMode}
-                      disabled={isUpdatingDarkMode}
-                    >
-                      {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-                    </Button>
-
-                    {/* User Dropdown Menu */}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2">
-                          <UserCircle size={18} />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="glass-dropdown-content w-48">
-                        <DropdownMenuItem className="text-sm text-slate-500 cursor-default">
-                          <UserCircle className="mr-2 h-4 w-4" />
-                          المستخدم: {user.role === "admin" ? "أدمن" : "مستخدم"}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          className="text-red-600 hover:bg-red-50 cursor-pointer"
-                          onClick={onLogout}
-                        >
-                          <LogOut className="mr-2 h-4 w-4" />
-                          تسجيل الخروج
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* Page Content with top padding for fixed navbar */}
-            <div className="relative z-10 pt-28 sm:pt-32">
+            <div className="relative z-10 pt-16 sm:pt-20">
               {renderPage()}
             </div>
           </div>
