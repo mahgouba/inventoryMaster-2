@@ -17,7 +17,7 @@ import InventoryTable from "@/components/inventory-table";
 import InventoryFormSimple from "@/components/inventory-form-simple";
 import ExcelImport from "@/components/excel-import";
 
-import VoiceAssistant from "@/components/voice-assistant";
+
 import { InventoryFAB } from "@/components/animated-fab";
 import SpecificationsManager from "@/components/specifications-manager";
 import SpecificationsManagement from "@/components/specifications-management";
@@ -51,7 +51,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [editItem, setEditItem] = useState<InventoryItem | undefined>(undefined);
   const [isExcelImportOpen, setIsExcelImportOpen] = useState(false);
 
-  const [voiceChatOpen, setVoiceChatOpen] = useState(false);
+
   const [specificationsManagerOpen, setSpecificationsManagerOpen] = useState(false);
   const [imageManagementOpen, setImageManagementOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -1267,7 +1267,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         }}
         onExport={handleExport}
         onPrint={handlePrint}
-        onVoiceChat={() => setVoiceChatOpen(true)}
+        onVoiceChat={() => {}}
       />
 
       {/* Add/Edit Form */}
@@ -1285,27 +1285,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
 
 
-      {/* Voice Assistant Dialog */}
-      <VoiceAssistant
-        open={voiceChatOpen}
-        onOpenChange={setVoiceChatOpen}
-        onAddItem={() => setFormOpen(true)}
-        onEditItem={(item) => {
-          setEditItem(item);
-          setFormOpen(true);
-        }}
-        onSellItem={async (itemId) => {
-          // Handle sell item
-          console.log('Selling item:', itemId);
-        }}
-        onDeleteItem={async (itemId) => {
-          // Handle delete item
-          console.log('Deleting item:', itemId);
-        }}
-        onExtractChassisNumber={(file) => {
-          console.log('Extracting chassis number from:', file);
-        }}
-      />
+
 
       {/* Specifications Manager Dialog */}
       <SpecificationsManager

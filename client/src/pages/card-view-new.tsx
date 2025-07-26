@@ -44,7 +44,7 @@ import { Link } from "wouter";
 import { useTheme } from "@/hooks/useTheme";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import VoiceAssistant from "@/components/voice-assistant";
+
 import { CardViewFAB } from "@/components/animated-fab";
 import InventoryFormSimple from "@/components/inventory-form-simple";
 import VehicleShare from "@/components/vehicle-share";
@@ -67,7 +67,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const { companyName, companyLogo, darkMode, toggleDarkMode, isUpdatingDarkMode } = useTheme();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [voiceChatOpen, setVoiceChatOpen] = useState(false);
+
   const [expandedManufacturer, setExpandedManufacturer] = useState<string | null>(null);
   const [itemToDelete, setItemToDelete] = useState<InventoryItem | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -1430,34 +1430,14 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
       {/* Animated Floating Action Button */}
       <CardViewFAB
-        onVoiceChat={() => setVoiceChatOpen(true)}
+        onVoiceChat={() => {}}
         onSettings={() => {
           // Could add settings dialog for card view preferences
           console.log("Card view settings clicked");
         }}
       />
 
-      {/* Voice Assistant Dialog */}
-      <VoiceAssistant
-        open={voiceChatOpen}
-        onOpenChange={setVoiceChatOpen}
-        onAddItem={() => {
-          // Navigate to inventory page to add item
-          window.location.href = '/inventory';
-        }}
-        onEditItem={(item) => {
-          console.log('Editing item:', item);
-        }}
-        onSellItem={async (itemId) => {
-          console.log('Selling item:', itemId);
-        }}
-        onDeleteItem={async (itemId) => {
-          console.log('Deleting item:', itemId);
-        }}
-        onExtractChassisNumber={(file) => {
-          console.log('Extracting chassis number from:', file);
-        }}
-      />
+
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!itemToDelete} onOpenChange={() => setItemToDelete(null)}>

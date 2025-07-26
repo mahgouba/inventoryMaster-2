@@ -25,9 +25,7 @@ import QuotationCreationPage from "@/pages/quotation-creation";
 import QuotationEditPage from "@/pages/quotation-edit";
 import QuotationManagementPage from "@/pages/quotation-management";
 import InvoiceManagementPage from "@/pages/invoice-management";
-import DynamicCompanyControl from "@/pages/dynamic-company-control";
-import IntegrationManagementPage from "@/pages/integration-management";
-import ComprehensiveListsPage from "@/pages/comprehensive-lists";
+
 import ReservationsPage from "@/pages/reservations";
 import SoldVehiclesPage from "@/pages/sold-vehicles";
 import BankManagement from "@/pages/bank-management";
@@ -105,9 +103,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
                 <Route path="/manufacturer-logos" component={() => <ManufacturerLogosPage userRole={user.role} onLogout={onLogout} />} />
                 <Route path="/user-management" component={() => <UserManagementPage />} />
                 <Route path="/bank-management" component={BankManagement} />
-                <Route path="/dynamic-company-control" component={() => <DynamicCompanyControl />} />
-                <Route path="/integration-management" component={() => <IntegrationManagementPage />} />
-                <Route path="/comprehensive-lists" component={ComprehensiveListsPage} />
+
               </>
             )}
             <Route component={NotFound} />
