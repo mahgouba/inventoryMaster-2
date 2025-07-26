@@ -84,7 +84,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
             <HorizontalNavigation userRole={user.role} />
 
             {/* Page Content with padding for navigation bar */}
-            <div className="relative z-10 sm:pt-16 pt-[5px] pb-[5px] pr-24">
+            <div className="relative z-10 sm:pt-16 pt-[5px] pb-[5px] pr-28">
               {renderPage()}
             </div>
           </div>

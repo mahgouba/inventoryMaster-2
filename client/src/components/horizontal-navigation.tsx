@@ -334,61 +334,85 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   };
 
   return (
-    <div className="fixed top-8 right-4 z-50 w-16 h-[calc(100vh-4rem)] rounded-xl bg-transparent border-none backdrop-blur-none">
-      <div className="h-full flex flex-col justify-start px-2 py-4">
-        <div className="flex flex-col items-center relative h-full">
-          {/* Navigation Items with Vertical Drag Scroll */}
-          <div className="flex-1 overflow-hidden w-full">
-            <div 
-              ref={scrollRef}
-              className="flex flex-col items-center justify-start space-y-3 py-4 overflow-y-auto scrollbar-none h-full"
-              style={{ 
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none'
-              }}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-            >
-              {allItems.map((item, index) => {
-                const active = isActive(item.href);
-                return (
-                  <div
-                    key={index}
-                    onClick={() => handleNavigation(item)}
-                    className={cn(
-                      "w-12 h-12 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ease-in-out transform flex-shrink-0 ios-nav-button",
-                      "bg-white/10 backdrop-blur-sm border border-white/20",
-                      "hover:scale-110 hover:shadow-lg hover:bg-white/20 hover:backdrop-blur-md",
-                      "active:scale-95",
-                      active && "bg-blue-600/40 border-blue-400/40 shadow-xl scale-110 text-white font-semibold ios-selection-ring"
-                    )}
-                    title={item.title}
-                  >
-                    <item.icon 
-                      size={active ? 18 : 14} 
-                      className={cn(
-                        "transition-all duration-300",
-                        active && "drop-shadow-lg"
-                      )} 
-                    />
-                    <span className={cn(
-                      "text-[7px] mt-0.5 text-center leading-tight transition-all duration-300",
-                      active && "font-bold drop-shadow-sm"
-                    )}>
-                      {item.title.split(' ')[0]}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+    <div className="fixed top-6 right-6 z-50 w-20 h-[calc(100vh-3rem)] bg-gradient-to-b from-white/15 via-white/10 to-white/5 backdrop-blur-2xl border border-white/30 rounded-2xl shadow-2xl overflow-hidden sidebar-floating sidebar-glass-container">
+      {/* Header Section */}
+      <div className="p-4 border-b border-white/20">
+        <div className="w-12 h-12 mx-auto bg-gradient-to-br from-blue-400/30 to-purple-500/30 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/20 overflow-hidden">
+          <img 
+            src="/copmany logo.svg" 
+            alt="شعار البريمي للسيارات" 
+            className="w-8 h-8 object-contain filter brightness-150"
+          />
         </div>
       </div>
+
+      {/* Navigation Items */}
+      <div className="flex-1 p-3">
+        <div 
+          ref={scrollRef}
+          className="flex flex-col items-center space-y-3 h-full overflow-y-auto scrollbar-none"
+          style={{ 
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {allItems.map((item, index) => {
+            const active = isActive(item.href);
+            return (
+              <div
+                key={index}
+                onClick={() => handleNavigation(item)}
+                className={cn(
+                  "group relative w-14 h-14 rounded-xl cursor-pointer transition-all duration-500 ease-out flex-shrink-0",
+                  "flex flex-col items-center justify-center sidebar-nav-item",
+                  "before:absolute before:inset-0 before:rounded-xl before:transition-all before:duration-500",
+                  active 
+                    ? "bg-gradient-to-br from-blue-500/40 to-purple-600/40 border border-blue-400/50 shadow-xl shadow-blue-500/25 scale-105 sidebar-active-pulse" 
+                    : "bg-white/5 border border-white/10 hover:bg-white/15 hover:border-white/25 hover:scale-105 hover:shadow-lg hover:shadow-white/10",
+                  "before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent before:opacity-0 hover:before:opacity-100"
+                )}
+                title={item.title}
+              >
+                {/* Icon */}
+                <item.icon 
+                  size={active ? 20 : 16} 
+                  className={cn(
+                    "transition-all duration-300 mb-1",
+                    active 
+                      ? "text-white drop-shadow-lg" 
+                      : "text-white/80 group-hover:text-white group-hover:drop-shadow-md"
+                  )} 
+                />
+                
+                {/* Label */}
+                <span className={cn(
+                  "text-[8px] text-center leading-tight transition-all duration-300 font-medium",
+                  active 
+                    ? "text-white font-bold drop-shadow-sm" 
+                    : "text-white/70 group-hover:text-white/90"
+                )}>
+                  {item.title.split(' ')[0]}
+                </span>
+
+                {/* Active Indicator */}
+                {active && (
+                  <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-400 to-purple-500 rounded-full shadow-lg"></div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Footer Glow */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-blue-500/10 to-transparent pointer-events-none"></div>
     </div>
   );
 }
