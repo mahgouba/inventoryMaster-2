@@ -24,7 +24,8 @@ import {
   CreditCard,
   Archive,
   Users,
-  Palette
+  Palette,
+  Image
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -121,6 +122,12 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
       href: "/bank-management", 
       icon: CreditCard,
       description: "Bank Management"
+    },
+    { 
+      title: "إدارة شعارات الصناع", 
+      href: "/pdf-appearance", 
+      icon: Image,
+      description: "Manufacturer Logos"
     },
     { 
       title: "إدارة المظهر", 
