@@ -336,19 +336,37 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   return (
     <div className="fixed top-0 right-0 z-50 w-24 h-screen bg-gradient-to-b from-white/15 via-white/10 to-white/5 backdrop-blur-2xl border-l border-white/30 shadow-2xl overflow-hidden sidebar-glass-container">
       {/* Header Section */}
-      <div className="p-6 border-b border-white/20">
-        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-400/30 to-purple-500/30 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/20 overflow-hidden">
-          <img 
-            src="/copmany logo.svg" 
-            alt="شعار البريمي للسيارات" 
-            className="w-10 h-10 object-contain filter brightness-150"
-          />
-        </div>
+      <div className="p-6 border-b border-white/20 flex items-center justify-center">
+        <img 
+          src="/copmany logo.svg" 
+          alt="شعار البريمي للسيارات" 
+          className="w-12 h-12 object-contain filter brightness-150"
+        />
+      </div>
+
+      {/* Scroll Up Button */}
+      <div className="p-2 border-b border-white/10">
+        <button
+          onClick={() => {
+            if (scrollRef.current) {
+              scrollRef.current.scrollBy({ top: -200, behavior: 'smooth' });
+            }
+          }}
+          className="w-full py-2 text-white/60 hover:text-white transition-colors duration-300"
+        >
+          <div className="flex items-center justify-center">
+            <div className="w-6 h-1 bg-white/30 rounded-full"></div>
+          </div>
+          <div className="flex items-center justify-center mt-1">
+            <div className="w-4 h-1 bg-white/40 rounded-full"></div>
+          </div>
+        </button>
       </div>
 
       {/* Navigation Items */}
       <div className="flex-1 p-4">
         <div 
+          ref={scrollRef}
           className="flex flex-col items-center space-y-6 h-full overflow-y-auto scrollbar-none"
           style={{ 
             scrollbarWidth: 'none',
@@ -399,6 +417,25 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
             );
           })}
         </div>
+      </div>
+
+      {/* Scroll Down Button */}
+      <div className="p-2 border-t border-white/10">
+        <button
+          onClick={() => {
+            if (scrollRef.current) {
+              scrollRef.current.scrollBy({ top: 200, behavior: 'smooth' });
+            }
+          }}
+          className="w-full py-2 text-white/60 hover:text-white transition-colors duration-300"
+        >
+          <div className="flex items-center justify-center">
+            <div className="w-4 h-1 bg-white/40 rounded-full"></div>
+          </div>
+          <div className="flex items-center justify-center mt-1">
+            <div className="w-6 h-1 bg-white/30 rounded-full"></div>
+          </div>
+        </button>
       </div>
 
       {/* Footer Glow */}
