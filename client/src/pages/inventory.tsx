@@ -460,11 +460,11 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         {/* Header */}
         <header className="glass-container sticky top-0 z-50 border-b border-white/20 dark:border-slate-700/30">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-            <div className="flex justify-between items-center h-14 sm:h-16">
-              {/* Logo and Company Name */}
+            {/* Logo and Company Name - Moved to Top */}
+            <div className="flex items-center justify-center py-3 border-b border-white/10">
               <div className="flex items-center space-x-3 space-x-reverse">
                 <div className="relative">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center shadow-lg overflow-hidden hover:scale-110 transition-all duration-300" style={{ backgroundColor: '#00627F' }}>
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center shadow-lg overflow-hidden hover:scale-110 transition-all duration-300" style={{ backgroundColor: '#00627F' }}>
                     {companyLogo ? (
                       <img 
                         src={companyLogo} 
@@ -477,7 +477,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         <img 
                           src="/copmany logo.svg" 
                           alt="شعار البريمي للسيارات" 
-                          className="w-8 h-8 sm:w-10 sm:h-10 object-contain hover:animate-none transition-all duration-[3s]"
+                          className="w-10 h-10 sm:w-12 sm:h-12 object-contain hover:animate-none transition-all duration-[3s]"
                           style={{ animation: 'spin 4s linear infinite' }}
                         />
                       </div>
@@ -485,10 +485,13 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   </div>
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
                 </div>
-                <div className="hidden sm:block">
-                  <h1 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg hover:text-amber-400 transition-colors duration-300">{companyName}</h1>
+                <div>
+                  <h1 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg hover:text-amber-400 transition-colors duration-300">{companyName}</h1>
                 </div>
               </div>
+            </div>
+            
+            <div className="flex justify-between items-center h-14 sm:h-16">
               {/* Navigation */}
               <div className="flex items-center space-x-2 space-x-reverse">
                 {/* Navigation Tabs - Desktop */}
