@@ -334,7 +334,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   };
 
   return (
-    <div className="glass-container fixed top-8 right-4 z-50 w-16 h-[calc(100vh-4rem)] rounded-xl border border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
+    <div className="fixed top-8 right-4 z-50 w-16 h-[calc(100vh-4rem)] rounded-xl bg-transparent border-none backdrop-blur-none">
       <div className="h-full flex flex-col justify-start px-2 py-4">
         <div className="flex flex-col items-center relative h-full">
           {/* Navigation Items with Vertical Drag Scroll */}
@@ -362,8 +362,8 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                     onClick={() => handleNavigation(item)}
                     className={cn(
                       "w-12 h-12 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ease-in-out transform flex-shrink-0 ios-nav-button",
-                      "glass-button glass-text-primary",
-                      "hover:scale-110 hover:shadow-lg hover:bg-white/25",
+                      "bg-white/10 backdrop-blur-sm border border-white/20",
+                      "hover:scale-110 hover:shadow-lg hover:bg-white/20 hover:backdrop-blur-md",
                       "active:scale-95",
                       active && "bg-blue-600/40 border-blue-400/40 shadow-xl scale-110 text-white font-semibold ios-selection-ring"
                     )}
