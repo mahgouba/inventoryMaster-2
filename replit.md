@@ -282,11 +282,12 @@ The application uses PostgreSQL for persistent data storage with proper database
   - Added click protection to prevent navigation during actual dragging
   - Enhanced timing controls with proper state reset delays
   - Maintained smooth drag/scroll functionality while enabling precise button clicks
-- ✅ **COMPLETED: Center Navigation Indicator** - Added visual center indicator to horizontal navigation bar per user request:
-  - Added golden gradient center line spanning full height of navigation bar
-  - Implemented circular indicator dot in the center with yellow glow effect
-  - Positioned indicator at absolute center (left-1/2) with proper z-index layering
-  - Enhanced visual feedback for showing current page position during drag scrolling
+- ✅ **COMPLETED: Center Selection Box** - Added interactive center selection box to horizontal navigation bar per user request:
+  - Implemented rectangular selection box (32x12) in the center with golden border and translucent background
+  - Added real-time center item detection during drag scrolling with distance calculation
+  - Automatic navigation to center item when drag ends - activates whichever page lands in the center box
+  - Enhanced visual feedback with gradient background and dual border design for clear selection indication
+  - Smart drag-to-select functionality: drag any page to center box and release to navigate to it
 - ✅ Migration completed successfully with comprehensive Arabic inventory management system operational
 
 ### Previous Replit Environment Migration with Bank Page Updates (July 25, 2025)

@@ -32,6 +32,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   const [scrollLeft, setScrollLeft] = useState(0);
   const [dragStartTime, setDragStartTime] = useState(0);
   const [hasMoved, setHasMoved] = useState(false);
+  const [centerItem, setCenterItem] = useState<any>(null);
 
   // Mouse drag handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -56,15 +57,14 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       e.preventDefault();
       const walk = (x - startX) * 2; // Scroll speed multiplier
       scrollRef.current.scrollLeft = scrollLeft - walk;
+      
+      // Check which item is in the center during drag
+      checkCenterItem();
     }
   };
 
   const handleMouseUp = () => {
-    // Reset drag state after a short delay to allow click to process
-    setTimeout(() => {
-      setIsDragging(false);
-      setHasMoved(false);
-    }, 50);
+    handleDragEnd();
   };
 
   // Touch drag handlers
@@ -89,15 +89,57 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       setHasMoved(true);
       const walk = (x - startX) * 1.5; // Touch scroll speed
       scrollRef.current.scrollLeft = scrollLeft - walk;
+      
+      // Check which item is in the center during drag
+      checkCenterItem();
     }
   };
 
   const handleTouchEnd = () => {
-    // Reset drag state after a short delay to allow click to process
+    handleDragEnd();
+  };
+
+  // Function to check which item is in the center
+  const checkCenterItem = () => {
+    if (!scrollRef.current) return;
+    
+    const container = scrollRef.current;
+    const containerCenter = container.offsetWidth / 2;
+    const buttons = container.querySelectorAll('button');
+    
+    let closestButton = null;
+    let closestDistance = Infinity;
+    
+    buttons.forEach((button, index) => {
+      const buttonRect = button.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const buttonCenter = buttonRect.left - containerRect.left + buttonRect.width / 2 - container.scrollLeft;
+      const distance = Math.abs(buttonCenter - containerCenter);
+      
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestButton = allItems[index];
+      }
+    });
+    
+    setCenterItem(closestButton);
+  };
+
+  // Auto-navigate to center item when drag ends
+  const handleDragEnd = () => {
     setTimeout(() => {
+      if (centerItem && hasMoved) {
+        // Navigate to the center item
+        if (centerItem.internal) {
+          setLocation(centerItem.href);
+        } else {
+          window.location.href = centerItem.href;
+        }
+      }
       setIsDragging(false);
       setHasMoved(false);
-    }, 50);
+      setCenterItem(null);
+    }, 100);
   };
 
   // Cleanup mouse events
@@ -230,9 +272,10 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     <div className="glass-container fixed top-0 left-0 right-0 z-50 border-b border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
       <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-center items-center h-16 sm:h-20 relative">
-          {/* Center Indicator Line */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-yellow-400/60 to-transparent transform -translate-x-1/2 z-10 pointer-events-none">
-            <div className="absolute top-1/2 left-1/2 w-3 h-3 bg-yellow-400/80 rounded-full transform -translate-x-1/2 -translate-y-1/2 shadow-lg shadow-yellow-400/40"></div>
+          {/* Center Selection Box */}
+          <div className="absolute left-1/2 top-1/2 w-32 h-12 border-2 border-yellow-400/60 bg-yellow-400/10 rounded-lg transform -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none backdrop-blur-sm">
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 via-yellow-400/15 to-yellow-400/5 rounded-lg"></div>
+            <div className="absolute top-1 left-1 right-1 bottom-1 border border-yellow-400/30 rounded-md"></div>
           </div>
           
           {/* Navigation Items with Horizontal Drag Scroll */}
