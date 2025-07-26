@@ -1,12 +1,12 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, Car, CreditCard, Phone, Search, User, MapPin, Printer, FileSpreadsheet } from "lucide-react";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
+import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import * as XLSX from 'xlsx';
 
 export default function SoldVehiclesPage() {
@@ -231,25 +231,25 @@ export default function SoldVehiclesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
-        <div className="container mx-auto">
+      <SystemGlassWrapper>
+        <div className="container mx-auto p-4">
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-custom-primary mx-auto"></div>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">جاري تحميل السيارات المباعة...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto"></div>
+            <p className="mt-2 text-white/70 drop-shadow-sm">جاري تحميل السيارات المباعة...</p>
           </div>
         </div>
-      </div>
+      </SystemGlassWrapper>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4" dir="rtl">
-      <div className="container mx-auto">
+    <SystemGlassWrapper>
+      <div className="container mx-auto p-4" dir="rtl">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-2xl font-bold text-white drop-shadow-lg mb-2">
             السيارات المباعة
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-white/70 drop-shadow-sm">
             استعراض وإدارة السيارات المباعة مع تقارير المبيعات
           </p>
         </div>
@@ -334,132 +334,122 @@ export default function SoldVehiclesPage() {
           
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-custom-primary">{filteredVehicles.length}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">إجمالي السيارات المباعة</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {formatCurrency(
-                    filteredVehicles.reduce((sum: number, item: any) => sum + (parseFloat(item.salePrice) || 0), 0).toString()
-                  )}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">إجمالي قيمة المبيعات</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {filteredVehicles.filter((item: any) => item.paymentMethod === 'نقداً').length}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">المبيعات النقدية</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-purple-600">
-                  {filteredVehicles.filter((item: any) => item.paymentMethod === 'بنك').length}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">المبيعات البنكية</div>
-              </CardContent>
-            </Card>
+            <div className="glass-container p-4 text-center">
+              <div className="text-2xl font-bold text-blue-400 drop-shadow-lg">{filteredVehicles.length}</div>
+              <div className="text-sm text-white/70 drop-shadow-sm">إجمالي السيارات المباعة</div>
+            </div>
+            <div className="glass-container p-4 text-center">
+              <div className="text-2xl font-bold text-green-400 drop-shadow-lg">
+                {formatCurrency(
+                  filteredVehicles.reduce((sum: number, item: any) => sum + (parseFloat(item.salePrice) || 0), 0).toString()
+                )}
+              </div>
+              <div className="text-sm text-white/70 drop-shadow-sm">إجمالي قيمة المبيعات</div>
+            </div>
+            <div className="glass-container p-4 text-center">
+              <div className="text-2xl font-bold text-amber-400 drop-shadow-lg">
+                {filteredVehicles.filter((item: any) => item.paymentMethod === 'نقداً').length}
+              </div>
+              <div className="text-sm text-white/70 drop-shadow-sm">المبيعات النقدية</div>
+            </div>
+            <div className="glass-container p-4 text-center">
+              <div className="text-2xl font-bold text-purple-400 drop-shadow-lg">
+                {filteredVehicles.filter((item: any) => item.paymentMethod === 'بنك').length}
+              </div>
+              <div className="text-sm text-white/70 drop-shadow-sm">المبيعات البنكية</div>
+            </div>
           </div>
         </div>
 
         {/* Vehicles List */}
         {filteredVehicles.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-8">
-              <Car className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                {searchQuery || salesRepFilter || paymentMethodFilter || dateFilter ? "لا توجد نتائج للبحث" : "لا توجد سيارات مباعة"}
-              </h3>
-              <p className="text-gray-500 dark:text-gray-500">
-                {searchQuery || salesRepFilter || paymentMethodFilter || dateFilter ? "جرب تعديل الفلاتر أو البحث" : "لم يتم بيع أي سيارات بعد"}
-              </p>
-            </CardContent>
-          </Card>
+          <div className="glass-container text-center py-8">
+            <Car className="w-12 h-12 text-white/40 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-white drop-shadow-lg mb-2">
+              {searchQuery || salesRepFilter || paymentMethodFilter || dateFilter ? "لا توجد نتائج للبحث" : "لا توجد سيارات مباعة"}
+            </h3>
+            <p className="text-white/70 drop-shadow-sm">
+              {searchQuery || salesRepFilter || paymentMethodFilter || dateFilter ? "جرب تعديل الفلاتر أو البحث" : "لم يتم بيع أي سيارات بعد"}
+            </p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredVehicles.map((item: any) => (
-              <Card key={item.id} className="overflow-hidden">
-                <CardHeader className="pb-3">
+              <div key={item.id} className="glass-container overflow-hidden">
+                <div className="pb-3 border-b border-white/10">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <ManufacturerLogo manufacturerName={item.manufacturer} size="sm" />
-                      <CardTitle className="text-lg">{item.manufacturer}</CardTitle>
+                      <h3 className="text-lg font-semibold text-white drop-shadow-lg">{item.manufacturer}</h3>
                     </div>
-                    <Badge variant="secondary" className="bg-green-100 text-green-800">
+                    <Badge className="bg-green-500/20 text-green-300 border-green-400/30">
                       مباع
                     </Badge>
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-white/70 drop-shadow-sm mt-1">
                     {item.category} {item.trimLevel && `- ${item.trimLevel}`}
                   </div>
-                </CardHeader>
+                </div>
                 
-                <CardContent className="space-y-4">
+                <div className="space-y-4 p-4">
                   {/* Vehicle Info */}
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="flex items-center gap-1">
-                      <Car className="w-3 h-3 text-gray-400" />
-                      <span className="text-gray-600">السنة:</span>
-                      <span>{item.year}</span>
+                      <Car className="w-3 h-3 text-white/60" />
+                      <span className="text-white/70">السنة:</span>
+                      <span className="text-white drop-shadow-sm">{item.year}</span>
                     </div>
                     <div className="flex items-center gap-1 text-xs">
-                      <span className="text-gray-600">الهيكل:</span>
-                      <span className="font-mono">{item.chassisNumber}</span>
+                      <span className="text-white/70">الهيكل:</span>
+                      <span className="font-mono text-white/90 drop-shadow-sm">{item.chassisNumber}</span>
                     </div>
                   </div>
 
                   {/* Sale Information */}
-                  <div className="border-t pt-3">
-                    <h4 className="font-semibold text-sm mb-2">معلومات البيع</h4>
+                  <div className="border-t border-white/10 pt-3">
+                    <h4 className="font-semibold text-sm mb-2 text-white drop-shadow-sm">معلومات البيع</h4>
                     <div className="space-y-1 text-sm">
                       <div className="flex items-center gap-2">
-                        <User className="w-3 h-3 text-gray-400" />
-                        <span>{item.soldToCustomerName || 'غير محدد'}</span>
+                        <User className="w-3 h-3 text-white/60" />
+                        <span className="text-white drop-shadow-sm">{item.soldToCustomerName || 'غير محدد'}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Phone className="w-3 h-3 text-gray-400" />
-                        <span dir="ltr">{item.soldToCustomerPhone || 'غير محدد'}</span>
+                        <Phone className="w-3 h-3 text-white/60" />
+                        <span dir="ltr" className="text-white drop-shadow-sm">{item.soldToCustomerPhone || 'غير محدد'}</span>
                       </div>
                       {item.soldBySalesRep && (
                         <div className="flex items-center gap-2">
                           <User className="w-3 h-3 text-blue-400" />
-                          <span className="text-blue-600 font-medium">
+                          <span className="text-blue-300 font-medium drop-shadow-sm">
                             مندوب: {item.soldBySalesRep}
                           </span>
                         </div>
                       )}
                       <div className="flex items-center gap-2">
                         <CreditCard className="w-3 h-3 text-green-400" />
-                        <span className="text-green-600 font-bold">
+                        <span className="text-green-400 font-bold drop-shadow-sm">
                           {formatCurrency(item.salePrice)}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <CreditCard className="w-3 h-3 text-gray-400" />
-                        <span>{item.paymentMethod || 'غير محدد'}</span>
+                        <CreditCard className="w-3 h-3 text-white/60" />
+                        <span className="text-white drop-shadow-sm">{item.paymentMethod || 'غير محدد'}</span>
                         {item.bankName && (
-                          <span className="text-gray-500">- {item.bankName}</span>
+                          <span className="text-white/70 drop-shadow-sm">- {item.bankName}</span>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <Calendar className="w-3 h-3 text-gray-400" />
-                        <span>{formatDate(item.soldDate)}</span>
+                        <Calendar className="w-3 h-3 text-white/60" />
+                        <span className="text-white drop-shadow-sm">{formatDate(item.soldDate)}</span>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </SystemGlassWrapper>
   );
 }

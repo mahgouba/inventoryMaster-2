@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import { EnhancedSaleDialog } from "@/components/enhanced-sale-dialog";
+import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
 export default function ReservationsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -137,25 +137,25 @@ export default function ReservationsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
-        <div className="container mx-auto">
+      <SystemGlassWrapper>
+        <div className="container mx-auto p-4">
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-custom-primary mx-auto"></div>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">جاري تحميل طلبات الحجز...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto"></div>
+            <p className="mt-2 text-white/70 drop-shadow-sm">جاري تحميل طلبات الحجز...</p>
           </div>
         </div>
-      </div>
+      </SystemGlassWrapper>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4" dir="rtl">
-      <div className="container mx-auto">
+    <SystemGlassWrapper>
+      <div className="container mx-auto p-4" dir="rtl">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-2xl font-bold text-white drop-shadow-lg mb-2">
             إدارة طلبات الحجز
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-white/70 drop-shadow-sm">
             إدارة طلبات حجز السيارات وبيانات العملاء
           </p>
         </div>
@@ -228,109 +228,102 @@ export default function ReservationsPage() {
           )}
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-custom-primary">{(reservedItems as any[]).length}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">إجمالي الحجوزات</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {(reservedItems as any[]).reduce((sum: number, item: any) => sum + (parseFloat(item.paidAmount) || 0), 0).toLocaleString('ar-SA')}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">إجمالي المبالغ المدفوعة</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600">{filteredReservations.length}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">نتائج البحث</div>
-              </CardContent>
-            </Card>
+            <div className="glass-container p-4 text-center">
+              <div className="text-2xl font-bold text-blue-400 drop-shadow-lg">{(reservedItems as any[]).length}</div>
+              <div className="text-sm text-white/70 drop-shadow-sm">إجمالي الحجوزات</div>
+            </div>
+            <div className="glass-container p-4 text-center">
+              <div className="text-2xl font-bold text-green-400 drop-shadow-lg">
+                {(reservedItems as any[]).reduce((sum: number, item: any) => sum + (parseFloat(item.paidAmount) || 0), 0).toLocaleString('ar-SA')}
+              </div>
+              <div className="text-sm text-white/70 drop-shadow-sm">إجمالي المبالغ المدفوعة</div>
+            </div>
+            <div className="glass-container p-4 text-center">
+              <div className="text-2xl font-bold text-amber-400 drop-shadow-lg">{filteredReservations.length}</div>
+              <div className="text-sm text-white/70 drop-shadow-sm">نتائج البحث</div>
+            </div>
           </div>
         </div>
 
         {/* Reservations List */}
         {filteredReservations.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-8">
-              <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                {searchQuery ? "لا توجد نتائج للبحث" : "لا توجد طلبات حجز"}
-              </h3>
-              <p className="text-gray-500 dark:text-gray-500">
-                {searchQuery ? "جرب البحث بكلمات أخرى" : "لم يتم إجراء أي حجوزات بعد"}
-              </p>
-            </CardContent>
-          </Card>
+          <div className="glass-container text-center py-8">
+            <Calendar className="w-12 h-12 text-white/40 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-white drop-shadow-lg mb-2">
+              {searchQuery ? "لا توجد نتائج للبحث" : "لا توجد طلبات حجز"}
+            </h3>
+            <p className="text-white/70 drop-shadow-sm">
+              {searchQuery ? "جرب البحث بكلمات أخرى" : "لم يتم إجراء أي حجوزات بعد"}
+            </p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredReservations.map((item: any) => (
-              <Card key={item.id} className="overflow-hidden">
-                <CardHeader className="pb-3">
+              <div key={item.id} className="glass-container overflow-hidden">
+                <div className="pb-3 border-b border-white/10">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <ManufacturerLogo manufacturerName={item.manufacturer} size="sm" />
-                      <CardTitle className="text-lg">{item.manufacturer}</CardTitle>
+                      <h3 className="text-lg font-semibold text-white drop-shadow-lg">{item.manufacturer}</h3>
                     </div>
-                    <Badge variant="secondary" className="bg-custom-primary/10 text-custom-primary">
+                    <Badge className="bg-blue-500/20 text-blue-300 border-blue-400/30">
                       محجوز
                     </Badge>
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-white/70 drop-shadow-sm mt-1">
                     {item.category} {item.trimLevel && `- ${item.trimLevel}`}
                   </div>
-                </CardHeader>
+                </div>
                 
-                <CardContent className="space-y-4">
+                <div className="space-y-4 p-4">
                   {/* Vehicle Info */}
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="flex items-center gap-1">
-                      <Car className="w-3 h-3 text-gray-400" />
-                      <span className="text-gray-600">السنة:</span>
-                      <span>{item.year}</span>
+                      <Car className="w-3 h-3 text-white/60" />
+                      <span className="text-white/70">السنة:</span>
+                      <span className="text-white drop-shadow-sm">{item.year}</span>
                     </div>
                     <div className="flex items-center gap-1 text-xs">
-                      <span className="text-gray-600">الهيكل:</span>
-                      <span className="font-mono">{item.chassisNumber}</span>
+                      <span className="text-white/70">الهيكل:</span>
+                      <span className="font-mono text-white/90 drop-shadow-sm">{item.chassisNumber}</span>
                     </div>
                   </div>
 
-                  <div className="border-t pt-3">
-                    <h4 className="font-semibold text-sm mb-2">بيانات العميل</h4>
+                  <div className="border-t border-white/10 pt-3">
+                    <h4 className="font-semibold text-sm mb-2 text-white drop-shadow-sm">بيانات العميل</h4>
                     <div className="space-y-1 text-sm">
                       <div className="flex items-center gap-2">
-                        <User className="w-3 h-3 text-gray-400" />
-                        <span>{item.customerName}</span>
+                        <User className="w-3 h-3 text-white/60" />
+                        <span className="text-white drop-shadow-sm">{item.customerName}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Phone className="w-3 h-3 text-gray-400" />
-                        <span dir="ltr">{item.customerPhone}</span>
+                        <Phone className="w-3 h-3 text-white/60" />
+                        <span dir="ltr" className="text-white drop-shadow-sm">{item.customerPhone}</span>
                       </div>
                       {item.salesRepresentative && (
                         <div className="flex items-center gap-2">
                           <User className="w-3 h-3 text-blue-400" />
-                          <span className="text-blue-600 font-medium">
+                          <span className="text-blue-300 font-medium drop-shadow-sm">
                             مندوب المبيعات: {item.salesRepresentative}
                           </span>
                         </div>
                       )}
                       <div className="flex items-center gap-2">
-                        <CreditCard className="w-3 h-3 text-gray-400" />
-                        <span className="font-semibold text-green-600">
+                        <CreditCard className="w-3 h-3 text-white/60" />
+                        <span className="font-semibold text-green-400 drop-shadow-sm">
                           {formatCurrency(item.paidAmount)}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Calendar className="w-3 h-3 text-gray-400" />
-                        <span>{formatDate(item.reservationDate)}</span>
+                        <Calendar className="w-3 h-3 text-white/60" />
+                        <span className="text-white drop-shadow-sm">{formatDate(item.reservationDate)}</span>
                       </div>
                     </div>
 
                     {item.reservationNote && (
-                      <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded text-xs">
-                        <strong>ملاحظات:</strong> {item.reservationNote}
+                      <div className="mt-2 p-2 bg-white/5 rounded text-xs border border-white/10">
+                        <strong className="text-white drop-shadow-sm">ملاحظات:</strong> 
+                        <span className="text-white/80 drop-shadow-sm"> {item.reservationNote}</span>
                       </div>
                     )}
                   </div>
@@ -339,7 +332,7 @@ export default function ReservationsPage() {
                   <div className="flex gap-2 pt-2">
                     <Button
                       size="sm"
-                      className="flex-1 bg-green-600 hover:bg-green-700"
+                      className="flex-1 bg-green-500/80 hover:bg-green-500 text-white border-green-400/30"
                       onClick={() => handleSellVehicle(item)}
                       disabled={sellMutation.isPending || cancelReservationMutation.isPending}
                     >
@@ -348,8 +341,7 @@ export default function ReservationsPage() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="flex-1 text-red-600 border-red-200 hover:bg-red-50"
+                      className="flex-1 bg-red-500/80 hover:bg-red-500 text-white border-red-400/30"
                       onClick={() => cancelReservationMutation.mutate(item.id)}
                       disabled={sellMutation.isPending || cancelReservationMutation.isPending}
                     >
@@ -357,8 +349,8 @@ export default function ReservationsPage() {
                       إلغاء
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         )}
@@ -377,6 +369,6 @@ export default function ReservationsPage() {
           />
         )}
       </div>
-    </div>
+    </SystemGlassWrapper>
   );
 }

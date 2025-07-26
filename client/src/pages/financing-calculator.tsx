@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +9,7 @@ import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
 interface BankRate {
   name: string;
@@ -402,36 +402,34 @@ export default function FinancingCalculatorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4 rtl:space-x-reverse">
-              <Calculator className="h-8 w-8 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">حاسبة التمويل</h1>
+    <SystemGlassWrapper>
+      <div className="container mx-auto p-4" dir="rtl">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <Calculator className="h-8 w-8 text-blue-400" />
+              <h1 className="text-2xl font-bold text-white drop-shadow-lg">حاسبة التمويل</h1>
             </div>
             <Link href="/">
-              <Button variant="outline" size="sm">
+              <Button className="bg-white/10 hover:bg-white/20 text-white border-white/20">
                 <Home className="h-4 w-4 ml-2" />
                 العودة للرئيسية
               </Button>
             </Link>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Input Form */}
-          <Card className="h-fit">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <TrendingUp className="h-5 w-5 ml-2" />
+          <div className="glass-container h-fit">
+            <div className="pb-3 border-b border-white/10">
+              <h2 className="text-lg font-semibold text-white drop-shadow-lg flex items-center">
+                <TrendingUp className="h-5 w-5 ml-2 text-blue-400" />
                 بيانات التمويل
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+              </h2>
+            </div>
+            <div className="space-y-6 p-4">
               {/* Customer Info */}
               <div className="space-y-4">
                 <div>
