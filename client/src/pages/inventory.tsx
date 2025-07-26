@@ -19,9 +19,7 @@ import ExcelImport from "@/components/excel-import";
 
 
 import { InventoryFAB } from "@/components/animated-fab";
-import SpecificationsManager from "@/components/specifications-manager";
-import SpecificationsManagement from "@/components/specifications-management";
-import ImageManagement from "@/components/image-management";
+
 import { AdvancedPrintDialog } from "@/components/advanced-print-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import { exportToCSV, exportToExcel, printTable, printTableWithSettings } from "@/lib/utils";
@@ -52,8 +50,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [isExcelImportOpen, setIsExcelImportOpen] = useState(false);
 
 
-  const [specificationsManagerOpen, setSpecificationsManagerOpen] = useState(false);
-  const [imageManagementOpen, setImageManagementOpen] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -107,27 +104,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     },
   });
 
-  // Mutation for clearing all inventory items
-  const clearAllItemsMutation = useMutation({
-    mutationFn: () => apiRequest("DELETE", "/api/inventory/clear-all", {}),
-    onSuccess: () => {
-      queryClient.removeQueries({ queryKey: ["/api/inventory"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory/stats"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
-      toast({
-        title: "تم حذف جميع العناصر",
-        description: "تم حذف جميع العناصر من المخزون بنجاح",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "خطأ في حذف العناصر",
-        description: "فشل حذف جميع العناصر من المخزون",
-        variant: "destructive",
-      });
-    },
-  });
+
 
   // Dynamic manufacturers from inventory data - removed hardcoded list
   
@@ -448,11 +425,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     importCarsMutation.mutate();
   };
 
-  const handleClearAllItems = () => {
-    if (confirm("هل أنت متأكد من حذف جميع العناصر من المخزون؟ لا يمكن التراجع عن هذا الإجراء.")) {
-      clearAllItemsMutation.mutate();
-    }
-  };
+
 
 
 
@@ -638,39 +611,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="glass-dropdown-content w-56">
-                      <Link href="/financing-calculator">
-                        <DropdownMenuItem>
-                          <DollarSign className="mr-2 h-4 w-4" />
-                          حاسبة التمويل
-                        </DropdownMenuItem>
-                      </Link>
-
-                      <DropdownMenuSeparator />
-
                       <Link href="/appearance">
                         <DropdownMenuItem>
                           <Palette className="mr-2 h-4 w-4" />
                           إدارة المظهر
                         </DropdownMenuItem>
                       </Link>
-
-                      <Link href="/pdf-appearance">
-                        <DropdownMenuItem>
-                          <FileText className="mr-2 h-4 w-4" />
-                          مظهر عرض السعر PDF
-                        </DropdownMenuItem>
-                      </Link>
-
-                      <DropdownMenuSeparator />
-
-                      <DropdownMenuItem onClick={() => setSpecificationsManagerOpen(true)}>
-                        <Settings className="mr-2 h-4 w-4" />
-                        إدارة المواصفات
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setImageManagementOpen(true)}>
-                        <FileText className="mr-2 h-4 w-4" />
-                        إدارة الصور
-                      </DropdownMenuItem>
 
                       <DropdownMenuSeparator />
 
@@ -1073,25 +1019,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     </Button>
                   )}
                   
-                  <Link href="/quotation-creation">
-                    <Button 
-                      className="glass-button-secondary"
-                      size="sm"
-                    >
-                      <FileText className="w-4 h-4 ml-2" />
-                      إنشاء عرض سعر
-                    </Button>
-                  </Link>
 
-                  <Link href="/financing-calculator">
-                    <Button 
-                      className="glass-button-secondary"
-                      size="sm"
-                    >
-                      <DollarSign className="w-4 h-4 ml-2" />
-                      حاسبة التمويل
-                    </Button>
-                  </Link>
                 </div>
 
                 {/* Secondary Actions Row */}
@@ -1148,41 +1076,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   )}
                 </div>
 
-                {/* Admin Advanced Actions Row */}
-                {userRole === "admin" && (
-                  <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
-                    <Button 
-                      onClick={() => setSpecificationsManagerOpen(true)}
-                      variant="outline"
-                      size="sm"
-                      className="glass-button glass-text-primary"
-                    >
-                      <Settings className="w-4 h-4 ml-2" />
-                      إدارة المواصفات
-                    </Button>
-                    
-                    <Button 
-                      onClick={() => setImageManagementOpen(true)}
-                      variant="outline"
-                      size="sm"
-                      className="glass-button glass-text-primary"
-                    >
-                      <FileText className="w-4 h-4 ml-2" />
-                      إدارة الصور
-                    </Button>
 
-                    <Button 
-                      onClick={handleClearAllItems}
-                      variant="outline"
-                      size="sm"
-                      className="glass-button glass-text-primary"
-                      disabled={clearAllItemsMutation.isPending}
-                    >
-                      <Database className="w-4 h-4 ml-2" />
-                      {clearAllItemsMutation.isPending ? "جاري الحذف..." : "حذف الكل"}
-                    </Button>
-                  </div>
-                )}
               </div>
             </div>
           </CardContent>
@@ -1276,28 +1170,10 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
 
 
-      {/* Specifications Manager Dialog */}
-      <SpecificationsManager
-        open={specificationsManagerOpen}
-        onOpenChange={setSpecificationsManagerOpen}
-      />
-      
-      {/* Specifications Management Dialog */}
-      <SpecificationsManagement
-        open={specificationsManagerOpen}
-        onOpenChange={setSpecificationsManagerOpen}
-      />
-
       {/* Advanced Print Dialog */}
       <AdvancedPrintDialog
         open={printDialogOpen}
         onOpenChange={setPrintDialogOpen}
-      />
-
-      {/* Image Management Dialog */}
-      <ImageManagement
-        open={imageManagementOpen}
-        onOpenChange={setImageManagementOpen}
       />
     </div>
   );
