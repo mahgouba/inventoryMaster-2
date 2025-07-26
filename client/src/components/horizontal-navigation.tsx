@@ -17,9 +17,7 @@ import {
   Palette, 
   Image, 
   Users, 
-  Building,
-  ChevronLeft,
-  ChevronRight
+  Building
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,18 +28,6 @@ interface HorizontalNavigationProps {
 export default function HorizontalNavigation({ userRole }: HorizontalNavigationProps) {
   const [location, setLocation] = useLocation();
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  const scrollLeft = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -200, behavior: 'smooth' });
-    }
-  };
-
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 200, behavior: 'smooth' });
-    }
-  };
 
   const menuItems = [
     { 
@@ -157,19 +143,9 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   return (
     <div className="glass-container fixed top-0 left-0 right-0 z-50 border-b border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
       <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex justify-center items-center h-16 sm:h-20 relative">
-          {/* Left Scroll Arrow */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={scrollLeft}
-            className="absolute left-2 z-10 glass-button rounded-full w-10 h-10 bg-white/20 hover:bg-white/30 border border-white/30"
-          >
-            <ChevronRight size={18} className="text-white" />
-          </Button>
-
+        <div className="flex justify-center items-center h-16 sm:h-20">
           {/* Navigation Items with Horizontal Scroll */}
-          <div className="flex-1 mx-12">
+          <div className="flex-1">
             <ScrollArea className="w-full whitespace-nowrap" ref={scrollRef}>
               <div className="flex items-center justify-start space-x-3 space-x-reverse px-4">
                 {allItems.map((item, index) => {
@@ -206,16 +182,6 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
               <ScrollBar orientation="horizontal" className="h-1 bg-white/20 opacity-50" />
             </ScrollArea>
           </div>
-
-          {/* Right Scroll Arrow */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={scrollRight}
-            className="absolute right-2 z-10 glass-button rounded-full w-10 h-10 bg-white/20 hover:bg-white/30 border border-white/30"
-          >
-            <ChevronLeft size={18} className="text-white" />
-          </Button>
         </div>
       </div>
     </div>
