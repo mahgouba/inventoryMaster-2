@@ -23,7 +23,6 @@ import NotFound from "@/pages/not-found";
 import QuotationCreationPage from "@/pages/quotation-creation";
 
 import QuotationEditPage from "@/pages/quotation-edit";
-import QuotationManagementPage from "@/pages/quotation-management";
 import InvoiceManagementPage from "@/pages/invoice-management";
 
 import ReservationsPage from "@/pages/reservations";
@@ -84,7 +83,6 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
             <Route path="/quotation-creation" component={() => <QuotationCreationPage />} />
 
             <Route path="/quotation-edit/:id" component={QuotationEditPage} />
-            <Route path="/quotation-management" component={QuotationManagementPage} />
             <Route path="/invoice-management" component={InvoiceManagementPage} />
             <Route path="/locations" component={() => <LocationPage userRole={user.role} onLogout={onLogout} />} />
             <Route path="/reservations" component={() => <ReservationsPage />} />
