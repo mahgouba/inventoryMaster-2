@@ -469,49 +469,48 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
       </div>
       <div className="relative z-10" dir="rtl">
         {/* Header */}
-        <header className="glass-container shadow-lg sticky top-0 z-50">
+        <header className="glass-container sticky top-0 z-50 border-b border-white/20 dark:border-slate-700/30">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
             <div className="flex justify-between items-center h-14 sm:h-16">
               {/* Logo and Company Name */}
               <div className="flex items-center space-x-3 space-x-reverse">
                 <div className="relative">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center shadow-lg overflow-hidden hover:scale-110 transition-all duration-300" style={{ backgroundColor: '#00627F' }}>
-                  {companyLogo ? (
-                    <img 
-                      src={companyLogo} 
-                      alt="شعار الشركة" 
-                      className="w-full h-full object-contain hover:animate-none transition-all duration-[3s]"
-                      style={{ animation: 'bounce 3s infinite' }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center shadow-lg overflow-hidden hover:scale-110 transition-all duration-300" style={{ backgroundColor: '#00627F' }}>
+                    {companyLogo ? (
                       <img 
-                        src="/copmany logo.svg" 
-                        alt="شعار البريمي للسيارات" 
-                        className="w-8 h-8 sm:w-10 sm:h-10 object-contain hover:animate-none transition-all duration-[3s]"
-                        style={{ animation: 'spin 4s linear infinite' }}
+                        src={companyLogo} 
+                        alt="شعار الشركة" 
+                        className="w-full h-full object-contain hover:animate-none transition-all duration-[3s]"
+                        style={{ animation: 'bounce 3s infinite' }}
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <img 
+                          src="/copmany logo.svg" 
+                          alt="شعار البريمي للسيارات" 
+                          className="w-8 h-8 sm:w-10 sm:h-10 object-contain hover:animate-none transition-all duration-[3s]"
+                          style={{ animation: 'spin 4s linear infinite' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
+                <div className="hidden sm:block">
+                  <h1 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg hover:text-amber-400 transition-colors duration-300">{companyName}</h1>
+                </div>
               </div>
-              <div className="hidden sm:block">
-                <h1 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg hover:text-amber-400 transition-colors duration-300">{companyName}</h1>
-                <span className="text-xs text-white/70 font-latin drop-shadow-md">Inventory System</span>
-              </div>
-              </div>
-              {/* Mobile and Desktop Navigation */}
-              <div className="flex items-center space-x-2 sm:space-x-4 space-x-reverse">
-                {/* Navigation Tabs - Hidden on mobile */}
-                <div className="hidden md:flex items-center space-x-2 space-x-reverse glass-container rounded-lg p-1">
+              {/* Navigation */}
+              <div className="flex items-center space-x-2 space-x-reverse">
+                {/* Navigation Tabs - Desktop */}
+                <div className="hidden md:flex items-center space-x-2 space-x-reverse">
                   <Button variant="default" size="sm" className="glass-button-primary text-white">
-                    <Table size={14} className="ml-1" />
+                    <Table size={16} className="ml-1" />
                     <span className="hidden lg:inline">جدول</span>
                   </Button>
                   <Link href="/cards">
-                    <Button variant="ghost" size="sm" className="glass-button glass-text-primary">
-                      <LayoutGrid size={14} className="ml-1" />
+                    <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                      <LayoutGrid size={16} className="ml-1" />
                       <span className="hidden lg:inline">بطاقات</span>
                     </Button>
                   </Link>
@@ -529,127 +528,106 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   </Link>
                 </div>
 
-                {/* User Actions */}
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  {/* Quick Action Buttons - Admin Only */}
-                  {userRole === "admin" && (
-                    <div className="hidden lg:flex items-center space-x-2 space-x-reverse">
-                    <Link href="/financing-calculator">
-                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                        <DollarSign size={16} className="ml-1" />
-                        <span className="hidden xl:inline">حاسبة التمويل</span>
-                      </Button>
-                    </Link>
-                    
-                    <Link href="/appearance">
-                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                        <Palette size={16} className="ml-1" />
-                        <span className="hidden xl:inline">إدارة المظهر</span>
-                      </Button>
-                    </Link>
-                    </div>
-                  )}
+                {/* Quick Action Buttons - Admin Only */}
+                {userRole === "admin" && (
+                  <Link href="/appearance">
+                    <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                      <Palette size={16} className="ml-1" />
+                      <span className="hidden sm:inline">إدارة المظهر</span>
+                      <span className="sm:hidden">المظهر</span>
+                    </Button>
+                  </Link>
+                )}
 
-                  {/* Bank Header Icons */}
-                  <div className="flex items-center space-x-1 space-x-reverse">
-                    <Link href="/banks-company">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="glass-button glass-text-primary p-2" 
-                        title="بنوك الشركة"
-                        onMouseDown={(e) => {
-                          const longPressTimer = setTimeout(() => {
-                            const currentUrl = window.location.origin + "/banks-company";
-                            if (navigator.share) {
-                              navigator.share({
-                                title: "بنوك الشركة",
-                                text: "صفحة بنوك الشركة",
-                                url: currentUrl
-                              }).catch(() => {
-                                navigator.clipboard.writeText(currentUrl);
-                                toast({
-                                  title: "تم نسخ الرابط",
-                                  description: "تم نسخ رابط صفحة بنوك الشركة"
-                                });
-                              });
-                            } else {
+                {/* Bank Header Icons */}
+                <div className="flex items-center space-x-1 space-x-reverse">
+                  <Link href="/banks-company">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="glass-button glass-text-primary p-2" 
+                      title="بنوك الشركة"
+                      onMouseDown={(e) => {
+                        const longPressTimer = setTimeout(() => {
+                          const currentUrl = window.location.origin + "/banks-company";
+                          if (navigator.share) {
+                            navigator.share({
+                              title: "بنوك الشركة",
+                              text: "صفحة بنوك الشركة",
+                              url: currentUrl
+                            }).catch(() => {
                               navigator.clipboard.writeText(currentUrl);
                               toast({
                                 title: "تم نسخ الرابط",
                                 description: "تم نسخ رابط صفحة بنوك الشركة"
                               });
-                            }
-                          }, 800);
-                          
-                          const clearTimer = () => {
-                            clearTimeout(longPressTimer);
-                            document.removeEventListener('mouseup', clearTimer);
-                            document.removeEventListener('mouseleave', clearTimer);
-                          };
-                          
-                          document.addEventListener('mouseup', clearTimer);
-                          document.addEventListener('mouseleave', clearTimer);
-                        }}
-                      >
-                        <Building2 size={18} />
-                      </Button>
-                    </Link>
-                    <Link href="/banks-personal">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="glass-button glass-text-primary p-2" 
-                        title="البنوك الشخصية"
-                        onMouseDown={(e) => {
-                          const longPressTimer = setTimeout(() => {
-                            const currentUrl = window.location.origin + "/banks-personal";
-                            if (navigator.share) {
-                              navigator.share({
-                                title: "البنوك الشخصية",
-                                text: "صفحة البنوك الشخصية",
-                                url: currentUrl
-                              }).catch(() => {
-                                navigator.clipboard.writeText(currentUrl);
-                                toast({
-                                  title: "تم نسخ الرابط",
-                                  description: "تم نسخ رابط صفحة البنوك الشخصية"
-                                });
-                              });
-                            } else {
+                            });
+                          } else {
+                            navigator.clipboard.writeText(currentUrl);
+                            toast({
+                              title: "تم نسخ الرابط",
+                              description: "تم نسخ رابط صفحة بنوك الشركة"
+                            });
+                          }
+                        }, 800);
+                        
+                        const clearTimer = () => {
+                          clearTimeout(longPressTimer);
+                          document.removeEventListener('mouseup', clearTimer);
+                          document.removeEventListener('mouseleave', clearTimer);
+                        };
+                        
+                        document.addEventListener('mouseup', clearTimer);
+                        document.addEventListener('mouseleave', clearTimer);
+                      }}
+                    >
+                      <Building2 size={18} />
+                    </Button>
+                  </Link>
+                  <Link href="/banks-personal">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="glass-button glass-text-primary p-2" 
+                      title="البنوك الشخصية"
+                      onMouseDown={(e) => {
+                        const longPressTimer = setTimeout(() => {
+                          const currentUrl = window.location.origin + "/banks-personal";
+                          if (navigator.share) {
+                            navigator.share({
+                              title: "البنوك الشخصية",
+                              text: "صفحة البنوك الشخصية",
+                              url: currentUrl
+                            }).catch(() => {
                               navigator.clipboard.writeText(currentUrl);
                               toast({
                                 title: "تم نسخ الرابط",
                                 description: "تم نسخ رابط صفحة البنوك الشخصية"
                               });
-                            }
-                          }, 800);
-                          
-                          const clearTimer = () => {
-                            clearTimeout(longPressTimer);
-                            document.removeEventListener('mouseup', clearTimer);
-                            document.removeEventListener('mouseleave', clearTimer);
-                          };
-                          
-                          document.addEventListener('mouseup', clearTimer);
-                          document.addEventListener('mouseleave', clearTimer);
-                        }}
-                      >
-                        <CreditCard size={18} />
-                      </Button>
-                    </Link>
-                  </div>
-
-                {/* Dark Mode Toggle */}
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="glass-button glass-text-primary p-2" 
-                  onClick={toggleDarkMode}
-                  disabled={isUpdatingDarkMode}
-                >
-                  {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-                </Button>
+                            });
+                          } else {
+                            navigator.clipboard.writeText(currentUrl);
+                            toast({
+                              title: "تم نسخ الرابط",
+                              description: "تم نسخ رابط صفحة البنوك الشخصية"
+                            });
+                          }
+                        }, 800);
+                        
+                        const clearTimer = () => {
+                          clearTimeout(longPressTimer);
+                          document.removeEventListener('mouseup', clearTimer);
+                          document.removeEventListener('mouseleave', clearTimer);
+                        };
+                        
+                        document.addEventListener('mouseup', clearTimer);
+                        document.addEventListener('mouseleave', clearTimer);
+                      }}
+                    >
+                      <CreditCard size={18} />
+                    </Button>
+                  </Link>
+                </div>
 
                 {/* Admin Dropdown Menu */}
                 {userRole === "admin" && (
@@ -759,6 +737,17 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   </DropdownMenu>
                 )}
                 
+                {/* Dark Mode Toggle */}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="glass-button glass-text-primary p-2" 
+                  onClick={toggleDarkMode}
+                  disabled={isUpdatingDarkMode}
+                >
+                  {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+                </Button>
+
                 {/* User Dropdown Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -781,11 +770,11 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                </div>
               </div>
             </div>
           </div>
         </header>
+      </div>
 
 
 
@@ -1310,7 +1299,6 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         open={imageManagementOpen}
         onOpenChange={setImageManagementOpen}
       />
-      </div>
     </div>
   );
 }
