@@ -18,6 +18,7 @@ import QuotationEditPage from "@/pages/quotation-edit";
 import PersonalBanks from "@/pages/personal-banks";
 import CompanyBanks from "@/pages/company-banks";
 import IOSPickerDemo from "@/pages/ios-picker-demo";
+import VerticalPickerShowcase from "@/pages/vertical-picker-showcase";
 
 interface User {
   username: string;
@@ -84,6 +85,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           
           {/* Demo Pages */}
           <Route path="/ios-picker-demo" component={IOSPickerDemo} />
+          <Route path="/vertical-picker-showcase" component={VerticalPickerShowcase} />
           
           {/* Special Routes */}
           <Route path="/quotation-edit/:id" component={QuotationEditPage} />
