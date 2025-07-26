@@ -123,6 +123,262 @@ html, body {
   max-height: none !important;
 }
 
+/* ==============================
+   NEUMORPHISM THEME STYLES
+   ============================== */
+
+/* Neumorphism Theme Root Variables */
+.neumorphism-theme {
+  --neumorphism-shadow-1: 20px 20px 60px var(--neumorphism-shadow-dark);
+  --neumorphism-shadow-2: -20px -20px 60px var(--neumorphism-shadow-light);
+  --neumorphism-shadow-inset-1: inset 20px 20px 60px var(--neumorphism-shadow-dark);
+  --neumorphism-shadow-inset-2: inset -20px -20px 60px var(--neumorphism-shadow-light);
+  --neumorphism-shadow-pressed: inset 10px 10px 20px var(--neumorphism-shadow-dark), inset -10px -10px 20px var(--neumorphism-shadow-light);
+}
+
+/* Neumorphism Global Background */
+.neumorphism-theme body,
+.neumorphism-theme html,
+.neumorphism-theme #root {
+  background: var(--neumorphism-bg) !important;
+  color: var(--neumorphism-text) !important;
+}
+
+/* Neumorphism Cards */
+.neumorphism-theme .card,
+.neumorphism-theme .glass-container,
+.neumorphism-theme .dark-glass {
+  background: var(--neumorphism-surface) !important;
+  border: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--neumorphism-shadow-1), var(--neumorphism-shadow-2) !important;
+  border-radius: 20px !important;
+  padding: 2rem !important;
+}
+
+.neumorphism-theme .card:hover,
+.neumorphism-theme .glass-container:hover,
+.neumorphism-theme .dark-glass:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    25px 25px 75px var(--neumorphism-shadow-dark),
+    -25px -25px 75px var(--neumorphism-shadow-light) !important;
+}
+
+/* Neumorphism Buttons */
+.neumorphism-theme .btn,
+.neumorphism-theme button,
+.neumorphism-theme .button {
+  background: var(--neumorphism-surface) !important;
+  border: none !important;
+  box-shadow: 
+    8px 8px 16px var(--neumorphism-shadow-dark),
+    -8px -8px 16px var(--neumorphism-shadow-light) !important;
+  border-radius: 12px !important;
+  color: var(--neumorphism-text) !important;
+  transition: all 0.2s ease !important;
+}
+
+.neumorphism-theme .btn:hover,
+.neumorphism-theme button:hover,
+.neumorphism-theme .button:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    10px 10px 20px var(--neumorphism-shadow-dark),
+    -10px -10px 20px var(--neumorphism-shadow-light) !important;
+}
+
+.neumorphism-theme .btn:active,
+.neumorphism-theme button:active,
+.neumorphism-theme .button:active {
+  transform: translateY(0px);
+  box-shadow: var(--neumorphism-shadow-pressed) !important;
+}
+
+/* Neumorphism Primary Buttons */
+.neumorphism-theme .btn-primary,
+.neumorphism-theme .bg-custom-primary,
+.neumorphism-theme .bg-primary {
+  background: linear-gradient(145deg, var(--neumorphism-primary), var(--neumorphism-primary-hover)) !important;
+  color: white !important;
+}
+
+.neumorphism-theme .btn-primary:hover,
+.neumorphism-theme .bg-custom-primary:hover,
+.neumorphism-theme .bg-primary:hover {
+  background: linear-gradient(145deg, var(--neumorphism-primary-hover), var(--neumorphism-primary)) !important;
+}
+
+/* Neumorphism Accent Buttons */
+.neumorphism-theme .btn-accent,
+.neumorphism-theme .text-custom-primary {
+  color: var(--neumorphism-accent) !important;
+}
+
+.neumorphism-theme .btn-accent:hover {
+  color: var(--neumorphism-accent-hover) !important;
+}
+
+/* Neumorphism Inputs */
+.neumorphism-theme input,
+.neumorphism-theme textarea,
+.neumorphism-theme select {
+  background: var(--neumorphism-surface) !important;
+  border: none !important;
+  box-shadow: var(--neumorphism-shadow-inset-1), var(--neumorphism-shadow-inset-2) !important;
+  border-radius: 12px !important;
+  color: var(--neumorphism-text) !important;
+  padding: 12px 16px !important;
+}
+
+.neumorphism-theme input:focus,
+.neumorphism-theme textarea:focus,
+.neumorphism-theme select:focus {
+  outline: none !important;
+  box-shadow: 
+    var(--neumorphism-shadow-inset-1), 
+    var(--neumorphism-shadow-inset-2),
+    0 0 0 2px var(--neumorphism-primary) !important;
+}
+
+/* Neumorphism Navigation */
+.neumorphism-theme .nav,
+.neumorphism-theme .navbar,
+.neumorphism-theme .glass-header {
+  background: var(--neumorphism-surface) !important;
+  border: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--neumorphism-shadow-1), var(--neumorphism-shadow-2) !important;
+  border-radius: 0 0 20px 20px !important;
+}
+
+/* Neumorphism Dialogs and Modals */
+.neumorphism-theme .dialog-content,
+.neumorphism-theme .modal {
+  background: var(--neumorphism-surface) !important;
+  border: none !important;
+  box-shadow: 
+    30px 30px 80px var(--neumorphism-shadow-dark),
+    -30px -30px 80px var(--neumorphism-shadow-light) !important;
+  border-radius: 24px !important;
+}
+
+/* Neumorphism Text Colors */
+.neumorphism-theme .text-slate-900,
+.neumorphism-theme .text-gray-900,
+.neumorphism-theme .text-black,
+.neumorphism-theme .text-foreground {
+  color: var(--neumorphism-text) !important;
+}
+
+.neumorphism-theme .text-slate-700,
+.neumorphism-theme .text-gray-700,
+.neumorphism-theme .text-slate-500,
+.neumorphism-theme .text-gray-500,
+.neumorphism-theme .text-muted-foreground {
+  color: var(--neumorphism-text-secondary) !important;
+}
+
+/* Neumorphism Badges and Pills */
+.neumorphism-theme .badge,
+.neumorphism-theme .pill {
+  background: var(--neumorphism-surface) !important;
+  box-shadow: 
+    4px 4px 8px var(--neumorphism-shadow-dark),
+    -4px -4px 8px var(--neumorphism-shadow-light) !important;
+  border-radius: 8px !important;
+  color: var(--neumorphism-text) !important;
+  border: none !important;
+}
+
+/* Neumorphism Scrollbars */
+.neumorphism-theme ::-webkit-scrollbar {
+  width: 12px;
+  background: var(--neumorphism-surface);
+}
+
+.neumorphism-theme ::-webkit-scrollbar-thumb {
+  background: var(--neumorphism-surface);
+  border-radius: 6px;
+  box-shadow: 
+    inset 4px 4px 8px var(--neumorphism-shadow-dark),
+    inset -4px -4px 8px var(--neumorphism-shadow-light);
+}
+
+.neumorphism-theme ::-webkit-scrollbar-track {
+  background: var(--neumorphism-bg);
+  box-shadow: var(--neumorphism-shadow-inset-1), var(--neumorphism-shadow-inset-2);
+}
+
+/* ==============================
+   CLASSIC THEME STYLES
+   ============================== */
+
+/* Classic Theme Root Variables */
+.classic-theme body,
+.classic-theme html,
+.classic-theme #root {
+  background: var(--classic-bg) !important;
+  color: var(--classic-text) !important;
+}
+
+/* Classic Cards */
+.classic-theme .card,
+.classic-theme .glass-container,
+.classic-theme .dark-glass {
+  background: var(--classic-surface) !important;
+  border: 1px solid var(--classic-border) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+  padding: 1.5rem !important;
+}
+
+.classic-theme .card:hover,
+.classic-theme .glass-container:hover,
+.classic-theme .dark-glass:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+/* Classic Buttons */
+.classic-theme .btn,
+.classic-theme button,
+.classic-theme .button {
+  background: var(--classic-surface) !important;
+  border: 1px solid var(--classic-border) !important;
+  box-shadow: none !important;
+  border-radius: 6px !important;
+  color: var(--classic-text) !important;
+  transition: all 0.2s ease !important;
+}
+
+.classic-theme .btn:hover,
+.classic-theme button:hover,
+.classic-theme .button:hover {
+  background: var(--classic-bg) !important;
+  transform: none !important;
+}
+
+/* Classic Text Colors */
+.classic-theme .text-slate-900,
+.classic-theme .text-gray-900,
+.classic-theme .text-black,
+.classic-theme .text-foreground {
+  color: var(--classic-text) !important;
+}
+
+.classic-theme .text-slate-700,
+.classic-theme .text-gray-700,
+.classic-theme .text-slate-500,
+.classic-theme .text-gray-500,
+.classic-theme .text-muted-foreground {
+  color: var(--classic-text-secondary) !important;
+}
+
 /* Input and Form Elements */
 input, textarea, select {
   background: rgba(255, 255, 255, 0.05) !important;

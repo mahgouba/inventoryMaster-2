@@ -6,6 +6,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useTheme } from "@/hooks/useTheme";
+import { ThemeStyles } from "@/components/theme-styles";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import UniversalGlass from "@/components/universal-glass";
 import SidebarNavigation from "@/components/sidebar-navigation";
@@ -43,7 +44,12 @@ interface User {
 function ThemeProvider({ children }: { children: React.ReactNode }) {
   // This component loads and applies theme settings
   useTheme();
-  return <>{children}</>;
+  return (
+    <>
+      <ThemeStyles />
+      {children}
+    </>
+  );
 }
 
 function Router({ user, onLogout }: { user: User; onLogout: () => void }) {

@@ -727,6 +727,7 @@ export const appearanceSettings = pgTable("appearance_settings", {
   
   darkMode: boolean("dark_mode").default(false),
   rtlLayout: boolean("rtl_layout").default(true),
+  themeStyle: varchar("theme_style", { length: 20 }).default("glass"), // glass, neumorphism, classic
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });

@@ -104,6 +104,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
   
   const [darkMode, setDarkMode] = useState(false);
   const [rtlLayout, setRtlLayout] = useState(true);
+  const [themeStyle, setThemeStyle] = useState("glass");
   
   // State for new manufacturer dialog
   const [showNewManufacturerDialog, setShowNewManufacturerDialog] = useState(false);
@@ -366,6 +367,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
       
       setDarkMode(appearanceSettings.darkMode || false);
       setRtlLayout(appearanceSettings.rtlLayout !== false);
+      setThemeStyle(appearanceSettings.themeStyle || "glass");
     }
   }, [appearanceSettings]);
 
@@ -412,6 +414,7 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
       darkHeaderBackgroundColor,
       darkMode,
       rtlLayout,
+      themeStyle,
     };
     saveAppearanceMutation.mutate(settings);
   };
@@ -475,8 +478,9 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
 
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
         <Tabs defaultValue="branding" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="branding">العلامة التجارية</TabsTrigger>
+            <TabsTrigger value="themes">نمط المظهر</TabsTrigger>
             <TabsTrigger value="light-colors">الألوان العادية</TabsTrigger>
             <TabsTrigger value="dark-colors">الألوان الليلية</TabsTrigger>
             <TabsTrigger value="logos">🏭 إدارة شعارات الصناع</TabsTrigger>
@@ -678,6 +682,91 @@ export default function AppearancePage({ userRole, onLogout }: AppearancePagePro
                         </div>
                       </div>
                     )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Theme Styles */}
+          <TabsContent value="themes" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette size={20} />
+                  اختيار نمط المظهر
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <Label>نمط المظهر العام للتطبيق</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Glass Theme */}
+                    <div 
+                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                        themeStyle === 'glass' 
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => setThemeStyle('glass')}
+                    >
+                      <div className="space-y-3">
+                        <div className="w-full h-16 rounded bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                          <span className="text-sm font-medium">Glass Morphism</span>
+                        </div>
+                        <div className="text-center">
+                          <h3 className="font-semibold text-gray-900">زجاجي (Glass)</h3>
+                          <p className="text-sm text-gray-600 mt-1">تصميم زجاجي شفاف مع تأثيرات الضبابية</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Neumorphism Theme */}
+                    <div 
+                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                        themeStyle === 'neumorphism' 
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => setThemeStyle('neumorphism')}
+                    >
+                      <div className="space-y-3">
+                        <div className="w-full h-16 rounded-lg bg-gray-200 flex items-center justify-center shadow-[inset_8px_8px_16px_#bebebe,inset_-8px_-8px_16px_#ffffff]">
+                          <span className="text-sm font-medium text-gray-700">Neumorphism</span>
+                        </div>
+                        <div className="text-center">
+                          <h3 className="font-semibold text-gray-900">عصري (Neumorphism)</h3>
+                          <p className="text-sm text-gray-600 mt-1">تصميم عصري مع ظلال طبيعية ناعمة</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Classic Theme */}
+                    <div 
+                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                        themeStyle === 'classic' 
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => setThemeStyle('classic')}
+                    >
+                      <div className="space-y-3">
+                        <div className="w-full h-16 rounded bg-white border border-gray-300 flex items-center justify-center shadow-sm">
+                          <span className="text-sm font-medium text-gray-700">Classic</span>
+                        </div>
+                        <div className="text-center">
+                          <h3 className="font-semibold text-gray-900">كلاسيكي (Classic)</h3>
+                          <p className="text-sm text-gray-600 mt-1">تصميم كلاسيكي بسيط وواضح</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      <strong>ملاحظة:</strong> سيتم تطبيق النمط المختار على كامل التطبيق بعد الحفظ. 
+                      يمكنك معاينة النمط قبل الحفظ من خلال النقر عليه.
+                    </p>
                   </div>
                 </div>
               </CardContent>
