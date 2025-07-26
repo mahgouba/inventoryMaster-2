@@ -83,35 +83,38 @@ html, body {
   display: none;
 }
 
-/* iOS-Style Navigation Animations */
+/* iOS-Style Navigation Animations - Enhanced Stability */
 .ios-navigation {
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
   transform-origin: center;
+  will-change: transform;
 }
 
 .ios-navigation:active {
-  transform: scale(0.98);
+  transform: scale(0.99);
 }
 
 .ios-scroll-container {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  transition: scroll-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: scroll-left 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  overscroll-behavior-x: contain;
 }
 
-/* iOS-Style Button Animations */
+/* iOS-Style Button Animations - Enhanced Stability */
 .ios-nav-button {
-  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
   transform-origin: center;
+  will-change: transform, box-shadow;
 }
 
 .ios-nav-button:active {
-  transform: scale(0.95);
+  transform: scale(0.96);
 }
 
 .ios-nav-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-0.5px) scale(1.02);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
 }
 
 /* Selection Ring Animation */

@@ -50,10 +50,9 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     return;
   };
 
-  // Sound effect function
-  const playNavigationSound = () => {
+  // Enhanced sound effects for different interactions
+  const playSoundEffect = (type: 'drag' | 'snap' | 'select') => {
     try {
-      // Create audio context for sound generation
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
@@ -61,14 +60,34 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
       
-      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
-      
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      // Different sounds for different actions
+      switch (type) {
+        case 'drag':
+          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.08);
+          gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
+          oscillator.stop(audioContext.currentTime + 0.08);
+          break;
+        case 'snap':
+          oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.05);
+          oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.12);
+          gainNode.gain.setValueAtTime(0.12, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.12);
+          oscillator.stop(audioContext.currentTime + 0.12);
+          break;
+        case 'select':
+          oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(1400, audioContext.currentTime + 0.06);
+          oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.15);
+          gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+          oscillator.stop(audioContext.currentTime + 0.15);
+          break;
+      }
       
       oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.1);
     } catch (error) {
       console.log('Audio not supported or blocked');
     }
@@ -88,32 +107,39 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     const x = e.touches[0].pageX - scrollRef.current.offsetLeft;
     const distance = Math.abs(x - startX);
     
-    // Only start dragging if moved more than 10px - HORIZONTAL ONLY
-    if (distance > 10) {
+    // Only start dragging if moved more than 8px for more stable movement
+    if (distance > 8) {
       if (!isDragging) {
         setIsDragging(true);
-        playNavigationSound(); // Play sound when dragging starts
+        playSoundEffect('drag'); // Play drag sound when starting
       }
       setHasMoved(true);
       
-      // Smooth horizontal scrolling with iOS-style momentum
-      const walk = (x - startX) * 1.2; // Reduced for smoother movement
+      // More stable horizontal scrolling with damping
+      const walk = (x - startX) * 0.8; // Reduced multiplier for stability
       const newScrollLeft = scrollLeft - walk;
       
-      // Apply smooth transition with momentum
-      scrollRef.current.style.transition = 'scroll-behavior: smooth';
-      scrollRef.current.scrollLeft = Math.max(0, newScrollLeft);
+      // Constrain scrolling within bounds for stability
+      const maxScrollLeft = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
+      const constrainedScrollLeft = Math.max(0, Math.min(newScrollLeft, maxScrollLeft));
       
-      // Check for magnetic snap to center
-      snapToCenter();
+      // Apply smooth scrolling without abrupt transitions
+      scrollRef.current.style.scrollBehavior = 'auto';
+      scrollRef.current.scrollLeft = constrainedScrollLeft;
+      
+      // Play periodic drag sounds for feedback
+      if (Math.abs(constrainedScrollLeft - scrollRef.current.scrollLeft) > 20) {
+        playSoundEffect('drag');
+      }
     }
   };
 
   const handleTouchEnd = () => {
-    // Add iOS-style deceleration animation
+    // Add stable deceleration with momentum
     if (scrollRef.current && hasMoved) {
-      scrollRef.current.style.transition = 'scroll-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-      playNavigationSound(); // Play sound when touch ends
+      scrollRef.current.style.scrollBehavior = 'smooth';
+      scrollRef.current.style.transition = 'scroll-left 0.3s cubic-bezier(0.23, 1, 0.32, 1)';
+      playSoundEffect('snap'); // Play snap sound when touch ends
     }
     handleDragEnd();
   };
@@ -151,9 +177,10 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       const buttonCenter = buttonRect.left - containerRect.left + buttonRect.width / 2;
       const targetScrollLeft = container.scrollLeft + (buttonCenter - containerCenter);
       
-      // iOS-style smooth scroll to center with sound
-      playNavigationSound();
-      container.style.transition = 'scroll-left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      // Stable smooth scroll to center with enhanced sound
+      playSoundEffect('snap');
+      container.style.scrollBehavior = 'smooth';
+      container.style.transition = 'scroll-left 0.25s cubic-bezier(0.23, 1, 0.32, 1)';
       container.scrollTo({
         left: targetScrollLeft,
         behavior: 'smooth'
@@ -163,36 +190,18 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     }
   };
 
-  // Auto-navigate to center item when drag ends with iOS-style animation
+  // Stable drag end with enhanced feedback
   const handleDragEnd = () => {
+    // Reset transition for stability
+    if (scrollRef.current) {
+      scrollRef.current.style.scrollBehavior = 'smooth';
+    }
+    
     setTimeout(() => {
-      if (centerItem && hasMoved) {
-        playNavigationSound(); // Play selection sound
-        
-        // Add selection feedback animation
-        if (scrollRef.current) {
-          scrollRef.current.style.transform = 'scale(0.98)';
-          setTimeout(() => {
-            if (scrollRef.current) {
-              scrollRef.current.style.transform = 'scale(1)';
-              scrollRef.current.style.transition = 'transform 0.2s ease-out';
-            }
-          }, 100);
-        }
-        
-        // Navigate to the center item
-        setTimeout(() => {
-          if (centerItem.internal) {
-            setLocation(centerItem.href);
-          } else {
-            window.location.href = centerItem.href;
-          }
-        }, 200);
-      }
       setIsDragging(false);
       setHasMoved(false);
       setCenterItem(null);
-    }, 100);
+    }, 50);
   };
 
   // Cleanup mouse events
@@ -311,6 +320,9 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     if (hasMoved || isDragging) {
       return;
     }
+    
+    // Play selection sound
+    playSoundEffect('select');
     
     if (item.internal) {
       // For internal pages, just update the URL without navigating away
