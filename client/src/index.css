@@ -1221,6 +1221,16 @@ button.glass-button:active,
     0 3px 12px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
+/* Hide scrollbar completely for horizontal drag navigation */
+.scrollbar-none {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+}
+
 .glass-action-secondary {
   background: rgba(196, 150, 50, 0.2) !important;
   backdrop-filter: blur(15px) !important;

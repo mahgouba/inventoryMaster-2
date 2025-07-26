@@ -1,7 +1,6 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { 
   LayoutDashboard, 
   Package, 
@@ -28,6 +27,70 @@ interface HorizontalNavigationProps {
 export default function HorizontalNavigation({ userRole }: HorizontalNavigationProps) {
   const [location, setLocation] = useLocation();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  // Mouse drag handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setScrollLeft(scrollRef.current.scrollLeft);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // Scroll speed multiplier
+    scrollRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Touch drag handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    setStartX(e.touches[0].pageX - scrollRef.current.offsetLeft);
+    setScrollLeft(scrollRef.current.scrollLeft);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    const x = e.touches[0].pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5; // Touch scroll speed
+    scrollRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  // Cleanup mouse events
+  useEffect(() => {
+    const handleGlobalMouseUp = () => setIsDragging(false);
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !scrollRef.current) return;
+      e.preventDefault();
+      const x = e.pageX - scrollRef.current.offsetLeft;
+      const walk = (x - startX) * 2;
+      scrollRef.current.scrollLeft = scrollLeft - walk;
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleGlobalMouseMove);
+      document.addEventListener('mouseup', handleGlobalMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDragging, startX, scrollLeft]);
 
   const menuItems = [
     { 
@@ -144,43 +207,55 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     <div className="glass-container fixed top-0 left-0 right-0 z-50 border-b border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
       <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-center items-center h-16 sm:h-20">
-          {/* Navigation Items with Horizontal Scroll */}
-          <div className="flex-1">
-            <ScrollArea className="w-full whitespace-nowrap" ref={scrollRef}>
-              <div className="flex items-center justify-start space-x-3 space-x-reverse px-4">
-                {allItems.map((item, index) => {
-                  const active = isActive(item.href);
-                  return (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleNavigation(item)}
+          {/* Navigation Items with Horizontal Drag Scroll */}
+          <div className="flex-1 overflow-hidden">
+            <div 
+              ref={scrollRef}
+              className="flex items-center justify-start space-x-3 space-x-reverse px-4 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing"
+              style={{ 
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
+              }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              {allItems.map((item, index) => {
+                const active = isActive(item.href);
+                return (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleNavigation(item)}
+                    className={cn(
+                      "glass-button glass-text-primary transition-all duration-300 ease-in-out transform whitespace-nowrap flex-shrink-0",
+                      "hover:scale-110 hover:shadow-lg hover:bg-white/25",
+                      active && "bg-blue-600/40 border-blue-400/40 shadow-xl scale-110 text-white font-semibold",
+                      isDragging && "pointer-events-none" // Disable clicks while dragging
+                    )}
+                  >
+                    <item.icon 
+                      size={active ? 18 : 14} 
                       className={cn(
-                        "glass-button glass-text-primary transition-all duration-300 ease-in-out transform whitespace-nowrap flex-shrink-0",
-                        "hover:scale-110 hover:shadow-lg hover:bg-white/25",
-                        active && "bg-blue-600/40 border-blue-400/40 shadow-xl scale-110 text-white font-semibold"
-                      )}
-                    >
-                      <item.icon 
-                        size={active ? 18 : 14} 
-                        className={cn(
-                          "ml-1 transition-all duration-300",
-                          active && "drop-shadow-lg"
-                        )} 
-                      />
-                      <span className={cn(
-                        "text-sm transition-all duration-300",
-                        active && "font-bold drop-shadow-sm"
-                      )}>
-                        {item.title}
-                      </span>
-                    </Button>
-                  );
-                })}
-              </div>
-              <ScrollBar orientation="horizontal" className="h-1 bg-white/20 opacity-50" />
-            </ScrollArea>
+                        "ml-1 transition-all duration-300",
+                        active && "drop-shadow-lg"
+                      )} 
+                    />
+                    <span className={cn(
+                      "text-sm transition-all duration-300",
+                      active && "font-bold drop-shadow-sm"
+                    )}>
+                      {item.title}
+                    </span>
+                  </Button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
