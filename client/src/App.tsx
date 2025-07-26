@@ -51,6 +51,7 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
   const [location] = useLocation();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   // Pages that should not show sidebar (bank pages and card view)
   const pagesWithoutSidebar = [
@@ -66,12 +67,16 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
   return (
     <div className="min-h-screen relative overflow-x-hidden">
       {shouldShowSidebar && (
-        <SidebarNavigation user={user} onLogout={onLogout} />
+        <SidebarNavigation 
+          user={user} 
+          onLogout={onLogout} 
+          onCollapseChange={setSidebarCollapsed}
+        />
       )}
       
       <div className={cn(
         "min-h-screen transition-all duration-300",
-        shouldShowSidebar ? "mr-64" : ""
+        shouldShowSidebar ? (sidebarCollapsed ? "mr-16" : "mr-64") : ""
       )}>
         <SystemGlassWrapper>
           <Switch>

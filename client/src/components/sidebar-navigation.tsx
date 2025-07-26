@@ -39,13 +39,20 @@ interface SidebarNavigationProps {
     id: number;
   };
   onLogout: () => void;
+  onCollapseChange?: (collapsed: boolean) => void;
 }
 
-export default function SidebarNavigation({ user, onLogout }: SidebarNavigationProps) {
+export default function SidebarNavigation({ user, onLogout, onCollapseChange }: SidebarNavigationProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [location] = useLocation();
   const { settings, toggleDarkMode } = useTheme();
   const isDarkMode = settings?.darkMode || false;
+
+  const handleCollapseToggle = () => {
+    const newCollapsed = !isCollapsed;
+    setIsCollapsed(newCollapsed);
+    onCollapseChange?.(newCollapsed);
+  };
 
   const overviewItems = [
     { 
@@ -272,7 +279,7 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={handleCollapseToggle}
             className="h-8 w-8 p-0 backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 text-white"
           >
             {isCollapsed ? <ChevronLeft className="h-4 w-4 drop-shadow-sm" /> : <ChevronRight className="h-4 w-4 drop-shadow-sm" />}
