@@ -334,7 +334,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   };
 
   return (
-    <div className="glass-container fixed top-8 right-8 z-50 w-20 h-[calc(100vh-8rem)] rounded-xl border border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
+    <div className="glass-container fixed top-8 right-4 z-50 w-16 h-[calc(100vh-4rem)] rounded-xl border border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
       <div className="h-full flex flex-col justify-start px-2 py-4">
         <div className="flex flex-col items-center relative h-full">
           {/* Navigation Items with Vertical Drag Scroll */}
@@ -361,7 +361,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                     key={index}
                     onClick={() => handleNavigation(item)}
                     className={cn(
-                      "w-14 h-14 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ease-in-out transform flex-shrink-0 ios-nav-button",
+                      "w-12 h-12 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ease-in-out transform flex-shrink-0 ios-nav-button",
                       "glass-button glass-text-primary",
                       "hover:scale-110 hover:shadow-lg hover:bg-white/25",
                       "active:scale-95",
@@ -370,14 +370,14 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                     title={item.title}
                   >
                     <item.icon 
-                      size={active ? 20 : 16} 
+                      size={active ? 18 : 14} 
                       className={cn(
                         "transition-all duration-300",
                         active && "drop-shadow-lg"
                       )} 
                     />
                     <span className={cn(
-                      "text-[8px] mt-1 text-center leading-tight transition-all duration-300",
+                      "text-[7px] mt-0.5 text-center leading-tight transition-all duration-300",
                       active && "font-bold drop-shadow-sm"
                     )}>
                       {item.title.split(' ')[0]}
