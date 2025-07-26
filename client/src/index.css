@@ -73,6 +73,16 @@ html, body {
   color: var(--text-primary) !important;
 }
 
+/* Scrollbar Utilities */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 .text-slate-700,
 .text-gray-700 {
   color: var(--text-secondary) !important;

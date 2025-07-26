@@ -17,6 +17,7 @@ import NotFound from "@/pages/not-found";
 import QuotationEditPage from "@/pages/quotation-edit";
 import PersonalBanks from "@/pages/personal-banks";
 import CompanyBanks from "@/pages/company-banks";
+import IOSPickerDemo from "@/pages/ios-picker-demo";
 
 interface User {
   username: string;
@@ -80,6 +81,9 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           <Route path="/card-view-new" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
           <Route path="/banks-personal" component={PersonalBanks} />
           <Route path="/banks-company" component={CompanyBanks} />
+          
+          {/* Demo Pages */}
+          <Route path="/ios-picker-demo" component={IOSPickerDemo} />
           
           {/* Special Routes */}
           <Route path="/quotation-edit/:id" component={QuotationEditPage} />
