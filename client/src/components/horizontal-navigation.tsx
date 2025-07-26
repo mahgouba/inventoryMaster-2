@@ -98,14 +98,14 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     if (!scrollRef.current) return;
     setDragStartTime(Date.now());
     setHasMoved(false);
-    setStartX(e.touches[0].pageX - scrollRef.current.offsetLeft);
-    setScrollLeft(scrollRef.current.scrollLeft);
+    setStartX(e.touches[0].pageY - scrollRef.current.getBoundingClientRect().top); // Using Y coordinate for vertical
+    setScrollLeft(scrollRef.current.scrollTop); // Using scrollTop for vertical
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!scrollRef.current) return;
-    const x = e.touches[0].pageX - scrollRef.current.offsetLeft;
-    const distance = Math.abs(x - startX);
+    const y = e.touches[0].pageY - scrollRef.current.getBoundingClientRect().top;
+    const distance = Math.abs(y - startX); // Using startX for Y coordinate
     
     // Only start dragging if moved more than 8px for more stable movement
     if (distance > 8) {
@@ -115,30 +115,30 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       }
       setHasMoved(true);
       
-      // More stable horizontal scrolling with damping
-      const walk = (x - startX) * 0.8; // Reduced multiplier for stability
-      const newScrollLeft = scrollLeft - walk;
+      // More stable vertical scrolling with damping
+      const walk = (y - startX) * 0.8; // Reduced multiplier for stability
+      const newScrollTop = scrollLeft - walk; // Using scrollLeft for Y position
       
       // Constrain scrolling within bounds for stability
-      const maxScrollLeft = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
-      const constrainedScrollLeft = Math.max(0, Math.min(newScrollLeft, maxScrollLeft));
+      const maxScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
+      const constrainedScrollTop = Math.max(0, Math.min(newScrollTop, maxScrollTop));
       
       // Apply smooth scrolling without abrupt transitions
       scrollRef.current.style.scrollBehavior = 'auto';
-      scrollRef.current.scrollLeft = constrainedScrollLeft;
+      scrollRef.current.scrollTop = constrainedScrollTop;
       
       // Play periodic drag sounds for feedback
-      if (Math.abs(constrainedScrollLeft - scrollRef.current.scrollLeft) > 20) {
+      if (Math.abs(constrainedScrollTop - scrollRef.current.scrollTop) > 20) {
         playSoundEffect('drag');
       }
     }
   };
 
   const handleTouchEnd = () => {
-    // Add stable deceleration with momentum
+    // Add stable deceleration with momentum for vertical scrolling
     if (scrollRef.current && hasMoved) {
       scrollRef.current.style.scrollBehavior = 'smooth';
-      scrollRef.current.style.transition = 'scroll-left 0.3s cubic-bezier(0.23, 1, 0.32, 1)';
+      scrollRef.current.style.transition = 'scroll-top 0.3s cubic-bezier(0.23, 1, 0.32, 1)';
       playSoundEffect('snap'); // Play snap sound when touch ends
     }
     handleDragEnd();
@@ -334,14 +334,14 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   };
 
   return (
-    <div className="glass-container fixed top-0 left-0 right-0 z-50 border-b border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
-      <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex justify-center items-center h-16 sm:h-20 relative">
-          {/* Navigation Items with Horizontal Drag Scroll */}
-          <div className="flex-1 overflow-hidden">
+    <div className="glass-container fixed top-0 right-0 bottom-0 z-50 w-20 border-l border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
+      <div className="h-full flex flex-col justify-center px-2">
+        <div className="flex flex-col items-center relative h-full py-4">
+          {/* Navigation Items with Vertical Drag Scroll */}
+          <div className="flex-1 overflow-hidden w-full">
             <div 
               ref={scrollRef}
-              className="flex items-center justify-start space-x-3 space-x-reverse px-4 overflow-x-auto scrollbar-none"
+              className="flex flex-col items-center justify-start space-y-3 py-4 overflow-y-auto scrollbar-none h-full"
               style={{ 
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none'
@@ -357,32 +357,32 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
               {allItems.map((item, index) => {
                 const active = isActive(item.href);
                 return (
-                  <Button
+                  <div
                     key={index}
-                    variant="outline"
-                    size="sm"
                     onClick={() => handleNavigation(item)}
                     className={cn(
-                      "glass-button glass-text-primary transition-all duration-300 ease-in-out transform whitespace-nowrap flex-shrink-0 ios-nav-button",
-                      "hover:scale-110 hover:shadow-lg hover:bg-white/25 hover:translate-y-[-1px]",
-                      "active:scale-95 active:translate-y-0",
+                      "w-14 h-14 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ease-in-out transform flex-shrink-0 ios-nav-button",
+                      "glass-button glass-text-primary",
+                      "hover:scale-110 hover:shadow-lg hover:bg-white/25",
+                      "active:scale-95",
                       active && "bg-blue-600/40 border-blue-400/40 shadow-xl scale-110 text-white font-semibold ios-selection-ring"
                     )}
+                    title={item.title}
                   >
                     <item.icon 
-                      size={active ? 18 : 14} 
+                      size={active ? 20 : 16} 
                       className={cn(
-                        "ml-1 transition-all duration-300",
+                        "transition-all duration-300",
                         active && "drop-shadow-lg"
                       )} 
                     />
                     <span className={cn(
-                      "text-sm transition-all duration-300",
+                      "text-[8px] mt-1 text-center leading-tight transition-all duration-300",
                       active && "font-bold drop-shadow-sm"
                     )}>
-                      {item.title}
+                      {item.title.split(' ')[0]}
                     </span>
-                  </Button>
+                  </div>
                 );
               })}
             </div>
