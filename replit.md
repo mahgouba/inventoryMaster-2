@@ -236,12 +236,13 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ **COMPLETED: Company Logo Repositioning** - Moved company logo and name section to the very top of inventory page above all other elements
 - ✅ Enhanced logo and company name display with larger size and prominent positioning for better branding
 - ✅ **COMPLETED: Navigation System Merger** - Successfully merged sidebar navigation with main header navigation per user request:
-  - Integrated primary navigation (Dashboard, Card View, Quote Creation) into main header
+  - Integrated primary navigation (Card View, Quote Creation) into main header
   - Added administrative functions (Appearance Management, User Management) to center navigation
   - Included financial navigation (Company Banks, Personal Banks) with descriptive labels
   - Added reports navigation (Reservations Management, Sold Vehicles) for comprehensive access
   - Maintained all existing functionality while creating unified navigation experience
   - Removed need for separate sidebar component by consolidating all navigation into single header
+  - **REMOVED**: Dashboard button ("لوحة المتابعة") from navigation per user request
 - ✅ **COMPLETED: Background Layer Removal** - Removed bg-slate-900 background from main App.tsx router container per user request
 - ✅ **COMPLETED: Admin Dashboard Cleanup** - Removed specific admin buttons per user request:
   - Removed specifications management button (إدارة المواصفات)  

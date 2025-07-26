@@ -503,10 +503,6 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 <div className="flex items-center space-x-3 space-x-reverse">
                   {/* Main Pages Navigation */}
                   <div className="flex items-center space-x-2 space-x-reverse">
-                    <Button variant="default" size="sm" className="glass-button-primary text-white">
-                      <LayoutDashboard size={16} className="ml-1" />
-                      <span className="hidden md:inline">لوحة المتابعة</span>
-                    </Button>
                     <Link href="/card-view-new">
                       <Button variant="outline" size="sm" className="glass-button glass-text-primary">
                         <Package size={16} className="ml-1" />
