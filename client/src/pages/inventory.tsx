@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Eye, EyeOff, Calendar, ShoppingCart, Landmark, CreditCard, LayoutDashboard, Package, Activity, BarChart3 } from "lucide-react";
+import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Eye, EyeOff, Calendar, ShoppingCart, Landmark, CreditCard, LayoutDashboard, Package, Activity, BarChart3, Calculator, UserCheck, Image, Building } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -499,79 +499,128 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
             <div className="flex justify-center items-center h-16 sm:h-20">
               {/* Merged Navigation */}
               <div className="flex items-center justify-between w-full">
-                {/* Primary Navigation - Left Side */}
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  {/* Main Pages Navigation */}
-                  <div className="flex items-center space-x-2 space-x-reverse">
-                    <Link href="/card-view-new">
-                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                        <Package size={16} className="ml-1" />
-                        <span className="hidden md:inline">عرض البطاقات</span>
-                      </Button>
-                    </Link>
-                    <Link href="/quotation-creation">
-                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                        <MessageSquare size={16} className="ml-1" />
-                        <span className="hidden lg:inline">إنشاء عرض سعر</span>
-                      </Button>
-                    </Link>
+                {/* Comprehensive Horizontal Navigation Bar - All Pages */}
+                <div className="flex-1 px-4">
+                  <div className="flex items-center justify-center">
+                    <div className="flex items-center space-x-2 space-x-reverse flex-wrap gap-1">
+                      
+                      {/* Core Pages */}
+                      <Link href="/inventory">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <LayoutDashboard size={14} className="ml-1" />
+                          <span className="hidden sm:inline">المخزون</span>
+                        </Button>
+                      </Link>
+                      
+                      <Link href="/card-view-new">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <Package size={14} className="ml-1" />
+                          <span className="hidden sm:inline">البطاقات</span>
+                        </Button>
+                      </Link>
+                      
+                      <Link href="/quotation-creation">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <MessageSquare size={14} className="ml-1" />
+                          <span className="hidden sm:inline">عرض سعر</span>
+                        </Button>
+                      </Link>
+
+                      <Link href="/invoice-management">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <FileText size={14} className="ml-1" />
+                          <span className="hidden sm:inline">الفواتير</span>
+                        </Button>
+                      </Link>
+
+                      <Link href="/reservations">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <Calendar size={14} className="ml-1" />
+                          <span className="hidden sm:inline">الحجوزات</span>
+                        </Button>
+                      </Link>
+
+                      <Link href="/sold-vehicles">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <ShoppingCart size={14} className="ml-1" />
+                          <span className="hidden sm:inline">المبيعات</span>
+                        </Button>
+                      </Link>
+
+                      <Link href="/financing-calculator">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <Calculator size={14} className="ml-1" />
+                          <span className="hidden sm:inline">التمويل</span>
+                        </Button>
+                      </Link>
+
+                      <Link href="/leave-requests">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <UserCheck size={14} className="ml-1" />
+                          <span className="hidden sm:inline">الإجازات</span>
+                        </Button>
+                      </Link>
+
+                      <Link href="/locations">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <MapPin size={14} className="ml-1" />
+                          <span className="hidden sm:inline">المواقع</span>
+                        </Button>
+                      </Link>
+
+                      {/* Banking Pages */}
+                      <Link href="/banks-personal">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <CreditCard size={14} className="ml-1" />
+                          <span className="hidden lg:inline">البنوك الشخصية</span>
+                        </Button>
+                      </Link>
+
+                      <Link href="/banks-company">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <Building2 size={14} className="ml-1" />
+                          <span className="hidden lg:inline">بنوك الشركة</span>
+                        </Button>
+                      </Link>
+
+                      {/* Admin Only Pages */}
+                      {userRole === "admin" && (
+                        <>
+                          <Link href="/pdf-appearance">
+                            <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                              <Palette size={14} className="ml-1" />
+                              <span className="hidden lg:inline">المظهر</span>
+                            </Button>
+                          </Link>
+
+                          <Link href="/manufacturer-logos">
+                            <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                              <Image size={14} className="ml-1" />
+                              <span className="hidden lg:inline">الشعارات</span>
+                            </Button>
+                          </Link>
+
+                          <Link href="/user-management">
+                            <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                              <Users size={14} className="ml-1" />
+                              <span className="hidden lg:inline">المستخدمين</span>
+                            </Button>
+                          </Link>
+
+                          <Link href="/bank-management">
+                            <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                              <Building size={14} className="ml-1" />
+                              <span className="hidden lg:inline">إدارة البنوك</span>
+                            </Button>
+                          </Link>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Center Navigation - Quick Actions */}
+                {/* Right Side - User Actions */}  
                 <div className="flex items-center space-x-2 space-x-reverse">
-                  {/* Quick Action Buttons */}
-                  {userRole === "admin" && (
-                    <>
-                      <Link href="/appearance">
-                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                          <Palette size={16} className="ml-1" />
-                          <span className="hidden sm:inline">إدارة المظهر</span>
-                        </Button>
-                      </Link>
-                      <Link href="/user-management">
-                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                          <Users size={16} className="ml-1" />
-                          <span className="hidden sm:inline">إدارة المستخدمين</span>
-                        </Button>
-                      </Link>
-                    </>
-                  )}
-                </div>
-
-                {/* Right Side Navigation - User & System */}  
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  {/* Bank & Financial Navigation */}
-                  <div className="flex items-center space-x-1 space-x-reverse">
-                    <Link href="/banks-company">
-                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                        <Building2 size={16} className="ml-1" />
-                        <span className="hidden lg:inline">بنوك الشركة</span>
-                      </Button>
-                    </Link>
-                    <Link href="/banks-personal">
-                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                        <CreditCard size={16} className="ml-1" />
-                        <span className="hidden lg:inline">البنوك الشخصية</span>
-                      </Button>
-                    </Link>
-                  </div>
-
-                  {/* Reports & Analytics Navigation */}
-                  <div className="flex items-center space-x-1 space-x-reverse">
-                    <Link href="/reservations">
-                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                        <Calendar size={16} className="ml-1" />
-                        <span className="hidden lg:inline">إدارة الحجوزات</span>
-                      </Button>
-                    </Link>
-                    <Link href="/sold-vehicles">
-                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                        <ShoppingCart size={16} className="ml-1" />
-                        <span className="hidden lg:inline">السيارات المباعة</span>
-                      </Button>
-                    </Link>
-                  </div>
 
                 {/* Admin Dropdown Menu */}
                 {userRole === "admin" && (
