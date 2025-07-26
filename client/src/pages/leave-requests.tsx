@@ -13,6 +13,42 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
+// Glass Background Components
+const GlassBackground = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated gradient background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
+        <div className="blob blob-1"></div>
+        <div className="blob blob-2"></div>
+        <div className="blob blob-3"></div>
+        <div className="blob blob-4"></div>
+        <div className="blob blob-5"></div>
+      </div>
+      <div className="relative z-10">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+const GlassContainer = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
+  return (
+    <div className={`glass-container backdrop-blur-md bg-white/10 border border-white/20 rounded-xl shadow-xl ${className}`}>
+      {children}
+    </div>
+  );
+};
+
+const GlassCard = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
+  return (
+    <div className={`glass-card backdrop-blur-sm bg-white/5 border border-white/10 rounded-lg shadow-lg hover:bg-white/10 transition-all duration-300 ${className}`}>
+      {children}
+    </div>
+  );
+};
+
 interface User {
   id: number;
   username: string;
@@ -195,200 +231,195 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900" dir="rtl">
-      <div className="container mx-auto p-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">طلبات الإجازة والاستئذان</h1>
-            <p className="text-slate-600 dark:text-slate-400">إدارة طلبات الإجازات والاستئذان للموظفين</p>
-          </div>
-          
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                <Plus size={20} className="ml-2" />
-                إنشاء طلب جديد
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md" dir="rtl">
-              <DialogHeader>
-                <DialogTitle>إنشاء طلب إجازة أو استئذان</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label>اختيار المستخدم</Label>
-                  <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر المستخدم" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {users.map((user) => (
-                        <SelectItem key={user.id} value={user.id.toString()}>
-                          {user.username} ({user.role})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label>نوع الطلب</Label>
-                  <Select value={requestType} onValueChange={setRequestType}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر نوع الطلب" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="إجازة">إجازة (بالأيام)</SelectItem>
-                      <SelectItem value="استئذان">استئذان (بالساعات)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label>تاريخ البداية</Label>
-                  <Input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                  />
-                </div>
-
-                {requestType === "إجازة" && (
+    <GlassBackground>
+      <div className="container mx-auto p-6" dir="rtl">
+        <GlassContainer className="p-6 mb-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-white drop-shadow-lg">طلبات الإجازة والاستئذان</h1>
+              <p className="text-white/80 drop-shadow-md">إدارة طلبات الإجازات والاستئذان للموظفين</p>
+            </div>
+            
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white shadow-lg">
+                  <Plus size={20} className="ml-2" />
+                  إنشاء طلب جديد
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md backdrop-blur-md bg-slate-900/90 border border-white/20" dir="rtl">
+                <DialogHeader>
+                  <DialogTitle className="text-white">إنشاء طلب إجازة أو استئذان</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
                   <div>
-                    <Label>تاريخ النهاية</Label>
+                    <Label className="text-white/90 drop-shadow-md">اختيار المستخدم</Label>
+                    <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                      <SelectTrigger className="bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                        <SelectValue placeholder="اختر المستخدم" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {users.map((user) => (
+                          <SelectItem key={user.id} value={user.id.toString()}>
+                            {user.username} ({user.role})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-white/90 drop-shadow-md">نوع الطلب</Label>
+                    <Select value={requestType} onValueChange={setRequestType}>
+                      <SelectTrigger className="bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                        <SelectValue placeholder="اختر نوع الطلب" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="إجازة">إجازة (بالأيام)</SelectItem>
+                        <SelectItem value="استئذان">استئذان (بالساعات)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-white/90 drop-shadow-md">تاريخ البداية</Label>
                     <Input
                       type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="bg-white/10 border-white/20 text-white backdrop-blur-sm"
                     />
                   </div>
-                )}
 
-                <div>
-                  <Label>
-                    {requestType === "إجازة" ? "عدد الأيام" : "عدد الساعات"}
-                  </Label>
-                  <Input
-                    type="number"
-                    value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                    placeholder={requestType === "إجازة" ? "عدد الأيام" : "عدد الساعات"}
-                  />
-                </div>
+                  {requestType === "إجازة" && (
+                    <div>
+                      <Label className="text-white/90 drop-shadow-md">تاريخ النهاية</Label>
+                      <Input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="bg-white/10 border-white/20 text-white backdrop-blur-sm"
+                      />
+                    </div>
+                  )}
 
-                <div>
-                  <Label>سبب الطلب</Label>
-                  <Textarea
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    placeholder="اكتب سبب الإجازة أو الاستئذان"
-                    rows={3}
-                  />
-                </div>
+                  <div>
+                    <Label className="text-white/90 drop-shadow-md">
+                      {requestType === "إجازة" ? "عدد الأيام" : "عدد الساعات"}
+                    </Label>
+                    <Input
+                      type="number"
+                      value={duration}
+                      onChange={(e) => setDuration(e.target.value)}
+                      placeholder={requestType === "إجازة" ? "عدد الأيام" : "عدد الساعات"}
+                      className="bg-white/10 border-white/20 text-white backdrop-blur-sm"
+                    />
+                  </div>
 
-                <div className="flex justify-end space-x-2 space-x-reverse">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsCreateDialogOpen(false)}
-                  >
-                    إلغاء
-                  </Button>
-                  <Button
-                    onClick={handleCreateRequest}
-                    disabled={createLeaveRequestMutation.isPending}
-                  >
-                    {createLeaveRequestMutation.isPending ? "جاري الإنشاء..." : "إنشاء الطلب"}
-                  </Button>
+                  <div>
+                    <Label className="text-white/90 drop-shadow-md">سبب الطلب</Label>
+                    <Textarea
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                      placeholder="اكتب سبب الإجازة أو الاستئذان"
+                      rows={3}
+                      className="bg-white/10 border-white/20 text-white backdrop-blur-sm placeholder:text-white/60"
+                    />
+                  </div>
+
+                  <div className="flex justify-end space-x-2 space-x-reverse">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsCreateDialogOpen(false)}
+                      className="bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"
+                    >
+                      إلغاء
+                    </Button>
+                    <Button
+                      onClick={handleCreateRequest}
+                      disabled={createLeaveRequestMutation.isPending}
+                      className="bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white"
+                    >
+                      {createLeaveRequestMutation.isPending ? "جاري الإنشاء..." : "إنشاء الطلب"}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </GlassContainer>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">إجمالي الطلبات</p>
-                  <p className="text-2xl font-bold">{leaveRequests.length}</p>
-                </div>
-                <Users className="h-8 w-8 text-blue-600" />
+          <GlassCard className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/70 drop-shadow-md">إجمالي الطلبات</p>
+                <p className="text-2xl font-bold text-white drop-shadow-lg">{leaveRequests.length}</p>
               </div>
-            </CardContent>
-          </Card>
+              <Users className="h-8 w-8 text-blue-400 drop-shadow-lg" />
+            </div>
+          </GlassCard>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">في الانتظار</p>
-                  <p className="text-2xl font-bold text-yellow-600">
-                    {leaveRequests.filter(r => r.status === "pending").length}
-                  </p>
-                </div>
-                <AlertCircle className="h-8 w-8 text-yellow-600" />
+          <GlassCard className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/70 drop-shadow-md">في الانتظار</p>
+                <p className="text-2xl font-bold text-yellow-400 drop-shadow-lg">
+                  {leaveRequests.filter(r => r.status === "pending").length}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <AlertCircle className="h-8 w-8 text-yellow-400 drop-shadow-lg" />
+            </div>
+          </GlassCard>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">موافق عليها</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {leaveRequests.filter(r => r.status === "approved").length}
-                  </p>
-                </div>
-                <Check className="h-8 w-8 text-green-600" />
+          <GlassCard className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/70 drop-shadow-md">موافق عليها</p>
+                <p className="text-2xl font-bold text-green-400 drop-shadow-lg">
+                  {leaveRequests.filter(r => r.status === "approved").length}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <Check className="h-8 w-8 text-green-400 drop-shadow-lg" />
+            </div>
+          </GlassCard>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">مرفوضة</p>
-                  <p className="text-2xl font-bold text-red-600">
-                    {leaveRequests.filter(r => r.status === "rejected").length}
-                  </p>
-                </div>
-                <X className="h-8 w-8 text-red-600" />
+          <GlassCard className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/70 drop-shadow-md">مرفوضة</p>
+                <p className="text-2xl font-bold text-red-400 drop-shadow-lg">
+                  {leaveRequests.filter(r => r.status === "rejected").length}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <X className="h-8 w-8 text-red-400 drop-shadow-lg" />
+            </div>
+          </GlassCard>
         </div>
 
         {/* Requests List */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <GlassContainer className="p-6">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-white drop-shadow-lg flex items-center gap-2">
               <Calendar size={20} />
               قائمة الطلبات
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {leaveRequests.length === 0 ? (
-                <div className="text-center py-8">
-                  <Calendar className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-                  <p className="text-slate-600 dark:text-slate-400">لا توجد طلبات حالياً</p>
-                </div>
-              ) : (
-                leaveRequests.map((request) => (
-                  <div
-                    key={request.id}
-                    className="border border-slate-200 dark:border-slate-700 rounded-lg p-4 space-y-3"
-                  >
+            </h2>
+          </div>
+            {leaveRequests.length === 0 ? (
+              <div className="text-center py-8">
+                <Calendar className="mx-auto h-12 w-12 text-white/40 mb-4 drop-shadow-lg" />
+                <p className="text-white/70 drop-shadow-md">لا توجد طلبات حالياً</p>
+              </div>
+            ) : (
+              leaveRequests.map((request) => (
+                <GlassCard key={request.id} className="p-4 space-y-3">
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
-                        <h3 className="font-semibold text-slate-900 dark:text-white">
+                        <h3 className="font-semibold text-white drop-shadow-lg">
                           {request.requestType} - {request.userName}
                         </h3>
-                        <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
+                        <div className="flex items-center gap-4 text-sm text-white/70 drop-shadow-md">
                           <span className="flex items-center gap-1">
                             <Calendar size={14} />
                             {format(new Date(request.startDate), "PPP", { locale: ar })}
@@ -411,13 +442,13 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                                   status: "approved",
                                 })
                               }
-                              className="bg-green-600 hover:bg-green-700"
+                              className="bg-green-600/80 hover:bg-green-700/90 backdrop-blur-sm border border-white/20"
                             >
                               <Check size={14} />
                             </Button>
                             <Button
                               size="sm"
-                              variant="destructive"
+                              className="bg-red-600/80 hover:bg-red-700/90 backdrop-blur-sm border border-white/20"
                               onClick={() =>
                                 updateRequestStatusMutation.mutate({
                                   id: request.id,
@@ -433,11 +464,11 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                       </div>
                     </div>
                     
-                    <div className="text-sm text-slate-700 dark:text-slate-300">
-                      <strong>السبب:</strong> {request.reason}
+                    <div className="text-sm text-white/80 drop-shadow-md">
+                      <strong className="text-white drop-shadow-lg">السبب:</strong> {request.reason}
                     </div>
                     
-                    <div className="text-xs text-slate-500 dark:text-slate-400 border-t pt-2">
+                    <div className="text-xs text-white/60 border-t border-white/20 pt-2 drop-shadow-md">
                       طلب بواسطة: {request.requestedByName} في{" "}
                       {format(new Date(request.createdAt), "PPP", { locale: ar })}
                       {request.approvedByName && (
@@ -446,13 +477,11 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                         </span>
                       )}
                     </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                </GlassCard>
+              ))
+            )}
+        </GlassContainer>
       </div>
-    </div>
+    </GlassBackground>
   );
 }
