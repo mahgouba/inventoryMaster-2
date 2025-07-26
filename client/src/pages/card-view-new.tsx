@@ -632,7 +632,15 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   }
 
   return (
-    <div className="min-h-screen bg-slate-900" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-purple-950 relative overflow-hidden" dir="rtl">
+      {/* Animated Mesh Background */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-gradient-to-r from-teal-500 to-green-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+        <div className="absolute bottom-10 right-20 w-72 h-72 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-6000"></div>
+      </div>
+      <div className="relative z-10" dir="rtl">
       {/* Header */}
       <header className="glass-container sticky top-0 z-50 border-b border-white/20 dark:border-slate-700/30">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
@@ -662,7 +670,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-200 hover:text-amber-600 transition-colors duration-300">{companyName}</h1>
+                <h1 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg hover:text-amber-400 transition-colors duration-300">{companyName}</h1>
               </div>
             </div>
 
@@ -919,21 +927,21 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             }) => (
                               <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{title}</h3>
+                                  <h3 className="text-sm font-medium text-white drop-shadow-md">{title}</h3>
                                   <div className="flex items-center space-x-2 space-x-reverse">
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                                    <span className="text-xs text-white/70 drop-shadow-sm">
                                       {selectedFilters.length > 0 ? `(${selectedFilters.length} محدد)` : ""}
                                     </span>
                                     <Button
                                       variant="ghost"
                                       size="sm"
                                       onClick={() => onToggleChange(!toggleState)}
-                                      className="p-2 h-8 w-8 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                                      className="glass-button p-2 h-8 w-8"
                                     >
                                       {toggleState ? (
-                                        <Eye size={16} className="text-blue-600 dark:text-blue-400" />
+                                        <Eye size={16} className="glass-text-accent" />
                                       ) : (
-                                        <EyeOff size={16} className="text-slate-400 dark:text-slate-500" />
+                                        <EyeOff size={16} className="glass-text-secondary" />
                                       )}
                                     </Button>
                                   </div>
@@ -950,10 +958,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                             variant={isSelected ? "default" : "outline"}
                                             size="sm"
                                             onClick={() => onFilterToggle(item)}
-                                            className={`transition-all duration-200 whitespace-nowrap relative ${
+                                            className={`glass-button transition-all duration-200 whitespace-nowrap relative ${
                                               isSelected
-                                                ? "bg-custom-primary hover:bg-custom-primary-dark text-white"
-                                                : "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-custom-primary"
+                                                ? "glass-button-primary text-white drop-shadow-md"
+                                                : "glass-text-primary hover:glass-button-secondary"
                                             }`}
                                           >
                                             {isSelected && (
@@ -1517,6 +1525,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         item={reserveItem}
         onSuccess={handleReservationSuccess}
       />
+      </div>
     </div>
   );
 }
