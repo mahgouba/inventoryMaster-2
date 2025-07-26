@@ -334,9 +334,9 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   };
 
   return (
-    <div className="glass-container fixed top-0 right-0 bottom-0 z-50 w-20 border-l border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
-      <div className="h-full flex flex-col justify-center px-2">
-        <div className="flex flex-col items-center relative h-full py-4">
+    <div className="glass-container fixed top-8 right-8 z-50 w-20 h-[calc(100vh-8rem)] rounded-xl border border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
+      <div className="h-full flex flex-col justify-start px-2 py-4">
+        <div className="flex flex-col items-center relative h-full">
           {/* Navigation Items with Vertical Drag Scroll */}
           <div className="flex-1 overflow-hidden w-full">
             <div 
