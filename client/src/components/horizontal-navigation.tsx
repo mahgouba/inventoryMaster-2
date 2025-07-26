@@ -380,7 +380,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                 key={index}
                 onClick={() => handleNavigation(item)}
                 className={cn(
-                  "group relative w-12 h-12 cursor-pointer transition-all duration-300 ease-out flex-shrink-0",
+                  "group relative w-12 h-12 cursor-pointer flex-shrink-0",
                   "flex flex-col items-center justify-center",
                   active 
                     ? "text-white" 
@@ -392,26 +392,26 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                 <item.icon 
                   size={18} 
                   className={cn(
-                    "mb-1 transition-colors duration-300",
+                    "mb-1",
                     active 
                       ? "text-blue-400 drop-shadow-lg" 
-                      : "group-hover:text-blue-300"
+                      : "text-white/70 hover:text-blue-300"
                   )} 
                 />
                 
                 {/* Label */}
                 <span className={cn(
-                  "text-[7px] text-center leading-tight font-medium transition-colors duration-300",
+                  "text-[7px] text-center leading-tight font-medium",
                   active 
                     ? "text-blue-400 font-bold" 
-                    : "group-hover:text-blue-300"
+                    : "text-white/70 hover:text-blue-300"
                 )}>
                   {item.title.split(' ')[0]}
                 </span>
 
                 {/* Active Indicator */}
                 {active && (
-                  <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full shadow-lg"></div>
+                  <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full shadow-lg"></div>
                 )}
               </div>
             );

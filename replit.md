@@ -380,6 +380,11 @@ The application uses PostgreSQL for persistent data storage with proper database
   - Reduced icon size from 24px to 18px and label font size from 9px to 7px
   - Reduced active indicator from h-10 to h-8 and adjusted positioning
   - Updated main content padding from pr-24 to pr-16 to match smaller sidebar
+- ✅ **COMPLETED: Static Icon Positioning** - Fixed sidebar icons to prevent movement per user request:
+  - Removed all transition animations from navigation items and icons
+  - Fixed active indicator position from -right-1 to right-0 for stable positioning
+  - Eliminated duration-300 and ease-out transitions that caused icon movement
+  - Made icons completely static with no left or right movement during interactions
 - ✅ Migration completed successfully with comprehensive Arabic inventory management system operational and unified visual design
 
 ### Previous Replit Environment Migration with Bank Page Updates (July 25, 2025)
