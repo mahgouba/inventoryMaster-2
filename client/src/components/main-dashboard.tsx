@@ -8,8 +8,7 @@ import ReservationsPage from "@/pages/reservations";
 import SoldVehiclesPage from "@/pages/sold-vehicles";
 import FinancingCalculatorPage from "@/pages/financing-calculator";
 import LeaveRequestsPage from "@/pages/leave-requests";
-import LocationPage from "@/pages/locations";
-import PdfAppearanceManagement from "@/pages/pdf-appearance-management";
+
 import ManufacturerLogosPage from "@/pages/manufacturer-logos";
 import UserManagementPage from "@/pages/user-management-simple";
 import BankManagement from "@/pages/bank-management";
@@ -46,10 +45,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return <FinancingCalculatorPage />;
       case "/leave-requests":
         return <LeaveRequestsPage userRole={user.role} username={user.username} userId={user.id} />;
-      case "/locations":
-        return <LocationPage userRole={user.role} onLogout={onLogout} />;
-      case "/pdf-appearance":
-        return user.role === "admin" ? <PdfAppearanceManagement userRole={user.role} onLogout={onLogout} /> : null;
+
       case "/manufacturer-logos":
         return user.role === "admin" ? <ManufacturerLogosPage userRole={user.role} onLogout={onLogout} /> : null;
       case "/user-management":

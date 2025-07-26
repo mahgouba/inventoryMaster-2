@@ -132,9 +132,7 @@ export interface IStorage {
   updateManufacturerLogo(id: number, logo: string): Promise<Manufacturer | undefined>;
   
   // PDF Appearance settings methods
-  getPdfAppearanceSettings(): Promise<any>;
-  savePdfAppearanceSettings(settings: any): Promise<any>;
-  updatePdfAppearanceSettings(id: number, settings: any): Promise<any>;
+
   
   // Import Types methods
   getAllImportTypes(): Promise<any[]>;
@@ -582,9 +580,6 @@ export class MemStorage implements IStorage {
   async getCategoriesByManufacturer(manufacturer: string): Promise<{ category: string }[]> { return []; }
   async getAllEngineCapacities(): Promise<{ engineCapacity: string }[]> { return []; }
   async getSpecificationByVehicleParams(manufacturer: string, category: string, trimLevel: string | null, year: number, engineCapacity: string): Promise<any> { return undefined; }
-  async getPdfAppearanceSettings(): Promise<any> { return {}; }
-  async savePdfAppearanceSettings(settings: any): Promise<any> { return settings; }
-  async updatePdfAppearanceSettings(id: number, settings: any): Promise<any> { return settings; }
   async createInvoice(invoice: any): Promise<any> { return invoice; }
   async getInvoices(): Promise<any[]> { return []; }
   async getInvoiceById(id: number): Promise<any> { return undefined; }
@@ -1529,9 +1524,7 @@ export class MemStorage implements IStorage {
     this.manufacturers.set(id, updated);
     return updated;
   }
-  async getPdfAppearanceSettings(): Promise<any> { return {}; }
-  async savePdfAppearanceSettings(settings: any): Promise<any> { return settings; }
-  async updatePdfAppearanceSettings(id: number, settings: any): Promise<any> { return settings; }
+
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2829,8 +2822,10 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // PDF Appearance Settings methods
-  async getPdfAppearanceSettings(): Promise<any> {
+  // Comprehensive List Management methods for DatabaseStorage
+  
+  // Import Types methods
+  async getAllImportTypes(): Promise<any[]> {
     try {
       const [settings] = await db.select().from(pdfAppearanceSettings).limit(1);
       return settings || {

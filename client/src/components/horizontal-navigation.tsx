@@ -135,12 +135,6 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       icon: UserCheck,
       internal: true
     },
-    { 
-      title: "المواقع", 
-      href: "/locations", 
-      icon: MapPin,
-      internal: true
-    },
     // External pages (will navigate away)
     { 
       title: "البطاقات", 
@@ -163,12 +157,6 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   ];
 
   const adminItems = userRole === "admin" ? [
-    { 
-      title: "المظهر", 
-      href: "/pdf-appearance", 
-      icon: Palette,
-      internal: true
-    },
     { 
       title: "الشعارات", 
       href: "/manufacturer-logos", 
