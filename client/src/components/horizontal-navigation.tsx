@@ -229,7 +229,12 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   return (
     <div className="glass-container fixed top-0 left-0 right-0 z-50 border-b border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
       <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex justify-center items-center h-16 sm:h-20">
+        <div className="flex justify-center items-center h-16 sm:h-20 relative">
+          {/* Center Indicator Line */}
+          <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-yellow-400/60 to-transparent transform -translate-x-1/2 z-10 pointer-events-none">
+            <div className="absolute top-1/2 left-1/2 w-3 h-3 bg-yellow-400/80 rounded-full transform -translate-x-1/2 -translate-y-1/2 shadow-lg shadow-yellow-400/40"></div>
+          </div>
+          
           {/* Navigation Items with Horizontal Drag Scroll */}
           <div className="flex-1 overflow-hidden">
             <div 
