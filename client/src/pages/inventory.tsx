@@ -433,40 +433,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-purple-950 relative overflow-hidden" dir="rtl">
-      {/* Top Company Header - Above Everything */}
-      <div className="relative z-60 glass-container border-b border-white/20 dark:border-slate-700/30">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-          <div className="flex items-center justify-center py-4">
-            <div className="flex items-center space-x-4 space-x-reverse">
-              <div className="relative">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg flex items-center justify-center shadow-lg overflow-hidden hover:scale-110 transition-all duration-300" style={{ backgroundColor: '#00627F' }}>
-                  {companyLogo ? (
-                    <img 
-                      src={companyLogo} 
-                      alt="شعار الشركة" 
-                      className="w-full h-full object-contain hover:animate-none transition-all duration-[3s]"
-                      style={{ animation: 'bounce 3s infinite' }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <img 
-                        src="/copmany logo.svg" 
-                        alt="شعار البريمي للسيارات" 
-                        className="w-12 h-12 sm:w-16 sm:h-16 object-contain hover:animate-none transition-all duration-[3s]"
-                        style={{ animation: 'spin 4s linear infinite' }}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full animate-ping"></div>
-              </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg hover:text-amber-400 transition-colors duration-300">{companyName}</h1>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+
       
       {/* Company Logo Background */}
       <div className="absolute inset-0 flex items-center justify-center opacity-5">
