@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Eye, EyeOff, Calendar, ShoppingCart, Landmark, CreditCard } from "lucide-react";
+import { Search, Plus, Download, Printer, Bell, UserCircle, FileSpreadsheet, LayoutGrid, Table, DollarSign, Settings, LogOut, Palette, Users, MapPin, Building2, MessageSquare, Moon, Sun, FileText, Database, Filter, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Eye, EyeOff, Calendar, ShoppingCart, Landmark, CreditCard, LayoutDashboard, Package, Activity, BarChart3 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -492,141 +492,90 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         <div className="absolute bottom-10 right-20 w-72 h-72 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-6000"></div>
       </div>
       <div className="relative z-10" dir="rtl">
-        {/* Header */}
+        {/* Merged Header with Navigation */}
         <header className="glass-container sticky top-0 z-50 border-b border-white/20 dark:border-slate-700/30">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
             
-            <div className="flex justify-center items-center h-14 sm:h-16">
-              {/* Navigation - Centered */}
-              <div className="flex items-center justify-between w-full space-x-2 space-x-reverse">
-                {/* Left Side Navigation */}
+            <div className="flex justify-center items-center h-16 sm:h-20">
+              {/* Merged Navigation */}
+              <div className="flex items-center justify-between w-full">
+                {/* Primary Navigation - Left Side */}
+                <div className="flex items-center space-x-3 space-x-reverse">
+                  {/* Main Pages Navigation */}
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <Button variant="default" size="sm" className="glass-button-primary text-white">
+                      <LayoutDashboard size={16} className="ml-1" />
+                      <span className="hidden md:inline">لوحة المتابعة</span>
+                    </Button>
+                    <Link href="/card-view-new">
+                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                        <Package size={16} className="ml-1" />
+                        <span className="hidden md:inline">عرض البطاقات</span>
+                      </Button>
+                    </Link>
+                    <Link href="/quotation-creation">
+                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                        <MessageSquare size={16} className="ml-1" />
+                        <span className="hidden lg:inline">إنشاء عرض سعر</span>
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Center Navigation - Quick Actions */}
                 <div className="flex items-center space-x-2 space-x-reverse">
-                  {/* Navigation Tabs - Desktop */}
-                <div className="hidden md:flex items-center space-x-2 space-x-reverse">
-                  <Button variant="default" size="sm" className="glass-button-primary text-white">
-                    <Table size={16} className="ml-1" />
-                    <span className="hidden lg:inline">جدول</span>
-                  </Button>
-                  <Link href="/cards">
-                    <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                      <LayoutGrid size={16} className="ml-1" />
-                      <span className="hidden lg:inline">بطاقات</span>
-                    </Button>
-                  </Link>
-                </div>
-              
-                {/* Mobile Navigation Icons */}
-                <div className="flex md:hidden items-center space-x-1 space-x-reverse">
-                  <Button variant="default" size="sm" className="glass-button-primary text-white p-2">
-                    <Table size={16} />
-                  </Button>
-                  <Link href="/cards">
-                    <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2">
-                      <LayoutGrid size={16} />
-                    </Button>
-                  </Link>
+                  {/* Quick Action Buttons */}
+                  {userRole === "admin" && (
+                    <>
+                      <Link href="/appearance">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <Palette size={16} className="ml-1" />
+                          <span className="hidden sm:inline">إدارة المظهر</span>
+                        </Button>
+                      </Link>
+                      <Link href="/user-management">
+                        <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                          <Users size={16} className="ml-1" />
+                          <span className="hidden sm:inline">إدارة المستخدمين</span>
+                        </Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
 
-                {/* Quick Action Buttons - Admin Only */}
-                {userRole === "admin" && (
-                  <Link href="/appearance">
-                    <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                      <Palette size={16} className="ml-1" />
-                      <span className="hidden sm:inline">إدارة المظهر</span>
-                      <span className="sm:hidden">المظهر</span>
-                    </Button>
-                  </Link>
-                )}
+                {/* Right Side Navigation - User & System */}  
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  {/* Bank & Financial Navigation */}
+                  <div className="flex items-center space-x-1 space-x-reverse">
+                    <Link href="/banks-company">
+                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                        <Building2 size={16} className="ml-1" />
+                        <span className="hidden lg:inline">بنوك الشركة</span>
+                      </Button>
+                    </Link>
+                    <Link href="/banks-personal">
+                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                        <CreditCard size={16} className="ml-1" />
+                        <span className="hidden lg:inline">البنوك الشخصية</span>
+                      </Button>
+                    </Link>
+                  </div>
 
-                {/* Bank Header Icons */}
-                <div className="flex items-center space-x-1 space-x-reverse">
-                  <Link href="/banks-company">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="glass-button glass-text-primary p-2" 
-                      title="بنوك الشركة"
-                      onMouseDown={(e) => {
-                        const longPressTimer = setTimeout(() => {
-                          const currentUrl = window.location.origin + "/banks-company";
-                          if (navigator.share) {
-                            navigator.share({
-                              title: "بنوك الشركة",
-                              text: "صفحة بنوك الشركة",
-                              url: currentUrl
-                            }).catch(() => {
-                              navigator.clipboard.writeText(currentUrl);
-                              toast({
-                                title: "تم نسخ الرابط",
-                                description: "تم نسخ رابط صفحة بنوك الشركة"
-                              });
-                            });
-                          } else {
-                            navigator.clipboard.writeText(currentUrl);
-                            toast({
-                              title: "تم نسخ الرابط",
-                              description: "تم نسخ رابط صفحة بنوك الشركة"
-                            });
-                          }
-                        }, 800);
-                        
-                        const clearTimer = () => {
-                          clearTimeout(longPressTimer);
-                          document.removeEventListener('mouseup', clearTimer);
-                          document.removeEventListener('mouseleave', clearTimer);
-                        };
-                        
-                        document.addEventListener('mouseup', clearTimer);
-                        document.addEventListener('mouseleave', clearTimer);
-                      }}
-                    >
-                      <Building2 size={18} />
-                    </Button>
-                  </Link>
-                  <Link href="/banks-personal">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="glass-button glass-text-primary p-2" 
-                      title="البنوك الشخصية"
-                      onMouseDown={(e) => {
-                        const longPressTimer = setTimeout(() => {
-                          const currentUrl = window.location.origin + "/banks-personal";
-                          if (navigator.share) {
-                            navigator.share({
-                              title: "البنوك الشخصية",
-                              text: "صفحة البنوك الشخصية",
-                              url: currentUrl
-                            }).catch(() => {
-                              navigator.clipboard.writeText(currentUrl);
-                              toast({
-                                title: "تم نسخ الرابط",
-                                description: "تم نسخ رابط صفحة البنوك الشخصية"
-                              });
-                            });
-                          } else {
-                            navigator.clipboard.writeText(currentUrl);
-                            toast({
-                              title: "تم نسخ الرابط",
-                              description: "تم نسخ رابط صفحة البنوك الشخصية"
-                            });
-                          }
-                        }, 800);
-                        
-                        const clearTimer = () => {
-                          clearTimeout(longPressTimer);
-                          document.removeEventListener('mouseup', clearTimer);
-                          document.removeEventListener('mouseleave', clearTimer);
-                        };
-                        
-                        document.addEventListener('mouseup', clearTimer);
-                        document.addEventListener('mouseleave', clearTimer);
-                      }}
-                    >
-                      <CreditCard size={18} />
-                    </Button>
-                  </Link>
-                </div>
+                  {/* Reports & Analytics Navigation */}
+                  <div className="flex items-center space-x-1 space-x-reverse">
+                    <Link href="/reservations">
+                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                        <Calendar size={16} className="ml-1" />
+                        <span className="hidden lg:inline">إدارة الحجوزات</span>
+                      </Button>
+                    </Link>
+                    <Link href="/sold-vehicles">
+                      <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                        <ShoppingCart size={16} className="ml-1" />
+                        <span className="hidden lg:inline">السيارات المباعة</span>
+                      </Button>
+                    </Link>
+                  </div>
 
                 {/* Admin Dropdown Menu */}
                 {userRole === "admin" && (
