@@ -523,6 +523,11 @@ body {
   background-color: var(--dark-bg-accent) !important;
 }
 
+/* Radial gradient for magnifier effect */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
 /* Global checkbox and radio button styling */
 input[type="checkbox"], 
 input[type="radio"] {

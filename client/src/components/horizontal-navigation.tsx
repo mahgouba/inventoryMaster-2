@@ -34,40 +34,23 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
   const [hasMoved, setHasMoved] = useState(false);
   const [centerItem, setCenterItem] = useState<any>(null);
 
-  // Mouse drag handlers
+  // Disable mouse drag - only touch drag allowed
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (!scrollRef.current) return;
-    setDragStartTime(Date.now());
-    setHasMoved(false);
-    setStartX(e.pageX - scrollRef.current.offsetLeft);
-    setScrollLeft(scrollRef.current.scrollLeft);
+    // Disabled mouse drag functionality
+    return;
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!scrollRef.current) return;
-    const x = e.pageX - scrollRef.current.offsetLeft;
-    const distance = Math.abs(x - startX);
-    
-    // Only start dragging if moved more than 5px or held for more than 100ms
-    if (distance > 5 || (Date.now() - dragStartTime > 100)) {
-      if (!isDragging) {
-        setIsDragging(true);
-      }
-      setHasMoved(true);
-      e.preventDefault();
-      const walk = (x - startX) * 2; // Scroll speed multiplier
-      scrollRef.current.scrollLeft = scrollLeft - walk;
-      
-      // Check which item is in the center during drag
-      checkCenterItem();
-    }
+    // Disabled mouse drag functionality
+    return;
   };
 
   const handleMouseUp = () => {
-    handleDragEnd();
+    // Disabled mouse drag functionality
+    return;
   };
 
-  // Touch drag handlers
+  // Touch drag handlers with magnetic center stop
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!scrollRef.current) return;
     setDragStartTime(Date.now());
@@ -81,7 +64,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     const x = e.touches[0].pageX - scrollRef.current.offsetLeft;
     const distance = Math.abs(x - startX);
     
-    // Only start dragging if moved more than 10px (more threshold for touch)
+    // Only start dragging if moved more than 10px
     if (distance > 10) {
       if (!isDragging) {
         setIsDragging(true);
@@ -90,8 +73,8 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       const walk = (x - startX) * 1.5; // Touch scroll speed
       scrollRef.current.scrollLeft = scrollLeft - walk;
       
-      // Check which item is in the center during drag
-      checkCenterItem();
+      // Check for magnetic snap to center
+      snapToCenter();
     }
   };
 
@@ -99,8 +82,8 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     handleDragEnd();
   };
 
-  // Function to check which item is in the center
-  const checkCenterItem = () => {
+  // Magnetic snap to center function
+  const snapToCenter = () => {
     if (!scrollRef.current) return;
     
     const container = scrollRef.current;
@@ -109,6 +92,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     
     let closestButton = null;
     let closestDistance = Infinity;
+    let closestIndex = 0;
     
     buttons.forEach((button, index) => {
       const buttonRect = button.getBoundingClientRect();
@@ -119,10 +103,26 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       if (distance < closestDistance) {
         closestDistance = distance;
         closestButton = allItems[index];
+        closestIndex = index;
       }
     });
     
-    setCenterItem(closestButton);
+    // Magnetic snap when close to center (within 50px)
+    if (closestDistance < 50 && closestButton) {
+      const button = buttons[closestIndex] as HTMLElement;
+      const buttonRect = button.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const buttonCenter = buttonRect.left - containerRect.left + buttonRect.width / 2;
+      const targetScrollLeft = container.scrollLeft + (buttonCenter - containerCenter);
+      
+      // Smooth scroll to center
+      container.scrollTo({
+        left: targetScrollLeft,
+        behavior: 'smooth'
+      });
+      
+      setCenterItem(closestButton);
+    }
   };
 
   // Auto-navigate to center item when drag ends
@@ -272,17 +272,21 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     <div className="glass-container fixed top-0 left-0 right-0 z-50 border-b border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
       <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-center items-center h-16 sm:h-20 relative">
-          {/* Center Selection Box */}
-          <div className="absolute left-1/2 top-1/2 w-32 h-12 border-2 border-yellow-400/60 bg-yellow-400/10 rounded-lg transform -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none backdrop-blur-sm">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 via-yellow-400/15 to-yellow-400/5 rounded-lg"></div>
-            <div className="absolute top-1 left-1 right-1 bottom-1 border border-yellow-400/30 rounded-md"></div>
+          {/* Center Magnifier Box */}
+          <div className="absolute left-1/2 top-1/2 w-32 h-12 border-2 border-yellow-400/80 bg-white/20 rounded-lg transform -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none shadow-lg shadow-yellow-400/30">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-lg"></div>
+            <div className="absolute top-1 left-1 right-1 bottom-1 border border-yellow-400/50 rounded-md bg-white/10"></div>
+            {/* Magnifier effect overlay */}
+            <div className="absolute inset-0 rounded-lg overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-radial from-white/40 via-white/20 to-transparent"></div>
+            </div>
           </div>
           
           {/* Navigation Items with Horizontal Drag Scroll */}
           <div className="flex-1 overflow-hidden">
             <div 
               ref={scrollRef}
-              className="flex items-center justify-start space-x-3 space-x-reverse px-4 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing"
+              className="flex items-center justify-start space-x-3 space-x-reverse px-4 overflow-x-auto scrollbar-none"
               style={{ 
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none'
