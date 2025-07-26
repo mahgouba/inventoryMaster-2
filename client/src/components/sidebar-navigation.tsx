@@ -184,9 +184,9 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
         <button
           onClick={item.onClick}
           className={cn(
-            "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 backdrop-blur-sm",
+            "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 glass-button",
             "hover:bg-white/10 text-white/90 hover:text-white",
-            active && "bg-gradient-to-r from-blue-500/30 to-blue-600/30 text-white border border-blue-400/30 shadow-lg"
+            active && "glass-button-primary border border-blue-400/30 shadow-lg"
           )}
         >
           <item.icon className="h-5 w-5 flex-shrink-0 drop-shadow-sm" />
@@ -201,9 +201,9 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
       <Link href={item.href}>
         <div
           className={cn(
-            "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 backdrop-blur-sm cursor-pointer",
+            "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 glass-button cursor-pointer",
             "hover:bg-white/10 text-white/90 hover:text-white",
-            active && "bg-gradient-to-r from-blue-500/30 to-blue-600/30 text-white border border-blue-400/30 shadow-lg"
+            active && "glass-button-primary border border-blue-400/30 shadow-lg"
           )}
         >
           <item.icon className="h-5 w-5 flex-shrink-0 drop-shadow-sm" />
@@ -217,19 +217,54 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
 
   return (
     <div className={cn(
-      "fixed right-0 top-0 h-screen backdrop-blur-xl bg-white/10 dark:bg-black/10 border-l border-white/20 dark:border-white/10 transition-all duration-300 z-50 shadow-2xl flex flex-col",
+      "fixed right-0 top-0 h-screen backdrop-blur-xl bg-gradient-to-br from-gray-900 via-black to-purple-950 border-l border-white/20 dark:border-white/10 transition-all duration-300 z-50 shadow-2xl flex flex-col relative overflow-hidden",
       isCollapsed ? "w-16" : "w-64"
     )}>
+      {/* Company Logo Background - Same as main page */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-5">
+        {settings?.companyLogo ? (
+          <img 
+            src={settings.companyLogo} 
+            alt="شعار الشركة" 
+            className="w-32 h-32 object-contain"
+          />
+        ) : (
+          <img 
+            src="/copmany logo.svg" 
+            alt="شعار البريمي للسيارات" 
+            className="w-32 h-32 object-contain"
+          />
+        )}
+      </div>
+      {/* Animated Mesh Background - Same as main page */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute top-20 right-5 w-32 h-32 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-20 left-5 w-32 h-32 bg-gradient-to-r from-teal-500 to-green-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+        <div className="absolute bottom-10 right-10 w-32 h-32 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-6000"></div>
+      </div>
       {/* Header */}
-      <div className="p-4 border-b border-white/20 dark:border-white/10 backdrop-blur-sm">
+      <div className="relative z-10 p-4 border-b border-white/20 dark:border-white/10 backdrop-blur-sm glass-container">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg backdrop-blur-sm">
-                <span className="text-white font-bold text-sm drop-shadow-sm">ش</span>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg overflow-hidden" style={{ backgroundColor: '#00627F' }}>
+                {settings?.companyLogo ? (
+                  <img 
+                    src={settings.companyLogo} 
+                    alt="شعار الشركة" 
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <img 
+                    src="/copmany logo.svg" 
+                    alt="شعار البريمي للسيارات" 
+                    className="w-6 h-6 object-contain"
+                  />
+                )}
               </div>
               <div className="text-right">
-                <div className="font-semibold text-sm text-white drop-shadow-sm">شركة البريمي</div>
+                <div className="font-semibold text-sm text-white drop-shadow-sm">{settings?.companyName || 'شركة البريمي'}</div>
                 <div className="text-xs text-white/70 drop-shadow-sm">للسيارات</div>
               </div>
             </div>
@@ -246,7 +281,7 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 p-4 overflow-y-auto overflow-x-hidden max-h-screen">
+      <div className="relative z-10 flex-1 p-4 overflow-y-auto overflow-x-hidden max-h-screen">
         {/* Overview Section */}
         <div className="mb-6">
           {!isCollapsed && (
@@ -292,7 +327,7 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
             {/* Logout Button */}
             <button
               onClick={onLogout}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 backdrop-blur-sm hover:bg-red-500/20 text-red-300 hover:text-red-200 border border-red-400/20 hover:border-red-400/40"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 glass-button hover:bg-red-500/20 text-red-300 hover:text-red-200 border border-red-400/20 hover:border-red-400/40"
             >
               <LogOut className="h-5 w-5 flex-shrink-0 drop-shadow-sm" />
               {!isCollapsed && (
@@ -304,12 +339,12 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
       </div>
 
       {/* Bottom Section */}
-      <div className="p-4 border-t border-white/20 dark:border-white/10 backdrop-blur-sm">
+      <div className="relative z-10 p-4 border-t border-white/20 dark:border-white/10 backdrop-blur-sm glass-container">
         {/* Theme Toggle */}
         <div className="mb-4">
           <button
             onClick={toggleDarkMode}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 backdrop-blur-sm hover:bg-white/10 text-white/90 hover:text-white border border-white/20 hover:border-white/30"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 glass-button hover:bg-white/10 text-white/90 hover:text-white border border-white/20 hover:border-white/30"
           >
             {isDarkMode ? (
               <Sun className="h-5 w-5 flex-shrink-0 drop-shadow-sm" />
@@ -325,7 +360,7 @@ export default function SidebarNavigation({ user, onLogout }: SidebarNavigationP
         </div>
 
         {/* User Info */}
-        <div className="flex items-center gap-3 p-3 rounded-lg backdrop-blur-sm bg-white/5 border border-white/20">
+        <div className="flex items-center gap-3 p-3 rounded-lg glass-container bg-white/5 border border-white/20">
           <Avatar className="h-8 w-8">
             <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg">
               {user.username.charAt(0).toUpperCase()}
