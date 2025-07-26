@@ -325,15 +325,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     <div className="glass-container fixed top-0 left-0 right-0 z-50 border-b border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/10 dark:bg-slate-900/20">
       <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-center items-center h-16 sm:h-20 relative">
-          {/* Center Magnifier Box */}
-          <div className="absolute left-1/2 top-1/2 w-32 h-12 border-2 border-yellow-400/80 bg-white/20 rounded-lg transform -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none shadow-lg shadow-yellow-400/30">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-lg"></div>
-            <div className="absolute top-1 left-1 right-1 bottom-1 border border-yellow-400/50 rounded-md bg-white/10"></div>
-            {/* Magnifier effect overlay */}
-            <div className="absolute inset-0 rounded-lg overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-radial from-white/40 via-white/20 to-transparent"></div>
-            </div>
-          </div>
+
           
           {/* Navigation Items with Horizontal Drag Scroll */}
           <div className="flex-1 overflow-hidden">
