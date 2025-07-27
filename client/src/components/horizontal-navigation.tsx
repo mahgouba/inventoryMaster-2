@@ -16,7 +16,8 @@ import {
   Palette, 
   Image, 
   Users, 
-  Building
+  Building,
+  Receipt
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -274,6 +275,12 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       title: "البطاقات", 
       href: "/card-view-new", 
       icon: Package,
+      internal: false
+    },
+    { 
+      title: "بطاقات الأسعار", 
+      href: "/price-cards", 
+      icon: Receipt,
       internal: false
     },
     { 

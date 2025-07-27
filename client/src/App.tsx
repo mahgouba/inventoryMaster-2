@@ -12,6 +12,7 @@ import UniversalGlass from "@/components/universal-glass";
 // import SidebarNavigation from "@/components/sidebar-navigation";
 import MainDashboard from "@/components/main-dashboard";
 import CardViewPage from "@/pages/card-view-new";
+import PriceCardsManagementPage from "@/pages/price-cards-management";
 import LoginPage from "@/pages/login";
 import NotFound from "@/pages/not-found";
 import QuotationEditPage from "@/pages/quotation-edit";
@@ -46,7 +47,8 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
     '/banks-company', 
     '/card-view', 
     '/card-view-new', 
-    '/cards'
+    '/cards',
+    '/price-cards'
   ];
   
   const shouldShowSidebar = !pagesWithoutSidebar.includes(location);
@@ -80,6 +82,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           <Route path="/cards" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
           <Route path="/card-view" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
           <Route path="/card-view-new" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+          <Route path="/price-cards" component={() => <PriceCardsManagementPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
           <Route path="/banks-personal" component={PersonalBanks} />
           <Route path="/banks-company" component={CompanyBanks} />
           
