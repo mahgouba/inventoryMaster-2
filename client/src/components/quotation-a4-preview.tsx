@@ -549,33 +549,42 @@ export default function QuotationA4Preview({
                 })()}
                 
                 <div className="relative z-10 text-xs">
-                  {/* Vehicle Information Grid - Properly Aligned */}
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-[13px]">
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-[#2B4C8C] print:text-black">الصانع:</span>
-                      <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.manufacturer}</span>
+                  {/* Vehicle Information Grid - Two Rows Layout */}
+                  <div className="space-y-4 text-[13px]">
+                    {/* First Row: Manufacturer, Category, Trim Level */}
+                    <div className="grid grid-cols-3 gap-x-6">
+                      <div className="flex justify-between">
+                        <span className="font-semibold text-[#2B4C8C] print:text-black">الصانع:</span>
+                        <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.manufacturer}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-semibold text-[#2B4C8C] print:text-black">الفئة:</span>
+                        <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.category}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-semibold text-[#2B4C8C] print:text-black">درجة التجهيز:</span>
+                        <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.trimLevel || "غير محدد"}</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-[#2B4C8C] print:text-black">الفئة:</span>
-                      <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.category}</span>
+                    
+                    {/* Second Row: Year, Exterior Color, Interior Color */}
+                    <div className="grid grid-cols-3 gap-x-6">
+                      <div className="flex justify-between">
+                        <span className="font-semibold text-[#2B4C8C] print:text-black">السنة:</span>
+                        <span className="text-right text-[#C49632] font-bold print:text-black">{selectedVehicle.year}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-semibold text-[#2B4C8C] print:text-black">اللون الخارجي:</span>
+                        <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.exteriorColor}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-semibold text-[#2B4C8C] print:text-black">اللون الداخلي:</span>
+                        <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.interiorColor}</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-[#2B4C8C] print:text-black">درجة التجهيز:</span>
-                      <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.trimLevel || "غير محدد"}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-[#2B4C8C] print:text-black">السنة:</span>
-                      <span className="text-right text-[#C49632] font-bold print:text-black">{selectedVehicle.year}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-[#2B4C8C] print:text-black">اللون الخارجي:</span>
-                      <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.exteriorColor}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-[#2B4C8C] print:text-black">اللون الداخلي:</span>
-                      <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.interiorColor}</span>
-                    </div>
-                    <div className="flex justify-between col-span-2">
+                    
+                    {/* Third Row: Chassis Number - Full Width */}
+                    <div className="flex justify-between w-full">
                       <span className="font-semibold text-[#2B4C8C] print:text-black">رقم الهيكل:</span>
                       <span className="text-right text-[#C49632] font-bold print:text-black">{selectedVehicle.chassisNumber}</span>
                     </div>
