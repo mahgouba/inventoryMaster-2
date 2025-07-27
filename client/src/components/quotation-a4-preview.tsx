@@ -263,7 +263,7 @@ export default function QuotationA4Preview({
               </div>
               
               {/* Customer Information Details below header */}
-              <div className="mt-4 bg-white/95 print:bg-white p-3 pt-[1px] pb-[1px] text-[13px] text-right border border-[#E2E8F0] rounded-md">
+              <div className="mt-4 bg-white/95 print:bg-white p-3 pt-[1px] pb-[1px] text-[13px] text-right print:border-none">
                 <div className="space-y-2 text-xs">
                   <div className="text-right text-[16px] font-semibold text-[#2B4C8C] print:text-black">
                     {isInvoiceMode ? (
