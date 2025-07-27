@@ -242,7 +242,7 @@ export default function QuotationA4Preview({
 
             {/* Document Type with Number and Date in same row */}
             <div className="absolute top-20 right-8">
-              <div className="flex items-center gap-6 print:text-black">
+              <div className="flex items-center gap-6 text-[#000000f2] print:text-black">
                 <h2 className="text-base font-bold text-black print:text-black" style={{fontFamily: 'Cairo, sans-serif'}}>
                   {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
                 </h2>
