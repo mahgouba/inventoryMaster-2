@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { QrCode, Phone, Mail, Globe, Building, Printer } from "lucide-react";
+import { QrCode, Phone, Mail, Globe, Building } from "lucide-react";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import type { Company, InventoryItem, Specification } from "@shared/schema";
 import { getManufacturerLogo } from "@shared/manufacturer-logos";
@@ -404,14 +404,7 @@ export default function QuotationA4Preview({
           <span className="text-sm text-yellow-700 font-medium">خلفية 2</span>
         </div>
         
-        {/* Print Button */}
-        <Button
-          onClick={handlePrint}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg px-6 py-2 flex items-center gap-2"
-        >
-          <Printer className="w-4 h-4" />
-          طباعة {isInvoiceMode ? 'الفاتورة' : 'عرض السعر'}
-        </Button>
+
       </div>
 
       <div 
