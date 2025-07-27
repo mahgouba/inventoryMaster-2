@@ -402,11 +402,16 @@ The application uses PostgreSQL for persistent data storage with proper database
   - Made icons completely static with no left or right movement during interactions
 - ✅ Migration completed successfully with comprehensive Arabic inventory management system operational and unified visual design
 
-### PDF Table Styling Update - White Borders (July 27, 2025)
+### PDF Optimization and Design Updates (July 27, 2025)
 - ✅ **COMPLETED: White Table Borders in PDF** - Changed all table borders from black/gray to white in quotation PDF per user request
 - ✅ Updated Price Breakdown Table borders (table container, header, cells) from gray-300/gray-200 to white
 - ✅ Updated Terms & Conditions section border from gray-300 to white
 - ✅ Updated Representative Information section borders from gray-300/gray-200 to white
+- ✅ **COMPLETED: Print Optimization** - Added comprehensive CSS print styles for better PDF output
+- ✅ Implemented black text and white background formatting for all printed quotation content
+- ✅ Added print-specific CSS overrides to ensure professional appearance in printed documents
+- ✅ **COMPLETED: Removed Dark Glass Styling from PDF** - Replaced dark glass background (`bg-[#fafafa12]`) with clean white background (`bg-white/90 print:bg-white`) in vehicle information section per user request
+- ✅ Enhanced vehicle information section with proper borders and clean appearance for PDF output
 - ✅ Maintained table structure and functionality while improving visual appearance with white borders for cleaner PDF output
 
 ### Previous Replit Environment Migration with Bank Page Updates (July 25, 2025)
