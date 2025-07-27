@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import HorizontalNavigation from "@/components/horizontal-navigation";
 import InventoryPage from "@/pages/inventory";
 import QuotationCreationPage from "@/pages/quotation-creation";
+import QuotationManagementPage from "@/pages/quotation-management";
 import InvoiceManagementPage from "@/pages/invoice-management";
 import ReservationsPage from "@/pages/reservations";
 import SoldVehiclesPage from "@/pages/sold-vehicles";
@@ -35,6 +36,8 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />;
       case "/quotation-creation":
         return <QuotationCreationPage />;
+      case "/quotation-management":
+        return <QuotationManagementPage />;
       case "/invoice-management":
         return <InvoiceManagementPage />;
       case "/reservations":

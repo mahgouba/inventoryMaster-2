@@ -90,7 +90,10 @@ export default function QuotationManagement() {
   // Fetch quotations
   const { data: quotations = [], isLoading } = useQuery<Quotation[]>({
     queryKey: ["/api/quotations"],
-    queryFn: () => apiRequest("/api/quotations"),
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/quotations");
+      return response.json();
+    },
   });
 
   // Update quotation mutation
@@ -135,7 +138,7 @@ export default function QuotationManagement() {
   });
 
   // Filter quotations
-  const filteredQuotations = quotations.filter((quotation) => {
+  const filteredQuotations = (quotations as Quotation[]).filter((quotation: Quotation) => {
     const matchesSearch = searchTerm === "" || 
       quotation.quoteNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       quotation.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -254,7 +257,7 @@ export default function QuotationManagement() {
               <FileText className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{quotations.length}</div>
+              <div className="text-2xl font-bold">{(quotations as Quotation[]).length}</div>
             </CardContent>
           </Card>
           <Card>
@@ -264,7 +267,7 @@ export default function QuotationManagement() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {quotations.filter(q => q.status === "مسودة").length}
+                {(quotations as Quotation[]).filter((q: Quotation) => q.status === "مسودة").length}
               </div>
             </CardContent>
           </Card>
@@ -275,7 +278,7 @@ export default function QuotationManagement() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {quotations.filter(q => q.status === "مرسل").length}
+                {(quotations as Quotation[]).filter((q: Quotation) => q.status === "مرسل").length}
               </div>
             </CardContent>
           </Card>
@@ -286,7 +289,7 @@ export default function QuotationManagement() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {quotations.filter(q => q.status === "مقبول").length}
+                {(quotations as Quotation[]).filter((q: Quotation) => q.status === "مقبول").length}
               </div>
             </CardContent>
           </Card>
@@ -336,7 +339,7 @@ export default function QuotationManagement() {
           <CardHeader>
             <CardTitle>العروض المحفوظة</CardTitle>
             <CardDescription>
-              عدد العروض الظاهرة: {filteredQuotations.length} من أصل {quotations.length}
+              عدد العروض الظاهرة: {filteredQuotations.length} من أصل {(quotations as Quotation[]).length}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -355,7 +358,7 @@ export default function QuotationManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredQuotations.map((quotation) => (
+                  {filteredQuotations.map((quotation: Quotation) => (
                     <TableRow key={quotation.id}>
                       <TableCell className="font-medium">
                         {quotation.quoteNumber}
