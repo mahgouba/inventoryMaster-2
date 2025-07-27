@@ -242,34 +242,34 @@ export default function QuotationA4Preview({
 
             {/* Document Type with Number and Date in same row */}
             <div className="absolute top-20 right-8">
-              <div className="flex items-center gap-6 text-[#000000f2] print:text-black">
-                <h2 className="text-base font-bold text-black print:text-black" style={{fontFamily: 'Cairo, sans-serif'}}>
+              <div className="flex items-center gap-6">
+                <h2 className="text-base font-bold text-[#2B4C8C] print:text-black" style={{fontFamily: 'Cairo, sans-serif'}}>
                   {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
                 </h2>
-                <div className="text-xs text-black print:text-black">
-                  <span className="font-semibold print:text-black">رقم: </span>
-                  <span className="print:text-black">{isInvoiceMode ? invoiceNumber : quoteNumber}</span>
+                <div className="text-xs text-[#1A365D] print:text-black">
+                  <span className="font-semibold">رقم: </span>
+                  <span className="font-bold text-[#C49632]">{isInvoiceMode ? invoiceNumber : quoteNumber}</span>
                 </div>
-                <div className="text-xs text-black print:text-black">
-                  <span className="font-semibold print:text-black">الإصدار:      </span>
-                  <span className="print:text-black">{new Date().toLocaleDateString('en-GB')}</span>
+                <div className="text-xs text-[#1A365D] print:text-black">
+                  <span className="font-semibold">الإصدار: </span>
+                  <span className="font-bold text-[#C49632]">{new Date().toLocaleDateString('en-GB')}</span>
                   {!isInvoiceMode && (
                     <>
-                      <span className="font-semibold ml-4 print:text-black">صالح حتى: </span>
-                      <span className="print:text-black">{validUntil.toLocaleDateString('en-GB')}</span>
+                      <span className="font-semibold ml-4">صالح حتى: </span>
+                      <span className="font-bold text-[#C49632]">{validUntil.toLocaleDateString('en-GB')}</span>
                     </>
                   )}
                 </div>
               </div>
               
               {/* Customer Information Details below header */}
-              <div className="mt-4 bg-white/90 print:bg-white p-3 pt-[1px] pb-[1px] text-[13px] text-right">
-                <div className="space-y-2 text-xs text-black print:text-black">
-                  <div className="text-right text-[16px] font-semibold print:text-black">
+              <div className="mt-4 bg-white/95 print:bg-white p-3 pt-[1px] pb-[1px] text-[13px] text-right border border-[#E2E8F0] rounded-md">
+                <div className="space-y-2 text-xs">
+                  <div className="text-right text-[16px] font-semibold text-[#2B4C8C] print:text-black">
                     {isInvoiceMode ? (
-                      <span className="print:text-black">بناءً على طلبكم رقم: {invoiceNumber || quoteNumber}</span>
+                      <span>بناءً على طلبكم رقم: <span className="text-[#C49632]">{invoiceNumber || quoteNumber}</span></span>
                     ) : (
-                      <span className="print:text-black">{customerTitle} / {customerName || "غير محدد"} &nbsp;&nbsp;&nbsp; الموقرين</span>
+                      <span>{customerTitle} / <span className="text-[#C49632]">{customerName || "غير محدد"}</span> &nbsp;&nbsp;&nbsp; الموقرين</span>
                     )}
                   </div>
                 </div>
@@ -285,7 +285,7 @@ export default function QuotationA4Preview({
 
             {/* Vehicle Information */}
             {selectedVehicle && (
-              <div className="relative p-4 w-full mt-[166px] mb-[16px] overflow-hidden bg-white/90 print:bg-white text-black print:text-black border border-white">
+              <div className="relative p-4 w-full mt-[166px] mb-[16px] overflow-hidden bg-white/95 print:bg-white border border-[#E2E8F0] rounded-md shadow-sm">
                 {/* Systematic Manufacturer Logo Watermark Pattern */}
                 {selectedVehicle && (() => {
                   const manufacturerLogo = getManufacturerLogo(selectedVehicle.manufacturer);
@@ -329,36 +329,36 @@ export default function QuotationA4Preview({
                   );
                 })()}
                 
-                <div className="relative z-10 text-xs text-black print:text-black">
+                <div className="relative z-10 text-xs">
                   {/* Vehicle Information Grid - Properly Aligned */}
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-[13px] print:text-black">
-                    <div className="flex justify-between print:text-black">
-                      <span className="font-semibold text-gray-700 print:text-black">الصانع:</span>
-                      <span className="text-right print:text-black">{selectedVehicle.manufacturer}</span>
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-[13px]">
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-[#2B4C8C] print:text-black">الصانع:</span>
+                      <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.manufacturer}</span>
                     </div>
-                    <div className="flex justify-between print:text-black">
-                      <span className="font-semibold text-gray-700 print:text-black">الفئة:</span>
-                      <span className="text-right print:text-black">{selectedVehicle.category}</span>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-[#2B4C8C] print:text-black">الفئة:</span>
+                      <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.category}</span>
                     </div>
-                    <div className="flex justify-between print:text-black">
-                      <span className="font-semibold text-gray-700 print:text-black">درجة التجهيز:</span>
-                      <span className="text-right print:text-black">{selectedVehicle.trimLevel || "غير محدد"}</span>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-[#2B4C8C] print:text-black">درجة التجهيز:</span>
+                      <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.trimLevel || "غير محدد"}</span>
                     </div>
-                    <div className="flex justify-between print:text-black">
-                      <span className="font-semibold text-gray-700 print:text-black">السنة:</span>
-                      <span className="text-right print:text-black">{selectedVehicle.year}</span>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-[#2B4C8C] print:text-black">السنة:</span>
+                      <span className="text-right text-[#C49632] font-bold print:text-black">{selectedVehicle.year}</span>
                     </div>
-                    <div className="flex justify-between print:text-black">
-                      <span className="font-semibold text-gray-700 print:text-black">اللون الخارجي:</span>
-                      <span className="text-right print:text-black">{selectedVehicle.exteriorColor}</span>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-[#2B4C8C] print:text-black">اللون الخارجي:</span>
+                      <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.exteriorColor}</span>
                     </div>
-                    <div className="flex justify-between print:text-black">
-                      <span className="font-semibold text-gray-700 print:text-black">اللون الداخلي:</span>
-                      <span className="text-right print:text-black">{selectedVehicle.interiorColor}</span>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-[#2B4C8C] print:text-black">اللون الداخلي:</span>
+                      <span className="text-right text-[#1A365D] font-medium print:text-black">{selectedVehicle.interiorColor}</span>
                     </div>
-                    <div className="flex justify-between col-span-2 print:text-black">
-                      <span className="font-semibold text-gray-700 print:text-black">رقم الهيكل:</span>
-                      <span className="text-right print:text-black">{selectedVehicle.chassisNumber}</span>
+                    <div className="flex justify-between col-span-2">
+                      <span className="font-semibold text-[#2B4C8C] print:text-black">رقم الهيكل:</span>
+                      <span className="text-right text-[#C49632] font-bold print:text-black">{selectedVehicle.chassisNumber}</span>
                     </div>
                   </div>
                 </div>
@@ -366,12 +366,12 @@ export default function QuotationA4Preview({
                 {/* Detailed Specifications - Full Width Editable */}
 <div className="mt-3 pt-3">
                   <div className="flex items-center justify-between mt-[-10px] mb-[-10px] pt-[0px] pb-[0px]">
-                    <h4 className="text-xs font-bold text-[#cf9b46]">المواصفات التفصيلية:</h4>
+                    <h4 className="text-xs font-bold text-[#2B4C8C] print:text-black">المواصفات التفصيلية:</h4>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setIsEditingSpecs(!isEditingSpecs)}
-                      className="text-xs px-2 py-1 print:hidden"
+                      className="text-xs px-2 py-1 print:hidden border-[#C49632] text-[#C49632] hover:bg-[#C49632] hover:text-white"
                     >
                       {isEditingSpecs ? "حفظ" : "تحرير"}
                     </Button>
@@ -380,12 +380,12 @@ export default function QuotationA4Preview({
                     <textarea
                       value={editableSpecs}
                       onChange={(e) => setEditableSpecs(e.target.value)}
-                      className="w-full h-20 p-2 text-xs text-black border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      className="w-full h-20 p-2 text-xs text-[#1A365D] border border-[#E2E8F0] rounded resize-none focus:outline-none focus:ring-2 focus:ring-[#C49632] focus:border-[#C49632]"
                       placeholder="اكتب المواصفات التفصيلية هنا..."
                       style={{ direction: 'rtl' }}
                     />
                   ) : (
-                    <div className="text-xs text-[#000000] whitespace-pre-wrap max-h-20 overflow-y-auto bg-[#ffffff] p-2 rounded border">
+                    <div className="text-xs text-[#1A365D] whitespace-pre-wrap max-h-20 overflow-y-auto bg-[#F8FAFC] border border-[#E2E8F0] p-2 rounded print:bg-white print:text-black">
                       {editableSpecs || "لا توجد مواصفات تفصيلية"}
                     </div>
                   )}
@@ -395,41 +395,41 @@ export default function QuotationA4Preview({
           </div>
 
           {/* Price Breakdown Table */}
-          <div className="bg-white/90 print:bg-white border border-white rounded mb-6 shadow-sm">
-            <div className="p-4 rounded-t bg-[#03627f] print:bg-[#03627f] text-[#c39631] print:text-[#c39631] pt-[2px] pb-[2px]">
-              <h3 className="text-sm font-bold text-center print:text-[#c39631]" style={{fontFamily: 'Cairo, sans-serif'}}>تفاصيل السعر</h3>
+          <div className="bg-white/95 print:bg-white border border-[#E2E8F0] rounded-lg mb-6 shadow-lg overflow-hidden">
+            <div className="p-4 rounded-t bg-[#2B4C8C] print:bg-[#2B4C8C] text-white print:text-white pt-[2px] pb-[2px]">
+              <h3 className="text-sm font-bold text-center print:text-white" style={{fontFamily: 'Cairo, sans-serif'}}>تفاصيل السعر</h3>
             </div>
             
             {/* Table Header */}
-            <div className="grid grid-cols-5 bg-gray-100 print:bg-white border-b border-white text-xs font-bold text-center print:text-black">
-              <div className="p-2 border-l border-white print:text-black">الكمية</div>
-              <div className="p-2 border-l border-white print:text-black">السعر الفردي</div>
-              <div className="p-2 border-l border-white print:text-black">الضريبة ({taxRate}%)</div>
-              <div className="p-2 border-l border-white print:text-black">اللوحات</div>
-              <div className="p-2 print:text-black">الإجمالي</div>
+            <div className="grid grid-cols-5 bg-[#F1F5F9] print:bg-white border-b border-white text-xs font-bold text-center">
+              <div className="p-2 border-l border-white text-[#2B4C8C] print:text-black">الكمية</div>
+              <div className="p-2 border-l border-white text-[#2B4C8C] print:text-black">السعر الفردي</div>
+              <div className="p-2 border-l border-white text-[#2B4C8C] print:text-black">الضريبة ({taxRate}%)</div>
+              <div className="p-2 border-l border-white text-[#2B4C8C] print:text-black">اللوحات</div>
+              <div className="p-2 text-[#2B4C8C] print:text-black">الإجمالي</div>
             </div>
             
             {/* Table Row */}
-            <div className="grid grid-cols-5 border-b border-white text-xs text-center text-black bg-white print:bg-white print:text-black">
-              <div className="p-2 border-l border-white print:text-black">1</div>
-              <div className="p-2 border-l border-white font-semibold print:text-black">{basePrice.toLocaleString()}</div>
-              <div className="p-2 border-l border-white font-semibold print:text-black">{taxAmount.toLocaleString()}</div>
-              <div className="p-2 border-l border-white font-semibold print:text-black">
+            <div className="grid grid-cols-5 border-b border-white text-xs text-center bg-white print:bg-white">
+              <div className="p-2 border-l border-white text-[#1A365D] print:text-black">1</div>
+              <div className="p-2 border-l border-white font-semibold text-[#1A365D] print:text-black">{basePrice.toLocaleString()}</div>
+              <div className="p-2 border-l border-white font-semibold text-[#1A365D] print:text-black">{taxAmount.toLocaleString()}</div>
+              <div className="p-2 border-l border-white font-semibold text-[#1A365D] print:text-black">
                 {includeLicensePlate ? licensePlatePrice.toLocaleString() : "0"}
               </div>
-              <div className="p-2 font-bold text-blue-800 print:text-black">
+              <div className="p-2 font-bold text-[#C49632] print:text-black">
                 {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}
               </div>
             </div>
             
             {/* Total Row */}
-            <div className="p-4 bg-[#ffffff] print:bg-white border-t-2 border-white rounded-b pt-[4px] pb-[4px]">
+            <div className="p-4 bg-[#F8FAFC] print:bg-white border-t-2 border-[#E2E8F0] rounded-b pt-[4px] pb-[4px]">
               <div className="flex justify-center mb-3">
-                <div className="font-bold text-sm text-blue-800 print:text-black">
-                  المجموع: {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()} ريال
+                <div className="font-bold text-sm text-[#2B4C8C] print:text-black">
+                  المجموع: <span className="text-[#C49632]">{(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}</span> ريال
                 </div>
               </div>
-              <div className="text-center text-xs font-bold text-white print:text-black px-4 py-3 rounded bg-[#c49631] print:bg-gray-100 pt-[2px] pb-[2px]">
+              <div className="text-center text-xs font-bold text-white print:text-black px-4 py-3 rounded bg-[#C49632] print:bg-gray-100 pt-[2px] pb-[2px]">
                 {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))} ريال سعودي لا غير
               </div>
             </div>
@@ -439,17 +439,18 @@ export default function QuotationA4Preview({
           <div className="flex gap-6 mb-6">
             {/* Terms & Conditions Section - Hidden in invoice mode */}
             {!isInvoiceMode && (
-              <div className="bg-white/90 print:bg-white border border-white p-4 rounded flex-1 shadow-sm">
-                <div className="text-xs text-black print:text-black space-y-2">
+              <div className="bg-white/95 print:bg-white border border-[#E2E8F0] p-4 rounded-lg flex-1 shadow-sm">
+                <h4 className="text-sm font-bold mb-3 text-[#2B4C8C] print:text-black border-b border-[#E2E8F0] pb-2">الشروط والأحكام</h4>
+                <div className="text-xs space-y-2">
                   {termsConditions.length > 0 ? (
                     termsConditions.map((term, index) => (
-                      <div key={term.id} className="flex items-start gap-2 print:text-black">
-                        <span className="text-amber-600 print:text-black font-semibold min-w-[1rem]">{index + 1}.</span>
-                        <span className="leading-relaxed print:text-black">{term.term_text}</span>
+                      <div key={term.id} className="flex items-start gap-2">
+                        <span className="text-[#C49632] print:text-black font-bold min-w-[1rem]">{index + 1}.</span>
+                        <span className="leading-relaxed text-[#1A365D] print:text-black">{term.term_text}</span>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500 print:text-black italic">لم يتم إضافة شروط وأحكام بعد</p>
+                    <p className="text-[#64748B] print:text-black italic">لم يتم إضافة شروط وأحكام بعد</p>
                   )}
                 </div>
               </div>
@@ -457,18 +458,18 @@ export default function QuotationA4Preview({
             
             {/* Representative Information - Small box on the right - Hidden if no representative selected */}
             {representativeName && (
-              <div className="bg-white/90 print:bg-white border border-white p-3 rounded shadow-sm w-64">
-                <h3 className="text-xs font-bold mb-2 text-blue-800 print:text-black border-b border-white pb-1" style={{fontFamily: 'Cairo, sans-serif'}}>
+              <div className="bg-white/95 print:bg-white border border-[#E2E8F0] p-3 rounded-lg shadow-sm w-64">
+                <h3 className="text-xs font-bold mb-2 text-[#2B4C8C] print:text-black border-b border-[#E2E8F0] pb-1" style={{fontFamily: 'Cairo, sans-serif'}}>
                   بيانات المندوب
                 </h3>
-                <div className="space-y-1 text-xs text-black print:text-black">
-                  <div className="flex justify-between print:text-black">
-                    <span className="font-semibold text-gray-700 print:text-black">الاسم:</span>
-                    <span className="print:text-black">{representativeName}</span>
+                <div className="space-y-1 text-xs">
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-[#2B4C8C] print:text-black">الاسم:</span>
+                    <span className="text-[#1A365D] font-medium print:text-black">{representativeName}</span>
                   </div>
-                  <div className="flex justify-between print:text-black">
-                    <span className="font-semibold text-gray-700 print:text-black">الجوال:</span>
-                    <span className="print:text-black">{representativePhone || "غير محدد"}</span>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-[#2B4C8C] print:text-black">الجوال:</span>
+                    <span className="text-[#C49632] font-bold print:text-black">{representativePhone || "غير محدد"}</span>
                   </div>
                 </div>
               </div>
@@ -478,7 +479,7 @@ export default function QuotationA4Preview({
           {/* Stamp Section - Only show if companyStamp is provided */}
           {companyStamp && (
             <div className="flex justify-end mb-6">
-              <div className="bg-transparent w-80 h-40 flex items-center justify-center">
+              <div className="bg-white/95 print:bg-white border border-[#E2E8F0] rounded-lg p-3 w-80 h-40 flex items-center justify-center shadow-sm">
                 <img 
                   src={companyStamp} 
                   alt="ختم الشركة" 
