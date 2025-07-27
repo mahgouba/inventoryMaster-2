@@ -421,7 +421,7 @@ export default function QuotationA4Preview({
             {/* Total Row - Third Row */}
             <div className="grid grid-cols-10 print:bg-transparent text-xs">
               <div className="p-4 text-center col-span-3">
-                <div className="font-bold text-sm text-[#2B4C8C] print:text-black">
+                <div className="font-bold text-[#2B4C8C] print:text-black text-[13px]">
                   المجموع: <span className="text-[#2B4C8C] print:text-black">{(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}</span> ريال
                 </div>
               </div>
