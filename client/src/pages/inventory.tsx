@@ -473,9 +473,10 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         <Card className="glass-container mb-8">
           <CardContent className="p-6">
             <div className="flex flex-col gap-4">
-              {/* Search Bar and Filter Toggle */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="relative max-w-md">
+              {/* Main Control Bar */}
+              <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+                {/* Search Input */}
+                <div className="relative max-w-md flex-shrink-0">
                   <Input
                     type="text"
                     placeholder="البحث في المخزون..."
@@ -485,24 +486,87 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   />
                   <Search className="absolute right-3 top-3 h-4 w-4 text-white/60" />
                 </div>
-                
-                {/* Filter Toggle Button - Right Aligned */}
-                <div className="flex items-center justify-end w-full sm:w-auto">
-                  <div className="w-full">
-                    <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
-                      <div className="flex justify-end w-full">
-                        <CollapsibleTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="glass-toggle-button flex items-center gap-2"
-                          >
-                            <Filter size={16} />
-                            الفلاتر
-                            {filtersOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                          </Button>
-                        </CollapsibleTrigger>
-                      </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-2 items-center">
+                  {/* Add Item Button */}
+                  {userRole === "admin" && (
+                    <Button 
+                      onClick={() => setFormOpen(true)}
+                      className="glass-button-primary"
+                      size="sm"
+                    >
+                      <Plus className="w-4 h-4 ml-2" />
+                      إضافة عنصر
+                    </Button>
+                  )}
+                  
+                  {/* Export Button */}
+                  <Button 
+                    onClick={handleExport}
+                    variant="outline"
+                    size="sm"
+                    className="glass-button glass-text-primary"
+                  >
+                    <Download className="w-4 h-4 ml-2" />
+                    تصدير
+                  </Button>
+                  
+                  {/* Print Button */}
+                  <Button 
+                    onClick={handlePrint}
+                    variant="outline"
+                    size="sm"
+                    className="glass-button glass-text-primary"
+                  >
+                    <Printer className="w-4 h-4 ml-2" />
+                    طباعة مخصصة
+                  </Button>
+
+                  {/* Import Button - Admin Only */}
+                  {userRole === "admin" && (
+                    <Button 
+                      onClick={() => setIsExcelImportOpen(true)}
+                      variant="outline"
+                      size="sm"
+                      className="glass-button glass-text-primary"
+                    >
+                      <FileSpreadsheet className="w-4 h-4 ml-2" />
+                      استيراد
+                    </Button>
+                  )}
+
+                  {/* Show Sold Cars Button - Admin Only */}
+                  {userRole === "admin" && (
+                    <Button 
+                      onClick={() => setShowSoldCars(!showSoldCars)}
+                      variant={showSoldCars ? "default" : "outline"}
+                      size="sm"
+                      className={showSoldCars ? "glass-button-primary" : "glass-button glass-text-primary"}
+                    >
+                      <Eye className="w-4 h-4 ml-2" />
+                      {showSoldCars ? "إخفاء المباعة" : "إظهار المباعة"}
+                      {(stats as any)?.sold && (stats as any).sold > 0 && (
+                        <span className="glass-badge mr-2 px-2 py-1 text-xs font-semibold rounded-full">
+                          {(stats as any).sold}
+                        </span>
+                      )}
+                    </Button>
+                  )}
+
+                  {/* Filter Toggle Button */}
+                  <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
+                    <CollapsibleTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="glass-toggle-button flex items-center gap-2"
+                      >
+                        <Filter size={16} />
+                        الفلاتر
+                        {filtersOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                      </Button>
+                    </CollapsibleTrigger>
                     
                     <CollapsibleContent className="mt-4 w-full">
                       <Card className="glass-collapsible w-full">
@@ -739,84 +803,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       </Card>
                     </CollapsibleContent>
                     </Collapsible>
-                  </div>
                 </div>
-              </div>
-              
-              {/* Action Buttons */}
-              <div className="space-y-3">
-                {/* Primary Actions Row */}
-                <div className="flex flex-wrap gap-2">
-                  {/* Essential Actions */}
-                  {userRole === "admin" && (
-                    <Button 
-                      onClick={() => setFormOpen(true)}
-                      className="glass-button-primary"
-                      size="sm"
-                    >
-                      <Plus className="w-4 h-4 ml-2" />
-                      إضافة عنصر
-                    </Button>
-                  )}
-                  
-
-                </div>
-
-                {/* Secondary Actions Row */}
-                <div className="flex flex-wrap gap-2">
-                  {/* Export & Print Actions */}
-                  <Button 
-                    onClick={handleExport}
-                    variant="outline"
-                    size="sm"
-                    className="glass-button glass-text-primary"
-                  >
-                    <Download className="w-4 h-4 ml-2" />
-                    تصدير CSV
-                  </Button>
-                  
-                  <Button 
-                    onClick={handlePrint}
-                    variant="outline"
-                    size="sm"
-                    className="glass-button glass-text-primary"
-                  >
-                    <Printer className="w-4 h-4 ml-2" />
-                    طباعة مخصصة
-                  </Button>
-
-                  {/* Admin Management Actions */}
-                  {userRole === "admin" && (
-                    <>
-                      <Button 
-                        onClick={() => setIsExcelImportOpen(true)}
-                        variant="outline"
-                        size="sm"
-                        className="glass-button glass-text-primary"
-                      >
-                        <FileSpreadsheet className="w-4 h-4 ml-2" />
-                        استيراد Excel
-                      </Button>
-
-                      <Button 
-                        onClick={() => setShowSoldCars(!showSoldCars)}
-                        variant={showSoldCars ? "default" : "outline"}
-                        size="sm"
-                        className={showSoldCars ? "glass-button-primary" : "glass-button glass-text-primary"}
-                      >
-                        <Eye className="w-4 h-4 ml-2" />
-                        {showSoldCars ? "إخفاء المباعة" : "إظهار المباعة"}
-                        {(stats as any)?.sold && (stats as any).sold > 0 && (
-                          <span className="glass-badge mr-2 px-2 py-1 text-xs font-semibold rounded-full">
-                            {(stats as any).sold}
-                          </span>
-                        )}
-                      </Button>
-                    </>
-                  )}
-                </div>
-
-
               </div>
             </div>
           </CardContent>
