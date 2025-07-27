@@ -686,20 +686,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
             {/* Navigation */}
             <div className="flex items-center space-x-2 space-x-reverse">
-              {/* Add Item Button */}
-              <Button 
-                variant="default" 
-                size="sm" 
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={() => {
-                  setEditingItem(null);
-                  setShowEditDialog(true);
-                }}
-              >
-                <Plus size={16} className="ml-1" />
-                <span className="hidden sm:inline">إضافة عنصر</span>
-                <span className="sm:hidden">إضافة</span>
-              </Button>
+
 
               {/* Home Button */}
               <Link href="/">
@@ -709,16 +696,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                 </Button>
               </Link>
 
-              {/* Appearance Management Button - Admin Only */}
-              {userRole === "admin" && (
-                <Link href="/appearance">
-                  <Button variant="outline" size="sm" className="glass-button glass-text-primary">
-                    <Palette size={16} className="ml-1" />
-                    <span className="hidden sm:inline">إدارة المظهر</span>
-                    <span className="sm:hidden">المظهر</span>
-                  </Button>
-                </Link>
-              )}
+
 
               {/* Admin Dropdown Menu */}
               {userRole === "admin" && (
@@ -729,12 +707,6 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="glass-dropdown-content w-56">
-                    <Link href="/appearance">
-                      <DropdownMenuItem>
-                        <Palette className="mr-2 h-4 w-4" />
-                        إدارة المظهر
-                      </DropdownMenuItem>
-                    </Link>
                     <Link href="/user-management">
                       <DropdownMenuItem>
                         <Users className="mr-2 h-4 w-4" />
@@ -853,16 +825,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                 </Link>
               </div>
 
-              {/* Dark Mode Toggle */}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="glass-button glass-text-primary p-2" 
-                onClick={toggleDarkMode}
-                disabled={isUpdatingDarkMode}
-              >
-                {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-              </Button>
+
 
               {/* Logout Button */}
               <Button onClick={onLogout} variant="outline" size="sm" className="glass-button glass-text-primary">
