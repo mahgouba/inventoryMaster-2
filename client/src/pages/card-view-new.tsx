@@ -35,7 +35,8 @@ import {
   Eye,
   EyeOff,
   CreditCard,
-  Plus
+  Plus,
+  Receipt
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -54,6 +55,7 @@ import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import MultiSelectFilter from "@/components/multi-select-filter";
 import { ReservationDialog } from "@/components/reservation-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
+import PriceCard from "@/components/price-card";
 
 import type { InventoryItem } from "@shared/schema";
 
@@ -95,6 +97,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [specificationsOpen, setSpecificationsOpen] = useState(false);
   const [quotationManagementOpen, setQuotationManagementOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [priceCardOpen, setPriceCardOpen] = useState(false);
+  const [priceCardVehicle, setPriceCardVehicle] = useState<InventoryItem | null>(null);
   
   // Toggle states for individual filters - default to false (closed)
   const [showManufacturerFilter, setShowManufacturerFilter] = useState(false);
@@ -605,6 +609,12 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     localStorage.setItem('selectedVehicleForQuote', JSON.stringify(item));
     // Navigate to quotation creation page
     window.location.href = '/quotation-creation';
+  };
+
+  // Handle price card creation
+  const handleCreatePriceCard = (item: InventoryItem) => {
+    setPriceCardVehicle(item);
+    setPriceCardOpen(true);
   };
 
   // Status color mapping
@@ -1356,6 +1366,16 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 <FileText size={14} />
                               </Button>
 
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="px-3 h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
+                                onClick={() => handleCreatePriceCard(item)}
+                                title="بطاقة السعر"
+                              >
+                                <Receipt size={14} />
+                              </Button>
+
                               {item.status === "محجوز" ? (
                                 <Button
                                   size="sm"
@@ -1504,6 +1524,13 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         onOpenChange={setReserveDialogOpen}
         item={reserveItem}
         onSuccess={handleReservationSuccess}
+      />
+
+      {/* Price Card Dialog */}
+      <PriceCard
+        open={priceCardOpen}
+        onOpenChange={setPriceCardOpen}
+        vehicle={priceCardVehicle}
       />
       </div>
     </div>
