@@ -673,7 +673,88 @@ input[type="radio"] {
 input[type="checkbox"]:checked,
 input[type="radio"]:checked {
   background-color: #C49632;
-  border-color: #C49632;
+}
+
+/* Comprehensive Print Styles for Quotation PDFs */
+@media print {
+  /* Force black text and white backgrounds for all elements */
+  *,
+  *::before,
+  *::after {
+    color: #000000 !important;
+    background: transparent !important;
+    background-color: #ffffff !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+  }
+
+  /* Specific print overrides for quotation elements */
+  [data-pdf-export="quotation"] *,
+  .print\:text-black,
+  .print\:bg-white {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+  }
+
+  /* Table styling for print */
+  table, th, td,
+  .grid,
+  .grid > div {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    border-color: #ffffff !important;
+  }
+
+  /* Header elements */
+  h1, h2, h3, h4, h5, h6 {
+    color: #000000 !important;
+    background-color: transparent !important;
+  }
+
+  /* Ensure all text is black in print */
+  span, div, p, td, th, label {
+    color: #000000 !important;
+    background-color: transparent !important;
+  }
+
+  /* Hide unnecessary elements */
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Ensure proper table borders are white */
+  .border-white,
+  .border-l-white,
+  .border-t-white,
+  .border-b-white,
+  .border-r-white {
+    border-color: #ffffff !important;
+  }
+
+  /* Override any background colors for containers */
+  .bg-gray-100,
+  .bg-gray-50,
+  .bg-white\/90,
+  .bg-\[#c49631\] {
+    background-color: #ffffff !important;
+  }
+
+  /* Ensure price breakdown section is readable */
+  .bg-\[#03627f\] {
+    background-color: #03627f !important;
+  }
+
+  .text-\[#c39631\] {
+    color: #c39631 !important;
+  }
+
+  /* Remove shadows and effects for clean print */
+  .shadow-sm,
+  .shadow-2xl,
+  .drop-shadow-md {
+    box-shadow: none !important;
+  }
 }
 
 /* RadioGroup styling for shadcn components */

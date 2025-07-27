@@ -242,34 +242,34 @@ export default function QuotationA4Preview({
 
             {/* Document Type with Number and Date in same row */}
             <div className="absolute top-20 right-8">
-              <div className="flex items-center gap-6">
-                <h2 className="text-base font-bold text-black" style={{fontFamily: 'Cairo, sans-serif'}}>
+              <div className="flex items-center gap-6 print:text-black">
+                <h2 className="text-base font-bold text-black print:text-black" style={{fontFamily: 'Cairo, sans-serif'}}>
                   {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
                 </h2>
-                <div className="text-xs text-black">
-                  <span className="font-semibold">رقم: </span>
-                  <span>{isInvoiceMode ? invoiceNumber : quoteNumber}</span>
+                <div className="text-xs text-black print:text-black">
+                  <span className="font-semibold print:text-black">رقم: </span>
+                  <span className="print:text-black">{isInvoiceMode ? invoiceNumber : quoteNumber}</span>
                 </div>
-                <div className="text-xs text-black">
-                  <span className="font-semibold">الإصدار:      </span>
-                  <span>{new Date().toLocaleDateString('en-GB')}</span>
+                <div className="text-xs text-black print:text-black">
+                  <span className="font-semibold print:text-black">الإصدار:      </span>
+                  <span className="print:text-black">{new Date().toLocaleDateString('en-GB')}</span>
                   {!isInvoiceMode && (
                     <>
-                      <span className="font-semibold ml-4">صالح حتى: </span>
-                      <span>{validUntil.toLocaleDateString('en-GB')}</span>
+                      <span className="font-semibold ml-4 print:text-black">صالح حتى: </span>
+                      <span className="print:text-black">{validUntil.toLocaleDateString('en-GB')}</span>
                     </>
                   )}
                 </div>
               </div>
               
               {/* Customer Information Details below header */}
-              <div className="mt-4 bg-white/90 p-3 pt-[1px] pb-[1px] text-[13px] text-right">
-                <div className="space-y-2 text-xs text-black">
-                  <div className="text-right text-[16px] font-semibold">
+              <div className="mt-4 bg-white/90 print:bg-white p-3 pt-[1px] pb-[1px] text-[13px] text-right">
+                <div className="space-y-2 text-xs text-black print:text-black">
+                  <div className="text-right text-[16px] font-semibold print:text-black">
                     {isInvoiceMode ? (
-                      <span>بناءً على طلبكم رقم: {invoiceNumber || quoteNumber}</span>
+                      <span className="print:text-black">بناءً على طلبكم رقم: {invoiceNumber || quoteNumber}</span>
                     ) : (
-                      <span>{customerTitle} / {customerName || "غير محدد"} &nbsp;&nbsp;&nbsp; الموقرين</span>
+                      <span className="print:text-black">{customerTitle} / {customerName || "غير محدد"} &nbsp;&nbsp;&nbsp; الموقرين</span>
                     )}
                   </div>
                 </div>
@@ -329,36 +329,36 @@ export default function QuotationA4Preview({
                   );
                 })()}
                 
-                <div className="relative z-10 text-xs text-black">
+                <div className="relative z-10 text-xs text-black print:text-black">
                   {/* Vehicle Information Grid - Properly Aligned */}
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-[13px]">
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-gray-700">الصانع:</span>
-                      <span className="text-right">{selectedVehicle.manufacturer}</span>
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-[13px] print:text-black">
+                    <div className="flex justify-between print:text-black">
+                      <span className="font-semibold text-gray-700 print:text-black">الصانع:</span>
+                      <span className="text-right print:text-black">{selectedVehicle.manufacturer}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-gray-700">الفئة:</span>
-                      <span className="text-right">{selectedVehicle.category}</span>
+                    <div className="flex justify-between print:text-black">
+                      <span className="font-semibold text-gray-700 print:text-black">الفئة:</span>
+                      <span className="text-right print:text-black">{selectedVehicle.category}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-gray-700">درجة التجهيز:</span>
-                      <span className="text-right">{selectedVehicle.trimLevel || "غير محدد"}</span>
+                    <div className="flex justify-between print:text-black">
+                      <span className="font-semibold text-gray-700 print:text-black">درجة التجهيز:</span>
+                      <span className="text-right print:text-black">{selectedVehicle.trimLevel || "غير محدد"}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-gray-700">السنة:</span>
-                      <span className="text-right">{selectedVehicle.year}</span>
+                    <div className="flex justify-between print:text-black">
+                      <span className="font-semibold text-gray-700 print:text-black">السنة:</span>
+                      <span className="text-right print:text-black">{selectedVehicle.year}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-gray-700">اللون الخارجي:</span>
-                      <span className="text-right">{selectedVehicle.exteriorColor}</span>
+                    <div className="flex justify-between print:text-black">
+                      <span className="font-semibold text-gray-700 print:text-black">اللون الخارجي:</span>
+                      <span className="text-right print:text-black">{selectedVehicle.exteriorColor}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-gray-700">اللون الداخلي:</span>
-                      <span className="text-right">{selectedVehicle.interiorColor}</span>
+                    <div className="flex justify-between print:text-black">
+                      <span className="font-semibold text-gray-700 print:text-black">اللون الداخلي:</span>
+                      <span className="text-right print:text-black">{selectedVehicle.interiorColor}</span>
                     </div>
-                    <div className="flex justify-between col-span-2">
-                      <span className="font-semibold text-gray-700">رقم الهيكل:</span>
-                      <span className="text-right">{selectedVehicle.chassisNumber}</span>
+                    <div className="flex justify-between col-span-2 print:text-black">
+                      <span className="font-semibold text-gray-700 print:text-black">رقم الهيكل:</span>
+                      <span className="text-right print:text-black">{selectedVehicle.chassisNumber}</span>
                     </div>
                   </div>
                 </div>
@@ -395,41 +395,41 @@ export default function QuotationA4Preview({
           </div>
 
           {/* Price Breakdown Table */}
-          <div className="bg-white/90 border border-white rounded mb-6 shadow-sm">
-            <div className="p-4 rounded-t bg-[#03627f] text-[#c39631] pt-[2px] pb-[2px]">
-              <h3 className="text-sm font-bold text-center" style={{fontFamily: 'Cairo, sans-serif'}}>تفاصيل السعر</h3>
+          <div className="bg-white/90 print:bg-white border border-white rounded mb-6 shadow-sm">
+            <div className="p-4 rounded-t bg-[#03627f] print:bg-[#03627f] text-[#c39631] print:text-[#c39631] pt-[2px] pb-[2px]">
+              <h3 className="text-sm font-bold text-center print:text-[#c39631]" style={{fontFamily: 'Cairo, sans-serif'}}>تفاصيل السعر</h3>
             </div>
             
             {/* Table Header */}
-            <div className="grid grid-cols-5 bg-gray-100 border-b border-white text-xs font-bold text-center">
-              <div className="p-2 border-l border-white">الكمية</div>
-              <div className="p-2 border-l border-white">السعر الفردي</div>
-              <div className="p-2 border-l border-white">الضريبة ({taxRate}%)</div>
-              <div className="p-2 border-l border-white">اللوحات</div>
-              <div className="p-2">الإجمالي</div>
+            <div className="grid grid-cols-5 bg-gray-100 print:bg-white border-b border-white text-xs font-bold text-center print:text-black">
+              <div className="p-2 border-l border-white print:text-black">الكمية</div>
+              <div className="p-2 border-l border-white print:text-black">السعر الفردي</div>
+              <div className="p-2 border-l border-white print:text-black">الضريبة ({taxRate}%)</div>
+              <div className="p-2 border-l border-white print:text-black">اللوحات</div>
+              <div className="p-2 print:text-black">الإجمالي</div>
             </div>
             
             {/* Table Row */}
-            <div className="grid grid-cols-5 border-b border-white text-xs text-center text-black bg-white">
-              <div className="p-2 border-l border-white">1</div>
-              <div className="p-2 border-l border-white font-semibold">{basePrice.toLocaleString()}</div>
-              <div className="p-2 border-l border-white font-semibold">{taxAmount.toLocaleString()}</div>
-              <div className="p-2 border-l border-white font-semibold">
+            <div className="grid grid-cols-5 border-b border-white text-xs text-center text-black bg-white print:bg-white print:text-black">
+              <div className="p-2 border-l border-white print:text-black">1</div>
+              <div className="p-2 border-l border-white font-semibold print:text-black">{basePrice.toLocaleString()}</div>
+              <div className="p-2 border-l border-white font-semibold print:text-black">{taxAmount.toLocaleString()}</div>
+              <div className="p-2 border-l border-white font-semibold print:text-black">
                 {includeLicensePlate ? licensePlatePrice.toLocaleString() : "0"}
               </div>
-              <div className="p-2 font-bold text-blue-800">
+              <div className="p-2 font-bold text-blue-800 print:text-black">
                 {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}
               </div>
             </div>
             
             {/* Total Row */}
-            <div className="p-4 bg-gray-50 border-t-2 border-white rounded-b pt-[4px] pb-[4px]">
+            <div className="p-4 bg-gray-50 print:bg-white border-t-2 border-white rounded-b pt-[4px] pb-[4px]">
               <div className="flex justify-center mb-3">
-                <div className="font-bold text-sm text-blue-800">
+                <div className="font-bold text-sm text-blue-800 print:text-black">
                   المجموع: {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()} ريال
                 </div>
               </div>
-              <div className="text-center text-xs font-bold text-white px-4 py-3 rounded bg-[#c49631] pt-[2px] pb-[2px]">
+              <div className="text-center text-xs font-bold text-white print:text-black px-4 py-3 rounded bg-[#c49631] print:bg-gray-100 pt-[2px] pb-[2px]">
                 {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))} ريال سعودي لا غير
               </div>
             </div>
@@ -439,17 +439,17 @@ export default function QuotationA4Preview({
           <div className="flex gap-6 mb-6">
             {/* Terms & Conditions Section - Hidden in invoice mode */}
             {!isInvoiceMode && (
-              <div className="bg-white/90 border border-white p-4 rounded flex-1 shadow-sm">
-                <div className="text-xs text-black space-y-2">
+              <div className="bg-white/90 print:bg-white border border-white p-4 rounded flex-1 shadow-sm">
+                <div className="text-xs text-black print:text-black space-y-2">
                   {termsConditions.length > 0 ? (
                     termsConditions.map((term, index) => (
-                      <div key={term.id} className="flex items-start gap-2">
-                        <span className="text-amber-600 font-semibold min-w-[1rem]">{index + 1}.</span>
-                        <span className="leading-relaxed">{term.term_text}</span>
+                      <div key={term.id} className="flex items-start gap-2 print:text-black">
+                        <span className="text-amber-600 print:text-black font-semibold min-w-[1rem]">{index + 1}.</span>
+                        <span className="leading-relaxed print:text-black">{term.term_text}</span>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500 italic">لم يتم إضافة شروط وأحكام بعد</p>
+                    <p className="text-gray-500 print:text-black italic">لم يتم إضافة شروط وأحكام بعد</p>
                   )}
                 </div>
               </div>
@@ -457,18 +457,18 @@ export default function QuotationA4Preview({
             
             {/* Representative Information - Small box on the right - Hidden if no representative selected */}
             {representativeName && (
-              <div className="bg-white/90 border border-white p-3 rounded shadow-sm w-64">
-                <h3 className="text-xs font-bold mb-2 text-blue-800 border-b border-white pb-1" style={{fontFamily: 'Cairo, sans-serif'}}>
+              <div className="bg-white/90 print:bg-white border border-white p-3 rounded shadow-sm w-64">
+                <h3 className="text-xs font-bold mb-2 text-blue-800 print:text-black border-b border-white pb-1" style={{fontFamily: 'Cairo, sans-serif'}}>
                   بيانات المندوب
                 </h3>
-                <div className="space-y-1 text-xs text-black">
-                  <div className="flex justify-between">
-                    <span className="font-semibold text-gray-700">الاسم:</span>
-                    <span>{representativeName}</span>
+                <div className="space-y-1 text-xs text-black print:text-black">
+                  <div className="flex justify-between print:text-black">
+                    <span className="font-semibold text-gray-700 print:text-black">الاسم:</span>
+                    <span className="print:text-black">{representativeName}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="font-semibold text-gray-700">الجوال:</span>
-                    <span>{representativePhone || "غير محدد"}</span>
+                  <div className="flex justify-between print:text-black">
+                    <span className="font-semibold text-gray-700 print:text-black">الجوال:</span>
+                    <span className="print:text-black">{representativePhone || "غير محدد"}</span>
                   </div>
                 </div>
               </div>
