@@ -282,10 +282,10 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
         </div>
       </div>
 
-      {/* Banks Section - Direct under header */}
-      <div className="relative z-10 p-4 border-b border-white/20 dark:border-white/10 backdrop-blur-sm">
+      {/* Banks & Cards Section - Direct under company logo */}
+      <div className="relative z-10 px-4 pt-3 pb-4 border-b border-golden/20 dark:border-golden/10 backdrop-blur-sm">
         {!isCollapsed && (
-          <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-3 text-right drop-shadow-sm">
+          <h3 className="text-xs font-semibold text-golden uppercase tracking-wider mb-3 text-right drop-shadow-sm">
             البنوك والبطاقات
           </h3>
         )}
@@ -293,10 +293,10 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
           <Link href="/card-view-new">
             <div className={cn(
               "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 glass-button cursor-pointer",
-              "hover:bg-white/10 text-white/90 hover:text-white",
-              isActive("/card-view-new") && "glass-button-primary border border-blue-400/30 shadow-lg"
+              "hover:bg-golden/10 text-white/90 hover:text-white border-golden/20 hover:border-golden/40",
+              isActive("/card-view-new") && "glass-button-golden border border-golden/50 shadow-lg bg-golden/20"
             )}>
-              <Package className="h-5 w-5 flex-shrink-0 drop-shadow-sm" />
+              <Package className="h-5 w-5 flex-shrink-0 drop-shadow-sm text-golden" />
               {!isCollapsed && (
                 <span className="text-right flex-1 drop-shadow-sm">عرض البطاقات</span>
               )}
@@ -306,10 +306,10 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
           <Link href="/banks-personal">
             <div className={cn(
               "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 glass-button cursor-pointer",
-              "hover:bg-white/10 text-white/90 hover:text-white",
-              isActive("/banks-personal") && "glass-button-primary border border-blue-400/30 shadow-lg"
+              "hover:bg-golden/10 text-white/90 hover:text-white border-golden/20 hover:border-golden/40",
+              isActive("/banks-personal") && "glass-button-golden border border-golden/50 shadow-lg bg-golden/20"
             )}>
-              <CreditCard className="h-5 w-5 flex-shrink-0 drop-shadow-sm" />
+              <CreditCard className="h-5 w-5 flex-shrink-0 drop-shadow-sm text-golden" />
               {!isCollapsed && (
                 <span className="text-right flex-1 drop-shadow-sm">البنوك الشخصية</span>
               )}
@@ -319,10 +319,10 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
           <Link href="/banks-company">
             <div className={cn(
               "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 glass-button cursor-pointer",
-              "hover:bg-white/10 text-white/90 hover:text-white",
-              isActive("/banks-company") && "glass-button-primary border border-blue-400/30 shadow-lg"
+              "hover:bg-golden/10 text-white/90 hover:text-white border-golden/20 hover:border-golden/40",
+              isActive("/banks-company") && "glass-button-golden border border-golden/50 shadow-lg bg-golden/20"
             )}>
-              <Building className="h-5 w-5 flex-shrink-0 drop-shadow-sm" />
+              <Building className="h-5 w-5 flex-shrink-0 drop-shadow-sm text-golden" />
               {!isCollapsed && (
                 <span className="text-right flex-1 drop-shadow-sm">بنوك الشركة</span>
               )}

@@ -11,6 +11,7 @@
   --text-primary: rgba(255, 255, 255, 0.95);
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.5);
+  --golden: #C49632;
 }
 
 /* Global Single Dark Background */
@@ -174,6 +175,19 @@ html, body {
 
 .sidebar-active-pulse {
   animation: sidebar-pulse 2s infinite;
+}
+
+/* Golden styling for banks section */
+.glass-button-golden {
+  background: rgba(196, 150, 50, 0.15) !important;
+  border: 1px solid rgba(196, 150, 50, 0.3) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+}
+
+.glass-button-golden:hover {
+  background: rgba(196, 150, 50, 0.25) !important;
+  border-color: rgba(196, 150, 50, 0.5) !important;
 }
 
 .text-slate-700,

@@ -61,6 +61,7 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
+        golden: "var(--golden)",
       },
       keyframes: {
         "accordion-down": {
