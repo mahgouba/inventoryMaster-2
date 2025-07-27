@@ -345,24 +345,7 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
         />
       </div>
 
-      {/* Scroll Up Button */}
-      <div className="p-2 border-b border-white/10">
-        <button
-          onClick={() => {
-            if (scrollRef.current) {
-              scrollRef.current.scrollBy({ top: -200, behavior: 'smooth' });
-            }
-          }}
-          className="w-full py-2 text-white/60 hover:text-white transition-colors duration-300"
-        >
-          <div className="flex items-center justify-center">
-            <div className="w-6 h-1 bg-white/30 rounded-full"></div>
-          </div>
-          <div className="flex items-center justify-center mt-1">
-            <div className="w-4 h-1 bg-white/40 rounded-full"></div>
-          </div>
-        </button>
-      </div>
+
 
       {/* Navigation Items */}
       <div className="flex-1 p-2">
