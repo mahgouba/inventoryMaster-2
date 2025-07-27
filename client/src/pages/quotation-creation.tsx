@@ -1031,7 +1031,20 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         setTimeout(resolve, 1000);
       });
 
-      // Make sure element is visible during capture
+      // Hide all interactive elements before PDF generation
+      const interactiveElements = element.querySelectorAll('button, .print\\:hidden, .no-print, [data-html2canvas-ignore]');
+      const originalDisplayValues: string[] = [];
+      const originalVisibilityValues: string[] = [];
+      
+      interactiveElements.forEach((el, index) => {
+        const htmlEl = el as HTMLElement;
+        originalDisplayValues[index] = htmlEl.style.display;
+        originalVisibilityValues[index] = htmlEl.style.visibility;
+        htmlEl.style.display = 'none';
+        htmlEl.style.visibility = 'hidden';
+      });
+
+      // Make sure main element is visible during capture
       const originalDisplay = (element as HTMLElement).style.display;
       const originalVisibility = (element as HTMLElement).style.visibility;
       (element as HTMLElement).style.display = 'block';
@@ -1052,12 +1065,25 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         scrollX: 0,
         scrollY: 0,
         windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight
+        windowHeight: element.scrollHeight,
+        ignoreElements: (element) => {
+          return element.classList?.contains('no-print') || 
+                 element.classList?.contains('print:hidden') ||
+                 element.hasAttribute('data-html2canvas-ignore') ||
+                 element.tagName === 'BUTTON';
+        }
       });
 
       // Restore original display properties
       (element as HTMLElement).style.display = originalDisplay;
       (element as HTMLElement).style.visibility = originalVisibility;
+      
+      // Restore interactive elements display properties
+      interactiveElements.forEach((el, index) => {
+        const htmlEl = el as HTMLElement;
+        htmlEl.style.display = originalDisplayValues[index] || '';
+        htmlEl.style.visibility = originalVisibilityValues[index] || '';
+      });
 
       // Check if canvas was created successfully
       if (canvas.width === 0 || canvas.height === 0) {
@@ -1118,7 +1144,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       
       toast({
         title: "تم التحميل بنجاح",
-        description: "تم تحميل العرض بجودة عالية وأبعاد A4 الصحيحة",
+        description: "تم تحميل العرض بجودة عالية مع إخفاء جميع الأزرار التفاعلية",
       });
       
     } catch (error) {

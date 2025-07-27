@@ -2001,8 +2001,16 @@ span.badge,
     page-break-after: always;
   }
   
-  .no-print {
+  .no-print,
+  button,
+  .print\\:hidden,
+  [data-html2canvas-ignore],
+  .cursor-pointer:not(.print-content),
+  input[type="button"],
+  input[type="submit"] {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
   }
   
   .print-header {

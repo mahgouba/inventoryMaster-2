@@ -148,8 +148,11 @@ export default function QuotationA4Preview({
         .print-content .cursor-pointer,
         .print-content [class*="hover:"],
         .print-content .print\\:hidden,
-        .print-content [class*="print:hidden"] {
+        .print-content [class*="print:hidden"],
+        .print-content .no-print,
+        .print-content [data-html2canvas-ignore] {
           display: none !important;
+          visibility: hidden !important;
         }
         
         /* Ensure all text is black and borders are white for print */
@@ -384,7 +387,7 @@ export default function QuotationA4Preview({
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
       {/* Controls - Background Toggle and Print Button */}
-      <div className="mb-4 flex justify-center items-center gap-4">
+      <div className="mb-4 flex justify-center items-center gap-4 print:hidden no-print" data-html2canvas-ignore="true">
         <div className="flex items-center gap-3 border border-yellow-600 rounded-lg px-4 py-3 bg-white">
           <span className="bg-[#cf9b46] text-[#fcfcfc] text-[15px] px-2 py-1 rounded">البريمي</span>
           <div className="relative">
@@ -587,6 +590,8 @@ export default function QuotationA4Preview({
                       size="sm"
                       onClick={() => setIsEditingSpecs(!isEditingSpecs)}
                       className="text-xs px-2 py-1 print:hidden no-print border-[#C49632] text-[#C49632] hover:bg-[#C49632] hover:text-white"
+                      style={{ display: 'none' }}
+                      data-html2canvas-ignore="true"
                     >
                       {isEditingSpecs ? "حفظ" : "تحرير"}
                     </Button>
