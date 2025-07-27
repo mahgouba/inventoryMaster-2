@@ -1428,12 +1428,6 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4 space-x-reverse">
-              <Link href="/card-view">
-                <Button variant="outline" size="sm" className="glass-button text-white border-white/20 hover:bg-white/20">
-                  <ArrowLeft size={16} className="ml-2" />
-                  العودة
-                </Button>
-              </Link>
               <h1 className="text-xl font-bold text-white drop-shadow-lg">إنشاء عرض سعر</h1>
             </div>
             
