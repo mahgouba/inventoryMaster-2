@@ -42,19 +42,50 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
     setIsGeneratingPDF(true);
     try {
       const element = document.getElementById('price-card-content');
-      if (!element) return;
+      if (!element) {
+        console.error('Price card element not found');
+        return;
+      }
 
-      // High-quality canvas with proper scaling
+      // Check if element has content
+      if (element.children.length === 0) {
+        console.error('Price card element is empty');
+        return;
+      }
+
+      // Wait for content to load
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Ensure element is visible
+      const originalDisplay = element.style.display;
+      const originalVisibility = element.style.visibility;
+      element.style.display = 'block';
+      element.style.visibility = 'visible';
+
+      // High-quality canvas with improved settings
       const canvas = await html2canvas(element, {
-        scale: 3, // High quality but stable
+        scale: 2,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        foreignObjectRendering: true,
-        imageTimeout: 10000,
+        foreignObjectRendering: false,
+        imageTimeout: 15000,
+        logging: true,
         height: element.scrollHeight,
-        width: element.scrollWidth
+        width: element.scrollWidth,
+        scrollX: 0,
+        scrollY: 0
       });
+
+      // Restore display properties
+      element.style.display = originalDisplay;
+      element.style.visibility = originalVisibility;
+
+      // Check canvas validity
+      if (canvas.width === 0 || canvas.height === 0) {
+        console.error('Canvas creation failed - zero dimensions');
+        return;
+      }
 
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -81,8 +112,8 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
       const xOffset = (pdfWidth - finalWidth) / 2;
       const yOffset = (pdfHeight - finalHeight) / 2;
 
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      pdf.addImage(imgData, 'JPEG', xOffset, yOffset, finalWidth, finalHeight);
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
       
       const timestamp = new Date().toLocaleDateString('ar-SA').replace(/\//g, '-');
       pdf.save(`بطاقة-سعر-${vehicle.manufacturer}-${vehicle.category}-${vehicle.year}-${timestamp}.pdf`);

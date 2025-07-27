@@ -1010,24 +1010,64 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       if (!element) {
         toast({
           title: "خطأ",
-          description: "لم يتم العثور على معاينة العرض",
+          description: "لم يتم العثور على معاينة العرض. تأكد من إدخال بيانات العرض أولاً.",
           variant: "destructive",
         });
         return;
       }
+
+      // Check if element has content
+      if (element.children.length === 0) {
+        toast({
+          title: "خطأ",
+          description: "معاينة العرض فارغة. تأكد من إدخال بيانات السيارة والعميل.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Wait for all images and fonts to load
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+
+      // Make sure element is visible during capture
+      const originalDisplay = (element as HTMLElement).style.display;
+      const originalVisibility = (element as HTMLElement).style.visibility;
+      (element as HTMLElement).style.display = 'block';
+      (element as HTMLElement).style.visibility = 'visible';
       
-      // Create canvas with ultra-high quality settings
+      // Create canvas with improved settings
       const canvas = await html2canvas(element as HTMLElement, {
-        scale: 3, // High quality but stable
+        scale: 2, // Balanced quality and performance
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        logging: false,
-        imageTimeout: 10000,
-        foreignObjectRendering: true,
+        logging: true, // Enable logging for debugging
+        imageTimeout: 15000, // Longer timeout for images
+        foreignObjectRendering: false, // Disable for better compatibility
+        removeContainer: false,
         height: element.scrollHeight,
-        width: element.scrollWidth
+        width: element.scrollWidth,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
       });
+
+      // Restore original display properties
+      (element as HTMLElement).style.display = originalDisplay;
+      (element as HTMLElement).style.visibility = originalVisibility;
+
+      // Check if canvas was created successfully
+      if (canvas.width === 0 || canvas.height === 0) {
+        toast({
+          title: "خطأ في إنشاء PDF",
+          description: "فشل في تحويل العرض إلى صورة. حاول مرة أخرى.",
+          variant: "destructive",
+        });
+        return;
+      }
       
       // Create PDF with exact A4 dimensions
       const pdf = new jsPDF({
@@ -1041,7 +1081,6 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const canvasAspectRatio = canvas.height / canvas.width;
-      const pdfAspectRatio = pdfHeight / pdfWidth;
       
       let finalWidth = pdfWidth;
       let finalHeight = pdfWidth * canvasAspectRatio;
@@ -1057,12 +1096,12 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       const yOffset = (pdfHeight - finalHeight) / 2;
       
       // Convert canvas to high-quality image
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const imgData = canvas.toDataURL('image/png', 1.0);
       
       // Add image to PDF with proper scaling
       pdf.addImage(
         imgData,
-        'JPEG',
+        'PNG',
         xOffset,
         yOffset,
         finalWidth,

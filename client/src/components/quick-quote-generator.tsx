@@ -115,20 +115,62 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
     setIsDownloadingPDF(true);
     try {
       const element = document.getElementById('quote-preview');
-      if (!element) return;
+      if (!element) {
+        toast({
+          title: "خطأ",
+          description: "لم يتم العثور على معاينة العرض",
+          variant: "destructive",
+        });
+        return;
+      }
 
-      // High-quality canvas with proper scaling
+      // Check if element has content
+      if (element.children.length === 0) {
+        toast({
+          title: "خطأ",
+          description: "معاينة العرض فارغة",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Wait for content to load
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Ensure element is visible
+      const originalDisplay = element.style.display;
+      const originalVisibility = element.style.visibility;
+      element.style.display = 'block';
+      element.style.visibility = 'visible';
+
+      // High-quality canvas with improved settings
       const canvas = await html2canvas(element, {
-        scale: 3, // High quality but stable
-        logging: false,
+        scale: 2,
+        logging: true,
         allowTaint: true,
         useCORS: true,
         backgroundColor: '#ffffff',
-        foreignObjectRendering: true,
-        imageTimeout: 10000,
+        foreignObjectRendering: false,
+        imageTimeout: 15000,
         height: element.scrollHeight,
-        width: element.scrollWidth
+        width: element.scrollWidth,
+        scrollX: 0,
+        scrollY: 0
       });
+
+      // Restore display properties
+      element.style.display = originalDisplay;
+      element.style.visibility = originalVisibility;
+
+      // Check canvas validity
+      if (canvas.width === 0 || canvas.height === 0) {
+        toast({
+          title: "خطأ في إنشاء PDF",
+          description: "فشل في تحويل العرض إلى صورة",
+          variant: "destructive",
+        });
+        return;
+      }
 
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -156,11 +198,11 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
       const yOffset = (pdfHeight - finalHeight) / 2;
       
       // High-quality image data
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const imgData = canvas.toDataURL('image/png', 1.0);
       
       pdf.addImage(
         imgData,
-        'JPEG',
+        'PNG',
         xOffset,
         yOffset,
         finalWidth,
