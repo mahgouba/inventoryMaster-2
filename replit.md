@@ -481,6 +481,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ **Stamp Size Enhancement** - Increased company stamp size by 80% (216×144 pixels) per user request for better visibility in printed documents
 - ✅ **Edit Button Hidden in PDF** - Removed edit button and all interactive elements from PDF output for clean professional appearance
 - ✅ **300 DPI Print Resolution** - Enhanced print quality with crisp image rendering and optimized contrast for professional document output
+- ✅ **Representative Section Header** - Added "المندوب" label to representative information section for better organization and clarity
 
 ### PDF Optimization and Design Updates (July 27, 2025)
 - ✅ **COMPLETED: White Table Borders in PDF** - Changed all table borders from black/gray to white in quotation PDF per user request
