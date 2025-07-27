@@ -394,7 +394,7 @@ export default function QuotationA4Preview({
           </div>
 
           {/* Price Breakdown Table */}
-          <div className="print:bg-transparent border border-[#E2E8F0] rounded-lg mb-6 shadow-lg overflow-hidden">
+          <div className="print:bg-transparent border border-[#E2E8F0] rounded-lg mb-6 shadow-lg overflow-hidden p-4">
             
             {/* Table Header */}
             <div className="grid grid-cols-5 print:bg-transparent border-b border-white print:border-white text-xs font-bold text-center">
