@@ -285,7 +285,7 @@ export default function QuotationA4Preview({
 
             {/* Vehicle Information */}
             {selectedVehicle && (
-              <div className="relative p-4 w-full mt-[166px] mb-[16px] overflow-hidden bg-white/95 print:bg-white border border-[#E2E8F0] rounded-md shadow-sm">
+              <div className="relative p-4 w-full mt-[166px] mb-[16px] overflow-hidden bg-white/95 print:bg-white border border-[#E2E8F0] print:border-none rounded-md shadow-sm">
                 {/* Systematic Manufacturer Logo Watermark Pattern */}
                 {selectedVehicle && (() => {
                   const manufacturerLogo = getManufacturerLogo(selectedVehicle.manufacturer);
@@ -435,8 +435,8 @@ export default function QuotationA4Preview({
           <div className="flex gap-6 mb-6">
             {/* Terms & Conditions Section - Hidden in invoice mode */}
             {!isInvoiceMode && (
-              <div className="bg-white/95 print:bg-white border border-[#E2E8F0] p-4 rounded-lg flex-1 shadow-sm">
-                <h4 className="text-sm font-bold mb-3 text-[#2B4C8C] print:text-black border-b border-[#E2E8F0] pb-2">الشروط والأحكام</h4>
+              <div className="bg-white/95 print:bg-white border border-[#E2E8F0] print:border-none p-4 rounded-lg flex-1 shadow-sm">
+                <h4 className="text-sm font-bold mb-3 text-[#2B4C8C] print:text-black border-b border-[#E2E8F0] print:border-none pb-2">الشروط والأحكام</h4>
                 <div className="text-xs space-y-2">
                   {termsConditions.length > 0 ? (
                     termsConditions.map((term, index) => (
@@ -454,8 +454,8 @@ export default function QuotationA4Preview({
             
             {/* Representative Information - Small box on the right - Hidden if no representative selected */}
             {representativeName && (
-              <div className="bg-white/95 print:bg-white border border-[#E2E8F0] p-3 rounded-lg shadow-sm w-64">
-                <h3 className="text-xs font-bold mb-2 text-[#2B4C8C] print:text-black border-b border-[#E2E8F0] pb-1" style={{fontFamily: 'Cairo, sans-serif'}}>
+              <div className="bg-white/95 print:bg-white border border-[#E2E8F0] print:border-none p-3 rounded-lg shadow-sm w-64">
+                <h3 className="text-xs font-bold mb-2 text-[#2B4C8C] print:text-black border-b border-[#E2E8F0] print:border-none pb-1" style={{fontFamily: 'Cairo, sans-serif'}}>
                   بيانات المندوب
                 </h3>
                 <div className="space-y-1 text-xs">

@@ -267,6 +267,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Fixed total row formatting with white background and black text contrast in PDF mode
 - ✅ Enhanced final total amount display with proper PDF-specific styling (white background, black text, black border)
 - ✅ Improved PDF print quality by ensuring proper contrast ratios throughout the entire pricing table
+- ✅ **COMPLETED: Border Removal** - Removed all borders from vehicle information, terms & conditions, and representative information sections in PDF using `print:border-none`
 
 ### Latest Replit Environment Migration - Complete Success (July 27, 2025)
 - ✅ Successfully completed migration from Replit Agent to standard Replit environment  
