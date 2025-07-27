@@ -828,6 +828,81 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
           onEdit={handleEdit}
         />
 
+        {/* Filtered Vehicles Statistics */}
+        <Card className="glass-container mt-4">
+          <CardContent className="p-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {(() => {
+                // Apply the same filtering logic as InventoryTable
+                const filteredItems = items.filter((item: InventoryItem) => {
+                  const matchesSearch = !searchQuery || 
+                    Object.values(item).some(value => 
+                      value?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                  const matchesManufacturer = manufacturerFilter.length === 0 || manufacturerFilter.includes(item.manufacturer || "");
+                  const matchesCategory = categoryFilter.length === 0 || categoryFilter.includes(item.category || "");
+                  const matchesTrimLevel = trimLevelFilter.length === 0 || trimLevelFilter.includes(item.trimLevel || "");
+                  const matchesYear = yearFilter.length === 0 || yearFilter.includes(String(item.year));
+                  const matchesEngineCapacity = engineCapacityFilter.length === 0 || engineCapacityFilter.includes(item.engineCapacity || "");
+                  const matchesInteriorColor = interiorColorFilter.length === 0 || interiorColorFilter.includes(item.interiorColor || "");
+                  const matchesExteriorColor = exteriorColorFilter.length === 0 || exteriorColorFilter.includes(item.exteriorColor || "");
+                  const matchesStatus = statusFilter.length === 0 || statusFilter.includes(item.status || "");
+                  const matchesImportType = importTypeFilter.length === 0 || importTypeFilter.includes(item.importType || "");
+                  const matchesOwnershipType = ownershipTypeFilter.length === 0 || ownershipTypeFilter.includes(item.ownershipType || "");
+                  const matchesSoldFilter = showSoldCars ? true : item.status !== "مباع";
+                  
+                  return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesYear && matchesEngineCapacity && matchesInteriorColor && matchesExteriorColor && matchesStatus && matchesImportType && matchesOwnershipType && matchesSoldFilter;
+                });
+
+                const stats = {
+                  total: filteredItems.length,
+                  available: filteredItems.filter(item => item.status === "متوفر").length,
+                  inTransit: filteredItems.filter(item => item.status === "في الطريق").length,
+                  maintenance: filteredItems.filter(item => item.status === "صيانة").length,
+                  reserved: filteredItems.filter(item => item.status === "محجوز").length,
+                  sold: filteredItems.filter(item => item.status === "مباع").length,
+                };
+
+                return (
+                  <>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white drop-shadow-lg">{stats.total}</div>
+                      <div className="text-sm text-white/80 drop-shadow">إجمالي الظاهرة</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-400 drop-shadow-lg">{stats.available}</div>
+                      <div className="text-sm text-white/80 drop-shadow">متوفر</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-yellow-400 drop-shadow-lg">{stats.inTransit}</div>
+                      <div className="text-sm text-white/80 drop-shadow">في الطريق</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-orange-400 drop-shadow-lg">{stats.maintenance}</div>
+                      <div className="text-sm text-white/80 drop-shadow">صيانة</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400 drop-shadow-lg">{stats.reserved}</div>
+                      <div className="text-sm text-white/80 drop-shadow">محجوز</div>
+                    </div>
+                    {showSoldCars && (
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-red-400 drop-shadow-lg">{stats.sold}</div>
+                        <div className="text-sm text-white/80 drop-shadow">مباع</div>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+            <div className="mt-3 pt-3 border-t border-white/20">
+              <div className="text-center text-sm text-white/70 drop-shadow">
+                إحصائيات السيارات الظاهرة في الجدول حسب الفلاتر المطبقة
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Pagination */}
         <div className="flex items-center justify-end mt-8">
           <div className="glass-pagination flex items-center space-x-2 space-x-reverse">

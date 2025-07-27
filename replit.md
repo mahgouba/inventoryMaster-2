@@ -281,6 +281,17 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ User interface navigation cleaned up - removed scroll down button from horizontal navigation
 - ✅ Removed "إدارة الفواتير" (invoices) from both sidebar and horizontal navigation per user request
 - ✅ Arabic inventory management system fully operational and ready for development
+
+### Filtered Vehicle Statistics Enhancement (July 27, 2025)
+- ✅ **COMPLETED: Dynamic Statistics Display** - Added real-time statistics rectangle showing counts for currently filtered/visible vehicles in inventory table
+- ✅ **Smart Filtering Integration** - Statistics automatically update based on all applied filters (search, manufacturer, category, status, etc.)
+- ✅ **Comprehensive Status Breakdown** - Shows counts for: Total visible, Available, In Transit, Maintenance, Reserved, and Sold (when sold cars view is enabled)
+- ✅ **Glass Morphism Design** - Consistent styling with existing application design using glass-container and white text with drop shadows
+- ✅ **Responsive Grid Layout** - Adapts from 2 columns on mobile to 6 columns on large screens for optimal viewing experience
+- ✅ **Arabic Interface** - Full RTL support with Arabic labels and descriptive text explaining the statistics functionality
+- ✅ **Color-Coded Display** - Each status uses distinctive colors (green for available, yellow for transit, blue for reserved, etc.)
+- ✅ **Conditional Display** - Sold vehicles count only appears when "إظهار السيارات المباعة" is enabled
+- ✅ **Real-Time Updates** - Statistics update instantly when filters are applied or removed, providing immediate feedback to users
 - ✅ **COMPLETED: Fixed Horizontal Navigation** - Added fixed horizontal navigation bar to inventory page with proper positioning and spacing
 - ✅ Enhanced main content padding (pt-24) to accommodate fixed navigation bar and prevent content overlap
 - ✅ Integrated HorizontalNavigation component with glass morphism styling and proper z-index positioning
