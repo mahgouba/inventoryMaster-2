@@ -271,7 +271,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ **COMPLETED: Pricing Table Restoration** - Restored complete 5-column pricing table structure with license plate and total columns after accidental deletion
 - ✅ **COMPLETED: Price Details Header Removal** - Removed "تفاصيل السعر" header from pricing table per user request for cleaner appearance
 
-### Latest Replit Environment Migration - Complete Success with UI Updates (July 27, 2025)
+### Latest Replit Environment Migration - Complete Success with Border Removal (July 27, 2025)
 - ✅ Successfully completed migration from Replit Agent to standard Replit environment  
 - ✅ All required packages installed and verified working (Node.js 20, tsx, all dependencies)
 - ✅ Application running smoothly with Express server on port 5000
@@ -316,6 +316,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Fixed all JSX syntax errors and compilation issues
 - ✅ Cleaned up unused imports and variables throughout codebase
 - ✅ **UPDATED: Quotation Background Images** - Replaced both quotation backgrounds from JPG to SVG format per user request
+- ✅ **COMPLETED: Vehicle Information Border Removal** - Removed borders from vehicle information section in PDF quotation output per user request
 - ✅ Updated albarimi1 background from public/albarimi-1.jpg to public/albarimi-1.svg
 - ✅ Updated albarimi2 background from public/albarimi-2.jpg to public/albarimi-2.svg  
 - ✅ Updated backgroundImages object in quotation-a4-preview.tsx to use SVG format for both backgrounds
