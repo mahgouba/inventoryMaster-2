@@ -97,7 +97,10 @@ export default function InvoiceManagement() {
   // Fetch invoices
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
     queryKey: ["/api/invoices"],
-    queryFn: () => apiRequest("/api/invoices"),
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/invoices");
+      return response.json();
+    },
   });
 
   // Update invoice mutation
