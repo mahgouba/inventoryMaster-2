@@ -436,7 +436,7 @@ export default function QuotationA4Preview({
             {/* Terms & Conditions Section - Hidden in invoice mode */}
             {!isInvoiceMode && (
               <div className="bg-white/95 print:bg-white border border-[#E2E8F0] print:border-none p-4 rounded-lg flex-1 shadow-sm">
-                <h4 className="text-sm font-bold mb-3 text-[#2B4C8C] print:text-black border-b border-[#E2E8F0] print:border-none pb-2">الشروط والأحكام</h4>
+                
                 <div className="text-xs space-y-2">
                   {termsConditions.length > 0 ? (
                     termsConditions.map((term, index) => (
