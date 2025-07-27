@@ -1147,41 +1147,8 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         return;
       }
 
-      // Force background printing in browser
-      const printStyles = `
-        <style>
-          @media print {
-            * {
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-              color-adjust: exact !important;
-            }
-            
-            [data-pdf-export="quotation"] {
-              background-image: inherit !important;
-              background-repeat: no-repeat !important;
-              background-position: center !important;
-              background-size: cover !important;
-              -webkit-background-size: cover !important;
-            }
-          }
-        </style>
-      `;
-      
-      // Add print styles to current document
-      const styleElement = document.createElement('style');
-      styleElement.innerHTML = printStyles.replace(/<\/?style>/g, '');
-      document.head.appendChild(styleElement);
-      
-      // Trigger print
-      window.print();
-      
-      // Remove added styles after print
-      setTimeout(() => {
-        document.head.removeChild(styleElement);
-      }, 1000);
-      
-      return;
+      // Create print window with A4 dimensions
+      const printWindow = window.open('', '_blank', 'width=210mm,height=297mm,scrollbars=yes,resizable=yes');
       if (!printWindow) {
         toast({
           title: "خطأ",
@@ -1190,39 +1157,129 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         });
         return;
       }
-      
-      // Copy styles and content to print window
+
+      // Get all stylesheets
+      const stylesheets = Array.from(document.styleSheets).map(sheet => {
+        try {
+          return Array.from(sheet.cssRules).map(rule => rule.cssText).join('\n');
+        } catch (e) {
+          return '';
+        }
+      }).join('\n');
+
+      // Create print document with exact A4 dimensions and Arabic support
       printWindow.document.write(`
-        <html>
+        <!DOCTYPE html>
+        <html dir="rtl" lang="ar">
           <head>
-            <title>طباعة العرض</title>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>طباعة ${isInvoiceMode ? 'الفاتورة' : 'عرض السعر'}</title>
+            <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
             <style>
-              @media print {
-                body { margin: 0; padding: 20px; }
-                * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
+              * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
               }
-              ${Array.from(document.styleSheets).map(sheet => {
-                try {
-                  return Array.from(sheet.cssRules).map(rule => rule.cssText).join('\n');
-                } catch (e) {
-                  return '';
+              
+              body {
+                margin: 0;
+                padding: 0;
+                font-family: 'Noto Sans Arabic', Arial, sans-serif;
+                direction: rtl;
+                background: white;
+              }
+              
+              @page {
+                size: A4;
+                margin: 0;
+                background-color: white;
+              }
+              
+              @media print {
+                body { 
+                  margin: 0 !important; 
+                  padding: 0 !important;
+                  width: 210mm;
+                  height: 297mm;
                 }
-              }).join('\n')}
+                
+                * {
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+                  color-adjust: exact !important;
+                }
+                
+                .quotation-container {
+                  width: 210mm !important;
+                  height: 297mm !important;
+                  min-width: 210mm !important;
+                  min-height: 297mm !important;
+                  max-width: 210mm !important;
+                  max-height: 297mm !important;
+                  background-repeat: no-repeat !important;
+                  background-position: center !important;
+                  background-size: cover !important;
+                  -webkit-background-size: cover !important;
+                  transform: none !important;
+                  zoom: 1 !important;
+                }
+                
+                /* Hide any buttons or interactive elements */
+                button, .print-hide { 
+                  display: none !important; 
+                }
+                
+                /* Ensure text is black for printing */
+                .print\\:text-black {
+                  color: black !important;
+                }
+                
+                /* Ensure backgrounds are preserved */
+                .print\\:bg-white {
+                  background-color: white !important;
+                }
+                
+                /* Company stamp sizing for print */
+                .company-stamp {
+                  width: 216px !important;
+                  height: 144px !important;
+                  max-width: 216px !important;
+                  max-height: 144px !important;
+                }
+                
+                /* Table alignment for print */
+                .print-table td, .print-table th {
+                  text-align: center !important;
+                  vertical-align: middle !important;
+                }
+              }
+              
+              ${stylesheets}
             </style>
           </head>
           <body>
-            ${element.outerHTML}
+            <div class="quotation-container">
+              ${element.outerHTML}
+            </div>
+            <script>
+              window.onload = function() {
+                setTimeout(function() {
+                  window.print();
+                  window.close();
+                }, 500);
+              };
+            </script>
           </body>
         </html>
       `);
       
       printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
       
       toast({
         title: "تم التحضير للطباعة",
-        description: "تم تحضير العرض للطباعة بنجاح",
+        description: "تم تحضير العرض للطباعة بأبعاد A4 وخلفية كاملة",
       });
       
     } catch (error) {
