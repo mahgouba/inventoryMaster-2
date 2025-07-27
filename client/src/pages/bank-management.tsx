@@ -20,7 +20,10 @@ export default function BankManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBank, setEditingBank] = useState<Bank | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [hiddenBanks, setHiddenBanks] = useState<Set<number>>(new Set());
+  const [hiddenBanks, setHiddenBanks] = useState<Set<number>>(() => {
+    const saved = localStorage.getItem('hiddenBanks');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -45,10 +48,7 @@ export default function BankManagement() {
 
   const createMutation = useMutation({
     mutationFn: (data: InsertBank) => 
-      apiRequest("/api/banks", {
-        method: "POST",
-        body: JSON.stringify(data)
-      }),
+      apiRequest("POST", "/api/banks", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/banks"] });
       setIsDialogOpen(false);
@@ -69,10 +69,7 @@ export default function BankManagement() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<InsertBank> }) =>
-      apiRequest(`/api/banks/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(data)
-      }),
+      apiRequest("PUT", `/api/banks/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/banks"] });
       setIsDialogOpen(false);
@@ -94,9 +91,7 @@ export default function BankManagement() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest(`/api/banks/${id}`, {
-        method: "DELETE"
-      }),
+      apiRequest("DELETE", `/api/banks/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/banks"] });
       toast({
@@ -178,7 +173,7 @@ export default function BankManagement() {
         newSet.delete(bankId);
         toast({
           title: "تم إظهار البنك",
-          description: "أصبح البنك مرئياً في الصفحة",
+          description: "أصبح البنك مرئياً في صفحة العرض",
         });
       } else {
         newSet.add(bankId);
@@ -187,6 +182,8 @@ export default function BankManagement() {
           description: "تم إخفاء البنك من صفحة العرض",
         });
       }
+      // Save to localStorage
+      localStorage.setItem('hiddenBanks', JSON.stringify(Array.from(newSet)));
       return newSet;
     });
   };

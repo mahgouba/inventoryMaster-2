@@ -3,7 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { User, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft, Info } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { User, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft, Info, MoreVertical } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -12,9 +13,13 @@ import type { Bank } from "@shared/schema";
 export default function PersonalBanks() {
   const [expandedBanks, setExpandedBanks] = useState<Set<number>>(new Set());
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [hiddenBanks, setHiddenBanks] = useState<Set<number>>(() => {
+    const saved = localStorage.getItem('hiddenBanks');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
   const { toast } = useToast();
 
-  const { data: banks = [], isLoading } = useQuery({
+  const { data: allBanks = [], isLoading } = useQuery({
     queryKey: ["/api/banks/type/شخصي"],
     queryFn: async () => {
       const response = await fetch("/api/banks/type/شخصي");
@@ -22,6 +27,9 @@ export default function PersonalBanks() {
       return response.json() as Promise<Bank[]>;
     }
   });
+
+  // Filter out hidden banks
+  const banks = allBanks.filter(bank => !hiddenBanks.has(bank.id));
 
   // Fetch company logo from appearance settings
   const { data: appearance } = useQuery({
@@ -394,17 +402,40 @@ export default function PersonalBanks() {
                             </div>
                           </div>
 
-                          {/* Share Button */}
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              shareBank(bank);
-                            }}
-                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm border border-white/20"
-                          >
-                            <Share2 className="w-5 h-5" />
-                            <span className="font-semibold">مشاركة</span>
-                          </Button>
+                          {/* Actions Dropdown */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm border border-white/20"
+                              >
+                                <MoreVertical className="w-5 h-5" />
+                                <span className="font-semibold">الإجراءات</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="bg-white/90 backdrop-blur-sm border-white/20" align="end">
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  shareBank(bank);
+                                }}
+                                className="flex items-center gap-2 cursor-pointer hover:bg-gray-100/50"
+                              >
+                                <Share2 className="w-4 h-4" />
+                                <span>مشاركة بيانات البنك</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  copyToClipboard(`${bank.bankName}\nاسم الحساب: ${bank.accountName}\nرقم الحساب: ${bank.accountNumber}\nالآيبان: ${bank.iban}`, "بيانات البنك");
+                                }}
+                                className="flex items-center gap-2 cursor-pointer hover:bg-gray-100/50"
+                              >
+                                <Copy className="w-4 h-4" />
+                                <span>نسخ كامل البيانات</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       )}
                     </div>
