@@ -677,13 +677,29 @@ input[type="radio"]:checked {
 
 /* Comprehensive Print Styles for Quotation PDFs */
 @media print {
-  /* Force black text and white backgrounds for all elements */
-  *,
-  *::before,
-  *::after {
+  /* Force backgrounds to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  /* Preserve quotation background image */
+  [data-pdf-export="quotation"] {
+    background-image: inherit !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: cover !important;
+    -webkit-background-size: cover !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  /* Force black text and white backgrounds for content elements only */
+  [data-pdf-export="quotation"] *:not([data-pdf-export="quotation"]) {
     color: #000000 !important;
     background: transparent !important;
-    background-color: #ffffff !important;
     text-shadow: none !important;
     box-shadow: none !important;
     filter: none !important;

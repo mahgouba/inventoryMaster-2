@@ -1146,9 +1146,42 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         });
         return;
       }
+
+      // Force background printing in browser
+      const printStyles = `
+        <style>
+          @media print {
+            * {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              color-adjust: exact !important;
+            }
+            
+            [data-pdf-export="quotation"] {
+              background-image: inherit !important;
+              background-repeat: no-repeat !important;
+              background-position: center !important;
+              background-size: cover !important;
+              -webkit-background-size: cover !important;
+            }
+          }
+        </style>
+      `;
       
-      // Create a new window for printing
-      const printWindow = window.open('', '_blank');
+      // Add print styles to current document
+      const styleElement = document.createElement('style');
+      styleElement.innerHTML = printStyles.replace(/<\/?style>/g, '');
+      document.head.appendChild(styleElement);
+      
+      // Trigger print
+      window.print();
+      
+      // Remove added styles after print
+      setTimeout(() => {
+        document.head.removeChild(styleElement);
+      }, 1000);
+      
+      return;
       if (!printWindow) {
         toast({
           title: "خطأ",
