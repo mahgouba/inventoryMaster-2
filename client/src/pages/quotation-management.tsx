@@ -54,7 +54,6 @@ import {
   Car,
   User,
   Building,
-  Home,
 } from "lucide-react";
 
 interface Quotation {
@@ -239,12 +238,6 @@ export default function QuotationManagement() {
                 </div>
               </div>
               <div className="flex space-x-reverse space-x-3">
-                <Link href="/">
-                  <Button variant="outline" size="sm" className="glass-button border-white/20 text-white hover:bg-white/10">
-                    <Home className="h-4 w-4 ml-2" />
-                    الرئيسية
-                  </Button>
-                </Link>
                 <Link href="/quotation-creation">
                   <Button className="glass-button bg-blue-600/80 hover:bg-blue-700/80 text-white border-white/20">
                     <Plus className="h-4 w-4 ml-2" />
