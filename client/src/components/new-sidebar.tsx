@@ -60,11 +60,6 @@ export default function NewSidebar({ user, onLogout }: NewSidebarProps) {
       icon: MessageSquare 
     },
     { 
-      title: "إدارة الفواتير", 
-      href: "/invoice-management", 
-      icon: Calendar 
-    },
-    { 
       title: "طلبات الحجز", 
       href: "/reservations", 
       icon: Activity 

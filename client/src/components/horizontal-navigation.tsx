@@ -241,12 +241,6 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       internal: true
     },
     { 
-      title: "الفواتير", 
-      href: "/invoice-management", 
-      icon: FileText,
-      internal: true
-    },
-    { 
       title: "الحجوزات", 
       href: "/reservations", 
       icon: Calendar,

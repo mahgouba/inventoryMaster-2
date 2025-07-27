@@ -267,7 +267,8 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ No compilation errors or LSP diagnostics issues
 - ✅ Workflow running successfully with hot module replacement (HMR)
 - ✅ User interface navigation cleaned up - removed scroll down button from horizontal navigation
-- ✅ Arabic inventory management system fully operational and ready for developmentnventory page per user request
+- ✅ Removed "إدارة الفواتير" (invoices) from both sidebar and horizontal navigation per user request
+- ✅ Arabic inventory management system fully operational and ready for development
 - ✅ **COMPLETED: Fixed Horizontal Navigation** - Added fixed horizontal navigation bar to inventory page with proper positioning and spacing
 - ✅ Enhanced main content padding (pt-24) to accommodate fixed navigation bar and prevent content overlap
 - ✅ Integrated HorizontalNavigation component with glass morphism styling and proper z-index positioning
