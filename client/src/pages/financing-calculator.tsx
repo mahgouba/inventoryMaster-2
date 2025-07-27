@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calculator, Printer, Save, ArrowRight, Home, TrendingUp } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -246,10 +247,7 @@ export default function FinancingCalculatorPage() {
 
   const saveCalculationMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest("/api/financing-calculations", {
-        method: "POST",
-        body: JSON.stringify(data)
-      });
+      return apiRequest("POST", "/api/financing-calculations", data);
     },
     onSuccess: () => {
       toast({
@@ -422,14 +420,14 @@ export default function FinancingCalculatorPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Input Form */}
-          <div className="glass-container h-fit">
-            <div className="pb-3 border-b border-white/10">
-              <h2 className="text-lg font-semibold text-white drop-shadow-lg flex items-center">
+          <Card className="glass-container h-fit">
+            <CardHeader className="pb-3 border-b border-white/10">
+              <CardTitle className="text-lg font-semibold text-white drop-shadow-lg flex items-center">
                 <TrendingUp className="h-5 w-5 ml-2 text-blue-400" />
                 بيانات التمويل
-              </h2>
-            </div>
-            <div className="space-y-6 p-4">
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6 p-4">
               {/* Customer Info */}
               <div className="space-y-4">
                 <div>
@@ -707,6 +705,6 @@ export default function FinancingCalculatorPage() {
           )}
         </div>
       </div>
-    </div>
+    </SystemGlassWrapper>
   );
 }
