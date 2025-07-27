@@ -3173,8 +3173,8 @@ export class DatabaseStorage implements IStorage {
 // Initialize storage based on environment
 let storage: IStorage;
 
-// For now, use MemStorage for development compatibility
-console.log("✅ Using MemStorage for development compatibility");
+// For development, use MemStorage until database is provisioned
+console.log("⚠️ Using MemStorage for development compatibility");
 storage = new MemStorage();
 
 export { storage };

@@ -3,14 +3,17 @@ import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
 
-neonConfig.webSocketConstructor = ws;
+// Only configure database if DATABASE_URL is available
+let pool: Pool | null = null;
+let db: any = null;
 
-// For development compatibility, use a fallback or handle missing DATABASE_URL gracefully
-if (!process.env.DATABASE_URL) {
-  console.warn("DATABASE_URL not set. Using fallback database configuration for development.");
-  // You can set a fallback URL or handle this gracefully
-  process.env.DATABASE_URL = "postgresql://localhost:5432/inventory_dev";
+if (process.env.DATABASE_URL) {
+  neonConfig.webSocketConstructor = ws;
+  pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  db = drizzle({ client: pool, schema });
+  console.log("✅ Database connection configured");
+} else {
+  console.log("⚠️ DATABASE_URL not set - database features will use in-memory storage");
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+export { pool, db };
