@@ -474,14 +474,11 @@ export default function QuotationA4Preview({
           {/* Stamp Section - Only show if companyStamp is provided */}
           {companyStamp && (
             <div className="flex justify-end mb-6">
-              <div className="bg-white/95 print:bg-white border border-[#E2E8F0] rounded-lg p-3 w-80 h-40 flex items-center justify-center shadow-sm">
-                <img 
-                  src={companyStamp} 
-                  alt="ختم الشركة" 
-                  className="w-full h-full object-contain"
-                  style={{ transform: 'scale(0.92)' }}
-                />
-              </div>
+              <img 
+                src={companyStamp} 
+                alt="ختم الشركة" 
+                className="w-80 h-40 object-contain"
+              />
             </div>
           )}
 
