@@ -426,7 +426,7 @@ export default function QuotationA4Preview({
                 </div>
               </div>
               <div className="p-4 text-center">
-                <div className="text-center text-xs font-bold text-[#2B4C8C] print:text-black px-4 py-3">
+                <div className="text-center text-xs font-bold text-[#2B4C8C] print:text-black">
                   {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))} ريال سعودي لا غير
                 </div>
               </div>
