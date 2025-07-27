@@ -426,8 +426,6 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
         </div>
       </div>
 
-
-
       {/* Footer Glow */}
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-blue-500/10 to-transparent pointer-events-none"></div>
     </div>
