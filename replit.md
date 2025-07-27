@@ -269,6 +269,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ Improved PDF print quality by ensuring proper contrast ratios throughout the entire pricing table
 - ✅ **COMPLETED: Border Removal** - Removed all borders from vehicle information, terms & conditions, and representative information sections in PDF using `print:border-none`
 - ✅ **COMPLETED: Pricing Table Restoration** - Restored complete 5-column pricing table structure with license plate and total columns after accidental deletion
+- ✅ **COMPLETED: Price Details Header Removal** - Removed "تفاصيل السعر" header from pricing table per user request for cleaner appearance
 
 ### Latest Replit Environment Migration - Complete Success (July 27, 2025)
 - ✅ Successfully completed migration from Replit Agent to standard Replit environment  
