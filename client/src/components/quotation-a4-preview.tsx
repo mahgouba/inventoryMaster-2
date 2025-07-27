@@ -401,35 +401,35 @@ export default function QuotationA4Preview({
             </div>
             
             {/* Table Header */}
-            <div className="grid grid-cols-5 bg-[#F1F5F9] print:bg-white border-b border-white text-xs font-bold text-center">
-              <div className="p-2 border-l border-white text-[#2B4C8C] print:text-white">الكمية</div>
-              <div className="p-2 border-l border-white text-[#2B4C8C] print:text-white">السعر الفردي</div>
-              <div className="p-2 border-l border-white text-[#2B4C8C] print:text-white">الضريبة ({taxRate}%)</div>
-              <div className="p-2 border-l border-white text-[#2B4C8C] print:text-white">اللوحات</div>
-              <div className="p-2 text-[#2B4C8C] print:text-white">الإجمالي</div>
+            <div className="grid grid-cols-5 bg-[#F1F5F9] print:bg-white border-b border-white print:border-white text-xs font-bold text-center">
+              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">الكمية</div>
+              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">السعر الفردي</div>
+              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">الضريبة ({taxRate}%)</div>
+              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">اللوحات</div>
+              <div className="p-2 text-[#2B4C8C] print:text-black">الإجمالي</div>
             </div>
             
             {/* Table Row */}
-            <div className="grid grid-cols-5 border-b border-white text-xs text-center bg-white print:bg-white">
-              <div className="p-2 border-l border-white text-[#1A365D] print:text-white">1</div>
-              <div className="p-2 border-l border-white font-semibold text-[#1A365D] print:text-white">{basePrice.toLocaleString()}</div>
-              <div className="p-2 border-l border-white font-semibold text-[#1A365D] print:text-white">{taxAmount.toLocaleString()}</div>
-              <div className="p-2 border-l border-white font-semibold text-[#1A365D] print:text-white">
+            <div className="grid grid-cols-5 border-b border-white print:border-white text-xs text-center bg-white print:bg-white">
+              <div className="p-2 border-l border-white print:border-white text-[#1A365D] print:text-black">1</div>
+              <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black">{basePrice.toLocaleString()}</div>
+              <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black">{taxAmount.toLocaleString()}</div>
+              <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black">
                 {includeLicensePlate ? licensePlatePrice.toLocaleString() : "0"}
               </div>
-              <div className="p-2 font-bold text-[#C49632] print:text-white">
+              <div className="p-2 font-bold text-[#C49632] print:text-black">
                 {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}
               </div>
             </div>
             
             {/* Total Row */}
-            <div className="p-4 bg-[#F8FAFC] print:bg-white border-t-2 border-[#E2E8F0] rounded-b pt-[4px] pb-[4px]">
+            <div className="p-4 bg-[#F8FAFC] print:bg-white border-t-2 border-[#E2E8F0] print:border-white rounded-b pt-[4px] pb-[4px]">
               <div className="flex justify-center mb-3">
-                <div className="font-bold text-sm text-[#2B4C8C] print:text-white">
-                  المجموع: <span className="text-[#C49632]">{(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}</span> ريال
+                <div className="font-bold text-sm text-[#2B4C8C] print:text-black">
+                  المجموع: <span className="text-[#C49632] print:text-black">{(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}</span> ريال
                 </div>
               </div>
-              <div className="text-center text-xs font-bold text-white print:text-white px-4 py-3 rounded bg-[#C49632] print:bg-gray-100 pt-[2px] pb-[2px]">
+              <div className="text-center text-xs font-bold text-white print:text-black px-4 py-3 rounded bg-[#C49632] print:bg-white print:border print:border-black pt-[2px] pb-[2px]">
                 {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))} ريال سعودي لا غير
               </div>
             </div>
