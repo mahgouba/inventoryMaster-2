@@ -162,6 +162,14 @@ export default function QuotationA4Preview({
           print-color-adjust: exact;
         }
         
+        /* Stamp sizing for print */
+        .print-content img[alt="ختم الشركة"] {
+          width: 120px !important;
+          height: 80px !important;
+          max-width: 120px !important;
+          max-height: 80px !important;
+        }
+        
         /* Ensure proper font sizing and spacing */
         .print-content .text-xs { font-size: 0.75rem; }
         .print-content .text-sm { font-size: 0.875rem; }
@@ -178,6 +186,22 @@ export default function QuotationA4Preview({
         .print-content .flex { display: flex; }
         .print-content .justify-between { justify-content: space-between; }
         .print-content .items-center { align-items: center; }
+        .print-content .justify-center { justify-content: center; }
+        
+        /* Table cell alignment fixes */
+        .print-content .grid-cols-5 > div {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          text-align: center !important;
+        }
+        
+        .print-content .grid-cols-10 > div {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          text-align: center !important;
+        }
         
         /* Preserve margins and padding */
         .print-content .p-2 { padding: 0.5rem; }
@@ -565,35 +589,35 @@ export default function QuotationA4Preview({
           <div className="print:bg-transparent border border-[#E2E8F0] rounded-lg mb-6 shadow-lg overflow-hidden p-4">
             
             {/* Table Header */}
-            <div className="grid grid-cols-5 print:bg-transparent border-b border-white print:border-white text-xs font-bold text-center">
-              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">الكمية</div>
-              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">السعر الفردي</div>
-              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">الضريبة ({taxRate}%)</div>
-              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">اللوحات</div>
-              <div className="p-2 text-[#2B4C8C] print:text-black">الإجمالي</div>
+            <div className="grid grid-cols-5 print:bg-transparent border-b border-white print:border-white text-xs font-bold">
+              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black text-center flex items-center justify-center">الكمية</div>
+              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black text-center flex items-center justify-center">السعر الفردي</div>
+              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black text-center flex items-center justify-center">الضريبة ({taxRate}%)</div>
+              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black text-center flex items-center justify-center">اللوحات</div>
+              <div className="p-2 text-[#2B4C8C] print:text-black text-center flex items-center justify-center">الإجمالي</div>
             </div>
             
             {/* Table Data Row */}
-            <div className="grid grid-cols-5 border-b border-white print:border-white text-xs text-center print:bg-transparent">
-              <div className="p-2 border-l border-white print:border-white text-[#1A365D] print:text-black">1</div>
-              <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black">{basePrice.toLocaleString()}</div>
-              <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black">{taxAmount.toLocaleString()}</div>
-              <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black">
+            <div className="grid grid-cols-5 border-b border-white print:border-white text-xs print:bg-transparent">
+              <div className="p-2 border-l border-white print:border-white text-[#1A365D] print:text-black text-center flex items-center justify-center">1</div>
+              <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black text-center flex items-center justify-center">{basePrice.toLocaleString()}</div>
+              <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black text-center flex items-center justify-center">{taxAmount.toLocaleString()}</div>
+              <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black text-center flex items-center justify-center">
                 {includeLicensePlate ? licensePlatePrice.toLocaleString() : "0"}
               </div>
-              <div className="p-2 font-bold text-[#2B4C8C] print:text-black">
+              <div className="p-2 font-bold text-[#2B4C8C] print:text-black text-center flex items-center justify-center">
                 {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}
               </div>
             </div>
             
             {/* Total Row - Third Row */}
             <div className="grid grid-cols-10 print:bg-transparent text-xs">
-              <div className="p-4 text-center col-span-3">
-                <div className="font-bold text-[#2B4C8C] print:text-black text-[13px]">
+              <div className="p-4 col-span-3 flex items-center justify-center">
+                <div className="font-bold text-[#2B4C8C] print:text-black text-[13px] text-center">
                   المجموع: <span className="text-[#2B4C8C] print:text-black">{(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}</span> ريال
                 </div>
               </div>
-              <div className="p-4 text-center col-span-7">
+              <div className="p-4 col-span-7 flex items-center justify-center">
                 <div className="text-center text-xs font-bold text-[#2B4C8C] print:text-black">
                   {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))} ريال سعودي لا غير
                 </div>
@@ -645,7 +669,7 @@ export default function QuotationA4Preview({
               <img 
                 src={companyStamp} 
                 alt="ختم الشركة" 
-                className="w-80 h-40 object-contain"
+                className="w-32 h-20 object-contain max-w-[120px] max-h-[80px] print:w-[120px] print:h-[80px]"
               />
             </div>
           )}

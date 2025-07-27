@@ -469,6 +469,16 @@ The application uses PostgreSQL for persistent data storage with proper database
   - Made icons completely static with no left or right movement during interactions
 - ✅ Migration completed successfully with comprehensive Arabic inventory management system operational and unified visual design
 
+### PDF Print Optimization - Stamp Size and Table Alignment Fix (July 27, 2025)
+- ✅ **COMPLETED: Stamp Size Optimization** - Fixed irregular stamp sizing in PDF output by implementing proper print-specific CSS constraints
+- ✅ **Stamp Dimensions Control** - Applied consistent 120px x 80px sizing for company stamp in both preview and print modes
+- ✅ **Table Center Alignment Fix** - Resolved table cell misalignment issues by implementing proper flex center alignment for all table cells
+- ✅ **Grid Layout Enhancement** - Added CSS rules to ensure all grid columns (grid-cols-5, grid-cols-10) display proper center alignment in print mode
+- ✅ **Print Styles Optimization** - Enhanced print CSS with specific selectors for stamp sizing and table cell alignment
+- ✅ **Professional PDF Output** - Print function now maintains exact formatting and dimensions as shown in preview interface
+- ✅ **Arabic RTL Support** - Maintained proper Arabic text direction and formatting throughout print process
+- ✅ **Font and Background Preservation** - Ensured Noto Sans Arabic font and background images render correctly in printed documents
+
 ### PDF Optimization and Design Updates (July 27, 2025)
 - ✅ **COMPLETED: White Table Borders in PDF** - Changed all table borders from black/gray to white in quotation PDF per user request
 - ✅ Updated Price Breakdown Table borders (table container, header, cells) from gray-300/gray-200 to white
