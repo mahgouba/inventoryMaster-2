@@ -242,7 +242,7 @@ export default function QuotationA4Preview({
 
             {/* Document Type with Number and Date in same row */}
             <div className="absolute top-20 right-8">
-              <div className="flex items-center gap-6">
+              <div className="flex items-center gap-8">
                 <h2 className="text-base font-bold text-[#2B4C8C] print:text-black" style={{fontFamily: 'Cairo, sans-serif'}}>
                   {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
                 </h2>
@@ -253,13 +253,13 @@ export default function QuotationA4Preview({
                 <div className="text-xs text-[#1A365D] print:text-black">
                   <span className="font-semibold">الإصدار: </span>
                   <span className="font-bold text-[#C49632]">{new Date().toLocaleDateString('en-GB')}</span>
-                  {!isInvoiceMode && (
-                    <>
-                      <span className="font-semibold ml-4">صالح حتى: </span>
-                      <span className="font-bold text-[#C49632]">{validUntil.toLocaleDateString('en-GB')}</span>
-                    </>
-                  )}
                 </div>
+                {!isInvoiceMode && (
+                  <div className="text-xs text-[#1A365D] print:text-black">
+                    <span className="font-semibold">صالح حتى: </span>
+                    <span className="font-bold text-[#C49632]">{validUntil.toLocaleDateString('en-GB')}</span>
+                  </div>
+                )}
               </div>
               
               {/* Customer Information Details below header */}
