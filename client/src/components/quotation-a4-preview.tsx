@@ -139,13 +139,16 @@ export default function QuotationA4Preview({
           -webkit-print-color-adjust: exact;
           color-adjust: exact;
           print-color-adjust: exact;
+          image-rendering: crisp-edges;
+          image-rendering: -webkit-optimize-contrast;
         }
         
         /* Hide interactive elements during print */
         .print-content button,
         .print-content .cursor-pointer,
         .print-content [class*="hover:"],
-        .print-content .print\\:hidden {
+        .print-content .print\\:hidden,
+        .print-content [class*="print:hidden"] {
           display: none !important;
         }
         
@@ -229,28 +232,56 @@ export default function QuotationA4Preview({
       // Get the background image as absolute URL
       const backgroundUrl = window.location.origin + (useAlbarimi2Background ? backgroundImages.albarimi2 : backgroundImages.albarimi1);
       
+      // Clean the content to remove all buttons and interactive elements
+      let cleanContent = printContent.innerHTML;
+      // Remove all buttons
+      cleanContent = cleanContent.replace(/<button[^>]*>.*?<\/button>/gi, '');
+      // Remove elements with print:hidden class
+      cleanContent = cleanContent.replace(/<[^>]*class="[^"]*print:hidden[^"]*"[^>]*>.*?<\/[^>]*>/gi, '');
+      // Remove elements with no-print class
+      cleanContent = cleanContent.replace(/<[^>]*class="[^"]*no-print[^"]*"[^>]*>.*?<\/[^>]*>/gi, '');
+      
       printWindow.document.write(`
         <html dir="rtl">
           <head>
             <title>طباعة ${isInvoiceMode ? 'فاتورة' : 'عرض سعر'} - ${quoteNumber || invoiceNumber}</title>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="print-color-adjust" content="exact">
+            <meta name="color-scheme" content="light">
             ${printStyles}
           </head>
           <body>
-            <div class="print-content" style="background-image: url('${backgroundUrl}');">
-              ${printContent.innerHTML}
+            <div class="print-content" style="background-image: url('${backgroundUrl}'); image-rendering: crisp-edges; image-rendering: -webkit-optimize-contrast;">
+              ${cleanContent}
             </div>
           </body>
         </html>
       `);
       printWindow.document.close();
       
-      // Wait for all content including images and fonts to load
+      // Wait for all content including images and fonts to load with higher DPI rendering
       printWindow.onload = () => {
+        // Set print media type for better quality
+        const printMedia = printWindow.document.createElement('style');
+        printMedia.innerHTML = `
+          @media print {
+            * { 
+              -webkit-print-color-adjust: exact !important;
+              color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .print-content {
+              image-rendering: -webkit-optimize-contrast !important;
+              image-rendering: crisp-edges !important;
+            }
+          }
+        `;
+        printWindow.document.head.appendChild(printMedia);
+        
         setTimeout(() => {
           printWindow.print();
-        }, 1000);
+        }, 1500);
       };
       
       // Fallback if onload doesn't work
@@ -258,7 +289,7 @@ export default function QuotationA4Preview({
         if (printWindow && !printWindow.closed) {
           printWindow.print();
         }
-      }, 1500);
+      }, 2000);
     }
   };
 
@@ -562,7 +593,7 @@ export default function QuotationA4Preview({
                       variant="outline"
                       size="sm"
                       onClick={() => setIsEditingSpecs(!isEditingSpecs)}
-                      className="text-xs px-2 py-1 print:hidden border-[#C49632] text-[#C49632] hover:bg-[#C49632] hover:text-white"
+                      className="text-xs px-2 py-1 print:hidden no-print border-[#C49632] text-[#C49632] hover:bg-[#C49632] hover:text-white"
                     >
                       {isEditingSpecs ? "حفظ" : "تحرير"}
                     </Button>
