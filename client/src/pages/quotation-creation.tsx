@@ -1147,139 +1147,100 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         return;
       }
 
-      // Create print window with A4 dimensions
-      const printWindow = window.open('', '_blank', 'width=210mm,height=297mm,scrollbars=yes,resizable=yes');
-      if (!printWindow) {
-        toast({
-          title: "خطأ",
-          description: "لم يتم السماح بفتح نافذة جديدة للطباعة",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Get all stylesheets
-      const stylesheets = Array.from(document.styleSheets).map(sheet => {
-        try {
-          return Array.from(sheet.cssRules).map(rule => rule.cssText).join('\n');
-        } catch (e) {
-          return '';
+      // Add print styles to preserve background and formatting
+      const printStyles = document.createElement('style');
+      printStyles.id = 'quotation-print-styles';
+      printStyles.innerHTML = `
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          
+          [data-pdf-export="quotation"], 
+          [data-pdf-export="quotation"] * {
+            visibility: visible;
+          }
+          
+          [data-pdf-export="quotation"] {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            transform: none !important;
+            zoom: 1 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-size: cover !important;
+            -webkit-background-size: cover !important;
+          }
+          
+          /* Hide controls during print */
+          .mb-4, button, .print-hide {
+            display: none !important;
+            visibility: hidden !important;
+          }
+          
+          /* Ensure text is black for printing */
+          .print\\:text-black {
+            color: black !important;
+          }
+          
+          /* Ensure backgrounds are preserved */
+          .print\\:bg-white {
+            background-color: white !important;
+          }
+          
+          /* Company stamp sizing for print */
+          .company-stamp, img[alt*="ختم"] {
+            width: 216px !important;
+            height: 144px !important;
+            max-width: 216px !important;
+            max-height: 144px !important;
+          }
+          
+          /* Table alignment for print */
+          table td, table th {
+            text-align: center !important;
+            vertical-align: middle !important;
+          }
+          
+          /* Preserve Arabic fonts */
+          * {
+            font-family: 'Noto Sans Arabic', Arial, sans-serif !important;
+            direction: rtl !important;
+          }
+          
+          @page {
+            size: A4;
+            margin: 0;
+            background-color: white;
+          }
         }
-      }).join('\n');
-
-      // Create print document with exact A4 dimensions and Arabic support
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html dir="rtl" lang="ar">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>طباعة ${isInvoiceMode ? 'الفاتورة' : 'عرض السعر'}</title>
-            <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
-            <style>
-              * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-              }
-              
-              body {
-                margin: 0;
-                padding: 0;
-                font-family: 'Noto Sans Arabic', Arial, sans-serif;
-                direction: rtl;
-                background: white;
-              }
-              
-              @page {
-                size: A4;
-                margin: 0;
-                background-color: white;
-              }
-              
-              @media print {
-                body { 
-                  margin: 0 !important; 
-                  padding: 0 !important;
-                  width: 210mm;
-                  height: 297mm;
-                }
-                
-                * {
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                  color-adjust: exact !important;
-                }
-                
-                .quotation-container {
-                  width: 210mm !important;
-                  height: 297mm !important;
-                  min-width: 210mm !important;
-                  min-height: 297mm !important;
-                  max-width: 210mm !important;
-                  max-height: 297mm !important;
-                  background-repeat: no-repeat !important;
-                  background-position: center !important;
-                  background-size: cover !important;
-                  -webkit-background-size: cover !important;
-                  transform: none !important;
-                  zoom: 1 !important;
-                }
-                
-                /* Hide any buttons or interactive elements */
-                button, .print-hide { 
-                  display: none !important; 
-                }
-                
-                /* Ensure text is black for printing */
-                .print\\:text-black {
-                  color: black !important;
-                }
-                
-                /* Ensure backgrounds are preserved */
-                .print\\:bg-white {
-                  background-color: white !important;
-                }
-                
-                /* Company stamp sizing for print */
-                .company-stamp {
-                  width: 216px !important;
-                  height: 144px !important;
-                  max-width: 216px !important;
-                  max-height: 144px !important;
-                }
-                
-                /* Table alignment for print */
-                .print-table td, .print-table th {
-                  text-align: center !important;
-                  vertical-align: middle !important;
-                }
-              }
-              
-              ${stylesheets}
-            </style>
-          </head>
-          <body>
-            <div class="quotation-container">
-              ${element.outerHTML}
-            </div>
-            <script>
-              window.onload = function() {
-                setTimeout(function() {
-                  window.print();
-                  window.close();
-                }, 500);
-              };
-            </script>
-          </body>
-        </html>
-      `);
+      `;
       
-      printWindow.document.close();
+      // Add styles to document head
+      document.head.appendChild(printStyles);
+      
+      // Trigger print
+      window.print();
+      
+      // Remove print styles after printing
+      setTimeout(() => {
+        const existingStyles = document.getElementById('quotation-print-styles');
+        if (existingStyles) {
+          document.head.removeChild(existingStyles);
+        }
+      }, 1000);
       
       toast({
         title: "تم التحضير للطباعة",
-        description: "تم تحضير العرض للطباعة بأبعاد A4 وخلفية كاملة",
+        description: "تم تحضير العرض للطباعة بنفس تنسيق المعاينة",
       });
       
     } catch (error) {
