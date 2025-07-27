@@ -44,22 +44,48 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
       const element = document.getElementById('price-card-content');
       if (!element) return;
 
+      // High-quality canvas with proper scaling
       const canvas = await html2canvas(element, {
-        scale: 3,
+        scale: 3, // High quality but stable
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        width: 794,
-        height: 1123
+        foreignObjectRendering: true,
+        imageTimeout: 10000,
+        height: element.scrollHeight,
+        width: element.scrollWidth
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+      
+      // Calculate proper scaling for A4
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const canvasAspectRatio = canvas.height / canvas.width;
+      
+      let finalWidth = pdfWidth;
+      let finalHeight = pdfWidth * canvasAspectRatio;
+      
+      // If height exceeds page, scale down
+      if (finalHeight > pdfHeight) {
+        finalHeight = pdfHeight;
+        finalWidth = pdfHeight / canvasAspectRatio;
+      }
+      
+      // Center the content
+      const xOffset = (pdfWidth - finalWidth) / 2;
+      const yOffset = (pdfHeight - finalHeight) / 2;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      pdf.save(`بطاقة-سعر-${vehicle.manufacturer}-${vehicle.category}-${vehicle.year}.pdf`);
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      pdf.addImage(imgData, 'JPEG', xOffset, yOffset, finalWidth, finalHeight);
+      
+      const timestamp = new Date().toLocaleDateString('ar-SA').replace(/\//g, '-');
+      pdf.save(`بطاقة-سعر-${vehicle.manufacturer}-${vehicle.category}-${vehicle.year}-${timestamp}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
     } finally {

@@ -1000,7 +1000,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
   });
 
   // Calculate pricing
-  // Handle PDF download
+  // Handle PDF download with high quality
   const handleDownloadPDF = async () => {
     try {
       setDownloadLoading(true);
@@ -1016,51 +1016,70 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         return;
       }
       
-      // Convert to canvas with higher quality
+      // Create canvas with ultra-high quality settings
       const canvas = await html2canvas(element as HTMLElement, {
-        scale: 2,
+        scale: 3, // High quality but stable
         useCORS: true,
+        allowTaint: true,
         backgroundColor: '#ffffff',
         logging: false,
+        imageTimeout: 10000,
+        foreignObjectRendering: true,
         height: element.scrollHeight,
         width: element.scrollWidth
       });
       
-      // Create PDF
+      // Create PDF with exact A4 dimensions
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
-        format: 'a4'
+        format: 'a4',
+        compress: true
       });
       
-      // Calculate dimensions
+      // Calculate proper scaling for A4
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
+      const canvasAspectRatio = canvas.height / canvas.width;
+      const pdfAspectRatio = pdfHeight / pdfWidth;
       
-      // Calculate scale to fit A4
-      const scale = Math.min(pdfWidth / (canvasWidth * 0.264583), pdfHeight / (canvasHeight * 0.264583));
-      const scaledWidth = canvasWidth * 0.264583 * scale;
-      const scaledHeight = canvasHeight * 0.264583 * scale;
+      let finalWidth = pdfWidth;
+      let finalHeight = pdfWidth * canvasAspectRatio;
       
-      // Center the image
-      const xOffset = (pdfWidth - scaledWidth) / 2;
-      const yOffset = (pdfHeight - scaledHeight) / 2;
+      // If height exceeds page, scale down
+      if (finalHeight > pdfHeight) {
+        finalHeight = pdfHeight;
+        finalWidth = pdfHeight / canvasAspectRatio;
+      }
       
-      // Add canvas to PDF
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, scaledWidth, scaledHeight);
+      // Center the content
+      const xOffset = (pdfWidth - finalWidth) / 2;
+      const yOffset = (pdfHeight - finalHeight) / 2;
       
-      // Generate filename
+      // Convert canvas to high-quality image
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      
+      // Add image to PDF with proper scaling
+      pdf.addImage(
+        imgData,
+        'JPEG',
+        xOffset,
+        yOffset,
+        finalWidth,
+        finalHeight
+      );
+      
+      // Generate filename with Arabic support
       const vehicleInfo = selectedVehicle || editableVehicle;
-      const filename = `عرض_سعر_${vehicleInfo?.manufacturer || 'البريمي'}_${vehicleInfo?.category || 'سيارة'}_${new Date().toLocaleDateString('en-US').replace(/\//g, '-')}.pdf`;
+      const timestamp = new Date().toLocaleDateString('ar-SA').replace(/\//g, '-');
+      const filename = `عرض_سعر_${vehicleInfo?.manufacturer || 'البريمي'}_${vehicleInfo?.category || 'سيارة'}_${timestamp}.pdf`;
       
       // Save PDF
       pdf.save(filename);
       
       toast({
         title: "تم التحميل بنجاح",
-        description: "تم تحميل العرض بصيغة PDF بنجاح",
+        description: "تم تحميل العرض بجودة عالية وأبعاد A4 الصحيحة",
       });
       
     } catch (error) {

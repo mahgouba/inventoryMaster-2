@@ -117,40 +117,63 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
       const element = document.getElementById('quote-preview');
       if (!element) return;
 
+      // High-quality canvas with proper scaling
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 3, // High quality but stable
         logging: false,
         allowTaint: true,
         useCORS: true,
         backgroundColor: '#ffffff',
+        foreignObjectRendering: true,
+        imageTimeout: 10000,
+        height: element.scrollHeight,
+        width: element.scrollWidth
       });
 
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
+        compress: true
       });
 
-      const imgWidth = 210;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // Calculate proper scaling for A4
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const canvasAspectRatio = canvas.height / canvas.width;
+      
+      let finalWidth = pdfWidth;
+      let finalHeight = pdfWidth * canvasAspectRatio;
+      
+      // If height exceeds page, scale down
+      if (finalHeight > pdfHeight) {
+        finalHeight = pdfHeight;
+        finalWidth = pdfHeight / canvasAspectRatio;
+      }
+      
+      // Center the content
+      const xOffset = (pdfWidth - finalWidth) / 2;
+      const yOffset = (pdfHeight - finalHeight) / 2;
+      
+      // High-quality image data
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       
       pdf.addImage(
-        canvas.toDataURL('image/png'),
-        'PNG',
-        0,
-        0,
-        imgWidth,
-        imgHeight,
-        '',
-        'FAST'
+        imgData,
+        'JPEG',
+        xOffset,
+        yOffset,
+        finalWidth,
+        finalHeight
       );
 
-      const filename = `عرض_سعر_${vehicle.manufacturer}_${vehicle.category}_${new Date().toISOString().split('T')[0]}.pdf`;
+      const timestamp = new Date().toLocaleDateString('ar-SA').replace(/\//g, '-');
+      const filename = `عرض_سعر_${vehicle.manufacturer}_${vehicle.category}_${timestamp}.pdf`;
       pdf.save(filename);
 
       toast({
         title: "تم التنزيل بنجاح",
-        description: "تم تنزيل عرض السعر بصيغة PDF",
+        description: "تم تنزيل عرض السعر بجودة عالية وأبعاد صحيحة",
       });
     } catch (error) {
       console.error('Error downloading PDF:', error);
