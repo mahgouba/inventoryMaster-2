@@ -400,21 +400,17 @@ export default function QuotationA4Preview({
             </div>
             
             {/* Table Header */}
-            <div className="grid grid-cols-4 bg-[#F1F5F9] print:bg-white border-b border-white print:border-white text-xs font-bold text-center">
+            <div className="grid grid-cols-3 bg-[#F1F5F9] print:bg-white border-b border-white print:border-white text-xs font-bold text-center">
               <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">الكمية</div>
               <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">السعر الفردي</div>
-              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">الضريبة ({taxRate}%)</div>
-              <div className="p-2 text-[#2B4C8C] print:text-black">الإجمالي</div>
+              <div className="p-2 text-[#2B4C8C] print:text-black">الضريبة ({taxRate}%)</div>
             </div>
             
             {/* Table Row */}
-            <div className="grid grid-cols-4 border-b border-white print:border-white text-xs text-center bg-white print:bg-white">
+            <div className="grid grid-cols-3 border-b border-white print:border-white text-xs text-center bg-white print:bg-white">
               <div className="p-2 border-l border-white print:border-white text-[#1A365D] print:text-black">1</div>
               <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black">{basePrice.toLocaleString()}</div>
-              <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black">{taxAmount.toLocaleString()}</div>
-              <div className="p-2 font-bold text-[#C49632] print:text-black">
-                {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}
-              </div>
+              <div className="p-2 font-semibold text-[#1A365D] print:text-black">{taxAmount.toLocaleString()}</div>
             </div>
             
             {/* Total Row */}
