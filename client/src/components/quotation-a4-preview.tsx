@@ -419,13 +419,13 @@ export default function QuotationA4Preview({
             </div>
             
             {/* Total Row - Third Row */}
-            <div className="grid grid-cols-5 print:bg-transparent text-xs">
-              <div className="p-4 text-center">
+            <div className="grid grid-cols-3 print:bg-transparent text-xs">
+              <div className="p-4 text-center col-span-2">
                 <div className="font-bold text-sm text-[#2B4C8C] print:text-black">
                   المجموع: <span className="text-[#2B4C8C] print:text-black">{(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}</span> ريال
                 </div>
               </div>
-              <div className="p-4 text-center col-span-4">
+              <div className="p-4 text-center">
                 <div className="text-center text-xs font-bold text-[#2B4C8C] print:text-black">
                   {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))} ريال سعودي لا غير
                 </div>
