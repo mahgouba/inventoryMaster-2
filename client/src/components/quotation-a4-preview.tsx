@@ -188,10 +188,95 @@ export default function QuotationA4Preview({
           visibility: hidden !important;
         }
         
-        /* Ensure all text is black and borders are white for print */
+        /* Ensure all text is black and borders are visible for print */
         .print-content * {
           color: black !important;
-          border-color: white !important;
+          border-color: #cccccc !important;
+        }
+        
+        /* Fix text rendering and spacing issues */
+        .print-content {
+          line-height: 1.4 !important;
+          letter-spacing: normal !important;
+        }
+        
+        /* Fix overlapping text issues */
+        .print-content .text-xs {
+          font-size: 11px !important;
+          line-height: 1.3 !important;
+        }
+        
+        .print-content .text-sm {
+          font-size: 13px !important;
+          line-height: 1.4 !important;
+        }
+        
+        /* Ensure proper spacing between elements */
+        .print-content .space-y-1 > * + * {
+          margin-top: 0.25rem !important;
+        }
+        
+        .print-content .space-y-2 > * + * {
+          margin-top: 0.5rem !important;
+        }
+        
+        /* Fix general grid cell content alignment */
+        .print-content .grid > div {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          padding: 0.5rem !important;
+        }
+        
+        /* Ensure proper Arabic text rendering */
+        .print-content {
+          font-feature-settings: normal !important;
+          text-rendering: optimizeLegibility !important;
+        }
+        
+        /* Fix customer and vehicle information sections */
+        .print-content .bg-white\\/95 {
+          background-color: white !important;
+          border: 1px solid #cccccc !important;
+          margin-bottom: 1rem !important;
+          padding: 1rem !important;
+        }
+        
+        /* Customer info specific styling */
+        .print-content .customer-info .flex {
+          margin-bottom: 8px !important;
+          display: flex !important;
+          justify-content: space-between !important;
+          align-items: center !important;
+        }
+        
+        /* Vehicle info specific styling */
+        .print-content .vehicle-info .flex {
+          margin-bottom: 8px !important;
+          display: flex !important;
+          justify-content: space-between !important;
+          align-items: center !important;
+        }
+        
+        /* Representative section fix */
+        .print-content .representative-section {
+          background-color: white !important;
+          border: 1px solid #cccccc !important;
+          padding: 0.75rem !important;
+        }
+        
+        /* Terms and conditions section fix */
+        .print-content .terms-section {
+          background-color: white !important;
+          border: 1px solid #cccccc !important;
+          padding: 1rem !important;
+        }
+        
+        .print-content .terms-section .flex {
+          margin-bottom: 6px !important;
+          display: flex !important;
+          align-items: flex-start !important;
+          gap: 8px !important;
         }
         
         /* Preserve background images and colors */
@@ -227,12 +312,17 @@ export default function QuotationA4Preview({
         .print-content .items-center { align-items: center; }
         .print-content .justify-center { justify-content: center; }
         
-        /* Table cell alignment fixes */
+        /* Table cell alignment fixes with proper height and spacing */
         .print-content .grid-cols-5 > div {
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
           text-align: center !important;
+          min-height: 35px !important;
+          padding: 8px 4px !important;
+          word-wrap: break-word !important;
+          overflow-wrap: break-word !important;
+          white-space: normal !important;
         }
         
         .print-content .grid-cols-10 > div {
@@ -240,6 +330,26 @@ export default function QuotationA4Preview({
           align-items: center !important;
           justify-content: center !important;
           text-align: center !important;
+          min-height: 35px !important;
+          padding: 8px 4px !important;
+          word-wrap: break-word !important;
+          overflow-wrap: break-word !important;
+          white-space: normal !important;
+        }
+        
+        /* Fix pricing table display issues */
+        .print-content .grid.grid-cols-5,
+        .print-content .grid.grid-cols-10 {
+          border-collapse: separate !important;
+          border-spacing: 0 !important;
+        }
+        
+        /* Prevent text overflow in narrow columns */
+        .print-content .grid-cols-5 > div,
+        .print-content .grid-cols-10 > div {
+          font-size: 11px !important;
+          line-height: 1.2 !important;
+          hyphens: auto !important;
         }
         
         /* Preserve margins and padding */
@@ -515,7 +625,7 @@ export default function QuotationA4Preview({
               </div>
               
               {/* Customer Information Details below header */}
-              <div className="mt-4 bg-white/95 print:bg-white p-3 pt-[1px] pb-[1px] text-[13px] text-right print:border-none">
+              <div className="customer-info mt-4 bg-white/95 print:bg-white p-3 pt-[1px] pb-[1px] text-[13px] text-right print:border-none">
                 <div className="space-y-2 text-xs">
                   <div className="text-right text-[16px] font-semibold text-[#2B4C8C] print:text-black">
                     {isInvoiceMode ? (
@@ -537,7 +647,7 @@ export default function QuotationA4Preview({
 
             {/* Vehicle Information */}
             {selectedVehicle && (
-              <div className="relative p-4 w-full mt-[166px] mb-[16px] overflow-hidden print:bg-transparent border border-[#E2E8F0] rounded-lg shadow-lg print:border-none pl-[18px] pr-[18px] ml-[-22px] mr-[-22px]">
+              <div className="vehicle-info relative p-4 w-full mt-[166px] mb-[16px] overflow-hidden print:bg-transparent border border-[#E2E8F0] rounded-lg shadow-lg print:border-none pl-[18px] pr-[18px] ml-[-22px] mr-[-22px]">
                 {/* Systematic Manufacturer Logo Watermark Pattern */}
                 {selectedVehicle && (() => {
                   const manufacturerLogo = getManufacturerLogo(selectedVehicle.manufacturer);
@@ -700,7 +810,7 @@ export default function QuotationA4Preview({
           <div className="flex gap-6 mb-6">
             {/* Terms & Conditions Section - Hidden in invoice mode */}
             {!isInvoiceMode && (
-              <div className="bg-white/95 print:bg-white border border-[#E2E8F0] print:border-none p-4 rounded-lg flex-1 shadow-sm">
+              <div className="terms-section bg-white/95 print:bg-white border border-[#E2E8F0] print:border-none p-4 rounded-lg flex-1 shadow-sm">
                 
                 <div className="text-xs space-y-2">
                   {termsConditions.length > 0 ? (
@@ -719,7 +829,7 @@ export default function QuotationA4Preview({
             
             {/* Representative Information - Small box on the right - Hidden if no representative selected */}
             {representativeName && (
-              <div className="bg-white/95 print:bg-white border border-[#E2E8F0] print:border-none p-3 rounded-lg shadow-sm w-64">
+              <div className="representative-section bg-white/95 print:bg-white border border-[#E2E8F0] print:border-none p-3 rounded-lg shadow-sm w-64">
                 {/* Representative Header */}
                 <div className="text-center mb-2 pb-1 border-b border-[#E2E8F0] print:border-gray-300">
                   <span className="font-bold text-[#2B4C8C] print:text-black text-sm">المندوب</span>
