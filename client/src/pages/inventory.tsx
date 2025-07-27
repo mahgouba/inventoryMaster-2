@@ -867,7 +867,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   <>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-white drop-shadow-lg">{stats.total}</div>
-                      <div className="text-sm text-white/80 drop-shadow">إجمالي الظاهرة</div>
+                      <div className="text-sm text-white/80 drop-shadow">الإجمالي</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-400 drop-shadow-lg">{stats.available}</div>
