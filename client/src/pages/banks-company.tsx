@@ -196,6 +196,10 @@ export default function CompanyBanks() {
                                   alt={bank.bankName} 
                                   className="h-18 w-18 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110 cursor-pointer"
                                   style={{ height: '4.5rem', width: '4.5rem' }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    shareBank(bank);
+                                  }}
                                   onMouseDown={(e) => {
                                     e.stopPropagation();
                                     handleLongPressStart(bank);
@@ -229,6 +233,10 @@ export default function CompanyBanks() {
                               <div className="flex items-center space-x-3 space-x-reverse">
                                 <div 
                                   className="h-18 w-18 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30 cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    shareBank(bank);
+                                  }}
                                   onMouseDown={(e) => {
                                     e.stopPropagation();
                                     handleLongPressStart(bank);
