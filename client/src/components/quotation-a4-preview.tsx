@@ -396,7 +396,7 @@ export default function QuotationA4Preview({
 
           {/* Price Breakdown Table */}
           <div className="bg-white/95 print:bg-white border border-[#E2E8F0] rounded-lg mb-6 shadow-lg overflow-hidden">
-            <div className="p-4 rounded-t bg-[#2B4C8C] print:bg-[#2B4C8C] text-white print:text-white pt-[2px] pb-[2px]">
+            <div className="p-4 rounded-t print:bg-[#2B4C8C] text-white print:text-white pt-[2px] pb-[2px] bg-[#03627f]">
               <h3 className="text-sm font-bold text-center print:text-white" style={{fontFamily: 'Cairo, sans-serif'}}>تفاصيل السعر</h3>
             </div>
             
