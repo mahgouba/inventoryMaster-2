@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { QrCode, Phone, Mail, Globe, Building } from "lucide-react";
+import { QrCode, Phone, Mail, Globe, Building, Printer } from "lucide-react";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import type { Company, InventoryItem, Specification } from "@shared/schema";
 import { getManufacturerLogo } from "@shared/manufacturer-logos";
@@ -81,6 +81,78 @@ export default function QuotationA4Preview({
   const [editableSpecs, setEditableSpecs] = useState<string>("");
   const [useAlbarimi2Background, setUseAlbarimi2Background] = useState(true); // Default to albarimi-2
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Print function for the quotation preview
+  const handlePrint = () => {
+    const printContent = previewRef.current;
+    if (!printContent) {
+      console.error('لا يوجد محتوى للطباعة');
+      return;
+    }
+
+    // Create styles for print
+    const printStyles = `
+      <style>
+        @page {
+          margin: 0;
+          size: A4;
+        }
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: 'Noto Sans Arabic', Arial, sans-serif;
+          direction: rtl;
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .print-content {
+          width: 210mm;
+          height: 297mm;
+          background-size: cover;
+          background-repeat: no-repeat;
+          background-position: center;
+          position: relative;
+        }
+        .print-content * {
+          color: black !important;
+          border-color: white !important;
+        }
+        .print-hidden {
+          display: none !important;
+        }
+        @media print {
+          body { margin: 0; }
+          .no-print { display: none !important; }
+        }
+      </style>
+    `;
+
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html dir="rtl">
+          <head>
+            <title>طباعة ${isInvoiceMode ? 'فاتورة' : 'عرض سعر'} - ${quoteNumber || invoiceNumber}</title>
+            ${printStyles}
+          </head>
+          <body>
+            <div class="print-content" style="background-image: url('${useAlbarimi2Background ? backgroundImages.albarimi2 : backgroundImages.albarimi1}');">
+              ${printContent.innerHTML}
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      
+      // Wait for images to load before printing
+      printWindow.onload = () => {
+        setTimeout(() => {
+          printWindow.print();
+        }, 500);
+      };
+    }
+  };
 
   // Fetch terms and conditions
   useEffect(() => {
@@ -172,7 +244,7 @@ export default function QuotationA4Preview({
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
-      {/* Background Toggle Switch - RTL Design */}
+      {/* Controls - Background Toggle and Print Button */}
       <div className="mb-4 flex justify-center items-center gap-4">
         <div className="flex items-center gap-3 border border-yellow-600 rounded-lg px-4 py-3 bg-white">
           <span className="bg-[#cf9b46] text-[#fcfcfc] text-[15px] px-2 py-1 rounded">البريمي</span>
@@ -192,6 +264,15 @@ export default function QuotationA4Preview({
           </div>
           <span className="text-sm text-yellow-700 font-medium">خلفية 2</span>
         </div>
+        
+        {/* Print Button */}
+        <Button
+          onClick={handlePrint}
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg px-6 py-2 flex items-center gap-2"
+        >
+          <Printer className="w-4 h-4" />
+          طباعة {isInvoiceMode ? 'الفاتورة' : 'عرض السعر'}
+        </Button>
       </div>
 
       <div 
