@@ -76,7 +76,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     <div className="min-h-screen bg-slate-50 dark:bg-black flex items-center justify-center p-4" dir="rtl">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">إدارة المخزون</CardTitle>
+          <CardTitle className="text-2xl font-bold">تسجيل الدخول</CardTitle>
           <p className="text-muted-foreground">تسجيل الدخول إلى النظام</p>
         </CardHeader>
         <CardContent>

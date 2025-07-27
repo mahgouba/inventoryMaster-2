@@ -658,26 +658,21 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
             {/* Logo and Company Name */}
             <div className="flex items-center space-x-3 space-x-reverse">
               <div className="relative">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center shadow-lg overflow-hidden hover:scale-110 transition-all duration-300" style={{ backgroundColor: '#00627F' }}>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
                   {companyLogo ? (
                     <img 
                       src={companyLogo} 
                       alt="شعار الشركة" 
-                      className="w-full h-full object-contain hover:animate-none transition-all duration-[3s]"
-                      style={{ animation: 'bounce 3s infinite' }}
+                      className="w-full h-full object-contain"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <img 
-                        src="/copmany logo.svg" 
-                        alt="شعار البريمي للسيارات" 
-                        className="w-8 h-8 sm:w-10 sm:h-10 object-contain hover:animate-none transition-all duration-[3s]"
-                        style={{ animation: 'spin 4s linear infinite' }}
-                      />
-                    </div>
+                    <img 
+                      src="/copmany logo.svg" 
+                      alt="شعار البريمي للسيارات" 
+                      className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+                    />
                   )}
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg hover:text-amber-400 transition-colors duration-300">{companyName}</h1>
