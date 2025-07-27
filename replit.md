@@ -478,6 +478,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ **Professional PDF Output** - Print function now maintains exact formatting and dimensions as shown in preview interface
 - ✅ **Arabic RTL Support** - Maintained proper Arabic text direction and formatting throughout print process
 - ✅ **Font and Background Preservation** - Ensured Noto Sans Arabic font and background images render correctly in printed documents
+- ✅ **Stamp Size Enhancement** - Increased company stamp size by 80% (216×144 pixels) per user request for better visibility in printed documents
 
 ### PDF Optimization and Design Updates (July 27, 2025)
 - ✅ **COMPLETED: White Table Borders in PDF** - Changed all table borders from black/gray to white in quotation PDF per user request

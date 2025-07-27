@@ -164,10 +164,10 @@ export default function QuotationA4Preview({
         
         /* Stamp sizing for print */
         .print-content img[alt="ختم الشركة"] {
-          width: 120px !important;
-          height: 80px !important;
-          max-width: 120px !important;
-          max-height: 80px !important;
+          width: 216px !important;
+          height: 144px !important;
+          max-width: 216px !important;
+          max-height: 144px !important;
         }
         
         /* Ensure proper font sizing and spacing */
@@ -669,7 +669,7 @@ export default function QuotationA4Preview({
               <img 
                 src={companyStamp} 
                 alt="ختم الشركة" 
-                className="w-32 h-20 object-contain max-w-[120px] max-h-[80px] print:w-[120px] print:h-[80px]"
+                className="w-54 h-36 object-contain max-w-[216px] max-h-[144px] print:w-[216px] print:h-[144px]"
               />
             </div>
           )}
