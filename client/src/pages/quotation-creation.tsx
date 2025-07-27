@@ -1159,10 +1159,10 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
     }
   };
   
-  // Handle print quotation - calls the print function from the preview component
+  // Handle print quotation - improved print functionality
   const handlePrintQuotation = () => {
     try {
-      // Call the print function directly from the preview component
+      // Find the quotation preview element
       const previewElement = document.querySelector('[data-pdf-export="quotation"]');
       if (!previewElement) {
         toast({
@@ -1173,19 +1173,29 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         return;
       }
 
-      // Create print styles for proper formatting
+      // Create enhanced print styles
       const printStyles = document.createElement('style');
       printStyles.id = 'dynamic-print-styles';
       printStyles.innerHTML = `
         @media print {
-          body {
+          @page {
+            size: A4;
             margin: 0;
-            padding: 0;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+          }
+          
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
             font-family: 'Noto Sans Arabic', Arial, sans-serif !important;
             direction: rtl !important;
             -webkit-print-color-adjust: exact !important;
             color-adjust: exact !important;
             print-color-adjust: exact !important;
+            background: white !important;
           }
           
           * {
@@ -1194,88 +1204,124 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
             print-color-adjust: exact !important;
           }
           
-          body * {
-            visibility: hidden;
+          /* Hide everything first */
+          body > * {
+            display: none !important;
           }
           
-          [data-pdf-export="quotation"], 
-          [data-pdf-export="quotation"] * {
-            visibility: visible !important;
-          }
-          
+          /* Show only the quotation preview */
           [data-pdf-export="quotation"] {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
+            display: block !important;
+            position: static !important;
             width: 210mm !important;
-            height: 297mm !important;
+            min-height: 297mm !important;
             margin: 0 !important;
             padding: 0 !important;
             box-shadow: none !important;
             border: none !important;
             transform: none !important;
-            zoom: 1 !important;
             background-size: cover !important;
             background-repeat: no-repeat !important;
             background-position: center !important;
             overflow: visible !important;
+            page-break-inside: avoid !important;
           }
           
-          @page {
-            size: A4;
-            margin: 0;
+          /* Make the body only show the quotation */
+          body {
+            background: white !important;
           }
           
-          /* Hide background switch buttons during print */
-          [data-pdf-export="quotation"] .mb-4,
+          /* Ensure text is visible */
+          [data-pdf-export="quotation"] * {
+            color: black !important;
+            background-color: transparent !important;
+          }
+          
+          /* White backgrounds for content areas */
+          [data-pdf-export="quotation"] .bg-white {
+            background-color: white !important;
+          }
+          
+          /* Hide interactive elements */
           [data-pdf-export="quotation"] button,
-          [data-pdf-export="quotation"] .print\\:hidden {
+          [data-pdf-export="quotation"] .print\\:hidden,
+          [data-pdf-export="quotation"] .no-print {
             display: none !important;
             visibility: hidden !important;
           }
           
-          /* Preserve image quality */
+          /* Preserve images */
           [data-pdf-export="quotation"] img {
+            max-width: 100% !important;
+            height: auto !important;
             image-rendering: -webkit-optimize-contrast !important;
             image-rendering: crisp-edges !important;
           }
           
-          /* Company stamp sizing */
-          [data-pdf-export="quotation"] .company-stamp,
-          [data-pdf-export="quotation"] img[alt*="ختم"] {
+          /* Company stamp specific sizing */
+          [data-pdf-export="quotation"] img[alt*="ختم"],
+          [data-pdf-export="quotation"] .company-stamp {
             width: 216px !important;
             height: 144px !important;
             max-width: 216px !important;
             max-height: 144px !important;
           }
+          
+          /* Ensure tables print properly */
+          [data-pdf-export="quotation"] table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+          }
+          
+          [data-pdf-export="quotation"] td,
+          [data-pdf-export="quotation"] th {
+            border: 1px solid #ccc !important;
+            padding: 8px !important;
+            text-align: center !important;
+          }
+          
+          /* Header styles */
+          [data-pdf-export="quotation"] h1,
+          [data-pdf-export="quotation"] h2,
+          [data-pdf-export="quotation"] h3 {
+            color: black !important;
+            margin: 10px 0 !important;
+          }
         }
       `;
 
-      // Inject print styles
+      // Remove any existing print styles
+      const existingStyles = document.getElementById('dynamic-print-styles');
+      if (existingStyles) {
+        document.head.removeChild(existingStyles);
+      }
+
+      // Add new print styles
       document.head.appendChild(printStyles);
 
-      // Trigger print
+      // Trigger print with delay to ensure styles are applied
       setTimeout(() => {
         window.print();
         
-        // Remove print styles after printing
+        // Clean up after printing
         setTimeout(() => {
-          const existingStyles = document.getElementById('dynamic-print-styles');
-          if (existingStyles) {
-            document.head.removeChild(existingStyles);
+          const stylesToRemove = document.getElementById('dynamic-print-styles');
+          if (stylesToRemove) {
+            document.head.removeChild(stylesToRemove);
           }
-        }, 1000);
-      }, 100);
+        }, 2000);
+      }, 500);
 
       toast({
         title: "جاهز للطباعة",
-        description: "تم تحضير عرض السعر للطباعة مع الحفاظ على التنسيق والخلفية",
+        description: "تم تحضير عرض السعر للطباعة بتنسيق محسن",
       });
 
     } catch (error) {
       console.error('Error printing quotation:', error);
       toast({
-        title: "خطأ في الطباعة",
+        title: "خطأ في الطباعة", 
         description: "حدث خطأ أثناء تحضير العرض للطباعة",
         variant: "destructive",
       });
