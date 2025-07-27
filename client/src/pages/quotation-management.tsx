@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import {
   Card,
   CardContent,
@@ -208,180 +209,177 @@ export default function QuotationManagement() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">جاري تحميل العروض...</p>
+      <SystemGlassWrapper>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+            <p className="mt-4 text-white drop-shadow-lg">جاري تحميل العروض...</p>
+          </div>
         </div>
-      </div>
+      </SystemGlassWrapper>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <FileText className="h-8 w-8 text-blue-600 ml-3" />
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-                إدارة العروض
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4 space-x-reverse">
-              <Link href="/">
-                <Button variant="outline" size="sm">
-                  <Home className="h-4 w-4 ml-2" />
-                  الرئيسية
-                </Button>
-              </Link>
-              <Link href="/quotation-creation">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                  <Plus className="h-4 w-4 ml-2" />
-                  عرض جديد
-                </Button>
-              </Link>
+    <SystemGlassWrapper>
+      <div className="min-h-screen" dir="rtl">
+        {/* Header */}
+        <div className="glass-header border-white/20 dark:border-slate-700/30">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center space-x-reverse space-x-4">
+                <FileText className="h-8 w-8 text-white drop-shadow-lg" />
+                <div>
+                  <h1 className="text-xl font-bold text-white drop-shadow-lg">
+                    إدارة العروض المحفوظة
+                  </h1>
+                  <p className="text-sm text-white/80 drop-shadow-lg">
+                    عرض وإدارة جميع عروض الأسعار المحفوظة
+                  </p>
+                </div>
+              </div>
+              <div className="flex space-x-reverse space-x-3">
+                <Link href="/">
+                  <Button variant="outline" size="sm" className="glass-button border-white/20 text-white hover:bg-white/10">
+                    <Home className="h-4 w-4 ml-2" />
+                    الرئيسية
+                  </Button>
+                </Link>
+                <Link href="/quotation-creation">
+                  <Button className="glass-button bg-blue-600/80 hover:bg-blue-700/80 text-white border-white/20">
+                    <Plus className="h-4 w-4 ml-2" />
+                    عرض جديد
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">إجمالي العروض</CardTitle>
-              <FileText className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{(quotations as Quotation[]).length}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">مسودات</CardTitle>
-              <Edit className="h-4 w-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {(quotations as Quotation[]).filter((q: Quotation) => q.status === "مسودة").length}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">مرسلة</CardTitle>
-              <Mail className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {(quotations as Quotation[]).filter((q: Quotation) => q.status === "مرسل").length}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">مقبولة</CardTitle>
-              <DollarSign className="h-4 w-4 text-green-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {(quotations as Quotation[]).filter((q: Quotation) => q.status === "مقبول").length}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="glass-container p-4">
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <h3 className="text-sm font-medium text-white drop-shadow-lg">إجمالي العروض</h3>
+              <FileText className="h-4 w-4 text-white drop-shadow-lg" />
+            </div>
+            <div className="text-2xl font-bold text-white drop-shadow-lg">{(quotations as Quotation[]).length}</div>
+          </div>
+          <div className="glass-container p-4">
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <h3 className="text-sm font-medium text-white drop-shadow-lg">مسودات</h3>
+              <Edit className="h-4 w-4 text-white drop-shadow-lg" />
+            </div>
+            <div className="text-2xl font-bold text-white drop-shadow-lg">
+              {(quotations as Quotation[]).filter((q: Quotation) => q.status === "مسودة").length}
+            </div>
+          </div>
+          <div className="glass-container p-4">
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <h3 className="text-sm font-medium text-white drop-shadow-lg">مرسلة</h3>
+              <Mail className="h-4 w-4 text-white drop-shadow-lg" />
+            </div>
+            <div className="text-2xl font-bold text-white drop-shadow-lg">
+              {(quotations as Quotation[]).filter((q: Quotation) => q.status === "مرسل").length}
+            </div>
+          </div>
+          <div className="glass-container p-4">
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <h3 className="text-sm font-medium text-white drop-shadow-lg">مقبولة</h3>
+              <DollarSign className="h-4 w-4 text-green-400 drop-shadow-lg" />
+            </div>
+            <div className="text-2xl font-bold text-white drop-shadow-lg">
+              {(quotations as Quotation[]).filter((q: Quotation) => q.status === "مقبول").length}
+            </div>
+          </div>
         </div>
 
         {/* Search and Filter */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Search className="h-5 w-5 ml-2" />
-              البحث والتصفية
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <Label htmlFor="search">البحث</Label>
-                <Input
-                  id="search"
-                  placeholder="البحث برقم العرض، اسم العميل، الصانع، أو رقم الهيكل..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="w-full md:w-48">
-                <Label htmlFor="status-filter">حالة العرض</Label>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="اختر الحالة" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">جميع الحالات</SelectItem>
-                    <SelectItem value="مسودة">مسودة</SelectItem>
-                    <SelectItem value="مرسل">مرسل</SelectItem>
-                    <SelectItem value="مقبول">مقبول</SelectItem>
-                    <SelectItem value="مرفوض">مرفوض</SelectItem>
-                    <SelectItem value="منتهي الصلاحية">منتهي الصلاحية</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        <div className="glass-container p-6 mb-6">
+          <h2 className="flex items-center text-lg font-semibold text-white drop-shadow-lg mb-4">
+            <Search className="h-5 w-5 ml-2" />
+            البحث والتصفية
+          </h2>
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <label htmlFor="search" className="block text-sm font-medium text-white drop-shadow-lg mb-2">البحث</label>
+              <Input
+                id="search"
+                placeholder="البحث برقم العرض، اسم العميل، الصانع، أو رقم الهيكل..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="glass-input bg-white/10 border-white/20 text-white placeholder:text-white/50"
+              />
             </div>
-          </CardContent>
-        </Card>
+            <div className="w-full md:w-48">
+              <label htmlFor="status-filter" className="block text-sm font-medium text-white drop-shadow-lg mb-2">حالة العرض</label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="glass-input bg-white/10 border-white/20 text-white">
+                  <SelectValue placeholder="جميع الحالات" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">جميع الحالات</SelectItem>
+                  <SelectItem value="مسودة">مسودة</SelectItem>
+                  <SelectItem value="مرسل">مرسل</SelectItem>
+                  <SelectItem value="مقبول">مقبول</SelectItem>
+                  <SelectItem value="مرفوض">مرفوض</SelectItem>
+                  <SelectItem value="منتهي الصلاحية">منتهي الصلاحية</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
 
         {/* Quotations Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>العروض المحفوظة</CardTitle>
-            <CardDescription>
+        <div className="glass-container">
+          <div className="p-6 border-b border-white/20">
+            <h2 className="text-lg font-semibold text-white drop-shadow-lg">العروض المحفوظة</h2>
+            <p className="text-sm text-white/80 drop-shadow-lg mt-1">
               عدد العروض الظاهرة: {filteredQuotations.length} من أصل {(quotations as Quotation[]).length}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+            </p>
+          </div>
+          <div className="p-6">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right">رقم العرض</TableHead>
-                    <TableHead className="text-right">العميل</TableHead>
-                    <TableHead className="text-right">المركبة</TableHead>
-                    <TableHead className="text-right">السعر النهائي</TableHead>
-                    <TableHead className="text-right">الحالة</TableHead>
-                    <TableHead className="text-right">تاريخ الإنشاء</TableHead>
-                    <TableHead className="text-right">صالح حتى</TableHead>
-                    <TableHead className="text-right">الإجراءات</TableHead>
+                    <TableHead className="text-right text-white drop-shadow-lg font-semibold">رقم العرض</TableHead>
+                    <TableHead className="text-right text-white drop-shadow-lg font-semibold">العميل</TableHead>
+                    <TableHead className="text-right text-white drop-shadow-lg font-semibold">المركبة</TableHead>
+                    <TableHead className="text-right text-white drop-shadow-lg font-semibold">السعر النهائي</TableHead>
+                    <TableHead className="text-right text-white drop-shadow-lg font-semibold">الحالة</TableHead>
+                    <TableHead className="text-right text-white drop-shadow-lg font-semibold">تاريخ الإنشاء</TableHead>
+                    <TableHead className="text-right text-white drop-shadow-lg font-semibold">صالح حتى</TableHead>
+                    <TableHead className="text-right text-white drop-shadow-lg font-semibold">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredQuotations.map((quotation: Quotation) => (
                     <TableRow key={quotation.id}>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-white drop-shadow-lg">
                         {quotation.quoteNumber}
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{quotation.customerName}</div>
+                          <div className="font-medium text-white drop-shadow-lg">{quotation.customerName}</div>
                           {quotation.customerPhone && (
-                            <div className="text-sm text-gray-500">{quotation.customerPhone}</div>
+                            <div className="text-sm text-white/70 drop-shadow-lg">{quotation.customerPhone}</div>
                           )}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">
+                          <div className="font-medium text-white drop-shadow-lg">
                             {quotation.manufacturer} {quotation.category}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-white/70 drop-shadow-lg">
                             {quotation.year} - {quotation.chassisNumber}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-white drop-shadow-lg">
                         {formatPrice(quotation.finalPrice)}
                       </TableCell>
                       <TableCell>
@@ -389,10 +387,10 @@ export default function QuotationManagement() {
                           {quotation.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-white drop-shadow-lg">
                         {formatDate(quotation.createdAt)}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-white drop-shadow-lg">
                         {quotation.validUntil ? formatDate(quotation.validUntil) : "-"}
                       </TableCell>
                       <TableCell>
@@ -401,6 +399,7 @@ export default function QuotationManagement() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleViewQuotation(quotation)}
+                            className="glass-button border-white/20 text-white hover:bg-white/10"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -408,6 +407,7 @@ export default function QuotationManagement() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleEditQuotation(quotation)}
+                            className="glass-button border-white/20 text-white hover:bg-white/10"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -415,7 +415,7 @@ export default function QuotationManagement() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleDeleteQuotation(quotation.id)}
-                            className="text-red-600 hover:text-red-700"
+                            className="glass-button border-red-300/20 text-red-300 hover:bg-red-500/10"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -427,17 +427,16 @@ export default function QuotationManagement() {
               </Table>
             </div>
             
-            {filteredQuotations.length === 0 && (
-              <div className="text-center py-8">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">لم يتم العثور على عروض</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quotation Details Dialog */}
+              {filteredQuotations.length === 0 && (
+                <div className="text-center py-8">
+                  <FileText className="h-12 w-12 text-white/40 drop-shadow-lg mx-auto mb-4" />
+                  <p className="text-white/70 drop-shadow-lg">لم يتم العثور على عروض</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        {/* Quotation Details Dialog */}
       <Dialog open={showQuotationDialog} onOpenChange={setShowQuotationDialog}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -590,6 +589,7 @@ export default function QuotationManagement() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </SystemGlassWrapper>
   );
 }
