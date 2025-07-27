@@ -393,13 +393,19 @@ export default function BankManagement() {
                     <CardContent className="p-4">
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          {bank.logo && (
-                            <img 
-                              src={bank.logo} 
-                              alt={bank.bankName} 
-                              className="w-12 h-12 object-contain"
-                            />
-                          )}
+                          <div className="flex items-center gap-3">
+                            {bank.logo && (
+                              <img 
+                                src={bank.logo} 
+                                alt={bank.bankName} 
+                                className="w-12 h-12 object-contain"
+                              />
+                            )}
+                            <div>
+                              <h3 className="font-semibold text-lg">{bank.bankName}</h3>
+                              <p className="text-sm text-gray-600">{bank.accountName}</p>
+                            </div>
+                          </div>
                           <div className="flex gap-1">
                             <Button
                               size="sm"
@@ -428,11 +434,6 @@ export default function BankManagement() {
                               <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
-                        </div>
-                        
-                        <div>
-                          <h3 className="font-semibold text-lg">{bank.bankName}</h3>
-                          <p className="text-sm text-gray-600">{bank.accountName}</p>
                         </div>
                         
                         <div className="space-y-1 text-sm">
@@ -474,13 +475,19 @@ export default function BankManagement() {
                     <CardContent className="p-4">
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          {bank.logo && (
-                            <img 
-                              src={bank.logo} 
-                              alt={bank.bankName} 
-                              className="w-12 h-12 object-contain"
-                            />
-                          )}
+                          <div className="flex items-center gap-3">
+                            {bank.logo && (
+                              <img 
+                                src={bank.logo} 
+                                alt={bank.bankName} 
+                                className="w-12 h-12 object-contain"
+                              />
+                            )}
+                            <div>
+                              <h3 className="font-semibold text-lg">{bank.bankName}</h3>
+                              <p className="text-sm text-gray-600">{bank.accountName}</p>
+                            </div>
+                          </div>
                           <div className="flex gap-1">
                             <Button
                               size="sm"
@@ -509,11 +516,6 @@ export default function BankManagement() {
                               <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
-                        </div>
-                        
-                        <div>
-                          <h3 className="font-semibold text-lg">{bank.bankName}</h3>
-                          <p className="text-sm text-gray-600">{bank.accountName}</p>
                         </div>
                         
                         <div className="space-y-1 text-sm">
