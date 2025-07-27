@@ -1133,32 +1133,48 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
     }
   };
   
-  // Handle print quotation
+  // Handle print quotation - calls the print function from the preview component
   const handlePrintQuotation = () => {
     try {
-      // Get the quotation preview element
-      const element = document.querySelector('[data-pdf-export="quotation"]');
-      if (!element) {
+      // Call the print function directly from the preview component
+      const previewElement = document.querySelector('[data-pdf-export="quotation"]');
+      if (!previewElement) {
         toast({
           title: "خطأ",
-          description: "لم يتم العثور على معاينة العرض",
+          description: "لم يتم العثور على معاينة العرض للطباعة",
           variant: "destructive",
         });
         return;
       }
 
-      // Add print styles to preserve background and formatting
+      // Create print styles for proper formatting
       const printStyles = document.createElement('style');
-      printStyles.id = 'quotation-print-styles';
+      printStyles.id = 'dynamic-print-styles';
       printStyles.innerHTML = `
         @media print {
+          body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans Arabic', Arial, sans-serif !important;
+            direction: rtl !important;
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          
+          * {
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          
           body * {
             visibility: hidden;
           }
           
           [data-pdf-export="quotation"], 
           [data-pdf-export="quotation"] * {
-            visibility: visible;
+            visibility: visible !important;
           }
           
           [data-pdf-export="quotation"] {
@@ -1169,80 +1185,67 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
             height: 297mm !important;
             margin: 0 !important;
             padding: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
             transform: none !important;
             zoom: 1 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            color-adjust: exact !important;
+            background-size: cover !important;
             background-repeat: no-repeat !important;
             background-position: center !important;
-            background-size: cover !important;
-            -webkit-background-size: cover !important;
-          }
-          
-          /* Hide controls during print */
-          .mb-4, button, .print-hide {
-            display: none !important;
-            visibility: hidden !important;
-          }
-          
-          /* Ensure text is black for printing */
-          .print\\:text-black {
-            color: black !important;
-          }
-          
-          /* Ensure backgrounds are preserved */
-          .print\\:bg-white {
-            background-color: white !important;
-          }
-          
-          /* Company stamp sizing for print */
-          .company-stamp, img[alt*="ختم"] {
-            width: 216px !important;
-            height: 144px !important;
-            max-width: 216px !important;
-            max-height: 144px !important;
-          }
-          
-          /* Table alignment for print */
-          table td, table th {
-            text-align: center !important;
-            vertical-align: middle !important;
-          }
-          
-          /* Preserve Arabic fonts */
-          * {
-            font-family: 'Noto Sans Arabic', Arial, sans-serif !important;
-            direction: rtl !important;
+            overflow: visible !important;
           }
           
           @page {
             size: A4;
             margin: 0;
-            background-color: white;
+          }
+          
+          /* Hide background switch buttons during print */
+          [data-pdf-export="quotation"] .mb-4,
+          [data-pdf-export="quotation"] button,
+          [data-pdf-export="quotation"] .print\\:hidden {
+            display: none !important;
+            visibility: hidden !important;
+          }
+          
+          /* Preserve image quality */
+          [data-pdf-export="quotation"] img {
+            image-rendering: -webkit-optimize-contrast !important;
+            image-rendering: crisp-edges !important;
+          }
+          
+          /* Company stamp sizing */
+          [data-pdf-export="quotation"] .company-stamp,
+          [data-pdf-export="quotation"] img[alt*="ختم"] {
+            width: 216px !important;
+            height: 144px !important;
+            max-width: 216px !important;
+            max-height: 144px !important;
           }
         }
       `;
-      
-      // Add styles to document head
+
+      // Inject print styles
       document.head.appendChild(printStyles);
-      
+
       // Trigger print
-      window.print();
-      
-      // Remove print styles after printing
       setTimeout(() => {
-        const existingStyles = document.getElementById('quotation-print-styles');
-        if (existingStyles) {
-          document.head.removeChild(existingStyles);
-        }
-      }, 1000);
-      
+        window.print();
+        
+        // Remove print styles after printing
+        setTimeout(() => {
+          const existingStyles = document.getElementById('dynamic-print-styles');
+          if (existingStyles) {
+            document.head.removeChild(existingStyles);
+          }
+        }, 1000);
+      }, 100);
+
       toast({
-        title: "تم التحضير للطباعة",
-        description: "تم تحضير العرض للطباعة بنفس تنسيق المعاينة",
+        title: "جاهز للطباعة",
+        description: "تم تحضير عرض السعر للطباعة مع الحفاظ على التنسيق والخلفية",
       });
-      
+
     } catch (error) {
       console.error('Error printing quotation:', error);
       toast({
