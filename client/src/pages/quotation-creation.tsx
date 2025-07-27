@@ -25,7 +25,6 @@ import {
   QrCode,
   Search,
   Calculator,
-  Printer,
   Download,  
   FileDown,
   MessageCircle,
@@ -2277,15 +2276,6 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                       تحميل العرض PDF
                     </>
                   )}
-                </Button>
-                
-                <Button 
-                  onClick={handlePrintQuotation}
-                  variant="outline"
-                  className="w-full glass-button border-white/20 text-white hover:bg-white/20 bg-white/10"
-                >
-                  <Printer size={16} className="ml-2" />
-                  طباعة العرض
                 </Button>
                 </div>
               </div>
