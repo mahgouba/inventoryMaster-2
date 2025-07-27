@@ -385,7 +385,7 @@ export default function QuotationA4Preview({
                       style={{ direction: 'rtl' }}
                     />
                   ) : (
-                    <div className="text-xs text-black whitespace-pre-wrap max-h-20 overflow-y-auto bg-gray-50 p-2 rounded border">
+                    <div className="text-xs text-[#000000] whitespace-pre-wrap max-h-20 overflow-y-auto bg-[#ffffff] p-2 rounded border">
                       {editableSpecs || "لا توجد مواصفات تفصيلية"}
                     </div>
                   )}
