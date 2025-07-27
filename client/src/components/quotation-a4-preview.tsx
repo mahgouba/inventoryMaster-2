@@ -397,28 +397,38 @@ export default function QuotationA4Preview({
           <div className="print:bg-transparent border border-[#E2E8F0] rounded-lg mb-6 shadow-lg overflow-hidden">
             
             {/* Table Header */}
-            <div className="grid grid-cols-6 bg-[#F1F5F9] print:bg-white border-b border-white print:border-white text-xs font-bold text-center">
+            <div className="grid grid-cols-5 bg-[#F1F5F9] print:bg-white border-b border-white print:border-white text-xs font-bold text-center">
               <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">الكمية</div>
               <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">السعر الفردي</div>
               <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">الضريبة ({taxRate}%)</div>
               <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">اللوحات</div>
-              <div className="p-2 border-l border-white print:border-white text-[#2B4C8C] print:text-black">الإجمالي</div>
-              <div className="p-2 text-[#2B4C8C] print:text-black">المجموع المكتوب</div>
+              <div className="p-2 text-[#2B4C8C] print:text-black">الإجمالي</div>
             </div>
             
-            {/* Table Row with Total */}
-            <div className="grid grid-cols-6 text-xs text-center bg-white print:bg-transparent">
+            {/* Table Data Row */}
+            <div className="grid grid-cols-5 border-b border-white print:border-white text-xs text-center bg-white print:bg-transparent">
               <div className="p-2 border-l border-white print:border-white text-[#1A365D] print:text-black">1</div>
               <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black">{basePrice.toLocaleString()}</div>
               <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black">{taxAmount.toLocaleString()}</div>
               <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black">
                 {includeLicensePlate ? licensePlatePrice.toLocaleString() : "0"}
               </div>
-              <div className="p-2 border-l border-white print:border-white font-bold text-[#C49632] print:text-black">
-                {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()} ريال
+              <div className="p-2 font-bold text-[#C49632] print:text-black">
+                {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}
               </div>
-              <div className="p-2 text-center text-xs font-bold text-white print:text-black px-2 py-3 rounded bg-[#C49632] print:bg-white print:border print:border-black">
-                {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))} ريال سعودي لا غير
+            </div>
+            
+            {/* Total Row - Third Row */}
+            <div className="grid grid-cols-2 bg-white print:bg-transparent text-xs">
+              <div className="p-4 text-center">
+                <div className="font-bold text-sm text-[#2B4C8C] print:text-black">
+                  المجموع: <span className="text-[#C49632] print:text-black">{(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}</span> ريال
+                </div>
+              </div>
+              <div className="p-4 text-center">
+                <div className="text-center text-xs font-bold text-white print:text-black px-4 py-3 rounded bg-[#C49632] print:bg-white print:border print:border-black">
+                  {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))} ريال سعودي لا غير
+                </div>
               </div>
             </div>
           </div>
