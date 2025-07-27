@@ -90,54 +90,131 @@ export default function QuotationA4Preview({
       return;
     }
 
-    // Create styles for print
+    // Create comprehensive styles for print that match the preview exactly
     const printStyles = `
       <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+        
         @page {
           margin: 0;
           size: A4;
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+          print-color-adjust: exact;
         }
+        
+        * {
+          box-sizing: border-box;
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        
         body {
           margin: 0;
           padding: 0;
           font-family: 'Noto Sans Arabic', Arial, sans-serif;
           direction: rtl;
+          background: white;
           -webkit-print-color-adjust: exact;
           color-adjust: exact;
           print-color-adjust: exact;
         }
+        
         .print-content {
           width: 210mm;
           height: 297mm;
+          min-width: 210mm;
+          min-height: 297mm;
+          max-width: 210mm;
+          max-height: 297mm;
           background-size: cover;
           background-repeat: no-repeat;
           background-position: center;
           position: relative;
+          transform: none;
+          zoom: 1;
+          overflow: hidden;
+          font-family: 'Noto Sans Arabic', Arial, sans-serif;
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+          print-color-adjust: exact;
         }
+        
+        /* Hide interactive elements during print */
+        .print-content button,
+        .print-content .cursor-pointer,
+        .print-content [class*="hover:"],
+        .print-content .print\\:hidden {
+          display: none !important;
+        }
+        
+        /* Ensure all text is black and borders are white for print */
         .print-content * {
           color: black !important;
           border-color: white !important;
         }
-        .print-hidden {
-          display: none !important;
+        
+        /* Preserve background images and colors */
+        .print-content img {
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+          print-color-adjust: exact;
         }
+        
+        /* Ensure proper font sizing and spacing */
+        .print-content .text-xs { font-size: 0.75rem; }
+        .print-content .text-sm { font-size: 0.875rem; }
+        .print-content .text-base { font-size: 1rem; }
+        .print-content .text-lg { font-size: 1.125rem; }
+        
+        /* Maintain grid layouts */
+        .print-content .grid { display: grid; }
+        .print-content .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .print-content .grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+        .print-content .grid-cols-10 { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+        
+        /* Maintain flex layouts */
+        .print-content .flex { display: flex; }
+        .print-content .justify-between { justify-content: space-between; }
+        .print-content .items-center { align-items: center; }
+        
+        /* Preserve margins and padding */
+        .print-content .p-2 { padding: 0.5rem; }
+        .print-content .p-3 { padding: 0.75rem; }
+        .print-content .p-4 { padding: 1rem; }
+        .print-content .p-8 { padding: 2rem; }
+        .print-content .mb-6 { margin-bottom: 1.5rem; }
+        .print-content .mt-3 { margin-top: 0.75rem; }
+        .print-content .mt-4 { margin-top: 1rem; }
+        
+        /* Font weights */
+        .print-content .font-bold { font-weight: 700; }
+        .print-content .font-semibold { font-weight: 600; }
+        .print-content .font-medium { font-weight: 500; }
+        
         @media print {
           body { margin: 0; }
-          .no-print { display: none !important; }
+          .no-print, button, .cursor-pointer { display: none !important; }
         }
       </style>
     `;
 
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    const printWindow = window.open('', '_blank', 'width=210mm,height=297mm');
     if (printWindow) {
+      // Get the background image as absolute URL
+      const backgroundUrl = window.location.origin + (useAlbarimi2Background ? backgroundImages.albarimi2 : backgroundImages.albarimi1);
+      
       printWindow.document.write(`
         <html dir="rtl">
           <head>
             <title>طباعة ${isInvoiceMode ? 'فاتورة' : 'عرض سعر'} - ${quoteNumber || invoiceNumber}</title>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             ${printStyles}
           </head>
           <body>
-            <div class="print-content" style="background-image: url('${useAlbarimi2Background ? backgroundImages.albarimi2 : backgroundImages.albarimi1}');">
+            <div class="print-content" style="background-image: url('${backgroundUrl}');">
               ${printContent.innerHTML}
             </div>
           </body>
@@ -145,12 +222,19 @@ export default function QuotationA4Preview({
       `);
       printWindow.document.close();
       
-      // Wait for images to load before printing
+      // Wait for all content including images and fonts to load
       printWindow.onload = () => {
         setTimeout(() => {
           printWindow.print();
-        }, 500);
+        }, 1000);
       };
+      
+      // Fallback if onload doesn't work
+      setTimeout(() => {
+        if (printWindow && !printWindow.closed) {
+          printWindow.print();
+        }
+      }, 1500);
     }
   };
 
