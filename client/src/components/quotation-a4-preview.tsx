@@ -285,7 +285,7 @@ export default function QuotationA4Preview({
 
             {/* Vehicle Information */}
             {selectedVehicle && (
-              <div className="relative p-4 w-full mt-[166px] mb-[16px] overflow-hidden print:bg-transparent border border-[#E2E8F0] rounded-lg shadow-lg print:border-none pl-[18px] pr-[18px] ml-[-22px] mr-[-22px]">
+              <div className="relative w-full mb-6 overflow-hidden print:bg-transparent border border-[#E2E8F0] rounded-lg shadow-lg print:border-none p-4">
                 {/* Systematic Manufacturer Logo Watermark Pattern */}
                 {selectedVehicle && (() => {
                   const manufacturerLogo = getManufacturerLogo(selectedVehicle.manufacturer);
