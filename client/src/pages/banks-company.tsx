@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Building2, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Building2, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft, Info } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -114,6 +115,7 @@ export default function CompanyBanks() {
   }
 
   return (
+    <TooltipProvider>
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-950 relative overflow-hidden" dir="rtl">
       {/* Animated Mesh Background */}
       <div className="absolute inset-0 opacity-20">
@@ -304,7 +306,17 @@ export default function CompanyBanks() {
                             {/* Account Name */}
                             <div className="space-y-2 mb-4">
                               <div className="flex items-center justify-between">
-                                <span className="text-base font-bold text-white drop-shadow-sm">اسم الحساب</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-base font-bold text-white drop-shadow-sm">اسم الحساب</span>
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <Info className="w-3 h-3 text-white/60 hover:text-white/80" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top" className="bg-black/90 text-white border-white/20">
+                                      <p className="text-xs">انقر للنسخ أو اضغط على الشعار للمشاركة السريعة</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
                                 <Button
                                   size="sm"
                                   variant="ghost"
@@ -324,7 +336,17 @@ export default function CompanyBanks() {
                             {/* Account Number */}
                             <div className="space-y-2 mb-4">
                               <div className="flex items-center justify-between">
-                                <span className="text-base font-bold text-white drop-shadow-sm">رقم الحساب</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-base font-bold text-white drop-shadow-sm">رقم الحساب</span>
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <Info className="w-3 h-3 text-white/60 hover:text-white/80" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top" className="bg-black/90 text-white border-white/20">
+                                      <p className="text-xs">رقم الحساب البنكي للتحويلات المحلية</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
                                 <Button
                                   size="sm"
                                   variant="ghost"
@@ -344,7 +366,17 @@ export default function CompanyBanks() {
                             {/* IBAN */}
                             <div className="space-y-2">
                               <div className="flex items-center justify-between">
-                                <span className="text-base font-bold text-white drop-shadow-sm">الآيبان</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-base font-bold text-white drop-shadow-sm">الآيبان</span>
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <Info className="w-3 h-3 text-white/60 hover:text-white/80" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top" className="bg-black/90 text-white border-white/20">
+                                      <p className="text-xs">رقم الحساب الدولي للتحويلات الخارجية</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
                                 <Button
                                   size="sm"
                                   variant="ghost"
@@ -402,5 +434,6 @@ export default function CompanyBanks() {
         </div>
       </div>
     </div>
+    </TooltipProvider>
   );
 }
