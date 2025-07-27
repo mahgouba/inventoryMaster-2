@@ -143,6 +143,39 @@ export default function QuotationA4Preview({
           image-rendering: -webkit-optimize-contrast;
         }
         
+        /* Mobile print optimization */
+        @media screen and (max-width: 768px) {
+          .print-content {
+            width: 100vw !important;
+            height: auto !important;
+            min-width: 100vw !important;
+            min-height: auto !important;
+            max-width: 100vw !important;
+            max-height: none !important;
+            transform: scale(1) !important;
+            zoom: 1 !important;
+            overflow: visible !important;
+          }
+        }
+        
+        /* Additional mobile compatibility */
+        @media print and (max-width: 768px) {
+          .print-content {
+            width: 210mm !important;
+            height: 297mm !important;
+            transform: none !important;
+            zoom: 1 !important;
+            page-break-inside: avoid !important;
+          }
+          
+          html, body {
+            width: 210mm !important;
+            height: 297mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+        }
+        
         /* Hide interactive elements during print */
         .print-content button,
         .print-content .cursor-pointer,
