@@ -455,9 +455,6 @@ export default function QuotationA4Preview({
             {/* Representative Information - Small box on the right - Hidden if no representative selected */}
             {representativeName && (
               <div className="bg-white/95 print:bg-white border border-[#E2E8F0] print:border-none p-3 rounded-lg shadow-sm w-64">
-                <h3 className="text-xs font-bold mb-2 text-[#2B4C8C] print:text-black border-b border-[#E2E8F0] print:border-none pb-1" style={{fontFamily: 'Cairo, sans-serif'}}>
-                  بيانات المندوب
-                </h3>
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between">
                     <span className="font-semibold text-[#2B4C8C] print:text-black">الاسم:</span>
