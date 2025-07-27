@@ -1159,7 +1159,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
     }
   };
   
-  // Handle print quotation - improved print functionality
+  // Handle print quotation - direct content printing
   const handlePrintQuotation = () => {
     try {
       // Find the quotation preview element
@@ -1173,155 +1173,178 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         return;
       }
 
-      // Create enhanced print styles
-      const printStyles = document.createElement('style');
-      printStyles.id = 'dynamic-print-styles';
-      printStyles.innerHTML = `
-        @media print {
-          @page {
-            size: A4;
-            margin: 0;
-            -webkit-print-color-adjust: exact;
-            color-adjust: exact;
-          }
-          
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            font-family: 'Noto Sans Arabic', Arial, sans-serif !important;
-            direction: rtl !important;
-            -webkit-print-color-adjust: exact !important;
-            color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            background: white !important;
-          }
-          
-          * {
-            -webkit-print-color-adjust: exact !important;
-            color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          
-          /* Hide everything first */
-          body > * {
-            display: none !important;
-          }
-          
-          /* Show only the quotation preview */
-          [data-pdf-export="quotation"] {
-            display: block !important;
-            position: static !important;
-            width: 210mm !important;
-            min-height: 297mm !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            box-shadow: none !important;
-            border: none !important;
-            transform: none !important;
-            background-size: cover !important;
-            background-repeat: no-repeat !important;
-            background-position: center !important;
-            overflow: visible !important;
-            page-break-inside: avoid !important;
-          }
-          
-          /* Make the body only show the quotation */
-          body {
-            background: white !important;
-          }
-          
-          /* Ensure text is visible */
-          [data-pdf-export="quotation"] * {
-            color: black !important;
-            background-color: transparent !important;
-          }
-          
-          /* White backgrounds for content areas */
-          [data-pdf-export="quotation"] .bg-white {
-            background-color: white !important;
-          }
-          
-          /* Hide interactive elements */
-          [data-pdf-export="quotation"] button,
-          [data-pdf-export="quotation"] .print\\:hidden,
-          [data-pdf-export="quotation"] .no-print {
-            display: none !important;
-            visibility: hidden !important;
-          }
-          
-          /* Preserve images */
-          [data-pdf-export="quotation"] img {
-            max-width: 100% !important;
-            height: auto !important;
-            image-rendering: -webkit-optimize-contrast !important;
-            image-rendering: crisp-edges !important;
-          }
-          
-          /* Company stamp specific sizing */
-          [data-pdf-export="quotation"] img[alt*="ختم"],
-          [data-pdf-export="quotation"] .company-stamp {
-            width: 216px !important;
-            height: 144px !important;
-            max-width: 216px !important;
-            max-height: 144px !important;
-          }
-          
-          /* Ensure tables print properly */
-          [data-pdf-export="quotation"] table {
-            border-collapse: collapse !important;
-            width: 100% !important;
-          }
-          
-          [data-pdf-export="quotation"] td,
-          [data-pdf-export="quotation"] th {
-            border: 1px solid #ccc !important;
-            padding: 8px !important;
-            text-align: center !important;
-          }
-          
-          /* Header styles */
-          [data-pdf-export="quotation"] h1,
-          [data-pdf-export="quotation"] h2,
-          [data-pdf-export="quotation"] h3 {
-            color: black !important;
-            margin: 10px 0 !important;
-          }
-        }
-      `;
-
-      // Remove any existing print styles
-      const existingStyles = document.getElementById('dynamic-print-styles');
-      if (existingStyles) {
-        document.head.removeChild(existingStyles);
+      // Get the HTML content of the quotation
+      const quotationHTML = previewElement.outerHTML;
+      
+      // Create a new window for printing
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      if (!printWindow) {
+        toast({
+          title: "خطأ",
+          description: "لا يمكن فتح نافذة الطباعة. يرجى السماح للنوافذ المنبثقة",
+          variant: "destructive",
+        });
+        return;
       }
 
-      // Add new print styles
-      document.head.appendChild(printStyles);
+      // Write the content to the new window
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="ar" dir="rtl">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>عرض السعر - طباعة</title>
+          <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+          <style>
+            @page {
+              size: A4;
+              margin: 0;
+              -webkit-print-color-adjust: exact;
+              color-adjust: exact;
+            }
+            
+            * {
+              -webkit-print-color-adjust: exact !important;
+              color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            
+            html, body {
+              margin: 0;
+              padding: 0;
+              font-family: 'Noto Sans Arabic', Arial, sans-serif;
+              direction: rtl;
+              background: white;
+              color: black;
+              width: 210mm;
+              min-height: 297mm;
+            }
+            
+            [data-pdf-export="quotation"] {
+              width: 210mm !important;
+              min-height: 297mm !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              background-size: cover !important;
+              background-repeat: no-repeat !important;
+              background-position: center !important;
+              overflow: visible !important;
+            }
+            
+            /* Hide interactive elements */
+            button, .print\\:hidden, .no-print {
+              display: none !important;
+            }
+            
+            /* Ensure text visibility */
+            * {
+              color: black !important;
+            }
+            
+            /* Preserve images */
+            img {
+              max-width: 100%;
+              height: auto;
+            }
+            
+            /* Company stamp sizing */
+            img[alt*="ختم"], .company-stamp {
+              width: 216px !important;
+              height: 144px !important;
+            }
+            
+            /* Table styles */
+            table {
+              border-collapse: collapse;
+              width: 100%;
+            }
+            
+            td, th {
+              border: 1px solid white;
+              padding: 8px;
+              text-align: center;
+              color: black !important;
+            }
+            
+            /* Grid and layout fixes */
+            .grid {
+              display: grid;
+            }
+            
+            .grid-cols-2 {
+              grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .grid-cols-3 {
+              grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .grid-cols-4 {
+              grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .grid-cols-5 {
+              grid-template-columns: repeat(5, 1fr);
+            }
+            
+            .gap-2 { gap: 0.5rem; }
+            .gap-4 { gap: 1rem; }
+            .gap-6 { gap: 1.5rem; }
+            
+            .p-2 { padding: 0.5rem; }
+            .p-4 { padding: 1rem; }
+            .p-6 { padding: 1.5rem; }
+            .p-8 { padding: 2rem; }
+            
+            .text-center { text-align: center; }
+            .text-right { text-align: right; }
+            .text-left { text-align: left; }
+            
+            .font-bold { font-weight: bold; }
+            .font-semibold { font-weight: 600; }
+            
+            .text-lg { font-size: 1.125rem; }
+            .text-xl { font-size: 1.25rem; }
+            .text-2xl { font-size: 1.5rem; }
+            .text-3xl { font-size: 1.875rem; }
+            
+            .mb-2 { margin-bottom: 0.5rem; }
+            .mb-4 { margin-bottom: 1rem; }
+            .mb-6 { margin-bottom: 1.5rem; }
+            .mb-8 { margin-bottom: 2rem; }
+            
+            .mt-2 { margin-top: 0.5rem; }
+            .mt-4 { margin-top: 1rem; }
+            .mt-6 { margin-top: 1.5rem; }
+            .mt-8 { margin-top: 2rem; }
+          </style>
+        </head>
+        <body>
+          ${quotationHTML}
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+                window.close();
+              }, 1000);
+            };
+          </script>
+        </body>
+        </html>
+      `);
 
-      // Trigger print with delay to ensure styles are applied
-      setTimeout(() => {
-        window.print();
-        
-        // Clean up after printing
-        setTimeout(() => {
-          const stylesToRemove = document.getElementById('dynamic-print-styles');
-          if (stylesToRemove) {
-            document.head.removeChild(stylesToRemove);
-          }
-        }, 2000);
-      }, 500);
+      printWindow.document.close();
 
       toast({
-        title: "جاهز للطباعة",
-        description: "تم تحضير عرض السعر للطباعة بتنسيق محسن",
+        title: "جاري الطباعة",
+        description: "تم فتح نافذة الطباعة مع عرض السعر",
       });
 
     } catch (error) {
       console.error('Error printing quotation:', error);
       toast({
-        title: "خطأ في الطباعة", 
+        title: "خطأ في الطباعة",
         description: "حدث خطأ أثناء تحضير العرض للطباعة",
         variant: "destructive",
       });
