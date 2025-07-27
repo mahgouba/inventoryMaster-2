@@ -271,7 +271,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ **COMPLETED: Pricing Table Restoration** - Restored complete 5-column pricing table structure with license plate and total columns after accidental deletion
 - ✅ **COMPLETED: Price Details Header Removal** - Removed "تفاصيل السعر" header from pricing table per user request for cleaner appearance
 
-### Latest Replit Environment Migration - Complete Success (July 27, 2025)
+### Latest Replit Environment Migration - Complete Success with UI Updates (July 27, 2025)
 - ✅ Successfully completed migration from Replit Agent to standard Replit environment  
 - ✅ All required packages installed and verified working (Node.js 20, tsx, all dependencies)
 - ✅ Application running smoothly with Express server on port 5000
@@ -281,6 +281,18 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ User interface navigation cleaned up - removed scroll down button from horizontal navigation
 - ✅ Removed "إدارة الفواتير" (invoices) from both sidebar and horizontal navigation per user request
 - ✅ Arabic inventory management system fully operational and ready for development
+- ✅ **COMPLETED: Filtered Vehicle Statistics Enhancement** - Added real-time statistics rectangle showing counts for currently filtered/visible vehicles in inventory table
+- ✅ **Smart Filtering Integration** - Statistics automatically update based on all applied filters (search, manufacturer, category, status, etc.)
+- ✅ **Comprehensive Status Breakdown** - Shows counts for: Total visible, Available, In Transit, Maintenance, Reserved, and Sold (when sold cars view is enabled)
+- ✅ **Glass Morphism Design** - Consistent styling with existing application design using glass-container and white text with drop shadows
+- ✅ **Responsive Grid Layout** - Adapts from 2 columns on mobile to 6 columns on large screens for optimal viewing experience
+- ✅ **Arabic Interface** - Full RTL support with Arabic labels and descriptive text explaining the statistics functionality
+- ✅ **Color-Coded Display** - Each status uses distinctive colors (green for available, yellow for transit, blue for reserved, etc.)
+- ✅ **Conditional Display** - Sold vehicles count only appears when "إظهار السيارات المباعة" is enabled
+- ✅ **Real-Time Updates** - Statistics update instantly when filters are applied or removed, providing immediate feedback to users
+- ✅ **COMPLETED: Quotation Table Enhancement** - Updated quotation PDF table layout to put total amount and written total in same row as price data
+- ✅ **Background Removal** - Removed table background in PDF mode using `print:bg-transparent` for cleaner appearance
+- ✅ **Layout Optimization** - Converted from 5-column to 6-column grid to accommodate both numerical total and written total in same row
 
 ### Filtered Vehicle Statistics Enhancement (July 27, 2025)
 - ✅ **COMPLETED: Dynamic Statistics Display** - Added real-time statistics rectangle showing counts for currently filtered/visible vehicles in inventory table
