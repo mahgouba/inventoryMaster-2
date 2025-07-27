@@ -187,79 +187,96 @@ export default function PersonalBanks() {
                         className="w-full flex justify-between items-center cursor-pointer group"
                         onClick={() => toggleExpanded(bank.id)}
                       >
-                        <div className="flex items-center space-x-4 space-x-reverse">
-                          {bank.logo ? (
-                            <div className="flex items-center space-x-3 space-x-reverse">
-                              <img 
-                                src={bank.logo} 
-                                alt={bank.bankName} 
-                                className="h-18 w-18 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110 cursor-pointer"
-                                style={{ height: '4.5rem', width: '4.5rem' }}
-                                onMouseDown={(e) => {
-                                  e.stopPropagation();
-                                  handleLongPressStart(bank);
-                                }}
-                                onMouseUp={(e) => {
-                                  e.stopPropagation();
-                                  handleLongPressEnd();
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.stopPropagation();
-                                  handleLongPressEnd();
-                                }}
-                                onTouchStart={(e) => {
-                                  e.stopPropagation();
-                                  handleLongPressStart(bank);
-                                }}
-                                onTouchEnd={(e) => {
-                                  e.stopPropagation();
-                                  handleLongPressEnd();
-                                }}
-                                onTouchCancel={(e) => {
-                                  e.stopPropagation();
-                                  handleLongPressEnd();
-                                }}
-                              />
-                              <h3 className="text-lg font-bold text-white drop-shadow-md">
-                                {bank.bankName}
-                              </h3>
-                            </div>
-                          ) : (
-                            <div className="flex items-center space-x-3 space-x-reverse">
-                              <div 
-                                className="h-18 w-18 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30 cursor-pointer"
-                                onMouseDown={(e) => {
-                                  e.stopPropagation();
-                                  handleLongPressStart(bank);
-                                }}
-                                onMouseUp={(e) => {
-                                  e.stopPropagation();
-                                  handleLongPressEnd();
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.stopPropagation();
-                                  handleLongPressEnd();
-                                }}
-                                onTouchStart={(e) => {
-                                  e.stopPropagation();
-                                  handleLongPressStart(bank);
-                                }}
-                                onTouchEnd={(e) => {
-                                  e.stopPropagation();
-                                  handleLongPressEnd();
-                                }}
-                                onTouchCancel={(e) => {
-                                  e.stopPropagation();
-                                  handleLongPressEnd();
-                                }}
-                              >
-                                <User className="w-8 h-8 text-white" />
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center space-x-4 space-x-reverse">
+                            {bank.logo ? (
+                              <div className="flex items-center space-x-3 space-x-reverse">
+                                <img 
+                                  src={bank.logo} 
+                                  alt={bank.bankName} 
+                                  className="h-18 w-18 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110 cursor-pointer"
+                                  style={{ height: '4.5rem', width: '4.5rem' }}
+                                  onMouseDown={(e) => {
+                                    e.stopPropagation();
+                                    handleLongPressStart(bank);
+                                  }}
+                                  onMouseUp={(e) => {
+                                    e.stopPropagation();
+                                    handleLongPressEnd();
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.stopPropagation();
+                                    handleLongPressEnd();
+                                  }}
+                                  onTouchStart={(e) => {
+                                    e.stopPropagation();
+                                    handleLongPressStart(bank);
+                                  }}
+                                  onTouchEnd={(e) => {
+                                    e.stopPropagation();
+                                    handleLongPressEnd();
+                                  }}
+                                  onTouchCancel={(e) => {
+                                    e.stopPropagation();
+                                    handleLongPressEnd();
+                                  }}
+                                />
+                                <h3 className="text-lg font-bold text-white drop-shadow-md">
+                                  {bank.bankName}
+                                </h3>
                               </div>
-                              <h3 className="text-lg font-bold text-white drop-shadow-md">
-                                {bank.bankName}
-                              </h3>
-                            </div>
-                          )}
+                            ) : (
+                              <div className="flex items-center space-x-3 space-x-reverse">
+                                <div 
+                                  className="h-18 w-18 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30 cursor-pointer"
+                                  onMouseDown={(e) => {
+                                    e.stopPropagation();
+                                    handleLongPressStart(bank);
+                                  }}
+                                  onMouseUp={(e) => {
+                                    e.stopPropagation();
+                                    handleLongPressEnd();
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.stopPropagation();
+                                    handleLongPressEnd();
+                                  }}
+                                  onTouchStart={(e) => {
+                                    e.stopPropagation();
+                                    handleLongPressStart(bank);
+                                  }}
+                                  onTouchEnd={(e) => {
+                                    e.stopPropagation();
+                                    handleLongPressEnd();
+                                  }}
+                                  onTouchCancel={(e) => {
+                                    e.stopPropagation();
+                                    handleLongPressEnd();
+                                  }}
+                                >
+                                  <User className="w-8 h-8 text-white" />
+                                </div>
+                                <h3 className="text-lg font-bold text-white drop-shadow-md">
+                                  {bank.bankName}
+                                </h3>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Quick Share Button */}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              shareBank(bank);
+                            }}
+                            className="p-2 hover:bg-white/20 rounded-lg transition-all duration-300 flex items-center gap-1 backdrop-blur-sm border border-white/20"
+                            title="مشاركة معلومات البنك"
+                          >
+                            <Share2 className="w-4 h-4 text-white" />
+                            <span className="text-xs text-white hidden sm:inline">مشاركة</span>
+                          </Button>
                         </div>
                         
                         {isExpanded ? (
