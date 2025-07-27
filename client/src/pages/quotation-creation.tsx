@@ -2014,6 +2014,17 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-white drop-shadow-md mb-4">إدارة بيانات العرض</h3>
                 <div className="space-y-3">
+                {/* Saved Quotations Button */}
+                <Link href="/quotation-management">
+                  <Button
+                    variant="outline"
+                    className="w-full glass-button border-blue-500/50 text-blue-300 hover:bg-blue-500/20 bg-white/10"
+                  >
+                    <FileText size={16} className="ml-2" />
+                    العروض المحفوظة
+                  </Button>
+                </Link>
+
                 {/* Terms and Conditions Button */}
                 <Button
                   variant="outline"
