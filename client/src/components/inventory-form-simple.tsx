@@ -346,7 +346,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto w-[90vw] sm:w-full glass-dialog-secondary" draggable={true}>
+        <DialogContent className="max-w-6xl max-h-[95vh] w-[95vw] sm:w-full glass-dialog-secondary" draggable={true}>
           <DialogHeader>
             <div className="flex items-center justify-between" data-dialog-drag-handle>
               <div className="flex items-center gap-2">
@@ -366,21 +366,21 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                 قوائم
               </Button>
             </div>
-            <DialogDescription className="text-xs text-white/70 mb-3">
+            <DialogDescription className="text-xs text-white/70 mb-2">
               {editItem ? "تحرير البيانات" : "إدخال بيانات المركبة"}
             </DialogDescription>
           </DialogHeader>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
                 {/* Manufacturer Field */}
                 <FormField
                   control={form.control}
                   name="manufacturer"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>الصانع</FormLabel>
+                      <FormLabel className="text-sm text-white">الصانع</FormLabel>
                       <FormControl>
                         <Select value={field.value} onValueChange={(value) => {
                           handleManufacturerChange(value);
@@ -410,7 +410,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                     name="category"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>الفئة</FormLabel>
+                        <FormLabel className="text-sm text-white">الفئة</FormLabel>
                         <FormControl>
                           <Select value={field.value} onValueChange={(value) => {
                             handleCategoryChange(value);
@@ -452,7 +452,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                     name="trimLevel"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>درجة التجهيز</FormLabel>
+                        <FormLabel className="text-sm text-white">درجة التجهيز</FormLabel>
                         <FormControl>
                           <Select value={field.value || ""} onValueChange={field.onChange} disabled={!selectedManufacturer || !selectedCategory}>
                             <SelectTrigger>
@@ -491,7 +491,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   name="engineCapacity"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>سعة المحرك</FormLabel>
+                      <FormLabel className="text-sm text-white">سعة المحرك</FormLabel>
                       <FormControl>
                         <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger>
@@ -517,7 +517,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   name="year"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>السنة</FormLabel>
+                      <FormLabel className="text-sm text-white">السنة</FormLabel>
                       <FormControl>
                         <Select value={field.value?.toString()} onValueChange={(value) => field.onChange(parseInt(value))}>
                           <SelectTrigger>
@@ -543,7 +543,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   name="exteriorColor"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>اللون الخارجي</FormLabel>
+                      <FormLabel className="text-sm text-white">اللون الخارجي</FormLabel>
                       <FormControl>
                         <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger>
@@ -569,7 +569,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   name="interiorColor"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>اللون الداخلي</FormLabel>
+                      <FormLabel className="text-sm text-white">اللون الداخلي</FormLabel>
                       <FormControl>
                         <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger>
@@ -595,7 +595,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   name="importType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>نوع الاستيراد</FormLabel>
+                      <FormLabel className="text-sm text-white">نوع الاستيراد</FormLabel>
                       <FormControl>
                         <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger>
@@ -622,7 +622,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                     name="mileage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>ممشي السيارة (كم)</FormLabel>
+                        <FormLabel className="text-sm text-white">ممشي السيارة (كم)</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="أدخل عدد الكيلومترات" 
@@ -644,7 +644,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   name="location"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>الموقع</FormLabel>
+                      <FormLabel className="text-sm text-white">الموقع</FormLabel>
                       <FormControl>
                         <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger>
@@ -670,7 +670,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>الحالة</FormLabel>
+                      <FormLabel className="text-sm text-white">الحالة</FormLabel>
                       <FormControl>
                         <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger>
@@ -696,7 +696,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   name="chassisNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>رقم الهيكل</FormLabel>
+                      <FormLabel className="text-sm text-white">رقم الهيكل</FormLabel>
                       <div className="flex gap-2">
                         <FormControl className="flex-1">
                           <Input placeholder="أدخل رقم الهيكل" {...field} />
@@ -722,7 +722,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>السعر</FormLabel>
+                      <FormLabel className="text-sm text-white">السعر</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="أدخل السعر" 
@@ -742,7 +742,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   name="ownershipType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>نوع الملكية</FormLabel>
+                      <FormLabel className="text-sm text-white">نوع الملكية</FormLabel>
                       <FormControl>
                         <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger>
@@ -759,17 +759,20 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   )}
                 />
 
-                {/* Notes */}
+              </div>
+
+              {/* Notes - Full width row */}
+              <div className="mt-3">
                 <FormField
                   control={form.control}
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>الملاحظات</FormLabel>
+                      <FormLabel className="text-sm text-white">الملاحظات</FormLabel>
                       <FormControl>
                         <Textarea 
                           placeholder="ملاحظات..."
-                          className="min-h-[60px] text-sm"
+                          className="min-h-[60px] text-sm resize-none"
                           value={field.value || ''}
                           onChange={field.onChange}
                         />
