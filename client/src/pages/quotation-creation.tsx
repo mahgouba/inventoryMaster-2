@@ -1233,16 +1233,18 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
             
             [data-pdf-export="quotation"] {
               width: 210mm !important;
-              height: 297mm !important;
+              min-height: 297mm !important;
+              max-height: 297mm !important;
               margin: 0 auto !important;
-              padding: 0 !important;
+              padding: 15mm !important;
               background-size: cover !important;
               background-repeat: no-repeat !important;
               background-position: center !important;
-              overflow: hidden !important;
+              overflow: visible !important;
               position: relative !important;
               box-shadow: none !important;
               border: none !important;
+              box-sizing: border-box !important;
             }
             
             /* Hide interactive elements */
@@ -1302,6 +1304,14 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
             .grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
             .grid-cols-5 { grid-template-columns: repeat(5, 1fr) !important; }
             .grid-cols-10 { grid-template-columns: repeat(10, 1fr) !important; }
+            
+            /* Ensure grid items align properly */
+            .grid > * {
+              display: flex !important;
+              align-items: center !important;
+              justify-content: center !important;
+              padding: 4px !important;
+            }
             
             /* Spacing utilities */
             .gap-1 { gap: 0.25rem !important; }
@@ -1374,6 +1384,33 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
             /* Shadow utilities */
             .shadow { box-shadow: none !important; }
             .shadow-lg { box-shadow: none !important; }
+            
+            /* Content scaling and positioning fixes */
+            [data-pdf-export="quotation"] > * {
+              max-width: 100% !important;
+              page-break-inside: avoid !important;
+            }
+            
+            /* Ensure footer content stays visible */
+            [data-pdf-export="quotation"] .absolute {
+              position: relative !important;
+            }
+            
+            /* Fix any overflow issues */
+            [data-pdf-export="quotation"] .overflow-hidden {
+              overflow: visible !important;
+            }
+            
+            /* Ensure proper spacing for different sections */
+            [data-pdf-export="quotation"] > div {
+              margin-bottom: 10px !important;
+            }
+            
+            /* Company stamp positioning */
+            [data-pdf-export="quotation"] img[alt*="ختم"] {
+              margin: 10px auto !important;
+              display: block !important;
+            }
           </style>
         </head>
         <body>
