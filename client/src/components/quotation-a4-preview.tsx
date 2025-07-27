@@ -285,7 +285,7 @@ export default function QuotationA4Preview({
 
             {/* Vehicle Information */}
             {selectedVehicle && (
-              <div className="relative p-4 w-full mt-[166px] mb-[16px] overflow-hidden print:bg-transparent print:border-none">
+              <div className="relative p-4 w-full mt-[166px] mb-[16px] overflow-hidden print:bg-transparent border border-[#E2E8F0] rounded-lg shadow-lg print:border-none">
                 {/* Systematic Manufacturer Logo Watermark Pattern */}
                 {selectedVehicle && (() => {
                   const manufacturerLogo = getManufacturerLogo(selectedVehicle.manufacturer);
@@ -384,7 +384,7 @@ export default function QuotationA4Preview({
                       style={{ direction: 'rtl' }}
                     />
                   ) : (
-                    <div className="text-xs text-[#1A365D] whitespace-pre-wrap max-h-20 overflow-y-auto bg-[#F8FAFC] print:bg-white print:text-black p-2 print:border-none">
+                    <div className="text-xs text-[#1A365D] whitespace-pre-wrap max-h-20 overflow-y-auto bg-[#F8FAFC] border border-[#E2E8F0] p-2 rounded print:bg-white print:text-black print:border-none">
                       {editableSpecs || "لا توجد مواصفات تفصيلية"}
                     </div>
                   )}
