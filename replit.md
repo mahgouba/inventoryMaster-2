@@ -402,6 +402,13 @@ The application uses PostgreSQL for persistent data storage with proper database
   - Made icons completely static with no left or right movement during interactions
 - ✅ Migration completed successfully with comprehensive Arabic inventory management system operational and unified visual design
 
+### PDF Table Styling Update - White Borders (July 27, 2025)
+- ✅ **COMPLETED: White Table Borders in PDF** - Changed all table borders from black/gray to white in quotation PDF per user request
+- ✅ Updated Price Breakdown Table borders (table container, header, cells) from gray-300/gray-200 to white
+- ✅ Updated Terms & Conditions section border from gray-300 to white
+- ✅ Updated Representative Information section borders from gray-300/gray-200 to white
+- ✅ Maintained table structure and functionality while improving visual appearance with white borders for cleaner PDF output
+
 ### Previous Replit Environment Migration with Bank Page Updates (July 25, 2025)
 - ✅ Successfully completed migration from Replit Agent to standard Replit environment
 - ✅ All required packages installed and verified working (Node.js 20, tsx, all dependencies)
