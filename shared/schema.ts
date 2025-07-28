@@ -59,6 +59,7 @@ export const banks = pgTable("banks", {
   id: serial("id").primaryKey(),
   logo: text("logo"), // شعار البنك (Base64 أو URL)
   bankName: text("bank_name").notNull(), // اسم البنك
+  nameEn: text("name_en"), // الاسم الإنجليزي
   accountName: text("account_name").notNull(), // اسم الحساب
   accountNumber: text("account_number").notNull(), // رقم الحساب
   iban: text("iban").notNull(), // رقم الآيبان

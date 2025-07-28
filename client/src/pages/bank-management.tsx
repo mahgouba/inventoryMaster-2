@@ -30,6 +30,7 @@ export default function BankManagement() {
   const [formData, setFormData] = useState<InsertBank>({
     logo: "",
     bankName: "",
+    nameEn: "",
     accountName: "",
     accountNumber: "",
     iban: "",
@@ -149,6 +150,7 @@ export default function BankManagement() {
     setFormData({
       logo: "",
       bankName: "",
+      nameEn: "",
       accountName: "",
       accountNumber: "",
       iban: "",
@@ -310,7 +312,15 @@ export default function BankManagement() {
                 />
               </div>
               
-
+              <div className="space-y-2">
+                <Label htmlFor="nameEn">الاسم الإنجليزي</Label>
+                <Input
+                  id="nameEn"
+                  value={formData.nameEn || ""}
+                  onChange={(e) => setFormData(prev => ({ ...prev, nameEn: e.target.value }))}
+                  placeholder="Example: Al Rajhi Bank"
+                />
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="accountName">اسم الحساب *</Label>
