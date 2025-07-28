@@ -29,8 +29,7 @@ export default function BankManagement() {
 
   const [formData, setFormData] = useState<InsertBank>({
     logo: "",
-    name: "",
-    nameEn: "",
+    bankName: "",
     accountName: "",
     accountNumber: "",
     iban: "",
@@ -149,8 +148,7 @@ export default function BankManagement() {
   const resetForm = () => {
     setFormData({
       logo: "",
-      name: "",
-      nameEn: "",
+      bankName: "",
       accountName: "",
       accountNumber: "",
       iban: "",
@@ -178,8 +176,7 @@ export default function BankManagement() {
     setEditingBank(bank);
     setFormData({
       logo: bank.logo || "",
-      name: bank.name,
-      nameEn: bank.nameEn || "",
+      bankName: bank.bankName,
       accountName: bank.accountName,
       accountNumber: bank.accountNumber,
       iban: bank.iban,
@@ -303,25 +300,17 @@ export default function BankManagement() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="name">اسم البنك *</Label>
+                <Label htmlFor="bankName">اسم البنك *</Label>
                 <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  id="bankName"
+                  value={formData.bankName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, bankName: e.target.value }))}
                   placeholder="مثال: مصرف الراجحي"
                   required
                 />
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="nameEn">الاسم الإنجليزي</Label>
-                <Input
-                  id="nameEn"
-                  value={formData.nameEn}
-                  onChange={(e) => setFormData(prev => ({ ...prev, nameEn: e.target.value }))}
-                  placeholder="Example: Al Rajhi Bank"
-                />
-              </div>
+
 
               <div className="space-y-2">
                 <Label htmlFor="accountName">اسم الحساب *</Label>
@@ -458,12 +447,12 @@ export default function BankManagement() {
                             {bank.logo && (
                               <img 
                                 src={bank.logo} 
-                                alt={bank.name} 
+                                alt={bank.bankName} 
                                 className="w-12 h-12 object-contain"
                               />
                             )}
                             <div>
-                              <h3 className="font-semibold text-lg">{bank.name}</h3>
+                              <h3 className="font-semibold text-lg">{bank.bankName}</h3>
                               <p className="text-sm text-gray-600">{bank.accountName}</p>
                             </div>
                           </div>
@@ -540,12 +529,12 @@ export default function BankManagement() {
                             {bank.logo && (
                               <img 
                                 src={bank.logo} 
-                                alt={bank.name} 
+                                alt={bank.bankName} 
                                 className="w-12 h-12 object-contain"
                               />
                             )}
                             <div>
-                              <h3 className="font-semibold text-lg">{bank.name}</h3>
+                              <h3 className="font-semibold text-lg">{bank.bankName}</h3>
                               <p className="text-sm text-gray-600">{bank.accountName}</p>
                             </div>
                           </div>
