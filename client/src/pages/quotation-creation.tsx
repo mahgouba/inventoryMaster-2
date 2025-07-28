@@ -49,6 +49,7 @@ import CompanyPDFTemplates from "@/components/company-pdf-templates";
 
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import EnhancedPDFExport from "@/components/enhanced-pdf-export";
 
 interface QuotationCreationPageProps {
   vehicleData?: InventoryItem;
@@ -2423,32 +2424,19 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   </Label>
                 </div>
                 
-                <Button 
-                  onClick={handleDownloadPDF}
-                  className="w-full glass-button bg-gradient-to-r from-green-500/70 to-green-600/70 hover:from-green-600/80 hover:to-green-700/80 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl backdrop-blur-sm"
-                  disabled={downloadLoading}
-                >
-                  {downloadLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
-                      جاري التحميل...
-                    </>
-                  ) : (
-                    <>
-                      <Download size={16} className="ml-2" />
-                      تحميل العرض PDF
-                    </>
-                  )}
-                </Button>
-                
-                <Button 
-                  onClick={handlePrintQuotation}
-                  variant="outline"
-                  className="w-full glass-button border-white/20 text-white hover:bg-white/20 bg-white/10"
-                >
-                  <Printer size={16} className="ml-2" />
-                  طباعة عرض السعر
-                </Button>
+                {/* Enhanced PDF and Image Export System */}
+                <div className="w-full space-y-2">
+                  <Label className="text-sm font-medium text-white drop-shadow-sm mb-2 block">
+                    تصدير وطباعة العرض
+                  </Label>
+                  <EnhancedPDFExport
+                    targetElementId="quotation"
+                    filename={`عرض_سعر_${authorizationNumber || quoteNumber || generateQuoteNumber()}`}
+                    showJPGExport={true}
+                    showPDFExport={true}
+                    showPrintButton={true}
+                  />
+                </div>
                 </div>
               </div>
             </GlassBackground>
