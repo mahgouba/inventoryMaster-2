@@ -23,7 +23,7 @@ import { eq, like, or, and, sql, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByUsername(userbankName: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getAllUsers(): Promise<User[]>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
@@ -712,7 +712,7 @@ export class MemStorage implements IStorage {
   private initializeBankData() {
     const sampleBanks: InsertBank[] = [
       {
-        name: 'مصرف الراجحي',
+        bankName: 'مصرف الراجحي',
         nameEn: 'Al Rajhi Bank',
         accountName: 'شركة البريمي للسيارات',
         accountNumber: '575608010000904',
@@ -722,7 +722,7 @@ export class MemStorage implements IStorage {
         logo: '/rajhi.png'
       },
       {
-        name: 'البنك الأهلي السعودي',
+        bankName: 'البنك الأهلي السعودي',
         nameEn: 'Saudi National Bank',
         accountName: 'شركة البريمي للسيارات',
         accountNumber: '25268400000102',
@@ -732,7 +732,7 @@ export class MemStorage implements IStorage {
         logo: '/snb.png'
       },
       {
-        name: 'بنك الجزيرة',
+        bankName: 'بنك الجزيرة',
         nameEn: 'Bank Al Jazira',
         accountName: 'شركة البريمي للسيارات',
         accountNumber: '030495028555001',
@@ -742,7 +742,7 @@ export class MemStorage implements IStorage {
         logo: '/jazira.png'
       },
       {
-        name: 'بنك البلاد',
+        bankName: 'بنك البلاد',
         nameEn: 'Banque Saudi Fransi',
         accountName: 'شركة البريمي للسيارات',
         accountNumber: '448888888780008',
@@ -752,7 +752,7 @@ export class MemStorage implements IStorage {
         logo: '/albilad.png'
       },
       {
-        name: 'البنك العربي الوطني',
+        bankName: 'البنك العربي الوطني',
         nameEn: 'Arab National Bank',
         accountName: 'شركة البريمي للسيارات',
         accountNumber: '0108095322110019',
@@ -762,7 +762,7 @@ export class MemStorage implements IStorage {
         logo: '/anb.png'
       },
       {
-        name: 'بنك الإمارات دبي الوطني',
+        bankName: 'بنك الإمارات دبي الوطني',
         nameEn: 'Emirates NBD Bank',
         accountName: 'شركة البريمي للسيارات',
         accountNumber: '1016050175301',
@@ -772,7 +772,7 @@ export class MemStorage implements IStorage {
         logo: '/nbd.png'
       },
       {
-        name: 'بنك الرياض',
+        bankName: 'بنك الرياض',
         nameEn: 'Riyad Bank',
         accountName: 'شركة البريمي للسيارات',
         accountNumber: '2383212779940',
@@ -782,7 +782,7 @@ export class MemStorage implements IStorage {
         logo: '/riyad.png'
       },
       {
-        name: 'مصرف الإنماء',
+        bankName: 'مصرف الإنماء',
         nameEn: 'Alinma Bank',
         accountName: 'شركة البريمي للسيارات',
         accountNumber: '68201863704000',
@@ -792,7 +792,7 @@ export class MemStorage implements IStorage {
         logo: '/alinma.png'
       },
       {
-        name: 'البنك السعودي الأول',
+        bankName: 'البنك السعودي الأول',
         nameEn: 'The Saudi Investment Bank',
         accountName: 'شركة معرض البريمي للسيارات',
         accountNumber: '822173787001',
@@ -802,7 +802,7 @@ export class MemStorage implements IStorage {
         logo: '/sab.png'
       },
       {
-        name: 'البنك السعودي الفرنسي',
+        bankName: 'البنك السعودي الفرنسي',
         nameEn: 'Banque Saudi Fransi',
         accountName: 'شركة البريمي للسيارات',
         accountNumber: '97844900167',
@@ -828,7 +828,7 @@ export class MemStorage implements IStorage {
     // Add some personal bank accounts
     const personalBanks: InsertBank[] = [
       {
-        name: 'مصرف الراجحي',
+        bankName: 'مصرف الراجحي',
         nameEn: 'Al Rajhi Bank',
         accountName: 'أحمد البريمي',
         accountNumber: '575608010001234',
@@ -838,7 +838,7 @@ export class MemStorage implements IStorage {
         logo: '/rajhi.png'
       },
       {
-        name: 'البنك الأهلي السعودي',
+        bankName: 'البنك الأهلي السعودي',
         nameEn: 'Saudi National Bank',
         accountName: 'محمد البريمي',
         accountNumber: '25268400005678',
@@ -848,7 +848,7 @@ export class MemStorage implements IStorage {
         logo: '/snb.png'
       },
       {
-        name: 'بنك الرياض',
+        bankName: 'بنك الرياض',
         nameEn: 'Riyad Bank',
         accountName: 'عبدالله البريمي',
         accountNumber: '2383212779999',
@@ -875,7 +875,7 @@ export class MemStorage implements IStorage {
     return this.users.get(id);
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
+  async getUserByUsername(userbankName: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(
       (user) => user.username === username,
     );
@@ -1533,7 +1533,7 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
+  async getUserByUsername(userbankName: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
@@ -1831,7 +1831,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(inventoryItems)
       .where(eq(inventoryItems.location, 
-        await db.select({ name: locations.name }).from(locations).where(eq(locations.id, id)).then(res => res[0]?.name || '')
+        await db.select({ bankName: locations.name }).from(locations).where(eq(locations.id, id)).then(res => res[0]?.name || '')
       ));
     
     if (itemsInLocation.length > 0) {
