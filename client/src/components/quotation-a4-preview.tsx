@@ -793,7 +793,7 @@ export default function QuotationA4Preview({
           </div>
 
           {/* Separate Total Section */}
-          <div className="print:bg-transparent border border-[#E2E8F0] rounded-lg shadow-lg overflow-hidden p-4 mt-[21px] mb-[21px] pt-[1px] pb-[1px]">
+          <div className="print:bg-transparent border border-[#E2E8F0] rounded-lg shadow-lg overflow-hidden p-4 pt-[1px] pb-[1px] mt-[12px] mb-[12px]"></div>
             <div className="grid grid-cols-10 print:bg-transparent text-xs">
               <div className="p-4 col-span-3 flex items-center justify-center">
                 <div className="font-bold text-[#2B4C8C] print:text-black text-[13px] text-center">
