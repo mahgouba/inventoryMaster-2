@@ -386,39 +386,42 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     queryKey: ["/api/companies"]
   });
 
-  // Fetch manufacturers for dropdown selection from cars database
-  const { data: manufacturersData = [] } = useQuery<any[]>({
-    queryKey: ["/api/cars/manufacturers"]
+  // Query for all available vehicles from inventory (real data) - MOVED TO TOP
+  const { data: availableVehicles = [] } = useQuery<InventoryItem[]>({
+    queryKey: ["/api/inventory"]
   });
 
-  // Transform manufacturers data for consistent format
-  const manufacturers = manufacturersData.map((m: any) => ({
-    id: m.name_ar,
-    name: m.name_ar,
-    nameEn: m.name_en
+  // Get manufacturers from inventory data
+  const manufacturers = Array.from(new Set(availableVehicles.map(item => item.manufacturer)))
+    .filter(Boolean)
+    .map(manufacturer => ({
+      id: manufacturer,
+      name: manufacturer,
+      nameEn: manufacturer
+    }));
+
+  // Get categories from inventory data based on selected manufacturer
+  const categories = Array.from(new Set(
+    availableVehicles
+      .filter(item => item.manufacturer === (vehicleManufacturer || editingQuotation?.manufacturer))
+      .map(item => item.category)
+      .filter(Boolean)
+  )).map(category => ({
+    category: category
   }));
 
-  // Fetch categories based on selected manufacturer from cars database
-  const { data: categoriesData = [] } = useQuery<any[]>({
-    queryKey: [`/api/cars/models/${vehicleManufacturer || editingQuotation?.manufacturer}`],
-    enabled: !!(vehicleManufacturer || editingQuotation?.manufacturer)
-  });
-
-  // Transform categories data for consistent format
-  const categories = categoriesData.map((model: any) => ({
-    category: model.model_ar
-  }));
-
-  // Fetch trim levels based on selected manufacturer and category from cars database
-  const { data: trimLevelsData = [] } = useQuery<any[]>({
-    queryKey: [`/api/cars/trims/${vehicleManufacturer || editingQuotation?.manufacturer}/${vehicleCategory || editingQuotation?.category}`],
-    enabled: !!(vehicleManufacturer || editingQuotation?.manufacturer) && !!(vehicleCategory || editingQuotation?.category)
-  });
-
-  // Transform trim levels data for consistent format
-  const trimLevels = trimLevelsData.map((trim: any) => ({
-    id: trim.trim_ar || trim.trim,
-    trimLevel: trim.trim_ar || trim.trim
+  // Get trim levels from inventory data based on selected manufacturer and category
+  const trimLevels = Array.from(new Set(
+    availableVehicles
+      .filter(item => 
+        item.manufacturer === (vehicleManufacturer || editingQuotation?.manufacturer) &&
+        item.category === (vehicleCategory || editingQuotation?.category)
+      )
+      .map(item => item.trimLevel)
+      .filter(Boolean)
+  )).map(trimLevel => ({
+    id: trimLevel,
+    trimLevel: trimLevel
   }));
 
   // Vehicle editing state for editable form
@@ -434,43 +437,38 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     price: 0
   });
 
-  // Fetch categories for editing dialog from cars database
-  const { data: editingCategoriesData = [] } = useQuery<any[]>({
-    queryKey: [`/api/cars/models/${editingVehicleData.manufacturer}`],
-    enabled: !!editingVehicleData.manufacturer
-  });
-
-  // Transform editing categories data
-  const editingCategories = editingCategoriesData.map((model: any) => ({
-    category: model.model_ar
+  // Get editing categories from inventory data
+  const editingCategories = Array.from(new Set(
+    availableVehicles
+      .filter(item => item.manufacturer === editingVehicleData.manufacturer)
+      .map(item => item.category)
+      .filter(Boolean)
+  )).map(category => ({
+    category: category
   }));
 
-  // Fetch trim levels for editing dialog from cars database
-  const { data: editingTrimLevelsData = [] } = useQuery<any[]>({
-    queryKey: [`/api/cars/trims/${editingVehicleData.manufacturer}/${editingVehicleData.category}`],
-    enabled: !!(editingVehicleData.manufacturer && editingVehicleData.category)
-  });
-
-  // Transform editing trim levels data
-  const editingTrimLevels = editingTrimLevelsData.map((trim: any) => ({
-    id: trim.trim_ar || trim.trim,
-    trimLevel: trim.trim_ar || trim.trim
+  // Get editing trim levels from inventory data
+  const editingTrimLevels = Array.from(new Set(
+    availableVehicles
+      .filter(item => 
+        item.manufacturer === editingVehicleData.manufacturer &&
+        item.category === editingVehicleData.category
+      )
+      .map(item => item.trimLevel)
+      .filter(Boolean)
+  )).map(trimLevel => ({
+    id: trimLevel,
+    trimLevel: trimLevel
   }));
 
-  // Fetch engine capacities from cars database
-  const { data: engineCapacitiesData = [] } = useQuery<any[]>({
-    queryKey: ["/api/cars/engines"]
-  });
-
-  // Transform engine capacities data
-  const engineCapacities = engineCapacitiesData.map((engine: any) => ({
-    engineCapacity: engine.engine_ar || engine.engine
+  // Get engine capacities from inventory data
+  const engineCapacities = Array.from(new Set(
+    availableVehicles
+      .map(item => item.engineCapacity)
+      .filter(Boolean)
+  )).map(engineCapacity => ({
+    engineCapacity: engineCapacity
   }));
-
-  // Query for all available vehicles from cars database (not just inventory)
-  const { data: availableVehicles = [] } = useQuery({
-    queryKey: ["/api/cars/all-vehicles"]
-  });
   
 
 
