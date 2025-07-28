@@ -767,7 +767,7 @@ export default function QuotationA4Preview({
           </div>
 
           {/* Price Breakdown Table */}
-          <div className="print:bg-transparent border border-[#E2E8F0] rounded-lg mb-6 shadow-lg overflow-hidden p-4">
+          <div className="print:bg-transparent border border-[#E2E8F0] rounded-lg mb-4 shadow-lg overflow-hidden p-4">
             
             {/* Table Header */}
             <div className="grid grid-cols-5 print:bg-transparent border-b border-white print:border-white text-xs font-bold">
@@ -779,7 +779,7 @@ export default function QuotationA4Preview({
             </div>
             
             {/* Table Data Row */}
-            <div className="grid grid-cols-5 border-b border-white print:border-white text-xs print:bg-transparent">
+            <div className="grid grid-cols-5 print:bg-transparent text-xs">
               <div className="p-2 border-l border-white print:border-white text-[#1A365D] print:text-black text-center flex items-center justify-center">1</div>
               <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black text-center flex items-center justify-center">{basePrice.toLocaleString()}</div>
               <div className="p-2 border-l border-white print:border-white font-semibold text-[#1A365D] print:text-black text-center flex items-center justify-center">{taxAmount.toLocaleString()}</div>
@@ -790,8 +790,10 @@ export default function QuotationA4Preview({
                 {(grandTotal + (includeLicensePlate ? licensePlatePrice : 0)).toLocaleString()}
               </div>
             </div>
-            
-            {/* Total Row - Third Row */}
+          </div>
+
+          {/* Separate Total Section */}
+          <div className="print:bg-transparent border border-[#E2E8F0] rounded-lg mb-6 shadow-lg overflow-hidden p-4">
             <div className="grid grid-cols-10 print:bg-transparent text-xs">
               <div className="p-4 col-span-3 flex items-center justify-center">
                 <div className="font-bold text-[#2B4C8C] print:text-black text-[13px] text-center">
