@@ -43,6 +43,7 @@ interface QuotationA4PreviewProps {
   companyStamp?: string | null;
   isInvoiceMode?: boolean;
   invoiceNumber?: string;
+  authorizationNumber?: string;
 }
 
 export default function QuotationA4Preview({
@@ -70,7 +71,8 @@ export default function QuotationA4Preview({
   termsRefreshTrigger = 0,
   companyStamp = null,
   isInvoiceMode = false,
-  invoiceNumber = ""
+  invoiceNumber = "",
+  authorizationNumber = ""
 }: QuotationA4PreviewProps) {
   
   const [termsConditions, setTermsConditions] = useState<Array<{ id: number; term_text: string; display_order: number }>>([]);
@@ -96,11 +98,13 @@ export default function QuotationA4Preview({
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
         
         @page {
-          margin: 0;
-          size: A4;
-          -webkit-print-color-adjust: exact;
-          color-adjust: exact;
-          print-color-adjust: exact;
+          margin: 0 !important;
+          size: A4 portrait !important;
+          -webkit-print-color-adjust: exact !important;
+          color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          width: 210mm !important;
+          height: 297mm !important;
         }
         
         * {
@@ -110,37 +114,48 @@ export default function QuotationA4Preview({
           print-color-adjust: exact;
         }
         
-        body {
-          margin: 0;
-          padding: 0;
-          font-family: 'Noto Sans Arabic', Arial, sans-serif;
-          direction: rtl;
-          background: white;
-          -webkit-print-color-adjust: exact;
-          color-adjust: exact;
-          print-color-adjust: exact;
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          font-family: 'Noto Sans Arabic', Arial, sans-serif !important;
+          direction: rtl !important;
+          background: white !important;
+          -webkit-print-color-adjust: exact !important;
+          color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          width: 210mm !important;
+          height: 297mm !important;
+          overflow: hidden !important;
+          transform: none !important;
+          zoom: 1 !important;
+          scale: 1 !important;
         }
         
         .print-content {
-          width: 210mm;
-          height: 297mm;
-          min-width: 210mm;
-          min-height: 297mm;
-          max-width: 210mm;
-          max-height: 297mm;
-          background-size: cover;
-          background-repeat: no-repeat;
-          background-position: center;
-          position: relative;
-          transform: none;
-          zoom: 1;
-          overflow: hidden;
-          font-family: 'Noto Sans Arabic', Arial, sans-serif;
-          -webkit-print-color-adjust: exact;
-          color-adjust: exact;
-          print-color-adjust: exact;
-          image-rendering: crisp-edges;
-          image-rendering: -webkit-optimize-contrast;
+          width: 210mm !important;
+          height: 297mm !important;
+          min-width: 210mm !important;
+          min-height: 297mm !important;
+          max-width: 210mm !important;
+          max-height: 297mm !important;
+          background-size: cover !important;
+          background-repeat: no-repeat !important;
+          background-position: center !important;
+          position: relative !important;
+          transform: none !important;
+          zoom: 1 !important;
+          scale: 1 !important;
+          overflow: hidden !important;
+          font-family: 'Noto Sans Arabic', Arial, sans-serif !important;
+          -webkit-print-color-adjust: exact !important;
+          color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          image-rendering: crisp-edges !important;
+          image-rendering: -webkit-optimize-contrast !important;
+          page-break-inside: avoid !important;
+          display: block !important;
+          margin: 0 auto !important;
+          padding: 0 !important;
         }
         
         /* Mobile print optimization */
@@ -173,6 +188,49 @@ export default function QuotationA4Preview({
             height: 297mm !important;
             margin: 0 !important;
             padding: 0 !important;
+          }
+        }
+        
+        /* Prevent layout distortion in print */
+        @media print {
+          * {
+            -webkit-box-sizing: border-box !important;
+            box-sizing: border-box !important;
+            max-width: none !important;
+          }
+          
+          html {
+            width: 210mm !important;
+            height: 297mm !important;
+            font-size: 12pt !important;
+          }
+          
+          body {
+            width: 210mm !important;
+            height: 297mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            font-size: 12pt !important;
+          }
+          
+          .print-content {
+            width: 210mm !important;
+            height: 297mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            transform: none !important;
+            position: static !important;
+            float: none !important;
+            clear: both !important;
+            page-break-inside: avoid !important;
+            overflow: visible !important;
+          }
+          
+          /* Fix container and wrapper issues */
+          .print-content > * {
+            max-width: 100% !important;
+            overflow: visible !important;
           }
         }
         
