@@ -23,12 +23,14 @@ services:
 
   # Application
   app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: inventory_app
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://postgres:password123@postgres:5432/inventory_db
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     ports:
       - "5000:5000"
     depends_on:
@@ -39,6 +41,11 @@ services:
     volumes:
       - ./uploads:/app/uploads
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/inventory/stats"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   postgres_data:

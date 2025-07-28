@@ -1,48 +1,23 @@
-# Dependencies
 node_modules
-npm-debug.log*
-
-# Production build
-dist
-
-# Environment files
-.env
-.env.local
-.env.production
-
-# Git
+npm-debug.log
 .git
 .gitignore
-
-# IDE
-.vscode
-.idea
-
-# Logs
-logs
-*.log
-
-# Runtime data
-pids
-*.pid
-*.seed
-
-# Coverage directory used by tools like istanbul
+README.md
+.env
+.nyc_output
 coverage
-
-# Temporary folders
-.tmp
-.temp
-
-# OS generated files
+.nyc_output
+dist
 .DS_Store
-Thumbs.db
-
-# Docker files
-Dockerfile
-docker-compose.yml
-.dockerignore
-
-# Development files
-.replit
-replit.nix
+*.log
+.local
+attached_assets
+logos 
+temp*
+*.backup
+scripts/
+add-*.sh
+GIT_UPLOAD_GUIDE.md
+DOCKER-QUICK-START.md
+README-DOCKER.md
+docker-deployment-guide.md
