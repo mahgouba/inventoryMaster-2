@@ -20,9 +20,10 @@ export default function PersonalBanks() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Listen for bank visibility changes from management page
+  // Listen for bank data changes from management page
   useEffect(() => {
-    const handleVisibilityChange = (event: CustomEvent) => {
+    const handleDataChange = () => {
+      // Update hidden banks from localStorage
       const saved = localStorage.getItem('hiddenBanks');
       const newHiddenBanks = saved ? new Set<number>(JSON.parse(saved)) : new Set<number>();
       setHiddenBanks(newHiddenBanks);
@@ -31,10 +32,15 @@ export default function PersonalBanks() {
       queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
     };
 
-    window.addEventListener('bankVisibilityChanged', handleVisibilityChange as EventListener);
+    const handleVisibilityChange = handleDataChange;
+
+    // Listen to both events for comprehensive updates
+    window.addEventListener('bankDataChanged', handleDataChange);
+    window.addEventListener('bankVisibilityChanged', handleVisibilityChange);
     
     return () => {
-      window.removeEventListener('bankVisibilityChanged', handleVisibilityChange as EventListener);
+      window.removeEventListener('bankDataChanged', handleDataChange);
+      window.removeEventListener('bankVisibilityChanged', handleVisibilityChange);
     };
   }, [queryClient]);
 

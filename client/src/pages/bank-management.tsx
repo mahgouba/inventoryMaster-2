@@ -29,7 +29,8 @@ export default function BankManagement() {
 
   const [formData, setFormData] = useState<InsertBank>({
     logo: "",
-    bankName: "",
+    name: "",
+    nameEn: "",
     accountName: "",
     accountNumber: "",
     iban: "",
@@ -50,23 +51,33 @@ export default function BankManagement() {
     mutationFn: (data: InsertBank) => 
       apiRequest("POST", "/api/banks", data),
     onSuccess: () => {
-      // Invalidate all bank-related queries to refresh all pages
-      queryClient.invalidateQueries({ queryKey: ["/api/banks"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
+      // Reset form and close dialog first
       setIsDialogOpen(false);
       resetForm();
-      toast({
-        title: "تم بنجاح",
-        description: "تم إنشاء البنك بنجاح",
-      });
+      
+      // Then invalidate queries and notify
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["/api/banks"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
+        
+        // Trigger refresh for display pages
+        window.dispatchEvent(new CustomEvent('bankDataChanged'));
+        
+        toast({
+          title: "تم بنجاح",
+          description: "تم إنشاء البنك بنجاح",
+        });
+      }, 100);
     },
     onError: () => {
-      toast({
-        title: "خطأ",
-        description: "فشل في إنشاء البنك",
-        variant: "destructive"
-      });
+      setTimeout(() => {
+        toast({
+          title: "خطأ",
+          description: "فشل في إنشاء البنك",
+          variant: "destructive"
+        });
+      }, 100);
     }
   });
 
@@ -74,24 +85,34 @@ export default function BankManagement() {
     mutationFn: ({ id, data }: { id: number; data: Partial<InsertBank> }) =>
       apiRequest("PUT", `/api/banks/${id}`, data),
     onSuccess: () => {
-      // Invalidate all bank-related queries to refresh all pages
-      queryClient.invalidateQueries({ queryKey: ["/api/banks"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
+      // Reset form and close dialog first
       setIsDialogOpen(false);
       setEditingBank(null);
       resetForm();
-      toast({
-        title: "تم بنجاح",
-        description: "تم تحديث البنك بنجاح",
-      });
+      
+      // Then invalidate queries and notify
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["/api/banks"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
+        
+        // Trigger refresh for display pages
+        window.dispatchEvent(new CustomEvent('bankDataChanged'));
+        
+        toast({
+          title: "تم بنجاح",
+          description: "تم تحديث البنك بنجاح",
+        });
+      }, 100);
     },
     onError: () => {
-      toast({
-        title: "خطأ",
-        description: "فشل في تحديث البنك",
-        variant: "destructive"
-      });
+      setTimeout(() => {
+        toast({
+          title: "خطأ",
+          description: "فشل في تحديث البنك",
+          variant: "destructive"
+        });
+      }, 100);
     }
   });
 
@@ -99,28 +120,37 @@ export default function BankManagement() {
     mutationFn: (id: number) =>
       apiRequest("DELETE", `/api/banks/${id}`),
     onSuccess: () => {
-      // Invalidate all bank-related queries to refresh all pages
-      queryClient.invalidateQueries({ queryKey: ["/api/banks"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
-      toast({
-        title: "تم بنجاح",
-        description: "تم حذف البنك بنجاح",
-      });
+      // Invalidate queries and notify after small delay
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["/api/banks"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
+        
+        // Trigger refresh for display pages
+        window.dispatchEvent(new CustomEvent('bankDataChanged'));
+        
+        toast({
+          title: "تم بنجاح",
+          description: "تم حذف البنك بنجاح",
+        });
+      }, 100);
     },
     onError: () => {
-      toast({
-        title: "خطأ",
-        description: "فشل في حذف البنك",
-        variant: "destructive"
-      });
+      setTimeout(() => {
+        toast({
+          title: "خطأ",
+          description: "فشل في حذف البنك",
+          variant: "destructive"
+        });
+      }, 100);
     }
   });
 
   const resetForm = () => {
     setFormData({
       logo: "",
-      bankName: "",
+      name: "",
+      nameEn: "",
       accountName: "",
       accountNumber: "",
       iban: "",
@@ -148,7 +178,8 @@ export default function BankManagement() {
     setEditingBank(bank);
     setFormData({
       logo: bank.logo || "",
-      bankName: bank.bankName,
+      name: bank.name,
+      nameEn: bank.nameEn || "",
       accountName: bank.accountName,
       accountNumber: bank.accountNumber,
       iban: bank.iban,
@@ -178,30 +209,34 @@ export default function BankManagement() {
   const toggleBankVisibility = (bankId: number) => {
     setHiddenBanks(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(bankId)) {
+      const wasHidden = newSet.has(bankId);
+      
+      if (wasHidden) {
         newSet.delete(bankId);
-        toast({
-          title: "تم إظهار البنك",
-          description: "أصبح البنك مرئياً في صفحة العرض",
-        });
       } else {
         newSet.add(bankId);
-        toast({
-          title: "تم إخفاء البنك",
-          description: "تم إخفاء البنك من صفحة العرض",
-        });
       }
+      
       // Save to localStorage
       localStorage.setItem('hiddenBanks', JSON.stringify(Array.from(newSet)));
       
-      // Force refresh bank display pages
-      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
-      
-      // Trigger a custom event to notify other pages of the change
-      window.dispatchEvent(new CustomEvent('bankVisibilityChanged', { 
-        detail: { bankId, hidden: newSet.has(bankId) } 
-      }));
+      // Notify after state update
+      setTimeout(() => {
+        // Force refresh bank display pages
+        queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
+        
+        // Trigger custom events
+        window.dispatchEvent(new CustomEvent('bankVisibilityChanged', { 
+          detail: { bankId, hidden: !wasHidden } 
+        }));
+        window.dispatchEvent(new CustomEvent('bankDataChanged'));
+        
+        toast({
+          title: wasHidden ? "تم إظهار البنك" : "تم إخفاء البنك",
+          description: wasHidden ? "أصبح البنك مرئياً في صفحة العرض" : "تم إخفاء البنك من صفحة العرض",
+        });
+      }, 100);
       
       return newSet;
     });
@@ -268,13 +303,23 @@ export default function BankManagement() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="bankName">اسم البنك *</Label>
+                <Label htmlFor="name">اسم البنك *</Label>
                 <Input
-                  id="bankName"
-                  value={formData.bankName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, bankName: e.target.value }))}
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="مثال: مصرف الراجحي"
                   required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="nameEn">الاسم الإنجليزي</Label>
+                <Input
+                  id="nameEn"
+                  value={formData.nameEn}
+                  onChange={(e) => setFormData(prev => ({ ...prev, nameEn: e.target.value }))}
+                  placeholder="Example: Al Rajhi Bank"
                 />
               </div>
 
@@ -413,12 +458,12 @@ export default function BankManagement() {
                             {bank.logo && (
                               <img 
                                 src={bank.logo} 
-                                alt={bank.bankName} 
+                                alt={bank.name} 
                                 className="w-12 h-12 object-contain"
                               />
                             )}
                             <div>
-                              <h3 className="font-semibold text-lg">{bank.bankName}</h3>
+                              <h3 className="font-semibold text-lg">{bank.name}</h3>
                               <p className="text-sm text-gray-600">{bank.accountName}</p>
                             </div>
                           </div>
@@ -495,12 +540,12 @@ export default function BankManagement() {
                             {bank.logo && (
                               <img 
                                 src={bank.logo} 
-                                alt={bank.bankName} 
+                                alt={bank.name} 
                                 className="w-12 h-12 object-contain"
                               />
                             )}
                             <div>
-                              <h3 className="font-semibold text-lg">{bank.bankName}</h3>
+                              <h3 className="font-semibold text-lg">{bank.name}</h3>
                               <p className="text-sm text-gray-600">{bank.accountName}</p>
                             </div>
                           </div>
