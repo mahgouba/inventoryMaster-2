@@ -629,7 +629,7 @@ export default function QuotationA4Preview({
                 <div className="space-y-2 text-xs">
                   <div className="text-right text-[16px] font-semibold text-[#2B4C8C] print:text-black">
                     {isInvoiceMode ? (
-                      <span>بناءً على طلبكم رقم: <span className="text-[#C49632]">{invoiceNumber || quoteNumber}</span></span>
+                      <span>بناءً على تعميدكم رقم: <span className="text-[#C49632]">{invoiceNumber || quoteNumber}</span></span>
                     ) : (
                       <span>{customerTitle} / <span className="text-[#C49632] ml-[14px] mr-[14px]">{customerName || "غير محدد"}</span> &nbsp;&nbsp;&nbsp; الموقرين</span>
                     )}
