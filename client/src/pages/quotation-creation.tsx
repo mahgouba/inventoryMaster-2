@@ -2462,7 +2462,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
           selectedCompany={selectedCompanyData}
           selectedVehicle={editableVehicle}
           vehicleSpecs={vehicleSpecs}
-          quoteNumber={quoteNumber}
+          quoteNumber={authorizationNumber || quoteNumber}
           customerName={customerName}
           customerPhone={customerPhone}
           customerEmail={customerEmail}
@@ -2484,6 +2484,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
           companyStamp={showStamp ? companyStamp : null}
           isInvoiceMode={isInvoiceMode}
           invoiceNumber={invoiceNumber}
+          authorizationNumber={authorizationNumber}
         />
       </div>
 
