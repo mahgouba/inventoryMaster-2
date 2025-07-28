@@ -2084,7 +2084,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   <div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="quoteNumber">رقم عرض السعر</Label>
+                        <Label htmlFor="quoteNumber">رقم التعميد</Label>
                         <Input
                           id="quoteNumber"
                           value={quoteNumber}
