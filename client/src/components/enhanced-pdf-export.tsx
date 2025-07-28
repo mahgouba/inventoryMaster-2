@@ -122,12 +122,13 @@ export default function EnhancedPDFExport({
       const canvasHeight = canvas.height;
       
       // Calculate scaling to fit A4 while maintaining aspect ratio
-      const widthRatio = pdfWidth / (canvasWidth / canvas.scale);
-      const heightRatio = pdfHeight / (canvasHeight / canvas.scale);
+      const scale = 2; // We know the scale we used
+      const widthRatio = pdfWidth / (canvasWidth / scale);
+      const heightRatio = pdfHeight / (canvasHeight / scale);
       const ratio = Math.min(widthRatio, heightRatio);
       
-      const imgWidth = (canvasWidth / canvas.scale) * ratio;
-      const imgHeight = (canvasHeight / canvas.scale) * ratio;
+      const imgWidth = (canvasWidth / scale) * ratio;
+      const imgHeight = (canvasHeight / scale) * ratio;
       
       // Center the image on the page
       const x = (pdfWidth - imgWidth) / 2;
@@ -135,13 +136,13 @@ export default function EnhancedPDFExport({
 
       // Add image to PDF with optimized quality
       pdf.addImage(
-        canvas.toDataURL('image/jpeg', 0.85),
-        'JPEG',
+        canvas.toDataURL('image/png', 1.0),
+        'PNG',
         x,
         y,
         imgWidth,
         imgHeight,
-        undefined,
+        '',
         'FAST'
       );
 
@@ -154,9 +155,10 @@ export default function EnhancedPDFExport({
       });
     } catch (error) {
       console.error('Error exporting PDF:', error);
+      const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
       toast({
         title: "خطأ في التصدير",
-        description: "حدث خطأ أثناء تصدير ملف PDF",
+        description: `فشل تصدير PDF: ${errorMessage}`,
         variant: "destructive",
       });
     }
