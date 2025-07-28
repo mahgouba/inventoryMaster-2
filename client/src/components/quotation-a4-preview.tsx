@@ -649,47 +649,44 @@ export default function QuotationA4Preview({
             {selectedVehicle && (
               <div className="vehicle-info relative p-4 w-full mt-[166px] mb-[16px] overflow-hidden print:bg-transparent border border-[#E2E8F0] rounded-lg shadow-lg print:border-none pl-[18px] pr-[18px] ml-[-22px] mr-[-22px]">
                 {/* Systematic Manufacturer Logo Watermark Pattern */}
-                {selectedVehicle && (() => {
-                  const manufacturerLogo = getManufacturerLogo(selectedVehicle.manufacturer);
-                  return manufacturerLogo && (
-                    <div className="absolute inset-0 pointer-events-none">
-                      {/* Organized grid pattern with systematic layout */}
-                      <div className="grid grid-cols-4 grid-rows-3 gap-6 h-full w-full p-4">
-                        {Array.from({ length: 12 }).map((_, index) => (
-                          <div key={index} className="flex items-center justify-center">
-                            <img 
-                              src={manufacturerLogo} 
-                              alt={`${selectedVehicle.manufacturer} logo`}
-                              className="w-16 h-16 object-contain opacity-20"
-                              style={{
-                                filter: 'sepia(1) saturate(2) hue-rotate(25deg) brightness(1.2)',
-                                color: '#C79C45'
-                              }}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                      
-                      {/* Central focal logo with golden color */}
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <div 
-                          className="w-24 h-24 rounded-full flex items-center justify-center"
-                          style={{ backgroundColor: 'rgba(199, 156, 69, 0.1)' }}
-                        >
+                {selectedVehicle && manufacturerLogo && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    {/* Organized grid pattern with systematic layout */}
+                    <div className="grid grid-cols-4 grid-rows-3 gap-6 h-full w-full p-4">
+                      {Array.from({ length: 12 }).map((_, index) => (
+                        <div key={index} className="flex items-center justify-center">
                           <img 
                             src={manufacturerLogo} 
                             alt={`${selectedVehicle.manufacturer} logo`}
-                            className="w-20 h-20 object-contain opacity-30"
+                            className="w-16 h-16 object-contain opacity-20"
                             style={{
                               filter: 'sepia(1) saturate(2) hue-rotate(25deg) brightness(1.2)',
                               color: '#C79C45'
                             }}
                           />
                         </div>
+                      ))}
+                    </div>
+                    
+                    {/* Central focal logo with golden color */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                      <div 
+                        className="w-24 h-24 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: 'rgba(199, 156, 69, 0.1)' }}
+                      >
+                        <img 
+                          src={manufacturerLogo} 
+                          alt={`${selectedVehicle.manufacturer} logo`}
+                          className="w-20 h-20 object-contain opacity-30"
+                          style={{
+                            filter: 'sepia(1) saturate(2) hue-rotate(25deg) brightness(1.2)',
+                            color: '#C79C45'
+                          }}
+                        />
                       </div>
                     </div>
-                  );
-                })()}
+                  </div>
+                )}
                 
                 <div className="relative z-10 text-xs">
                   {/* Vehicle Information Grid - Two Rows Layout */}
@@ -793,7 +790,7 @@ export default function QuotationA4Preview({
           </div>
 
           {/* Separate Total Section */}
-          <div className="print:bg-transparent border border-[#E2E8F0] rounded-lg shadow-lg overflow-hidden p-4 pt-[1px] pb-[1px] mt-[12px] mb-[12px]"></div>
+          <div className="print:bg-transparent border border-[#E2E8F0] rounded-lg shadow-lg overflow-hidden p-4 pt-[1px] pb-[1px] mt-[12px] mb-[12px]">
             <div className="grid grid-cols-10 print:bg-transparent text-xs">
               <div className="p-4 col-span-3 flex items-center justify-center">
                 <div className="font-bold text-[#2B4C8C] print:text-black text-[13px] text-center">
