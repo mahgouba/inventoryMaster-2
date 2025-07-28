@@ -23,7 +23,7 @@ import { eq, like, or, and, sql, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByUsername(userbankName: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getAllUsers(): Promise<User[]>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
@@ -816,12 +816,9 @@ export class MemStorage implements IStorage {
     // Add company banks
     sampleBanks.forEach(bankData => {
       const id = this.currentBankId++;
-      const bank: Bank = {
+      const bank = {
         id,
         ...bankData,
-        logo: bankData.logo || null,
-        nameEn: bankData.nameEn || null,
-        isActive: bankData.isActive ?? true,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -864,12 +861,9 @@ export class MemStorage implements IStorage {
 
     personalBanks.forEach(bankData => {
       const id = this.currentBankId++;
-      const bank: Bank = {
+      const bank = {
         id,
         ...bankData,
-        logo: bankData.logo || null,
-        nameEn: bankData.nameEn || null,
-        isActive: bankData.isActive ?? true,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -881,7 +875,7 @@ export class MemStorage implements IStorage {
     return this.users.get(id);
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
+  async getUserByUsername(userbankName: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(
       (user) => user.username === username,
     );
@@ -889,11 +883,7 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { 
-      ...insertUser, 
-      id,
-      createdAt: new Date()
-    };
+    const user: User = { ...insertUser, id };
     this.users.set(id, user);
     return user;
   }
@@ -1368,7 +1358,34 @@ export class MemStorage implements IStorage {
     return this.companies.get(id);
   }
 
+  async createCompany(companyData: InsertCompany): Promise<Company> {
+    const id = this.currentCompanyId++;
+    const company: Company = {
+      ...companyData,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.companies.set(id, company);
+    return company;
+  }
 
+  async updateCompany(id: number, companyData: Partial<InsertCompany>): Promise<Company | undefined> {
+    const existing = this.companies.get(id);
+    if (!existing) return undefined;
+    
+    const updated: Company = {
+      ...existing,
+      ...companyData,
+      updatedAt: new Date()
+    };
+    this.companies.set(id, updated);
+    return updated;
+  }
+
+  async deleteCompany(id: number): Promise<boolean> {
+    return this.companies.delete(id);
+  }
 
   // Other missing methods with simple implementations
   async getAllSpecifications(): Promise<Specification[]> {
@@ -1516,7 +1533,7 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
+  async getUserByUsername(userbankName: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
@@ -3153,191 +3170,11 @@ export class DatabaseStorage implements IStorage {
 
 
 
-// Test class to isolate bank functionality
-class TestBankStorage implements IStorage {
-  private banks = new Map<number, Bank>();
-  private currentBankId = 1;
-
-  // Initialize with sample bank data
-  constructor() {
-    this.initializeBanks();
-  }
-
-  private initializeBanks() {
-    const sampleBank: Bank = {
-      id: this.currentBankId++,
-      bankName: "مصرف الراجحي",
-      nameEn: "Al Rajhi Bank",
-      accountName: "شركة البريمي للسيارات",
-      accountNumber: "575608010000904",
-      iban: "SA8080000575608010000904",
-      type: "شركة",
-      isActive: true,
-      logo: "/rajhi.png",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    this.banks.set(1, sampleBank);
-  }
-
-  async getAllBanks(): Promise<Bank[]> {
-    return Array.from(this.banks.values());
-  }
-
-  async getBank(id: number): Promise<Bank | undefined> {
-    return this.banks.get(id);
-  }
-
-  async getBanksByType(type: "شخصي" | "شركة"): Promise<Bank[]> {
-    return Array.from(this.banks.values()).filter(bank => bank.type === type && bank.isActive);
-  }
-
-  async createBank(bankData: InsertBank): Promise<Bank> {
-    const id = this.currentBankId++;
-    const bank: Bank = {
-      id,
-      ...bankData,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.banks.set(id, bank);
-    return bank;
-  }
-
-  async updateBank(id: number, bankData: Partial<InsertBank>): Promise<Bank | undefined> {
-    const existingBank = this.banks.get(id);
-    if (!existingBank) return undefined;
-
-    const updatedBank: Bank = {
-      ...existingBank,
-      ...bankData,
-      updatedAt: new Date(),
-    };
-    this.banks.set(id, updatedBank);
-    return updatedBank;
-  }
-
-  async deleteBank(id: number): Promise<boolean> {
-    return this.banks.delete(id);
-  }
-
-  // Minimal implementation of other required methods
-  async getUser(id: number): Promise<User | undefined> { return undefined; }
-  async getUserByUsername(username: string): Promise<User | undefined> { return undefined; }
-  async createUser(user: InsertUser): Promise<User> { throw new Error("Not implemented"); }
-  async getAllUsers(): Promise<User[]> { return []; }
-  async updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined> { return undefined; }
-  async deleteUser(id: number): Promise<boolean> { return false; }
-  async getAllInventoryItems(): Promise<InventoryItem[]> { return []; }
-  async getInventoryItem(id: number): Promise<InventoryItem | undefined> { return undefined; }
-  async createInventoryItem(item: InsertInventoryItem): Promise<InventoryItem> { throw new Error("Not implemented"); }
-  async updateInventoryItem(id: number, item: Partial<InsertInventoryItem>): Promise<InventoryItem | undefined> { return undefined; }
-  async deleteInventoryItem(id: number): Promise<boolean> { return false; }
-  async getInventoryStats(): Promise<any> { return {}; }
-  async getInventoryStatsWithFilters(filters: any): Promise<any> { return {}; }
-  async getManufacturerStats(): Promise<any[]> { return []; }
-  async searchInventoryItems(query: string): Promise<InventoryItem[]> { return []; }
-  async filterInventoryItems(filters: any): Promise<InventoryItem[]> { return []; }
-  async getDistinctValues(field: string): Promise<string[]> { return []; }
-  async getManufacturers(): Promise<Manufacturer[]> { return []; }
-  async createManufacturer(manufacturer: InsertManufacturer): Promise<Manufacturer> { throw new Error("Not implemented"); }
-  async updateManufacturer(id: number, manufacturer: Partial<InsertManufacturer>): Promise<Manufacturer | undefined> { return undefined; }
-  async deleteManufacturer(id: number): Promise<boolean> { return false; }
-  async getAllCompanies(): Promise<Company[]> { return []; }
-  async getCompany(id: number): Promise<Company | undefined> { return undefined; }
-  async createCompany(company: InsertCompany): Promise<Company> { throw new Error("Not implemented"); }
-  async updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined> { return undefined; }
-  async deleteCompany(id: number): Promise<boolean> { return false; }
-  async getAllLeaveRequests(): Promise<LeaveRequest[]> { return []; }
-  async getLeaveRequestById(id: number): Promise<LeaveRequest | undefined> { return undefined; }
-  async createLeaveRequest(request: InsertLeaveRequest): Promise<LeaveRequest> { throw new Error("Not implemented"); }
-  async updateLeaveRequestStatus(id: number, status: string, approvedBy?: number, approvedByName?: string, rejectionReason?: string): Promise<LeaveRequest | undefined> { return undefined; }
-  async deleteLeaveRequest(id: number): Promise<boolean> { return false; }
-  async getAllSpecifications(): Promise<Specification[]> { return []; }
-  async getSpecification(id: number): Promise<Specification | undefined> { return undefined; }
-  async createSpecification(spec: InsertSpecification): Promise<Specification> { throw new Error("Not implemented"); }
-  async updateSpecification(id: number, spec: Partial<InsertSpecification>): Promise<Specification | undefined> { return undefined; }
-  async deleteSpecification(id: number): Promise<boolean> { return false; }
-  async getAllTrimLevels(): Promise<TrimLevel[]> { return []; }
-  async getTrimLevel(id: number): Promise<TrimLevel | undefined> { return undefined; }
-  async createTrimLevel(trim: InsertTrimLevel): Promise<TrimLevel> { throw new Error("Not implemented"); }
-  async updateTrimLevel(id: number, trim: Partial<InsertTrimLevel>): Promise<TrimLevel | undefined> { return undefined; }
-  async deleteTrimLevel(id: number): Promise<boolean> { return false; }
-  async getAllQuotations(): Promise<Quotation[]> { return []; }
-  async getQuotation(id: number): Promise<Quotation | undefined> { return undefined; }
-  async createQuotation(quotation: InsertQuotation): Promise<Quotation> { throw new Error("Not implemented"); }
-  async updateQuotation(id: number, quotation: Partial<InsertQuotation>): Promise<Quotation | undefined> { return undefined; }
-  async deleteQuotation(id: number): Promise<boolean> { return false; }
-  async getAllImportTypes(): Promise<ImportType[]> { return []; }
-  async getImportType(id: number): Promise<ImportType | undefined> { return undefined; }
-  async createImportType(importType: InsertImportType): Promise<ImportType> { throw new Error("Not implemented"); }
-  async updateImportType(id: number, importType: Partial<InsertImportType>): Promise<ImportType | undefined> { return undefined; }
-  async deleteImportType(id: number): Promise<boolean> { return false; }
-  async getAllVehicleStatuses(): Promise<VehicleStatus[]> { return []; }
-  async getVehicleStatus(id: number): Promise<VehicleStatus | undefined> { return undefined; }
-  async createVehicleStatus(status: InsertVehicleStatus): Promise<VehicleStatus> { throw new Error("Not implemented"); }
-  async updateVehicleStatus(id: number, status: Partial<InsertVehicleStatus>): Promise<VehicleStatus | undefined> { return undefined; }
-  async deleteVehicleStatus(id: number): Promise<boolean> { return false; }
-  async getAllOwnershipTypes(): Promise<OwnershipType[]> { return []; }
-  async getOwnershipType(id: number): Promise<OwnershipType | undefined> { return undefined; }
-  async createOwnershipType(ownership: InsertOwnershipType): Promise<OwnershipType> { throw new Error("Not implemented"); }
-  async updateOwnershipType(id: number, ownership: Partial<InsertOwnershipType>): Promise<OwnershipType | undefined> { return undefined; }
-  async deleteOwnershipType(id: number): Promise<boolean> { return false; }
-  async getAllFinancingCalculations(): Promise<FinancingCalculation[]> { return []; }
-  async getFinancingCalculation(id: number): Promise<FinancingCalculation | undefined> { return undefined; }
-  async createFinancingCalculation(calculation: InsertFinancingCalculation): Promise<FinancingCalculation> { throw new Error("Not implemented"); }
-  async updateFinancingCalculation(id: number, calculation: Partial<InsertFinancingCalculation>): Promise<FinancingCalculation | undefined> { return undefined; }
-  async deleteFinancingCalculation(id: number): Promise<boolean> { return false; }
-  async getAllLocations(): Promise<Location[]> { return []; }
-  async getLocation(id: number): Promise<Location | undefined> { return undefined; }
-  async createLocation(location: InsertLocation): Promise<Location> { throw new Error("Not implemented"); }
-  async updateLocation(id: number, location: Partial<InsertLocation>): Promise<Location | undefined> { return undefined; }
-  async deleteLocation(id: number): Promise<boolean> { return false; }
-  async getAllLocationTransfers(): Promise<LocationTransfer[]> { return []; }
-  async getLocationTransfer(id: number): Promise<LocationTransfer | undefined> { return undefined; }
-  async createLocationTransfer(transfer: InsertLocationTransfer): Promise<LocationTransfer> { throw new Error("Not implemented"); }
-  async updateLocationTransfer(id: number, transfer: Partial<InsertLocationTransfer>): Promise<LocationTransfer | undefined> { return undefined; }
-  async deleteLocationTransfer(id: number): Promise<boolean> { return false; }
-  async getAllImageLinks(): Promise<any[]> { return []; }
-  async getImageLink(id: number): Promise<any | undefined> { return undefined; }
-  async createImageLink(imageLink: any): Promise<any> { throw new Error("Not implemented"); }
-  async updateImageLink(id: number, imageLink: any): Promise<any | undefined> { return undefined; }
-  async deleteImageLink(id: number): Promise<boolean> { return false; }
-  async searchImageLinks(criteria: any): Promise<any[]> { return []; }
-  async getStockLevels(): Promise<any[]> { return []; }
-  async updateStockLevel(id: number, level: any): Promise<any> { return undefined; }
-  async getAlerts(): Promise<any[]> { return []; }
-  async createAlert(alert: any): Promise<any> { throw new Error("Not implemented"); }
-  async markAlertAsRead(id: number): Promise<boolean> { return false; }
-  async deleteAlert(id: number): Promise<boolean> { return false; }
-  async checkStockLevels(): Promise<void> {}
-  async getStockSettings(): Promise<any[]> { return []; }
-  async getStockSettingsByCategory(manufacturer: string, category: string): Promise<any> { return undefined; }
-  async createStockSettings(settings: any): Promise<any> { throw new Error("Not implemented"); }
-  async updateStockSettings(id: number, settings: any): Promise<any> { return undefined; }
-  async deleteStockSettings(id: number): Promise<boolean> { return false; }
-  async getAppearanceSettings(): Promise<any> { return undefined; }
-  async updateAppearanceSettings(settings: any): Promise<any> { return undefined; }
-  async updateManufacturerLogo(id: number, logo: string): Promise<Manufacturer | undefined> { return undefined; }
-  async getDefaultCompanyId(): Promise<number | null> { return null; }
-  async getAllQuotationsWithVehicles(): Promise<any[]> { return []; }
-  async getSystemSettings(): Promise<Array<{key: string, value: string}>> { return []; }
-  async updateSystemSetting(key: string, value: string): Promise<{key: string, value: string}> { return { key, value }; }
-  async getImportTypeById(id: number): Promise<ImportType | undefined> { return undefined; }
-  async getVehicleStatusById(id: number): Promise<VehicleStatus | undefined> { return undefined; }
-  async getOwnershipTypeById(id: number): Promise<OwnershipType | undefined> { return undefined; }
-  async getReservedItems(): Promise<any[]> { return []; }
-  async getAllSoldInventoryItems(): Promise<InventoryItem[]> { return []; }
-  async getInventoryStatsExcludingSold(): Promise<any> { return {}; }
-  async getUsersByRole(role: string): Promise<User[]> { return []; }
-  async getManufacturerById(id: number): Promise<Manufacturer | undefined> { return undefined; }
-}
-
 // Initialize storage based on environment
 let storage: IStorage;
 
-// For development, use TestBankStorage until database is provisioned
-console.log("⚠️ Using TestBankStorage for development compatibility");
-storage = new TestBankStorage();
+// For development, use MemStorage until database is provisioned
+console.log("⚠️ Using MemStorage for development compatibility");
+storage = new MemStorage();
 
 export { storage };
