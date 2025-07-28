@@ -50,7 +50,10 @@ export default function BankManagement() {
     mutationFn: (data: InsertBank) => 
       apiRequest("POST", "/api/banks", data),
     onSuccess: () => {
+      // Invalidate all bank-related queries to refresh all pages
       queryClient.invalidateQueries({ queryKey: ["/api/banks"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
       setIsDialogOpen(false);
       resetForm();
       toast({
@@ -71,7 +74,10 @@ export default function BankManagement() {
     mutationFn: ({ id, data }: { id: number; data: Partial<InsertBank> }) =>
       apiRequest("PUT", `/api/banks/${id}`, data),
     onSuccess: () => {
+      // Invalidate all bank-related queries to refresh all pages
       queryClient.invalidateQueries({ queryKey: ["/api/banks"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
       setIsDialogOpen(false);
       setEditingBank(null);
       resetForm();
@@ -93,7 +99,10 @@ export default function BankManagement() {
     mutationFn: (id: number) =>
       apiRequest("DELETE", `/api/banks/${id}`),
     onSuccess: () => {
+      // Invalidate all bank-related queries to refresh all pages
       queryClient.invalidateQueries({ queryKey: ["/api/banks"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
       toast({
         title: "تم بنجاح",
         description: "تم حذف البنك بنجاح",
@@ -184,6 +193,16 @@ export default function BankManagement() {
       }
       // Save to localStorage
       localStorage.setItem('hiddenBanks', JSON.stringify(Array.from(newSet)));
+      
+      // Force refresh bank display pages
+      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
+      
+      // Trigger a custom event to notify other pages of the change
+      window.dispatchEvent(new CustomEvent('bankVisibilityChanged', { 
+        detail: { bankId, hidden: newSet.has(bankId) } 
+      }));
+      
       return newSet;
     });
   };

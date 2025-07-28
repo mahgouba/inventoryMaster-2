@@ -1,11 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Building2, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft, Info, MoreVertical } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import type { Bank } from "@shared/schema";
@@ -18,6 +18,25 @@ export default function CompanyBanks() {
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Listen for bank visibility changes from management page
+  useEffect(() => {
+    const handleVisibilityChange = (event: CustomEvent) => {
+      const saved = localStorage.getItem('hiddenBanks');
+      const newHiddenBanks = saved ? new Set<number>(JSON.parse(saved)) : new Set<number>();
+      setHiddenBanks(newHiddenBanks);
+      
+      // Refresh the query to get updated data
+      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
+    };
+
+    window.addEventListener('bankVisibilityChanged', handleVisibilityChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('bankVisibilityChanged', handleVisibilityChange as EventListener);
+    };
+  }, [queryClient]);
 
   const { data: allBanks = [], isLoading } = useQuery({
     queryKey: ["/api/banks/type/شركة"],
