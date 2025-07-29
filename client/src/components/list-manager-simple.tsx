@@ -40,13 +40,13 @@ export default function ListManagerSimple({ open, onOpenChange, listsData, onSav
   const [showDeleteDialog, setShowDeleteDialog] = useState<{type: string, index: number, value: string} | null>(null);
 
   const listConfigs = [
-    { key: "manufacturers", label: "الشركات المصنعة", color: "bg-blue-100 text-blue-800" },
-    { key: "engineCapacities", label: "سعات المحرك", color: "bg-green-100 text-green-800" },
-    { key: "statuses", label: "حالات المركبة", color: "bg-yellow-100 text-yellow-800" },
-    { key: "importTypes", label: "أنواع الاستيراد", color: "bg-purple-100 text-purple-800" },
-    { key: "locations", label: "المواقع", color: "bg-orange-100 text-orange-800" },
-    { key: "exteriorColors", label: "الألوان الخارجية", color: "bg-red-100 text-red-800" },
-    { key: "interiorColors", label: "الألوان الداخلية", color: "bg-pink-100 text-pink-800" }
+    { key: "manufacturers", label: "الشركات المصنعة", color: "bg-blue-500/20 text-blue-200 border-blue-400/30" },
+    { key: "engineCapacities", label: "سعات المحرك", color: "bg-green-500/20 text-green-200 border-green-400/30" },
+    { key: "statuses", label: "حالات المركبة", color: "bg-yellow-500/20 text-yellow-200 border-yellow-400/30" },
+    { key: "importTypes", label: "أنواع الاستيراد", color: "bg-purple-500/20 text-purple-200 border-purple-400/30" },
+    { key: "locations", label: "المواقع", color: "bg-orange-500/20 text-orange-200 border-orange-400/30" },
+    { key: "exteriorColors", label: "الألوان الخارجية", color: "bg-red-500/20 text-red-200 border-red-400/30" },
+    { key: "interiorColors", label: "الألوان الداخلية", color: "bg-pink-500/20 text-pink-200 border-pink-400/30" }
   ];
 
   const handleAddItem = (type: string) => {
@@ -125,23 +125,29 @@ export default function ListManagerSimple({ open, onOpenChange, listsData, onSav
   const renderListItems = (type: string, items: string[], color: string) => (
     <div className="space-y-3">
       {/* إضافة عنصر جديد */}
-      <div className="flex gap-2 p-3 bg-slate-50 rounded-lg">
-        <Input
-          placeholder="إضافة عنصر جديد..."
-          value={newItem}
-          onChange={(e) => setNewItem(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleAddItem(type)}
-          className="flex-1"
-        />
-        <Button onClick={() => handleAddItem(type)} size="sm">
-          <Plus className="h-4 w-4" />
-        </Button>
+      <div className="glass-container p-4 rounded-xl border border-white/20">
+        <div className="flex gap-2">
+          <Input
+            placeholder="إضافة عنصر جديد..."
+            value={newItem}
+            onChange={(e) => setNewItem(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleAddItem(type)}
+            className="flex-1 bg-white/10 text-white placeholder-white/60 border-white/20 focus:border-white/40"
+          />
+          <Button 
+            onClick={() => handleAddItem(type)} 
+            size="sm"
+            className="glass-button"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* قائمة العناصر */}
-      <div className="space-y-2 max-h-64 overflow-y-auto">
+      <div className="space-y-2 max-h-64 overflow-y-auto scrollbar-none">
         {items.map((item, index) => (
-          <div key={index} className="flex items-center justify-between p-2 bg-white border rounded-lg">
+          <div key={index} className="glass-container p-3 rounded-lg border border-white/20 backdrop-blur-sm">
             {editingItem?.type === type && editingItem?.index === index ? (
               <div className="flex items-center gap-2 flex-1">
                 <Input
@@ -152,27 +158,29 @@ export default function ListManagerSimple({ open, onOpenChange, listsData, onSav
                       handleEditItem(type, index, editingItem.value);
                     }
                   }}
-                  className="flex-1"
+                  className="flex-1 bg-white/10 text-white border-white/20 focus:border-white/40"
                   autoFocus
                 />
                 <Button 
                   size="sm" 
                   variant="ghost"
                   onClick={() => handleEditItem(type, index, editingItem.value)}
+                  className="text-green-400 hover:text-green-300 hover:bg-green-500/20"
                 >
-                  <Check className="h-4 w-4 text-green-600" />
+                  <Check className="h-4 w-4" />
                 </Button>
                 <Button 
                   size="sm" 
                   variant="ghost"
                   onClick={() => setEditingItem(null)}
+                  className="text-red-400 hover:text-red-300 hover:bg-red-500/20"
                 >
-                  <X className="h-4 w-4 text-red-600" />
+                  <X className="h-4 w-4" />
                 </Button>
               </div>
             ) : (
-              <>
-                <Badge variant="secondary" className={color}>
+              <div className="flex items-center justify-between">
+                <Badge variant="secondary" className={`${color} border backdrop-blur-sm`}>
                   {item}
                 </Badge>
                 <div className="flex gap-1">
@@ -180,24 +188,26 @@ export default function ListManagerSimple({ open, onOpenChange, listsData, onSav
                     size="sm" 
                     variant="ghost"
                     onClick={() => setEditingItem({type, index, value: item})}
+                    className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20"
                   >
-                    <Edit2 className="h-4 w-4 text-blue-600" />
+                    <Edit2 className="h-4 w-4" />
                   </Button>
                   <Button 
                     size="sm" 
                     variant="ghost"
                     onClick={() => setShowDeleteDialog({type, index, value: item})}
+                    className="text-red-400 hover:text-red-300 hover:bg-red-500/20"
                   >
-                    <Trash2 className="h-4 w-4 text-red-600" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-              </>
+              </div>
             )}
           </div>
         ))}
         {items.length === 0 && (
-          <div className="text-center text-gray-500 py-4">
-            لا توجد عناصر
+          <div className="glass-container p-4 rounded-lg border border-white/20 text-center">
+            <p className="text-white/60">لا توجد عناصر</p>
           </div>
         )}
       </div>
@@ -207,18 +217,20 @@ export default function ListManagerSimple({ open, onOpenChange, listsData, onSav
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden glass-dialog">
           <DialogHeader>
-            <DialogTitle>إدارة قوائم الخيارات</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-white text-center">
+              إدارة قوائم الخيارات
+            </DialogTitle>
           </DialogHeader>
           
           <Tabs defaultValue="manufacturers" className="w-full">
-            <TabsList className="grid w-full grid-cols-7">
+            <TabsList className="glass-container grid w-full grid-cols-7 p-1 border border-white/20">
               {listConfigs.map((config) => (
                 <TabsTrigger 
                   key={config.key} 
                   value={config.key}
-                  className="text-xs"
+                  className="text-xs text-white/80 data-[state=active]:text-white data-[state=active]:bg-white/20 data-[state=active]:shadow-none"
                 >
                   {config.label.split(' ')[0]}
                 </TabsTrigger>
@@ -228,11 +240,13 @@ export default function ListManagerSimple({ open, onOpenChange, listsData, onSav
             {listConfigs.map((config) => (
               <TabsContent key={config.key} value={config.key} className="mt-4">
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-lg font-semibold">{config.label}</Label>
-                    <Badge variant="outline">
-                      {((listsData[config.key as keyof typeof listsData] || []) as string[]).length} عنصر
-                    </Badge>
+                  <div className="glass-container p-4 rounded-xl border border-white/20">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-lg font-semibold text-white">{config.label}</Label>
+                      <Badge variant="outline" className="bg-white/10 text-white border-white/30">
+                        {((listsData[config.key as keyof typeof listsData] || []) as string[]).length} عنصر
+                      </Badge>
+                    </div>
                   </div>
                   {renderListItems(
                     config.key, 
@@ -248,18 +262,18 @@ export default function ListManagerSimple({ open, onOpenChange, listsData, onSav
 
       {/* نافذة تأكيد الحذف */}
       <AlertDialog open={!!showDeleteDialog} onOpenChange={() => setShowDeleteDialog(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="glass-dialog-secondary">
           <AlertDialogHeader>
-            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-white">تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/80">
               هل أنت متأكد من حذف "{showDeleteDialog?.value}"؟ لا يمكن التراجع عن هذا الإجراء.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogCancel className="glass-button">إلغاء</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeleteItem}
-              className="bg-red-600 hover:bg-red-700"
+              className="glass-button bg-red-500/20 text-red-200 border-red-400/30 hover:bg-red-500/30"
             >
               حذف
             </AlertDialogAction>
