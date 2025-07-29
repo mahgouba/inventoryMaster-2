@@ -217,7 +217,7 @@ export default function ListManagerSimple({ open, onOpenChange, listsData, onSav
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden glass-dialog fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden glass-dialog mx-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-white text-center">
               إدارة قوائم الخيارات

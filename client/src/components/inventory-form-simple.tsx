@@ -833,19 +833,19 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                 </div>
 
                 {/* أزرار الحفظ والإلغاء */}
-                <div className="flex flex-col xs:flex-row justify-end gap-2 sm:gap-3 pt-4 sm:pt-6 border-t border-white/20 sticky bottom-0 bg-transparent backdrop-blur-sm">
+                <div className="flex flex-row justify-center gap-4 pt-6 border-t border-white/20 mt-6">
                   <Button 
                     type="button" 
                     variant="outline" 
                     onClick={() => onOpenChange(false)} 
-                    className="glass-button sm:w-auto"
+                    className="min-w-[120px] h-12 text-white border-white/30 hover:bg-white/10 hover:border-white/50 bg-white/5 backdrop-blur-sm"
                   >
                     إلغاء
                   </Button>
                   <Button 
                     type="submit" 
                     disabled={isLoading} 
-                    className="bg-custom-gold hover:bg-custom-gold-dark text-white glass-button sm:w-auto"
+                    className="min-w-[120px] h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg"
                   >
                     <CloudUpload className="h-4 w-4 ml-2" />
                     {isLoading ? "جاري الحفظ..." : editItem ? "تحديث البيانات" : "حفظ المركبة"}
