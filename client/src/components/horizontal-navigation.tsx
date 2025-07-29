@@ -17,7 +17,8 @@ import {
   Image, 
   Users, 
   Building,
-  Receipt
+  Receipt,
+  Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -296,6 +297,12 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       title: "الشعارات", 
       href: "/manufacturer-logos", 
       icon: Image,
+      internal: true
+    },
+    { 
+      title: "إدارة القوائم", 
+      href: "/list-management", 
+      icon: Settings,
       internal: true
     },
     { 
