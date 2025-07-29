@@ -857,7 +857,7 @@ export default function QuotationA4Preview({
               </div>
               <div className="p-4 col-span-7 flex items-center justify-center">
                 <div className="text-center text-xs font-bold text-[#2B4C8C] print:text-black">
-                  {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))} ريال سعودي لا غير
+                  {numberToArabic(grandTotal + (includeLicensePlate ? licensePlatePrice : 0))}
                 </div>
               </div>
             </div>
