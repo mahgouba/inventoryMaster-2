@@ -69,6 +69,18 @@ export const banks = pgTable("banks", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Bank Interest Rates table - for financing calculator
+export const bankInterestRates = pgTable("bank_interest_rates", {
+  id: serial("id").primaryKey(),
+  bankId: integer("bank_id").references(() => banks.id).notNull(), // معرف البنك
+  categoryName: text("category_name").notNull(), // اسم الفئة (موظف حكومي، موظف قطاع خاص، إلخ)
+  interestRate: decimal("interest_rate", { precision: 5, scale: 2 }).notNull(), // نسبة الفائدة
+  years: integer("years").notNull(), // عدد السنوات
+  isActive: boolean("is_active").default(true).notNull(), // نشط
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Manufacturers table for storing manufacturer logos
 export const manufacturers = pgTable("manufacturers", {
   id: serial("id").primaryKey(),
@@ -374,6 +386,12 @@ export const insertBankSchema = createInsertSchema(banks).omit({
   updatedAt: true,
 });
 
+export const insertBankInterestRateSchema = createInsertSchema(bankInterestRates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertManufacturerSchema = createInsertSchema(manufacturers).omit({
   id: true,
   createdAt: true,
@@ -523,6 +541,8 @@ export type User = typeof users.$inferSelect;
 export type InsertInventoryItem = z.infer<typeof insertInventoryItemSchema>;
 export type InsertBank = z.infer<typeof insertBankSchema>;
 export type Bank = typeof banks.$inferSelect;
+export type InsertBankInterestRate = z.infer<typeof insertBankInterestRateSchema>;
+export type BankInterestRate = typeof bankInterestRates.$inferSelect;
 export type InventoryItem = typeof inventoryItems.$inferSelect;
 export type InsertManufacturer = z.infer<typeof insertManufacturerSchema>;
 export type Manufacturer = typeof manufacturers.$inferSelect;

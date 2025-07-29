@@ -510,6 +510,20 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     </Button>
                   )}
 
+                  {/* Bank Management Button - Admin Only */}
+                  {userRole === "admin" && (
+                    <Link href="/bank-management-full">
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        className="glass-button glass-text-primary"
+                      >
+                        <Landmark className="w-4 h-4 ml-2" />
+                        إدارة البنوك
+                      </Button>
+                    </Link>
+                  )}
+
                   {/* Show Sold Cars Button - Admin Only */}
                   {userRole === "admin" && (
                     <Button 

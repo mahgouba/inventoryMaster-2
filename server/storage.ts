@@ -13,7 +13,8 @@ import {
   type Quotation, type InsertQuotation,
   type FinancingCalculation, type InsertFinancingCalculation,
   type Bank, type InsertBank,
-  type LeaveRequest, type InsertLeaveRequest
+  type LeaveRequest, type InsertLeaveRequest,
+  type BankInterestRate, type InsertBankInterestRate
 } from "@shared/schema";
 
 export interface IStorage {
@@ -162,6 +163,13 @@ export interface IStorage {
   updateBank(id: number, bank: Partial<InsertBank>): Promise<Bank | undefined>;
   deleteBank(id: number): Promise<boolean>;
 
+  // Bank Interest Rate methods
+  getBankInterestRates(bankId: number): Promise<BankInterestRate[]>;
+  getBankInterestRate(id: number): Promise<BankInterestRate | undefined>;
+  createBankInterestRate(rateData: InsertBankInterestRate): Promise<BankInterestRate>;
+  updateBankInterestRate(id: number, rateData: Partial<InsertBankInterestRate>): Promise<BankInterestRate | undefined>;
+  deleteBankInterestRate(id: number): Promise<boolean>;
+
   // Leave request methods
   getAllLeaveRequests(): Promise<LeaveRequest[]>;
   getLeaveRequestById(id: number): Promise<LeaveRequest | undefined>;
@@ -182,6 +190,7 @@ export class MemStorage implements IStorage {
   private invoices = new Map<number, any>();
   private financingCalculations = new Map<number, FinancingCalculation>();
   private banks = new Map<number, Bank>();
+  private bankInterestRates = new Map<number, BankInterestRate>();
   private leaveRequests = new Map<number, LeaveRequest>();
   
   private currentUserId = 1;
@@ -195,6 +204,7 @@ export class MemStorage implements IStorage {
   private currentInvoiceId = 1;
   private currentFinancingCalculationId = 1;
   private currentBankId = 1;
+  private currentBankInterestRateId = 1;
   private currentLeaveRequestId = 1;
   
   private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
@@ -263,6 +273,9 @@ export class MemStorage implements IStorage {
 
     // Initialize banks
     this.initializeBanks();
+    
+    // Initialize sample bank interest rates
+    this.initializeBankInterestRates();
   }
 
   private initializeBanks() {
@@ -298,6 +311,59 @@ export class MemStorage implements IStorage {
         updatedAt: new Date(),
       };
       this.banks.set(id, bank);
+    });
+  }
+
+  private initializeBankInterestRates() {
+    // Sample interest rates for bank ID 1 (Al Rajhi Bank)
+    const sampleRates = [
+      {
+        bankId: 1,
+        rateName: "موظف حكومي",
+        rateValue: 6.5,
+        years: 5,
+        isActive: true
+      },
+      {
+        bankId: 1,
+        rateName: "موظف قطاع خاص",
+        rateValue: 7.2,
+        years: 5,
+        isActive: true
+      },
+      {
+        bankId: 1,
+        rateName: "عسكري",
+        rateValue: 6.0,
+        years: 7,
+        isActive: true
+      },
+      // Sample rates for bank ID 2 (SNB)
+      {
+        bankId: 2,
+        rateName: "موظف حكومي",
+        rateValue: 6.8,
+        years: 5,
+        isActive: true
+      },
+      {
+        bankId: 2,
+        rateName: "موظف قطاع خاص",
+        rateValue: 7.5,
+        years: 5,
+        isActive: true
+      }
+    ];
+
+    sampleRates.forEach(rateData => {
+      const id = this.currentBankInterestRateId++;
+      const rate: BankInterestRate = {
+        id,
+        ...rateData,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.bankInterestRates.set(id, rate);
     });
   }
 
@@ -521,6 +587,45 @@ export class MemStorage implements IStorage {
 
   async deleteBank(id: number): Promise<boolean> {
     return this.banks.delete(id);
+  }
+
+  // Bank Interest Rate methods implementation
+  async getBankInterestRates(bankId: number): Promise<BankInterestRate[]> {
+    return Array.from(this.bankInterestRates.values())
+      .filter(rate => rate.bankId === bankId);
+  }
+
+  async getBankInterestRate(id: number): Promise<BankInterestRate | undefined> {
+    return this.bankInterestRates.get(id);
+  }
+
+  async createBankInterestRate(rateData: InsertBankInterestRate): Promise<BankInterestRate> {
+    const id = this.currentBankInterestRateId++;
+    const rate: BankInterestRate = {
+      id,
+      ...rateData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.bankInterestRates.set(id, rate);
+    return rate;
+  }
+
+  async updateBankInterestRate(id: number, rateData: Partial<InsertBankInterestRate>): Promise<BankInterestRate | undefined> {
+    const existingRate = this.bankInterestRates.get(id);
+    if (!existingRate) return undefined;
+
+    const updatedRate: BankInterestRate = {
+      ...existingRate,
+      ...rateData,
+      updatedAt: new Date(),
+    };
+    this.bankInterestRates.set(id, updatedRate);
+    return updatedRate;
+  }
+
+  async deleteBankInterestRate(id: number): Promise<boolean> {
+    return this.bankInterestRates.delete(id);
   }
 
   // Placeholder methods for other interfaces

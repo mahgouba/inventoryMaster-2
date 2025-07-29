@@ -17,6 +17,7 @@ import {
   insertOwnershipTypeSchema,
   insertFinancingCalculationSchema,
   insertBankSchema,
+  insertBankInterestRateSchema,
   insertLeaveRequestSchema
 } from "@shared/schema";
 import { z } from "zod";
@@ -2374,6 +2375,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting bank:", error);
       res.status(500).json({ message: "Failed to delete bank" });
+    }
+  });
+
+  // Bank Interest Rate API Routes
+  app.get("/api/bank-interest-rates/:bankId", async (req, res) => {
+    try {
+      const bankId = parseInt(req.params.bankId);
+      if (isNaN(bankId)) {
+        return res.status(400).json({ message: "Invalid bank ID" });
+      }
+
+      const rates = await storage.getBankInterestRates(bankId);
+      res.json(rates);
+    } catch (error) {
+      console.error("Error fetching bank interest rates:", error);
+      res.status(500).json({ message: "Failed to fetch bank interest rates" });
+    }
+  });
+
+  app.post("/api/bank-interest-rates", async (req, res) => {
+    try {
+      const rateData = insertBankInterestRateSchema.parse(req.body);
+      const rate = await storage.createBankInterestRate(rateData);
+      res.status(201).json(rate);
+    } catch (error) {
+      console.error("Error creating bank interest rate:", error);
+      res.status(500).json({ message: "Failed to create bank interest rate" });
+    }
+  });
+
+  app.put("/api/bank-interest-rates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid rate ID" });
+      }
+
+      const rateData = insertBankInterestRateSchema.partial().parse(req.body);
+      const rate = await storage.updateBankInterestRate(id, rateData);
+      
+      if (!rate) {
+        return res.status(404).json({ message: "Bank interest rate not found" });
+      }
+
+      res.json(rate);
+    } catch (error) {
+      console.error("Error updating bank interest rate:", error);
+      res.status(500).json({ message: "Failed to update bank interest rate" });
+    }
+  });
+
+  app.delete("/api/bank-interest-rates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid rate ID" });
+      }
+
+      const success = await storage.deleteBankInterestRate(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Bank interest rate not found" });
+      }
+
+      res.json({ message: "Bank interest rate deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting bank interest rate:", error);
+      res.status(500).json({ message: "Failed to delete bank interest rate" });
     }
   });
 
