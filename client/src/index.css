@@ -930,8 +930,6 @@ button.glass-button:active,
 .glass-overlay,
 [data-overlay].glass-overlay {
   background: rgba(0, 0, 0, 0.6) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
 }
 
 /* Glass Form Styling */
