@@ -126,6 +126,12 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
       description: "Manufacturer Logos"
     },
     { 
+      title: "إدارة القوائم", 
+      href: "/list-management", 
+      icon: Settings,
+      description: "List Management"
+    },
+    { 
       title: "التحكم الديناميكي", 
       href: "/dynamic-company-control", 
       icon: Archive,
