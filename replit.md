@@ -505,6 +505,7 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ **Bank Management Button Removal**: Removed duplicate bank management button from inventory page action bar
 - ✅ **Sidebar Navigation Enhancement**: Bank management is now exclusively accessible through sidebar under "إدارة النظام" section
 - ✅ **Clean Interface**: Streamlined inventory page interface by removing redundant navigation elements
+- ✅ **Bank Management Rename**: Updated sidebar navigation to rename "إدارة البنوك" to "إدارة النسب" (Ratio Management) per user request
 
 ### Mobile-Optimized Inventory Form Redesign (July 29, 2025)
 - ✅ **COMPLETED: Complete Mobile Compatibility Enhancement** - Redesigned inventory form (inventory-form-simple.tsx) for optimal mobile device experience

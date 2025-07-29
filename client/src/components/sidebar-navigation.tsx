@@ -114,10 +114,10 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
       description: "User Management"
     },
     { 
-      title: "إدارة البنوك", 
+      title: "إدارة النسب", 
       href: "/bank-management", 
       icon: Landmark,
-      description: "Bank Management"
+      description: "Ratio Management"
     },
     { 
       title: "إدارة شعارات الصناع", 
