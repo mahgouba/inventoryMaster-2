@@ -97,6 +97,8 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
   const [duration, setDuration] = useState("");
   const [reason, setReason] = useState("");
   const [selectedRequestForPrint, setSelectedRequestForPrint] = useState<LeaveRequest | null>(null);
+  const [employeeNameFilter, setEmployeeNameFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -107,8 +109,16 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
   });
 
   // Fetch leave requests
-  const { data: leaveRequests = [] } = useQuery<LeaveRequest[]>({
+  const { data: allLeaveRequests = [] } = useQuery<LeaveRequest[]>({
     queryKey: ["/api/leave-requests"],
+  });
+
+  // Filter leave requests based on employee name and status
+  const leaveRequests = allLeaveRequests.filter(request => {
+    const matchesName = employeeNameFilter === "" || 
+      request.userName.toLowerCase().includes(employeeNameFilter.toLowerCase());
+    const matchesStatus = statusFilter === "all" || request.status === statusFilter;
+    return matchesName && matchesStatus;
   });
 
   // Create leave request mutation
@@ -264,18 +274,44 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
         return;
       }
 
+      // Temporarily show the element for capture
+      element.style.position = 'fixed';
+      element.style.top = '0';
+      element.style.left = '0';
+      element.style.zIndex = '9999';
+      element.style.width = '794px'; // A4 width in pixels at 96 DPI
+      element.style.height = 'auto';
+      element.style.display = 'block';
+      element.style.visibility = 'visible';
+
+      // Wait for rendering
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 1.5,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        width: 794,
+        height: element.scrollHeight,
+        logging: false
       });
+
+      // Hide the element again
+      element.style.position = 'fixed';
+      element.style.top = '-9999px';
+      element.style.left = '-9999px';
+      element.style.display = 'none';
+
+      if (canvas.width === 0 || canvas.height === 0) {
+        throw new Error('Canvas has zero dimensions');
+      }
 
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       
       const imgWidth = 210;
-      const pageHeight = 295;
+      const pageHeight = 297;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let heightLeft = imgHeight;
 
@@ -474,7 +510,10 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/70 drop-shadow-md">إجمالي الطلبات</p>
-                <p className="text-2xl font-bold text-white drop-shadow-lg">{leaveRequests.length}</p>
+                <p className="text-2xl font-bold text-white drop-shadow-lg">{allLeaveRequests.length}</p>
+                {employeeNameFilter || statusFilter !== "all" ? (
+                  <p className="text-xs text-white/60">المفلترة: {leaveRequests.length}</p>
+                ) : null}
               </div>
               <Users className="h-8 w-8 text-blue-400 drop-shadow-lg" />
             </div>
@@ -517,12 +556,54 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
           </GlassCard>
         </div>
 
+        {/* Filters */}
+        <GlassContainer className="p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label className="text-white/90 drop-shadow-md">البحث باسم الموظف</Label>
+              <Input
+                type="text"
+                placeholder="ادخل اسم الموظف..."
+                value={employeeNameFilter}
+                onChange={(e) => setEmployeeNameFilter(e.target.value)}
+                className="bg-white/10 border-white/20 text-white backdrop-blur-sm placeholder:text-white/60"
+              />
+            </div>
+            <div>
+              <Label className="text-white/90 drop-shadow-md">تصفية حسب الحالة</Label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                  <SelectValue placeholder="اختر الحالة" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">جميع الطلبات</SelectItem>
+                  <SelectItem value="pending">في الانتظار</SelectItem>
+                  <SelectItem value="approved">موافق عليها</SelectItem>
+                  <SelectItem value="rejected">مرفوضة</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEmployeeNameFilter("");
+                  setStatusFilter("all");
+                }}
+                className="bg-white/10 border-white/20 text-white backdrop-blur-sm hover:bg-white/20"
+              >
+                إعادة تعيين الفلاتر
+              </Button>
+            </div>
+          </div>
+        </GlassContainer>
+
         {/* Requests List */}
         <GlassContainer className="p-6">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-white drop-shadow-lg flex items-center gap-2">
               <Calendar size={20} />
-              قائمة الطلبات
+              قائمة الطلبات ({leaveRequests.length})
             </h2>
           </div>
             {leaveRequests.length === 0 ? (
@@ -619,8 +700,14 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
             <div
               key={`print-${request.id}`}
               id={`leave-request-print-${request.id}`}
-              className="hidden print:block fixed top-0 left-0 w-full bg-white p-8"
-              style={{ fontFamily: 'Arial, sans-serif', direction: 'rtl', textAlign: 'right' }}
+              className="fixed top-[-9999px] left-[-9999px] w-[210mm] bg-white p-8 print:relative print:top-0 print:left-0"
+              style={{ 
+                fontFamily: 'Arial, sans-serif', 
+                direction: 'rtl', 
+                textAlign: 'right',
+                minHeight: '297mm',
+                pageBreakAfter: 'always'
+              }}
             >
               {/* Company Letterhead */}
               <div className="text-center mb-8 border-b-2 border-gray-300 pb-6">
