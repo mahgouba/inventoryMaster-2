@@ -622,5 +622,3 @@ export class MemStorage implements IStorage {
   async updateLeaveRequestStatus(id: number, status: string, approvedBy?: number, approvedByName?: string, rejectionReason?: string): Promise<LeaveRequest | undefined> { return undefined; }
   async deleteLeaveRequest(id: number): Promise<boolean> { return false; }
 }
-
-export const storage = new MemStorage();
