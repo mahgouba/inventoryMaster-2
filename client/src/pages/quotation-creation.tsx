@@ -1831,6 +1831,16 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                             </span>
                           </div>
                         )}
+                        {editableVehicle.detailedSpecifications && (
+                          <div className="col-span-2">
+                            <span className="text-white/70">المواصفات التفصيلية:</span>
+                            <div className="mt-2 p-3 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+                              <p className="text-sm text-white/90 leading-relaxed">
+                                {editableVehicle.detailedSpecifications}
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -3131,6 +3141,16 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   id="editChassisNumber"
                   value={editableVehicle?.chassisNumber || ""}
                   onChange={(e) => setEditableVehicle(prev => prev ? { ...prev, chassisNumber: e.target.value } : null)}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="editDetailedSpecifications">المواصفات التفصيلية</Label>
+                <textarea
+                  id="editDetailedSpecifications"
+                  className="w-full min-h-[120px] p-3 border border-gray-300 rounded-md resize-vertical focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="أدخل المواصفات التفصيلية للسيارة..."
+                  value={editableVehicle?.detailedSpecifications || ""}
+                  onChange={(e) => setEditableVehicle(prev => prev ? { ...prev, detailedSpecifications: e.target.value } : null)}
                 />
               </div>
             </div>
