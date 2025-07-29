@@ -718,6 +718,20 @@ export const insertLeaveRequestSchema = createInsertSchema(leaveRequests).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  startDate: z.union([z.string(), z.date()]).transform((val) => {
+    if (typeof val === 'string') {
+      return new Date(val);
+    }
+    return val;
+  }),
+  endDate: z.union([z.string(), z.date(), z.null()]).transform((val) => {
+    if (val === null) return null;
+    if (typeof val === 'string') {
+      return new Date(val);
+    }
+    return val;
+  }).nullable().optional(),
 });
 
 export type InsertLeaveRequest = z.infer<typeof insertLeaveRequestSchema>;
