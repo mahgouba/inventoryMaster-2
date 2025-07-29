@@ -346,9 +346,9 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-5xl max-h-[95vh] w-[95vw] sm:w-full glass-dialog-secondary overflow-hidden" draggable={true}>
+        <DialogContent className="max-w-4xl max-h-[98vh] w-[98vw] sm:w-[95vw] lg:w-full glass-dialog-secondary overflow-hidden" draggable={true}>
           <DialogHeader>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2" data-dialog-drag-handle>
+            <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 sm:gap-4" data-dialog-drag-handle>
               <div className="flex items-center gap-2">
                 <Move className="h-4 w-4 text-gray-400" />
                 <DialogTitle className="text-lg font-bold text-white">
@@ -371,9 +371,9 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
             </DialogDescription>
           </DialogHeader>
 
-          <div className="overflow-y-auto max-h-[calc(95vh-120px)] px-1">
+          <div className="overflow-y-auto max-h-[calc(98vh-140px)] px-2 sm:px-4 -mx-2 sm:-mx-4">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
                 
                 {/* قسم المعلومات الأساسية */}
                 <div className="space-y-4">
@@ -382,7 +382,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                     <h3 className="text-white font-semibold">المعلومات الأساسية</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                     {/* الصانع */}
                     <FormField
                       control={form.control}
@@ -571,7 +571,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                     <h3 className="text-white font-semibold">الألوان والمظهر</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {/* اللون الخارجي */}
                     <FormField
                       control={form.control}
@@ -633,7 +633,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                     <h3 className="text-white font-semibold">معلومات الاستيراد والحالة</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
 
                     {/* نوع الاستيراد */}
                     <FormField
@@ -748,7 +748,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                     <h3 className="text-white font-semibold">المعلومات الإضافية</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {/* رقم الهيكل */}
                     <FormField
                       control={form.control}
@@ -833,7 +833,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                 </div>
 
                 {/* أزرار الحفظ والإلغاء */}
-                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-white/20">
+                <div className="flex flex-col xs:flex-row justify-end gap-2 sm:gap-3 pt-4 sm:pt-6 border-t border-white/20 sticky bottom-0 bg-transparent backdrop-blur-sm">
                   <Button 
                     type="button" 
                     variant="outline" 
