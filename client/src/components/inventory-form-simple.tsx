@@ -355,16 +355,37 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   {editItem ? "تحرير المركبة" : "إضافة مركبة جديدة"}
                 </DialogTitle>
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setShowListManager(true)}
-                className="text-xs glass-button whitespace-nowrap"
-              >
-                <Settings className="h-3 w-3 ml-1" />
-                إدارة القوائم
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowListManager(true)}
+                  className="text-xs glass-button whitespace-nowrap"
+                >
+                  <Settings className="h-3 w-3 ml-1" />
+                  إدارة القوائم
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => onOpenChange(false)} 
+                  className="text-xs text-white border-white/30 hover:bg-white/10 hover:border-white/50 bg-white/5 backdrop-blur-sm"
+                >
+                  إلغاء
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={isLoading} 
+                  size="sm"
+                  className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                  form="inventory-form"
+                >
+                  <CloudUpload className="h-3 w-3 ml-1" />
+                  {isLoading ? "حفظ..." : editItem ? "تحديث" : "حفظ"}
+                </Button>
+              </div>
             </div>
             <DialogDescription className="text-sm text-white/80 mb-4">
               {editItem ? "تعديل بيانات المركبة المحددة" : "إدخال بيانات المركبة الجديدة في النظام"}
@@ -373,7 +394,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
 
           <div className="overflow-y-auto max-h-[calc(98vh-140px)] px-2 sm:px-4 -mx-2 sm:-mx-4">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+              <form id="inventory-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
                 
                 {/* قسم المعلومات الأساسية */}
                 <div className="space-y-4">
@@ -832,25 +853,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   />
                 </div>
 
-                {/* أزرار الحفظ والإلغاء - Sticky at bottom */}
-                <div className="sticky bottom-0 left-0 right-0 flex flex-row justify-center gap-4 pt-4 pb-4 mt-6 border-t border-white/20 bg-black/40 backdrop-blur-md z-50">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => onOpenChange(false)} 
-                    className="min-w-[120px] h-12 text-white border-white/30 hover:bg-white/10 hover:border-white/50 bg-white/5 backdrop-blur-sm"
-                  >
-                    إلغاء
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    disabled={isLoading} 
-                    className="min-w-[120px] h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg"
-                  >
-                    <CloudUpload className="h-4 w-4 ml-2" />
-                    {isLoading ? "جاري الحفظ..." : editItem ? "تحديث البيانات" : "حفظ المركبة"}
-                  </Button>
-                </div>
+
               </form>
             </Form>
           </div>
