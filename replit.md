@@ -508,6 +508,21 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ **Security Best Practices** - HTTPS configuration and secure environment variable management
 - ✅ **Monitoring Setup** - Health checks and service monitoring configuration for production environments
 
+### Leave Request Management System - Complete Implementation (July 29, 2025)
+- ✅ **COMPLETED: Comprehensive Leave Request System** - Implemented full leave request management with advanced features
+- ✅ **User Name Display**: Enhanced user selection to show full names and job titles instead of usernames for better identification
+- ✅ **Auto-Calculation Features**: 
+  - استئذان (leave requests): Auto-calculates end time based on start time and hours duration
+  - إجازة (vacation requests): Auto-calculates end date based on start date and days duration
+- ✅ **PDF Generation with Company Letterhead**: Complete PDF export functionality using albarimi-2.svg company letterhead
+- ✅ **Professional PDF Layout**: Includes employee information, request details, reason, status, and signature sections
+- ✅ **Time Management**: Added time input fields for استئذان requests with automatic end time calculation
+- ✅ **Real-time Form Updates**: Form automatically updates end time/date fields when duration is entered
+- ✅ **Glass Morphism UI**: Consistent design with the rest of the application using backdrop blur and transparency effects
+- ✅ **Arabic RTL Support**: Full right-to-left layout with proper Arabic date formatting and text direction
+- ✅ **Status Management**: Admin approval/rejection functionality with proper status badges and notifications
+- ✅ **Comprehensive Statistics**: Dashboard shows total, pending, approved, and rejected requests with visual indicators
+
 ### Latest Migration to Replit Environment - Complete Success with UI Updates (July 29, 2025)
 - ✅ Successfully completed migration from Replit Agent to standard Replit environment
 - ✅ All required packages verified and installed (Node.js 20, tsx, all dependencies)

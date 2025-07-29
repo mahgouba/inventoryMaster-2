@@ -728,11 +728,46 @@ export class MemStorage implements IStorage {
   async updateFinancingCalculation(id: number, calculation: Partial<InsertFinancingCalculation>): Promise<FinancingCalculation | undefined> { return undefined; }
   async deleteFinancingCalculation(id: number): Promise<boolean> { return false; }
   
-  async getAllLeaveRequests(): Promise<LeaveRequest[]> { return []; }
-  async getLeaveRequestById(id: number): Promise<LeaveRequest | undefined> { return undefined; }
-  async createLeaveRequest(request: InsertLeaveRequest): Promise<LeaveRequest> { throw new Error("Not implemented"); }
-  async updateLeaveRequestStatus(id: number, status: string, approvedBy?: number, approvedByName?: string, rejectionReason?: string): Promise<LeaveRequest | undefined> { return undefined; }
-  async deleteLeaveRequest(id: number): Promise<boolean> { return false; }
+  async getAllLeaveRequests(): Promise<LeaveRequest[]> { 
+    return Array.from(this.leaveRequests.values());
+  }
+  
+  async getLeaveRequestById(id: number): Promise<LeaveRequest | undefined> { 
+    return this.leaveRequests.get(id);
+  }
+  
+  async createLeaveRequest(request: InsertLeaveRequest): Promise<LeaveRequest> { 
+    const newRequest: LeaveRequest = {
+      id: this.currentLeaveRequestId++,
+      ...request,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.leaveRequests.set(newRequest.id, newRequest);
+    return newRequest;
+  }
+  
+  async updateLeaveRequestStatus(id: number, status: string, approvedBy?: number, approvedByName?: string, rejectionReason?: string): Promise<LeaveRequest | undefined> { 
+    const request = this.leaveRequests.get(id);
+    if (!request) return undefined;
+    
+    const updatedRequest = {
+      ...request,
+      status,
+      approvedBy,
+      approvedByName,
+      approvedAt: status === 'approved' ? new Date() : undefined,
+      rejectionReason,
+      updatedAt: new Date()
+    };
+    
+    this.leaveRequests.set(id, updatedRequest);
+    return updatedRequest;
+  }
+  
+  async deleteLeaveRequest(id: number): Promise<boolean> { 
+    return this.leaveRequests.delete(id);
+  }
 
   // Company methods
   async getAllCompanies(): Promise<Company[]> {

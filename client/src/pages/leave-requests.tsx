@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Calendar, Clock, Users, Plus, Check, X, AlertCircle } from "lucide-react";
+import { Calendar, Clock, Users, Plus, Check, X, AlertCircle, Download, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 // Glass Background Components
 const GlassBackground = ({ children }: { children: React.ReactNode }) => {
@@ -51,8 +53,11 @@ const GlassCard = ({ children, className = "" }: { children: React.ReactNode; cl
 
 interface User {
   id: number;
+  name: string;
   username: string;
   role: string;
+  jobTitle: string;
+  phoneNumber: string;
 }
 
 interface LeaveRequest {
@@ -86,9 +91,12 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const [requestType, setRequestType] = useState<string>("");
   const [startDate, setStartDate] = useState("");
+  const [startTime, setStartTime] = useState("09:00");
   const [endDate, setEndDate] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [duration, setDuration] = useState("");
   const [reason, setReason] = useState("");
+  const [selectedRequestForPrint, setSelectedRequestForPrint] = useState<LeaveRequest | null>(null);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -172,11 +180,32 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
     },
   });
 
+  // Auto-calculate end time/date based on duration
+  useEffect(() => {
+    if (requestType && startDate && duration) {
+      if (requestType === "استئذان" && startTime) {
+        // Calculate end time for leave requests (in hours)
+        const start = new Date(`${startDate}T${startTime}`);
+        const hours = parseInt(duration);
+        const end = new Date(start.getTime() + hours * 60 * 60 * 1000);
+        setEndTime(end.toTimeString().slice(0, 5));
+      } else if (requestType === "إجازة") {
+        // Calculate end date for vacation requests (in days)
+        const start = new Date(startDate);
+        const days = parseInt(duration);
+        const end = new Date(start.getTime() + (days - 1) * 24 * 60 * 60 * 1000);
+        setEndDate(end.toISOString().split('T')[0]);
+      }
+    }
+  }, [requestType, startDate, startTime, duration]);
+
   const resetForm = () => {
     setSelectedUserId("");
     setRequestType("");
     setStartDate("");
+    setStartTime("09:00");
     setEndDate("");
+    setEndTime("");
     setDuration("");
     setReason("");
   };
@@ -194,12 +223,24 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
     const selectedUser = users.find(u => u.id.toString() === selectedUserId);
     if (!selectedUser) return;
 
+    let finalStartDate, finalEndDate;
+    
+    if (requestType === "استئذان") {
+      // For leave requests, include time in the date
+      finalStartDate = new Date(`${startDate}T${startTime}`).toISOString();
+      finalEndDate = endTime ? new Date(`${startDate}T${endTime}`).toISOString() : null;
+    } else {
+      // For vacation requests, use date only
+      finalStartDate = new Date(startDate).toISOString();
+      finalEndDate = endDate ? new Date(endDate).toISOString() : null;
+    }
+
     const requestData = {
       userId: parseInt(selectedUserId),
-      userName: selectedUser.username,
+      userName: selectedUser.name, // Use name instead of username
       requestType,
-      startDate: new Date(startDate).toISOString(),
-      endDate: requestType === "إجازة" && endDate ? new Date(endDate).toISOString() : null,
+      startDate: finalStartDate,
+      endDate: finalEndDate,
       duration: parseInt(duration),
       durationType: requestType === "إجازة" ? "أيام" : "ساعات",
       reason,
@@ -208,6 +249,59 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
     };
 
     createLeaveRequestMutation.mutate(requestData);
+  };
+
+  // PDF Generation functionality
+  const generatePDF = async (request: LeaveRequest) => {
+    try {
+      const element = document.getElementById(`leave-request-print-${request.id}`);
+      if (!element) {
+        toast({
+          title: "خطأ في إنشاء PDF",
+          description: "لم يتم العثور على بيانات الطلب",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, -heightLeft, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`طلب_${request.requestType}_${request.userName}_${new Date().toLocaleDateString('ar-SA')}.pdf`);
+      
+      toast({
+        title: "تم إنشاء PDF بنجاح",
+        description: "تم تحميل ملف PDF للطلب",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "خطأ في إنشاء PDF",
+        description: "حدث خطأ أثناء إنشاء ملف PDF",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -247,9 +341,10 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                   إنشاء طلب جديد
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md backdrop-blur-md bg-slate-900/90 border border-white/20" dir="rtl">
+              <DialogContent className="max-w-md backdrop-blur-md bg-slate-900/90 border border-white/20" dir="rtl" aria-describedby="dialog-description">
                 <DialogHeader>
                   <DialogTitle className="text-white">إنشاء طلب إجازة أو استئذان</DialogTitle>
+                  <p id="dialog-description" className="text-white/80 text-sm">املأ النموذج لإنشاء طلب إجازة أو استئذان جديد</p>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
@@ -261,7 +356,7 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                       <SelectContent>
                         {users.map((user) => (
                           <SelectItem key={user.id} value={user.id.toString()}>
-                            {user.username} ({user.role})
+                            {user.name} - {user.jobTitle}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -291,14 +386,38 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                     />
                   </div>
 
-                  {requestType === "إجازة" && (
+                  {requestType === "استئذان" && (
                     <div>
-                      <Label className="text-white/90 drop-shadow-md">تاريخ النهاية</Label>
+                      <Label className="text-white/90 drop-shadow-md">وقت البداية</Label>
+                      <Input
+                        type="time"
+                        value={startTime}
+                        onChange={(e) => setStartTime(e.target.value)}
+                        className="bg-white/10 border-white/20 text-white backdrop-blur-sm"
+                      />
+                    </div>
+                  )}
+
+                  {requestType === "استئذان" && endTime && (
+                    <div>
+                      <Label className="text-white/90 drop-shadow-md">وقت النهاية (محسوب تلقائياً)</Label>
+                      <Input
+                        type="time"
+                        value={endTime}
+                        readOnly
+                        className="bg-green-500/20 border-green-400/50 text-white backdrop-blur-sm"
+                      />
+                    </div>
+                  )}
+
+                  {requestType === "إجازة" && endDate && (
+                    <div>
+                      <Label className="text-white/90 drop-shadow-md">تاريخ النهاية (محسوب تلقائياً)</Label>
                       <Input
                         type="date"
                         value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        className="bg-white/10 border-white/20 text-white backdrop-blur-sm"
+                        readOnly
+                        className="bg-green-500/20 border-green-400/50 text-white backdrop-blur-sm"
                       />
                     </div>
                   )}
@@ -432,6 +551,17 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                       </div>
                       <div className="flex items-center gap-2">
                         {getStatusBadge(request.status)}
+                        
+                        {/* PDF Download Button */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => generatePDF(request)}
+                          className="bg-blue-600/20 border-blue-400/50 text-white hover:bg-blue-600/40 backdrop-blur-sm"
+                        >
+                          <Download size={14} />
+                        </Button>
+                        
                         {userRole === "admin" && request.status === "pending" && (
                           <div className="flex gap-1">
                             <Button
@@ -481,6 +611,148 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
               ))
             )}
         </GlassContainer>
+
+        {/* Hidden PDF Print Templates */}
+        {leaveRequests.map((request) => {
+          const user = users.find(u => u.id === request.userId);
+          return (
+            <div
+              key={`print-${request.id}`}
+              id={`leave-request-print-${request.id}`}
+              className="hidden print:block fixed top-0 left-0 w-full bg-white p-8"
+              style={{ fontFamily: 'Arial, sans-serif', direction: 'rtl', textAlign: 'right' }}
+            >
+              {/* Company Letterhead */}
+              <div className="text-center mb-8 border-b-2 border-gray-300 pb-6">
+                <img 
+                  src="/albarimi-2.svg" 
+                  alt="Company Logo" 
+                  className="mx-auto mb-4 h-20 w-auto"
+                />
+                <h1 className="text-2xl font-bold text-gray-800 mb-2">شركة البريمي للسيارات</h1>
+                <p className="text-gray-600">طلب {request.requestType}</p>
+              </div>
+
+              {/* Request Details */}
+              <div className="space-y-6">
+                {/* Employee Information */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">بيانات الموظف</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="font-medium text-gray-700">الاسم: </span>
+                      <span className="text-gray-800">{request.userName}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">المسمى الوظيفي: </span>
+                      <span className="text-gray-800">{user?.jobTitle || 'غير محدد'}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">رقم الهاتف: </span>
+                      <span className="text-gray-800">{user?.phoneNumber || 'غير محدد'}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">تاريخ الطلب: </span>
+                      <span className="text-gray-800">{format(new Date(request.createdAt), "dd/MM/yyyy", { locale: ar })}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Request Information */}
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">تفاصيل الطلب</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="font-medium text-gray-700">نوع الطلب: </span>
+                      <span className="text-gray-800 font-semibold">{request.requestType}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">المدة: </span>
+                      <span className="text-gray-800">{request.duration} {request.durationType}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">تاريخ البداية: </span>
+                      <span className="text-gray-800">{format(new Date(request.startDate), "dd/MM/yyyy", { locale: ar })}</span>
+                    </div>
+                    {request.endDate && (
+                      <div>
+                        <span className="font-medium text-gray-700">تاريخ النهاية: </span>
+                        <span className="text-gray-800">{format(new Date(request.endDate), "dd/MM/yyyy", { locale: ar })}</span>
+                      </div>
+                    )}
+                    {request.requestType === "استئذان" && (
+                      <>
+                        <div>
+                          <span className="font-medium text-gray-700">وقت البداية: </span>
+                          <span className="text-gray-800">{format(new Date(request.startDate), "HH:mm", { locale: ar })}</span>
+                        </div>
+                        {request.endDate && (
+                          <div>
+                            <span className="font-medium text-gray-700">وقت النهاية: </span>
+                            <span className="text-gray-800">{format(new Date(request.endDate), "HH:mm", { locale: ar })}</span>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Reason */}
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">سبب الطلب</h3>
+                  <p className="text-gray-800 leading-relaxed">{request.reason}</p>
+                </div>
+
+                {/* Status and Approval */}
+                <div className="bg-yellow-50 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">حالة الطلب</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="font-medium text-gray-700">الحالة: </span>
+                      <span className={`font-semibold ${
+                        request.status === 'approved' ? 'text-green-600' : 
+                        request.status === 'rejected' ? 'text-red-600' : 'text-yellow-600'
+                      }`}>
+                        {request.status === 'approved' ? 'موافق عليه' : 
+                         request.status === 'rejected' ? 'مرفوض' : 'في الانتظار'}
+                      </span>
+                    </div>
+                    {request.approvedByName && (
+                      <div>
+                        <span className="font-medium text-gray-700">تمت المراجعة بواسطة: </span>
+                        <span className="text-gray-800">{request.approvedByName}</span>
+                      </div>
+                    )}
+                    <div>
+                      <span className="font-medium text-gray-700">طلب بواسطة: </span>
+                      <span className="text-gray-800">{request.requestedByName}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Signatures */}
+                <div className="mt-12 grid grid-cols-2 gap-8">
+                  <div className="text-center">
+                    <div className="border-t-2 border-gray-400 pt-2">
+                      <p className="font-semibold text-gray-800">توقيع الموظف</p>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="border-t-2 border-gray-400 pt-2">
+                      <p className="font-semibold text-gray-800">توقيع المدير المباشر</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="text-center mt-8 text-sm text-gray-500 border-t pt-4">
+                  <p>شركة البريمي للسيارات - نظام إدارة طلبات الإجازة والاستئذان</p>
+                  <p>تم إنشاء هذا الطلب في تاريخ: {format(new Date(), "dd/MM/yyyy HH:mm", { locale: ar })}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </GlassBackground>
   );
