@@ -194,7 +194,17 @@ function VehicleSpecificationsDisplayComponent({ manufacturer, category, trimLev
       ) : (
         <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
           <Info className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-          <p className="text-gray-600 dark:text-gray-400">لا توجد مواصفات تفصيلية متاحة</p>
+          <p 
+            className="text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            onDoubleClick={() => {
+              // Open vehicle edit dialog to add detailed specifications
+              setVehicleEditOpen(true);
+            }}
+            title="انقر مرتين لإضافة المواصفات التفصيلية"
+          >
+            لا توجد مواصفات تفصيلية متاحة
+          </p>
+          <p className="text-xs text-gray-500 mt-1">انقر مرتين للتحرير</p>
         </div>
       )}
       
@@ -1834,10 +1844,27 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                         {editableVehicle.detailedSpecifications && (
                           <div className="col-span-2">
                             <span className="text-white/70">المواصفات التفصيلية:</span>
-                            <div className="mt-2 p-3 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+                            <div 
+                              className="mt-2 p-3 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 cursor-pointer hover:bg-white/20 transition-colors"
+                              onDoubleClick={() => setVehicleEditOpen(true)}
+                              title="انقر مرتين للتحرير"
+                            >
                               <p className="text-sm text-white/90 leading-relaxed">
                                 {editableVehicle.detailedSpecifications}
                               </p>
+                              <p className="text-xs text-white/50 mt-1">انقر مرتين للتحرير</p>
+                            </div>
+                          </div>
+                        )}
+                        {!editableVehicle.detailedSpecifications && (
+                          <div className="col-span-2">
+                            <div 
+                              className="mt-2 p-3 bg-white/5 backdrop-blur-sm rounded-lg border border-dashed border-white/30 cursor-pointer hover:bg-white/10 transition-colors text-center"
+                              onDoubleClick={() => setVehicleEditOpen(true)}
+                              title="انقر مرتين لإضافة المواصفات التفصيلية"
+                            >
+                              <p className="text-sm text-white/70">لا توجد مواصفات تفصيلية</p>
+                              <p className="text-xs text-white/50 mt-1">انقر مرتين للإضافة</p>
                             </div>
                           </div>
                         )}
