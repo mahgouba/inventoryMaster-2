@@ -387,9 +387,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                 </Button>
               </div>
             </div>
-            <DialogDescription className="text-sm text-white/80 mb-4">
-              {editItem ? "تعديل بيانات المركبة المحددة" : "إدخال بيانات المركبة الجديدة في النظام"}
-            </DialogDescription>
+
           </DialogHeader>
 
           <div className="overflow-y-auto max-h-[calc(98vh-140px)] px-2 sm:px-4 -mx-2 sm:-mx-4">
@@ -398,10 +396,6 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                 
                 {/* قسم المعلومات الأساسية */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 border-b border-white/20 pb-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <h3 className="text-white font-semibold">المعلومات الأساسية</h3>
-                  </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                     {/* الصانع */}
@@ -587,10 +581,6 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
 
                 {/* قسم الألوان والمظهر */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 border-b border-white/20 pb-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <h3 className="text-white font-semibold">الألوان والمظهر</h3>
-                  </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {/* اللون الخارجي */}
@@ -649,10 +639,6 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
 
                 {/* قسم معلومات الاستيراد والحالة */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 border-b border-white/20 pb-2">
-                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                    <h3 className="text-white font-semibold">معلومات الاستيراد والحالة</h3>
-                  </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
 
@@ -764,10 +750,6 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
 
                 {/* قسم المعلومات الإضافية */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 border-b border-white/20 pb-2">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    <h3 className="text-white font-semibold">المعلومات الإضافية</h3>
-                  </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {/* رقم الهيكل */}
@@ -828,10 +810,6 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
 
                 {/* قسم الملاحظات */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 border-b border-white/20 pb-2">
-                    <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
-                    <h3 className="text-white font-semibold">ملاحظات إضافية</h3>
-                  </div>
                   
                   <FormField
                     control={form.control}
