@@ -723,12 +723,19 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
               return (
                 <div className="space-y-4">
                   {/* Preview of the PDF */}
-                  <div className="bg-white p-8 rounded-lg shadow-lg" style={{ 
+                  <div className="bg-white p-8 rounded-lg shadow-lg relative" style={{ 
                     fontFamily: 'Arial, sans-serif', 
                     direction: 'rtl', 
                     textAlign: 'right',
-                    minHeight: '600px'
+                    minHeight: '600px',
+                    backgroundImage: 'url(/albarimi-2.svg)',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center center',
+                    backgroundSize: '50% auto'
                   }}>
+                    {/* Background overlay to make text readable */}
+                    <div className="absolute inset-0 bg-white/80 rounded-lg"></div>
+                    <div className="relative z-10">
                     {/* Company Header with Logo */}
                     <div className="flex items-center justify-between mb-8 border-b-2 border-gray-300 pb-4">
                       <div className="text-right">
@@ -791,7 +798,7 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ النهاية:</label>
                           <p className="text-gray-800 border-b border-gray-300 pb-1">
-                            {format(new Date(previewRequest.endDate), "yyyy/MM/dd", { locale: ar })}
+                            {previewRequest.endDate ? format(new Date(previewRequest.endDate), "yyyy/MM/dd", { locale: ar }) : "غير محدد"}
                           </p>
                         </div>
                       </div>
@@ -799,11 +806,15 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                       <div className="grid grid-cols-3 gap-4 mb-6">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">وقت البداية:</label>
-                          <p className="text-gray-800 border-b border-gray-300 pb-1">{previewRequest.startTime}</p>
+                          <p className="text-gray-800 border-b border-gray-300 pb-1">
+                            {previewRequest.startDate ? format(new Date(previewRequest.startDate), "HH:mm") : "غير محدد"}
+                          </p>
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">وقت النهاية:</label>
-                          <p className="text-gray-800 border-b border-gray-300 pb-1">{previewRequest.endTime}</p>
+                          <p className="text-gray-800 border-b border-gray-300 pb-1">
+                            {previewRequest.endDate ? format(new Date(previewRequest.endDate), "HH:mm") : "غير محدد"}
+                          </p>
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">المدة:</label>
@@ -848,6 +859,7 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                         </div>
                       </div>
                     </div>
+                    </div>
                   </div>
 
                   {/* Action Buttons */}
@@ -883,15 +895,22 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
             <div
               key={`print-${request.id}`}
               id={`leave-request-print-${request.id}`}
-              className="fixed top-[-9999px] left-[-9999px] w-[210mm] bg-white p-8 print:relative print:top-0 print:left-0"
+              className="fixed top-[-9999px] left-[-9999px] w-[210mm] bg-white p-8 print:relative print:top-0 print:left-0 relative"
               style={{ 
                 fontFamily: 'Arial, sans-serif', 
                 direction: 'rtl', 
                 textAlign: 'right',
                 minHeight: '297mm',
-                pageBreakAfter: 'always'
+                pageBreakAfter: 'always',
+                backgroundImage: 'url(/albarimi-2.svg)',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center center',
+                backgroundSize: '50% auto'
               }}
             >
+              {/* Background overlay for text readability */}
+              <div className="absolute inset-0 bg-white/85"></div>
+              <div className="relative z-10">
               {/* Company Letterhead */}
               <div className="text-center mb-8 border-b-2 border-gray-300 pb-6">
                 <img 
@@ -1019,6 +1038,7 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                   <p>شركة البريمي للسيارات - نظام إدارة طلبات الإجازة والاستئذان</p>
                   <p>تم إنشاء هذا الطلب في تاريخ: {format(new Date(), "dd/MM/yyyy HH:mm", { locale: ar })}</p>
                 </div>
+              </div>
               </div>
             </div>
           );
