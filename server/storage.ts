@@ -176,6 +176,13 @@ export interface IStorage {
   createLeaveRequest(request: InsertLeaveRequest): Promise<LeaveRequest>;
   updateLeaveRequestStatus(id: number, status: string, approvedBy?: number, approvedByName?: string, rejectionReason?: string): Promise<LeaveRequest | undefined>;
   deleteLeaveRequest(id: number): Promise<boolean>;
+
+  // Company methods
+  getAllCompanies(): Promise<Company[]>;
+  getCompany(id: number): Promise<Company | undefined>;
+  createCompany(company: InsertCompany): Promise<Company>;
+  updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined>;
+  deleteCompany(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -726,6 +733,38 @@ export class MemStorage implements IStorage {
   async createLeaveRequest(request: InsertLeaveRequest): Promise<LeaveRequest> { throw new Error("Not implemented"); }
   async updateLeaveRequestStatus(id: number, status: string, approvedBy?: number, approvedByName?: string, rejectionReason?: string): Promise<LeaveRequest | undefined> { return undefined; }
   async deleteLeaveRequest(id: number): Promise<boolean> { return false; }
+
+  // Company methods
+  async getAllCompanies(): Promise<Company[]> {
+    return Array.from(this.companies.values());
+  }
+
+  async getCompany(id: number): Promise<Company | undefined> {
+    return this.companies.get(id);
+  }
+
+  async createCompany(company: InsertCompany): Promise<Company> {
+    const newCompany: Company = {
+      id: this.currentCompanyId++,
+      ...company
+    };
+    this.companies.set(newCompany.id, newCompany);
+    return newCompany;
+  }
+
+  async updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined> {
+    const existingCompany = this.companies.get(id);
+    if (!existingCompany) {
+      return undefined;
+    }
+    const updatedCompany = { ...existingCompany, ...company };
+    this.companies.set(id, updatedCompany);
+    return updatedCompany;
+  }
+
+  async deleteCompany(id: number): Promise<boolean> {
+    return this.companies.delete(id);
+  }
 }
 
 export const storage = new MemStorage();

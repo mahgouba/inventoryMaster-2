@@ -94,7 +94,7 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
     }
   ];
 
-  const adminItems = user.role === "admin" ? [
+  const userManagementItems = user.role === "admin" ? [
     { 
       title: "إدارة المستخدمين", 
       href: "/user-management", 
@@ -106,7 +106,10 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
       href: "/bank-management", 
       icon: Landmark,
       description: "Ratio Management"
-    },
+    }
+  ] : [];
+
+  const adminItems = user.role === "admin" ? [
     { 
       title: "إدارة شعارات الصناع", 
       href: "/manufacturer-logos", 
@@ -316,6 +319,22 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
             ))}
           </nav>
         </div>
+
+        {/* User Management Section */}
+        {userManagementItems.length > 0 && (
+          <div className="mb-6">
+            {!isCollapsed && (
+              <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-3 text-right drop-shadow-sm">
+                إدارة المستخدمين
+              </h3>
+            )}
+            <nav className="space-y-1">
+              {userManagementItems.map((item, index) => (
+                <NavItem key={index} item={item} section="admin" />
+              ))}
+            </nav>
+          </div>
+        )}
 
         {/* Admin Section */}
         {adminItems.length > 0 && (
