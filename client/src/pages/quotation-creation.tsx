@@ -386,9 +386,9 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     queryKey: ["/api/companies"]
   });
 
-  // Query for all available vehicles from inventory (real data) - MOVED TO TOP
+  // Query for all available vehicles from complete database (not just inventory) - MOVED TO TOP
   const { data: availableVehicles = [] } = useQuery<InventoryItem[]>({
-    queryKey: ["/api/inventory"]
+    queryKey: ["/api/cars/all-vehicles"]
   });
 
   // Get manufacturers from inventory data
