@@ -782,6 +782,39 @@ button.glass-button:active,
   position: fixed !important;
 }
 
+/* Desktop Dialog Styling */
+@media (min-width: 769px) {
+  .glass-dialog,
+  .glass-dialog-secondary,
+  [role="dialog"] {
+    z-index: 9999 !important;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    max-width: 80vw !important;
+    max-height: 90vh !important;
+    width: auto !important;
+  }
+  
+  /* Ensure dialogs appear above everything on desktop */
+  [data-radix-dialog-content] {
+    z-index: 9999 !important;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    max-width: 80vw !important;
+    max-height: 90vh !important;
+    width: auto !important;
+    min-width: 800px !important;
+  }
+  
+  [data-radix-dialog-overlay] {
+    z-index: 9998 !important;
+  }
+}
+
 /* Mobile Dialog Fixes */
 @media (max-width: 768px) {
   .glass-dialog,
