@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -217,11 +217,14 @@ export default function ListManagerSimple({ open, onOpenChange, listsData, onSav
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden glass-dialog">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden glass-dialog fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-white text-center">
               إدارة قوائم الخيارات
             </DialogTitle>
+            <DialogDescription className="text-white/70 text-center">
+              إدارة وتحرير قوائم الخيارات المختلفة في النظام
+            </DialogDescription>
           </DialogHeader>
           
           <Tabs defaultValue="manufacturers" className="w-full">
