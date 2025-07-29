@@ -346,13 +346,13 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-6xl max-h-[95vh] w-[95vw] sm:w-full glass-dialog-secondary" draggable={true}>
+        <DialogContent className="max-w-5xl max-h-[95vh] w-[95vw] sm:w-full glass-dialog-secondary overflow-hidden" draggable={true}>
           <DialogHeader>
-            <div className="flex items-center justify-between" data-dialog-drag-handle>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2" data-dialog-drag-handle>
               <div className="flex items-center gap-2">
                 <Move className="h-4 w-4 text-gray-400" />
-                <DialogTitle className="text-sm font-medium text-white">
-                  {editItem ? "تحرير" : "إضافة جديد"}
+                <DialogTitle className="text-lg font-bold text-white">
+                  {editItem ? "تحرير المركبة" : "إضافة مركبة جديدة"}
                 </DialogTitle>
               </div>
               <Button
@@ -360,440 +360,500 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                 variant="outline"
                 size="sm"
                 onClick={() => setShowListManager(true)}
-                className="text-xs glass-button"
+                className="text-xs glass-button whitespace-nowrap"
               >
                 <Settings className="h-3 w-3 ml-1" />
-                قوائم
+                إدارة القوائم
               </Button>
             </div>
-            <DialogDescription className="text-xs text-white/70 mb-2">
-              {editItem ? "تحرير البيانات" : "إدخال بيانات المركبة"}
+            <DialogDescription className="text-sm text-white/80 mb-4">
+              {editItem ? "تعديل بيانات المركبة المحددة" : "إدخال بيانات المركبة الجديدة في النظام"}
             </DialogDescription>
           </DialogHeader>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-              <div className="grid grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
-                {/* Manufacturer Field */}
-                <FormField
-                  control={form.control}
-                  name="manufacturer"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm text-white">الصانع</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={(value) => {
-                          handleManufacturerChange(value);
-                          field.onChange(value);
-                        }}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر الصانع" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from(new Set(allManufacturers)).map((manufacturer) => (
-                              <SelectItem key={manufacturer} value={manufacturer}>
-                                {manufacturer}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Category Field with Categories Manager */}
-                <div className="space-y-2">
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm text-white">الفئة</FormLabel>
-                        <FormControl>
-                          <Select value={field.value} onValueChange={(value) => {
-                            handleCategoryChange(value);
-                            field.onChange(value);
-                          }} disabled={!selectedManufacturer}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="اختر الفئة" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Array.from(new Set(allCategories)).map((category) => (
-                                <SelectItem key={category} value={category}>
-                                  {category}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+          <div className="overflow-y-auto max-h-[calc(95vh-120px)] px-1">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                
+                {/* قسم المعلومات الأساسية */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 border-b border-white/20 pb-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <h3 className="text-white font-semibold">المعلومات الأساسية</h3>
+                  </div>
                   
-                  {/* Manufacturer Categories Management Button */}
-                  {selectedManufacturer && (
-                    <ManufacturerCategoriesButton
-                      manufacturer={selectedManufacturer}
-                      categories={availableCategories}
-                      onCategoriesChange={(newCategories) => {
-                        setAvailableCategories(newCategories);
-                      }}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* الصانع */}
+                    <FormField
+                      control={form.control}
+                      name="manufacturer"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">الصانع</FormLabel>
+                          <FormControl>
+                            <Select value={field.value} onValueChange={(value) => {
+                              handleManufacturerChange(value);
+                              field.onChange(value);
+                            }}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="اختر الصانع" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Array.from(new Set(allManufacturers)).map((manufacturer) => (
+                                  <SelectItem key={manufacturer} value={manufacturer}>
+                                    {manufacturer}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
+
+                    {/* الفئة */}
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">الفئة</FormLabel>
+                          <FormControl>
+                            <Select value={field.value} onValueChange={(value) => {
+                              handleCategoryChange(value);
+                              field.onChange(value);
+                            }} disabled={!selectedManufacturer}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="اختر الفئة" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Array.from(new Set(allCategories)).map((category) => (
+                                  <SelectItem key={category} value={category}>
+                                    {category}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* درجة التجهيز */}
+                    <FormField
+                      control={form.control}
+                      name="trimLevel"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">درجة التجهيز</FormLabel>
+                          <FormControl>
+                            <Select value={field.value || ""} onValueChange={field.onChange} disabled={!selectedManufacturer || !selectedCategory}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="اختر درجة التجهيز" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Array.from(new Set(allTrimLevels)).map((trimLevel) => (
+                                  <SelectItem key={trimLevel} value={trimLevel}>
+                                    {trimLevel}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* سعة المحرك */}
+                    <FormField
+                      control={form.control}
+                      name="engineCapacity"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">سعة المحرك</FormLabel>
+                          <FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="اختر سعة المحرك" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {engineCapacities.map((capacity) => (
+                                  <SelectItem key={capacity} value={capacity}>
+                                    {capacity}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* السنة */}
+                    <FormField
+                      control={form.control}
+                      name="year"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">السنة</FormLabel>
+                          <FormControl>
+                            <Select value={field.value?.toString()} onValueChange={(value) => field.onChange(parseInt(value))}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="اختر السنة" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {initialYears.map((year) => (
+                                  <SelectItem key={year} value={year.toString()}>
+                                    {year}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* السعر */}
+                    <FormField
+                      control={form.control}
+                      name="price"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">السعر (ريال)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="أدخل السعر" 
+                              className="h-11 text-right"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  {/* أزرار إدارة البيانات */}
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {selectedManufacturer && (
+                      <ManufacturerCategoriesButton
+                        manufacturer={selectedManufacturer}
+                        categories={availableCategories}
+                        onCategoriesChange={(newCategories) => {
+                          setAvailableCategories(newCategories);
+                        }}
+                      />
+                    )}
+                    
+                    {selectedManufacturer && selectedCategory && (
+                      <TrimLevelManager
+                        manufacturer={selectedManufacturer}
+                        category={selectedCategory}
+                        onTrimLevelAdded={(newTrimLevel) => {
+                          setAvailableTrimLevels(prev => [...prev, newTrimLevel.trimLevel]);
+                          refetchTrimLevels();
+                        }}
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {/* قسم الألوان والمظهر */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 border-b border-white/20 pb-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <h3 className="text-white font-semibold">الألوان والمظهر</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* اللون الخارجي */}
+                    <FormField
+                      control={form.control}
+                      name="exteriorColor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">اللون الخارجي</FormLabel>
+                          <FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="اختر اللون الخارجي" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {exteriorColors.map((color) => (
+                                  <SelectItem key={color} value={color}>
+                                    {color}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* اللون الداخلي */}
+                    <FormField
+                      control={form.control}
+                      name="interiorColor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">اللون الداخلي</FormLabel>
+                          <FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="اختر اللون الداخلي" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {interiorColors.map((color) => (
+                                  <SelectItem key={color} value={color}>
+                                    {color}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* قسم معلومات الاستيراد والحالة */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 border-b border-white/20 pb-2">
+                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                    <h3 className="text-white font-semibold">معلومات الاستيراد والحالة</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                    {/* نوع الاستيراد */}
+                    <FormField
+                      control={form.control}
+                      name="importType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">نوع الاستيراد</FormLabel>
+                          <FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="اختر نوع الاستيراد" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {importTypes.map((type) => (
+                                  <SelectItem key={type} value={type}>
+                                    {type}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* الحالة */}
+                    <FormField
+                      control={form.control}
+                      name="status"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">حالة المركبة</FormLabel>
+                          <FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="اختر الحالة" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {statuses.map((status) => (
+                                  <SelectItem key={status} value={status}>
+                                    {status}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* الموقع */}
+                    <FormField
+                      control={form.control}
+                      name="location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">موقع المركبة</FormLabel>
+                          <FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="اختر الموقع" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {locations.map((location) => (
+                                  <SelectItem key={location} value={location}>
+                                    {location}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  {/* ممشي السيارة - فقط للمركبات المستعملة */}
+                  {(form.watch("importType") === "مستعمل" || form.watch("importType") === "مستعمل شخصي") && (
+                    <div className="mt-4">
+                      <FormField
+                        control={form.control}
+                        name="mileage"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white font-medium">ممشي السيارة (كم)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="أدخل عدد الكيلومترات" 
+                                type="number"
+                                min="0"
+                                className="h-11"
+                                value={field.value || ''}
+                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   )}
                 </div>
 
-                {/* Trim Level Field with Trim Level Manager */}
-                <div className="space-y-2">
-                  <FormField
-                    control={form.control}
-                    name="trimLevel"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm text-white">درجة التجهيز</FormLabel>
-                        <FormControl>
-                          <Select value={field.value || ""} onValueChange={field.onChange} disabled={!selectedManufacturer || !selectedCategory}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="اختر درجة التجهيز" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Array.from(new Set(allTrimLevels)).map((trimLevel) => (
-                                <SelectItem key={trimLevel} value={trimLevel}>
-                                  {trimLevel}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                {/* قسم المعلومات الإضافية */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 border-b border-white/20 pb-2">
+                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                    <h3 className="text-white font-semibold">المعلومات الإضافية</h3>
+                  </div>
                   
-                  {/* Trim Level Management Button */}
-                  {selectedManufacturer && selectedCategory && (
-                    <TrimLevelManager
-                      manufacturer={selectedManufacturer}
-                      category={selectedCategory}
-                      onTrimLevelAdded={(newTrimLevel) => {
-                        setAvailableTrimLevels(prev => [...prev, newTrimLevel.trimLevel]);
-                        refetchTrimLevels();
-                      }}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* رقم الهيكل */}
+                    <FormField
+                      control={form.control}
+                      name="chassisNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">رقم الهيكل (VIN)</FormLabel>
+                          <div className="flex gap-2">
+                            <FormControl className="flex-1">
+                              <Input 
+                                placeholder="أدخل رقم الهيكل" 
+                                className="h-11"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => setShowChassisScanner(true)}
+                              title="تصوير رقم الهيكل"
+                              className="h-11 w-11 shrink-0"
+                            >
+                              <Camera size={18} />
+                            </Button>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  )}
+
+                    {/* نوع الملكية */}
+                    <FormField
+                      control={form.control}
+                      name="ownershipType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white font-medium">نوع الملكية</FormLabel>
+                          <FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="اختر نوع الملكية" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="ملك الشركة">ملك الشركة</SelectItem>
+                                <SelectItem value="عرض (وسيط)">عرض (وسيط)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
 
-                {/* Engine Capacity */}
-                <FormField
-                  control={form.control}
-                  name="engineCapacity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm text-white">سعة المحرك</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر سعة المحرك" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {engineCapacities.map((capacity) => (
-                              <SelectItem key={capacity} value={capacity}>
-                                {capacity}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Year */}
-                <FormField
-                  control={form.control}
-                  name="year"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm text-white">السنة</FormLabel>
-                      <FormControl>
-                        <Select value={field.value?.toString()} onValueChange={(value) => field.onChange(parseInt(value))}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر السنة" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {initialYears.map((year) => (
-                              <SelectItem key={year} value={year.toString()}>
-                                {year}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Exterior Color */}
-                <FormField
-                  control={form.control}
-                  name="exteriorColor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm text-white">اللون الخارجي</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر اللون الخارجي" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {exteriorColors.map((color) => (
-                              <SelectItem key={color} value={color}>
-                                {color}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Interior Color */}
-                <FormField
-                  control={form.control}
-                  name="interiorColor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm text-white">اللون الداخلي</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر اللون الداخلي" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {interiorColors.map((color) => (
-                              <SelectItem key={color} value={color}>
-                                {color}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Import Type */}
-                <FormField
-                  control={form.control}
-                  name="importType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm text-white">نوع الاستيراد</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر نوع الاستيراد" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {importTypes.map((type) => (
-                              <SelectItem key={type} value={type}>
-                                {type}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Mileage - Only show for used vehicles */}
-                {(form.watch("importType") === "مستعمل" || form.watch("importType") === "مستعمل شخصي") && (
+                {/* قسم الملاحظات */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 border-b border-white/20 pb-2">
+                    <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
+                    <h3 className="text-white font-semibold">ملاحظات إضافية</h3>
+                  </div>
+                  
                   <FormField
                     control={form.control}
-                    name="mileage"
+                    name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm text-white">ممشي السيارة (كم)</FormLabel>
+                        <FormLabel className="text-white font-medium">الملاحظات</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="أدخل عدد الكيلومترات" 
-                            type="number"
-                            min="0"
+                          <Textarea 
+                            placeholder="أدخل أي ملاحظات إضافية حول المركبة..."
+                            className="min-h-[80px] resize-none"
                             value={field.value || ''}
-                            onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                            onChange={field.onChange}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                )}
+                </div>
 
-                {/* Location */}
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm text-white">الموقع</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر الموقع" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {locations.map((location) => (
-                              <SelectItem key={location} value={location}>
-                                {location}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Status */}
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm text-white">الحالة</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر الحالة" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {statuses.map((status) => (
-                              <SelectItem key={status} value={status}>
-                                {status}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Chassis Number */}
-                <FormField
-                  control={form.control}
-                  name="chassisNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm text-white">رقم الهيكل</FormLabel>
-                      <div className="flex gap-2">
-                        <FormControl className="flex-1">
-                          <Input placeholder="أدخل رقم الهيكل" {...field} />
-                        </FormControl>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => setShowChassisScanner(true)}
-                          title="تصوير رقم الهيكل"
-                        >
-                          <Camera size={16} />
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Price */}
-                <FormField
-                  control={form.control}
-                  name="price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm text-white">السعر</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="أدخل السعر" 
-                          type="text"
-                          value={field.value || ''}
-                          onChange={(e) => field.onChange(e.target.value)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Ownership Type */}
-                <FormField
-                  control={form.control}
-                  name="ownershipType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm text-white">نوع الملكية</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر نوع الملكية" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="ملك الشركة">ملك الشركة</SelectItem>
-                            <SelectItem value="عرض (وسيط)">عرض (وسيط)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-              </div>
-
-              {/* Notes - Full width row */}
-              <div className="mt-3">
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm text-white">الملاحظات</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="ملاحظات..."
-                          className="min-h-[60px] text-sm resize-none"
-                          value={field.value || ''}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3">
-                <Button type="button" variant="outline" size="sm" onClick={() => onOpenChange(false)} className="glass-button">
-                  إلغاء
-                </Button>
-                <Button type="submit" size="sm" disabled={isLoading} className="bg-custom-gold hover:bg-custom-gold-dark text-white glass-button">
-                  <CloudUpload className="h-3 w-3 ml-1" />
-                  {isLoading ? "حفظ..." : editItem ? "تحديث" : "حفظ"}
-                </Button>
-              </div>
-            </form>
-          </Form>
+                {/* أزرار الحفظ والإلغاء */}
+                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-white/20">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => onOpenChange(false)} 
+                    className="glass-button sm:w-auto"
+                  >
+                    إلغاء
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading} 
+                    className="bg-custom-gold hover:bg-custom-gold-dark text-white glass-button sm:w-auto"
+                  >
+                    <CloudUpload className="h-4 w-4 ml-2" />
+                    {isLoading ? "جاري الحفظ..." : editItem ? "تحديث البيانات" : "حفظ المركبة"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
         </DialogContent>
       </Dialog>
 
