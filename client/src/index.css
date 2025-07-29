@@ -735,8 +735,6 @@ button.glass-button:active,
 [role="dialog"].glass-dialog,
 .dialog-content.glass-dialog {
   background: rgba(10, 15, 25, 0.95) !important;
-  backdrop-filter: blur(30px) !important;
-  -webkit-backdrop-filter: blur(30px) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   border-radius: 16px !important;
   box-shadow: 
@@ -773,8 +771,6 @@ button.glass-button:active,
 /* Secondary Dialog Styling - Smaller and Different */
 .glass-dialog-secondary {
   background: rgba(255, 255, 255, 0.12) !important;
-  backdrop-filter: blur(30px) !important;
-  -webkit-backdrop-filter: blur(30px) !important;
   border: 2px solid rgba(255, 255, 255, 0.2) !important;
   border-radius: 16px !important;
   box-shadow: 
@@ -834,8 +830,6 @@ button.glass-button:active,
 
 .glass-dialog-secondary .glass-button {
   background: rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
   color: white !important;
   font-size: 0.75rem !important;
