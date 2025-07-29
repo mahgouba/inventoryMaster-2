@@ -5,7 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calculator, Printer, Save, ArrowRight, Home, TrendingUp } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Calculator, Printer, Save, ArrowRight, Home, TrendingUp, Plus, Upload, Trash2 } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -13,10 +14,18 @@ import { apiRequest } from "@/lib/queryClient";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
 interface BankRate {
+  id?: string;
   name: string;
+  logo?: string;
   rates: {
     [years: string]: number; // APR percentage
   };
+}
+
+interface NewBankForm {
+  name: string;
+  logo: string;
+  rates: { [years: string]: number };
 }
 
 const BANKS: BankRate[] = [
@@ -160,16 +169,34 @@ export default function FinancingCalculatorPage() {
 
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [selectedBank, setSelectedBank] = useState<BankRate | null>(null);
+  const [customBanks, setCustomBanks] = useState<BankRate[]>([]);
+  const [showAddBankDialog, setShowAddBankDialog] = useState(false);
+  const [newBank, setNewBank] = useState<NewBankForm>({
+    name: "",
+    logo: "",
+    rates: {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0
+    }
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Get all available banks (default + custom)
+  const allBanks = [...BANKS, ...customBanks];
 
   // Update bank rates when bank selection changes
   useEffect(() => {
     if (formData.bankName) {
-      const bank = BANKS.find(b => b.name === formData.bankName);
+      const bank = allBanks.find(b => b.name === formData.bankName);
       setSelectedBank(bank || null);
     }
-  }, [formData.bankName]);
+  }, [formData.bankName, customBanks]);
 
   // Auto-update interest rate when bank and years change
   useEffect(() => {
@@ -183,6 +210,75 @@ export default function FinancingCalculatorPage() {
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Bank management functions
+  const handleAddBank = () => {
+    if (!newBank.name.trim()) {
+      toast({
+        title: "خطأ في البيانات",
+        description: "يرجى إدخال اسم البنك",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const bankWithId: BankRate = {
+      ...newBank,
+      id: Date.now().toString()
+    };
+
+    setCustomBanks(prev => [...prev, bankWithId]);
+    setNewBank({
+      name: "",
+      logo: "",
+      rates: {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0
+      }
+    });
+    setShowAddBankDialog(false);
+    
+    toast({
+      title: "تم بنجاح",
+      description: "تم إضافة البنك بنجاح",
+    });
+  };
+
+  const handleDeleteBank = (bankId: string) => {
+    setCustomBanks(prev => prev.filter(bank => bank.id !== bankId));
+    toast({
+      title: "تم بنجاح",
+      description: "تم حذف البنك بنجاح",
+    });
+  };
+
+  const handleBankRateChange = (year: string, rate: string) => {
+    const rateValue = parseFloat(rate) || 0;
+    setNewBank(prev => ({
+      ...prev,
+      rates: {
+        ...prev.rates,
+        [year]: rateValue
+      }
+    }));
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const logoUrl = event.target?.result as string;
+        setNewBank(prev => ({ ...prev, logo: logoUrl }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const calculateFinancing = () => {
@@ -511,15 +607,35 @@ export default function FinancingCalculatorPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="bankName">البنك</Label>
+                  <div className="flex justify-between items-center mb-2">
+                    <Label htmlFor="bankName">البنك</Label>
+                    <Button 
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setShowAddBankDialog(true)}
+                      className="text-[#C79C45] border-[#C79C45] hover:bg-[#C79C45] hover:text-white"
+                    >
+                      <Plus className="h-4 w-4 ml-1" />
+                      إضافة بنك
+                    </Button>
+                  </div>
                   <Select value={formData.bankName} onValueChange={(value) => handleInputChange("bankName", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="اختر البنك" />
                     </SelectTrigger>
                     <SelectContent>
-                      {BANKS.map((bank) => (
+                      {allBanks.map((bank) => (
                         <SelectItem key={bank.name} value={bank.name}>
-                          {bank.name}
+                          <div className="flex items-center gap-2">
+                            {bank.logo && (
+                              <img src={bank.logo} alt={bank.name} className="w-4 h-4 object-contain" />
+                            )}
+                            {bank.name}
+                            {bank.id && (
+                              <span className="text-xs text-gray-500">(مخصص)</span>
+                            )}
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -704,6 +820,119 @@ export default function FinancingCalculatorPage() {
             </Card>
           )}
         </div>
+
+        {/* Add Bank Dialog */}
+        <Dialog open={showAddBankDialog} onOpenChange={setShowAddBankDialog}>
+          <DialogContent className="glass-container max-w-4xl">
+            <DialogHeader>
+              <DialogTitle className="text-white drop-shadow-lg text-xl">إضافة بنك جديد</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-6 p-4">
+              {/* Bank Name */}
+              <div>
+                <Label htmlFor="bankName" className="text-white">اسم البنك</Label>
+                <Input
+                  id="bankName"
+                  value={newBank.name}
+                  onChange={(e) => setNewBank(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="اسم البنك"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-300"
+                />
+              </div>
+
+              {/* Bank Logo */}
+              <div>
+                <Label htmlFor="bankLogo" className="text-white">شعار البنك</Label>
+                <div className="space-y-3">
+                  <Input
+                    id="bankLogo"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
+                    className="bg-white/10 border-white/20 text-white file:bg-[#C79C45] file:text-white file:border-0 file:rounded file:px-3 file:py-1 file:text-sm"
+                  />
+                  {newBank.logo && (
+                    <div className="flex items-center gap-3 p-3 bg-white/5 rounded border border-white/10">
+                      <img src={newBank.logo} alt="معاينة الشعار" className="w-12 h-12 object-contain" />
+                      <span className="text-white text-sm">تم رفع الشعار بنجاح</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Interest Rates */}
+              <div>
+                <Label className="text-white text-lg font-semibold">معدلات الفائدة (سنوياً)</Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
+                  {Object.entries(newBank.rates).map(([year, rate]) => (
+                    <div key={year}>
+                      <Label htmlFor={`rate-${year}`} className="text-white text-sm">
+                        {year} {year === "1" ? "سنة" : "سنوات"}
+                      </Label>
+                      <Input
+                        id={`rate-${year}`}
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="50"
+                        value={rate}
+                        onChange={(e) => handleBankRateChange(year, e.target.value)}
+                        placeholder="0.0"
+                        className="bg-white/10 border-white/20 text-white placeholder:text-gray-300"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom Banks List */}
+              {customBanks.length > 0 && (
+                <div>
+                  <Label className="text-white text-lg font-semibold">البنوك المخصصة</Label>
+                  <div className="space-y-2 mt-3 max-h-40 overflow-y-auto">
+                    {customBanks.map((bank) => (
+                      <div key={bank.id} className="flex items-center justify-between p-3 bg-white/5 rounded border border-white/10">
+                        <div className="flex items-center gap-3">
+                          {bank.logo && (
+                            <img src={bank.logo} alt={bank.name} className="w-8 h-8 object-contain" />
+                          )}
+                          <span className="text-white font-medium">{bank.name}</span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteBank(bank.id!)}
+                          className="bg-red-500/80 hover:bg-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAddBankDialog(false)}
+                  className="text-white border-white/20 hover:bg-white/10"
+                >
+                  إلغاء
+                </Button>
+                <Button
+                  onClick={handleAddBank}
+                  className="bg-[#C79C45] hover:bg-[#B8882A] text-white"
+                >
+                  <Plus className="h-4 w-4 ml-1" />
+                  إضافة البنك
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </SystemGlassWrapper>
   );
