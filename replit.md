@@ -510,6 +510,13 @@ The application uses PostgreSQL for persistent data storage with proper database
   - Removed "إدارة العروض" and "إدارة الفواتير" from overview section
   - Removed "التحكم الديناميكي", "إدارة التكامل", "القوائم الشاملة", and "إدارة المواقع" from admin section
   - Streamlined navigation to focus on core functionality
+- ✅ **Arabic Number-to-Text Conversion Fix**: Completely fixed the critical bug in quotation pricing text conversion:
+  - Fixed Arabic number ordering (خمس و عشرون instead of عشرون و خمسة)
+  - Corrected compound number handling for proper Arabic grammar
+  - Fixed halala singular/plural forms (هللة/هللتان/هللات)
+  - Updated format to match exact user specifications: "فقط [number] ريال سعودي و [halalas] هللة لا غير"
+  - All 18 test cases from user examples now pass successfully
+  - Function now properly handles all price ranges from 0.50 to 2,350,000.50 SAR
 
 ### Mobile-Optimized Inventory Form Redesign (July 29, 2025)
 - ✅ **COMPLETED: Complete Mobile Compatibility Enhancement** - Redesigned inventory form (inventory-form-simple.tsx) for optimal mobile device experience
