@@ -57,14 +57,7 @@ export default function CompanyBanksPage() {
 
   return (
     <div className="min-h-screen glass-background p-6" dir="rtl">
-      {/* Animated Mesh Background */}
-      <div className="fixed inset-0 overflow-hidden -z-10">
-        <div className="absolute -top-40 -right-80 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-60 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute -top-40 left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-        <div className="absolute -bottom-40 right-20 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-6000"></div>
-        <div className="absolute top-40 -right-40 w-80 h-80 bg-green-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-8000"></div>
-      </div>
+      {/* Background Animation Removed */}
 
       <div className="max-w-6xl mx-auto space-y-6 relative z-10">
         {/* Header */}

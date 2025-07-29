@@ -211,13 +211,7 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
           />
         )}
       </div>
-      {/* Animated Mesh Background - Same as main page */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-        <div className="absolute top-20 right-5 w-32 h-32 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-20 left-5 w-32 h-32 bg-gradient-to-r from-teal-500 to-green-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
-        <div className="absolute bottom-10 right-10 w-32 h-32 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-6000"></div>
-      </div>
+      {/* Background Animation Removed */}
       {/* Header */}
       <div className="relative z-10 p-4 border-b border-white/20 dark:border-white/10 backdrop-blur-sm glass-container">
         <div className="flex items-center justify-between">
