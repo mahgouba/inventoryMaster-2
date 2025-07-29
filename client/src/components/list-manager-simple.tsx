@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit2, Plus, Check, X } from "lucide-react";
+import { Trash2, Edit2, Plus, Check, X, Move } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -38,6 +38,47 @@ export default function ListManagerSimple({ open, onOpenChange, listsData, onSav
   const [editingItem, setEditingItem] = useState<{type: string, index: number, value: string} | null>(null);
   const [newItem, setNewItem] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState<{type: string, index: number, value: string} | null>(null);
+  
+  // Drag functionality
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [dialogPosition, setDialogPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!dialogRef.current) return;
+    
+    setIsDragging(true);
+    const rect = dialogRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging || !dialogRef.current) return;
+    
+    const newX = e.clientX - dragOffset.x;
+    const newY = e.clientY - dragOffset.y;
+    
+    setDialogPosition({ x: newX, y: newY });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, dragOffset]);
 
   const listConfigs = [
     { key: "manufacturers", label: "الشركات المصنعة", color: "bg-blue-500/20 text-blue-200 border-blue-400/30" },
@@ -217,11 +258,24 @@ export default function ListManagerSimple({ open, onOpenChange, listsData, onSav
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden glass-dialog mx-auto">
+        <DialogContent 
+          ref={dialogRef}
+          className="max-w-5xl max-h-[90vh] overflow-hidden glass-dialog mx-auto"
+          style={{
+            transform: `translate(${dialogPosition.x}px, ${dialogPosition.y}px)`,
+            cursor: isDragging ? 'grabbing' : 'default'
+          }}
+        >
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-white text-center">
-              إدارة قوائم الخيارات
-            </DialogTitle>
+            <div 
+              className="flex items-center justify-center gap-2 cursor-grab active:cursor-grabbing py-2 px-4 -mx-4 -mt-2 mb-2 hover:bg-white/5 rounded-t-lg"
+              onMouseDown={handleMouseDown}
+            >
+              <Move className="h-4 w-4 text-white/60" />
+              <DialogTitle className="text-xl font-bold text-white text-center">
+                إدارة قوائم الخيارات
+              </DialogTitle>
+            </div>
             <DialogDescription className="text-white/70 text-center">
               إدارة وتحرير قوائم الخيارات المختلفة في النظام
             </DialogDescription>

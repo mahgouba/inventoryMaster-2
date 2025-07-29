@@ -832,8 +832,8 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                   />
                 </div>
 
-                {/* أزرار الحفظ والإلغاء */}
-                <div className="flex flex-row justify-center gap-4 pt-6 border-t border-white/20 mt-6">
+                {/* أزرار الحفظ والإلغاء - Sticky at bottom */}
+                <div className="sticky bottom-0 left-0 right-0 flex flex-row justify-center gap-4 pt-4 pb-4 mt-6 border-t border-white/20 bg-black/40 backdrop-blur-md z-50">
                   <Button 
                     type="button" 
                     variant="outline" 
