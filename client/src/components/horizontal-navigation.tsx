@@ -374,8 +374,8 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                   "group relative w-12 h-12 cursor-pointer flex-shrink-0",
                   "flex flex-col items-center justify-center",
                   active 
-                    ? "text-white" 
-                    : "text-white/70 hover:text-white"
+                    ? "text-[#C79C45]" 
+                    : "text-white/70 hover:text-[#C79C45]"
                 )}
                 title={item.title}
               >
@@ -385,8 +385,8 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                   className={cn(
                     "mb-1",
                     active 
-                      ? "text-blue-400 drop-shadow-lg" 
-                      : "text-white/70 hover:text-blue-300"
+                      ? "text-[#C79C45] drop-shadow-lg" 
+                      : "text-white/70 hover:text-[#C79C45]"
                   )} 
                 />
                 
@@ -394,15 +394,15 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
                 <span className={cn(
                   "text-[7px] text-center leading-tight font-medium",
                   active 
-                    ? "text-blue-400 font-bold" 
-                    : "text-white/70 hover:text-blue-300"
+                    ? "text-[#C79C45] font-bold" 
+                    : "text-white/70 hover:text-[#C79C45]"
                 )}>
                   {item.title.split(' ')[0]}
                 </span>
 
                 {/* Active Indicator */}
                 {active && (
-                  <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full shadow-lg"></div>
+                  <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-[#C79C45] to-[#B8862F] rounded-full shadow-lg"></div>
                 )}
               </div>
             );
