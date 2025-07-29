@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Calendar, Clock, Users, Plus, Check, X, AlertCircle, Download, FileText } from "lucide-react";
+import { Calendar, Clock, Users, Plus, Check, X, AlertCircle, Download, FileText, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -99,6 +99,8 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
   const [selectedRequestForPrint, setSelectedRequestForPrint] = useState<LeaveRequest | null>(null);
   const [employeeNameFilter, setEmployeeNameFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [previewRequest, setPreviewRequest] = useState<LeaveRequest | null>(null);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -633,6 +635,19 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                       <div className="flex items-center gap-2">
                         {getStatusBadge(request.status)}
                         
+                        {/* Preview Button */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setPreviewRequest(request);
+                            setPreviewDialogOpen(true);
+                          }}
+                          className="bg-green-600/20 border-green-400/50 text-white hover:bg-green-600/40 backdrop-blur-sm"
+                        >
+                          <Eye size={14} />
+                        </Button>
+                        
                         {/* PDF Download Button */}
                         <Button
                           size="sm"
@@ -692,6 +707,174 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
               ))
             )}
         </GlassContainer>
+
+        {/* Print Preview Dialog */}
+        <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto backdrop-blur-md bg-slate-900/90 border border-white/20" dir="rtl">
+            <DialogHeader>
+              <DialogTitle className="text-white flex items-center gap-2">
+                <Eye size={20} />
+                معاينة الطباعة
+              </DialogTitle>
+            </DialogHeader>
+            
+            {previewRequest && (() => {
+              const user = users.find(u => u.id === previewRequest.userId);
+              return (
+                <div className="space-y-4">
+                  {/* Preview of the PDF */}
+                  <div className="bg-white p-8 rounded-lg shadow-lg" style={{ 
+                    fontFamily: 'Arial, sans-serif', 
+                    direction: 'rtl', 
+                    textAlign: 'right',
+                    minHeight: '600px'
+                  }}>
+                    {/* Company Header with Logo */}
+                    <div className="flex items-center justify-between mb-8 border-b-2 border-gray-300 pb-4">
+                      <div className="text-right">
+                        <h1 className="text-2xl font-bold text-gray-800">شركة البريمي للسيارات</h1>
+                        <p className="text-gray-600">Al-Barimi Cars Company</p>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <img 
+                          src="/albarimi-2.svg" 
+                          alt="Company Logo" 
+                          className="h-20 w-auto"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Document Title */}
+                    <div className="text-center mb-8">
+                      <h2 className="text-xl font-bold text-gray-800">
+                        طلب {previewRequest.requestType === "leave" ? "إجازة" : "استئذان"}
+                      </h2>
+                      <p className="text-gray-600">Leave Request Form</p>
+                    </div>
+
+                    {/* Employee Information */}
+                    <div className="grid grid-cols-2 gap-6 mb-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">اسم الموظف:</label>
+                        <p className="text-gray-800 border-b border-gray-300 pb-1">{previewRequest.userName}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">المسمى الوظيفي:</label>
+                        <p className="text-gray-800 border-b border-gray-300 pb-1">{user?.jobTitle || "غير محدد"}</p>
+                      </div>
+                    </div>
+
+                    {/* Request Details */}
+                    <div className="grid grid-cols-2 gap-6 mb-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">نوع الطلب:</label>
+                        <p className="text-gray-800 border-b border-gray-300 pb-1">
+                          {previewRequest.requestType === "leave" ? "إجازة" : "استئذان"}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ الطلب:</label>
+                        <p className="text-gray-800 border-b border-gray-300 pb-1">
+                          {format(new Date(previewRequest.startDate), "yyyy/MM/dd", { locale: ar })}
+                        </p>
+                      </div>
+                    </div>
+
+                    {previewRequest.requestType === "leave" ? (
+                      <div className="grid grid-cols-2 gap-6 mb-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ البداية:</label>
+                          <p className="text-gray-800 border-b border-gray-300 pb-1">
+                            {format(new Date(previewRequest.startDate), "yyyy/MM/dd", { locale: ar })}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ النهاية:</label>
+                          <p className="text-gray-800 border-b border-gray-300 pb-1">
+                            {format(new Date(previewRequest.endDate), "yyyy/MM/dd", { locale: ar })}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-3 gap-4 mb-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">وقت البداية:</label>
+                          <p className="text-gray-800 border-b border-gray-300 pb-1">{previewRequest.startTime}</p>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">وقت النهاية:</label>
+                          <p className="text-gray-800 border-b border-gray-300 pb-1">{previewRequest.endTime}</p>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">المدة:</label>
+                          <p className="text-gray-800 border-b border-gray-300 pb-1">{previewRequest.duration}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Reason */}
+                    <div className="mb-8">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">سبب الطلب:</label>
+                      <div className="bg-gray-50 p-4 rounded border">
+                        <p className="text-gray-800">{previewRequest.reason}</p>
+                      </div>
+                    </div>
+
+                    {/* Status */}
+                    <div className="mb-8">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">حالة الطلب:</label>
+                      <p className={`inline-block px-3 py-1 rounded text-sm font-medium ${
+                        previewRequest.status === "approved" ? "bg-green-100 text-green-800" :
+                        previewRequest.status === "rejected" ? "bg-red-100 text-red-800" :
+                        "bg-yellow-100 text-yellow-800"
+                      }`}>
+                        {previewRequest.status === "pending" ? "في الانتظار" :
+                         previewRequest.status === "approved" ? "موافق عليه" : "مرفوض"}
+                      </p>
+                    </div>
+
+                    {/* Signatures */}
+                    <div className="grid grid-cols-2 gap-12 mt-16">
+                      <div className="text-center">
+                        <div className="border-t border-gray-400 pt-2">
+                          <p className="text-sm text-gray-600">توقيع الموظف</p>
+                          <p className="text-xs text-gray-500">Employee Signature</p>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="border-t border-gray-400 pt-2">
+                          <p className="text-sm text-gray-600">توقيع المدير</p>
+                          <p className="text-xs text-gray-500">Manager Signature</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-4 justify-center">
+                    <Button
+                      onClick={() => {
+                        generatePDF(previewRequest);
+                        setPreviewDialogOpen(false);
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Download size={16} className="ml-2" />
+                      تحميل PDF
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setPreviewDialogOpen(false)}
+                      className="border-white/20 text-white hover:bg-white/10"
+                    >
+                      إغلاق
+                    </Button>
+                  </div>
+                </div>
+              );
+            })()}
+          </DialogContent>
+        </Dialog>
 
         {/* Hidden PDF Print Templates */}
         {leaveRequests.map((request) => {

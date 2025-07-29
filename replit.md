@@ -522,6 +522,10 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ **Arabic RTL Support**: Full right-to-left layout with proper Arabic date formatting and text direction
 - ✅ **Status Management**: Admin approval/rejection functionality with proper status badges and notifications
 - ✅ **Comprehensive Statistics**: Dashboard shows total, pending, approved, and rejected requests with visual indicators
+- ✅ **Print Preview Functionality**: Added preview section before PDF generation showing exact document layout
+- ✅ **Employee Name Filtering**: Search functionality to filter requests by specific employee names
+- ✅ **Status Filtering**: Filter requests by status (all, pending, approved, rejected) with reset option
+- ✅ **Enhanced Statistics Display**: Shows both total and filtered counts when filters are applied
 
 ### Latest Migration to Replit Environment - Complete Success with UI Updates (July 29, 2025)
 - ✅ Successfully completed migration from Replit Agent to standard Replit environment
