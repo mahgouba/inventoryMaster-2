@@ -69,18 +69,6 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
       description: "Create Quote"
     },
     { 
-      title: "إدارة العروض", 
-      href: "/quotation-management", 
-      icon: FileText,
-      description: "Quote Management"
-    },
-    { 
-      title: "إدارة الفواتير", 
-      href: "/invoice-management", 
-      icon: Calendar,
-      description: "Invoice Management"
-    },
-    { 
       title: "طلبات الحجز", 
       href: "/reservations", 
       icon: Activity,
@@ -130,30 +118,6 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
       href: "/list-management", 
       icon: Settings,
       description: "List Management"
-    },
-    { 
-      title: "التحكم الديناميكي", 
-      href: "/dynamic-company-control", 
-      icon: Archive,
-      description: "Dynamic Control"
-    },
-    { 
-      title: "إدارة التكامل", 
-      href: "/integration-management", 
-      icon: Settings,
-      description: "Integration Management"
-    },
-    { 
-      title: "القوائم الشاملة", 
-      href: "/comprehensive-lists", 
-      icon: FileSpreadsheet,
-      description: "Comprehensive Lists"
-    },
-    { 
-      title: "إدارة المواقع", 
-      href: "/locations", 
-      icon: Truck,
-      description: "Locations"
     }
   ] : [];
 
