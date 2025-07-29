@@ -11,8 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertInventoryItemSchema, type InsertInventoryItem, type InventoryItem, type TrimLevel } from "@shared/schema";
-import { CloudUpload, Settings, Camera, Move } from "lucide-react";
-import ListManagerSimple from "@/components/list-manager-simple";
+import { CloudUpload, Camera, Move } from "lucide-react";
+
 import ManufacturerCategoriesButton from "@/components/manufacturer-categories-button";
 import ChassisNumberScanner from "@/components/chassis-number-scanner";
 import TrimLevelManager from "@/components/trim-level-manager";
@@ -79,7 +79,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
   const [interiorColors, setInteriorColors] = useState<string[]>(initialColors);
   
   // List manager state
-  const [showListManager, setShowListManager] = useState(false);
+
   
   // Chassis number scanner state
   const [showChassisScanner, setShowChassisScanner] = useState(false);
@@ -356,16 +356,6 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
                 </DialogTitle>
               </div>
               <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowListManager(true)}
-                  className="text-xs glass-button whitespace-nowrap"
-                >
-                  <Settings className="h-3 w-3 ml-1" />
-                  إدارة القوائم
-                </Button>
                 <Button 
                   type="button" 
                   variant="outline" 
@@ -838,21 +828,7 @@ export default function InventoryFormSimple({ open, onOpenChange, editItem }: In
         </DialogContent>
       </Dialog>
 
-      {/* List Manager Dialog */}
-      <ListManagerSimple
-        open={showListManager}
-        onOpenChange={setShowListManager}
-        listsData={{
-          manufacturers,
-          engineCapacities,
-          statuses,
-          importTypes,
-          locations,
-          exteriorColors,
-          interiorColors,
-        }}
-        onSave={(type, newList) => setOptionsForType(type, newList as string[])}
-      />
+
 
       {/* Chassis Number Scanner Dialog */}
       <ChassisNumberScanner

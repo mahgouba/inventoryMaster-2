@@ -13,6 +13,7 @@ import LeaveRequestsPage from "@/pages/leave-requests";
 import ManufacturerLogosPage from "@/pages/manufacturer-logos";
 import UserManagementPage from "@/pages/user-management-simple";
 import BankManagement from "@/pages/bank-management";
+import ListManagement from "@/pages/list-management";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
 
@@ -51,6 +52,8 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
 
       case "/manufacturer-logos":
         return user.role === "admin" ? <ManufacturerLogosPage userRole={user.role} onLogout={onLogout} /> : null;
+      case "/list-management":
+        return user.role === "admin" ? <ListManagement /> : null;
       case "/user-management":
         return user.role === "admin" ? <UserManagementPage /> : null;
       case "/bank-management":

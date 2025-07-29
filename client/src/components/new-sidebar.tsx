@@ -93,6 +93,11 @@ export default function NewSidebar({ user, onLogout }: NewSidebarProps) {
       icon: Image 
     },
     { 
+      title: "إدارة القوائم", 
+      href: "/list-management", 
+      icon: Settings 
+    },
+    { 
       title: "إدارة المستخدمين", 
       href: "/user-management", 
       icon: Users 
