@@ -79,7 +79,7 @@ export function EnhancedSaleDialog({
 
         <div className="space-y-6">
           {/* Vehicle Information */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+          <div className="dark:bg-blue-900/20 p-4 rounded-lg bg-[#eff6ff00]">
             <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-3 flex items-center gap-2">
               <Car className="w-4 h-4" />
               بيانات السيارة
