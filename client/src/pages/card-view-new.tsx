@@ -706,12 +706,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                       <FileText className="mr-2 h-4 w-4" />
                       إدارة المواصفات
                     </DropdownMenuItem>
-                    <Link href="/quotation-management">
-                      <DropdownMenuItem>
-                        <FileText className="mr-2 h-4 w-4" />
-                        العروض المحفوظة
-                      </DropdownMenuItem>
-                    </Link>
+                    
                     
                     <Link href="/integration-management">
                       <DropdownMenuItem>
