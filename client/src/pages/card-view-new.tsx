@@ -1292,7 +1292,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             </div>
                           )}
 
-                          {/* Action Buttons - Single Row Icons Only */}
+                          {/* Action Buttons - Only Share, Sell, and Reservation */}
                           <div className="pt-3 mt-3 border-t border-slate-200">
                             <div className="flex justify-center gap-2">
                               <Button
@@ -1309,21 +1309,12 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="px-3 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
-                                onClick={() => handleCreateQuote(item)}
-                                title="إنشاء عرض سعر"
-                              >
-                                <FileText size={14} />
-                              </Button>
-
-                              <Button
-                                size="sm"
-                                variant="outline"
                                 className="px-3 h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
-                                onClick={() => handleCreatePriceCard(item)}
-                                title="بطاقة السعر"
+                                onClick={() => sellItemMutation.mutate(item.id)}
+                                disabled={sellingItemId === item.id || item.isSold}
+                                title="بيع"
                               >
-                                <Receipt size={14} />
+                                <ShoppingCart size={14} />
                               </Button>
 
                               {item.status === "محجوز" ? (
@@ -1348,32 +1339,6 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 >
                                   <Calendar size={14} />
                                 </Button>
-                              )}
-
-                              {userRole === "admin" && (
-                                <>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="px-3 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
-                                    onClick={() => {
-                                      setEditingItem(item);
-                                      setShowEditDialog(true);
-                                    }}
-                                    title="تحرير"
-                                  >
-                                    <Edit2 size={14} />
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="px-3 h-8 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300"
-                                    onClick={() => setItemToDelete(item)}
-                                    title="حذف"
-                                  >
-                                    <Trash2 size={14} />
-                                  </Button>
-                                </>
                               )}
                             </div>
                           </div>
