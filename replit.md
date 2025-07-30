@@ -596,6 +596,15 @@ The application uses PostgreSQL for persistent data storage with proper database
   - Added proper file validation to ensure only JSON files are accepted for import
   - Created automatic backup file naming with date stamps for exported data
   - Enhanced admin workflow with professional database backup and restore capabilities
+- ✅ **COMPLETED: Selective Data Type Import/Export Enhancement** - Added granular control for specific data types per user request:
+  - Enhanced database management page with checkable data type selection interface
+  - Added support for selective export/import of: البنوك (Banks), نسب التمويل (Financing Rates), الصناع (Manufacturers), الفئات (Categories), المستخدمين (Users), المخزون (Inventory), العروض (Quotations), الإعدادات (Settings)
+  - Implemented comprehensive UI with icons, descriptions, and Arabic labels for each data type
+  - Added server-side query parameter support for selective exports (?types=banks,users,etc.)
+  - Enhanced import functionality to process only selected data types when specified
+  - Created dual-button interface for both full and selective operations
+  - Added real-time counter showing number of selected items for export/import
+  - Applied proper validation and error handling for selective operations
 - ✅ **COMPLETED: Quotation Styling Enhancement** - Updated quotation terms & conditions section with golden background per user request:
   - Applied golden background color (#c49633a1) to terms and conditions section
   - Enhanced visual hierarchy in quotation preview components

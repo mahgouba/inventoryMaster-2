@@ -3072,48 +3072,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Database Management - Export all data
+  // Database Management - Export data (selective or full)
   app.get("/api/database/export", async (req, res) => {
     try {
-      const [
-        inventory,
-        banks,
-        quotations,
-        users,
-        manufacturers,
-        companies,
-        leaveRequests,
-        financingRates,
-        imageLinks
-      ] = await Promise.all([
-        storage.getAllInventoryItems(),
-        storage.getAllBanks(),
-        storage.getAllQuotations(),
-        storage.getAllUsers(),
-        storage.getAllManufacturers(),
-        storage.getAllCompanies(),
-        storage.getAllLeaveRequests(),
-        storage.getAllFinancingRates(),
-        storage.getAllImageLinks()
-      ]);
+      console.log("Starting database export...");
+      
+      const { types } = req.query;
+      const selectedTypes = types ? (types as string).split(',') : [];
+      const isSelective = selectedTypes.length > 0;
 
-      const exportData = {
-        metadata: {
-          exportDate: new Date().toISOString(),
-          version: "1.0.0",
-          description: "Albarimi Auto System Database Backup"
-        },
-        data: {
+      // Initialize data object
+      const data: any = {};
+
+      // If selective export, only fetch requested data types
+      if (isSelective) {
+        if (selectedTypes.includes('inventory')) {
+          data.inventory = await storage.getAllInventoryItems();
+        }
+        if (selectedTypes.includes('banks')) {
+          data.banks = await storage.getAllBanks();
+        }
+        if (selectedTypes.includes('quotations')) {
+          data.quotations = await storage.getAllQuotations();
+        }
+        if (selectedTypes.includes('users')) {
+          const users = await storage.getAllUsers();
+          data.users = users.map(user => ({ ...user, password: undefined })); // Remove passwords for security
+        }
+        if (selectedTypes.includes('manufacturers')) {
+          data.manufacturers = await storage.getAllManufacturers();
+        }
+        if (selectedTypes.includes('categories')) {
+          data.companies = await storage.getAllCompanies();
+        }
+        if (selectedTypes.includes('financingRates')) {
+          data.financingRates = await storage.getAllFinancingRates();
+        }
+        if (selectedTypes.includes('settings')) {
+          data.imageLinks = await storage.getAllImageLinks();
+          data.leaveRequests = await storage.getAllLeaveRequests();
+        }
+      } else {
+        // Full export - fetch all data
+        const [
           inventory,
           banks,
           quotations,
-          users: users.map(user => ({ ...user, password: undefined })), // Remove passwords for security
+          users,
           manufacturers,
           companies,
           leaveRequests,
           financingRates,
           imageLinks
-        }
+        ] = await Promise.all([
+          storage.getAllInventoryItems(),
+          storage.getAllBanks(),
+          storage.getAllQuotations(),
+          storage.getAllUsers(),
+          storage.getAllManufacturers(),
+          storage.getAllCompanies(),
+          storage.getAllLeaveRequests(),
+          storage.getAllFinancingRates(),
+          storage.getAllImageLinks()
+        ]);
+
+        data.inventory = inventory;
+        data.banks = banks;
+        data.quotations = quotations;
+        data.users = users.map(user => ({ ...user, password: undefined })); // Remove passwords for security
+        data.manufacturers = manufacturers;
+        data.companies = companies;
+        data.leaveRequests = leaveRequests;
+        data.financingRates = financingRates;
+        data.imageLinks = imageLinks;
+      }
+
+      const exportData = {
+        metadata: {
+          exportDate: new Date().toISOString(),
+          version: "1.0.0",
+          description: isSelective ? "Albarimi Auto System Selective Data Export" : "Albarimi Auto System Database Backup",
+          exportType: isSelective ? "selective" : "full",
+          selectedTypes: isSelective ? selectedTypes : "all"
+        },
+        data
       };
 
       res.json(exportData);
@@ -3123,7 +3165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Database Management - Import data
+  // Database Management - Import data (selective or full)
   app.post("/api/database/import", async (req, res) => {
     try {
       const importData = req.body;
@@ -3133,7 +3175,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid import data structure" });
       }
 
-      const { data } = importData;
+      const { data, selectedTypes } = importData;
+      const isSelective = selectedTypes && Array.isArray(selectedTypes) && selectedTypes.length > 0;
+      
       let importResults = {
         inventory: 0,
         banks: 0,
@@ -3147,7 +3191,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Import inventory items
-      if (data.inventory && Array.isArray(data.inventory)) {
+      if ((!isSelective || selectedTypes.includes('inventory')) && data.inventory && Array.isArray(data.inventory)) {
         for (const item of data.inventory) {
           try {
             const validatedItem = insertInventoryItemSchema.parse(item);
@@ -3160,7 +3204,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Import banks
-      if (data.banks && Array.isArray(data.banks)) {
+      if ((!isSelective || selectedTypes.includes('banks')) && data.banks && Array.isArray(data.banks)) {
         for (const bank of data.banks) {
           try {
             const validatedBank = insertBankSchema.parse(bank);
@@ -3172,8 +3216,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Import quotations
-      if (data.quotations && Array.isArray(data.quotations)) {
+      // Import quotations (only if not selective or quotations is selected)
+      if ((!isSelective || selectedTypes.includes('quotations')) && data.quotations && Array.isArray(data.quotations)) {
         for (const quotation of data.quotations) {
           try {
             const validatedQuotation = insertQuotationSchema.parse(quotation);
@@ -3185,8 +3229,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Import users
-      if (data.users && Array.isArray(data.users)) {
+      // Import users (only if not selective or users is selected)
+      if ((!isSelective || selectedTypes.includes('users')) && data.users && Array.isArray(data.users)) {
         for (const user of data.users) {
           try {
             // Hash password if provided
@@ -3202,8 +3246,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Import manufacturers
-      if (data.manufacturers && Array.isArray(data.manufacturers)) {
+      // Import manufacturers (only if not selective or manufacturers is selected)
+      if ((!isSelective || selectedTypes.includes('manufacturers')) && data.manufacturers && Array.isArray(data.manufacturers)) {
         for (const manufacturer of data.manufacturers) {
           try {
             const validatedManufacturer = insertManufacturerSchema.parse(manufacturer);
@@ -3215,8 +3259,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Import companies
-      if (data.companies && Array.isArray(data.companies)) {
+      // Import companies (only if not selective or categories is selected)
+      if ((!isSelective || selectedTypes.includes('categories')) && data.companies && Array.isArray(data.companies)) {
         for (const company of data.companies) {
           try {
             const validatedCompany = insertCompanySchema.parse(company);
@@ -3228,8 +3272,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Import leave requests
-      if (data.leaveRequests && Array.isArray(data.leaveRequests)) {
+      // Import leave requests (only if not selective or settings is selected)
+      if ((!isSelective || selectedTypes.includes('settings')) && data.leaveRequests && Array.isArray(data.leaveRequests)) {
         for (const leaveRequest of data.leaveRequests) {
           try {
             const validatedLeaveRequest = insertLeaveRequestSchema.parse(leaveRequest);
@@ -3241,8 +3285,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Import financing rates
-      if (data.financingRates && Array.isArray(data.financingRates)) {
+      // Import financing rates (only if not selective or financingRates is selected)
+      if ((!isSelective || selectedTypes.includes('financingRates')) && data.financingRates && Array.isArray(data.financingRates)) {
         for (const rate of data.financingRates) {
           try {
             const validatedRate = insertFinancingRateSchema.parse(rate);
@@ -3254,8 +3298,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // Import image links (only if not selective or settings is selected)
+      if ((!isSelective || selectedTypes.includes('settings')) && data.imageLinks && Array.isArray(data.imageLinks)) {
+        for (const imageLink of data.imageLinks) {
+          try {
+            await storage.saveImageLink(imageLink.imageName, imageLink.imageUrl);
+            importResults.imageLinks++;
+          } catch (error) {
+            console.log(`Skipped invalid image link:`, error);
+          }
+        }
+      }
+
       res.json({
-        message: "Database import completed successfully",
+        message: isSelective ? "Selective database import completed successfully" : "Database import completed successfully",
         results: importResults,
         totalImported: Object.values(importResults).reduce((sum, count) => sum + count, 0)
       });

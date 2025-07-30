@@ -1,19 +1,35 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Database, Download, Upload, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { Database, Download, Upload, AlertTriangle, CheckCircle, XCircle, Users, Building, CreditCard, Percent, Car, Settings, Tags } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function DatabaseManagement() {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [selectedExportTypes, setSelectedExportTypes] = useState<string[]>([]);
+  const [selectedImportTypes, setSelectedImportTypes] = useState<string[]>([]);
   const { toast } = useToast();
 
-  const handleExport = async () => {
+  const dataTypes = [
+    { id: 'banks', label: 'البنوك', icon: Building, description: 'بيانات البنوك الشخصية والشركة' },
+    { id: 'financingRates', label: 'نسب التمويل', icon: Percent, description: 'نسب التمويل البنكية' },
+    { id: 'manufacturers', label: 'الصناع', icon: Car, description: 'شركات تصنيع السيارات' },
+    { id: 'categories', label: 'الفئات', icon: Tags, description: 'فئات ونماذج السيارات' },
+    { id: 'users', label: 'المستخدمين', icon: Users, description: 'بيانات المستخدمين والصلاحيات' },
+    { id: 'inventory', label: 'المخزون', icon: Database, description: 'عناصر المخزون والسيارات' },
+    { id: 'quotations', label: 'العروض', icon: CreditCard, description: 'عروض الأسعار المحفوظة' },
+    { id: 'settings', label: 'الإعدادات', icon: Settings, description: 'إعدادات النظام والمظهر' }
+  ];
+
+  const handleExport = async (selective = false) => {
     setIsExporting(true);
     try {
-      const response = await fetch('/api/database/export');
+      const exportTypes = selective ? selectedExportTypes : [];
+      const queryParams = exportTypes.length > 0 ? `?types=${exportTypes.join(',')}` : '';
+      const response = await fetch(`/api/database/export${queryParams}`);
       if (!response.ok) throw new Error('فشل في تصدير البيانات');
       
       const data = await response.json();
@@ -21,7 +37,8 @@ export default function DatabaseManagement() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `database-backup-${new Date().toISOString().split('T')[0]}.json`;
+      const prefix = selective ? 'selective-' : 'full-';
+      a.download = `${prefix}database-backup-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -29,7 +46,7 @@ export default function DatabaseManagement() {
       
       toast({
         title: "تم التصدير بنجاح",
-        description: "تم تصدير قاعدة البيانات بنجاح",
+        description: selective ? "تم تصدير البيانات المحددة بنجاح" : "تم تصدير قاعدة البيانات بنجاح",
       });
     } catch (error) {
       toast({
@@ -42,7 +59,7 @@ export default function DatabaseManagement() {
     }
   };
 
-  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>, selective = false) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -60,11 +77,12 @@ export default function DatabaseManagement() {
       const text = await file.text();
       const data = JSON.parse(text);
       
-      const response = await apiRequest('POST', '/api/database/import', data);
+      const importData = selective ? { ...data, selectedTypes: selectedImportTypes } : data;
+      const response = await apiRequest('POST', '/api/database/import', importData);
       
       toast({
         title: "تم الاستيراد بنجاح",
-        description: "تم استيراد قاعدة البيانات بنجاح",
+        description: selective ? "تم استيراد البيانات المحددة بنجاح" : "تم استيراد قاعدة البيانات بنجاح",
       });
       
       // Refresh the page to reflect changes
@@ -84,6 +102,22 @@ export default function DatabaseManagement() {
     }
   };
 
+  const toggleExportType = (typeId: string) => {
+    setSelectedExportTypes(prev => 
+      prev.includes(typeId) 
+        ? prev.filter(id => id !== typeId)
+        : [...prev, typeId]
+    );
+  };
+
+  const toggleImportType = (typeId: string) => {
+    setSelectedImportTypes(prev => 
+      prev.includes(typeId) 
+        ? prev.filter(id => id !== typeId)
+        : [...prev, typeId]
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
       <div className="max-w-4xl mx-auto">
@@ -98,7 +132,7 @@ export default function DatabaseManagement() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Export Section */}
           <Card className="bg-white/5 backdrop-blur-lg border-white/10">
             <CardHeader className="text-center">
@@ -107,46 +141,70 @@ export default function DatabaseManagement() {
                   <Download className="w-6 h-6 text-green-400" />
                 </div>
               </div>
-              <CardTitle className="text-white text-xl">تصدير قاعدة البيانات</CardTitle>
+              <CardTitle className="text-white text-xl">تصدير البيانات</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-white/70 text-center">
-                قم بتصدير جميع بيانات النظام في ملف JSON للنسخ الاحتياطي
-              </p>
-              
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-blue-200">
-                    <p className="font-medium mb-1">سيتم تصدير:</p>
-                    <ul className="space-y-1 text-blue-300">
-                      <li>• جميع عناصر المخزون</li>
-                      <li>• بيانات البنوك</li>
-                      <li>• عروض الأسعار المحفوظة</li>
-                      <li>• بيانات المستخدمين</li>
-                      <li>• إعدادات المظهر</li>
-                    </ul>
-                  </div>
+            <CardContent className="space-y-6">
+              {/* Data Type Selection for Export */}
+              <div>
+                <h3 className="text-white font-semibold mb-4 text-center">اختر نوع البيانات للتصدير</h3>
+                <div className="grid grid-cols-1 gap-3">
+                  {dataTypes.map((type) => {
+                    const IconComponent = type.icon;
+                    return (
+                      <div
+                        key={type.id}
+                        className="flex items-center space-x-3 space-x-reverse p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors cursor-pointer"
+                        onClick={() => toggleExportType(type.id)}
+                      >
+                        <Checkbox
+                          checked={selectedExportTypes.includes(type.id)}
+                          onCheckedChange={() => toggleExportType(type.id)}
+                          className="border-white/30 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                        />
+                        <div className="flex items-center gap-3 flex-1">
+                          <IconComponent className="w-5 h-5 text-blue-400" />
+                          <div>
+                            <p className="text-white font-medium">{type.label}</p>
+                            <p className="text-white/60 text-sm">{type.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              <Button 
-                onClick={handleExport}
-                disabled={isExporting}
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
-              >
-                {isExporting ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    جاري التصدير...
-                  </div>
-                ) : (
+              {/* Export Buttons */}
+              <div className="space-y-3">
+                <Button 
+                  onClick={() => handleExport(false)}
+                  disabled={isExporting}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {isExporting ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      جاري التصدير...
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Download className="w-4 h-4" />
+                      تصدير جميع البيانات
+                    </div>
+                  )}
+                </Button>
+
+                <Button 
+                  onClick={() => handleExport(true)}
+                  disabled={isExporting || selectedExportTypes.length === 0}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+                >
                   <div className="flex items-center gap-2">
                     <Download className="w-4 h-4" />
-                    تصدير قاعدة البيانات
+                    تصدير البيانات المحددة ({selectedExportTypes.length})
                   </div>
-                )}
-              </Button>
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -158,52 +216,100 @@ export default function DatabaseManagement() {
                   <Upload className="w-6 h-6 text-orange-400" />
                 </div>
               </div>
-              <CardTitle className="text-white text-xl">استيراد قاعدة البيانات</CardTitle>
+              <CardTitle className="text-white text-xl">استيراد البيانات</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-white/70 text-center">
-                استيراد بيانات من ملف نسخة احتياطية سابق
-              </p>
-              
+            <CardContent className="space-y-6">
+              {/* Data Type Selection for Import */}
+              <div>
+                <h3 className="text-white font-semibold mb-4 text-center">اختر نوع البيانات للاستيراد</h3>
+                <div className="grid grid-cols-1 gap-3">
+                  {dataTypes.map((type) => {
+                    const IconComponent = type.icon;
+                    return (
+                      <div
+                        key={type.id}
+                        className="flex items-center space-x-3 space-x-reverse p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors cursor-pointer"
+                        onClick={() => toggleImportType(type.id)}
+                      >
+                        <Checkbox
+                          checked={selectedImportTypes.includes(type.id)}
+                          onCheckedChange={() => toggleImportType(type.id)}
+                          className="border-white/30 data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
+                        />
+                        <div className="flex items-center gap-3 flex-1">
+                          <IconComponent className="w-5 h-5 text-orange-400" />
+                          <div>
+                            <p className="text-white font-medium">{type.label}</p>
+                            <p className="text-white/60 text-sm">{type.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Warning */}
               <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
                   <div className="text-sm text-red-200">
                     <p className="font-medium mb-1">تحذير مهم:</p>
                     <ul className="space-y-1 text-red-300">
-                      <li>• سيتم استبدال جميع البيانات الحالية</li>
+                      <li>• سيتم استبدال البيانات المحددة</li>
                       <li>• تأكد من عمل نسخة احتياطية أولاً</li>
                       <li>• استخدم ملفات JSON صحيحة فقط</li>
-                      <li>• العملية غير قابلة للتراجع</li>
                     </ul>
                   </div>
                 </div>
               </div>
 
-              <div className="relative">
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleImport}
-                  disabled={isImporting}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                />
-                <Button 
-                  disabled={isImporting}
-                  className="w-full bg-orange-600 hover:bg-orange-700 text-white pointer-events-none"
-                >
-                  {isImporting ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      جاري الاستيراد...
-                    </div>
-                  ) : (
+              {/* Import Buttons */}
+              <div className="space-y-3">
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={(e) => handleImport(e, false)}
+                    disabled={isImporting}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  />
+                  <Button 
+                    disabled={isImporting}
+                    className="w-full bg-orange-600 hover:bg-orange-700 text-white pointer-events-none"
+                  >
+                    {isImporting ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        جاري الاستيراد...
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Upload className="w-4 h-4" />
+                        استيراد جميع البيانات
+                      </div>
+                    )}
+                  </Button>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={(e) => handleImport(e, true)}
+                    disabled={isImporting || selectedImportTypes.length === 0}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  />
+                  <Button 
+                    disabled={isImporting || selectedImportTypes.length === 0}
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white pointer-events-none disabled:opacity-50"
+                  >
                     <div className="flex items-center gap-2">
                       <Upload className="w-4 h-4" />
-                      اختيار ملف للاستيراد
+                      استيراد البيانات المحددة ({selectedImportTypes.length})
                     </div>
-                  )}
-                </Button>
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
