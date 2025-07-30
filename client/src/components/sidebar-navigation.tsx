@@ -26,7 +26,8 @@ import {
   Users,
   Palette,
   Image,
-  Landmark
+  Landmark,
+  Database
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -121,6 +122,12 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
       href: "/list-management", 
       icon: Settings,
       description: "List Management"
+    },
+    { 
+      title: "إدارة قاعدة البيانات", 
+      href: "/database-management", 
+      icon: Database,
+      description: "Database Management"
     }
   ] : [];
 
