@@ -74,7 +74,9 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     price: true,
     specifications: true,
     images: true,
-    linkedImage: true // Include linked image from image management system
+    linkedImage: true, // Include linked image from image management system
+    imageLink: true, // Include image link if available
+    mileage: true // Include mileage for used cars
   });
 
   // Fetch linked image for this vehicle
@@ -202,9 +204,19 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
       }
     }
 
+    // Add mileage for used cars if available and selected
+    if (includeFields.mileage && (vehicle.importType === "شخصي مستعمل" || vehicle.importType === "مستعمل") && vehicle.mileage) {
+      shareText += `\n🛣️ الممشي: ${vehicle.mileage.toLocaleString()} كيلومتر`;
+    }
+
     // Add linked image URL if available and selected
     if (includeFields.linkedImage && linkedImageUrl) {
-      shareText += `\n🖼️ رابط الصورة: ${linkedImageUrl}`;
+      shareText += `\n🖼️ رابط الصورة المرتبط: ${linkedImageUrl}`;
+    }
+
+    // Add image link for any vehicle with images if selected
+    if (includeFields.imageLink && vehicle.images && vehicle.images.length > 0) {
+      shareText += `\n📷 رابط الصورة: ${vehicle.images[0]}`;
     }
 
     // Add images info if available and selected
@@ -410,6 +422,20 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                   )}
                 </div>
 
+                {/* Image Link for any vehicle with images */}
+                {(vehicle.images && vehicle.images.length > 0) && (
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <Checkbox 
+                      id="imageLink"
+                      checked={includeFields.imageLink}
+                      onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, imageLink: !!checked }))}
+                      className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    />
+                    <Label htmlFor="imageLink" className="text-sm">رابط الصورة</Label>
+                    <span className="text-xs text-gray-500">({vehicle.images.length} صورة)</span>
+                  </div>
+                )}
+
                 {vehicle.images && vehicle.images.length > 0 && (
                   <div className="flex items-center space-x-2 space-x-reverse">
                     <Checkbox 
@@ -420,6 +446,22 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     />
                     <Label htmlFor="images" className="text-sm">الصور المرفقة</Label>
                     <span className="text-xs text-gray-500">({vehicle.images.length} صورة)</span>
+                  </div>
+                )}
+
+                {/* Mileage for used cars */}
+                {(vehicle.importType === "شخصي مستعمل" || vehicle.importType === "مستعمل") && (
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <Checkbox 
+                      id="mileage"
+                      checked={includeFields.mileage}
+                      onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, mileage: !!checked }))}
+                      className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    />
+                    <Label htmlFor="mileage" className="text-sm">الممشي (كيلومتر)</Label>
+                    <span className="text-xs text-gray-500">
+                      ({vehicle.mileage ? `${vehicle.mileage} كم` : "غير محدد"})
+                    </span>
                   </div>
                 )}
               </div>
@@ -676,7 +718,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                   <Button
                     variant="secondary"
                     onClick={() => {
-                      const shareText = `${generateShareText()}\n\nالصور:\n${vehicle.images.join('\n')}`;
+                      const shareText = `${generateShareText()}\n\nالصور:\n${vehicle.images?.join('\n') || ''}`;
                       if (navigator.share) {
                         navigator.share({
                           title: `${vehicle.manufacturer} ${vehicle.category}`,
