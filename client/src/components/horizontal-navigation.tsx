@@ -21,7 +21,8 @@ import {
   Settings,
   Landmark,
   LogOut,
-  Percent
+  Percent,
+  Database
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -325,6 +326,12 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       title: "نسب التمويل", 
       href: "/financing-rates", 
       icon: Percent,
+      internal: true
+    },
+    { 
+      title: "قاعدة البيانات", 
+      href: "/database-management", 
+      icon: Database,
       internal: true
     }
   ] : [];

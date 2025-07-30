@@ -3072,6 +3072,199 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Database Management - Export all data
+  app.get("/api/database/export", async (req, res) => {
+    try {
+      const [
+        inventory,
+        banks,
+        quotations,
+        users,
+        manufacturers,
+        companies,
+        leaveRequests,
+        financingRates,
+        imageLinks
+      ] = await Promise.all([
+        storage.getAllInventoryItems(),
+        storage.getAllBanks(),
+        storage.getAllQuotations(),
+        storage.getAllUsers(),
+        storage.getAllManufacturers(),
+        storage.getAllCompanies(),
+        storage.getAllLeaveRequests(),
+        storage.getAllFinancingRates(),
+        storage.getAllImageLinks()
+      ]);
+
+      const exportData = {
+        metadata: {
+          exportDate: new Date().toISOString(),
+          version: "1.0.0",
+          description: "Albarimi Auto System Database Backup"
+        },
+        data: {
+          inventory,
+          banks,
+          quotations,
+          users: users.map(user => ({ ...user, password: undefined })), // Remove passwords for security
+          manufacturers,
+          companies,
+          leaveRequests,
+          financingRates,
+          imageLinks
+        }
+      };
+
+      res.json(exportData);
+    } catch (error) {
+      console.error("Error exporting database:", error);
+      res.status(500).json({ message: "Failed to export database" });
+    }
+  });
+
+  // Database Management - Import data
+  app.post("/api/database/import", async (req, res) => {
+    try {
+      const importData = req.body;
+      
+      // Validate import data structure
+      if (!importData.data) {
+        return res.status(400).json({ message: "Invalid import data structure" });
+      }
+
+      const { data } = importData;
+      let importResults = {
+        inventory: 0,
+        banks: 0,
+        quotations: 0,
+        users: 0,
+        manufacturers: 0,
+        companies: 0,
+        leaveRequests: 0,
+        financingRates: 0,
+        imageLinks: 0
+      };
+
+      // Import inventory items
+      if (data.inventory && Array.isArray(data.inventory)) {
+        for (const item of data.inventory) {
+          try {
+            const validatedItem = insertInventoryItemSchema.parse(item);
+            await storage.createInventoryItem(validatedItem);
+            importResults.inventory++;
+          } catch (error) {
+            console.log(`Skipped invalid inventory item:`, error);
+          }
+        }
+      }
+
+      // Import banks
+      if (data.banks && Array.isArray(data.banks)) {
+        for (const bank of data.banks) {
+          try {
+            const validatedBank = insertBankSchema.parse(bank);
+            await storage.createBank(validatedBank);
+            importResults.banks++;
+          } catch (error) {
+            console.log(`Skipped invalid bank:`, error);
+          }
+        }
+      }
+
+      // Import quotations
+      if (data.quotations && Array.isArray(data.quotations)) {
+        for (const quotation of data.quotations) {
+          try {
+            const validatedQuotation = insertQuotationSchema.parse(quotation);
+            await storage.createQuotation(validatedQuotation);
+            importResults.quotations++;
+          } catch (error) {
+            console.log(`Skipped invalid quotation:`, error);
+          }
+        }
+      }
+
+      // Import users
+      if (data.users && Array.isArray(data.users)) {
+        for (const user of data.users) {
+          try {
+            // Hash password if provided
+            if (user.password) {
+              user.password = await bcrypt.hash(user.password, 10);
+            }
+            const validatedUser = insertUserSchema.parse(user);
+            await storage.createUser(validatedUser);
+            importResults.users++;
+          } catch (error) {
+            console.log(`Skipped invalid user:`, error);
+          }
+        }
+      }
+
+      // Import manufacturers
+      if (data.manufacturers && Array.isArray(data.manufacturers)) {
+        for (const manufacturer of data.manufacturers) {
+          try {
+            const validatedManufacturer = insertManufacturerSchema.parse(manufacturer);
+            await storage.createManufacturer(validatedManufacturer);
+            importResults.manufacturers++;
+          } catch (error) {
+            console.log(`Skipped invalid manufacturer:`, error);
+          }
+        }
+      }
+
+      // Import companies
+      if (data.companies && Array.isArray(data.companies)) {
+        for (const company of data.companies) {
+          try {
+            const validatedCompany = insertCompanySchema.parse(company);
+            await storage.createCompany(validatedCompany);
+            importResults.companies++;
+          } catch (error) {
+            console.log(`Skipped invalid company:`, error);
+          }
+        }
+      }
+
+      // Import leave requests
+      if (data.leaveRequests && Array.isArray(data.leaveRequests)) {
+        for (const leaveRequest of data.leaveRequests) {
+          try {
+            const validatedLeaveRequest = insertLeaveRequestSchema.parse(leaveRequest);
+            await storage.createLeaveRequest(validatedLeaveRequest);
+            importResults.leaveRequests++;
+          } catch (error) {
+            console.log(`Skipped invalid leave request:`, error);
+          }
+        }
+      }
+
+      // Import financing rates
+      if (data.financingRates && Array.isArray(data.financingRates)) {
+        for (const rate of data.financingRates) {
+          try {
+            const validatedRate = insertFinancingRateSchema.parse(rate);
+            await storage.createFinancingRate(validatedRate);
+            importResults.financingRates++;
+          } catch (error) {
+            console.log(`Skipped invalid financing rate:`, error);
+          }
+        }
+      }
+
+      res.json({
+        message: "Database import completed successfully",
+        results: importResults,
+        totalImported: Object.values(importResults).reduce((sum, count) => sum + count, 0)
+      });
+    } catch (error) {
+      console.error("Error importing database:", error);
+      res.status(500).json({ message: "Failed to import database" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
