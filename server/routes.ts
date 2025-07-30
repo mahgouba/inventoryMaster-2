@@ -24,8 +24,43 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
+
+// Cars.json management utility functions
+interface CarData {
+  brand_ar: string;
+  brand_en: string;
+  models: {
+    model_ar: string;
+    model_en: string;
+    trims: {
+      trim_ar: string;
+      trim_en: string;
+    }[];
+  }[];
+}
+
+function readCarsData(): CarData[] {
+  try {
+    const carsPath = join(process.cwd(), 'cars.json');
+    const data = readFileSync(carsPath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading cars.json:', error);
+    return [];
+  }
+}
+
+function writeCarsData(data: CarData[]): void {
+  try {
+    const carsPath = join(process.cwd(), 'cars.json');
+    writeFileSync(carsPath, JSON.stringify(data, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error writing cars.json:', error);
+    throw new Error('Failed to update cars data');
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
@@ -2757,6 +2792,283 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching color associations by trim level:", error);
       res.status(500).json({ message: "Failed to fetch color associations" });
+    }
+  });
+
+  // Cars.json management routes
+  // Get all manufacturers from cars.json
+  app.get("/api/cars-json/manufacturers", async (req, res) => {
+    try {
+      const carsData = readCarsData();
+      const manufacturers = carsData.map(car => ({
+        name_ar: car.brand_ar,
+        name_en: car.brand_en
+      }));
+      res.json(manufacturers);
+    } catch (error) {
+      console.error("Error fetching manufacturers from cars.json:", error);
+      res.status(500).json({ message: "Failed to fetch manufacturers" });
+    }
+  });
+
+  // Get categories (models) by manufacturer
+  app.get("/api/cars-json/categories/:manufacturer", async (req, res) => {
+    try {
+      const { manufacturer } = req.params;
+      const carsData = readCarsData();
+      const brand = carsData.find(car => car.brand_ar === manufacturer || car.brand_en === manufacturer);
+      
+      if (!brand) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      const categories = brand.models.map(model => ({
+        name_ar: model.model_ar,
+        name_en: model.model_en
+      }));
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  // Get trim levels by manufacturer and category
+  app.get("/api/cars-json/trims/:manufacturer/:category", async (req, res) => {
+    try {
+      const { manufacturer, category } = req.params;
+      const carsData = readCarsData();
+      const brand = carsData.find(car => car.brand_ar === manufacturer || car.brand_en === manufacturer);
+      
+      if (!brand) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      const model = brand.models.find(m => m.model_ar === category || m.model_en === category);
+      if (!model) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+
+      res.json(model.trims);
+    } catch (error) {
+      console.error("Error fetching trim levels:", error);
+      res.status(500).json({ message: "Failed to fetch trim levels" });
+    }
+  });
+
+  // Add new manufacturer
+  app.post("/api/cars-json/manufacturers", async (req, res) => {
+    try {
+      const { name_ar, name_en } = req.body;
+      
+      if (!name_ar || !name_en) {
+        return res.status(400).json({ message: "Arabic and English names are required" });
+      }
+
+      const carsData = readCarsData();
+      
+      // Check if manufacturer already exists
+      const existingBrand = carsData.find(car => car.brand_ar === name_ar || car.brand_en === name_en);
+      if (existingBrand) {
+        return res.status(409).json({ message: "Manufacturer already exists" });
+      }
+
+      // Add new manufacturer
+      const newBrand: CarData = {
+        brand_ar: name_ar,
+        brand_en: name_en,
+        models: []
+      };
+
+      carsData.push(newBrand);
+      writeCarsData(carsData);
+
+      res.status(201).json({ message: "Manufacturer added successfully", manufacturer: newBrand });
+    } catch (error) {
+      console.error("Error adding manufacturer:", error);
+      res.status(500).json({ message: "Failed to add manufacturer" });
+    }
+  });
+
+  // Add new category (model) to manufacturer
+  app.post("/api/cars-json/categories", async (req, res) => {
+    try {
+      const { manufacturer, name_ar, name_en } = req.body;
+      
+      if (!manufacturer || !name_ar || !name_en) {
+        return res.status(400).json({ message: "Manufacturer, Arabic and English names are required" });
+      }
+
+      const carsData = readCarsData();
+      const brandIndex = carsData.findIndex(car => car.brand_ar === manufacturer || car.brand_en === manufacturer);
+      
+      if (brandIndex === -1) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      // Check if category already exists
+      const existingModel = carsData[brandIndex].models.find(m => m.model_ar === name_ar || m.model_en === name_en);
+      if (existingModel) {
+        return res.status(409).json({ message: "Category already exists" });
+      }
+
+      // Add new category
+      const newModel = {
+        model_ar: name_ar,
+        model_en: name_en,
+        trims: []
+      };
+
+      carsData[brandIndex].models.push(newModel);
+      writeCarsData(carsData);
+
+      res.status(201).json({ message: "Category added successfully", category: newModel });
+    } catch (error) {
+      console.error("Error adding category:", error);
+      res.status(500).json({ message: "Failed to add category" });
+    }
+  });
+
+  // Add new trim level to category
+  app.post("/api/cars-json/trims", async (req, res) => {
+    try {
+      const { manufacturer, category, trim_ar, trim_en } = req.body;
+      
+      if (!manufacturer || !category || !trim_ar || !trim_en) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+
+      const carsData = readCarsData();
+      const brandIndex = carsData.findIndex(car => car.brand_ar === manufacturer || car.brand_en === manufacturer);
+      
+      if (brandIndex === -1) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      const modelIndex = carsData[brandIndex].models.findIndex(m => m.model_ar === category || m.model_en === category);
+      if (modelIndex === -1) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+
+      // Check if trim already exists
+      const existingTrim = carsData[brandIndex].models[modelIndex].trims.find(t => t.trim_ar === trim_ar || t.trim_en === trim_en);
+      if (existingTrim) {
+        return res.status(409).json({ message: "Trim level already exists" });
+      }
+
+      // Add new trim
+      const newTrim = { trim_ar, trim_en };
+      carsData[brandIndex].models[modelIndex].trims.push(newTrim);
+      writeCarsData(carsData);
+
+      res.status(201).json({ message: "Trim level added successfully", trim: newTrim });
+    } catch (error) {
+      console.error("Error adding trim level:", error);
+      res.status(500).json({ message: "Failed to add trim level" });
+    }
+  });
+
+  // Update manufacturer
+  app.put("/api/cars-json/manufacturers/:oldName", async (req, res) => {
+    try {
+      const { oldName } = req.params;
+      const { name_ar, name_en } = req.body;
+      
+      if (!name_ar || !name_en) {
+        return res.status(400).json({ message: "Arabic and English names are required" });
+      }
+
+      const carsData = readCarsData();
+      const brandIndex = carsData.findIndex(car => car.brand_ar === oldName || car.brand_en === oldName);
+      
+      if (brandIndex === -1) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      carsData[brandIndex].brand_ar = name_ar;
+      carsData[brandIndex].brand_en = name_en;
+      writeCarsData(carsData);
+
+      res.json({ message: "Manufacturer updated successfully", manufacturer: carsData[brandIndex] });
+    } catch (error) {
+      console.error("Error updating manufacturer:", error);
+      res.status(500).json({ message: "Failed to update manufacturer" });
+    }
+  });
+
+  // Delete manufacturer
+  app.delete("/api/cars-json/manufacturers/:name", async (req, res) => {
+    try {
+      const { name } = req.params;
+      const carsData = readCarsData();
+      const filteredData = carsData.filter(car => car.brand_ar !== name && car.brand_en !== name);
+      
+      if (filteredData.length === carsData.length) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      writeCarsData(filteredData);
+      res.json({ message: "Manufacturer deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting manufacturer:", error);
+      res.status(500).json({ message: "Failed to delete manufacturer" });
+    }
+  });
+
+  // Delete category
+  app.delete("/api/cars-json/categories/:manufacturer/:category", async (req, res) => {
+    try {
+      const { manufacturer, category } = req.params;
+      const carsData = readCarsData();
+      const brandIndex = carsData.findIndex(car => car.brand_ar === manufacturer || car.brand_en === manufacturer);
+      
+      if (brandIndex === -1) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      const originalLength = carsData[brandIndex].models.length;
+      carsData[brandIndex].models = carsData[brandIndex].models.filter(m => m.model_ar !== category && m.model_en !== category);
+      
+      if (carsData[brandIndex].models.length === originalLength) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+
+      writeCarsData(carsData);
+      res.json({ message: "Category deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      res.status(500).json({ message: "Failed to delete category" });
+    }
+  });
+
+  // Delete trim level
+  app.delete("/api/cars-json/trims/:manufacturer/:category/:trim", async (req, res) => {
+    try {
+      const { manufacturer, category, trim } = req.params;
+      const carsData = readCarsData();
+      const brandIndex = carsData.findIndex(car => car.brand_ar === manufacturer || car.brand_en === manufacturer);
+      
+      if (brandIndex === -1) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      const modelIndex = carsData[brandIndex].models.findIndex(m => m.model_ar === category || m.model_en === category);
+      if (modelIndex === -1) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+
+      const originalLength = carsData[brandIndex].models[modelIndex].trims.length;
+      carsData[brandIndex].models[modelIndex].trims = carsData[brandIndex].models[modelIndex].trims.filter(t => t.trim_ar !== trim && t.trim_en !== trim);
+      
+      if (carsData[brandIndex].models[modelIndex].trims.length === originalLength) {
+        return res.status(404).json({ message: "Trim level not found" });
+      }
+
+      writeCarsData(carsData);
+      res.json({ message: "Trim level deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting trim level:", error);
+      res.status(500).json({ message: "Failed to delete trim level" });
     }
   });
 

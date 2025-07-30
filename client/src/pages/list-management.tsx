@@ -5,9 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Edit2, Plus, Check, X, Settings } from "lucide-react";
+import { Trash2, Edit2, Plus, Check, X, Settings, Car } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ColorAssociationManager from "@/components/color-association-manager";
+import CarsJsonManager from "@/components/cars-json-manager";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,7 +48,7 @@ export default function ListManagement() {
   });
 
   const listTypes = [
-    { key: "manufacturers", label: "الشركات المصنعة", color: "bg-blue-500" },
+    { key: "carsJson", label: "بيانات المركبات (cars.json)", color: "bg-blue-500" },
     { key: "engineCapacities", label: "سعات المحرك", color: "bg-green-500" },
     { key: "statuses", label: "حالات المركبة", color: "bg-orange-500" },
     { key: "importTypes", label: "أنواع الاستيراد", color: "bg-purple-500" },
@@ -146,7 +147,7 @@ export default function ListManagement() {
           </CardHeader>
           
           <CardContent>
-            <Tabs defaultValue="manufacturers" className="w-full">
+            <Tabs defaultValue="carsJson" className="w-full">
               <TabsList className="grid w-full grid-cols-3 lg:grid-cols-8 glass-container border-white/20 mb-6">
                 {listTypes.map((listType) => (
                   <TabsTrigger
@@ -171,6 +172,8 @@ export default function ListManagement() {
                       exteriorColors={listsData.exteriorColors}
                       interiorColors={listsData.interiorColors}
                     />
+                  ) : listType.key === "carsJson" ? (
+                    <CarsJsonManager />
                   ) : (
                   <div className="space-y-4">
                     {/* Add new item section */}
