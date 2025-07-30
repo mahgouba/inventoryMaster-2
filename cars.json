@@ -620,6 +620,11 @@
             "trim_en": "Electric"
           }
         ]
+      },
+      {
+        "model_ar": "٨٩",
+        "model_en": "/*٧",
+        "trims": []
       }
     ]
   },
