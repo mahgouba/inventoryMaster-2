@@ -69,6 +69,70 @@ html, body {
   color: var(--text-muted) !important;
 }
 
+/* Mobile-Optimized Checkbox Styling - Circular Design */
+@media (max-width: 768px) {
+  [data-radix-checkbox-root] {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    border: 3px solid rgba(255, 255, 255, 0.5) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(12px) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  [data-radix-checkbox-root]:hover {
+    transform: scale(1.1) !important;
+    border-color: rgba(196, 150, 50, 0.8) !important;
+    box-shadow: 0 4px 12px rgba(196, 150, 50, 0.2) !important;
+  }
+  
+  [data-radix-checkbox-root][data-state="checked"] {
+    background: linear-gradient(135deg, #C49632, #E6B852) !important;
+    border-color: #C49632 !important;
+    box-shadow: 0 4px 16px rgba(196, 150, 50, 0.4) !important;
+    transform: scale(1.05) !important;
+  }
+  
+  [data-radix-checkbox-indicator] {
+    color: white !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  }
+}
+
+/* Desktop Checkbox Styling - Enhanced Glass Effect */
+@media (min-width: 769px) {
+  [data-radix-checkbox-root] {
+    width: 22px !important;
+    height: 22px !important;
+    border-radius: 6px !important;
+    border: 2px solid rgba(255, 255, 255, 0.4) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  [data-radix-checkbox-root]:hover {
+    border-color: rgba(196, 150, 50, 0.6) !important;
+    transform: scale(1.05) !important;
+  }
+  
+  [data-radix-checkbox-root][data-state="checked"] {
+    background: linear-gradient(135deg, #C49632, #D4A244) !important;
+    border-color: #C49632 !important;
+    box-shadow: 0 3px 10px rgba(196, 150, 50, 0.3) !important;
+  }
+  
+  [data-radix-checkbox-indicator] {
+    color: white !important;
+    font-weight: 600 !important;
+  }
+}
+
 /* Unified Glass Morphism Components - Lighter/More Transparent */
 .glass-container,
 .dark-glass {

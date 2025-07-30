@@ -70,13 +70,13 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     engineCapacity: true,
     exteriorColor: true,
     interiorColor: true,
-    status: false, // Hide status by default
+    status: true, // Show status by default
     price: true,
     specifications: true,
     images: true,
     linkedImage: true, // Include linked image from image management system
     imageLink: true, // Include image link if available
-    mileage: true // Include mileage for used cars
+    mileage: false // Include mileage only when shown (for used cars)
   });
 
   // Fetch linked image for this vehicle
@@ -106,10 +106,14 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     }
   };
 
-  // Fetch linked image when dialog opens
+  // Fetch linked image when dialog opens and set mileage checkbox for used cars
   React.useEffect(() => {
     if (open) {
       fetchLinkedImage();
+      // Enable mileage checkbox by default for used cars when dialog opens
+      if (vehicle.importType === "شخصي مستعمل" || vehicle.importType === "مستعمل") {
+        setIncludeFields(prev => ({ ...prev, mileage: true }));
+      }
     }
   }, [open, vehicle]);
 
