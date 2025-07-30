@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, timestamp, boolean, decimal, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, boolean, decimal, varchar, jsonb } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -742,9 +742,9 @@ export const financingRates = pgTable("financing_rates", {
   id: serial("id").primaryKey(),
   bankName: text("bank_name").notNull(), // اسم البنك (عربي)
   bankNameEn: text("bank_name_en").notNull(), // اسم البنك (إنجليزي)
+  bankLogo: text("bank_logo"), // شعار البنك (Base64)
   financingType: text("financing_type").notNull(), // نوع التمويل: "personal" أو "commercial"
-  minRate: decimal("min_rate", { precision: 5, scale: 2 }).notNull(), // أقل نسبة تمويل
-  maxRate: decimal("max_rate", { precision: 5, scale: 2 }).notNull(), // أعلى نسبة تمويل
+  rates: jsonb("rates").notNull().default('[]'), // مصفوفة النسب {rateName: string, rateValue: number}
   minPeriod: integer("min_period").notNull(), // أقل فترة سداد (بالشهور)
   maxPeriod: integer("max_period").notNull(), // أعلى فترة سداد (بالشهور)
   minAmount: decimal("min_amount", { precision: 12, scale: 2 }).notNull(), // أقل مبلغ تمويل
@@ -762,8 +762,10 @@ export const insertFinancingRateSchema = createInsertSchema(financingRates).omit
   createdAt: true,
   updatedAt: true,
 }).extend({
-  minRate: z.number().min(0, "النسبة يجب أن تكون أكبر من صفر"),
-  maxRate: z.number().min(0, "النسبة يجب أن تكون أكبر من صفر"),
+  rates: z.array(z.object({
+    rateName: z.string().min(1, "اسم النسبة مطلوب"),
+    rateValue: z.number().min(0, "قيمة النسبة يجب أن تكون أكبر من صفر").max(100, "قيمة النسبة يجب أن تكون أقل من 100%")
+  })).min(1, "يجب إضافة نسبة واحدة على الأقل"),
   minPeriod: z.number().min(1, "الفترة يجب أن تكون أكبر من صفر"),
   maxPeriod: z.number().min(1, "الفترة يجب أن تكون أكبر من صفر"),
   minAmount: z.number().min(0, "المبلغ يجب أن يكون أكبر من صفر"),

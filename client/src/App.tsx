@@ -66,6 +66,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           <Route path="/reservations" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/sold-vehicles" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/financing-calculator" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/financing-rates" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/leave-requests" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/locations" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           

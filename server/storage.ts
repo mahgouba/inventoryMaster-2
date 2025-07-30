@@ -825,8 +825,8 @@ export class MemStorage implements IStorage {
     const newRate: FinancingRate = {
       id: this.currentFinancingRateId++,
       ...rate,
-      minRate: String(rate.minRate),
-      maxRate: String(rate.maxRate),
+      bankLogo: rate.bankLogo || null,
+      rates: rate.rates || [],
       minAmount: String(rate.minAmount),
       maxAmount: String(rate.maxAmount),
       createdAt: new Date(),
@@ -844,8 +844,8 @@ export class MemStorage implements IStorage {
     const updatedRate: FinancingRate = {
       ...existingRate,
       ...rate,
-      minRate: rate.minRate ? String(rate.minRate) : existingRate.minRate,
-      maxRate: rate.maxRate ? String(rate.maxRate) : existingRate.maxRate,
+      bankLogo: rate.bankLogo !== undefined ? rate.bankLogo : existingRate.bankLogo,
+      rates: rate.rates !== undefined ? rate.rates : existingRate.rates,
       minAmount: rate.minAmount ? String(rate.minAmount) : existingRate.minAmount,
       maxAmount: rate.maxAmount ? String(rate.maxAmount) : existingRate.maxAmount,
       updatedAt: new Date(),
