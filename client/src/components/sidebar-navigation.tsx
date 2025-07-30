@@ -213,10 +213,12 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
   };
 
   return (
-    <div className={cn(
-      "fixed right-0 top-0 h-screen backdrop-blur-xl bg-gradient-to-br from-gray-900 via-black to-purple-950 border-l border-white/20 dark:border-white/10 transition-all duration-300 z-50 shadow-2xl flex flex-col relative overflow-hidden",
-      isCollapsed ? "w-16" : "w-64"
-    )}>
+    <div 
+      data-sidebar="true"
+      className={cn(
+        "fixed right-0 top-0 sidebar-full-height backdrop-blur-xl bg-gradient-to-br from-gray-900 via-black to-purple-950 border-l border-white/20 dark:border-white/10 transition-all duration-300 z-50 shadow-2xl flex flex-col relative overflow-hidden",
+        isCollapsed ? "w-16" : "w-64"
+      )}>
       {/* Company Logo Background - Same as main page */}
       <div className="absolute inset-0 flex items-center justify-center opacity-5">
         {settings?.companyLogo ? (

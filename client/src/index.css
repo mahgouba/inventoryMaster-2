@@ -133,6 +133,36 @@ html, body {
   }
 }
 
+/* Sidebar Full Height Extension */
+.sidebar-full-height {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+}
+
+/* Force sidebar to always extend to full screen height */
+[data-sidebar="true"] {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+}
+
+/* Mobile specific sidebar height adjustments */
+@media (max-width: 768px) {
+  [data-sidebar="true"] {
+    height: 100vh !important;
+    min-height: 100vh !important;
+  }
+}
+
+/* Desktop specific sidebar height adjustments */
+@media (min-width: 769px) {
+  [data-sidebar="true"] {
+    height: 100vh !important;
+    min-height: 100vh !important;
+  }
+}
+
 /* Unified Glass Morphism Components - Lighter/More Transparent */
 .glass-container,
 .dark-glass {
