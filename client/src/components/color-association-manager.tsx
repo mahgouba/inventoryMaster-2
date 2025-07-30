@@ -250,7 +250,7 @@ export default function ColorAssociationManager({
                   <SelectValue placeholder="اختر الشركة" />
                 </SelectTrigger>
                 <SelectContent>
-                  {manufacturers.map((manufacturer) => (
+                  {manufacturers.filter(m => m && m.trim()).map((manufacturer) => (
                     <SelectItem key={manufacturer} value={manufacturer}>
                       {manufacturer}
                     </SelectItem>
@@ -263,15 +263,15 @@ export default function ColorAssociationManager({
             <div>
               <Label className="text-white font-medium mb-2 block">الفئة (اختياري)</Label>
               <Select 
-                value={newAssociation.category || ""} 
-                onValueChange={(value) => setNewAssociation({...newAssociation, category: value})}
+                value={newAssociation.category || "all"} 
+                onValueChange={(value) => setNewAssociation({...newAssociation, category: value === "all" ? "" : value})}
               >
                 <SelectTrigger className="glass-container border-white/20 text-white">
                   <SelectValue placeholder="اختر الفئة" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">جميع الفئات</SelectItem>
-                  {categories.map((category) => (
+                  <SelectItem value="all">جميع الفئات</SelectItem>
+                  {categories.filter(c => c && c.trim()).map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
                     </SelectItem>
@@ -284,15 +284,15 @@ export default function ColorAssociationManager({
             <div>
               <Label className="text-white font-medium mb-2 block">درجة التجهيز (اختياري)</Label>
               <Select 
-                value={newAssociation.trimLevel || ""} 
-                onValueChange={(value) => setNewAssociation({...newAssociation, trimLevel: value})}
+                value={newAssociation.trimLevel || "all"} 
+                onValueChange={(value) => setNewAssociation({...newAssociation, trimLevel: value === "all" ? "" : value})}
               >
                 <SelectTrigger className="glass-container border-white/20 text-white">
                   <SelectValue placeholder="اختر درجة التجهيز" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">جميع الدرجات</SelectItem>
-                  {trimLevels.map((trim) => (
+                  <SelectItem value="all">جميع الدرجات</SelectItem>
+                  {trimLevels.filter(t => t && t.trim()).map((trim) => (
                     <SelectItem key={trim} value={trim}>
                       {trim}
                     </SelectItem>
@@ -329,7 +329,7 @@ export default function ColorAssociationManager({
                   <SelectValue placeholder="اختر اللون" />
                 </SelectTrigger>
                 <SelectContent>
-                  {getColorOptions(newAssociation.colorType!).map((color) => (
+                  {getColorOptions(newAssociation.colorType!).filter(c => c && c.trim()).map((color) => (
                     <SelectItem key={color} value={color}>
                       {color}
                     </SelectItem>
@@ -393,7 +393,7 @@ export default function ColorAssociationManager({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {manufacturers.map((manufacturer) => (
+                        {manufacturers.filter(m => m && m.trim()).map((manufacturer) => (
                           <SelectItem key={manufacturer} value={manufacturer}>
                             {manufacturer}
                           </SelectItem>
