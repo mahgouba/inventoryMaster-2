@@ -737,6 +737,42 @@ export const insertLeaveRequestSchema = createInsertSchema(leaveRequests).omit({
 export type InsertLeaveRequest = z.infer<typeof insertLeaveRequestSchema>;
 export type LeaveRequest = typeof leaveRequests.$inferSelect;
 
+// Financing Rates table - for bank financing management
+export const financingRates = pgTable("financing_rates", {
+  id: serial("id").primaryKey(),
+  bankName: text("bank_name").notNull(), // اسم البنك (عربي)
+  bankNameEn: text("bank_name_en").notNull(), // اسم البنك (إنجليزي)
+  financingType: text("financing_type").notNull(), // نوع التمويل: "personal" أو "commercial"
+  minRate: decimal("min_rate", { precision: 5, scale: 2 }).notNull(), // أقل نسبة تمويل
+  maxRate: decimal("max_rate", { precision: 5, scale: 2 }).notNull(), // أعلى نسبة تمويل
+  minPeriod: integer("min_period").notNull(), // أقل فترة سداد (بالشهور)
+  maxPeriod: integer("max_period").notNull(), // أعلى فترة سداد (بالشهور)
+  minAmount: decimal("min_amount", { precision: 12, scale: 2 }).notNull(), // أقل مبلغ تمويل
+  maxAmount: decimal("max_amount", { precision: 12, scale: 2 }).notNull(), // أعلى مبلغ تمويل
+  features: text("features").array().default([]), // المزايا
+  requirements: text("requirements").array().default([]), // المتطلبات
+  isActive: boolean("is_active").default(true).notNull(), // نشط
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(), // آخر تحديث
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertFinancingRateSchema = createInsertSchema(financingRates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  minRate: z.number().min(0, "النسبة يجب أن تكون أكبر من صفر"),
+  maxRate: z.number().min(0, "النسبة يجب أن تكون أكبر من صفر"),
+  minPeriod: z.number().min(1, "الفترة يجب أن تكون أكبر من صفر"),
+  maxPeriod: z.number().min(1, "الفترة يجب أن تكون أكبر من صفر"),
+  minAmount: z.number().min(0, "المبلغ يجب أن يكون أكبر من صفر"),
+  maxAmount: z.number().min(0, "المبلغ يجب أن يكون أكبر من صفر"),
+});
+
+export type InsertFinancingRate = z.infer<typeof insertFinancingRateSchema>;
+export type FinancingRate = typeof financingRates.$inferSelect;
+
 export type Company = typeof companies.$inferSelect;
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 

@@ -18,7 +18,8 @@ import {
   insertFinancingCalculationSchema,
   insertBankSchema,
   insertBankInterestRateSchema,
-  insertLeaveRequestSchema
+  insertLeaveRequestSchema,
+  insertFinancingRateSchema
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -2531,6 +2532,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting leave request:", error);
       res.status(500).json({ message: "Failed to delete leave request" });
+    }
+  });
+
+  // Financing Rates API Routes
+  app.get("/api/financing-rates", async (req, res) => {
+    try {
+      const rates = await storage.getAllFinancingRates();
+      res.json(rates);
+    } catch (error) {
+      console.error("Error fetching financing rates:", error);
+      res.status(500).json({ message: "Failed to fetch financing rates" });
+    }
+  });
+
+  app.get("/api/financing-rates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid rate ID" });
+      }
+
+      const rate = await storage.getFinancingRate(id);
+      if (!rate) {
+        return res.status(404).json({ message: "Financing rate not found" });
+      }
+
+      res.json(rate);
+    } catch (error) {
+      console.error("Error fetching financing rate:", error);
+      res.status(500).json({ message: "Failed to fetch financing rate" });
+    }
+  });
+
+  app.post("/api/financing-rates", async (req, res) => {
+    try {
+      const rateData = insertFinancingRateSchema.parse(req.body);
+      const rate = await storage.createFinancingRate(rateData);
+      res.status(201).json(rate);
+    } catch (error) {
+      console.error("Error creating financing rate:", error);
+      res.status(500).json({ message: "Failed to create financing rate" });
+    }
+  });
+
+  app.put("/api/financing-rates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid rate ID" });
+      }
+
+      const rateData = insertFinancingRateSchema.partial().parse(req.body);
+      const rate = await storage.updateFinancingRate(id, rateData);
+      
+      if (!rate) {
+        return res.status(404).json({ message: "Financing rate not found" });
+      }
+
+      res.json(rate);
+    } catch (error) {
+      console.error("Error updating financing rate:", error);
+      res.status(500).json({ message: "Failed to update financing rate" });
+    }
+  });
+
+  app.delete("/api/financing-rates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid rate ID" });
+      }
+
+      const success = await storage.deleteFinancingRate(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Financing rate not found" });
+      }
+
+      res.json({ message: "Financing rate deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting financing rate:", error);
+      res.status(500).json({ message: "Failed to delete financing rate" });
+    }
+  });
+
+  app.get("/api/financing-rates/filter/:type", async (req, res) => {
+    try {
+      const { type } = req.params;
+      if (!["personal", "commercial"].includes(type)) {
+        return res.status(400).json({ message: "Invalid financing type. Must be 'personal' or 'commercial'" });
+      }
+
+      const rates = await storage.getFinancingRatesByType(type);
+      res.json(rates);
+    } catch (error) {
+      console.error("Error fetching financing rates by type:", error);
+      res.status(500).json({ message: "Failed to fetch financing rates" });
     }
   });
 

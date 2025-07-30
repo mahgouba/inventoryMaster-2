@@ -20,7 +20,8 @@ import {
   Receipt,
   Settings,
   Landmark,
-  LogOut
+  LogOut,
+  Percent
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -318,6 +319,12 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       title: "إدارة النسب", 
       href: "/bank-management", 
       icon: Landmark,
+      internal: true
+    },
+    { 
+      title: "نسب التمويل", 
+      href: "/financing-rates", 
+      icon: Percent,
       internal: true
     }
   ] : [];

@@ -14,7 +14,8 @@ import {
   type FinancingCalculation, type InsertFinancingCalculation,
   type Bank, type InsertBank,
   type LeaveRequest, type InsertLeaveRequest,
-  type BankInterestRate, type InsertBankInterestRate
+  type BankInterestRate, type InsertBankInterestRate,
+  type FinancingRate, type InsertFinancingRate
 } from "@shared/schema";
 
 export interface IStorage {
@@ -183,6 +184,14 @@ export interface IStorage {
   createCompany(company: InsertCompany): Promise<Company>;
   updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined>;
   deleteCompany(id: number): Promise<boolean>;
+  
+  // Financing rates
+  getAllFinancingRates(): Promise<FinancingRate[]>;
+  getFinancingRate(id: number): Promise<FinancingRate | undefined>;
+  createFinancingRate(rate: InsertFinancingRate): Promise<FinancingRate>;
+  updateFinancingRate(id: number, rate: Partial<InsertFinancingRate>): Promise<FinancingRate | undefined>;
+  deleteFinancingRate(id: number): Promise<boolean>;
+  getFinancingRatesByType(type: string): Promise<FinancingRate[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -199,6 +208,7 @@ export class MemStorage implements IStorage {
   private banks = new Map<number, Bank>();
   private bankInterestRates = new Map<number, BankInterestRate>();
   private leaveRequests = new Map<number, LeaveRequest>();
+  private financingRates = new Map<number, FinancingRate>();
   
   private currentUserId = 1;
   private currentInventoryId = 1;
@@ -213,6 +223,7 @@ export class MemStorage implements IStorage {
   private currentBankId = 1;
   private currentBankInterestRateId = 1;
   private currentLeaveRequestId = 1;
+  private currentFinancingRateId = 1;
   
   private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
   private systemSettings = new Map<string, string>();
@@ -799,6 +810,57 @@ export class MemStorage implements IStorage {
 
   async deleteCompany(id: number): Promise<boolean> {
     return this.companies.delete(id);
+  }
+
+  // Financing rates methods implementation
+  async getAllFinancingRates(): Promise<FinancingRate[]> {
+    return Array.from(this.financingRates.values());
+  }
+
+  async getFinancingRate(id: number): Promise<FinancingRate | undefined> {
+    return this.financingRates.get(id);
+  }
+
+  async createFinancingRate(rate: InsertFinancingRate): Promise<FinancingRate> {
+    const newRate: FinancingRate = {
+      id: this.currentFinancingRateId++,
+      ...rate,
+      minRate: String(rate.minRate),
+      maxRate: String(rate.maxRate),
+      minAmount: String(rate.minAmount),
+      maxAmount: String(rate.maxAmount),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastUpdated: new Date(),
+    };
+    this.financingRates.set(newRate.id, newRate);
+    return newRate;
+  }
+
+  async updateFinancingRate(id: number, rate: Partial<InsertFinancingRate>): Promise<FinancingRate | undefined> {
+    const existingRate = this.financingRates.get(id);
+    if (!existingRate) return undefined;
+
+    const updatedRate: FinancingRate = {
+      ...existingRate,
+      ...rate,
+      minRate: rate.minRate ? String(rate.minRate) : existingRate.minRate,
+      maxRate: rate.maxRate ? String(rate.maxRate) : existingRate.maxRate,
+      minAmount: rate.minAmount ? String(rate.minAmount) : existingRate.minAmount,
+      maxAmount: rate.maxAmount ? String(rate.maxAmount) : existingRate.maxAmount,
+      updatedAt: new Date(),
+      lastUpdated: new Date(),
+    };
+    this.financingRates.set(id, updatedRate);
+    return updatedRate;
+  }
+
+  async deleteFinancingRate(id: number): Promise<boolean> {
+    return this.financingRates.delete(id);
+  }
+
+  async getFinancingRatesByType(type: string): Promise<FinancingRate[]> {
+    return Array.from(this.financingRates.values()).filter(rate => rate.financingType === type);
   }
 }
 
