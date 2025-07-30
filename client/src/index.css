@@ -1593,6 +1593,43 @@ span.badge,
     margin-bottom: 20px;
   }
   
+  /* Leave Request Print Styles */
+  [id^="leave-request-print-"] {
+    background: white !important;
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  [id^="leave-request-print-"] * {
+    background: white !important;
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  [id^="leave-request-print-"] .text-gray-800 {
+    color: #1f2937 !important;
+  }
+  
+  [id^="leave-request-print-"] .text-gray-600 {
+    color: #4b5563 !important;
+  }
+  
+  [id^="leave-request-print-"] .text-blue-600 {
+    color: #2563eb !important;
+  }
+  
+  [id^="leave-request-print-"] .text-gray-500 {
+    color: #6b7280 !important;
+  }
+  
+  [id^="leave-request-print-"] .border-gray-300 {
+    border-color: #d1d5db !important;
+  }
+  
+  [id^="leave-request-print-"] .bg-gray-50 {
+    background-color: #f9fafb !important;
+  }
+  
   .print-section h3 {
     background: #f0f0f0;
     padding: 8px;

@@ -728,35 +728,29 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                     direction: 'rtl', 
                     textAlign: 'right',
                     minHeight: '600px',
-                    backgroundImage: 'url(/albarimi-2.svg)',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center center',
-                    backgroundSize: '50% auto'
+                    backgroundColor: 'white'
                   }}>
-                    {/* Background overlay to make text readable */}
-                    <div className="absolute inset-0 bg-white/80 rounded-lg"></div>
-                    <div className="relative z-10">
+                    <div className="relative z-10 bg-white">
                     {/* Company Header with Logo */}
                     <div className="flex items-center justify-between mb-8 border-b-2 border-gray-300 pb-4">
                       <div className="text-right">
                         <h1 className="text-2xl font-bold text-gray-800">شركة البريمي للسيارات</h1>
                         <p className="text-gray-600">Al-Barimi Cars Company</p>
+                        <p className="text-lg font-semibold text-blue-600 mt-2">
+                          طلب {previewRequest.requestType === "leave" ? "إجازة" : "استئذان"}
+                        </p>
+                        <p className="text-sm text-gray-500">رقم الطلب: LR-{String(previewRequest.id).padStart(4, '0')}</p>
                       </div>
                       <div className="flex-shrink-0">
                         <img 
-                          src="/albarimi-2.svg" 
+                          src="/company-logo.svg" 
                           alt="Company Logo" 
-                          className="h-20 w-auto"
+                          className="h-24 w-24"
+                          onError={(e) => {
+                            e.currentTarget.src = "/albarimi-2.svg";
+                          }}
                         />
                       </div>
-                    </div>
-
-                    {/* Document Title */}
-                    <div className="text-center mb-8">
-                      <h2 className="text-xl font-bold text-gray-800">
-                        طلب {previewRequest.requestType === "leave" ? "إجازة" : "استئذان"}
-                      </h2>
-                      <p className="text-gray-600">Leave Request Form</p>
                     </div>
 
                     {/* Employee Information */}
@@ -895,31 +889,35 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
             <div
               key={`print-${request.id}`}
               id={`leave-request-print-${request.id}`}
-              className="fixed top-[-9999px] left-[-9999px] w-[210mm] bg-white p-8 print:relative print:top-0 print:left-0 relative"
+              className="fixed top-[-9999px] left-[-9999px] w-[210mm] bg-white p-8 print:relative print:top-0 print:left-0 print:bg-white"
               style={{ 
                 fontFamily: 'Arial, sans-serif', 
                 direction: 'rtl', 
                 textAlign: 'right',
                 minHeight: '297mm',
                 pageBreakAfter: 'always',
-                backgroundImage: 'url(/albarimi-2.svg)',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center center',
-                backgroundSize: '50% auto'
+                backgroundColor: 'white'
               }}
             >
-              {/* Background overlay for text readability */}
-              <div className="absolute inset-0 bg-white/85"></div>
-              <div className="relative z-10">
+              <div className="relative z-10 bg-white print:bg-white">
               {/* Company Letterhead */}
-              <div className="text-center mb-8 border-b-2 border-gray-300 pb-6">
-                <img 
-                  src="/albarimi-2.svg" 
-                  alt="Company Logo" 
-                  className="mx-auto mb-4 h-20 w-auto"
-                />
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">شركة البريمي للسيارات</h1>
-                <p className="text-gray-600">طلب {request.requestType}</p>
+              <div className="flex items-center justify-between mb-8 border-b-2 border-gray-300 pb-6">
+                <div className="text-right">
+                  <h1 className="text-2xl font-bold text-gray-800 mb-2">شركة البريمي للسيارات</h1>
+                  <p className="text-gray-600">Al-Barimi Cars Company</p>
+                  <p className="text-lg font-semibold text-blue-600 mt-2">طلب {request.requestType}</p>
+                  <p className="text-sm text-gray-500">رقم الطلب: LR-{String(request.id).padStart(4, '0')}</p>
+                </div>
+                <div className="flex-shrink-0">
+                  <img 
+                    src="/company-logo.svg" 
+                    alt="Company Logo" 
+                    className="h-24 w-24 print:h-24 print:w-24"
+                    onError={(e) => {
+                      e.currentTarget.src = "/albarimi-2.svg";
+                    }}
+                  />
+                </div>
               </div>
 
               {/* Request Details */}
