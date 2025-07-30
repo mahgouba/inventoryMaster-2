@@ -40,10 +40,13 @@ export default function ColorAssociationManager({
   const queryClient = useQueryClient();
 
   // Fetch color associations
-  const { data: associations = [], isLoading } = useQuery({
+  const { data: associationsData, isLoading } = useQuery({
     queryKey: ["/api/color-associations"],
     queryFn: () => apiRequest("GET", "/api/color-associations")
   });
+
+  // Ensure associations is always an array
+  const associations = Array.isArray(associationsData) ? associationsData : [];
 
   const [newAssociation, setNewAssociation] = useState<Partial<InsertColorAssociation>>({
     manufacturer: "",
@@ -55,7 +58,7 @@ export default function ColorAssociationManager({
   });
   
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editingValues, setEditingValues] = useState<Partial<ColorAssociation>>({});
+  const [editingValues, setEditingValues] = useState<Partial<InsertColorAssociation>>({});
   const [showDeleteDialog, setShowDeleteDialog] = useState<ColorAssociation | null>(null);
 
   // Create mutation
