@@ -15,7 +15,8 @@ import {
   type Bank, type InsertBank,
   type LeaveRequest, type InsertLeaveRequest,
   type BankInterestRate, type InsertBankInterestRate,
-  type FinancingRate, type InsertFinancingRate
+  type FinancingRate, type InsertFinancingRate,
+  type ColorAssociation, type InsertColorAssociation
 } from "@shared/schema";
 
 export interface IStorage {
@@ -192,6 +193,16 @@ export interface IStorage {
   updateFinancingRate(id: number, rate: Partial<InsertFinancingRate>): Promise<FinancingRate | undefined>;
   deleteFinancingRate(id: number): Promise<boolean>;
   getFinancingRatesByType(type: string): Promise<FinancingRate[]>;
+
+  // Color association methods
+  getAllColorAssociations(): Promise<ColorAssociation[]>;
+  getColorAssociation(id: number): Promise<ColorAssociation | undefined>;
+  createColorAssociation(association: InsertColorAssociation): Promise<ColorAssociation>;
+  updateColorAssociation(id: number, association: Partial<InsertColorAssociation>): Promise<ColorAssociation | undefined>;
+  deleteColorAssociation(id: number): Promise<boolean>;
+  getColorAssociationsByManufacturer(manufacturer: string): Promise<ColorAssociation[]>;
+  getColorAssociationsByCategory(manufacturer: string, category: string): Promise<ColorAssociation[]>;
+  getColorAssociationsByTrimLevel(manufacturer: string, category: string, trimLevel: string): Promise<ColorAssociation[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -209,6 +220,7 @@ export class MemStorage implements IStorage {
   private bankInterestRates = new Map<number, BankInterestRate>();
   private leaveRequests = new Map<number, LeaveRequest>();
   private financingRates = new Map<number, FinancingRate>();
+  private colorAssociations = new Map<number, ColorAssociation>();
   
   private currentUserId = 1;
   private currentInventoryId = 1;
@@ -224,6 +236,7 @@ export class MemStorage implements IStorage {
   private currentBankInterestRateId = 1;
   private currentLeaveRequestId = 1;
   private currentFinancingRateId = 1;
+  private currentColorAssociationId = 1;
   
   private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
   private systemSettings = new Map<string, string>();
@@ -861,6 +874,66 @@ export class MemStorage implements IStorage {
 
   async getFinancingRatesByType(type: string): Promise<FinancingRate[]> {
     return Array.from(this.financingRates.values()).filter(rate => rate.financingType === type);
+  }
+
+  // Color association methods implementation
+  async getAllColorAssociations(): Promise<ColorAssociation[]> {
+    return Array.from(this.colorAssociations.values());
+  }
+
+  async getColorAssociation(id: number): Promise<ColorAssociation | undefined> {
+    return this.colorAssociations.get(id);
+  }
+
+  async createColorAssociation(association: InsertColorAssociation): Promise<ColorAssociation> {
+    const newAssociation: ColorAssociation = {
+      id: this.currentColorAssociationId++,
+      ...association,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.colorAssociations.set(newAssociation.id, newAssociation);
+    return newAssociation;
+  }
+
+  async updateColorAssociation(id: number, association: Partial<InsertColorAssociation>): Promise<ColorAssociation | undefined> {
+    const existing = this.colorAssociations.get(id);
+    if (!existing) return undefined;
+
+    const updated: ColorAssociation = {
+      ...existing,
+      ...association,
+      updatedAt: new Date(),
+    };
+    this.colorAssociations.set(id, updated);
+    return updated;
+  }
+
+  async deleteColorAssociation(id: number): Promise<boolean> {
+    return this.colorAssociations.delete(id);
+  }
+
+  async getColorAssociationsByManufacturer(manufacturer: string): Promise<ColorAssociation[]> {
+    return Array.from(this.colorAssociations.values()).filter(
+      association => association.manufacturer === manufacturer
+    );
+  }
+
+  async getColorAssociationsByCategory(manufacturer: string, category: string): Promise<ColorAssociation[]> {
+    return Array.from(this.colorAssociations.values()).filter(
+      association => 
+        association.manufacturer === manufacturer && 
+        (association.category === category || !association.category)
+    );
+  }
+
+  async getColorAssociationsByTrimLevel(manufacturer: string, category: string, trimLevel: string): Promise<ColorAssociation[]> {
+    return Array.from(this.colorAssociations.values()).filter(
+      association => 
+        association.manufacturer === manufacturer && 
+        (association.category === category || !association.category) &&
+        (association.trimLevel === trimLevel || !association.trimLevel)
+    );
   }
 }
 

@@ -89,6 +89,20 @@ export const manufacturers = pgTable("manufacturers", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Color Associations table for linking colors to manufacturer/category/trim
+export const colorAssociations = pgTable("color_associations", {
+  id: serial("id").primaryKey(),
+  manufacturer: text("manufacturer").notNull(), // الشركة المصنعة
+  category: text("category"), // الفئة (اختياري)
+  trimLevel: text("trim_level"), // درجة التجهيز (اختياري)
+  colorType: text("color_type").notNull(), // نوع اللون: "exterior" أو "interior"
+  colorName: text("color_name").notNull(), // اسم اللون
+  colorCode: text("color_code"), // كود اللون (hex أو أي نوع آخر)
+  isActive: boolean("is_active").default(true).notNull(), // نشط
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Companies table for quotation management
 export const companies = pgTable("companies", {
   id: serial("id").primaryKey(),
@@ -774,6 +788,20 @@ export const insertFinancingRateSchema = createInsertSchema(financingRates).omit
 
 export type InsertFinancingRate = z.infer<typeof insertFinancingRateSchema>;
 export type FinancingRate = typeof financingRates.$inferSelect;
+
+// Color association schema for validation
+export const insertColorAssociationSchema = createInsertSchema(colorAssociations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  manufacturer: z.string().min(1, "الشركة المصنعة مطلوبة"),
+  colorType: z.enum(["exterior", "interior"], { errorMap: () => ({ message: "نوع اللون مطلوب" }) }),
+  colorName: z.string().min(1, "اسم اللون مطلوب"),
+});
+
+export type InsertColorAssociation = z.infer<typeof insertColorAssociationSchema>;
+export type ColorAssociation = typeof colorAssociations.$inferSelect;
 
 export type Company = typeof companies.$inferSelect;
 export type InsertCompany = z.infer<typeof insertCompanySchema>;

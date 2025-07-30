@@ -19,7 +19,8 @@ import {
   insertBankSchema,
   insertBankInterestRateSchema,
   insertLeaveRequestSchema,
-  insertFinancingRateSchema
+  insertFinancingRateSchema,
+  insertColorAssociationSchema
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -2629,6 +2630,133 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching financing rates by type:", error);
       res.status(500).json({ message: "Failed to fetch financing rates" });
+    }
+  });
+
+  // Color association endpoints
+  app.get("/api/color-associations", async (req, res) => {
+    try {
+      const associations = await storage.getAllColorAssociations();
+      res.json(associations);
+    } catch (error) {
+      console.error("Error fetching color associations:", error);
+      res.status(500).json({ message: "Failed to fetch color associations" });
+    }
+  });
+
+  app.get("/api/color-associations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid association ID" });
+      }
+
+      const association = await storage.getColorAssociation(id);
+      if (!association) {
+        return res.status(404).json({ message: "Color association not found" });
+      }
+
+      res.json(association);
+    } catch (error) {
+      console.error("Error fetching color association:", error);
+      res.status(500).json({ message: "Failed to fetch color association" });
+    }
+  });
+
+  app.post("/api/color-associations", async (req, res) => {
+    try {
+      const validation = insertColorAssociationSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid data", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const association = await storage.createColorAssociation(validation.data);
+      res.status(201).json(association);
+    } catch (error) {
+      console.error("Error creating color association:", error);
+      res.status(500).json({ message: "Failed to create color association" });
+    }
+  });
+
+  app.put("/api/color-associations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid association ID" });
+      }
+
+      const validation = insertColorAssociationSchema.partial().safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid data", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const association = await storage.updateColorAssociation(id, validation.data);
+      if (!association) {
+        return res.status(404).json({ message: "Color association not found" });
+      }
+
+      res.json(association);
+    } catch (error) {
+      console.error("Error updating color association:", error);
+      res.status(500).json({ message: "Failed to update color association" });
+    }
+  });
+
+  app.delete("/api/color-associations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid association ID" });
+      }
+
+      const success = await storage.deleteColorAssociation(id);
+      if (!success) {
+        return res.status(404).json({ message: "Color association not found" });
+      }
+
+      res.json({ message: "Color association deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting color association:", error);
+      res.status(500).json({ message: "Failed to delete color association" });
+    }
+  });
+
+  app.get("/api/color-associations/manufacturer/:manufacturer", async (req, res) => {
+    try {
+      const { manufacturer } = req.params;
+      const associations = await storage.getColorAssociationsByManufacturer(manufacturer);
+      res.json(associations);
+    } catch (error) {
+      console.error("Error fetching color associations by manufacturer:", error);
+      res.status(500).json({ message: "Failed to fetch color associations" });
+    }
+  });
+
+  app.get("/api/color-associations/category/:manufacturer/:category", async (req, res) => {
+    try {
+      const { manufacturer, category } = req.params;
+      const associations = await storage.getColorAssociationsByCategory(manufacturer, category);
+      res.json(associations);
+    } catch (error) {
+      console.error("Error fetching color associations by category:", error);
+      res.status(500).json({ message: "Failed to fetch color associations" });
+    }
+  });
+
+  app.get("/api/color-associations/trim/:manufacturer/:category/:trimLevel", async (req, res) => {
+    try {
+      const { manufacturer, category, trimLevel } = req.params;
+      const associations = await storage.getColorAssociationsByTrimLevel(manufacturer, category, trimLevel);
+      res.json(associations);
+    } catch (error) {
+      console.error("Error fetching color associations by trim level:", error);
+      res.status(500).json({ message: "Failed to fetch color associations" });
     }
   });
 

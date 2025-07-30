@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, Edit2, Plus, Check, X, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import ColorAssociationManager from "@/components/color-association-manager";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,7 +53,8 @@ export default function ListManagement() {
     { key: "importTypes", label: "أنواع الاستيراد", color: "bg-purple-500" },
     { key: "locations", label: "المواقع", color: "bg-teal-500" },
     { key: "exteriorColors", label: "الألوان الخارجية", color: "bg-red-500" },
-    { key: "interiorColors", label: "الألوان الداخلية", color: "bg-pink-500" }
+    { key: "interiorColors", label: "الألوان الداخلية", color: "bg-pink-500" },
+    { key: "colorAssociations", label: "ربط الألوان", color: "bg-indigo-500" }
   ];
 
   const handleSave = (type: string, newList: string[]) => {
@@ -145,7 +147,7 @@ export default function ListManagement() {
           
           <CardContent>
             <Tabs defaultValue="manufacturers" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 glass-container border-white/20 mb-6">
+              <TabsList className="grid w-full grid-cols-3 lg:grid-cols-8 glass-container border-white/20 mb-6">
                 {listTypes.map((listType) => (
                   <TabsTrigger
                     key={listType.key}
@@ -161,6 +163,15 @@ export default function ListManagement() {
 
               {listTypes.map((listType) => (
                 <TabsContent key={listType.key} value={listType.key} className="space-y-4">
+                  {listType.key === "colorAssociations" ? (
+                    <ColorAssociationManager 
+                      manufacturers={listsData.manufacturers}
+                      categories={["C-Class", "E-Class", "S-Class", "X3", "X5", "X7", "A4", "A6", "Q5"]}
+                      trimLevels={["ستاندرد", "فل كامل", "AMG", "M Sport", "S-Line"]}
+                      exteriorColors={listsData.exteriorColors}
+                      interiorColors={listsData.interiorColors}
+                    />
+                  ) : (
                   <div className="space-y-4">
                     {/* Add new item section */}
                     <Card className="glass-container border-white/20">
@@ -275,6 +286,7 @@ export default function ListManagement() {
                       </CardContent>
                     </Card>
                   </div>
+                  )}
                 </TabsContent>
               ))}
             </Tabs>
