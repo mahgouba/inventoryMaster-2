@@ -155,11 +155,17 @@ export async function seedDatabase() {
     
     await db.insert(users).values([
       {
+        name: "مدير النظام",
+        jobTitle: "مدير",
+        phoneNumber: "0500000000",
         username: "admin",
         password: hashedPassword,
         role: "admin"
       },
       {
+        name: "موظف المبيعات",
+        jobTitle: "مندوب مبيعات",
+        phoneNumber: "0500000001",
         username: "seller",
         password: sellerPassword,
         role: "seller"

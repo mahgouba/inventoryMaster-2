@@ -372,6 +372,281 @@ export class DatabaseStorage implements IStorage {
 
   async getAllLocationTransfers(): Promise<any[]> { return []; }
   async createLocationTransfer(data: any): Promise<any> { return data; }
+  async getLocationTransfer(id: number): Promise<any> { return undefined; }
+  async updateLocationTransfer(id: number, data: any): Promise<any> { return data; }
+  async deleteLocationTransfer(id: number): Promise<boolean> { return true; }
+  async getLocationTransfersByItem(itemId: number): Promise<any[]> { return []; }
+
+  // Additional missing methods
+  async getSoldItems(): Promise<InventoryItem[]> {
+    return await db.select().from(inventoryItems).where(
+      or(eq(inventoryItems.status, "مباع"), eq(inventoryItems.isSold, true))
+    );
+  }
+
+  async clearAllInventoryItems(): Promise<boolean> {
+    const result = await db.delete(inventoryItems);
+    return true;
+  }
+
+  async searchInventoryItems(query: string): Promise<InventoryItem[]> {
+    return await db.select().from(inventoryItems).where(
+      or(
+        like(inventoryItems.manufacturer, `%${query}%`),
+        like(inventoryItems.category, `%${query}%`),
+        like(inventoryItems.chassisNumber, `%${query}%`),
+        like(inventoryItems.notes, `%${query}%`)
+      )
+    );
+  }
+
+  async filterInventoryItems(filters: {
+    category?: string;
+    status?: string;
+    year?: number;
+    manufacturer?: string;
+    importType?: string;
+    location?: string;
+  }): Promise<InventoryItem[]> {
+    let query = db.select().from(inventoryItems);
+    const conditions = [];
+
+    if (filters.manufacturer) {
+      conditions.push(eq(inventoryItems.manufacturer, filters.manufacturer));
+    }
+    if (filters.category) {
+      conditions.push(eq(inventoryItems.category, filters.category));
+    }
+    if (filters.status) {
+      conditions.push(eq(inventoryItems.status, filters.status));
+    }
+    if (filters.year) {
+      conditions.push(eq(inventoryItems.year, filters.year));
+    }
+    if (filters.importType) {
+      conditions.push(eq(inventoryItems.importType, filters.importType));
+    }
+    if (filters.location) {
+      conditions.push(eq(inventoryItems.location, filters.location));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    return await query;
+  }
+
+  async getManufacturerByName(name: string): Promise<Manufacturer | undefined> {
+    const [manufacturer] = await db.select().from(manufacturers).where(eq(manufacturers.name, name));
+    return manufacturer || undefined;
+  }
+
+  async getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<any[]> {
+    return [];
+  }
+
+  async getSpecificationByVehicleParams(manufacturer: string, category: string, trimLevel: string | null, year: number, engineCapacity: string): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<any[]> {
+    return [];
+  }
+
+  async getAllCategories(): Promise<{ category: string }[]> {
+    const items = await db.select().from(inventoryItems);
+    const categories = [...new Set(items.map(item => item.category))];
+    return categories.map(category => ({ category }));
+  }
+
+  async getCategoriesByManufacturer(manufacturer: string): Promise<{ category: string }[]> {
+    const items = await db.select().from(inventoryItems).where(eq(inventoryItems.manufacturer, manufacturer));
+    const categories = [...new Set(items.map(item => item.category))];
+    return categories.map(category => ({ category }));
+  }
+
+  async getAllEngineCapacities(): Promise<{ engineCapacity: string }[]> {
+    const items = await db.select().from(inventoryItems);
+    const capacities = [...new Set(items.map(item => item.engineCapacity))];
+    return capacities.map(engineCapacity => ({ engineCapacity }));
+  }
+
+  async getQuotationsByStatus(status: string): Promise<Quotation[]> {
+    return await db.select().from(quotations).where(eq(quotations.status, status));
+  }
+
+  async getQuotationByNumber(quoteNumber: string): Promise<Quotation | undefined> {
+    const [quotation] = await db.select().from(quotations).where(eq(quotations.quoteNumber, quoteNumber));
+    return quotation || undefined;
+  }
+
+  async updateTermsConditions(terms: Array<{ id: number; term_text: string; display_order: number }>): Promise<void> {
+    // Implementation for terms and conditions
+  }
+
+  async createInvoice(invoice: any): Promise<any> {
+    return invoice;
+  }
+
+  async getInvoices(): Promise<any[]> {
+    return [];
+  }
+
+  async getInvoiceById(id: number): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async updateInvoice(id: number, invoice: any): Promise<any> {
+    return invoice;
+  }
+
+  async deleteInvoice(id: number): Promise<boolean> {
+    return true;
+  }
+
+  async getInvoicesByStatus(status: string): Promise<any[]> {
+    return [];
+  }
+
+  async getInvoiceByNumber(invoiceNumber: string): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async getSystemSettings(): Promise<Array<{key: string, value: string}>> {
+    return [];
+  }
+
+  async updateSystemSetting(key: string, value: string): Promise<{key: string, value: string}> {
+    return { key, value };
+  }
+
+  async getDefaultCompanyId(): Promise<number | null> {
+    return null;
+  }
+
+  async updateFinancingCalculation(id: number, calculation: any): Promise<any | undefined> {
+    return calculation;
+  }
+
+  async getBankInterestRates(bankId: number): Promise<any[]> {
+    return [];
+  }
+
+  async getBankInterestRate(id: number): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async createBankInterestRate(rateData: any): Promise<any> {
+    return rateData;
+  }
+
+  async updateBankInterestRate(id: number, rateData: any): Promise<any | undefined> {
+    return rateData;
+  }
+
+  async deleteBankInterestRate(id: number): Promise<boolean> {
+    return true;
+  }
+
+  async getAllLeaveRequests(): Promise<any[]> {
+    return [];
+  }
+
+  async getLeaveRequestById(id: number): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async createLeaveRequest(request: any): Promise<any> {
+    return request;
+  }
+
+  async updateLeaveRequestStatus(id: number, status: string, approvedBy?: number, approvedByName?: string, rejectionReason?: string): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async deleteLeaveRequest(id: number): Promise<boolean> {
+    return true;
+  }
+
+  async getAllFinancingRates(): Promise<any[]> {
+    return [];
+  }
+
+  async getFinancingRate(id: number): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async createFinancingRate(rate: any): Promise<any> {
+    return rate;
+  }
+
+  async updateFinancingRate(id: number, rate: any): Promise<any | undefined> {
+    return rate;
+  }
+
+  async deleteFinancingRate(id: number): Promise<boolean> {
+    return true;
+  }
+
+  async getFinancingRatesByType(type: string): Promise<any[]> {
+    return [];
+  }
+
+  async getAllColorAssociations(): Promise<any[]> {
+    return [];
+  }
+
+  async getColorAssociation(id: number): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async createColorAssociation(association: any): Promise<any> {
+    return association;
+  }
+
+  async updateColorAssociation(id: number, association: any): Promise<any | undefined> {
+    return association;
+  }
+
+  async deleteColorAssociation(id: number): Promise<boolean> {
+    return true;
+  }
+
+  async getColorAssociationsByManufacturer(manufacturer: string): Promise<any[]> {
+    return [];
+  }
+
+  async getColorAssociationsByCategory(manufacturer: string, category: string): Promise<any[]> {
+    return [];
+  }
+
+  async getColorAssociationsByTrimLevel(manufacturer: string, category: string, trimLevel: string): Promise<any[]> {
+    return [];
+  }
+
+  async getAllImageLinks(): Promise<string[]> {
+    const imageLinks: string[] = [];
+    
+    // Collect images from inventory items
+    const items = await db.select().from(inventoryItems);
+    items.forEach(item => {
+      if (item.images && Array.isArray(item.images)) {
+        imageLinks.push(...item.images);
+      }
+    });
+    
+    // Collect images from manufacturers
+    const manufacturersList = await db.select().from(manufacturers);
+    manufacturersList.forEach(manufacturer => {
+      if (manufacturer.logo) {
+        imageLinks.push(manufacturer.logo);
+      }
+    });
+    
+    // Remove duplicates and return
+    return [...new Set(imageLinks)];
+  }
 
   async getAllLowStockAlerts(): Promise<any[]> { return []; }
   async createLowStockAlert(data: any): Promise<any> { return data; }
@@ -380,16 +655,4 @@ export class DatabaseStorage implements IStorage {
   async getAllStockSettings(): Promise<any[]> { return []; }
   async getStockSettings(): Promise<any> { return null; }
   async updateStockSettings(data: any): Promise<any> { return data; }
-
-  async getAllImageLinks(): Promise<any[]> { return []; }
-  async getImageLink(id: number): Promise<any> { return undefined; }
-  async createImageLink(data: any): Promise<any> { return data; }
-  async updateImageLink(id: number, data: any): Promise<any> { return data; }
-  async deleteImageLink(id: number): Promise<boolean> { return true; }
-
-  async getAllLeaveRequests(): Promise<any[]> { return []; }
-  async getLeaveRequest(id: number): Promise<any> { return undefined; }
-  async createLeaveRequest(data: any): Promise<any> { return data; }
-  async updateLeaveRequest(id: number, data: any): Promise<any> { return data; }
-  async deleteLeaveRequest(id: number): Promise<boolean> { return true; }
 }
