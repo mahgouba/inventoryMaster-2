@@ -18,15 +18,18 @@ import {
   Users, 
   Building,
   Receipt,
-  Settings
+  Settings,
+  Landmark,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HorizontalNavigationProps {
   userRole: string;
+  onLogout?: () => void;
 }
 
-export default function HorizontalNavigation({ userRole }: HorizontalNavigationProps) {
+export default function HorizontalNavigation({ userRole, onLogout }: HorizontalNavigationProps) {
   const [location, setLocation] = useLocation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -312,14 +315,25 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
       internal: true
     },
     { 
-      title: "إدارة البنوك", 
+      title: "إدارة النسب", 
       href: "/bank-management", 
-      icon: Building,
+      icon: Landmark,
       internal: true
     }
   ] : [];
 
-  const allItems = [...menuItems, ...adminItems];
+  // System items (available for all users)
+  const systemItems = [
+    { 
+      title: "تسجيل الخروج", 
+      href: "#", 
+      icon: LogOut,
+      internal: true,
+      isLogout: true
+    }
+  ];
+
+  const allItems = [...menuItems, ...adminItems, ...systemItems];
 
   const isActive = (href: string) => location === href;
 
@@ -331,6 +345,12 @@ export default function HorizontalNavigation({ userRole }: HorizontalNavigationP
     
     // Play selection sound
     playSoundEffect('select');
+    
+    // Handle logout
+    if (item.isLogout && onLogout) {
+      onLogout();
+      return;
+    }
     
     if (item.internal) {
       // For internal pages, just update the URL without navigating away

@@ -84,7 +84,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
 
           <div className="relative z-10" dir="rtl">
             {/* Fixed Navigation */}
-            <HorizontalNavigation userRole={user.role} />
+            <HorizontalNavigation userRole={user.role} onLogout={onLogout} />
 
             {/* Page Content with padding for navigation bar */}
             <div className="relative z-10 sm:pt-16 pt-[5px] pb-[5px] pr-16">
