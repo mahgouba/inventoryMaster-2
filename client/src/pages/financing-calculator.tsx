@@ -9,9 +9,32 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Calculator, Printer, Save, ArrowRight, Home, TrendingUp, Plus, Upload, Trash2 } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
+
+// Bank rate type from financing rates management
+interface BankRateItem {
+  rateName: string;
+  rateValue: number;
+}
+
+interface FinancingRate {
+  id: number;
+  bankName: string;
+  bankNameEn: string;
+  bankLogo?: string;
+  financingType: "personal" | "commercial";
+  rates: BankRateItem[];
+  minPeriod: number;
+  maxPeriod: number;
+  minAmount: number;
+  maxAmount: number;
+  features: string[];
+  requirements: string[];
+  isActive: boolean;
+  lastUpdated: string;
+}
 
 interface BankRate {
   id?: string;
@@ -28,104 +51,27 @@ interface NewBankForm {
   rates: { [years: string]: number };
 }
 
-const BANKS: BankRate[] = [
-  {
-    name: "مصرف الراجحي",
-    rates: {
-      "1": 4.5,
-      "2": 5.2,
-      "3": 5.8,
-      "4": 6.3,
-      "5": 6.8,
-      "6": 7.2,
-      "7": 7.5
-    }
-  },
-  {
-    name: "بنك البلاد",
-    rates: {
-      "1": 4.8,
-      "2": 5.5,
-      "3": 6.1,
-      "4": 6.6,
-      "5": 7.1,
-      "6": 7.5,
-      "7": 7.8
-    }
-  },
-  {
-    name: "بنك الرياض",
-    rates: {
-      "1": 4.7,
-      "2": 5.4,
-      "3": 6.0,
-      "4": 6.5,
-      "5": 7.0,
-      "6": 7.4,
-      "7": 7.7
-    }
-  },
-  {
-    name: "البنك العربي",
-    rates: {
-      "1": 4.9,
-      "2": 5.6,
-      "3": 6.2,
-      "4": 6.7,
-      "5": 7.2,
-      "6": 7.6,
-      "7": 7.9
-    }
-  },
-  {
-    name: "بنك الإنماء",
-    rates: {
-      "1": 4.6,
-      "2": 5.3,
-      "3": 5.9,
-      "4": 6.4,
-      "5": 6.9,
-      "6": 7.3,
-      "7": 7.6
-    }
-  },
-  {
-    name: "بنك الإمارات دبي",
-    rates: {
-      "1": 5.0,
-      "2": 5.7,
-      "3": 6.3,
-      "4": 6.8,
-      "5": 7.3,
-      "6": 7.7,
-      "7": 8.0
-    }
-  },
-  {
-    name: "البنك السعودي الفرنسي",
-    rates: {
-      "1": 4.8,
-      "2": 5.5,
-      "3": 6.1,
-      "4": 6.6,
-      "5": 7.1,
-      "6": 7.5,
-      "7": 7.8
-    }
-  },
-  {
-    name: "بنك الجزيرة",
-    rates: {
-      "1": 4.7,
-      "2": 5.4,
-      "3": 6.0,
-      "4": 6.5,
-      "5": 7.0,
-      "6": 7.4,
-      "7": 7.7
-    }
-  }
-];
+// Convert financing rates from management system to calculator format
+const convertFinancingRatesToBankRates = (financingRates: FinancingRate[]): BankRate[] => {
+  return financingRates
+    .filter(rate => rate.isActive) // Only active rates
+    .map(rate => ({
+      id: rate.id.toString(),
+      name: rate.bankName,
+      logo: rate.bankLogo || "",
+      rates: rate.rates.reduce((acc, rateItem) => {
+        // Extract year from rate name if it contains numbers
+        const yearMatch = rateItem.rateName.match(/\d+/);
+        if (yearMatch) {
+          acc[yearMatch[0]] = rateItem.rateValue;
+        } else {
+          // If no year found, use the rate name as key
+          acc[rateItem.rateName] = rateItem.rateValue;
+        }
+        return acc;
+      }, {} as { [years: string]: number })
+    }));
+};
 
 interface CalculationResult {
   monthlyPayment: number;
@@ -187,8 +133,16 @@ export default function FinancingCalculatorPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Get all available banks (default + custom)
-  const allBanks = [...BANKS, ...customBanks];
+  // Fetch financing rates from management system
+  const { data: financingRatesData = [], isLoading: isLoadingRates } = useQuery<FinancingRate[]>({
+    queryKey: ["/api/financing-rates"],
+  });
+
+  // Convert financing rates to bank rates format
+  const managedBanks = convertFinancingRatesToBankRates(financingRatesData);
+  
+  // Get all available banks (managed + custom)
+  const allBanks = [...managedBanks, ...customBanks];
 
   // Update bank rates when bank selection changes
   useEffect(() => {
@@ -196,7 +150,7 @@ export default function FinancingCalculatorPage() {
       const bank = allBanks.find(b => b.name === formData.bankName);
       setSelectedBank(bank || null);
     }
-  }, [formData.bankName, customBanks]);
+  }, [formData.bankName, customBanks, managedBanks]);
 
   // Auto-update interest rate when bank and years change
   useEffect(() => {
@@ -609,35 +563,76 @@ export default function FinancingCalculatorPage() {
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <Label htmlFor="bankName">البنك</Label>
-                    <Button 
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setShowAddBankDialog(true)}
-                      className="text-[#C79C45] border-[#C79C45] hover:bg-[#C79C45] hover:text-white"
-                    >
-                      <Plus className="h-4 w-4 ml-1" />
-                      إضافة بنك
-                    </Button>
+                    <div className="flex gap-2">
+                      <Link href="/financing-rates">
+                        <Button 
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white"
+                        >
+                          <TrendingUp className="h-4 w-4 ml-1" />
+                          إدارة النسب
+                        </Button>
+                      </Link>
+                      <Button 
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setShowAddBankDialog(true)}
+                        className="text-[#C79C45] border-[#C79C45] hover:bg-[#C79C45] hover:text-white"
+                      >
+                        <Plus className="h-4 w-4 ml-1" />
+                        إضافة بنك
+                      </Button>
+                    </div>
                   </div>
-                  <Select value={formData.bankName} onValueChange={(value) => handleInputChange("bankName", value)}>
+                  <Select 
+                    value={formData.bankName} 
+                    onValueChange={(value) => handleInputChange("bankName", value)}
+                    disabled={isLoadingRates}
+                  >
                     <SelectTrigger>
-                      <SelectValue placeholder="اختر البنك" />
+                      <SelectValue placeholder={isLoadingRates ? "جاري تحميل البنوك..." : "اختر البنك"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {allBanks.map((bank) => (
-                        <SelectItem key={bank.name} value={bank.name}>
+                      {managedBanks.length > 0 && (
+                        <div className="px-2 py-1 text-xs text-muted-foreground border-b">
+                          البنوك من إدارة النسب ({managedBanks.length})
+                        </div>
+                      )}
+                      {managedBanks.map((bank) => (
+                        <SelectItem key={`managed-${bank.name}`} value={bank.name}>
                           <div className="flex items-center gap-2">
                             {bank.logo && (
                               <img src={bank.logo} alt={bank.name} className="w-4 h-4 object-contain" />
                             )}
                             {bank.name}
-                            {bank.id && (
-                              <span className="text-xs text-gray-500">(مخصص)</span>
-                            )}
+                            <span className="text-xs text-blue-600">(مُدار)</span>
                           </div>
                         </SelectItem>
                       ))}
+                      {customBanks.length > 0 && managedBanks.length > 0 && (
+                        <div className="px-2 py-1 text-xs text-muted-foreground border-b border-t">
+                          البنوك المخصصة ({customBanks.length})
+                        </div>
+                      )}
+                      {customBanks.map((bank) => (
+                        <SelectItem key={`custom-${bank.id}`} value={bank.name}>
+                          <div className="flex items-center gap-2">
+                            {bank.logo && (
+                              <img src={bank.logo} alt={bank.name} className="w-4 h-4 object-contain" />
+                            )}
+                            {bank.name}
+                            <span className="text-xs text-gray-500">(مخصص)</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                      {managedBanks.length === 0 && customBanks.length === 0 && !isLoadingRates && (
+                        <div className="px-2 py-2 text-sm text-muted-foreground text-center">
+                          لا توجد بنوك متاحة. يرجى إضافة بنوك من صفحة إدارة النسب أو إضافة بنك مخصص.
+                        </div>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
