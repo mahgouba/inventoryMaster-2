@@ -203,6 +203,9 @@ export interface IStorage {
   getColorAssociationsByManufacturer(manufacturer: string): Promise<ColorAssociation[]>;
   getColorAssociationsByCategory(manufacturer: string, category: string): Promise<ColorAssociation[]>;
   getColorAssociationsByTrimLevel(manufacturer: string, category: string, trimLevel: string): Promise<ColorAssociation[]>;
+  
+  // Image links methods
+  getAllImageLinks(): Promise<string[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -934,6 +937,32 @@ export class MemStorage implements IStorage {
         (association.category === category || !association.category) &&
         (association.trimLevel === trimLevel || !association.trimLevel)
     );
+  }
+
+  async getAllImageLinks(): Promise<string[]> {
+    const imageLinks: string[] = [];
+    
+    // Collect images from inventory items
+    for (const item of this.inventoryItems.values()) {
+      if (item.images && Array.isArray(item.images)) {
+        imageLinks.push(...item.images);
+      }
+    }
+    
+    // Collect images from manufacturers
+    for (const manufacturer of this.manufacturers.values()) {
+      if (manufacturer.logo) {
+        imageLinks.push(manufacturer.logo);
+      }
+    }
+    
+    // Collect images from appearance settings (if available)
+    if (this.appearanceSettings?.companyLogo) {
+      imageLinks.push(this.appearanceSettings.companyLogo);
+    }
+    
+    // Remove duplicates and return
+    return [...new Set(imageLinks)];
   }
 }
 
