@@ -124,6 +124,21 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
     }
   ] : [];
 
+  const bankingItems = [
+    { 
+      title: "البنوك الشخصية", 
+      href: "/banks-personal", 
+      icon: CreditCard,
+      description: "Personal Banks"
+    },
+    { 
+      title: "البنوك الشركة", 
+      href: "/banks-company", 
+      icon: Building,
+      description: "Company Banks"
+    }
+  ];
+
   const accountItems = [
     { 
       title: "الدردشة", 
