@@ -3,14 +3,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { 
   Bell, 
-  Settings, 
-  Users, 
+ 
   Palette, 
   Building2,
   LogOut,
@@ -49,7 +48,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { CardViewFAB } from "@/components/animated-fab";
 import InventoryFormSimple from "@/components/inventory-form-simple";
 import VehicleShare from "@/components/vehicle-share";
-import SpecificationsManagement from "@/components/specifications-management";
+
 import QuotationManagement from "@/components/quotation-management";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import MultiSelectFilter from "@/components/multi-select-filter";
@@ -94,7 +93,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [showSoldCars, setShowSoldCars] = useState<boolean>(false);
   const [shareVehicle, setShareVehicle] = useState<InventoryItem | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [specificationsOpen, setSpecificationsOpen] = useState(false);
+
   const [quotationManagementOpen, setQuotationManagementOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [priceCardOpen, setPriceCardOpen] = useState(false);
@@ -687,37 +686,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
 
 
-              {/* Admin Dropdown Menu */}
-              {userRole === "admin" && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="glass-button glass-text-primary p-2">
-                      <Settings size={18} />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="glass-dropdown-content w-56">
-                    <Link href="/user-management">
-                      <DropdownMenuItem>
-                        <Users className="mr-2 h-4 w-4" />
-                        إدارة المستخدمين
-                      </DropdownMenuItem>
-                    </Link>
-                    <DropdownMenuItem onClick={() => setSpecificationsOpen(true)}>
-                      <FileText className="mr-2 h-4 w-4" />
-                      إدارة المواصفات
-                    </DropdownMenuItem>
-                    
-                    
-                    <Link href="/integration-management">
-                      <DropdownMenuItem>
-                        <Settings className="mr-2 h-4 w-4" />
-                        إدارة التكامل
-                      </DropdownMenuItem>
-                    </Link>
 
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
 
               {/* Bank Header Icons */}
               <div className="flex items-center space-x-1 space-x-reverse">
@@ -1416,11 +1385,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         />
       )}
 
-      {/* Specifications Management Dialog */}
-      <SpecificationsManagement
-        open={specificationsOpen}
-        onOpenChange={setSpecificationsOpen}
-      />
+
 
       {/* Quotation Management Dialog */}
       <QuotationManagement
