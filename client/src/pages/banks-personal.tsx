@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { User, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft, Info, MoreVertical, Edit3, Trash2, Eye, EyeOff } from "lucide-react";
+import { User, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft, Info, MoreVertical, Edit3, Trash2, Eye, EyeOff, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -123,6 +123,7 @@ export default function PersonalBanks() {
         description: `تمت مشاركة بيانات ${bank.bankName}`,
       });
     }, 800); // 800ms for long press
+    
     setLongPressTimer(timer);
   };
 
@@ -133,43 +134,54 @@ export default function PersonalBanks() {
     }
   };
 
-  // Bank management functions
+  // Delete bank mutation
+  const deleteBankMutation = useMutation({
+    mutationFn: async (bankId: number) => {
+      const response = await fetch(`/api/banks/${bankId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete bank');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف البنك بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ في الحذف",
+        description: "فشل في حذف البنك",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Hide bank function
   const hideBank = (bankId: number) => {
     const newHiddenBanks = new Set(hiddenBanks);
     newHiddenBanks.add(bankId);
     setHiddenBanks(newHiddenBanks);
     localStorage.setItem('hiddenBanks', JSON.stringify(Array.from(newHiddenBanks)));
     
-    // Notify other components about the change
-    window.dispatchEvent(new Event('bankVisibilityChanged'));
+    // Dispatch event to notify other components
+    window.dispatchEvent(new CustomEvent('bankVisibilityChanged'));
     
     toast({
       title: "تم إخفاء البنك",
-      description: "تم إخفاء البنك من العرض بنجاح",
+      description: "تم إخفاء البنك من العرض",
     });
   };
 
-  const editBank = (bankId: number) => {
-    // Navigate to bank management page with edit mode
-    window.location.href = `/bank-management?edit=${bankId}&type=شخصي`;
-  };
-
-  const deleteBank = async (bankId: number, bankName: string) => {
-    if (confirm(`هل أنت متأكد من حذف بنك ${bankName}؟`)) {
+  // Delete bank function
+  const deleteBank = async (bankId: number) => {
+    if (window.confirm('هل أنت متأكد من حذف هذا البنك؟')) {
       try {
-        const response = await fetch(`/api/banks/${bankId}`, {
-          method: 'DELETE',
-        });
-        
-        if (response.ok) {
-          queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
-          toast({
-            title: "تم الحذف",
-            description: `تم حذف بنك ${bankName} بنجاح`,
-          });
-        } else {
-          throw new Error('Failed to delete bank');
-        }
+        deleteBankMutation.mutate(bankId);
       } catch (error) {
         toast({
           title: "خطأ في الحذف",
@@ -182,32 +194,27 @@ export default function PersonalBanks() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-purple-950 relative overflow-hidden">
-        {/* Animated Mesh Background */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-          <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-gradient-to-r from-teal-500 to-green-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--dark-bg-primary)' }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-white">جاري تحميل البنوك...</p>
         </div>
-        <div className="text-white text-xl font-semibold drop-shadow-lg">جاري التحميل...</div>
       </div>
     );
   }
 
   return (
     <TooltipProvider>
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 relative overflow-hidden" dir="rtl">
-      {/* Background Animation Removed */}
-
+    <div className="min-h-screen" style={{ background: 'var(--dark-bg-primary)' }} dir="rtl">
       <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Header مع الشعار والعنوان */}
-        <div className="text-center mb-8">
+        {/* Header with Company Logo and Title - Match Inventory Style */}
+        <div className="glass-container mb-8 p-8 text-center">
           <div className="flex justify-center mb-6">
             {appearance?.companyLogo ? (
               <img 
                 src={appearance.companyLogo} 
                 alt="شعار الشركة" 
-                className="w-40 h-40 object-contain drop-shadow-2xl"
+                className="w-32 h-32 object-contain drop-shadow-2xl"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
@@ -215,9 +222,9 @@ export default function PersonalBanks() {
               />
             ) : (
               <img 
-                src="/company-logo.svg" 
-                alt="شعار شركة البريمي للسيارة" 
-                className="w-40 h-40 object-contain drop-shadow-2xl"
+                src="/copmany logo.svg" 
+                alt="شعار شركة البريمي للسيارات" 
+                className="w-32 h-32 object-contain drop-shadow-2xl"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
@@ -226,14 +233,14 @@ export default function PersonalBanks() {
             )}
           </div>
           
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-3 drop-shadow-lg">
+          <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3 drop-shadow-lg">
             <User className="w-10 h-10" />
-            بنوك شركة البريمي للسيارات
+            البنوك الشخصية - شركة البريمي للسيارات
           </h1>
-          <p className="text-gray-700 dark:text-white/80 text-lg">معلومات الحسابات البنكية الشخصية</p>
+          <p className="text-white/80 text-lg drop-shadow-md">معلومات الحسابات البنكية الشخصية</p>
         </div>
 
-        {/* Banks Grid */}
+        {/* Banks Grid - Match Inventory Style */}
         {banks.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {banks.map((bank) => {
@@ -242,7 +249,7 @@ export default function PersonalBanks() {
               return (
                 <Card 
                   key={bank.id} 
-                  className="backdrop-blur-xl bg-white/90 dark:bg-black/30 border border-gray-200/50 dark:border-white/20 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:bg-white/95 dark:hover:bg-black/40"
+                  className="glass-container rounded-2xl hover:scale-105 transition-all duration-300"
                 >
                   <CardContent className="p-6">
                     <div className="flex flex-col space-y-4">
@@ -343,18 +350,18 @@ export default function PersonalBanks() {
                               e.stopPropagation();
                               shareBank(bank);
                             }}
-                            className="p-2 hover:bg-[#00627F]/20 rounded-lg transition-all duration-300 backdrop-blur-sm border border-[#00627F]/30"
+                            className="p-2 hover:bg-purple-500/20 rounded-lg transition-all duration-300 backdrop-blur-sm border border-purple-500/30"
                             title="مشاركة معلومات البنك"
                           >
-                            <Share2 className="w-4 h-4 text-[#00627F]" />
+                            <Share2 className="w-4 h-4 text-purple-400" />
                           </Button>
 
                         </div>
                         
                         {isExpanded ? (
-                          <ChevronUp className="w-6 h-6 text-gray-900 dark:text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
+                          <ChevronUp className="w-6 h-6 text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
                         ) : (
-                          <ChevronDown className="w-6 h-6 text-gray-900 dark:text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
+                          <ChevronDown className="w-6 h-6 text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
                         )}
                       </div>
 
@@ -363,7 +370,17 @@ export default function PersonalBanks() {
                         <div className="w-full space-y-4 animate-in slide-in-from-top-2 duration-300">
                           <Separator className="bg-white/30" />
 
-
+                          {/* Share Button - Large */}
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              shareBank(bank);
+                            }}
+                            className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg py-3 px-6 font-medium transition-all duration-300 backdrop-blur-sm shadow-lg"
+                          >
+                            <Share2 className="w-5 h-5 ml-2" />
+                            مشاركة بيانات البنك
+                          </Button>
 
                           {/* Bank Details Container - Remove borders */}
                           <div className="space-y-4">
@@ -454,11 +471,76 @@ export default function PersonalBanks() {
                                   <span className="text-xs text-white">نسخ</span>
                                 </Button>
                               </div>
-                              <p className="text-sm break-all text-white/90">{bank.iban}</p>
+                              <p className="text-sm text-white/90">{bank.iban}</p>
                             </div>
                           </div>
 
-
+                          {/* Management Actions Dropdown */}
+                          <div className="pt-4 border-t border-white/20">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="w-full justify-between hover:bg-white/10 text-white"
+                                >
+                                  <span className="flex items-center gap-2">
+                                    <MoreVertical className="w-4 h-4" />
+                                    إدارة البنك
+                                  </span>
+                                  <ChevronDown className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="w-48 bg-black/90 border-white/20">
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    shareBank(bank);
+                                  }}
+                                  className="text-white hover:bg-white/10 cursor-pointer"
+                                >
+                                  <Share2 className="w-4 h-4 ml-2" />
+                                  مشاركة
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(`${bank.bankName}\n${bank.accountName}\n${bank.accountNumber}\n${bank.iban}`, "بيانات البنك");
+                                  }}
+                                  className="text-white hover:bg-white/10 cursor-pointer"
+                                >
+                                  <Copy className="w-4 h-4 ml-2" />
+                                  نسخ الكل
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    hideBank(bank.id);
+                                  }}
+                                  className="text-white hover:bg-white/10 cursor-pointer"
+                                >
+                                  <EyeOff className="w-4 h-4 ml-2" />
+                                  إخفاء
+                                </DropdownMenuItem>
+                                <Link href="/bank-management">
+                                  <DropdownMenuItem className="text-white hover:bg-white/10 cursor-pointer">
+                                    <Edit3 className="w-4 h-4 ml-2" />
+                                    تحرير
+                                  </DropdownMenuItem>
+                                </Link>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteBank(bank.id);
+                                  }}
+                                  className="text-red-400 hover:bg-red-500/20 cursor-pointer"
+                                >
+                                  <Trash2 className="w-4 h-4 ml-2" />
+                                  حذف
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -468,14 +550,32 @@ export default function PersonalBanks() {
             })}
           </div>
         ) : (
-          <div className="text-center py-16 backdrop-blur-xl bg-white/10 rounded-2xl border border-white/20">
-            <User className="w-20 h-20 text-white/50 mx-auto mb-6 drop-shadow-lg" />
-            <h3 className="text-2xl font-semibold text-white mb-4 drop-shadow-md">لا توجد بنوك شخصية</h3>
-            <p className="text-white/70 text-lg">لم يتم إضافة أي بنوك شخصية حتى الآن</p>
+          <div className="glass-container p-12 text-center">
+            <User className="w-24 h-24 text-white/40 mx-auto mb-6" />
+            <h2 className="text-2xl font-bold text-white mb-4">لا توجد بنوك شخصية</h2>
+            <p className="text-white/70 mb-6">لم يتم العثور على أي حسابات بنكية شخصية</p>
+            <Link href="/bank-management">
+              <Button className="glass-button-primary">
+                <Plus className="w-5 h-5 ml-2" />
+                إضافة بنك جديد
+              </Button>
+            </Link>
           </div>
         )}
 
-
+        {/* Navigation Back Button */}
+        <div className="fixed bottom-8 left-8">
+          <Link href="/card-view-new">
+            <Button
+              variant="outline"
+              size="lg"
+              className="glass-container border-white/30 text-white hover:bg-white/20 transition-all duration-300"
+            >
+              <ArrowLeft className="w-5 h-5 ml-2" />
+              العودة لعرض البطاقات
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
     </TooltipProvider>

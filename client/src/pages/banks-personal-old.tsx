@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Building2, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft, Info, MoreVertical, Edit3, Trash2, Eye, EyeOff } from "lucide-react";
+import { User, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft, Info, MoreVertical, Edit3, Trash2, Eye, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import type { Bank } from "@shared/schema";
 
-export default function CompanyBanks() {
+export default function PersonalBanks() {
   const [expandedBanks, setExpandedBanks] = useState<Set<number>>(new Set());
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [hiddenBanks, setHiddenBanks] = useState<Set<number>>(() => {
@@ -29,7 +29,7 @@ export default function CompanyBanks() {
       setHiddenBanks(newHiddenBanks);
       
       // Refresh the query to get updated data
-      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
     };
 
     const handleVisibilityChange = handleDataChange;
@@ -45,10 +45,10 @@ export default function CompanyBanks() {
   }, [queryClient]);
 
   const { data: allBanks = [], isLoading } = useQuery({
-    queryKey: ["/api/banks/type/شركة"],
+    queryKey: ["/api/banks/type/شخصي"],
     queryFn: async () => {
-      const response = await fetch("/api/banks/type/شركة");
-      if (!response.ok) throw new Error("Failed to fetch company banks");
+      const response = await fetch("/api/banks/type/شخصي");
+      if (!response.ok) throw new Error("Failed to fetch personal banks");
       return response.json() as Promise<Bank[]>;
     }
   });
@@ -94,9 +94,9 @@ export default function CompanyBanks() {
 
   const shareBank = async (bank: Bank) => {
     const shareText = `
-بيانات بنك الشركة
+بيانات البنك الشخصي
 🏦 ${bank.bankName}
-🏢 ${bank.accountName}
+👤 ${bank.accountName}
 💳 رقم الحساب: ${bank.accountNumber}
 🏧 الآيبان: ${bank.iban}
     `.trim();
@@ -151,7 +151,7 @@ export default function CompanyBanks() {
 
   const editBank = (bankId: number) => {
     // Navigate to bank management page with edit mode
-    window.location.href = `/bank-management?edit=${bankId}&type=شركة`;
+    window.location.href = `/bank-management?edit=${bankId}&type=شخصي`;
   };
 
   const deleteBank = async (bankId: number, bankName: string) => {
@@ -162,7 +162,7 @@ export default function CompanyBanks() {
         });
         
         if (response.ok) {
-          queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
           toast({
             title: "تم الحذف",
             description: `تم حذف بنك ${bankName} بنجاح`,
@@ -182,27 +182,32 @@ export default function CompanyBanks() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--dark-bg-primary)' }}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-white">جاري تحميل البنوك...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-purple-950 relative overflow-hidden">
+        {/* Animated Mesh Background */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+          <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-gradient-to-r from-teal-500 to-green-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
         </div>
+        <div className="text-white text-xl font-semibold drop-shadow-lg">جاري التحميل...</div>
       </div>
     );
   }
 
   return (
     <TooltipProvider>
-    <div className="min-h-screen" style={{ background: 'var(--dark-bg-primary)' }} dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 relative overflow-hidden" dir="rtl">
+      {/* Background Animation Removed */}
+
       <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Header with Company Logo and Title - Match Inventory Style */}
-        <div className="glass-container mb-8 p-8 text-center">
+        {/* Header مع الشعار والعنوان */}
+        <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             {appearance?.companyLogo ? (
               <img 
                 src={appearance.companyLogo} 
                 alt="شعار الشركة" 
-                className="w-32 h-32 object-contain drop-shadow-2xl"
+                className="w-40 h-40 object-contain drop-shadow-2xl"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
@@ -210,9 +215,9 @@ export default function CompanyBanks() {
               />
             ) : (
               <img 
-                src="/copmany logo.svg" 
-                alt="شعار شركة البريمي للسيارات" 
-                className="w-32 h-32 object-contain drop-shadow-2xl"
+                src="/company-logo.svg" 
+                alt="شعار شركة البريمي للسيارة" 
+                className="w-40 h-40 object-contain drop-shadow-2xl"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
@@ -221,14 +226,14 @@ export default function CompanyBanks() {
             )}
           </div>
           
-          <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3 drop-shadow-lg">
-            <Building2 className="w-10 h-10" />
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-3 drop-shadow-lg">
+            <User className="w-10 h-10" />
             بنوك شركة البريمي للسيارات
           </h1>
-          <p className="text-white/80 text-lg drop-shadow-md">معلومات الحسابات البنكية للشركة</p>
+          <p className="text-gray-700 dark:text-white/80 text-lg">معلومات الحسابات البنكية الشخصية</p>
         </div>
 
-        {/* Banks Grid - Match Inventory Style */}
+        {/* Banks Grid */}
         {banks.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {banks.map((bank) => {
@@ -237,7 +242,7 @@ export default function CompanyBanks() {
               return (
                 <Card 
                   key={bank.id} 
-                  className="glass-container rounded-2xl hover:scale-105 transition-all duration-300"
+                  className="backdrop-blur-xl bg-white/90 dark:bg-black/30 border border-gray-200/50 dark:border-white/20 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:bg-white/95 dark:hover:bg-black/40"
                 >
                   <CardContent className="p-6">
                     <div className="flex flex-col space-y-4">
@@ -321,7 +326,7 @@ export default function CompanyBanks() {
                                     handleLongPressEnd();
                                   }}
                                 >
-                                  <Building2 className="w-8 h-8 text-white" />
+                                  <User className="w-8 h-8 text-white" />
                                 </div>
                                 <h3 className="text-lg font-bold text-white drop-shadow-md">
                                   {bank.bankName}
@@ -347,9 +352,9 @@ export default function CompanyBanks() {
                         </div>
                         
                         {isExpanded ? (
-                          <ChevronUp className="w-6 h-6 text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
+                          <ChevronUp className="w-6 h-6 text-gray-900 dark:text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
                         ) : (
-                          <ChevronDown className="w-6 h-6 text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
+                          <ChevronDown className="w-6 h-6 text-gray-900 dark:text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
                         )}
                       </div>
 
@@ -464,9 +469,9 @@ export default function CompanyBanks() {
           </div>
         ) : (
           <div className="text-center py-16 backdrop-blur-xl bg-white/10 rounded-2xl border border-white/20">
-            <Building2 className="w-20 h-20 text-white/50 mx-auto mb-6 drop-shadow-lg" />
-            <h3 className="text-2xl font-semibold text-white mb-4 drop-shadow-md">لا توجد بنوك شركات</h3>
-            <p className="text-white/70 text-lg">لم يتم إضافة أي بنوك شركات حتى الآن</p>
+            <User className="w-20 h-20 text-white/50 mx-auto mb-6 drop-shadow-lg" />
+            <h3 className="text-2xl font-semibold text-white mb-4 drop-shadow-md">لا توجد بنوك شخصية</h3>
+            <p className="text-white/70 text-lg">لم يتم إضافة أي بنوك شخصية حتى الآن</p>
           </div>
         )}
 
