@@ -246,34 +246,30 @@ export default function QuotationA4Preview({
         <div className="absolute inset-0" style={{ paddingTop: '2.5cm', padding: '1cm' }}>
           
           {/* First Row: Quote Header Information */}
-          <div className="flex justify-between items-center mt-[55px] mb-4 pt-[15px] pb-[15px]">
-            <div className="flex items-center gap-4">
-              <span className="text-lg font-bold text-black/80">
-                {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
+          <div className="flex items-center gap-6 mt-[55px] mb-2 text-sm">
+            <span className="text-lg font-bold text-black/80">
+              {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
+            </span>
+            
+            <div className="flex items-center gap-1">
+              <span className="font-semibold text-black/80">رقم العرض:</span>
+              <span className="font-bold text-[#C79C45]">
+                {isInvoiceMode ? invoiceNumber : quoteNumber}
               </span>
             </div>
             
-            <div className="flex items-center gap-2 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-[#333333] ml-[74px] mr-[74px]">رقم العرض:</span>
-                <span className="font-bold text-[#C79C45]">
-                  {isInvoiceMode ? invoiceNumber : quoteNumber}
-                </span>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-black/80">تاريخ الإصدار:</span>
-                <span className="text-black/80">
-                  {new Date().toLocaleDateString('ar-SA')}
-                </span>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-black/80">تاريخ الانتهاء:</span>
-                <span className="text-red-600 font-medium">
-                  {validUntil.toLocaleDateString('ar-SA')}
-                </span>
-              </div>
+            <div className="flex items-center gap-1">
+              <span className="font-semibold text-black/80">تاريخ الإصدار:</span>
+              <span className="text-black/80">
+                {new Date().toLocaleDateString('ar-SA')}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-1">
+              <span className="font-semibold text-black/80">تاريخ الانتهاء:</span>
+              <span className="text-red-600 font-medium">
+                {validUntil.toLocaleDateString('ar-SA')}
+              </span>
             </div>
           </div>
 
