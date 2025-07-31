@@ -246,7 +246,7 @@ export default function QuotationA4Preview({
         <div className="absolute inset-0" style={{ paddingTop: '2.5cm', padding: '1cm' }}>
           
           {/* First Row: Quote Header Information */}
-          <div className="flex items-center gap-6 text-sm mt-[4.5px] mb-[4.5px] pt-[63px] pb-[63px]">
+          <div className="flex items-center gap-6 text-sm mt-[4.5px] mb-[2px] pt-[63px] pb-[8px]">
             <span className="font-bold text-[20px] text-[#03627f]">
               {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
             </span>
@@ -274,7 +274,7 @@ export default function QuotationA4Preview({
           </div>
 
           {/* Second Row: Customer Information */}
-          <div className="mb-3">
+          <div className="mb-3 mt-[2px]">
             <div className="flex items-center gap-2">
               <span className="text-lg font-bold text-black/80">
                 {customerTitle} / {customerName || "غير محدد"}
