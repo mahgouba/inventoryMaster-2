@@ -246,7 +246,7 @@ export default function QuotationA4Preview({
         <div className="absolute inset-0" style={{ paddingTop: '2.5cm', padding: '1cm' }}>
           
           {/* First Row: Quote Header Information */}
-          <div className="flex justify-between items-center mb-6 bg-white/95 p-4 rounded-lg shadow-sm">
+          <div className="flex justify-between items-center bg-white/95 p-4 rounded-lg shadow-sm mt-[55px] mb-[55px]">
             <div className="flex items-center gap-4">
               <FileText className="text-[#2B4C8C] w-6 h-6" />
               <span className="text-lg font-bold text-[#2B4C8C]">
