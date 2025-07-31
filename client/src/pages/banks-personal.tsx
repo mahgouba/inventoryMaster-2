@@ -200,21 +200,14 @@ export default function PersonalBanks() {
       {/* Background Animation Removed */}
 
       <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <Link href="/">
-            <Button variant="ghost" className="text-white hover:bg-white/10 backdrop-blur-sm border border-white/20">
-              <ArrowLeft className="w-4 h-4 ml-2" />
-              العودة للرئيسية
-            </Button>
-          </Link>
-          
-          <div className="flex-1 flex justify-center">
+        {/* Header مع الشعار والعنوان */}
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-6">
             {appearance?.companyLogo ? (
               <img 
                 src={appearance.companyLogo} 
                 alt="شعار الشركة" 
-                className="w-32 h-32 object-contain drop-shadow-2xl"
+                className="w-40 h-40 object-contain drop-shadow-2xl"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
@@ -224,7 +217,7 @@ export default function PersonalBanks() {
               <img 
                 src="/company-logo.svg" 
                 alt="شعار شركة البريمي للسيارة" 
-                className="w-32 h-32 object-contain drop-shadow-2xl"
+                className="w-40 h-40 object-contain drop-shadow-2xl"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
@@ -233,14 +226,9 @@ export default function PersonalBanks() {
             )}
           </div>
           
-          <div className="flex-1"></div>
-        </div>
-
-        {/* Page Title */}
-        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3 drop-shadow-lg">
             <User className="w-10 h-10" />
-            شركة البريمي للسيارة
+            بنوك شركة البريمي للسيارات
           </h1>
           <p className="text-white/80 text-lg">معلومات الحسابات البنكية الشخصية</p>
         </div>
