@@ -98,6 +98,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [priceCardOpen, setPriceCardOpen] = useState(false);
   const [priceCardVehicle, setPriceCardVehicle] = useState<InventoryItem | null>(null);
+  const [arrivedTodayOpen, setArrivedTodayOpen] = useState(false);
   
   // Toggle states for individual filters - default to false (closed)
   const [showManufacturerFilter, setShowManufacturerFilter] = useState(false);
@@ -141,6 +142,20 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
   // Filter out sold cars from display unless showSoldCars is true
   const availableItems = showSoldCars ? inventoryData : inventoryData.filter(item => item.status !== "مباع");
+  
+  // Get vehicles arrived today (within last 24 hours)
+  const getVehiclesArrivedToday = () => {
+    const now = new Date();
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    
+    return inventoryData.filter(item => {
+      if (!item.entryDate) return false;
+      const entryDate = new Date(item.entryDate);
+      return entryDate >= twentyFourHoursAgo && entryDate <= now;
+    });
+  };
+  
+  const arrivedTodayVehicles = getVehiclesArrivedToday();
 
   // Function to get import type icon based on data
   const getImportTypeIcon = (importType: string) => {
@@ -683,6 +698,24 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   <span className="hidden sm:inline">الرئيسية</span>
                 </Button>
               </Link>
+
+              {/* Arrived Today Button */}
+              <div className="relative">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="glass-button glass-text-primary"
+                  onClick={() => setArrivedTodayOpen(true)}
+                >
+                  <Bell size={16} className="ml-1" />
+                  <span className="hidden sm:inline">وصل اليوم</span>
+                  {arrivedTodayVehicles.length > 0 && (
+                    <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                      {arrivedTodayVehicles.length}
+                    </div>
+                  )}
+                </Button>
+              </div>
 
 
 
@@ -1407,6 +1440,81 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         onOpenChange={setPriceCardOpen}
         vehicle={priceCardVehicle}
       />
+
+      {/* Arrived Today Dialog */}
+      <Dialog open={arrivedTodayOpen} onOpenChange={setArrivedTodayOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-amber-600 flex items-center gap-2">
+              <Bell className="w-6 h-6" />
+              السيارات التي وصلت اليوم
+              {arrivedTodayVehicles.length > 0 && (
+                <Badge className="bg-yellow-500 text-black">
+                  {arrivedTodayVehicles.length} سيارة
+                </Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="mt-4">
+            {arrivedTodayVehicles.length === 0 ? (
+              <div className="text-center py-8">
+                <Bell className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-500 text-lg">لا توجد سيارات وصلت خلال آخر 24 ساعة</p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {arrivedTodayVehicles.map((vehicle) => (
+                  <Card key={vehicle.id} className="glass-container border-l-4 border-l-yellow-500">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <ManufacturerLogo 
+                            manufacturerName={vehicle.manufacturer} 
+                            size="md" 
+                            className="w-12 h-12"
+                          />
+                          <div>
+                            <h3 className="font-bold text-white text-lg">
+                              {vehicle.manufacturer} {vehicle.category}
+                            </h3>
+                            <p className="text-white/80">
+                              {vehicle.year} - {vehicle.exteriorColor}
+                            </p>
+                            <p className="text-white/60 text-sm">
+                              رقم الهيكل: {vehicle.chassisNumber}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-left">
+                          <Badge className={`${getStatusColor(vehicle.status)} mb-2`}>
+                            {vehicle.status}
+                          </Badge>
+                          <p className="text-white/60 text-sm">
+                            وصل: {vehicle.entryDate ? new Date(vehicle.entryDate).toLocaleDateString('ar-SA', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            }) : 'غير محدد'}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          <div className="mt-6 flex justify-center">
+            <Button onClick={() => setArrivedTodayOpen(false)} className="glass-button">
+              إغلاق
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       </div>
     </div>
   );
