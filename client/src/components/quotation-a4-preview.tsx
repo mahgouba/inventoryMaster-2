@@ -242,12 +242,7 @@ export default function QuotationA4Preview({
           colorAdjust: 'exact'
         }}
       >
-        {/* Content overlay on A4 background */}
-        <div className="absolute inset-0 p-8">
-          <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
-            <p className="text-gray-600 dark:text-gray-400">معاينة الكوتيشن ستظهر هنا</p>
-          </div>
-        </div>
+
       </div>
     </div>
   );
