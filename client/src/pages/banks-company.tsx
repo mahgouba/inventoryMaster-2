@@ -196,7 +196,7 @@ export default function CompanyBanks() {
 
   return (
     <TooltipProvider>
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-950 relative overflow-hidden" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 relative overflow-hidden" dir="rtl">
       {/* Background Animation Removed */}
 
       <div className="relative z-10 container mx-auto px-4 py-8">
@@ -226,11 +226,11 @@ export default function CompanyBanks() {
             )}
           </div>
           
-          <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3 drop-shadow-lg">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-3 drop-shadow-lg">
             <Building2 className="w-10 h-10" />
             بنوك شركة البريمي للسيارات
           </h1>
-          <p className="text-white/80 text-lg">معلومات الحسابات البنكية للشركة</p>
+          <p className="text-gray-700 dark:text-white/80 text-lg">معلومات الحسابات البنكية للشركة</p>
         </div>
 
         {/* Banks Grid */}
@@ -242,7 +242,7 @@ export default function CompanyBanks() {
               return (
                 <Card 
                   key={bank.id} 
-                  className="backdrop-blur-xl bg-black/30 border border-white/20 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:bg-black/40"
+                  className="backdrop-blur-xl bg-white/90 dark:bg-black/30 border border-gray-200/50 dark:border-white/20 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:bg-white/95 dark:hover:bg-black/40"
                 >
                   <CardContent className="p-6">
                     <div className="flex flex-col space-y-4">
@@ -289,7 +289,7 @@ export default function CompanyBanks() {
                                     handleLongPressEnd();
                                   }}
                                 />
-                                <h3 className="text-lg font-bold text-white drop-shadow-md">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white drop-shadow-md">
                                   {bank.bankName}
                                 </h3>
                               </div>
@@ -326,22 +326,35 @@ export default function CompanyBanks() {
                                     handleLongPressEnd();
                                   }}
                                 >
-                                  <Building2 className="w-8 h-8 text-white" />
+                                  <Building2 className="w-8 h-8 text-gray-900 dark:text-white" />
                                 </div>
-                                <h3 className="text-lg font-bold text-white drop-shadow-md">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white drop-shadow-md">
                                   {bank.bankName}
                                 </h3>
                               </div>
                             )}
                           </div>
                           
+                          {/* Share Icon Button */}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              shareBank(bank);
+                            }}
+                            className="p-2 hover:bg-[#00627F]/20 rounded-lg transition-all duration-300 backdrop-blur-sm border border-[#00627F]/30"
+                            title="مشاركة معلومات البنك"
+                          >
+                            <Share2 className="w-4 h-4 text-[#00627F]" />
+                          </Button>
 
                         </div>
                         
                         {isExpanded ? (
-                          <ChevronUp className="w-6 h-6 text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
+                          <ChevronUp className="w-6 h-6 text-gray-900 dark:text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
                         ) : (
-                          <ChevronDown className="w-6 h-6 text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
+                          <ChevronDown className="w-6 h-6 text-gray-900 dark:text-white drop-shadow-md transform transition-all duration-300 group-hover:scale-110" />
                         )}
                       </div>
 
@@ -358,7 +371,7 @@ export default function CompanyBanks() {
                             <div className="space-y-2 mb-4">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-base font-bold text-white drop-shadow-sm">اسم الحساب</span>
+                                  <span className="text-base font-bold text-gray-900 dark:text-white drop-shadow-sm">اسم الحساب</span>
                                   <Tooltip>
                                     <TooltipTrigger>
                                       <Info className="w-3 h-3 text-white/60 hover:text-white/80" />
