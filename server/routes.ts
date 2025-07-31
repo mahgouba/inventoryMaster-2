@@ -2862,6 +2862,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Hierarchical data endpoints for inventory form
+  
+  // Get manufacturers for inventory form with hierarchical relationships
+  app.get("/api/hierarchical/manufacturers", async (req, res) => {
+    try {
+      const carsData = readCarsData();
+      const manufacturers = carsData.map(car => ({
+        id: car.brand_ar, // Use Arabic name as ID for compatibility
+        nameAr: car.brand_ar,
+        nameEn: car.brand_en,
+        categoriesCount: car.models.length
+      }));
+      res.json(manufacturers);
+    } catch (error) {
+      console.error("Error fetching manufacturers:", error);
+      res.status(500).json({ message: "Failed to fetch manufacturers" });
+    }
+  });
+
+  // Get categories by manufacturer with hierarchical relationships
+  app.get("/api/hierarchical/categories/:manufacturer", async (req, res) => {
+    try {
+      const { manufacturer } = req.params;
+      const carsData = readCarsData();
+      const brand = carsData.find(car => car.brand_ar === manufacturer || car.brand_en === manufacturer);
+      
+      if (!brand) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      const categories = brand.models.map(model => ({
+        id: model.model_ar, // Use Arabic name as ID
+        nameAr: model.model_ar,
+        nameEn: model.model_en,
+        manufacturerId: manufacturer,
+        trimLevelsCount: model.trims.length
+      }));
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  // Get trim levels by manufacturer and category with hierarchical relationships
+  app.get("/api/hierarchical/trim-levels/:manufacturer/:category", async (req, res) => {
+    try {
+      const { manufacturer, category } = req.params;
+      const carsData = readCarsData();
+      const brand = carsData.find(car => car.brand_ar === manufacturer || car.brand_en === manufacturer);
+      
+      if (!brand) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      const model = brand.models.find(m => m.model_ar === category || m.model_en === category);
+      if (!model) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+
+      const trimLevels = model.trims.map(trim => ({
+        id: trim.trim_ar, // Use Arabic name as ID
+        nameAr: trim.trim_ar,
+        nameEn: trim.trim_en,
+        categoryId: category,
+        manufacturerId: manufacturer
+      }));
+      res.json(trimLevels);
+    } catch (error) {
+      console.error("Error fetching trim levels:", error);
+      res.status(500).json({ message: "Failed to fetch trim levels" });
+    }
+  });
+
+  // Get colors for a specific trim level (exterior and interior)
+  app.get("/api/hierarchical/colors/:manufacturer/:category/:trimLevel", async (req, res) => {
+    try {
+      const { manufacturer, category, trimLevel } = req.params;
+      const colorType = req.query.type as string; // "exterior" or "interior"
+      
+      // Return predefined colors that can be associated with any trim level
+      const defaultColors = {
+        exterior: [
+          { id: "أسود", name: "أسود", code: "#000000" },
+          { id: "أبيض", name: "أبيض", code: "#ffffff" },
+          { id: "رمادي", name: "رمادي", code: "#808080" },
+          { id: "أزرق", name: "أزرق", code: "#0066cc" },
+          { id: "أحمر", name: "أحمر", code: "#cc0000" },
+          { id: "فضي", name: "فضي", code: "#C0C0C0" },
+          { id: "ذهبي", name: "ذهبي", code: "#FFD700" },
+          { id: "بيج", name: "بيج", code: "#F5F5DC" },
+          { id: "بني", name: "بني", code: "#8B4513" }
+        ],
+        interior: [
+          { id: "أسود", name: "أسود", code: "#000000" },
+          { id: "بيج", name: "بيج", code: "#F5F5DC" },
+          { id: "بني", name: "بني", code: "#8B4513" },
+          { id: "رمادي", name: "رمادي", code: "#808080" },
+          { id: "أبيض", name: "أبيض", code: "#ffffff" },
+          { id: "كريمي", name: "كريمي", code: "#FFFDD0" },
+          { id: "أحمر", name: "أحمر", code: "#cc0000" },
+          { id: "أزرق", name: "أزرق", code: "#0066cc" }
+        ]
+      };
+      
+      const colors = colorType === "interior" ? defaultColors.interior : defaultColors.exterior;
+      res.json(colors);
+    } catch (error) {
+      console.error("Error fetching colors:", error);
+      res.status(500).json({ message: "Failed to fetch colors" });
+    }
+  });
+
   // Cars.json management routes
   // Get all manufacturers from cars.json
   app.get("/api/cars-json/manufacturers", async (req, res) => {

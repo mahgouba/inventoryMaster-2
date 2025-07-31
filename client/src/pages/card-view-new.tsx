@@ -46,7 +46,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
 import { CardViewFAB } from "@/components/animated-fab";
-import InventoryFormSimple from "@/components/inventory-form-simple";
+import InventoryFormHierarchical from "@/components/inventory-form-hierarchical";
 import VehicleShare from "@/components/vehicle-share";
 
 import QuotationManagement from "@/components/quotation-management";
@@ -1402,8 +1402,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Edit Item Form */}
-      <InventoryFormSimple
+      {/* Edit Item Form - Hierarchical */}
+      <InventoryFormHierarchical
         open={showEditDialog}
         onOpenChange={setShowEditDialog}
         editItem={editingItem || undefined}
