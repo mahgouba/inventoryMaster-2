@@ -249,7 +249,7 @@ export default function QuotationA4Preview({
           <div className="flex justify-between items-center mt-[55px] mb-4">
             <div className="flex items-center gap-4">
               <FileText className="text-[#C79C45] w-6 h-6" />
-              <span className="text-lg font-bold text-white">
+              <span className="text-lg font-bold text-black/80">
                 {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
               </span>
             </div>
@@ -282,7 +282,7 @@ export default function QuotationA4Preview({
           <div className="mb-3">
             <div className="flex items-center gap-2">
               <User className="text-[#C79C45] w-5 h-5" />
-              <span className="text-lg font-bold text-white">
+              <span className="text-lg font-bold text-black/80">
                 {customerTitle} / {customerName || "غير محدد"}
               </span>
             </div>
@@ -292,7 +292,7 @@ export default function QuotationA4Preview({
           <div className="mb-3">
             <div className="flex items-center gap-2 mb-2">
               <Building2 className="text-[#C79C45] w-5 h-5" />
-              <span className="text-lg font-bold text-white">بيانات المركبة</span>
+              <span className="text-lg font-bold text-black/80">بيانات المركبة</span>
             </div>
             
             {selectedVehicle && (
@@ -338,7 +338,7 @@ export default function QuotationA4Preview({
           <div className="mb-3">
             <div className="flex items-center gap-2 mb-2">
               <Settings className="text-[#C79C45] w-5 h-5" />
-              <span className="text-lg font-bold text-white">المواصفات التفصيلية</span>
+              <span className="text-lg font-bold text-black/80">المواصفات التفصيلية</span>
             </div>
             
             {vehicleSpecs ? (
@@ -382,7 +382,7 @@ export default function QuotationA4Preview({
           <div className="mb-3">
             <div className="flex items-center gap-2 mb-2">
               <Calculator className="text-[#C79C45] w-5 h-5" />
-              <span className="text-lg font-bold text-white">تفاصيل السعر</span>
+              <span className="text-lg font-bold text-black/80">تفاصيل السعر</span>
             </div>
             
             <div className="space-y-1 text-sm">
