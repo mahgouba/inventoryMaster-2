@@ -255,7 +255,7 @@ export default function QuotationA4Preview({
             
             <div className="flex items-center gap-2 text-sm">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-[#333333]">رقم العرض:</span>
+                <span className="font-semibold text-[#333333] ml-[74px] mr-[74px]">رقم العرض:</span>
                 <span className="font-bold text-[#C79C45]">
                   {isInvoiceMode ? invoiceNumber : quoteNumber}
                 </span>
