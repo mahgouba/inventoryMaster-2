@@ -333,6 +333,12 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       href: "/database-management", 
       icon: Database,
       internal: true
+    },
+    { 
+      title: "إدارة الثيمات", 
+      href: "/theme-management", 
+      icon: Palette,
+      internal: true
     }
   ] : [];
 
