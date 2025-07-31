@@ -133,15 +133,66 @@ export default function ThemeManagement() {
     }
   });
 
-  // Apply theme to DOM
+  // Apply theme to DOM - Complete System-Wide Application
   const applyThemeToDOM = (theme: ThemeConfig) => {
     const root = document.documentElement;
+    
+    // Set CSS variables
     root.style.setProperty('--theme-primary', theme.variables.primary);
     root.style.setProperty('--theme-secondary', theme.variables.secondary);
     root.style.setProperty('--theme-accent', theme.variables.accent);
     root.style.setProperty('--theme-background', theme.variables.background);
     root.style.setProperty('--theme-foreground', theme.variables.foreground);
     root.style.setProperty('--theme-gradient', theme.gradient);
+    
+    // Apply colors to all dynamic classes
+    root.style.setProperty('--dynamic-primary', theme.variables.primary);
+    root.style.setProperty('--dynamic-secondary', theme.variables.secondary);
+    root.style.setProperty('--dynamic-accent', theme.variables.accent);
+    
+    // Convert hex to HSL for better compatibility
+    const hexToHsl = (hex: string): string => {
+      const r = parseInt(hex.slice(1, 3), 16) / 255;
+      const g = parseInt(hex.slice(3, 5), 16) / 255;
+      const b = parseInt(hex.slice(5, 7), 16) / 255;
+      
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h = 0;
+      let s = 0;
+      const l = (max + min) / 2;
+
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+
+      return `${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%`;
+    };
+    
+    // Apply HSL variables for better system integration
+    root.style.setProperty('--dynamic-primary-hsl', hexToHsl(theme.variables.primary));
+    root.style.setProperty('--dynamic-secondary-hsl', hexToHsl(theme.variables.secondary));
+    root.style.setProperty('--dynamic-accent-hsl', hexToHsl(theme.variables.accent));
+    
+    // Force re-render of all components by triggering style recalculation
+    document.body.style.display = 'none';
+    document.body.offsetHeight; // Trigger reflow
+    document.body.style.display = '';
+    
+    // Update appearance settings via API to persist the theme
+    apiRequest('PUT', '/api/appearance', {
+      primaryColor: theme.variables.primary,
+      secondaryColor: theme.variables.secondary,
+      accentColor: theme.variables.accent
+    }).catch(console.error);
   };
 
   // Handle theme selection

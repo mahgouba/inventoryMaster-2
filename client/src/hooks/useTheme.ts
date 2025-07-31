@@ -57,20 +57,32 @@ export function useTheme() {
     if (settings) {
       const root = document.documentElement;
       
-      // Apply colors if available
+      // Apply colors if available - Both hex and HSL formats
       if (settings.primaryColor) {
         const primaryHsl = hexToHsl(settings.primaryColor);
-        root.style.setProperty('--dynamic-primary', `hsl(${primaryHsl})`);
+        root.style.setProperty('--dynamic-primary', settings.primaryColor);
+        root.style.setProperty('--dynamic-primary-hsl', primaryHsl);
+        root.style.setProperty('--theme-primary', settings.primaryColor);
       }
       
       if (settings.secondaryColor) {
         const secondaryHsl = hexToHsl(settings.secondaryColor);
-        root.style.setProperty('--dynamic-secondary', `hsl(${secondaryHsl})`);
+        root.style.setProperty('--dynamic-secondary', settings.secondaryColor);
+        root.style.setProperty('--dynamic-secondary-hsl', secondaryHsl);
+        root.style.setProperty('--theme-secondary', settings.secondaryColor);
       }
       
       if (settings.accentColor) {
         const accentHsl = hexToHsl(settings.accentColor);
-        root.style.setProperty('--dynamic-accent', `hsl(${accentHsl})`);
+        root.style.setProperty('--dynamic-accent', settings.accentColor);
+        root.style.setProperty('--dynamic-accent-hsl', accentHsl);
+        root.style.setProperty('--theme-accent', settings.accentColor);
+      }
+      
+      // Create gradient if both primary and secondary colors are available
+      if (settings.primaryColor && settings.secondaryColor) {
+        const gradient = `linear-gradient(90deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 100%)`;
+        root.style.setProperty('--theme-gradient', gradient);
       }
 
       // Apply dark mode

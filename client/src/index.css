@@ -19,6 +19,14 @@
   --theme-background: #f8fafc;
   --theme-foreground: #1e293b;
   --theme-gradient: linear-gradient(90deg, #00627F 0%, #00A3CC 100%);
+  
+  /* Dynamic Theme Variables */
+  --dynamic-primary: #00627F;
+  --dynamic-secondary: #00A3CC;
+  --dynamic-accent: #0081A3;
+  --dynamic-primary-hsl: 194, 100%, 25%;
+  --dynamic-secondary-hsl: 194, 100%, 40%;
+  --dynamic-accent-hsl: 194, 100%, 32%;
 }
 
 /* Global Dark Background */
@@ -257,6 +265,79 @@ input:focus, textarea:focus, select:focus {
 .btn, button:not(.unstyled) {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+}
+
+/* Dynamic Theme Button Classes */
+.btn-theme-primary,
+.bg-theme-primary {
+  background: var(--dynamic-primary) !important;
+  color: white !important;
+}
+
+.btn-theme-secondary,
+.bg-theme-secondary {
+  background: var(--dynamic-secondary) !important;
+  color: white !important;
+}
+
+.btn-theme-accent,
+.bg-theme-accent {
+  background: var(--dynamic-accent) !important;
+  color: white !important;
+}
+
+.text-theme-primary {
+  color: var(--dynamic-primary) !important;
+}
+
+.text-theme-secondary {
+  color: var(--dynamic-secondary) !important;
+}
+
+.text-theme-accent {
+  color: var(--dynamic-accent) !important;
+}
+
+.border-theme-primary {
+  border-color: var(--dynamic-primary) !important;
+}
+
+.border-theme-secondary {
+  border-color: var(--dynamic-secondary) !important;
+}
+
+.border-theme-accent {
+  border-color: var(--dynamic-accent) !important;
+}
+
+/* Gradient Classes Using Theme Variables */
+.bg-theme-gradient {
+  background: var(--theme-gradient) !important;
+}
+
+/* Override existing blue colors with theme colors */
+.bg-blue-600 {
+  background: var(--dynamic-primary) !important;
+}
+
+.bg-blue-500 {
+  background: var(--dynamic-secondary) !important;
+}
+
+.text-blue-600 {
+  color: var(--dynamic-primary) !important;
+}
+
+.text-blue-500 {
+  color: var(--dynamic-secondary) !important;
+}
+
+.border-blue-600 {
+  border-color: var(--dynamic-primary) !important;
+}
+
+.border-blue-500 {
+  border-color: var(--dynamic-secondary) !important;
 }
 
 /* Modal and Dialog Styling */
