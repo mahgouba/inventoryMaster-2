@@ -2975,6 +2975,125 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced hierarchical Excel import
+  app.post("/api/inventory/hierarchical-import", async (req, res) => {
+    try {
+      const { data } = req.body;
+      
+      if (!Array.isArray(data)) {
+        return res.status(400).json({ message: "Data should be an array" });
+      }
+      
+      const results = [];
+      let carsData = readCarsData();
+      
+      for (const row of data) {
+        try {
+          const { manufacturer, category, trimLevel, exteriorColor, interiorColor } = row;
+          
+          if (!manufacturer || !category) {
+            results.push({ 
+              success: false, 
+              row, 
+              error: "Manufacturer and category are required" 
+            });
+            continue;
+          }
+          
+          // Find or create manufacturer
+          let brand = carsData.find(car => car.brand_ar === manufacturer);
+          if (!brand) {
+            brand = {
+              brand_ar: manufacturer,
+              brand_en: manufacturer,
+              models: []
+            };
+            carsData.push(brand);
+          }
+          
+          // Find or create category (model)
+          let model = brand.models.find(m => m.model_ar === category);
+          if (!model) {
+            model = {
+              model_ar: category,
+              model_en: category,
+              trims: []
+            };
+            brand.models.push(model);
+          }
+          
+          // Find or create trim level
+          if (trimLevel) {
+            let trim = model.trims.find(t => t.trim_ar === trimLevel);
+            if (!trim) {
+              trim = {
+                trim_ar: trimLevel,
+                trim_en: trimLevel,
+                colors: {
+                  exterior: [],
+                  interior: []
+                }
+              };
+              model.trims.push(trim);
+            }
+            
+            // Add colors if provided
+            if (exteriorColor && !trim.colors.exterior.includes(exteriorColor)) {
+              trim.colors.exterior.push(exteriorColor);
+            }
+            if (interiorColor && !trim.colors.interior.includes(interiorColor)) {
+              trim.colors.interior.push(interiorColor);
+            }
+          }
+          
+          // Now create the inventory item
+          const validatedData = insertInventoryItemSchema.safeParse(row);
+          if (!validatedData.success) {
+            results.push({ 
+              success: false, 
+              row, 
+              error: "Invalid inventory data: " + validatedData.error.errors.map(e => e.message).join(", ")
+            });
+            continue;
+          }
+          
+          const inventoryItem = await storage.createInventoryItem(validatedData.data);
+          results.push({ success: true, row, result: inventoryItem });
+          
+        } catch (error: any) {
+          results.push({ 
+            success: false, 
+            row, 
+            error: error.message || "Unknown error"
+          });
+        }
+      }
+      
+      // Save updated cars.json data
+      try {
+        writeCarsData(carsData);
+      } catch (error) {
+        console.error("Error saving cars.json:", error);
+      }
+      
+      const successful = results.filter(r => r.success).length;
+      const failed = results.filter(r => !r.success).length;
+      
+      res.json({
+        summary: {
+          total: data.length,
+          successful,
+          failed
+        },
+        results
+      });
+      
+    } catch (error) {
+      console.error("Hierarchical import error:", error);
+      res.status(500).json({ message: "Failed to process hierarchical import" });
+    }
+  });
+
   // Cars.json management routes
   // Get all manufacturers from cars.json
   app.get("/api/cars-json/manufacturers", async (req, res) => {

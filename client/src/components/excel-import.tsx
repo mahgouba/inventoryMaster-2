@@ -44,28 +44,20 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
 
   const importMutation = useMutation({
     mutationFn: async (data: any[]) => {
-      const results = [];
-      for (const item of data) {
-        try {
-          const result = await apiRequest("POST", "/api/inventory", item);
-          results.push({ success: true, item, result });
-        } catch (error) {
-          results.push({ success: false, item, error });
-        }
-      }
-      return results;
+      // Use hierarchical import endpoint
+      return await apiRequest("POST", "/api/inventory/hierarchical-import", { data });
     },
-    onSuccess: (results) => {
-      const successful = results.filter(r => r.success).length;
-      const failed = results.filter(r => !r.success).length;
+    onSuccess: (response) => {
+      const { summary, results } = response;
       
       queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory/stats"] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/hierarchical/manufacturers"] });
       
       toast({
-        title: "تم الاستيراد",
-        description: `تم استيراد ${successful} عنصر بنجاح${failed > 0 ? ` وفشل في ${failed} عنصر` : ''}`,
+        title: "تم الاستيراد الهرمي",
+        description: `تم استيراد ${summary.successful} عنصر بنجاح${summary.failed > 0 ? ` وفشل في ${summary.failed} عنصر` : ''}\nتم تحديث البيانات الهرمية (الصناع والفئات ودرجات التجهيز)`,
       });
       
       onOpenChange(false);
@@ -267,7 +259,7 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5" />
@@ -281,7 +273,17 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
             <CardHeader className="pb-3">
               <CardTitle className="text-base">تحميل النموذج</CardTitle>
               <CardDescription>
-                احصل على نموذج CSV يحتوي على الأعمدة المطلوبة: الصانع، الفئة، درجة التجهيز، سعة المحرك، السنة، اللون الخارجي، اللون الداخلي، الحالة، المكان، نوع الاستيراد، رقم الهيكل، نوع الملكية، تاريخ الدخول، السعر، الملاحظات
+                <div className="space-y-2">
+                  <div>احصل على نموذج CSV يحتوي على الأعمدة المطلوبة للاستيراد الهرمي</div>
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded text-sm">
+                    <strong className="text-blue-800 dark:text-blue-200">ميزة الاستيراد الهرمي:</strong>
+                    <ul className="text-blue-700 dark:text-blue-300 mt-1 space-y-1 text-xs">
+                      <li>• تكرار الصانع → يضيف فئة جديدة لذلك الصانع</li>
+                      <li>• تكرار الفئة → يضيف درجة تجهيز جديدة لتلك الفئة</li>
+                      <li>• تكرار درجة التجهيز → يضيف لون جديد لتلك الدرجة</li>
+                    </ul>
+                  </div>
+                </div>
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -301,7 +303,7 @@ export default function ExcelImport({ open, onOpenChange }: ExcelImportProps) {
             <CardHeader className="pb-3">
               <CardTitle className="text-base">رفع الملف</CardTitle>
               <CardDescription>
-                اختر ملف Excel (.xlsx, .xls) أو CSV (.csv) يحتوي على بيانات المخزون. تأكد من تطابق أسماء الأعمدة مع النموذج المحمل
+                اختر ملف Excel (.xlsx, .xls) أو CSV (.csv) يحتوي على بيانات المخزون. النظام سيقوم بإنشاء البيانات الهرمية تلقائياً عند تكرار الصناع والفئات
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
