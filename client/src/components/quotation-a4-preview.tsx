@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { QrCode, Phone, Mail, Globe, Building, FileText, User, Building2, Settings, Calculator } from "lucide-react";
+import { QrCode, Phone, Mail, Globe, Building, FileText, User, Building2, Settings, Calculator, Stamp } from "lucide-react";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import type { Company, InventoryItem, Specification } from "@shared/schema";
 import { getManufacturerLogo } from "@shared/manufacturer-logos";
@@ -405,44 +405,123 @@ export default function QuotationA4Preview({
             )}
           </div>
 
-          {/* Price Details */}
-          <div className="mb-3">
-            <div className="flex items-center gap-2 mb-2">
-              <Calculator className="text-[#C79C45] w-5 h-5" />
-              <span className="text-lg font-bold text-black/80">تفاصيل السعر</span>
+          {/* Top Row: Price Details and Terms & Conditions */}
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            {/* Price Details */}
+            <div className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
+              <div className="flex items-center gap-2 mb-2">
+                <Calculator className="text-[#C79C45] w-5 h-5" />
+                <span className="text-lg font-bold text-black/80">تفاصيل السعر</span>
+              </div>
+              
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span className="font-semibold text-black/80">السعر الأساسي:</span>
+                  <span className="text-black/80">{basePrice.toLocaleString()} ريال</span>
+                </div>
+                
+                {includeLicensePlate && (
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-black/80">رسوم اللوحة:</span>
+                    <span className="text-black/80">{licensePlatePrice.toLocaleString()} ريال</span>
+                  </div>
+                )}
+                
+                <div className="flex justify-between pt-1">
+                  <span className="font-semibold text-black/80">المجموع قبل الضريبة:</span>
+                  <span className="text-black/80">{finalPrice.toLocaleString()} ريال</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="font-semibold text-black/80">ضريبة القيمة المضافة ({taxRate}%):</span>
+                  <span className="text-black/80">{taxAmount.toFixed(2)} ريال</span>
+                </div>
+                
+                <div className="pt-1 text-lg font-bold">
+                  <div className="flex justify-between">
+                    <span className="text-black/80">المجموع النهائي:</span>
+                    <span className="text-[#C79C45]">{grandTotal.toFixed(2)} ريال</span>
+                  </div>
+                  <div className="text-sm text-black/80 mt-1 text-left">
+                    ({numberToArabic(Math.floor(grandTotal))} ريال سعودي)
+                  </div>
+                </div>
+              </div>
             </div>
-            
-            <div className="space-y-1 text-sm">
-              <div className="flex justify-between">
-                <span className="font-semibold text-black/80">السعر الأساسي:</span>
-                <span className="text-black/80">{basePrice.toLocaleString()} ريال</span>
+
+            {/* Terms & Conditions */}
+            <div className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="text-[#C79C45] w-5 h-5" />
+                <span className="text-lg font-bold text-black/80">الشروط والأحكام</span>
               </div>
               
-              {includeLicensePlate && (
-                <div className="flex justify-between">
-                  <span className="font-semibold text-black/80">رسوم اللوحة:</span>
-                  <span className="text-black/80">{licensePlatePrice.toLocaleString()} ريال</span>
-                </div>
-              )}
-              
-              <div className="flex justify-between pt-1">
-                <span className="font-semibold text-black/80">المجموع قبل الضريبة:</span>
-                <span className="text-black/80">{finalPrice.toLocaleString()} ريال</span>
+              <div className="space-y-1 text-xs text-black/80 max-h-32 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                {termsConditions.length > 0 ? (
+                  termsConditions.map((term, index) => (
+                    <div key={term.id} className="leading-relaxed">
+                      <span className="font-semibold">{index + 1}.</span> {term.term_text}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-black/60 py-2">
+                    لم يتم إضافة شروط وأحكام
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Row: Sales Representative and Company Stamp */}
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            {/* Sales Representative */}
+            <div className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
+              <div className="flex items-center gap-2 mb-2">
+                <User className="text-[#C79C45] w-5 h-5" />
+                <span className="text-lg font-bold text-black/80">مندوب المبيعات</span>
               </div>
               
-              <div className="flex justify-between">
-                <span className="font-semibold text-black/80">ضريبة القيمة المضافة ({taxRate}%):</span>
-                <span className="text-black/80">{taxAmount.toFixed(2)} ريال</span>
+              <div className="space-y-1 text-sm text-black/80">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">الاسم:</span>
+                  <span>{representativeName || "غير محدد"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">المنصب:</span>
+                  <span>{representativePosition || "مندوب مبيعات"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">الجوال:</span>
+                  <span>{representativePhone || "غير محدد"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">البريد:</span>
+                  <span className="text-xs">{representativeEmail || "غير محدد"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Company Stamp */}
+            <div className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
+              <div className="flex items-center gap-2 mb-2">
+                <Stamp className="text-[#C79C45] w-5 h-5" />
+                <span className="text-lg font-bold text-black/80">ختم الشركة</span>
               </div>
               
-              <div className="pt-1 text-lg font-bold">
-                <div className="flex justify-between">
-                  <span className="text-black/80">المجموع النهائي:</span>
-                  <span className="text-[#C79C45]">{grandTotal.toFixed(2)} ريال</span>
-                </div>
-                <div className="text-sm text-black/80 mt-1 text-left">
-                  ({numberToArabic(Math.floor(grandTotal))} ريال سعودي)
-                </div>
+              <div className="flex items-center justify-center h-20">
+                {companyStamp ? (
+                  <img 
+                    src={companyStamp} 
+                    alt="ختم الشركة" 
+                    className="max-h-16 max-w-full object-contain"
+                  />
+                ) : (
+                  <div className="text-center text-black/60 text-sm">
+                    <div className="border-2 border-dashed border-black/20 rounded-lg p-2 w-16 h-16 flex items-center justify-center">
+                      <span className="text-xs">ختم الشركة</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
