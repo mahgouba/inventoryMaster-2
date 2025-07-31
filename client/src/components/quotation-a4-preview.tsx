@@ -346,11 +346,13 @@ export default function QuotationA4Preview({
           {/* Vehicle Specifications */}
           <div className="mb-3">
             <div className="flex items-center gap-2 mb-2">
-              <Settings 
-                className="text-[#C79C45] w-5 h-5 cursor-pointer" 
+              <div 
+                className="text-[#C79C45] cursor-pointer" 
                 onDoubleClick={() => setIsEditingSpecs(!isEditingSpecs)}
                 title="انقر مرتين للتحرير"
-              />
+              >
+                <Settings className="w-5 h-5" />
+              </div>
               <span className="text-lg font-bold text-black/80">المواصفات التفصيلية</span>
             </div>
             
