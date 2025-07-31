@@ -389,13 +389,14 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
 
 
       {/* Navigation Items */}
-      <div className="flex-1 p-2">
+      <div className="flex-1 p-2 h-full">
         <div 
           ref={scrollRef}
           className="flex flex-col items-center space-y-3 h-full overflow-y-auto scrollbar-none"
           style={{ 
             scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
+            msOverflowStyle: 'none',
+            height: 'calc(100vh - 120px)' // Full height minus header and padding
           }}
         >
           {allItems.map((item, index) => {
