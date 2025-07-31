@@ -246,7 +246,7 @@ export default function QuotationA4Preview({
         <div className="absolute inset-0" style={{ paddingTop: '2.5cm', padding: '1cm' }}>
           
           {/* First Row: Quote Header Information */}
-          <div className="flex justify-between items-center bg-white/95 p-4 rounded-lg shadow-sm mt-[55px] mb-[55px]">
+          <div className="flex justify-between items-center mt-[55px] mb-4">
             <div className="flex items-center gap-4">
               <FileText className="text-[#2B4C8C] w-6 h-6" />
               <span className="text-lg font-bold text-[#2B4C8C]">
@@ -279,8 +279,8 @@ export default function QuotationA4Preview({
           </div>
 
           {/* Second Row: Customer Information */}
-          <div className="mb-6 bg-white/95 p-4 rounded-lg shadow-sm">
-            <div className="flex items-center gap-2 mb-3">
+          <div className="mb-3">
+            <div className="flex items-center gap-2">
               <User className="text-[#2B4C8C] w-5 h-5" />
               <span className="text-lg font-bold text-[#2B4C8C]">
                 {customerTitle} / {customerName || "غير محدد"}
@@ -288,15 +288,15 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
-          {/* Third Row: Vehicle Information Box */}
-          <div className="mb-6 bg-white/95 p-4 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-4">
+          {/* Third Row: Vehicle Information */}
+          <div className="mb-3">
+            <div className="flex items-center gap-2 mb-2">
               <Building2 className="text-[#2B4C8C] w-5 h-5" />
               <span className="text-lg font-bold text-[#2B4C8C]">بيانات المركبة</span>
             </div>
             
             {selectedVehicle && (
-              <div className="grid grid-cols-3 gap-4 text-sm">
+              <div className="grid grid-cols-3 gap-2 text-sm">
                 {/* First Row: Manufacturer, Category, Trim Level */}
                 <div className="flex justify-between">
                   <span className="font-semibold text-[#2B4C8C]">الصانع:</span>
@@ -334,16 +334,16 @@ export default function QuotationA4Preview({
             )}
           </div>
 
-          {/* Vehicle Specifications Box */}
-          <div className="mb-6 bg-white/95 p-4 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-4">
+          {/* Vehicle Specifications */}
+          <div className="mb-3">
+            <div className="flex items-center gap-2 mb-2">
               <Settings className="text-[#2B4C8C] w-5 h-5" />
               <span className="text-lg font-bold text-[#2B4C8C]">المواصفات التفصيلية</span>
             </div>
             
             {vehicleSpecs ? (
-              <div className="text-sm space-y-2">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="text-sm space-y-1">
+                <div className="grid grid-cols-2 gap-2">
                   <div className="flex justify-between">
                     <span className="font-semibold text-[#2B4C8C]">سعة المحرك:</span>
                     <span className="text-gray-700">{vehicleSpecs.engineCapacity}</span>
@@ -363,8 +363,8 @@ export default function QuotationA4Preview({
                 </div>
                 
                 {vehicleSpecs.detailedDescription && (
-                  <div className="mt-4">
-                    <span className="font-semibold text-[#2B4C8C] block mb-2">مواصفات إضافية:</span>
+                  <div className="mt-2">
+                    <span className="font-semibold text-[#2B4C8C] block mb-1">مواصفات إضافية:</span>
                     <div className="text-gray-700 text-xs leading-relaxed">
                       {vehicleSpecs.detailedDescription}
                     </div>
@@ -372,20 +372,20 @@ export default function QuotationA4Preview({
                 )}
               </div>
             ) : (
-              <div className="text-center text-gray-500 py-4">
+              <div className="text-center text-gray-500 py-2">
                 لم يتم تحديد مواصفات للمركبة
               </div>
             )}
           </div>
 
-          {/* Price Details Box */}
-          <div className="mb-6 bg-white/95 p-4 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-4">
+          {/* Price Details */}
+          <div className="mb-3">
+            <div className="flex items-center gap-2 mb-2">
               <Calculator className="text-[#2B4C8C] w-5 h-5" />
               <span className="text-lg font-bold text-[#2B4C8C]">تفاصيل السعر</span>
             </div>
             
-            <div className="space-y-3 text-sm">
+            <div className="space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="font-semibold text-[#2B4C8C]">السعر الأساسي:</span>
                 <span className="text-gray-700">{basePrice.toLocaleString()} ريال</span>
@@ -398,7 +398,7 @@ export default function QuotationA4Preview({
                 </div>
               )}
               
-              <div className="flex justify-between border-t pt-2">
+              <div className="flex justify-between pt-1">
                 <span className="font-semibold text-[#2B4C8C]">المجموع قبل الضريبة:</span>
                 <span className="text-gray-700">{finalPrice.toLocaleString()} ريال</span>
               </div>
@@ -408,7 +408,7 @@ export default function QuotationA4Preview({
                 <span className="text-gray-700">{taxAmount.toFixed(2)} ريال</span>
               </div>
               
-              <div className="flex justify-between border-t pt-2 text-lg font-bold">
+              <div className="flex justify-between pt-1 text-lg font-bold">
                 <span className="text-[#2B4C8C]">المجموع النهائي:</span>
                 <span className="text-[#C49632]">{grandTotal.toFixed(2)} ريال</span>
               </div>
