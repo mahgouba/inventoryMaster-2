@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Edit2, Plus, Check, X, Building2, Car, Settings2 } from "lucide-react";
+import { Trash2, Edit2, Plus, Check, X, Building2, Car, Settings2, Upload, Download, Palette } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -36,6 +36,25 @@ interface TrimLevel {
   trim_en: string;
 }
 
+interface Color {
+  name_ar: string;
+  name_en: string;
+  type: 'interior' | 'exterior';
+}
+
+interface BulkImportData {
+  manufacturer_ar: string;
+  manufacturer_en: string;
+  category_ar: string;
+  category_en: string;
+  trim_ar: string;
+  trim_en: string;
+  interior_color_ar?: string;
+  interior_color_en?: string;
+  exterior_color_ar?: string;
+  exterior_color_en?: string;
+}
+
 export default function CarsJsonManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -44,6 +63,12 @@ export default function CarsJsonManager() {
   const [newManufacturer, setNewManufacturer] = useState({ name_ar: "", name_en: "" });
   const [newCategory, setNewCategory] = useState({ manufacturer: "", name_ar: "", name_en: "" });
   const [newTrim, setNewTrim] = useState({ manufacturer: "", category: "", trim_ar: "", trim_en: "" });
+  const [newColor, setNewColor] = useState({ name_ar: "", name_en: "", type: "interior" as 'interior' | 'exterior' });
+  
+  // State for bulk import
+  const [bulkImportFile, setBulkImportFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
   
   // State for editing
   const [editingManufacturer, setEditingManufacturer] = useState<{ oldName: string; name_ar: string; name_en: string } | null>(null);
@@ -212,6 +237,115 @@ export default function CarsJsonManager() {
     setShowDeleteDialog(null);
   };
 
+  // Bulk import handler
+  const handleBulkImport = async () => {
+    if (!bulkImportFile) return;
+
+    setIsImporting(true);
+    setImportProgress(0);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', bulkImportFile);
+
+      // Simulate progress for user feedback
+      const progressInterval = setInterval(() => {
+        setImportProgress(prev => Math.min(prev + 10, 90));
+      }, 200);
+
+      const response = await fetch('/api/cars-json/bulk-import', {
+        method: 'POST',
+        body: formData,
+      });
+
+      clearInterval(progressInterval);
+      setImportProgress(100);
+
+      if (!response.ok) {
+        throw new Error('فشل في استيراد الملف');
+      }
+
+      const result = await response.json();
+      
+      // Invalidate all queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/cars-json/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/cars-json/categories'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/cars-json/trims'] });
+
+      toast({
+        title: 'تم الاستيراد بنجاح',
+        description: `تم استيراد ${result.imported || 0} عنصر بنجاح`,
+      });
+
+      setBulkImportFile(null);
+    } catch (error) {
+      console.error('Bulk import error:', error);
+      toast({
+        title: 'خطأ في الاستيراد',
+        description: 'حدث خطأ أثناء استيراد الملف',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsImporting(false);
+      setImportProgress(0);
+    }
+  };
+
+  // Download template handler
+  const downloadTemplate = () => {
+    const templateData = [
+      {
+        manufacturer_ar: 'تويوتا',
+        manufacturer_en: 'Toyota',
+        category_ar: 'كامري',
+        category_en: 'Camry',
+        trim_ar: 'فل كامل',
+        trim_en: 'Full Option',
+        interior_color_ar: 'أسود',
+        interior_color_en: 'Black',
+        exterior_color_ar: 'أبيض',
+        exterior_color_en: 'White'
+      },
+      {
+        manufacturer_ar: 'هوندا',
+        manufacturer_en: 'Honda',
+        category_ar: 'أكورد',
+        category_en: 'Accord',
+        trim_ar: 'استاندر',
+        trim_en: 'Standard',
+        interior_color_ar: 'بيج',
+        interior_color_en: 'Beige',
+        exterior_color_ar: 'أزرق',
+        exterior_color_en: 'Blue'
+      }
+    ];
+
+    // Create CSV content
+    const headers = Object.keys(templateData[0]);
+    const csvContent = [
+      headers.join(','),
+      ...templateData.map(row => headers.map(header => `"${row[header as keyof typeof row]}"`).join(','))
+    ].join('\n');
+
+    // Download CSV file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'vehicle_import_template.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    toast({
+      title: 'تم تنزيل النموذج',
+      description: 'يمكنك الآن تعبئة البيانات في الملف وإعادة رفعه',
+    });
+  };
+
   return (
     <div className="glass-background min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
@@ -226,7 +360,7 @@ export default function CarsJsonManager() {
 
         <Tabs defaultValue="manufacturers" className="space-y-6">
           <div className="glass-container border-white/20 p-2">
-            <TabsList className="grid w-full grid-cols-3 bg-transparent">
+            <TabsList className="grid w-full grid-cols-5 bg-transparent">
               <TabsTrigger value="manufacturers" className="data-[state=active]:bg-white/20 text-white">
                 <Building2 className="h-4 w-4 ml-2" />
                 الشركات المصنعة
@@ -238,6 +372,14 @@ export default function CarsJsonManager() {
               <TabsTrigger value="trims" className="data-[state=active]:bg-white/20 text-white">
                 <Settings2 className="h-4 w-4 ml-2" />
                 درجات التجهيز
+              </TabsTrigger>
+              <TabsTrigger value="colors" className="data-[state=active]:bg-white/20 text-white">
+                <Palette className="h-4 w-4 ml-2" />
+                الألوان
+              </TabsTrigger>
+              <TabsTrigger value="bulk-import" className="data-[state=active]:bg-white/20 text-white">
+                <Upload className="h-4 w-4 ml-2" />
+                استيراد مجمع
               </TabsTrigger>
             </TabsList>
           </div>
@@ -700,6 +842,143 @@ export default function CarsJsonManager() {
                     )}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Colors Tab */}
+          <TabsContent value="colors" className="space-y-6">
+            <Card className="glass-container border-white/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Palette className="h-5 w-5" />
+                  إضافة لون جديد
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label className="text-white font-medium mb-2 block">نوع اللون *</Label>
+                  <Select
+                    value={newColor.type}
+                    onValueChange={(value: 'interior' | 'exterior') => setNewColor(prev => ({ ...prev, type: value }))}
+                  >
+                    <SelectTrigger className="glass-container border-white/20 text-white">
+                      <SelectValue placeholder="اختر نوع اللون" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="interior">لون داخلي</SelectItem>
+                      <SelectItem value="exterior">لون خارجي</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-white font-medium mb-2 block">اسم اللون العربي *</Label>
+                    <Input
+                      value={newColor.name_ar}
+                      onChange={(e) => setNewColor(prev => ({ ...prev, name_ar: e.target.value }))}
+                      placeholder="مثال: أحمر"
+                      className="glass-container border-white/20 text-white placeholder:text-white/50"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-white font-medium mb-2 block">اسم اللون الإنجليزي *</Label>
+                    <Input
+                      value={newColor.name_en}
+                      onChange={(e) => setNewColor(prev => ({ ...prev, name_en: e.target.value }))}
+                      placeholder="Example: Red"
+                      className="glass-container border-white/20 text-white placeholder:text-white/50"
+                    />
+                  </div>
+                </div>
+                <Button
+                  onClick={() => {
+                    // Add color logic here
+                    toast({ title: "سيتم تطوير هذه الميزة قريباً" });
+                  }}
+                  disabled={!newColor.name_ar.trim() || !newColor.name_en.trim()}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  <Plus className="h-4 w-4 ml-2" />
+                  إضافة لون
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Bulk Import Tab */}
+          <TabsContent value="bulk-import" className="space-y-6">
+            <Card className="glass-container border-white/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Upload className="h-5 w-5" />
+                  استيراد مجمع للبيانات
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="text-white/80 space-y-2">
+                  <p className="font-medium">تنسيق الملف المطلوب:</p>
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    <li>ملف Excel (.xlsx) أو CSV (.csv)</li>
+                    <li>يجب أن يحتوي على الأعمدة التالية: manufacturer_ar, manufacturer_en, category_ar, category_en, trim_ar, trim_en</li>
+                    <li>أعمدة اختيارية للألوان: interior_color_ar, interior_color_en, exterior_color_ar, exterior_color_en</li>
+                  </ul>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-white font-medium mb-2 block">اختر ملف للاستيراد</Label>
+                    <Input
+                      type="file"
+                      accept=".xlsx,.csv"
+                      onChange={(e) => setBulkImportFile(e.target.files?.[0] || null)}
+                      className="glass-container border-white/20 text-white file:bg-white/10 file:border-0 file:text-white"
+                    />
+                  </div>
+
+                  {bulkImportFile && (
+                    <div className="p-4 glass-container border-white/20 rounded-lg">
+                      <p className="text-white text-sm">
+                        <strong>الملف المحدد:</strong> {bulkImportFile.name}
+                      </p>
+                      <p className="text-white/70 text-xs">
+                        الحجم: {(bulkImportFile.size / 1024 / 1024).toFixed(2)} ميجابايت
+                      </p>
+                    </div>
+                  )}
+
+                  {isImporting && (
+                    <div className="space-y-2">
+                      <div className="w-full bg-white/10 rounded-full h-2">
+                        <div 
+                          className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${importProgress}%` }}
+                        />
+                      </div>
+                      <p className="text-white text-sm text-center">جاري الاستيراد... {importProgress}%</p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-4">
+                    <Button
+                      onClick={handleBulkImport}
+                      disabled={!bulkImportFile || isImporting}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Upload className="h-4 w-4 ml-2" />
+                      {isImporting ? "جاري الاستيراد..." : "بدء الاستيراد"}
+                    </Button>
+
+                    <Button
+                      onClick={downloadTemplate}
+                      variant="outline"
+                      className="border-white/20 text-white hover:bg-white/10"
+                    >
+                      <Download className="h-4 w-4 ml-2" />
+                      تنزيل نموذج
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

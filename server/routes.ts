@@ -26,6 +26,8 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
+import multer from "multer";
+import * as XLSX from "xlsx";
 
 // Cars.json management utility functions
 interface CarData {
@@ -61,6 +63,12 @@ function writeCarsData(data: CarData[]): void {
     throw new Error('Failed to update cars data');
   }
 }
+
+// Configure multer for file uploads
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
@@ -3128,6 +3136,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting trim level:", error);
       res.status(500).json({ message: "Failed to delete trim level" });
+    }
+  });
+
+  // Bulk import cars data from Excel/CSV file
+  app.post("/api/cars-json/bulk-import", upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const fileExtension = req.file.originalname.split('.').pop()?.toLowerCase();
+      let data: any[] = [];
+
+      if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+        // Parse Excel file
+        const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        data = XLSX.utils.sheet_to_json(worksheet);
+      } else if (fileExtension === 'csv') {
+        // Parse CSV file
+        const csvData = req.file.buffer.toString('utf8');
+        const workbook = XLSX.read(csvData, { type: 'string' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        data = XLSX.utils.sheet_to_json(worksheet);
+      } else {
+        return res.status(400).json({ message: "Unsupported file format. Please use .xlsx or .csv files." });
+      }
+
+      if (!data || data.length === 0) {
+        return res.status(400).json({ message: "File is empty or invalid" });
+      }
+
+      // Validate required columns
+      const requiredColumns = ['manufacturer_ar', 'manufacturer_en', 'category_ar', 'category_en', 'trim_ar', 'trim_en'];
+      const firstRow = data[0];
+      const missingColumns = requiredColumns.filter(col => !(col in firstRow));
+      
+      if (missingColumns.length > 0) {
+        return res.status(400).json({ 
+          message: `Missing required columns: ${missingColumns.join(', ')}` 
+        });
+      }
+
+      let carsData = readCarsData();
+      let importedCount = 0;
+      let skippedCount = 0;
+
+      // Process each row
+      for (const row of data) {
+        try {
+          const { manufacturer_ar, manufacturer_en, category_ar, category_en, trim_ar, trim_en } = row;
+
+          if (!manufacturer_ar || !manufacturer_en || !category_ar || !category_en || !trim_ar || !trim_en) {
+            skippedCount++;
+            continue;
+          }
+
+          // Find or create manufacturer
+          let brandIndex = carsData.findIndex(car => 
+            car.brand_ar === manufacturer_ar || car.brand_en === manufacturer_en
+          );
+
+          if (brandIndex === -1) {
+            // Create new manufacturer
+            carsData.push({
+              brand_ar: manufacturer_ar,
+              brand_en: manufacturer_en,
+              models: []
+            });
+            brandIndex = carsData.length - 1;
+          }
+
+          // Find or create category/model
+          let modelIndex = carsData[brandIndex].models.findIndex(model => 
+            model.model_ar === category_ar || model.model_en === category_en
+          );
+
+          if (modelIndex === -1) {
+            // Create new category/model
+            carsData[brandIndex].models.push({
+              model_ar: category_ar,
+              model_en: category_en,
+              trims: []
+            });
+            modelIndex = carsData[brandIndex].models.length - 1;
+          }
+
+          // Check if trim level already exists
+          const trimExists = carsData[brandIndex].models[modelIndex].trims.some(trim => 
+            trim.trim_ar === trim_ar || trim.trim_en === trim_en
+          );
+
+          if (!trimExists) {
+            // Add new trim level
+            carsData[brandIndex].models[modelIndex].trims.push({
+              trim_ar,
+              trim_en
+            });
+            importedCount++;
+          } else {
+            skippedCount++;
+          }
+
+        } catch (error) {
+          console.error('Error processing row:', error);
+          skippedCount++;
+        }
+      }
+
+      // Save updated cars data
+      writeCarsData(carsData);
+
+      res.json({
+        message: "Bulk import completed successfully",
+        imported: importedCount,
+        skipped: skippedCount,
+        total: data.length
+      });
+
+    } catch (error) {
+      console.error("Error in bulk import:", error);
+      res.status(500).json({ message: "Failed to process bulk import" });
     }
   });
 
