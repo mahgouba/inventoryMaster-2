@@ -266,14 +266,14 @@ export default function QuotationA4Preview({
             </div>
             
             <div className="flex items-center gap-1">
-              <span className="font-semibold text-black/80">تاريخ الإصدار:</span>
+              <span className="font-semibold text-black/80">الإصدار:</span>
               <span className="text-black/80">
                 {new Date().toLocaleDateString('ar-SA')}
               </span>
             </div>
             
             <div className="flex items-center gap-1">
-              <span className="font-semibold text-black/80">تاريخ الانتهاء:</span>
+              <span className="font-semibold text-black/80">الإنتهاء:</span>
               <span className="text-red-600 font-medium">
                 {validUntil.toLocaleDateString('ar-SA')}
               </span>
