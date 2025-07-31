@@ -335,20 +335,7 @@ export default function PersonalBanks() {
                             )}
                           </div>
                           
-                          {/* Quick Share Button */}
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              shareBank(bank);
-                            }}
-                            className="p-2 hover:bg-white/20 rounded-lg transition-all duration-300 flex items-center gap-1 backdrop-blur-sm border border-white/20"
-                            title="مشاركة معلومات البنك"
-                          >
-                            <Share2 className="w-4 h-4 text-white" />
-                            <span className="text-xs text-white hidden sm:inline">مشاركة</span>
-                          </Button>
+
                         </div>
                         
                         {isExpanded ? (
@@ -363,19 +350,7 @@ export default function PersonalBanks() {
                         <div className="w-full space-y-4 animate-in slide-in-from-top-2 duration-300">
                           <Separator className="bg-white/30" />
 
-                          {/* Share Button */}
-                          <div className="flex justify-center mb-4">
-                            <Button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                shareBank(bank);
-                              }}
-                              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-xl flex items-center gap-3 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-white/20"
-                            >
-                              <Share2 className="w-5 h-5" />
-                              <span className="font-semibold">مشاركة بيانات البنك</span>
-                            </Button>
-                          </div>
+
 
                           {/* Bank Details Container - Remove borders */}
                           <div className="space-y-4">
@@ -470,70 +445,7 @@ export default function PersonalBanks() {
                             </div>
                           </div>
 
-                          {/* Actions Dropdown */}
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm border border-white/20"
-                              >
-                                <MoreVertical className="w-5 h-5" />
-                                <span className="font-semibold">الإجراءات</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-white/90 backdrop-blur-sm border-white/20" align="end">
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  shareBank(bank);
-                                }}
-                                className="flex items-center gap-2 cursor-pointer hover:bg-gray-100/50"
-                              >
-                                <Share2 className="w-4 h-4" />
-                                <span>مشاركة بيانات البنك</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyToClipboard(`${bank.bankName}\nاسم الحساب: ${bank.accountName}\nرقم الحساب: ${bank.accountNumber}\nالآيبان: ${bank.iban}`, "بيانات البنك");
-                                }}
-                                className="flex items-center gap-2 cursor-pointer hover:bg-gray-100/50"
-                              >
-                                <Copy className="w-4 h-4" />
-                                <span>نسخ كامل البيانات</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  hideBank(bank.id);
-                                }}
-                                className="flex items-center gap-2 cursor-pointer hover:bg-gray-100/50"
-                              >
-                                <EyeOff className="w-4 h-4" />
-                                <span>إخفاء البنك</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  editBank(bank.id);
-                                }}
-                                className="flex items-center gap-2 cursor-pointer hover:bg-gray-100/50"
-                              >
-                                <Edit3 className="w-4 h-4" />
-                                <span>تعديل البيانات</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteBank(bank.id, bank.bankName);
-                                }}
-                                className="flex items-center gap-2 cursor-pointer hover:bg-red-100/50 text-red-600"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                                <span>حذف البنك</span>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+
                         </div>
                       )}
                     </div>
@@ -550,17 +462,7 @@ export default function PersonalBanks() {
           </div>
         )}
 
-        {/* Quick Links */}
-        <div className="mt-12 flex justify-center">
-          <Link href="/banks-company">
-            <Button 
-              variant="outline" 
-              className="backdrop-blur-xl bg-white/10 text-white border-white/30 hover:bg-white/20 px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              عرض بنوك الشركات
-            </Button>
-          </Link>
-        </div>
+
       </div>
     </div>
     </TooltipProvider>
