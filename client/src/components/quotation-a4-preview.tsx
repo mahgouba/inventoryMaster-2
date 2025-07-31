@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { QrCode, Phone, Mail, Globe, Building } from "lucide-react";
+import { QrCode, Phone, Mail, Globe, Building, FileText, User, Building2, Settings, Calculator } from "lucide-react";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import type { Company, InventoryItem, Specification } from "@shared/schema";
 import { getManufacturerLogo } from "@shared/manufacturer-logos";
@@ -242,7 +242,180 @@ export default function QuotationA4Preview({
           colorAdjust: 'exact'
         }}
       >
+        {/* Content overlay on A4 background - Start at 2.5cm from top */}
+        <div className="absolute inset-0" style={{ paddingTop: '2.5cm', padding: '1cm' }}>
+          
+          {/* First Row: Quote Header Information */}
+          <div className="flex justify-between items-center mb-6 bg-white/95 p-4 rounded-lg shadow-sm">
+            <div className="flex items-center gap-4">
+              <FileText className="text-[#2B4C8C] w-6 h-6" />
+              <span className="text-lg font-bold text-[#2B4C8C]">
+                {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-[#2B4C8C]">رقم العرض:</span>
+                <span className="font-bold text-[#C49632]">
+                  {isInvoiceMode ? invoiceNumber : quoteNumber}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-[#2B4C8C]">تاريخ الإصدار:</span>
+                <span className="text-gray-700">
+                  {new Date().toLocaleDateString('ar-SA')}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-[#2B4C8C]">تاريخ الانتهاء:</span>
+                <span className="text-red-600 font-medium">
+                  {validUntil.toLocaleDateString('ar-SA')}
+                </span>
+              </div>
+            </div>
+          </div>
 
+          {/* Second Row: Customer Information */}
+          <div className="mb-6 bg-white/95 p-4 rounded-lg shadow-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <User className="text-[#2B4C8C] w-5 h-5" />
+              <span className="text-lg font-bold text-[#2B4C8C]">
+                {customerTitle} / {customerName || "غير محدد"}
+              </span>
+            </div>
+          </div>
+
+          {/* Third Row: Vehicle Information Box */}
+          <div className="mb-6 bg-white/95 p-4 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center gap-2 mb-4">
+              <Building2 className="text-[#2B4C8C] w-5 h-5" />
+              <span className="text-lg font-bold text-[#2B4C8C]">بيانات المركبة</span>
+            </div>
+            
+            {selectedVehicle && (
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                {/* First Row: Manufacturer, Category, Trim Level */}
+                <div className="flex justify-between">
+                  <span className="font-semibold text-[#2B4C8C]">الصانع:</span>
+                  <span className="text-gray-700">{selectedVehicle.manufacturer}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold text-[#2B4C8C]">الفئة:</span>
+                  <span className="text-gray-700">{selectedVehicle.category}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold text-[#2B4C8C]">درجة التجهيز:</span>
+                  <span className="text-gray-700">{selectedVehicle.trimLevel || "غير محدد"}</span>
+                </div>
+                
+                {/* Second Row: Model Year, Interior Color, Exterior Color */}
+                <div className="flex justify-between">
+                  <span className="font-semibold text-[#2B4C8C]">الموديل:</span>
+                  <span className="text-gray-700">{selectedVehicle.year}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold text-[#2B4C8C]">اللون الداخلي:</span>
+                  <span className="text-gray-700">{selectedVehicle.interiorColor || "غير محدد"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold text-[#2B4C8C]">اللون الخارجي:</span>
+                  <span className="text-gray-700">{selectedVehicle.exteriorColor}</span>
+                </div>
+                
+                {/* Third Row: Chassis Number */}
+                <div className="flex justify-between col-span-3">
+                  <span className="font-semibold text-[#2B4C8C]">رقم الهيكل:</span>
+                  <span className="text-gray-700">{selectedVehicle.chassisNumber || "غير محدد"}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Vehicle Specifications Box */}
+          <div className="mb-6 bg-white/95 p-4 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center gap-2 mb-4">
+              <Settings className="text-[#2B4C8C] w-5 h-5" />
+              <span className="text-lg font-bold text-[#2B4C8C]">المواصفات التفصيلية</span>
+            </div>
+            
+            {vehicleSpecs ? (
+              <div className="text-sm space-y-2">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-[#2B4C8C]">سعة المحرك:</span>
+                    <span className="text-gray-700">{vehicleSpecs.engineCapacity}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-[#2B4C8C]">نوع الوقود:</span>
+                    <span className="text-gray-700">{vehicleSpecs.fuelType || "غير محدد"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-[#2B4C8C]">ناقل الحركة:</span>
+                    <span className="text-gray-700">{vehicleSpecs.transmission || "غير محدد"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-[#2B4C8C]">نوع الدفع:</span>
+                    <span className="text-gray-700">{vehicleSpecs.drivetrain || "غير محدد"}</span>
+                  </div>
+                </div>
+                
+                {vehicleSpecs.detailedDescription && (
+                  <div className="mt-4">
+                    <span className="font-semibold text-[#2B4C8C] block mb-2">مواصفات إضافية:</span>
+                    <div className="text-gray-700 text-xs leading-relaxed">
+                      {vehicleSpecs.detailedDescription}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-4">
+                لم يتم تحديد مواصفات للمركبة
+              </div>
+            )}
+          </div>
+
+          {/* Price Details Box */}
+          <div className="mb-6 bg-white/95 p-4 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center gap-2 mb-4">
+              <Calculator className="text-[#2B4C8C] w-5 h-5" />
+              <span className="text-lg font-bold text-[#2B4C8C]">تفاصيل السعر</span>
+            </div>
+            
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="font-semibold text-[#2B4C8C]">السعر الأساسي:</span>
+                <span className="text-gray-700">{basePrice.toLocaleString()} ريال</span>
+              </div>
+              
+              {includeLicensePlate && (
+                <div className="flex justify-between">
+                  <span className="font-semibold text-[#2B4C8C]">رسوم اللوحة:</span>
+                  <span className="text-gray-700">{licensePlatePrice.toLocaleString()} ريال</span>
+                </div>
+              )}
+              
+              <div className="flex justify-between border-t pt-2">
+                <span className="font-semibold text-[#2B4C8C]">المجموع قبل الضريبة:</span>
+                <span className="text-gray-700">{finalPrice.toLocaleString()} ريال</span>
+              </div>
+              
+              <div className="flex justify-between">
+                <span className="font-semibold text-[#2B4C8C]">ضريبة القيمة المضافة ({taxRate}%):</span>
+                <span className="text-gray-700">{taxAmount.toFixed(2)} ريال</span>
+              </div>
+              
+              <div className="flex justify-between border-t pt-2 text-lg font-bold">
+                <span className="text-[#2B4C8C]">المجموع النهائي:</span>
+                <span className="text-[#C49632]">{grandTotal.toFixed(2)} ريال</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );
