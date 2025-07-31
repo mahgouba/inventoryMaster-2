@@ -1466,39 +1466,120 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               <div className="grid gap-4">
                 {arrivedTodayVehicles.map((vehicle) => (
                   <Card key={vehicle.id} className="glass-container border-l-4 border-l-yellow-500">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <ManufacturerLogo 
-                            manufacturerName={vehicle.manufacturer} 
-                            size="md" 
-                            className="w-12 h-12"
-                          />
-                          <div>
-                            <h3 className="font-bold text-white text-lg">
-                              {vehicle.manufacturer} {vehicle.category}
-                            </h3>
-                            <p className="text-white/80">
-                              {vehicle.year} - {vehicle.exteriorColor}
-                            </p>
-                            <p className="text-white/60 text-sm">
-                              رقم الهيكل: {vehicle.chassisNumber}
-                            </p>
+                    <CardContent className="p-6">
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Vehicle Main Info */}
+                        <div className="lg:col-span-2">
+                          <div className="flex items-center gap-4 mb-4">
+                            <ManufacturerLogo 
+                              manufacturerName={vehicle.manufacturer} 
+                              size="lg" 
+                              className="w-16 h-16"
+                            />
+                            <div>
+                              <h3 className="font-bold text-white text-xl">
+                                {vehicle.manufacturer} {vehicle.category}
+                              </h3>
+                              {vehicle.trimLevel && (
+                                <p className="text-yellow-400 font-semibold text-lg">
+                                  {vehicle.trimLevel}
+                                </p>
+                              )}
+                              <Badge className={`${getStatusColor(vehicle.status)} mt-1`}>
+                                {vehicle.status}
+                              </Badge>
+                            </div>
+                          </div>
+                          
+                          {/* Vehicle Details Grid */}
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-white/80">
+                                <Calendar size={16} />
+                                <span className="font-medium">السنة:</span>
+                                <span className="text-white">{vehicle.year}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-white/80">
+                                <div className="w-4 h-4 rounded-full border border-white/40"></div>
+                                <span className="font-medium">اللون الخارجي:</span>
+                                <span className="text-white">{vehicle.exteriorColor}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-white/80">
+                                <div className="w-4 h-4 rounded border border-white/40"></div>
+                                <span className="font-medium">اللون الداخلي:</span>
+                                <span className="text-white">{vehicle.interiorColor}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-white/80">
+                                <img src="/car-engine.svg" alt="engine" className="w-4 h-4" />
+                                <span className="font-medium">المحرك:</span>
+                                <span className="text-white">{vehicle.engineCapacity}</span>
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-white/80">
+                                <img src={getImportTypeIcon(vehicle.importType)} alt="import" className="w-4 h-4" />
+                                <span className="font-medium">نوع الاستيراد:</span>
+                                <span className="text-white">{vehicle.importType}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-white/80">
+                                <img src="/ownerchip.svg" alt="ownership" className="w-4 h-4" />
+                                <span className="font-medium">نوع الملكية:</span>
+                                <span className="text-white">{vehicle.ownershipType}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-white/80">
+                                <img src="/location.svg" alt="location" className="w-4 h-4" />
+                                <span className="font-medium">الموقع:</span>
+                                <span className="text-white">{vehicle.location}</span>
+                              </div>
+                              {vehicle.price && (
+                                <div className="flex items-center gap-2 text-white/80">
+                                  <span className="font-medium">السعر:</span>
+                                  <span className="text-green-400 font-bold">{Number(vehicle.price).toLocaleString()} ريال</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
-                        <div className="text-left">
-                          <Badge className={`${getStatusColor(vehicle.status)} mb-2`}>
-                            {vehicle.status}
-                          </Badge>
-                          <p className="text-white/60 text-sm">
-                            وصل: {vehicle.entryDate ? new Date(vehicle.entryDate).toLocaleDateString('ar-SA', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            }) : 'غير محدد'}
-                          </p>
+                        
+                        {/* Arrival Info */}
+                        <div className="lg:col-span-1 bg-white/5 rounded-lg p-4">
+                          <h4 className="font-bold text-yellow-400 mb-3">معلومات الوصول</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="text-white/80">
+                              <span className="font-medium">تاريخ الوصول:</span>
+                              <div className="text-white mt-1">
+                                {vehicle.entryDate ? new Date(vehicle.entryDate).toLocaleDateString('en-GB', {
+                                  year: 'numeric',
+                                  month: '2-digit',
+                                  day: '2-digit'
+                                }) : 'غير محدد'}
+                              </div>
+                            </div>
+                            <div className="text-white/80">
+                              <span className="font-medium">وقت الوصول:</span>
+                              <div className="text-white mt-1">
+                                {vehicle.entryDate ? new Date(vehicle.entryDate).toLocaleTimeString('en-GB', {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  hour12: false
+                                }) : 'غير محدد'}
+                              </div>
+                            </div>
+                            <div className="text-white/80">
+                              <span className="font-medium">رقم الهيكل:</span>
+                              <div className="text-white mt-1 font-mono text-xs break-all">
+                                {vehicle.chassisNumber}
+                              </div>
+                            </div>
+                            {vehicle.notes && (
+                              <div className="text-white/80">
+                                <span className="font-medium">ملاحظات:</span>
+                                <div className="text-white/90 mt-1 text-xs">
+                                  {vehicle.notes}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </CardContent>

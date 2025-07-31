@@ -332,6 +332,20 @@ The application uses PostgreSQL for persistent data storage with proper database
   - Empty state message when no vehicles arrived in last 24 hours
   - Real-time updates when new vehicles are added to inventory
 
+### System-Wide Date Format Standardization - Gregorian Calendar with 24-Hour Time (July 31, 2025)
+- ✅ **COMPLETED: Gregorian Calendar Implementation** - Updated entire system to use Gregorian calendar dates instead of Arabic (Hijri) calendar
+- ✅ **24-Hour Time Format** - Standardized all time displays to use 24-hour format (00:00-23:59) instead of 12-hour AM/PM format
+- ✅ **Enhanced "Arrived Today" Dialog** - Completely redesigned dialog to show comprehensive vehicle data:
+  - Full vehicle specifications grid with manufacturer logo, year, colors, engine capacity
+  - Import type, ownership type, and location information with appropriate icons
+  - Separate arrival information section with Gregorian date (DD/MM/YYYY format)
+  - 24-hour time display (HH:MM format) for precise arrival timing
+  - Complete chassis number display with proper formatting
+  - Vehicle notes and pricing information when available
+  - Professional glass morphism design with detailed data layout
+- ✅ **Date Format Consistency** - Applied 'en-GB' locale formatting throughout system for DD/MM/YYYY date display
+- ✅ **Time Display Standards** - All timestamps now use hour12: false setting for consistent 24-hour time format
+
 ### Previous Replit Environment Migration - Complete Success with Redesigned Add Item Form (July 27, 2025)
 - ✅ Successfully completed migration from Replit Agent to standard Replit environment  
 - ✅ All required packages installed and verified working (Node.js 20, tsx, all dependencies)
