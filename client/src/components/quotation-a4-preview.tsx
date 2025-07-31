@@ -253,7 +253,7 @@ export default function QuotationA4Preview({
               </span>
             </div>
             
-            <div className="flex items-center gap-6 text-sm">
+            <div className="flex items-center gap-2 text-sm">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-[#333333]">رقم العرض:</span>
                 <span className="font-bold text-[#C79C45]">
