@@ -285,7 +285,15 @@ export default function QuotationA4Preview({
           {/* Third Row: Vehicle Information */}
           <div className="mb-3">
             <div className="flex items-center gap-2 mb-2">
-              <Building2 className="text-[#C79C45] w-5 h-5" />
+              {selectedVehicle && getManufacturerLogo(selectedVehicle.manufacturer) ? (
+                <img 
+                  src={getManufacturerLogo(selectedVehicle.manufacturer)} 
+                  alt={selectedVehicle.manufacturer}
+                  className="w-5 h-5 object-contain"
+                />
+              ) : (
+                <Building2 className="text-[#C79C45] w-5 h-5" />
+              )}
               <span className="text-lg font-bold text-black/80">بيانات المركبة</span>
             </div>
             
