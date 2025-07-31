@@ -3104,6 +3104,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         if (selectedTypes.includes('categories')) {
           data.companies = await storage.getAllCompanies();
+          data.categories = await storage.getAllCategories();
+          data.trimLevels = await storage.getAllTrimLevels();
+          data.engineCapacities = await storage.getAllEngineCapacities();
+          data.specifications = await storage.getAllSpecifications();
+          // Add cars.json data for categories export
+          try {
+            data.carsJson = readCarsData();
+          } catch (error) {
+            console.log('Could not read cars.json:', error);
+            data.carsJson = [];
+          }
         }
         if (selectedTypes.includes('financingRates')) {
           data.financingRates = await storage.getAllFinancingRates();
@@ -3111,6 +3122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (selectedTypes.includes('settings')) {
           data.imageLinks = await storage.getAllImageLinks();
           data.leaveRequests = await storage.getAllLeaveRequests();
+          data.colorAssociations = await storage.getAllColorAssociations();
         }
       } else {
         // Full export - fetch all data
@@ -3123,7 +3135,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companies,
           leaveRequests,
           financingRates,
-          imageLinks
+          imageLinks,
+          specifications,
+          trimLevels,
+          categories,
+          engineCapacities,
+          colorAssociations
         ] = await Promise.all([
           storage.getAllInventoryItems(),
           storage.getAllBanks(),
@@ -3133,7 +3150,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           storage.getAllCompanies(),
           storage.getAllLeaveRequests(),
           storage.getAllFinancingRates(),
-          storage.getAllImageLinks()
+          storage.getAllImageLinks(),
+          storage.getAllSpecifications(),
+          storage.getAllTrimLevels(),
+          storage.getAllCategories(),
+          storage.getAllEngineCapacities(),
+          storage.getAllColorAssociations()
         ]);
 
         data.inventory = inventory;
@@ -3145,6 +3167,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         data.leaveRequests = leaveRequests;
         data.financingRates = financingRates;
         data.imageLinks = imageLinks;
+        data.specifications = specifications;
+        data.trimLevels = trimLevels;
+        data.categories = categories;
+        data.engineCapacities = engineCapacities;
+        data.colorAssociations = colorAssociations;
+        
+        // Add cars.json data which contains manufacturers, categories, and trim levels
+        try {
+          const carsJsonData = readCarsData();
+          data.carsJson = carsJsonData;
+          
+          // Extract manufacturers from cars.json for better compatibility
+          data.carsManufacturers = carsJsonData.map(car => ({
+            name_ar: car.brand_ar,
+            name_en: car.brand_en,
+            models: car.models.map(model => ({
+              model_ar: model.model_ar,
+              model_en: model.model_en,
+              trims: model.trims.map(trim => ({
+                trim_ar: trim.trim_ar,
+                trim_en: trim.trim_en
+              }))
+            }))
+          }));
+        } catch (error) {
+          console.log('Could not read cars.json:', error);
+          data.carsJson = [];
+          data.carsManufacturers = [];
+        }
       }
 
       const exportData = {
