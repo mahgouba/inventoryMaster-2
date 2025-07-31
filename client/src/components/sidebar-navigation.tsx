@@ -56,36 +56,40 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
     onCollapseChange?.(newCollapsed);
   };
 
-  const overviewItems = [
+  // Define permissions based on user role
+  const hasAccountantPermissions = ["admin", "accountant", "salesperson", "sales_manager"].includes(user.role);
+  const hasLeaveApprovalPermissions = ["admin", "sales_manager"].includes(user.role);
+
+  const overviewItems = hasAccountantPermissions ? [
     { 
-      title: "لوحة المتابعة", 
+      title: "المخزون", 
       href: "/inventory", 
       icon: LayoutDashboard,
-      description: "Dashboard"
+      description: "Inventory"
     },
     { 
-      title: "إنشاء عرض سعر", 
+      title: "العروض", 
       href: "/quotation-creation", 
       icon: MessageSquare,
-      description: "Create Quote"
+      description: "Quotations"
     },
     { 
-      title: "طلبات الحجز", 
+      title: "المبيعات", 
+      href: "/sold-vehicles", 
+      icon: BarChart3,
+      description: "Sales"
+    },
+    { 
+      title: "الحجوزات", 
       href: "/reservations", 
       icon: Activity,
       description: "Reservations"
     },
     { 
-      title: "السيارات المباعة", 
-      href: "/sold-vehicles", 
-      icon: BarChart3,
-      description: "Sold Vehicles"
-    },
-    { 
-      title: "حاسبة التمويل", 
-      href: "/financing-calculator", 
-      icon: Calculator,
-      description: "Financing Calculator"
+      title: "البطاقات", 
+      href: "/card-view-new", 
+      icon: CreditCard,
+      description: "Cards"
     },
     { 
       title: "طلبات الإجازة", 
@@ -93,7 +97,7 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
       icon: UserCheck,
       description: "Leave Requests"
     }
-  ];
+  ] : [];
 
   const userManagementItems = user.role === "admin" ? [
     { 

@@ -538,6 +538,21 @@ The application uses PostgreSQL for persistent data storage with proper database
 - ✅ **Empty State Handling**: Added helpful messages when no rates are available, directing users to the rates management page
 - ✅ **Query Integration**: Used TanStack Query for efficient data fetching with proper loading states and error handling
 
+### Role-Based Permissions System Implementation - Complete Success (July 31, 2025)
+- ✅ **COMPLETED: Complete Role-Based Access Control System** - Implemented comprehensive permissions system across the entire application
+- ✅ **User Role Schema Update** - Enhanced user schema to support 4 role types: admin, accountant, salesperson, sales_manager  
+- ✅ **Leave Requests Permission Control** - Applied role-based permissions to leave requests page:
+  - **Accountant & Salesperson**: Can access inventory, offers, sales, reservations, bank cards, and create leave requests (pending status)
+  - **Sales Manager**: All accountant/salesperson permissions plus ability to approve/deny leave requests
+  - **Admin**: Full system access including all management functions
+- ✅ **Sidebar Navigation Permissions** - Updated sidebar to dynamically show/hide sections based on user role
+- ✅ **Smart UI Adaptation** - Page titles and descriptions change based on user permissions (e.g., "إدارة طلبات الإجازة" for managers vs "طلبات الإجازة" for staff)
+- ✅ **Action Button Control** - Approval/rejection buttons only visible to sales_manager and admin roles
+- ✅ **Create Request Permissions** - New leave request button only appears for authorized roles (accountant, salesperson, sales_manager, admin)
+- ✅ **Enhanced Security** - All requests from accountant/salesperson automatically set to "pending" status requiring management approval
+- ✅ **Complete Arabic Interface** - All permission-based UI changes maintain full Arabic RTL support and glass morphism design
+- ✅ **Zero Breaking Changes** - Implementation maintains backward compatibility with existing functionality
+
 ### Latest Database Integration Implementation - Complete Success (July 30, 2025)
 - ✅ Successfully migrated from in-memory storage to PostgreSQL database with full data persistence
 - ✅ Provisioned PostgreSQL database and pushed complete schema using Drizzle ORM

@@ -102,6 +102,10 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const [previewRequest, setPreviewRequest] = useState<LeaveRequest | null>(null);
 
+  // Define permissions based on user role
+  const canApproveRequests = ["admin", "sales_manager"].includes(userRole);
+  const canCreateRequests = ["admin", "accountant", "salesperson", "sales_manager"].includes(userRole);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -368,17 +372,22 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
         <GlassContainer className="p-6 mb-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-white drop-shadow-lg">طلبات الإجازة والاستئذان</h1>
-              <p className="text-white/80 drop-shadow-md">إدارة طلبات الإجازات والاستئذان للموظفين</p>
+              <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+                {canApproveRequests ? "إدارة طلبات الإجازة والاستئذان" : "طلبات الإجازة والاستئذان"}
+              </h1>
+              <p className="text-white/80 drop-shadow-md">
+                {canApproveRequests ? "إدارة طلبات الإجازات والاستئذان للموظفين" : "عرض وإنشاء طلبات الإجازات والاستئذان"}
+              </p>
             </div>
             
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white shadow-lg">
-                  <Plus size={20} className="ml-2" />
-                  إنشاء طلب جديد
-                </Button>
-              </DialogTrigger>
+            {canCreateRequests && (
+              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white shadow-lg">
+                    <Plus size={20} className="ml-2" />
+                    إنشاء طلب جديد
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="max-w-md backdrop-blur-md bg-slate-900/90 border border-white/20" dir="rtl" aria-describedby="dialog-description">
                 <DialogHeader>
                   <DialogTitle className="text-white">إنشاء طلب إجازة أو استئذان</DialogTitle>
@@ -503,6 +512,7 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                 </div>
               </DialogContent>
             </Dialog>
+            )}
           </div>
         </GlassContainer>
 
@@ -658,7 +668,7 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                           <Download size={14} />
                         </Button>
                         
-                        {userRole === "admin" && request.status === "pending" && (
+                        {canApproveRequests && request.status === "pending" && (
                           <div className="flex gap-1">
                             <Button
                               size="sm"
