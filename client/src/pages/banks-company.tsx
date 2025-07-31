@@ -195,14 +195,14 @@ export default function CompanyBanks() {
     <TooltipProvider>
     <div className="min-h-screen" style={{ background: 'var(--dark-bg-primary)' }} dir="rtl">
       <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Header with Company Logo and Title - Match Inventory Style */}
-        <div className="glass-container mb-8 p-8 text-center">
-          <div className="flex justify-center mb-6">
+        {/* Header with Company Logo and Title - Compact Style */}
+        <div className="glass-container mb-6 p-4">
+          <div className="flex items-center justify-center gap-4">
             {appearance?.companyLogo ? (
               <img 
                 src={appearance.companyLogo} 
                 alt="شعار الشركة" 
-                className="w-32 h-32 object-contain drop-shadow-2xl"
+                className="w-16 h-16 object-contain drop-shadow-xl"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
@@ -212,19 +212,19 @@ export default function CompanyBanks() {
               <img 
                 src="/copmany logo.svg" 
                 alt="شعار شركة البريمي للسيارات" 
-                className="w-32 h-32 object-contain drop-shadow-2xl"
+                className="w-16 h-16 object-contain drop-shadow-xl"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                 }}
               />
             )}
+            
+            <h1 className="text-2xl font-bold text-white flex items-center gap-2 drop-shadow-lg">
+              <Building2 className="w-6 h-6" />
+              بنوك شركة البريمي للسيارات
+            </h1>
           </div>
-          
-          <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3 drop-shadow-lg">
-            <Building2 className="w-10 h-10" />
-            بنوك شركة البريمي للسيارات
-          </h1>
         </div>
 
         {/* Banks Grid - Match Inventory Style */}

@@ -16,8 +16,8 @@ import PriceCardsManagementPage from "@/pages/price-cards-management";
 import LoginPage from "@/pages/login";
 import NotFound from "@/pages/not-found";
 import QuotationEditPage from "@/pages/quotation-edit";
-import PersonalBanks from "@/pages/banks-personal";
-import CompanyBanks from "@/pages/banks-company";
+import PersonalBanks from "@/pages/banks-personal-new";
+import CompanyBanks from "@/pages/banks-company-new";
 import IOSPickerDemo from "@/pages/ios-picker-demo";
 import VerticalPickerShowcase from "@/pages/vertical-picker-showcase";
 
