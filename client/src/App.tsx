@@ -71,6 +71,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           <Route path="/theme-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/database-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/cars-migration" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/car-data-import" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/locations" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           
           {/* Admin Routes through Main Dashboard */}

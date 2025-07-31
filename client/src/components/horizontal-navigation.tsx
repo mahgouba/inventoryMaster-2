@@ -22,7 +22,8 @@ import {
   Landmark,
   LogOut,
   Percent,
-  Database
+  Database,
+  Upload
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -338,6 +339,12 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       title: "إدارة الثيمات", 
       href: "/theme-management", 
       icon: Palette,
+      internal: true
+    },
+    { 
+      title: "استيراد السيارات", 
+      href: "/car-data-import", 
+      icon: Upload,
       internal: true
     }
   ] : [];

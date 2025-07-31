@@ -1913,6 +1913,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Import comprehensive car data endpoint
+  app.post("/api/cars/import-comprehensive", async (req, res) => {
+    try {
+      console.log("Starting comprehensive car data import...");
+      
+      // Read the comprehensive cars data
+      const comprehensiveData = JSON.parse(readFileSync(join(process.cwd(), "comprehensive-cars-data.json"), "utf8"));
+      
+      let manufacturersCreated = 0;
+      let categoriesCreated = 0;
+      let trimLevelsCreated = 0;
+      const errors: string[] = [];
+
+      // Import each brand
+      for (const brand of comprehensiveData) {
+        try {
+          // Create manufacturer
+          const manufacturerData = {
+            nameAr: brand.brand_ar,
+            nameEn: brand.brand_en,
+            isActive: true
+          };
+
+          const manufacturer = await storage.createManufacturer(manufacturerData);
+          manufacturersCreated++;
+          console.log(`Created manufacturer: ${brand.brand_ar}`);
+
+          // Import models (categories) for this manufacturer
+          for (const model of brand.models) {
+            try {
+              const categoryData = {
+                manufacturerId: manufacturer.id,
+                nameAr: model.model_ar,
+                nameEn: model.model_en,
+                isActive: true
+              };
+
+              const category = await storage.createVehicleCategory(categoryData);
+              categoriesCreated++;
+              console.log(`Created category: ${model.model_ar} for ${brand.brand_ar}`);
+
+              // Import trim levels for this category
+              for (const trim of model.trims) {
+                try {
+                  const trimData = {
+                    categoryId: category.id,
+                    nameAr: trim.trim_ar,
+                    nameEn: trim.trim_en,
+                    isActive: true
+                  };
+
+                  await storage.createVehicleTrimLevel(trimData);
+                  trimLevelsCreated++;
+                  console.log(`Created trim level: ${trim.trim_ar} for ${model.model_ar}`);
+                } catch (trimError: any) {
+                  console.error(`Error creating trim level ${trim.trim_ar}:`, trimError);
+                  errors.push(`فشل في إنشاء درجة التجهيز ${trim.trim_ar}: ${trimError.message}`);
+                }
+              }
+            } catch (categoryError: any) {
+              console.error(`Error creating category ${model.model_ar}:`, categoryError);
+              errors.push(`فشل في إنشاء الفئة ${model.model_ar}: ${categoryError.message}`);
+            }
+          }
+        } catch (manufacturerError: any) {
+          console.error(`Error creating manufacturer ${brand.brand_ar}:`, manufacturerError);
+          errors.push(`فشل في إنشاء الصانع ${brand.brand_ar}: ${manufacturerError.message}`);
+        }
+      }
+
+      const result = {
+        manufacturersCreated,
+        categoriesCreated,
+        trimLevelsCreated,
+        errors
+      };
+
+      console.log("Import completed:", result);
+      res.json(result);
+
+    } catch (error: any) {
+      console.error("Comprehensive import error:", error);
+      res.status(500).json({ 
+        error: "فشل في استيراد البيانات", 
+        details: error.message,
+        manufacturersCreated: 0,
+        categoriesCreated: 0,
+        trimLevelsCreated: 0,
+        errors: [error.message]
+      });
+    }
+  });
+
   app.get("/api/cars/manufacturers", async (req, res) => {
     try {
       const carsData = JSON.parse(readFileSync(join(process.cwd(), "cars.json"), "utf8"));
