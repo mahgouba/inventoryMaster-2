@@ -247,7 +247,7 @@ export default function QuotationA4Preview({
           
           {/* First Row: Quote Header Information */}
           <div className="flex items-center gap-6 text-sm mt-[4.5px] mb-[4.5px] pt-[63px] pb-[63px]">
-            <span className="text-lg font-bold text-black/80">
+            <span className="font-bold text-[20px] text-[#03627f]">
               {isInvoiceMode ? 'فاتورة' : 'عرض سعر'}
             </span>
             
