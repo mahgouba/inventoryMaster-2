@@ -2795,6 +2795,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Cars.json migration route  
+  app.post('/api/cars-json/migrate', async (req, res) => {
+    try {
+      const result = await storage.migrateCarsJsonToDatabase();
+      res.json({
+        success: true,
+        message: 'تم توزيع البيانات بنجاح',
+        data: result
+      });
+    } catch (error: any) {
+      console.error('Migration error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'فشل في توزيع البيانات',
+        error: error.message
+      });
+    }
+  });
+
+  // Vehicle Categories routes
+  app.get('/api/vehicle-categories', async (req, res) => {
+    try {
+      const categories = await storage.getAllVehicleCategories();
+      res.json(categories);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/vehicle-categories/manufacturer/:manufacturerId', async (req, res) => {
+    try {
+      const manufacturerId = parseInt(req.params.manufacturerId);
+      const categories = await storage.getVehicleCategoriesByManufacturer(manufacturerId);
+      res.json(categories);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Vehicle Trim Levels routes
+  app.get('/api/vehicle-trim-levels', async (req, res) => {
+    try {
+      const trimLevels = await storage.getAllVehicleTrimLevels();
+      res.json(trimLevels);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/vehicle-trim-levels/category/:categoryId', async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.categoryId);
+      const trimLevels = await storage.getVehicleTrimLevelsByCategory(categoryId);
+      res.json(trimLevels);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Cars.json management routes
   // Get all manufacturers from cars.json
   app.get("/api/cars-json/manufacturers", async (req, res) => {

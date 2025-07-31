@@ -81,12 +81,37 @@ export const bankInterestRates = pgTable("bank_interest_rates", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Manufacturers table for storing manufacturer logos
+// Manufacturers table for storing manufacturer information
 export const manufacturers = pgTable("manufacturers", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull().unique(),
-  logo: text("logo"),
-  createdAt: timestamp("created_at").defaultNow(),
+  nameAr: text("name_ar").notNull(), // الاسم العربي
+  nameEn: text("name_en").notNull(), // الاسم الإنجليزي  
+  logo: text("logo"), // الشعار
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Vehicle Categories table (models)
+export const vehicleCategories = pgTable("vehicle_categories", {
+  id: serial("id").primaryKey(),
+  manufacturerId: integer("manufacturer_id").references(() => manufacturers.id).notNull(),
+  nameAr: text("name_ar").notNull(), // الاسم العربي للفئة
+  nameEn: text("name_en").notNull(), // الاسم الإنجليزي للفئة
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Vehicle Trim Levels table
+export const vehicleTrimLevels = pgTable("vehicle_trim_levels", {
+  id: serial("id").primaryKey(),
+  categoryId: integer("category_id").references(() => vehicleCategories.id).notNull(),
+  nameAr: text("name_ar").notNull(), // الاسم العربي لدرجة التجهيز
+  nameEn: text("name_en").notNull(), // الاسم الإنجليزي لدرجة التجهيز
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // Color Associations table for linking colors to manufacturer/category/trim
@@ -872,3 +897,23 @@ export const insertAppearanceSettingsSchema = createInsertSchema(appearanceSetti
 
 export type AppearanceSettings = typeof appearanceSettings.$inferSelect;
 export type InsertAppearanceSettings = z.infer<typeof insertAppearanceSettingsSchema>;
+
+// Zod schemas for new vehicle-related tables
+export const insertVehicleCategorySchema = createInsertSchema(vehicleCategories).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertVehicleTrimLevelSchema = createInsertSchema(vehicleTrimLevels).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Types for new vehicle-related tables
+export type VehicleCategory = typeof vehicleCategories.$inferSelect;
+export type InsertVehicleCategory = z.infer<typeof insertVehicleCategorySchema>;
+
+export type VehicleTrimLevel = typeof vehicleTrimLevels.$inferSelect;
+export type InsertVehicleTrimLevel = z.infer<typeof insertVehicleTrimLevelSchema>;

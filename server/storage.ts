@@ -16,7 +16,9 @@ import {
   type LeaveRequest, type InsertLeaveRequest,
   type BankInterestRate, type InsertBankInterestRate,
   type FinancingRate, type InsertFinancingRate,
-  type ColorAssociation, type InsertColorAssociation
+  type ColorAssociation, type InsertColorAssociation,
+  type VehicleCategory, type InsertVehicleCategory,
+  type VehicleTrimLevel, type InsertVehicleTrimLevel
 } from "@shared/schema";
 
 export interface IStorage {
@@ -206,6 +208,29 @@ export interface IStorage {
   
   // Image links methods
   getAllImageLinks(): Promise<string[]>;
+
+  // Vehicle Categories methods
+  getAllVehicleCategories(): Promise<VehicleCategory[]>;
+  getVehicleCategory(id: number): Promise<VehicleCategory | undefined>;
+  getVehicleCategoriesByManufacturer(manufacturerId: number): Promise<VehicleCategory[]>;
+  createVehicleCategory(category: InsertVehicleCategory): Promise<VehicleCategory>;
+  updateVehicleCategory(id: number, category: Partial<InsertVehicleCategory>): Promise<VehicleCategory | undefined>;
+  deleteVehicleCategory(id: number): Promise<boolean>;
+
+  // Vehicle Trim Levels methods
+  getAllVehicleTrimLevels(): Promise<VehicleTrimLevel[]>;
+  getVehicleTrimLevel(id: number): Promise<VehicleTrimLevel | undefined>;
+  getVehicleTrimLevelsByCategory(categoryId: number): Promise<VehicleTrimLevel[]>;
+  createVehicleTrimLevel(trimLevel: InsertVehicleTrimLevel): Promise<VehicleTrimLevel>;
+  updateVehicleTrimLevel(id: number, trimLevel: Partial<InsertVehicleTrimLevel>): Promise<VehicleTrimLevel | undefined>;
+  deleteVehicleTrimLevel(id: number): Promise<boolean>;
+
+  // Cars.json migration utility
+  migrateCarsJsonToDatabase(): Promise<{ 
+    manufacturersCreated: number; 
+    categoriesCreated: number; 
+    trimLevelsCreated: number; 
+  }>;
 }
 
 export class MemStorage implements IStorage {
@@ -224,6 +249,8 @@ export class MemStorage implements IStorage {
   private leaveRequests = new Map<number, LeaveRequest>();
   private financingRates = new Map<number, FinancingRate>();
   private colorAssociations = new Map<number, ColorAssociation>();
+  private vehicleCategories = new Map<number, VehicleCategory>();
+  private vehicleTrimLevels = new Map<number, VehicleTrimLevel>();
   
   private currentUserId = 1;
   private currentInventoryId = 1;
@@ -240,6 +267,8 @@ export class MemStorage implements IStorage {
   private currentLeaveRequestId = 1;
   private currentFinancingRateId = 1;
   private currentColorAssociationId = 1;
+  private currentVehicleCategoryId = 1;
+  private currentVehicleTrimLevelId = 1;
   
   private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
   private systemSettings = new Map<string, string>();
@@ -676,12 +705,45 @@ export class MemStorage implements IStorage {
   async deleteLocationTransfer(id: number): Promise<boolean> { return false; }
   async getLocationTransfersByItem(itemId: number): Promise<LocationTransfer[]> { return []; }
   
-  async getAllManufacturers(): Promise<Manufacturer[]> { return []; }
-  async getManufacturer(id: number): Promise<Manufacturer | undefined> { return undefined; }
-  async createManufacturer(manufacturer: InsertManufacturer): Promise<Manufacturer> { throw new Error("Not implemented"); }
-  async updateManufacturer(id: number, manufacturer: Partial<InsertManufacturer>): Promise<Manufacturer | undefined> { return undefined; }
-  async deleteManufacturer(id: number): Promise<boolean> { return false; }
-  async getManufacturerByName(name: string): Promise<Manufacturer | undefined> { return undefined; }
+  async getAllManufacturers(): Promise<Manufacturer[]> { 
+    return Array.from(this.manufacturers.values()); 
+  }
+  
+  async getManufacturer(id: number): Promise<Manufacturer | undefined> { 
+    return this.manufacturers.get(id); 
+  }
+  
+  async createManufacturer(manufacturer: InsertManufacturer): Promise<Manufacturer> { 
+    const newManufacturer: Manufacturer = {
+      id: this.currentManufacturerId++,
+      ...manufacturer,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.manufacturers.set(newManufacturer.id, newManufacturer);
+    return newManufacturer;
+  }
+  
+  async updateManufacturer(id: number, manufacturer: Partial<InsertManufacturer>): Promise<Manufacturer | undefined> { 
+    const existing = this.manufacturers.get(id);
+    if (!existing) return undefined;
+
+    const updated: Manufacturer = {
+      ...existing,
+      ...manufacturer,
+      updatedAt: new Date(),
+    };
+    this.manufacturers.set(id, updated);
+    return updated;
+  }
+  
+  async deleteManufacturer(id: number): Promise<boolean> { 
+    return this.manufacturers.delete(id); 
+  }
+  
+  async getManufacturerByName(name: string): Promise<Manufacturer | undefined> { 
+    return Array.from(this.manufacturers.values()).find(m => m.nameAr === name || m.nameEn === name); 
+  }
   
   async getAppearanceSettings(): Promise<AppearanceSettings | undefined> { return this.appearanceSettings; }
   async updateAppearanceSettings(settings: InsertAppearanceSettings): Promise<AppearanceSettings> {
@@ -703,12 +765,47 @@ export class MemStorage implements IStorage {
   async getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<Specification[]> { return []; }
   async getSpecificationByVehicleParams(manufacturer: string, category: string, trimLevel: string | null, year: number, engineCapacity: string): Promise<Specification | undefined> { return undefined; }
   
-  async getAllTrimLevels(): Promise<TrimLevel[]> { return []; }
-  async getTrimLevel(id: number): Promise<TrimLevel | undefined> { return undefined; }
-  async createTrimLevel(trimLevel: InsertTrimLevel): Promise<TrimLevel> { throw new Error("Not implemented"); }
-  async updateTrimLevel(id: number, trimLevel: Partial<InsertTrimLevel>): Promise<TrimLevel | undefined> { return undefined; }
-  async deleteTrimLevel(id: number): Promise<boolean> { return false; }
-  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<TrimLevel[]> { return []; }
+  async getAllTrimLevels(): Promise<TrimLevel[]> { 
+    return Array.from(this.trimLevels.values()); 
+  }
+  
+  async getTrimLevel(id: number): Promise<TrimLevel | undefined> { 
+    return this.trimLevels.get(id); 
+  }
+  
+  async createTrimLevel(trimLevel: InsertTrimLevel): Promise<TrimLevel> { 
+    const newTrimLevel: TrimLevel = {
+      id: this.currentTrimLevelId++,
+      ...trimLevel,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.trimLevels.set(newTrimLevel.id, newTrimLevel);
+    return newTrimLevel;
+  }
+  
+  async updateTrimLevel(id: number, trimLevel: Partial<InsertTrimLevel>): Promise<TrimLevel | undefined> { 
+    const existing = this.trimLevels.get(id);
+    if (!existing) return undefined;
+
+    const updated: TrimLevel = {
+      ...existing,
+      ...trimLevel,
+      updatedAt: new Date(),
+    };
+    this.trimLevels.set(id, updated);
+    return updated;
+  }
+  
+  async deleteTrimLevel(id: number): Promise<boolean> { 
+    return this.trimLevels.delete(id); 
+  }
+  
+  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<TrimLevel[]> { 
+    return Array.from(this.trimLevels.values()).filter(t => 
+      t.manufacturer === manufacturer && t.category === category
+    ); 
+  }
   
   async getAllCategories(): Promise<{ category: string }[]> { return []; }
   async getCategoriesByManufacturer(manufacturer: string): Promise<{ category: string }[]> { return []; }
@@ -963,6 +1060,169 @@ export class MemStorage implements IStorage {
     
     // Remove duplicates and return
     return [...new Set(imageLinks)];
+  }
+
+  // Vehicle Categories methods implementation
+  async getAllVehicleCategories(): Promise<VehicleCategory[]> {
+    return Array.from(this.vehicleCategories.values());
+  }
+
+  async getVehicleCategory(id: number): Promise<VehicleCategory | undefined> {
+    return this.vehicleCategories.get(id);
+  }
+
+  async getVehicleCategoriesByManufacturer(manufacturerId: number): Promise<VehicleCategory[]> {
+    return Array.from(this.vehicleCategories.values()).filter(
+      category => category.manufacturerId === manufacturerId
+    );
+  }
+
+  async createVehicleCategory(category: InsertVehicleCategory): Promise<VehicleCategory> {
+    const newCategory: VehicleCategory = {
+      id: this.currentVehicleCategoryId++,
+      ...category,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.vehicleCategories.set(newCategory.id, newCategory);
+    return newCategory;
+  }
+
+  async updateVehicleCategory(id: number, category: Partial<InsertVehicleCategory>): Promise<VehicleCategory | undefined> {
+    const existing = this.vehicleCategories.get(id);
+    if (!existing) return undefined;
+
+    const updated: VehicleCategory = {
+      ...existing,
+      ...category,
+      updatedAt: new Date(),
+    };
+    this.vehicleCategories.set(id, updated);
+    return updated;
+  }
+
+  async deleteVehicleCategory(id: number): Promise<boolean> {
+    return this.vehicleCategories.delete(id);
+  }
+
+  // Vehicle Trim Levels methods implementation
+  async getAllVehicleTrimLevels(): Promise<VehicleTrimLevel[]> {
+    return Array.from(this.vehicleTrimLevels.values());
+  }
+
+  async getVehicleTrimLevel(id: number): Promise<VehicleTrimLevel | undefined> {
+    return this.vehicleTrimLevels.get(id);
+  }
+
+  async getVehicleTrimLevelsByCategory(categoryId: number): Promise<VehicleTrimLevel[]> {
+    return Array.from(this.vehicleTrimLevels.values()).filter(
+      trimLevel => trimLevel.categoryId === categoryId
+    );
+  }
+
+  async createVehicleTrimLevel(trimLevel: InsertVehicleTrimLevel): Promise<VehicleTrimLevel> {
+    const newTrimLevel: VehicleTrimLevel = {
+      id: this.currentVehicleTrimLevelId++,
+      ...trimLevel,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.vehicleTrimLevels.set(newTrimLevel.id, newTrimLevel);
+    return newTrimLevel;
+  }
+
+  async updateVehicleTrimLevel(id: number, trimLevel: Partial<InsertVehicleTrimLevel>): Promise<VehicleTrimLevel | undefined> {
+    const existing = this.vehicleTrimLevels.get(id);
+    if (!existing) return undefined;
+
+    const updated: VehicleTrimLevel = {
+      ...existing,
+      ...trimLevel,
+      updatedAt: new Date(),
+    };
+    this.vehicleTrimLevels.set(id, updated);
+    return updated;
+  }
+
+  async deleteVehicleTrimLevel(id: number): Promise<boolean> {
+    return this.vehicleTrimLevels.delete(id);
+  }
+
+  // Cars.json migration utility
+  async migrateCarsJsonToDatabase(): Promise<{ 
+    manufacturersCreated: number; 
+    categoriesCreated: number; 
+    trimLevelsCreated: number; 
+  }> {
+    try {
+      // Read cars.json file
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      const carsData = JSON.parse(await fs.readFile(path.join(process.cwd(), 'cars.json'), 'utf-8'));
+      
+      let manufacturersCreated = 0;
+      let categoriesCreated = 0;
+      let trimLevelsCreated = 0;
+
+      // Process each manufacturer
+      for (const car of carsData) {
+        // Create or update manufacturer
+        let manufacturer = Array.from(this.manufacturers.values()).find(
+          m => m.nameAr === car.brand_ar
+        );
+        
+        if (!manufacturer) {
+          manufacturer = await this.createManufacturer({
+            nameAr: car.brand_ar,
+            nameEn: car.brand_en,
+            logo: `/logos/${car.brand_en.toLowerCase()}.svg`
+          });
+          manufacturersCreated++;
+        }
+
+        // Process each model (category)
+        for (const model of car.models) {
+          let category = Array.from(this.vehicleCategories.values()).find(
+            c => c.manufacturerId === manufacturer!.id && c.nameAr === model.model_ar
+          );
+
+          if (!category) {
+            category = await this.createVehicleCategory({
+              manufacturerId: manufacturer.id,
+              nameAr: model.model_ar,
+              nameEn: model.model_en,
+              isActive: true
+            });
+            categoriesCreated++;
+          }
+
+          // Process each trim level
+          for (const trim of model.trims) {
+            const existingTrim = Array.from(this.vehicleTrimLevels.values()).find(
+              t => t.categoryId === category!.id && t.nameAr === trim.trim_ar
+            );
+
+            if (!existingTrim) {
+              await this.createVehicleTrimLevel({
+                categoryId: category.id,
+                nameAr: trim.trim_ar,
+                nameEn: trim.trim_en,
+                isActive: true
+              });
+              trimLevelsCreated++;
+            }
+          }
+        }
+      }
+
+      // Delete cars.json file after successful migration
+      await fs.unlink(path.join(process.cwd(), 'cars.json'));
+      
+      return { manufacturersCreated, categoriesCreated, trimLevelsCreated };
+    } catch (error) {
+      console.error('Migration error:', error);
+      throw new Error(`فشل في تحويل البيانات: ${error}`);
+    }
   }
 }
 

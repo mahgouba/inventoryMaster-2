@@ -17,6 +17,7 @@ import BankManagementFull from "@/pages/bank-management-full";
 import ListManagement from "@/pages/list-management";
 import FinancingRatesPage from "@/pages/financing-rates";
 import DatabaseManagement from "@/pages/database-management";
+import CarsMigrationPage from "@/pages/cars-migration";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
 
@@ -67,6 +68,8 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return user.role === "admin" ? <FinancingRatesPage /> : null;
       case "/database-management":
         return user.role === "admin" ? <DatabaseManagement /> : null;
+      case "/cars-migration":
+        return user.role === "admin" ? <CarsMigrationPage /> : null;
       default:
         return <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />;
     }

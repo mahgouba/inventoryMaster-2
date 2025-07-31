@@ -132,6 +132,12 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
       href: "/database-management", 
       icon: Database,
       description: "Database Management"
+    },
+    { 
+      title: "توزيع بيانات السيارات", 
+      href: "/cars-migration", 
+      icon: Package,
+      description: "Cars Data Migration"
     }
   ] : [];
 
