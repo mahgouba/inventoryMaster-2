@@ -263,14 +263,14 @@ export default function QuotationA4Preview({
               </div>
               
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-white">تاريخ الإصدار:</span>
-                <span className="text-white">
+                <span className="font-semibold text-black/80">تاريخ الإصدار:</span>
+                <span className="text-black/80">
                   {new Date().toLocaleDateString('ar-SA')}
                 </span>
               </div>
               
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-white">تاريخ الانتهاء:</span>
+                <span className="font-semibold text-black/80">تاريخ الانتهاء:</span>
                 <span className="text-red-600 font-medium">
                   {validUntil.toLocaleDateString('ar-SA')}
                 </span>
@@ -299,36 +299,36 @@ export default function QuotationA4Preview({
               <div className="grid grid-cols-3 gap-2 text-sm">
                 {/* First Row: Manufacturer, Category, Trim Level */}
                 <div className="flex justify-between">
-                  <span className="font-semibold text-white">الصانع:</span>
-                  <span className="text-white">{selectedVehicle.manufacturer}</span>
+                  <span className="font-semibold text-black/80">الصانع:</span>
+                  <span className="text-black/80">{selectedVehicle.manufacturer}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-semibold text-white">الفئة:</span>
-                  <span className="text-white">{selectedVehicle.category}</span>
+                  <span className="font-semibold text-black/80">الفئة:</span>
+                  <span className="text-black/80">{selectedVehicle.category}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-semibold text-white">درجة التجهيز:</span>
-                  <span className="text-white">{selectedVehicle.trimLevel || "غير محدد"}</span>
+                  <span className="font-semibold text-black/80">درجة التجهيز:</span>
+                  <span className="text-black/80">{selectedVehicle.trimLevel || "غير محدد"}</span>
                 </div>
                 
                 {/* Second Row: Model Year, Interior Color, Exterior Color */}
                 <div className="flex justify-between">
-                  <span className="font-semibold text-white">الموديل:</span>
-                  <span className="text-white">{selectedVehicle.year}</span>
+                  <span className="font-semibold text-black/80">الموديل:</span>
+                  <span className="text-black/80">{selectedVehicle.year}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-semibold text-white">اللون الداخلي:</span>
-                  <span className="text-white">{selectedVehicle.interiorColor || "غير محدد"}</span>
+                  <span className="font-semibold text-black/80">اللون الداخلي:</span>
+                  <span className="text-black/80">{selectedVehicle.interiorColor || "غير محدد"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-semibold text-white">اللون الخارجي:</span>
-                  <span className="text-white">{selectedVehicle.exteriorColor}</span>
+                  <span className="font-semibold text-black/80">اللون الخارجي:</span>
+                  <span className="text-black/80">{selectedVehicle.exteriorColor}</span>
                 </div>
                 
                 {/* Third Row: Chassis Number */}
                 <div className="flex justify-between col-span-3">
-                  <span className="font-semibold text-white">رقم الهيكل:</span>
-                  <span className="text-white">{selectedVehicle.chassisNumber || "غير محدد"}</span>
+                  <span className="font-semibold text-black/80">رقم الهيكل:</span>
+                  <span className="text-black/80">{selectedVehicle.chassisNumber || "غير محدد"}</span>
                 </div>
               </div>
             )}
@@ -345,34 +345,34 @@ export default function QuotationA4Preview({
               <div className="text-sm space-y-1">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex justify-between">
-                    <span className="font-semibold text-white">سعة المحرك:</span>
-                    <span className="text-white">{vehicleSpecs.engineCapacity}</span>
+                    <span className="font-semibold text-black/80">سعة المحرك:</span>
+                    <span className="text-black/80">{vehicleSpecs.engineCapacity}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-semibold text-white">نوع الوقود:</span>
-                    <span className="text-white">{vehicleSpecs.fuelType || "غير محدد"}</span>
+                    <span className="font-semibold text-black/80">نوع الوقود:</span>
+                    <span className="text-black/80">{vehicleSpecs.fuelType || "غير محدد"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-semibold text-white">ناقل الحركة:</span>
-                    <span className="text-white">{vehicleSpecs.transmission || "غير محدد"}</span>
+                    <span className="font-semibold text-black/80">ناقل الحركة:</span>
+                    <span className="text-black/80">{vehicleSpecs.transmission || "غير محدد"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-semibold text-white">نوع الدفع:</span>
-                    <span className="text-white">{vehicleSpecs.drivetrain || "غير محدد"}</span>
+                    <span className="font-semibold text-black/80">نوع الدفع:</span>
+                    <span className="text-black/80">{vehicleSpecs.drivetrain || "غير محدد"}</span>
                   </div>
                 </div>
                 
                 {vehicleSpecs.detailedDescription && (
                   <div className="mt-2">
-                    <span className="font-semibold text-white block mb-1">مواصفات إضافية:</span>
-                    <div className="text-white text-xs leading-relaxed">
+                    <span className="font-semibold text-black/80 block mb-1">مواصفات إضافية:</span>
+                    <div className="text-black/80 text-xs leading-relaxed">
                       {vehicleSpecs.detailedDescription}
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="text-center text-white py-2">
+              <div className="text-center text-black/80 py-2">
                 لم يتم تحديد مواصفات للمركبة
               </div>
             )}
@@ -387,33 +387,33 @@ export default function QuotationA4Preview({
             
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
-                <span className="font-semibold text-white">السعر الأساسي:</span>
-                <span className="text-white">{basePrice.toLocaleString()} ريال</span>
+                <span className="font-semibold text-black/80">السعر الأساسي:</span>
+                <span className="text-black/80">{basePrice.toLocaleString()} ريال</span>
               </div>
               
               {includeLicensePlate && (
                 <div className="flex justify-between">
-                  <span className="font-semibold text-white">رسوم اللوحة:</span>
-                  <span className="text-white">{licensePlatePrice.toLocaleString()} ريال</span>
+                  <span className="font-semibold text-black/80">رسوم اللوحة:</span>
+                  <span className="text-black/80">{licensePlatePrice.toLocaleString()} ريال</span>
                 </div>
               )}
               
               <div className="flex justify-between pt-1">
-                <span className="font-semibold text-white">المجموع قبل الضريبة:</span>
-                <span className="text-white">{finalPrice.toLocaleString()} ريال</span>
+                <span className="font-semibold text-black/80">المجموع قبل الضريبة:</span>
+                <span className="text-black/80">{finalPrice.toLocaleString()} ريال</span>
               </div>
               
               <div className="flex justify-between">
-                <span className="font-semibold text-white">ضريبة القيمة المضافة ({taxRate}%):</span>
-                <span className="text-white">{taxAmount.toFixed(2)} ريال</span>
+                <span className="font-semibold text-black/80">ضريبة القيمة المضافة ({taxRate}%):</span>
+                <span className="text-black/80">{taxAmount.toFixed(2)} ريال</span>
               </div>
               
               <div className="pt-1 text-lg font-bold">
                 <div className="flex justify-between">
-                  <span className="text-white">المجموع النهائي:</span>
+                  <span className="text-black/80">المجموع النهائي:</span>
                   <span className="text-[#C79C45]">{grandTotal.toFixed(2)} ريال</span>
                 </div>
-                <div className="text-sm text-white mt-1 text-left">
+                <div className="text-sm text-black/80 mt-1 text-left">
                   ({numberToArabic(Math.floor(grandTotal))} ريال سعودي)
                 </div>
               </div>
