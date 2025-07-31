@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { User, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft, Info, MoreVertical, Edit3, Trash2, Eye, EyeOff, Plus } from "lucide-react";
+import { User, Copy, Share2, ChevronDown, ChevronUp, MoreVertical, Edit3, Trash2, EyeOff, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -237,7 +237,6 @@ export default function PersonalBanks() {
             <User className="w-10 h-10" />
             البنوك الشخصية - شركة البريمي للسيارات
           </h1>
-          <p className="text-white/80 text-lg drop-shadow-md">معلومات الحسابات البنكية الشخصية</p>
         </div>
 
         {/* Banks Grid - Match Inventory Style */}
@@ -389,14 +388,6 @@ export default function PersonalBanks() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <span className="text-base font-bold text-white drop-shadow-sm">اسم الحساب</span>
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Info className="w-3 h-3 text-white/60 hover:text-white/80" />
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" className="bg-black/90 text-white border-white/20">
-                                      <p className="text-xs">انقر للنسخ أو اضغط على الشعار للمشاركة السريعة</p>
-                                    </TooltipContent>
-                                  </Tooltip>
                                 </div>
                                 <Button
                                   size="sm"
@@ -419,14 +410,6 @@ export default function PersonalBanks() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <span className="text-base font-bold text-white drop-shadow-sm">رقم الحساب</span>
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Info className="w-3 h-3 text-white/60 hover:text-white/80" />
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" className="bg-black/90 text-white border-white/20">
-                                      <p className="text-xs">رقم الحساب البنكي للتحويلات المحلية</p>
-                                    </TooltipContent>
-                                  </Tooltip>
                                 </div>
                                 <Button
                                   size="sm"
@@ -449,14 +432,6 @@ export default function PersonalBanks() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <span className="text-base font-bold text-white drop-shadow-sm">الآيبان</span>
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Info className="w-3 h-3 text-white/60 hover:text-white/80" />
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" className="bg-black/90 text-white border-white/20">
-                                      <p className="text-xs">رقم الحساب الدولي للتحويلات الخارجية</p>
-                                    </TooltipContent>
-                                  </Tooltip>
                                 </div>
                                 <Button
                                   size="sm"
@@ -563,19 +538,7 @@ export default function PersonalBanks() {
           </div>
         )}
 
-        {/* Navigation Back Button */}
-        <div className="fixed bottom-8 left-8">
-          <Link href="/card-view-new">
-            <Button
-              variant="outline"
-              size="lg"
-              className="glass-container border-white/30 text-white hover:bg-white/20 transition-all duration-300"
-            >
-              <ArrowLeft className="w-5 h-5 ml-2" />
-              العودة لعرض البطاقات
-            </Button>
-          </Link>
-        </div>
+
       </div>
     </div>
     </TooltipProvider>

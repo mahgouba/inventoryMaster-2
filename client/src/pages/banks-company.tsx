@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Building2, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft, Info, MoreVertical, Edit3, Trash2, Eye, EyeOff } from "lucide-react";
+import { Building2, Copy, Share2, ChevronDown, ChevronUp, MoreVertical, Edit3, Trash2, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -225,7 +225,6 @@ export default function CompanyBanks() {
             <Building2 className="w-10 h-10" />
             بنوك شركة البريمي للسيارات
           </h1>
-          <p className="text-white/80 text-lg drop-shadow-md">معلومات الحسابات البنكية للشركة</p>
         </div>
 
         {/* Banks Grid - Match Inventory Style */}
@@ -367,14 +366,6 @@ export default function CompanyBanks() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <span className="text-base font-bold text-white drop-shadow-sm">اسم الحساب</span>
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Info className="w-3 h-3 text-white/60 hover:text-white/80" />
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" className="bg-black/90 text-white border-white/20">
-                                      <p className="text-xs">انقر للنسخ أو اضغط على الشعار للمشاركة السريعة</p>
-                                    </TooltipContent>
-                                  </Tooltip>
                                 </div>
                                 <Button
                                   size="sm"
@@ -397,14 +388,6 @@ export default function CompanyBanks() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <span className="text-base font-bold text-white drop-shadow-sm">رقم الحساب</span>
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Info className="w-3 h-3 text-white/60 hover:text-white/80" />
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" className="bg-black/90 text-white border-white/20">
-                                      <p className="text-xs">رقم الحساب البنكي للتحويلات المحلية</p>
-                                    </TooltipContent>
-                                  </Tooltip>
                                 </div>
                                 <Button
                                   size="sm"
@@ -427,14 +410,6 @@ export default function CompanyBanks() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <span className="text-base font-bold text-white drop-shadow-sm">الآيبان</span>
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Info className="w-3 h-3 text-white/60 hover:text-white/80" />
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" className="bg-black/90 text-white border-white/20">
-                                      <p className="text-xs">رقم الحساب الدولي للتحويلات الخارجية</p>
-                                    </TooltipContent>
-                                  </Tooltip>
                                 </div>
                                 <Button
                                   size="sm"
