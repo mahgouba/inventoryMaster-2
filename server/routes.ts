@@ -3175,12 +3175,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
             data.carsJson = [];
           }
         }
+        if (selectedTypes.includes('trimLevels')) {
+          data.trimLevels = await storage.getAllTrimLevels();
+        }
+        if (selectedTypes.includes('interiorColors')) {
+          // Get unique interior colors from inventory items
+          const inventoryItems = await storage.getAllInventoryItems();
+          data.interiorColors = [...new Set(inventoryItems.map(item => item.interiorColor).filter(Boolean))];
+        }
+        if (selectedTypes.includes('exteriorColors')) {
+          // Get unique exterior colors from inventory items
+          const inventoryItems = await storage.getAllInventoryItems();
+          data.exteriorColors = [...new Set(inventoryItems.map(item => item.exteriorColor).filter(Boolean))];
+        }
+        if (selectedTypes.includes('leaveRequests')) {
+          data.leaveRequests = await storage.getAllLeaveRequests();
+        }
         if (selectedTypes.includes('financingRates')) {
           data.financingRates = await storage.getAllFinancingRates();
         }
         if (selectedTypes.includes('settings')) {
           data.imageLinks = await storage.getAllImageLinks();
-          data.leaveRequests = await storage.getAllLeaveRequests();
           data.colorAssociations = await storage.getAllColorAssociations();
         }
       } else {
@@ -3231,6 +3246,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         data.categories = categories;
         data.engineCapacities = engineCapacities;
         data.colorAssociations = colorAssociations;
+        
+        // Add interior and exterior colors from inventory
+        data.interiorColors = [...new Set(inventory.map(item => item.interiorColor).filter(Boolean))];
+        data.exteriorColors = [...new Set(inventory.map(item => item.exteriorColor).filter(Boolean))];
+        
+        // Add interior and exterior colors from inventory
+        data.interiorColors = [...new Set(inventory.map(item => item.interiorColor).filter(Boolean))];
+        data.exteriorColors = [...new Set(inventory.map(item => item.exteriorColor).filter(Boolean))];
         
         // Add cars.json data which contains manufacturers, categories, and trim levels
         try {
@@ -3297,7 +3320,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companies: 0,
         leaveRequests: 0,
         financingRates: 0,
-        imageLinks: 0
+        imageLinks: 0,
+        trimLevels: 0,
+        interiorColors: 0,
+        exteriorColors: 0
       };
 
       // Import inventory items

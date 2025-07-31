@@ -397,6 +397,21 @@ The application uses PostgreSQL for persistent data storage with proper database
   - **Glass Morphism Design**: Consistent styling with existing application design system
   - **Arabic RTL Support**: Full right-to-left layout with proper Arabic text and navigation
 
+### Database Management Enhancement - Additional Data Export/Import Options (July 31, 2025)
+- ✅ **COMPLETED: Database Management Page Enhancement** - Added comprehensive new data export/import options per user request:
+  - **Interior Colors (اللون الداخلي)**: Export/import unique interior colors from inventory items with Palette icon
+  - **Exterior Colors (اللون الخارجي)**: Export/import unique exterior colors from inventory items with Palette icon
+  - **Trim Levels (درجة التجهيز)**: Export/import vehicle trim levels and specifications with Wrench icon
+  - **Financing Rates (نسب التمويل)**: Already supported financing rates export/import functionality
+  - **Leave Requests (الإجازات)**: Export/import employee leave and vacation requests with UserCheck icon
+- ✅ **Enhanced Server-Side Export**: Updated `/api/database/export` endpoint to support new data types:
+  - Added selective export handling for interior/exterior colors extracted from inventory items
+  - Enhanced full export to include unique color lists alongside existing data types
+  - Maintained backward compatibility with existing export functionality
+- ✅ **Arabic Interface**: All new data types include proper Arabic labels and descriptions
+- ✅ **Professional UI**: Added appropriate Lucide React icons (Palette, Wrench, UserCheck) for visual identification
+- ✅ **Consistent Design**: Maintained existing glass morphism design and Arabic RTL layout
+
 ### Bank Management Enhancement - Share Buttons and Management Capabilities (July 31, 2025)
 - ✅ **COMPLETED: Share Button Integration** - Added comprehensive share functionality to both company and personal bank pages:
   - **Prominent Share Button**: Added large, visible share button within each bank card when expanded

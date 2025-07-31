@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Database, Download, Upload, AlertTriangle, CheckCircle, XCircle, Users, Building, CreditCard, Percent, Car, Settings, Tags } from "lucide-react";
+import { Database, Download, Upload, AlertTriangle, CheckCircle, XCircle, Users, Building, CreditCard, Percent, Car, Settings, Tags, Palette, UserCheck, Wrench } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -18,6 +18,10 @@ export default function DatabaseManagement() {
     { id: 'financingRates', label: 'نسب التمويل', icon: Percent, description: 'نسب التمويل البنكية' },
     { id: 'manufacturers', label: 'الصناع', icon: Car, description: 'شركات تصنيع السيارات' },
     { id: 'categories', label: 'الفئات', icon: Tags, description: 'فئات ونماذج السيارات' },
+    { id: 'trimLevels', label: 'درجة التجهيز', icon: Wrench, description: 'درجات التجهيز والمواصفات' },
+    { id: 'interiorColors', label: 'اللون الداخلي', icon: Palette, description: 'ألوان التصميم الداخلي للسيارات' },
+    { id: 'exteriorColors', label: 'اللون الخارجي', icon: Palette, description: 'ألوان الطلاء الخارجي للسيارات' },
+    { id: 'leaveRequests', label: 'الإجازات', icon: UserCheck, description: 'طلبات الإجازة والاستئذان' },
     { id: 'users', label: 'المستخدمين', icon: Users, description: 'بيانات المستخدمين والصلاحيات' },
     { id: 'inventory', label: 'المخزون', icon: Database, description: 'عناصر المخزون والسيارات' },
     { id: 'quotations', label: 'العروض', icon: CreditCard, description: 'عروض الأسعار المحفوظة' },
