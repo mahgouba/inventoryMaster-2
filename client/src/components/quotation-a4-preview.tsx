@@ -81,6 +81,13 @@ export default function QuotationA4Preview({
 
   const [isEditingSpecs, setIsEditingSpecs] = useState(false);
   const [editableSpecs, setEditableSpecs] = useState<string>("");
+  
+  // Initialize editableSpecs when vehicleSpecs changes
+  useEffect(() => {
+    if (vehicleSpecs?.detailedDescription) {
+      setEditableSpecs(vehicleSpecs.detailedDescription);
+    }
+  }, [vehicleSpecs?.detailedDescription]);
   const [useAlbarimi2Background, setUseAlbarimi2Background] = useState(true); // Default to albarimi-2
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -287,7 +294,7 @@ export default function QuotationA4Preview({
             <div className="flex items-center gap-2 mb-2">
               {selectedVehicle && getManufacturerLogo(selectedVehicle.manufacturer) ? (
                 <img 
-                  src={getManufacturerLogo(selectedVehicle.manufacturer)} 
+                  src={getManufacturerLogo(selectedVehicle.manufacturer)!} 
                   alt={selectedVehicle.manufacturer}
                   className="w-5 h-5 object-contain"
                 />
@@ -300,35 +307,35 @@ export default function QuotationA4Preview({
             {selectedVehicle && (
               <div className="grid grid-cols-3 gap-2 text-sm">
                 {/* First Row: Manufacturer, Category, Trim Level */}
-                <div className="flex justify-between">
+                <div className="flex justify-between border-b border-gray-300 pb-1">
                   <span className="font-semibold text-black/80">الصانع:</span>
                   <span className="text-black/80">{selectedVehicle.manufacturer}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between border-b border-gray-300 pb-1">
                   <span className="font-semibold text-black/80">الفئة:</span>
                   <span className="text-black/80">{selectedVehicle.category}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between border-b border-gray-300 pb-1">
                   <span className="font-semibold text-black/80">درجة التجهيز:</span>
                   <span className="text-black/80">{selectedVehicle.trimLevel || "غير محدد"}</span>
                 </div>
                 
                 {/* Second Row: Model Year, Interior Color, Exterior Color */}
-                <div className="flex justify-between">
+                <div className="flex justify-between border-b border-gray-300 pb-1 pt-1">
                   <span className="font-semibold text-black/80">الموديل:</span>
                   <span className="text-black/80">{selectedVehicle.year}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between border-b border-gray-300 pb-1 pt-1">
                   <span className="font-semibold text-black/80">اللون الداخلي:</span>
                   <span className="text-black/80">{selectedVehicle.interiorColor || "غير محدد"}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between border-b border-gray-300 pb-1 pt-1">
                   <span className="font-semibold text-black/80">اللون الخارجي:</span>
                   <span className="text-black/80">{selectedVehicle.exteriorColor}</span>
                 </div>
                 
                 {/* Third Row: Chassis Number */}
-                <div className="flex justify-between col-span-3">
+                <div className="flex justify-between col-span-3 pt-1">
                   <span className="font-semibold text-black/80">رقم الهيكل:</span>
                   <span className="text-black/80">{selectedVehicle.chassisNumber || "غير محدد"}</span>
                 </div>
@@ -339,7 +346,11 @@ export default function QuotationA4Preview({
           {/* Vehicle Specifications */}
           <div className="mb-3">
             <div className="flex items-center gap-2 mb-2">
-              <Settings className="text-[#C79C45] w-5 h-5" />
+              <Settings 
+                className="text-[#C79C45] w-5 h-5 cursor-pointer" 
+                onDoubleClick={() => setIsEditingSpecs(!isEditingSpecs)}
+                title="انقر مرتين للتحرير"
+              />
               <span className="text-lg font-bold text-black/80">المواصفات التفصيلية</span>
             </div>
             
@@ -364,12 +375,24 @@ export default function QuotationA4Preview({
                   </div>
                 </div>
                 
-                {vehicleSpecs.detailedDescription && (
+                {(vehicleSpecs.detailedDescription || isEditingSpecs) && (
                   <div className="mt-2">
                     <span className="font-semibold text-black/80 block mb-1">مواصفات إضافية:</span>
-                    <div className="text-black/80 text-xs leading-relaxed">
-                      {vehicleSpecs.detailedDescription}
-                    </div>
+                    {isEditingSpecs ? (
+                      <textarea
+                        value={editableSpecs}
+                        onChange={(e) => setEditableSpecs(e.target.value)}
+                        onBlur={() => setIsEditingSpecs(false)}
+                        className="w-full text-black/80 text-xs leading-relaxed border border-gray-300 rounded p-2 resize-none"
+                        rows={3}
+                        style={{ fontFamily: '"Noto Sans Arabic", Arial, sans-serif', direction: 'rtl' }}
+                        autoFocus
+                      />
+                    ) : (
+                      <div className="text-black/80 text-xs leading-relaxed">
+                        {editableSpecs || vehicleSpecs.detailedDescription}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
