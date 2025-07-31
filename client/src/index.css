@@ -11,6 +11,14 @@
   --text-primary: rgba(255, 255, 255, 0.95);
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.5);
+
+  /* Theme Management Variables */
+  --theme-primary: #00627F;
+  --theme-secondary: #00A3CC;
+  --theme-accent: #0081A3;
+  --theme-background: #f8fafc;
+  --theme-foreground: #1e293b;
+  --theme-gradient: linear-gradient(90deg, #00627F 0%, #00A3CC 100%);
 }
 
 /* Global Dark Background */

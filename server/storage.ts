@@ -231,6 +231,10 @@ export interface IStorage {
     categoriesCreated: number; 
     trimLevelsCreated: number; 
   }>;
+
+  // Theme management methods
+  getCurrentTheme(): Promise<any>;
+  saveTheme(theme: any): Promise<any>;
 }
 
 export class MemStorage implements IStorage {
@@ -273,6 +277,7 @@ export class MemStorage implements IStorage {
   private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
   private systemSettings = new Map<string, string>();
   private companies = new Map<number, Company>();
+  private currentTheme: any = null;
   private currentCompanyId = 1;
   private appearanceSettings: AppearanceSettings | undefined;
 
@@ -1223,6 +1228,28 @@ export class MemStorage implements IStorage {
       console.error('Migration error:', error);
       throw new Error(`فشل في تحويل البيانات: ${error}`);
     }
+  }
+
+  // Theme management methods
+  async getCurrentTheme(): Promise<any> {
+    return this.currentTheme || {
+      id: 'monochrome-gradient',
+      name: 'Monochrome Gradient',
+      nameAr: 'التدرج الأحادي',
+      gradient: 'linear-gradient(90deg, #00627F 0%, #00A3CC 100%)',
+      variables: {
+        primary: '#00627F',
+        secondary: '#00A3CC',
+        accent: '#0081A3',
+        background: '#f8fafc',
+        foreground: '#1e293b'
+      }
+    };
+  }
+
+  async saveTheme(theme: any): Promise<any> {
+    this.currentTheme = { ...theme };
+    return this.currentTheme;
   }
 }
 

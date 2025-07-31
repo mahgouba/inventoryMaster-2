@@ -748,6 +748,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Theme management routes
+  app.get("/api/appearance/theme", async (req, res) => {
+    try {
+      const theme = await storage.getCurrentTheme();
+      res.json(theme || {
+        id: 'monochrome-gradient',
+        name: 'Monochrome Gradient',
+        nameAr: 'التدرج الأحادي',
+        gradient: 'linear-gradient(90deg, #00627F 0%, #00A3CC 100%)',
+        variables: {
+          primary: '#00627F',
+          secondary: '#00A3CC',
+          accent: '#0081A3',
+          background: '#f8fafc',
+          foreground: '#1e293b'
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching current theme:", error);
+      res.status(500).json({ message: "Failed to fetch current theme" });
+    }
+  });
+
+  app.post("/api/appearance/theme", async (req, res) => {
+    try {
+      const theme = await storage.saveTheme(req.body);
+      res.json(theme);
+    } catch (error) {
+      console.error("Error saving theme:", error);
+      res.status(500).json({ message: "Failed to save theme" });
+    }
+  });
+
   app.put("/api/manufacturers/:id/logo", async (req, res) => {
     try {
       const id = parseInt(req.params.id);

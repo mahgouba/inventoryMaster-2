@@ -116,6 +116,12 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
 
   const adminItems = user.role === "admin" ? [
     { 
+      title: "إدارة الثيمات", 
+      href: "/theme-management", 
+      icon: Palette,
+      description: "Theme Management"
+    },
+    { 
       title: "إدارة شعارات الصناع", 
       href: "/manufacturer-logos", 
       icon: Image,
