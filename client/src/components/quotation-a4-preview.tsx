@@ -408,9 +408,14 @@ export default function QuotationA4Preview({
                 <span className="text-gray-700">{taxAmount.toFixed(2)} ريال</span>
               </div>
               
-              <div className="flex justify-between pt-1 text-lg font-bold">
-                <span className="text-[#2B4C8C]">المجموع النهائي:</span>
-                <span className="text-[#C49632]">{grandTotal.toFixed(2)} ريال</span>
+              <div className="pt-1 text-lg font-bold">
+                <div className="flex justify-between">
+                  <span className="text-[#2B4C8C]">المجموع النهائي:</span>
+                  <span className="text-[#C49632]">{grandTotal.toFixed(2)} ريال</span>
+                </div>
+                <div className="text-sm text-gray-600 mt-1 text-left">
+                  ({numberToArabic(Math.floor(grandTotal))} ريال سعودي)
+                </div>
               </div>
             </div>
           </div>
