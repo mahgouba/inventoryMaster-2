@@ -77,6 +77,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
             <>
               <Route path="/pdf-appearance" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
               <Route path="/list-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+              <Route path="/options-list-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
               <Route path="/manufacturer-logos" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
               <Route path="/user-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
               <Route path="/bank-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />

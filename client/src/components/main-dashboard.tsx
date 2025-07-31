@@ -58,6 +58,8 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return user.role === "admin" ? <ManufacturerLogosPage userRole={user.role} onLogout={onLogout} /> : null;
       case "/list-management":
         return user.role === "admin" ? <ListManagement /> : null;
+      case "/options-list-management":
+        return user.role === "admin" ? <ListManagement /> : null;
       case "/user-management":
         return user.role === "admin" ? <UserManagementPage /> : null;
       case "/bank-management":
