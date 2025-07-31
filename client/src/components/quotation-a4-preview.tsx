@@ -281,7 +281,6 @@ export default function QuotationA4Preview({
           {/* Second Row: Customer Information */}
           <div className="mb-3">
             <div className="flex items-center gap-2">
-              <User className="text-[#C79C45] w-5 h-5" />
               <span className="text-lg font-bold text-black/80">
                 {customerTitle} / {customerName || "غير محدد"}
               </span>
