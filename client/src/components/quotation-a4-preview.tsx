@@ -307,29 +307,29 @@ export default function QuotationA4Preview({
             {selectedVehicle && (
               <div className="grid grid-cols-3 gap-2 text-sm">
                 {/* First Row: Manufacturer, Category, Trim Level */}
-                <div className="flex justify-between border-b border-gray-300 pb-1">
+                <div className="flex justify-between border-b border-[#C79C45] pb-1">
                   <span className="font-semibold text-black/80">الصانع:</span>
                   <span className="text-black/80">{selectedVehicle.manufacturer}</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-300 pb-1">
+                <div className="flex justify-between border-b border-[#C79C45] pb-1">
                   <span className="font-semibold text-black/80">الفئة:</span>
                   <span className="text-black/80">{selectedVehicle.category}</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-300 pb-1">
+                <div className="flex justify-between border-b border-[#C79C45] pb-1">
                   <span className="font-semibold text-black/80">درجة التجهيز:</span>
                   <span className="text-black/80">{selectedVehicle.trimLevel || "غير محدد"}</span>
                 </div>
                 
                 {/* Second Row: Model Year, Interior Color, Exterior Color */}
-                <div className="flex justify-between border-b border-gray-300 pb-1 pt-1">
+                <div className="flex justify-between border-b border-[#C79C45] pb-1 pt-1">
                   <span className="font-semibold text-black/80">الموديل:</span>
                   <span className="text-black/80">{selectedVehicle.year}</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-300 pb-1 pt-1">
+                <div className="flex justify-between border-b border-[#C79C45] pb-1 pt-1">
                   <span className="font-semibold text-black/80">اللون الداخلي:</span>
                   <span className="text-black/80">{selectedVehicle.interiorColor || "غير محدد"}</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-300 pb-1 pt-1">
+                <div className="flex justify-between border-b border-[#C79C45] pb-1 pt-1">
                   <span className="font-semibold text-black/80">اللون الخارجي:</span>
                   <span className="text-black/80">{selectedVehicle.exteriorColor}</span>
                 </div>
@@ -347,9 +347,9 @@ export default function QuotationA4Preview({
           <div className="mb-3">
             <div className="flex items-center gap-2 mb-2">
               <div 
-                className="text-[#C79C45] cursor-pointer" 
-                onDoubleClick={() => setIsEditingSpecs(!isEditingSpecs)}
-                title="انقر مرتين للتحرير"
+                className="text-[#C79C45] cursor-pointer hover:text-[#d4a653] transition-colors" 
+                onClick={() => setIsEditingSpecs(!isEditingSpecs)}
+                title="انقر للتحرير أو الإضافة"
               >
                 <Settings className="w-5 h-5" />
               </div>
