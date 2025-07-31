@@ -1,10 +1,10 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { User, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft, Info, MoreVertical } from "lucide-react";
+import { User, Copy, Share2, ChevronDown, ChevronUp, ArrowLeft, Info, MoreVertical, Edit3, Trash2, Eye, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -130,6 +130,53 @@ export default function PersonalBanks() {
     if (longPressTimer) {
       clearTimeout(longPressTimer);
       setLongPressTimer(null);
+    }
+  };
+
+  // Bank management functions
+  const hideBank = (bankId: number) => {
+    const newHiddenBanks = new Set(hiddenBanks);
+    newHiddenBanks.add(bankId);
+    setHiddenBanks(newHiddenBanks);
+    localStorage.setItem('hiddenBanks', JSON.stringify(Array.from(newHiddenBanks)));
+    
+    // Notify other components about the change
+    window.dispatchEvent(new Event('bankVisibilityChanged'));
+    
+    toast({
+      title: "تم إخفاء البنك",
+      description: "تم إخفاء البنك من العرض بنجاح",
+    });
+  };
+
+  const editBank = (bankId: number) => {
+    // Navigate to bank management page with edit mode
+    window.location.href = `/bank-management?edit=${bankId}&type=شخصي`;
+  };
+
+  const deleteBank = async (bankId: number, bankName: string) => {
+    if (confirm(`هل أنت متأكد من حذف بنك ${bankName}؟`)) {
+      try {
+        const response = await fetch(`/api/banks/${bankId}`, {
+          method: 'DELETE',
+        });
+        
+        if (response.ok) {
+          queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شخصي"] });
+          toast({
+            title: "تم الحذف",
+            description: `تم حذف بنك ${bankName} بنجاح`,
+          });
+        } else {
+          throw new Error('Failed to delete bank');
+        }
+      } catch (error) {
+        toast({
+          title: "خطأ في الحذف",
+          description: "فشل في حذف البنك",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -328,6 +375,20 @@ export default function PersonalBanks() {
                         <div className="w-full space-y-4 animate-in slide-in-from-top-2 duration-300">
                           <Separator className="bg-white/30" />
 
+                          {/* Share Button */}
+                          <div className="flex justify-center mb-4">
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                shareBank(bank);
+                              }}
+                              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-xl flex items-center gap-3 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-white/20"
+                            >
+                              <Share2 className="w-5 h-5" />
+                              <span className="font-semibold">مشاركة بيانات البنك</span>
+                            </Button>
+                          </div>
+
                           {/* Bank Details Container - Remove borders */}
                           <div className="space-y-4">
                             {/* Account Name */}
@@ -452,6 +513,36 @@ export default function PersonalBanks() {
                               >
                                 <Copy className="w-4 h-4" />
                                 <span>نسخ كامل البيانات</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  hideBank(bank.id);
+                                }}
+                                className="flex items-center gap-2 cursor-pointer hover:bg-gray-100/50"
+                              >
+                                <EyeOff className="w-4 h-4" />
+                                <span>إخفاء البنك</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  editBank(bank.id);
+                                }}
+                                className="flex items-center gap-2 cursor-pointer hover:bg-gray-100/50"
+                              >
+                                <Edit3 className="w-4 h-4" />
+                                <span>تعديل البيانات</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteBank(bank.id, bank.bankName);
+                                }}
+                                className="flex items-center gap-2 cursor-pointer hover:bg-red-100/50 text-red-600"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                <span>حذف البنك</span>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
