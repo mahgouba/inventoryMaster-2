@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Calculator, Printer, Save, ArrowRight, Home, TrendingUp, Plus, Upload, Trash2 } from "lucide-react";
+import { Calculator, Printer, Save, ArrowRight, TrendingUp, Plus, Upload, Trash2 } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
@@ -454,21 +454,91 @@ export default function FinancingCalculatorPage() {
       <div className="container mx-auto p-4" dir="rtl">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <Calculator className="h-8 w-8 text-blue-400" />
-              <h1 className="text-2xl font-bold text-white drop-shadow-lg">حاسبة التمويل</h1>
-            </div>
-            <Link href="/">
-              <Button className="bg-white/10 hover:bg-white/20 text-white border-white/20">
-                <Home className="h-4 w-4 ml-2" />
-                العودة للرئيسية
-              </Button>
-            </Link>
+          <div className="flex items-center gap-4">
+            <Calculator className="h-8 w-8 text-blue-400" />
+            <h1 className="text-2xl font-bold text-white drop-shadow-lg">حاسبة التمويل</h1>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Banks Section */}
+          <Card className="glass-container h-fit">
+            <CardHeader className="pb-3 border-b border-white/10">
+              <CardTitle className="text-lg font-semibold text-white drop-shadow-lg flex items-center">
+                <TrendingUp className="h-5 w-5 ml-2 text-blue-400" />
+                البنوك ونسب التمويل
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              {isLoadingRates ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
+                  <p className="text-white/60">جاري تحميل البنوك...</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {allBanks.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-white/60 mb-4">لا توجد بنوك متاحة</p>
+                      <Link href="/financing-rates">
+                        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                          إدارة النسب
+                        </Button>
+                      </Link>
+                    </div>
+                  ) : (
+                    allBanks.map((bank) => (
+                      <div
+                        key={bank.id || bank.name}
+                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                          selectedBank?.name === bank.name
+                            ? 'border-blue-400 bg-blue-500/20'
+                            : 'border-white/20 bg-white/5 hover:bg-white/10'
+                        }`}
+                        onClick={() => {
+                          setSelectedBank(bank);
+                          handleInputChange("bankName", bank.name);
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            {bank.logo && (
+                              <img src={bank.logo} alt={bank.name} className="w-8 h-8 object-contain" />
+                            )}
+                            <div>
+                              <h3 className="font-semibold text-white">{bank.name}</h3>
+                              <p className="text-xs text-white/60">
+                                {bank.id ? "(مُدار)" : "(مخصص)"}
+                              </p>
+                            </div>
+                          </div>
+                          {selectedBank?.name === bank.name && (
+                            <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+                          )}
+                        </div>
+                        
+                        {/* Interest Rates Display */}
+                        {selectedBank?.name === bank.name && (
+                          <div className="mt-3 pt-3 border-t border-white/20">
+                            <h4 className="text-sm font-medium text-white mb-2">نسب الفائدة:</h4>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              {Object.entries(bank.rates).map(([years, rate]) => (
+                                <div key={years} className="flex justify-between p-2 bg-white/10 rounded">
+                                  <span className="text-white/80">{years} سنة:</span>
+                                  <span className="text-blue-400 font-bold">{rate}%</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Input Form */}
           <Card className="glass-container h-fit">
             <CardHeader className="pb-3 border-b border-white/10">
