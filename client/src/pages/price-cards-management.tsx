@@ -345,7 +345,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                                   style: 'currency',
                                   currency: 'SAR',
                                   minimumFractionDigits: 0
-                                }).format(vehicle.price || 0)}
+                                }).format(parseFloat(vehicle.price?.toString() || '0'))}
                               </span>
                             </div>
                           </div>
@@ -454,7 +454,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                               style: 'currency',
                               currency: 'SAR',
                               minimumFractionDigits: 0
-                            }).format(record.vehicle.price || 0)}
+                            }).format(parseFloat(record.vehicle.price?.toString() || '0'))}
                           </span>
                         </div>
                         <div className="flex justify-between text-sm">
@@ -598,56 +598,53 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
 
                   {/* Main Content Card - Above Gold Section */}
                   <div className="absolute bottom-8 left-8 right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl" style={{ zIndex: 10 }}>
-                    <div className="grid grid-cols-3 gap-6 h-full">
-                      {/* Left Section - Logo and Model */}
-                      <div className="flex flex-col items-center justify-center">
-                        <div className="w-20 h-20 mb-4 flex items-center justify-center bg-gray-100 rounded-full">
-                          <Car className="w-12 h-12 text-gray-600" />
-                        </div>
-                        <div className="text-[#CF9B47] text-4xl font-bold text-center">
+                    <div className="flex flex-col h-full space-y-4">
+                      {/* First Row - Category, Trim Level, Manufacturer Logo */}
+                      <div className="flex items-center justify-between">
+                        <div className="text-[#CF9B47] text-2xl font-bold">
                           S 450
                         </div>
+                        <div className="text-[#CF9B47] text-xl font-semibold">
+                          الفئة الفاخرة
+                        </div>
+                        <div className="w-16 h-16 flex items-center justify-center bg-gray-100 rounded-full">
+                          <Car className="w-10 h-10 text-[#CF9B47]" />
+                        </div>
                       </div>
 
-                      {/* Middle Section - Details */}
-                      <div className="flex flex-col justify-center space-y-4 text-lg">
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-700 font-semibold">السعـــر :</span>
-                          <span className="text-[#00627F] text-2xl font-bold">
-                            ﷼ 270,000
-                          </span>
+                      {/* Second Row - Status and Price Boxes */}
+                      <div className="flex items-center justify-between gap-4">
+                        {/* Status Box */}
+                        <div className="flex-1 bg-red-100 border-2 border-red-300 rounded-xl p-4 text-center">
+                          <div className="text-gray-700 text-sm font-semibold mb-1">الحالة</div>
+                          <div className="text-red-600 text-xl font-bold">مستعمل</div>
                         </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-700 font-semibold">المماشي :</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[#00627F] text-xl font-bold">6000</span>
-                            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
-                              <span className="text-xs font-bold">KM</span>
+
+                        {/* Price Box */}
+                        <div className="flex-1 bg-blue-100 border-2 border-blue-300 rounded-xl p-4 text-center">
+                          <div className="text-gray-700 text-sm font-semibold mb-1">السعر</div>
+                          <div className="text-[#00627F] text-xl font-bold">﷼ 270,000</div>
+                        </div>
+                      </div>
+
+                      {/* Third Row - Mileage (only for used cars) */}
+                      <div className="flex items-center justify-center">
+                        <div className="bg-gray-100 border-2 border-gray-300 rounded-xl p-3 px-6">
+                          <div className="flex items-center gap-3">
+                            <span className="text-gray-700 text-lg font-semibold">المماشي:</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[#00627F] text-xl font-bold">6000</span>
+                              <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center">
+                                <span className="text-xs font-bold text-white">KM</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
-
-                      {/* Right Section - Status */}
-                      <div className="flex flex-col items-center justify-center">
-                        <div className="text-right mb-2">
-                          <div className="text-gray-700 text-lg font-semibold">الحالــة :</div>
-                          <div className="text-red-600 text-2xl font-bold">مستعمل</div>
-                        </div>
-                        
-                        {/* Separator Line */}
-                        <div className="w-px h-16 bg-[#CF9B47] my-4"></div>
-                        
-                        <div className="text-center">
-                          <div className="text-gray-600 text-sm">سعة المحرك</div>
-                          <div className="text-[#00627F] text-xl font-bold">3.0L</div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Red Circle (Top Left) */}
+                  {/* Import Type Circle - Red for Used */}
                   <div className="absolute top-8 right-8 w-8 h-8 bg-red-500 rounded-full"></div>
                 </div>
               </div>

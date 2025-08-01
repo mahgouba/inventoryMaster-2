@@ -47,6 +47,17 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
     return isUsed ? "مستعمل" : "جديد";
   };
 
+  // تحديد لون الدائرة حسب نوع الاستيراد
+  const getImportTypeColor = (): string => {
+    if (vehicle.status === 'مستعمل') {
+      return 'bg-red-500'; // أحمر للمستعمل
+    } else if (vehicle.importType === 'شخصي' || vehicle.importType === 'personal') {
+      return 'bg-green-500'; // أخضر للشخصي
+    } else {
+      return 'bg-white border-2 border-gray-300'; // أبيض للشركة
+    }
+  };
+
   // توليد PDF
   const generatePDF = async () => {
     if (!vehicle) return;
@@ -169,60 +180,67 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
 
             {/* Main Content Card - Above Gold Section */}
             <div className="absolute bottom-8 left-8 right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl" style={{ zIndex: 10 }}>
-              <div className="grid grid-cols-3 gap-6 h-full">
-                {/* Left Section - Logo and Model */}
-                <div className="flex flex-col items-center justify-center">
-                  <div className="w-20 h-20 mb-4 flex items-center justify-center">
+              <div className="flex flex-col h-full space-y-4">
+                {/* First Row - Category, Trim Level, Manufacturer Logo */}
+                <div className="flex items-center justify-between">
+                  <div className="text-[#CF9B47] text-2xl font-bold">
+                    {vehicle.category}
+                  </div>
+                  <div className="text-[#CF9B47] text-xl font-semibold">
+                    {vehicle.trimLevel || 'الفئة الأساسية'}
+                  </div>
+                  <div className="w-16 h-16 flex items-center justify-center bg-gray-100 rounded-full">
                     <ManufacturerLogo 
                       manufacturerName={vehicle.manufacturer} 
                       className="w-full h-full object-contain filter brightness-110"
                     />
                   </div>
-                  <div className="text-[#CF9B47] text-4xl font-bold text-center">
-                    {vehicle.category}
+                </div>
+
+                {/* Second Row - Status and Price Boxes */}
+                <div className="flex items-center justify-between gap-4">
+                  {/* Status Box */}
+                  <div className={`flex-1 border-2 rounded-xl p-4 text-center ${
+                    getCarStatus() === 'مستعمل' 
+                      ? 'bg-red-100 border-red-300' 
+                      : 'bg-green-100 border-green-300'
+                  }`}>
+                    <div className="text-gray-700 text-sm font-semibold mb-1">الحالة</div>
+                    <div className={`text-xl font-bold ${
+                      getCarStatus() === 'مستعمل' ? 'text-red-600' : 'text-green-600'
+                    }`}>
+                      {getCarStatus() === 'مستعمل' ? 'مستعمل' : 'جديد'}
+                    </div>
+                  </div>
+
+                  {/* Price Box */}
+                  <div className="flex-1 bg-blue-100 border-2 border-blue-300 rounded-xl p-4 text-center">
+                    <div className="text-gray-700 text-sm font-semibold mb-1">السعر</div>
+                    <div className="text-[#00627F] text-xl font-bold">﷼ {formatPrice(vehicle.price || 0)}</div>
                   </div>
                 </div>
 
-                {/* Middle Section - Details */}
-                <div className="flex flex-col justify-center space-y-4 text-lg">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700 font-semibold">السعـــر :</span>
-                    <span className="text-[#00627F] text-2xl font-bold">
-                      ﷼ {formatPrice(vehicle.price || 0)}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700 font-semibold">المماشي :</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#00627F] text-xl font-bold">{getMileage()}</span>
-                      <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
-                        <span className="text-xs font-bold">KM</span>
+                {/* Third Row - Mileage (only for used cars) */}
+                {getCarStatus() === 'مستعمل' && (
+                  <div className="flex items-center justify-center">
+                    <div className="bg-gray-100 border-2 border-gray-300 rounded-xl p-3 px-6">
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-700 text-lg font-semibold">المماشي:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[#00627F] text-xl font-bold">{getMileage()}</span>
+                          <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">KM</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Right Section - Status */}
-                <div className="flex flex-col items-center justify-center">
-                  <div className="text-right mb-2">
-                    <div className="text-gray-700 text-lg font-semibold">الحالــة :</div>
-                    <div className="text-red-600 text-2xl font-bold">{getCarStatus()}</div>
-                  </div>
-                  
-                  {/* Separator Line */}
-                  <div className="w-px h-16 bg-[#CF9B47] my-4"></div>
-                  
-                  <div className="text-center">
-                    <div className="text-gray-600 text-sm">سعة المحرك</div>
-                    <div className="text-[#00627F] text-xl font-bold">{getEngineSize()}L</div>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
 
-            {/* Red Circle (Top Left) */}
-            <div className="absolute top-8 right-8 w-8 h-8 bg-red-500 rounded-full"></div>
+            {/* Import Type Circle */}
+            <div className={`absolute top-8 right-8 w-8 h-8 rounded-full ${getImportTypeColor()}`}></div>
           </div>
 
           {/* Action Buttons */}
