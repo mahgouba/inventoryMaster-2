@@ -199,77 +199,77 @@ export default function CompanyBanks() {
                           <div className="space-y-6">
                             {/* Account Name */}
                             <div className="text-center">
-                              <h3 className="text-xl font-bold text-white mb-3">{bank.accountName}</h3>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyToClipboard(bank.accountName, "اسم الحساب", `accountName-${bank.id}`);
-                                }}
-                                className={`${
-                                  copiedText === `accountName-${bank.id}` 
-                                    ? 'bg-green-500/20 scale-110' 
-                                    : 'hover:bg-white/20'
-                                } p-2 rounded-lg transition-all duration-300 flex items-center gap-2 backdrop-blur-sm border border-white/20`}
-                              >
-                                <Copy className="w-4 h-4 text-white" />
-                                <span className="text-sm text-white">
-                                  {copiedText === `accountName-${bank.id}` ? 'تم النسخ ✓' : 'نسخ اسم الحساب'}
-                                </span>
-                              </Button>
+                              <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-xl font-bold text-white">{bank.accountName}</h3>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(bank.accountName, "اسم الحساب", `accountName-${bank.id}`);
+                                  }}
+                                  className={`${
+                                    copiedText === `accountName-${bank.id}` 
+                                      ? 'bg-green-500/20 scale-110' 
+                                      : 'hover:bg-white/20'
+                                  } p-2 rounded-lg transition-all duration-300 backdrop-blur-sm border border-white/20`}
+                                  title={copiedText === `accountName-${bank.id}` ? 'تم النسخ ✓' : 'نسخ اسم الحساب'}
+                                >
+                                  <Copy className="w-4 h-4 text-white" />
+                                </Button>
+                              </div>
                             </div>
 
                             {/* Account Number */}
                             <div className="text-center">
-                              <p className="text-white/70 text-sm mb-2">رقم الحساب</p>
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-white/70 text-sm">رقم الحساب</p>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(bank.accountNumber, "رقم الحساب", `accountNumber-${bank.id}`);
+                                  }}
+                                  className={`${
+                                    copiedText === `accountNumber-${bank.id}` 
+                                      ? 'bg-green-500/20 scale-110' 
+                                      : 'hover:bg-white/20'
+                                  } p-2 rounded-lg transition-all duration-300 backdrop-blur-sm border border-white/20`}
+                                  title={copiedText === `accountNumber-${bank.id}` ? 'تم النسخ ✓' : 'نسخ رقم الحساب'}
+                                >
+                                  <Copy className="w-4 h-4 text-white" />
+                                </Button>
+                              </div>
                               <p className="text-lg font-mono text-white mb-3 bg-white/10 rounded-lg p-3 border border-white/20">
                                 {bank.accountNumber}
                               </p>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyToClipboard(bank.accountNumber, "رقم الحساب", `accountNumber-${bank.id}`);
-                                }}
-                                className={`${
-                                  copiedText === `accountNumber-${bank.id}` 
-                                    ? 'bg-green-500/20 scale-110' 
-                                    : 'hover:bg-white/20'
-                                } p-2 rounded-lg transition-all duration-300 flex items-center gap-2 backdrop-blur-sm border border-white/20`}
-                              >
-                                <Copy className="w-4 h-4 text-white" />
-                                <span className="text-sm text-white">
-                                  {copiedText === `accountNumber-${bank.id}` ? 'تم النسخ ✓' : 'نسخ رقم الحساب'}
-                                </span>
-                              </Button>
                             </div>
 
                             {/* IBAN */}
                             <div className="text-center">
-                              <p className="text-white/70 text-sm mb-2">رقم الآيبان</p>
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-white/70 text-sm">رقم الآيبان</p>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(bank.iban, "الآيبان", `iban-${bank.id}`);
+                                  }}
+                                  className={`${
+                                    copiedText === `iban-${bank.id}` 
+                                      ? 'bg-green-500/20 scale-110' 
+                                      : 'hover:bg-white/20'
+                                  } p-2 rounded-lg transition-all duration-300 backdrop-blur-sm border border-white/20`}
+                                  title={copiedText === `iban-${bank.id}` ? 'تم النسخ ✓' : 'نسخ الآيبان'}
+                                >
+                                  <Copy className="w-4 h-4 text-white" />
+                                </Button>
+                              </div>
                               <p className="text-lg font-mono text-white mb-3 bg-white/10 rounded-lg p-3 border border-white/20 break-all">
                                 {bank.iban}
                               </p>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyToClipboard(bank.iban, "الآيبان", `iban-${bank.id}`);
-                                }}
-                                className={`${
-                                  copiedText === `iban-${bank.id}` 
-                                    ? 'bg-green-500/20 scale-110' 
-                                    : 'hover:bg-white/20'
-                                } p-2 rounded-lg transition-all duration-300 flex items-center gap-2 backdrop-blur-sm border border-white/20`}
-                              >
-                                <Copy className="w-4 h-4 text-white" />
-                                <span className="text-sm text-white">
-                                  {copiedText === `iban-${bank.id}` ? 'تم النسخ ✓' : 'نسخ الآيبان'}
-                                </span>
-                              </Button>
                             </div>
                           </div>
                         </div>
