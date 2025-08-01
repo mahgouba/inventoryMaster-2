@@ -138,25 +138,16 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
           {/* Price Card Design */}
           <div 
             id="new-price-card-content"
-            className="relative w-[842px] h-[595px] bg-gradient-to-br from-[#00627F] to-[#004A5C] rounded-lg overflow-hidden"
+            className="relative w-[842px] h-[595px] rounded-lg overflow-hidden"
             style={{
               fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
               direction: 'rtl',
-              backgroundImage: 'linear-gradient(135deg, #00627F 0%, #004A5C 100%)'
+              backgroundImage: 'url(/price-card.svg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
             }}
           >
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#CF9B47] to-transparent">
-                <div className="h-full flex flex-col justify-center items-center gap-2">
-                  {/* Decorative Arabic pattern */}
-                  {Array.from({length: 20}).map((_, i) => (
-                    <div key={i} className="w-2 h-2 bg-[#CF9B47] rotate-45 opacity-60"></div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
             {/* Company Logo */}
             <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
               <div className="w-16 h-16 bg-[#CF9B47] rounded-full flex items-center justify-center p-2">
@@ -174,9 +165,6 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                 {vehicle.year || '2025'}
               </div>
             </div>
-
-            {/* Bottom Gold Section */}
-            <div className="absolute bottom-0 left-0 w-40 h-32 bg-[#CF9B47]"></div>
 
             {/* Main Content Card - Above Gold Section */}
             <div className="absolute bottom-8 left-8 right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl" style={{ zIndex: 10 }}>
@@ -197,45 +185,34 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                   </div>
                 </div>
 
-                {/* Second Row - Status and Price Boxes */}
+                {/* Second Row - Status, Mileage and Price */}
                 <div className="flex items-center justify-between gap-4">
-                  {/* Status Box */}
-                  <div className={`flex-1 border-2 rounded-xl p-4 text-center ${
-                    getCarStatus() === 'مستعمل' 
-                      ? 'bg-red-100 border-red-300' 
-                      : 'bg-green-100 border-green-300'
-                  }`}>
+                  {/* Status and Mileage Box */}
+                  <div className="flex-1 p-4 text-center">
                     <div className="text-gray-700 text-sm font-semibold mb-1">الحالة</div>
-                    <div className={`text-xl font-bold ${
+                    <div className={`text-xl font-bold mb-2 ${
                       getCarStatus() === 'مستعمل' ? 'text-red-600' : 'text-green-600'
                     }`}>
                       {getCarStatus() === 'مستعمل' ? 'مستعمل' : 'جديد'}
                     </div>
+                    
+                    {getCarStatus() === 'مستعمل' && (
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="text-gray-700 text-sm font-semibold">المماشي:</span>
+                        <span className="text-[#00627F] text-lg font-bold">{getMileage()}</span>
+                        <div className="w-5 h-5 bg-gray-400 rounded-full flex items-center justify-center">
+                          <span className="text-xs font-bold text-white">KM</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Price Box */}
-                  <div className="flex-1 bg-blue-100 border-2 border-blue-300 rounded-xl p-4 text-center">
+                  <div className="flex-1 p-4 text-center">
                     <div className="text-gray-700 text-sm font-semibold mb-1">السعر</div>
                     <div className="text-[#00627F] text-xl font-bold">﷼ {formatPrice(vehicle.price || 0)}</div>
                   </div>
                 </div>
-
-                {/* Third Row - Mileage (only for used cars) */}
-                {getCarStatus() === 'مستعمل' && (
-                  <div className="flex items-center justify-center">
-                    <div className="bg-gray-100 border-2 border-gray-300 rounded-xl p-3 px-6">
-                      <div className="flex items-center gap-3">
-                        <span className="text-gray-700 text-lg font-semibold">المماشي:</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[#00627F] text-xl font-bold">{getMileage()}</span>
-                          <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center">
-                            <span className="text-xs font-bold text-white">KM</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
