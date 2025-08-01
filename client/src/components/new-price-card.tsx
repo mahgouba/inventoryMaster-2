@@ -146,10 +146,14 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
               </div>
             </div>
 
-            {/* Logo */}
+            {/* Company Logo */}
             <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
-              <div className="w-16 h-16 bg-[#CF9B47] rounded-full flex items-center justify-center">
-                <div className="text-white text-2xl font-bold">البريمي</div>
+              <div className="w-16 h-16 bg-[#CF9B47] rounded-full flex items-center justify-center p-2">
+                <img 
+                  src="/company-logo.svg" 
+                  alt="شعار الشركة" 
+                  className="w-full h-full object-contain filter brightness-110"
+                />
               </div>
             </div>
 

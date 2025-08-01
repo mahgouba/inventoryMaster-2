@@ -551,7 +551,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
             <CardContent className="p-6">
               <div className="flex justify-center overflow-x-auto">
                 <div 
-                  className="relative bg-gradient-to-br from-[#00627F] to-[#004A5C] rounded-lg overflow-hidden"
+                  className="preview-price-card relative bg-gradient-to-br from-[#00627F] to-[#004A5C] rounded-lg overflow-hidden"
                   style={{
                     width: '297mm', // A4 landscape width
                     height: '210mm', // A4 landscape height
@@ -575,10 +575,14 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                     </div>
                   </div>
 
-                  {/* Logo */}
+                  {/* Company Logo */}
                   <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
-                    <div className="w-16 h-16 bg-[#CF9B47] rounded-full flex items-center justify-center">
-                      <div className="text-white text-2xl font-bold">البريمي</div>
+                    <div className="w-16 h-16 bg-[#CF9B47] rounded-full flex items-center justify-center p-2">
+                      <img 
+                        src="/company-logo.svg" 
+                        alt="شعار الشركة" 
+                        className="w-full h-full object-contain filter brightness-110"
+                      />
                     </div>
                   </div>
 
@@ -648,10 +652,79 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                 </div>
               </div>
               
-              <div className="text-center mt-4">
+              <div className="text-center mt-4 space-y-4">
                 <p className="text-white/80 text-sm drop-shadow-sm">
                   هذا مثال على شكل بطاقة السعر التي سيتم إنتاجها عند اختيار سيارة من المخزون
                 </p>
+                
+                {/* Preview Action Buttons */}
+                <div className="flex justify-center gap-3">
+                  <Button 
+                    onClick={() => {
+                      const element = document.querySelector('.preview-price-card');
+                      if (element) {
+                        window.print();
+                      }
+                    }}
+                    className="bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white px-6 py-2 rounded-lg"
+                  >
+                    <Printer className="w-4 h-4 ml-2" />
+                    طباعة المعاينة
+                  </Button>
+                  
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        const element = document.querySelector('.preview-price-card') as HTMLElement;
+                        if (!element) return;
+
+                        const html2canvas = (await import('html2canvas')).default;
+                        const jsPDF = (await import('jspdf')).default;
+
+                        const canvas = await html2canvas(element, {
+                          scale: 2,
+                          useCORS: true,
+                          allowTaint: true,
+                          backgroundColor: '#ffffff'
+                        });
+
+                        const pdf = new jsPDF({
+                          orientation: 'landscape',
+                          unit: 'mm',
+                          format: 'a4'
+                        });
+                        
+                        const pdfWidth = pdf.internal.pageSize.getWidth();
+                        const pdfHeight = pdf.internal.pageSize.getHeight();
+                        const canvasAspectRatio = canvas.height / canvas.width;
+                        
+                        let finalWidth = pdfWidth;
+                        let finalHeight = pdfWidth * canvasAspectRatio;
+                        
+                        if (finalHeight > pdfHeight) {
+                          finalHeight = pdfHeight;
+                          finalWidth = pdfHeight / canvasAspectRatio;
+                        }
+                        
+                        const xOffset = (pdfWidth - finalWidth) / 2;
+                        const yOffset = (pdfHeight - finalHeight) / 2;
+
+                        const imgData = canvas.toDataURL('image/png', 1.0);
+                        pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+                        
+                        const timestamp = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+                        pdf.save(`معاينة-بطاقة-السعر-${timestamp}.pdf`);
+                      } catch (error) {
+                        console.error('Error generating PDF:', error);
+                      }
+                    }}
+                    variant="outline"
+                    className="glass-button px-6 py-2 rounded-lg"
+                  >
+                    <Download className="w-4 h-4 ml-2" />
+                    تحميل PDF
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
