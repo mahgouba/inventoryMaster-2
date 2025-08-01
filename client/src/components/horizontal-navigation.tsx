@@ -282,7 +282,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       title: "بطاقات الأسعار", 
       href: "/price-cards", 
       icon: Receipt,
-      internal: false
+      internal: true
     },
     { 
       title: "البنوك الشخصية", 

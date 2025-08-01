@@ -47,8 +47,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
     '/banks-company', 
     '/card-view', 
     '/card-view-new', 
-    '/cards',
-    '/price-cards'
+    '/cards'
   ];
   
   const shouldShowSidebar = !pagesWithoutSidebar.includes(location);
@@ -92,7 +91,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           <Route path="/cards" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
           <Route path="/card-view" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
           <Route path="/card-view-new" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-          <Route path="/price-cards" component={() => <PriceCardsManagementPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+          <Route path="/price-cards" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/banks-personal" component={PersonalBanks} />
           <Route path="/banks-company" component={CompanyBanks} />
           
