@@ -33,6 +33,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { apiRequest } from "@/lib/queryClient";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import PriceCard from "@/components/price-card";
+import NewPriceCard from "@/components/new-price-card";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import type { InventoryItem } from "@shared/schema";
 
@@ -540,7 +541,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
         </div>
 
         {/* Price Card Preview Dialog */}
-        <PriceCard
+        <NewPriceCard
           open={priceCardOpen}
           onOpenChange={setPriceCardOpen}
           vehicle={previewVehicle || selectedVehicle}
