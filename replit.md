@@ -6,6 +6,7 @@ This is a full-stack inventory management system for managing inventory items wi
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 UI preferences: Add specifications management button next to "Add Item" button for easy access.
+Header navigation: Added "طلب إجازة وإستئذان" (Leave Request and Permission) button next to "وصل اليوم" (Arrived Today) button in the car cards page header for easy access to leave request functionality.
 
 ## System Architecture
 
