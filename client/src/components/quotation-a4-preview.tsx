@@ -405,10 +405,32 @@ export default function QuotationA4Preview({
             )}
           </div>
 
-          {/* Top Row: Price Details and Terms & Conditions */}
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            {/* Price Details */}
-            <div className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
+          {/* Top Row: Terms & Conditions and Price Details (switched positions) */}
+          <div className="flex gap-3 mb-3">
+            {/* Terms & Conditions - 35% width */}
+            <div className="w-[35%] border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="text-[#C79C45] w-5 h-5" />
+                <span className="text-lg font-bold text-black/80">الشروط والأحكام</span>
+              </div>
+              
+              <div className="space-y-1 text-xs text-black/80 max-h-32 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                {termsConditions.length > 0 ? (
+                  termsConditions.map((term, index) => (
+                    <div key={term.id} className="leading-relaxed">
+                      <span className="font-semibold">{index + 1}.</span> {term.term_text}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-black/60 py-2">
+                    لم يتم إضافة شروط وأحكام
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Price Details - 65% width */}
+            <div className="w-[65%] border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
               <div className="flex items-center gap-2 mb-2">
                 <Calculator className="text-[#C79C45] w-5 h-5" />
                 <span className="text-lg font-bold text-black/80">تفاصيل السعر</span>
@@ -448,28 +470,6 @@ export default function QuotationA4Preview({
                 </div>
               </div>
             </div>
-
-            {/* Terms & Conditions */}
-            <div className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className="text-[#C79C45] w-5 h-5" />
-                <span className="text-lg font-bold text-black/80">الشروط والأحكام</span>
-              </div>
-              
-              <div className="space-y-1 text-xs text-black/80 max-h-32 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                {termsConditions.length > 0 ? (
-                  termsConditions.map((term, index) => (
-                    <div key={term.id} className="leading-relaxed">
-                      <span className="font-semibold">{index + 1}.</span> {term.term_text}
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center text-black/60 py-2">
-                    لم يتم إضافة شروط وأحكام
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
           {/* Bottom Row: Sales Representative and Company Stamp */}
@@ -487,22 +487,14 @@ export default function QuotationA4Preview({
                   <span>{representativeName || "غير محدد"}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold">المنصب:</span>
-                  <span>{representativePosition || "مندوب مبيعات"}</span>
-                </div>
-                <div className="flex items-center gap-2">
                   <span className="font-semibold">الجوال:</span>
                   <span>{representativePhone || "غير محدد"}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">البريد:</span>
-                  <span className="text-xs">{representativeEmail || "غير محدد"}</span>
                 </div>
               </div>
             </div>
 
-            {/* Company Stamp */}
-            <div className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
+            {/* Company Stamp - removed border */}
+            <div className="rounded-lg p-3 bg-white/50">
               <div className="flex items-center gap-2 mb-2">
                 <Stamp className="text-[#C79C45] w-5 h-5" />
                 <span className="text-lg font-bold text-black/80">ختم الشركة</span>
