@@ -188,9 +188,10 @@ export default function QuotationA4Preview({
     };
   };
 
-  // Calculate pricing
-  const grandTotal = isVATInclusive ? finalPrice : (finalPrice + (finalPrice * taxRate / 100));
-  const taxAmount = isVATInclusive ? (finalPrice * taxRate / (100 + taxRate)) : (finalPrice * taxRate / 100);
+  // Calculate pricing - License plates are not subject to tax
+  const taxableAmount = includeLicensePlate ? (finalPrice - licensePlatePrice) : finalPrice;
+  const grandTotal = isVATInclusive ? finalPrice : (taxableAmount + (taxableAmount * taxRate / 100) + (includeLicensePlate ? licensePlatePrice : 0));
+  const taxAmount = isVATInclusive ? (taxableAmount * taxRate / (100 + taxRate)) : (taxableAmount * taxRate / 100);
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
@@ -461,7 +462,7 @@ export default function QuotationA4Preview({
                     <span className="text-[#C79C45]">{grandTotal.toFixed(2)} ريال</span>
                   </div>
                   <div className="text-sm text-black/80 mt-1 text-left">
-                    ({numberToArabic(Math.floor(grandTotal))} ريال سعودي)
+                    ({numberToArabic(Math.floor(grandTotal))} ريال فقط لاغير)
                   </div>
                 </div>
               </div>
