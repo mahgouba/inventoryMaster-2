@@ -618,9 +618,9 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                         </div>
 
                         {/* Price Box */}
-                        <div className="flex-1 p-4 text-center">
-                          <div className="text-gray-700 text-sm font-semibold mb-1">السعر</div>
-                          <div className="text-[#00627F] text-xl font-bold">﷼ 270,000</div>
+                        <div className="flex-1 p-4 text-center bg-blue-600 rounded-lg">
+                          <div className="text-white text-sm font-semibold mb-1">السعر</div>
+                          <div className="text-white text-xl font-bold">﷼ 270,000</div>
                         </div>
                       </div>
                     </div>
