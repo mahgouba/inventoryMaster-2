@@ -409,10 +409,6 @@ export default function QuotationA4Preview({
           <div className="flex gap-3 mb-3">
             {/* Terms & Conditions - 35% width */}
             <div className="w-[35%] border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className="text-[#C79C45] w-5 h-5" />
-                <span className="text-lg font-bold text-black/80">الشروط والأحكام</span>
-              </div>
               
               <div className="space-y-1 text-xs text-black/80 max-h-32 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                 {termsConditions.length > 0 ? (
@@ -475,7 +471,7 @@ export default function QuotationA4Preview({
           {/* Bottom Row: Sales Representative and Company Stamp */}
           <div className="grid grid-cols-2 gap-3 mb-3">
             {/* Sales Representative */}
-            <div className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
+            <div className="rounded-lg p-3 bg-white/50">
               <div className="flex items-center gap-2 mb-2">
                 <User className="text-[#C79C45] w-5 h-5" />
                 <span className="text-lg font-bold text-black/80">مندوب المبيعات</span>
@@ -493,23 +489,18 @@ export default function QuotationA4Preview({
               </div>
             </div>
 
-            {/* Company Stamp - removed border */}
+            {/* Company Stamp - removed border, icon, and text */}
             <div className="rounded-lg p-3 bg-white/50">
-              <div className="flex items-center gap-2 mb-2">
-                <Stamp className="text-[#C79C45] w-5 h-5" />
-                <span className="text-lg font-bold text-black/80">ختم الشركة</span>
-              </div>
-              
               <div className="flex items-center justify-center h-20">
                 {companyStamp ? (
                   <img 
                     src={companyStamp} 
                     alt="ختم الشركة" 
-                    className="max-h-16 max-w-full object-contain"
+                    className="max-h-48 max-w-full object-contain scale-[3]"
                   />
                 ) : (
                   <div className="text-center text-black/60 text-sm">
-                    <div className="border-2 border-dashed border-black/20 rounded-lg p-2 w-16 h-16 flex items-center justify-center">
+                    <div className="border-2 border-dashed border-black/20 rounded-lg p-6 w-48 h-48 flex items-center justify-center scale-[3]">
                       <span className="text-xs">ختم الشركة</span>
                     </div>
                   </div>
