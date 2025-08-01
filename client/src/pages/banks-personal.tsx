@@ -194,7 +194,7 @@ export default function PersonalBanks() {
                       {/* Expanded Content */}
                       {isExpanded && (
                         <div className="w-full space-y-4 animate-in slide-in-from-top-2 duration-300">
-                          <Separator className="bg-gradient-to-r from-transparent via-yellow-500 to-transparent h-px" />
+                          <Separator className="bg-white/30 h-px" />
 
                           <div className="space-y-4">
                             {/* Account Name Row */}
@@ -221,7 +221,7 @@ export default function PersonalBanks() {
                               </Button>
                             </div>
 
-                            <Separator className="bg-gradient-to-r from-transparent via-yellow-500 to-transparent h-px" />
+                            <Separator className="bg-white/30 h-px" />
 
                             {/* Account Number Row */}
                             <div className="flex items-center justify-between py-2">
@@ -247,7 +247,7 @@ export default function PersonalBanks() {
                               </Button>
                             </div>
 
-                            <Separator className="bg-gradient-to-r from-transparent via-yellow-500 to-transparent h-px" />
+                            <Separator className="bg-white/30 h-px" />
 
                             {/* IBAN Row */}
                             <div className="flex items-center justify-between py-2">
