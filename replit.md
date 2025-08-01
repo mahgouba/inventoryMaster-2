@@ -37,6 +37,7 @@ The system follows a clear separation of concerns, with distinct layers for fron
 - **Inventory Management**: CRUD operations for inventory items, supporting categories, versions, statuses, images, and detailed specifications (e.g., chassis number, engine capacity, colors).
 - **Quotation System**: Full-page quotation creation with QR code generation, dynamic pricing (VAT, license plates), company branding (logo, details, custom colors), and PDF/JPG export. Supports both quotation and invoice modes.
 - **Vehicle Sharing**: Share vehicle details with linked images and editable pricing.
+- **Enhanced WhatsApp Sharing**: Share quotations via WhatsApp with automatic PDF generation, Saudi Arabia country code (+966) integration, employee selection dropdown, and option to send to work numbers.
 - **Manufacturer Management**: Comprehensive system for managing manufacturers, categories, and trim levels with logo integration.
 - **Data Management**: Import/export functionality for various data types (inventory, banks, rates, users) via Excel and JSON, with selective options.
 - **Bank Management**: Management of company and personal bank accounts, including visibility toggles and share functionality.

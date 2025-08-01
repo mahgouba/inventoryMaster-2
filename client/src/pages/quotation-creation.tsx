@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   ArrowLeft,
   FileText, 
@@ -671,6 +672,10 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [showStamp, setShowStamp] = useState(true);
   const [downloadLoading, setDownloadLoading] = useState(false);
   
+  // WhatsApp sharing enhanced options
+  const [selectedEmployee, setSelectedEmployee] = useState<string>("");
+  const [sendToWorkNumber, setSendToWorkNumber] = useState(false);
+  
 
 
   // Load existing terms and conditions
@@ -885,10 +890,24 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
 
   // Share via WhatsApp with PDF generation
   const shareViaWhatsApp = async () => {
-    if (!whatsappNumber || whatsappNumber === "+966") {
+    // Determine target phone number
+    let targetNumber = "";
+    
+    if (selectedEmployee && sendToWorkNumber) {
+      // Use employee's work number
+      const selectedRep = representatives.find(r => r.id === selectedEmployee);
+      if (selectedRep) {
+        targetNumber = selectedRep.phone.startsWith('+') ? selectedRep.phone : `+966${selectedRep.phone.replace(/^0/, '')}`;
+      }
+    } else {
+      // Use custom entered number
+      targetNumber = whatsappNumber;
+    }
+
+    if (!targetNumber || targetNumber === "+966") {
       toast({
         title: "خطأ",
-        description: "يرجى إدخال رقم الواتساب",
+        description: selectedEmployee && sendToWorkNumber ? "رقم عمل الموظف غير متوفر" : "يرجى إدخال رقم الواتساب",
         variant: "destructive",
       });
       return;
@@ -980,7 +999,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
         URL.revokeObjectURL(url);
 
         // Open WhatsApp
-        const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = `https://wa.me/${targetNumber.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
       }
       
@@ -3515,25 +3534,60 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            {/* Employee Selection */}
             <div>
-              <Label htmlFor="whatsapp-number">رقم الواتساب</Label>
-              <div className="flex items-center">
-                <div className="bg-gray-100 border border-r-0 rounded-r-md px-3 py-2 text-sm font-medium text-gray-700">
-                  🇸🇦 +966
-                </div>
-                <Input
-                  id="whatsapp-number"
-                  placeholder="501234567"
-                  value={whatsappNumber.replace('+966', '')}
-                  onChange={(e) => setWhatsappNumber('+966' + e.target.value.replace(/^\+966/, ''))}
-                  className="text-left rounded-r-none border-r-0"
-                />
-              </div>
+              <Label htmlFor="employee-select">اختيار الموظف</Label>
+              <Select value={selectedEmployee} onValueChange={setSelectedEmployee}>
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر موظف لإرسال الرسالة إليه" />
+                </SelectTrigger>
+                <SelectContent>
+                  {representatives.map((rep) => (
+                    <SelectItem key={rep.id} value={rep.id}>
+                      {rep.name} - {rep.position}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+
+            {/* Work Number Checkbox */}
+            {selectedEmployee && (
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Checkbox 
+                  id="send-to-work" 
+                  checked={sendToWorkNumber}
+                  onCheckedChange={setSendToWorkNumber}
+                />
+                <Label htmlFor="send-to-work" className="text-sm">
+                  إرسال على رقم العمل: {representatives.find(r => r.id === selectedEmployee)?.phone}
+                </Label>
+              </div>
+            )}
+
+            {/* Phone Number Input - Only show if custom number or no work number selected */}
+            {(!sendToWorkNumber || !selectedEmployee) && (
+              <div>
+                <Label htmlFor="whatsapp-number">رقم الواتساب</Label>
+                <div className="flex items-center">
+                  <div className="bg-gray-100 border border-r-0 rounded-r-md px-3 py-2 text-sm font-medium text-gray-700">
+                    🇸🇦 +966
+                  </div>
+                  <Input
+                    id="whatsapp-number"
+                    placeholder="501234567"
+                    value={whatsappNumber.replace('+966', '')}
+                    onChange={(e) => setWhatsappNumber('+966' + e.target.value.replace(/^\+966/, ''))}
+                    className="text-left rounded-r-none border-r-0"
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-3">
               <Button onClick={shareViaWhatsApp} className="bg-emerald-600 hover:bg-emerald-700">
                 <MessageCircle size={16} className="ml-2" />
-                إرسال
+                إرسال PDF
               </Button>
               <Button variant="outline" onClick={() => setShowWhatsappDialog(false)}>
                 إلغاء
