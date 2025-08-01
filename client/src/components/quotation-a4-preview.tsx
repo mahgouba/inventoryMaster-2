@@ -88,6 +88,23 @@ export default function QuotationA4Preview({
       setEditableSpecs(vehicleSpecs.detailedDescription);
     }
   }, [vehicleSpecs?.detailedDescription]);
+
+  // Fetch terms and conditions
+  useEffect(() => {
+    const fetchTermsConditions = async () => {
+      try {
+        const response = await fetch('/api/terms-conditions');
+        if (response.ok) {
+          const data = await response.json();
+          setTermsConditions(data);
+        }
+      } catch (error) {
+        console.error('Error fetching terms and conditions:', error);
+      }
+    };
+
+    fetchTermsConditions();
+  }, [termsRefreshTrigger]);
   const [useAlbarimi2Background, setUseAlbarimi2Background] = useState(true); // Default to albarimi-2
   const previewRef = useRef<HTMLDivElement>(null);
 
