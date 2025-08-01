@@ -462,7 +462,7 @@ export default function QuotationA4Preview({
                     <span className="text-[#C79C45]">{grandTotal.toFixed(2)} ريال</span>
                   </div>
                   <div className="text-sm text-black/80 mt-1 text-left">
-                    ({numberToArabic(Math.floor(grandTotal))} ريال فقط لاغير)
+                    ({numberToArabic(Math.floor(grandTotal))})
                   </div>
                 </div>
               </div>
