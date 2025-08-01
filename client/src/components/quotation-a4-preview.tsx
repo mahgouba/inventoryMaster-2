@@ -503,12 +503,12 @@ export default function QuotationA4Preview({
                     src={companyStamp} 
                     alt="ختم الشركة" 
                     className="object-contain"
-                    style={{ height: '2cm', width: '3cm' }}
+                    style={{ height: '4cm', width: '6cm' }}
                   />
                 ) : (
                   <div className="text-center text-black/60 text-sm">
                     <div className="border-2 border-dashed border-black/20 rounded-lg flex items-center justify-center"
-                         style={{ height: '2cm', width: '3cm' }}>
+                         style={{ height: '4cm', width: '6cm' }}>
                       <span className="text-xs">ختم الشركة</span>
                     </div>
                   </div>
