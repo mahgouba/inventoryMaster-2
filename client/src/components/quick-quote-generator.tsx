@@ -16,13 +16,15 @@ import html2canvas from "html2canvas";
 
 interface QuickQuoteGeneratorProps {
   vehicle: InventoryItem;
+  defaultSalesRep?: string;
 }
 
-export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProps) {
+export default function QuickQuoteGenerator({ vehicle, defaultSalesRep }: QuickQuoteGeneratorProps) {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [salesRepName, setSalesRepName] = useState(defaultSalesRep || "");
   const [notes, setNotes] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -266,9 +268,12 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
   };
 
   const quotationData = {
+    quoteNumber: generateQuoteNumber(),
     quotationNumber: generateQuoteNumber(),
+    inventoryItemId: vehicle.id,
     customerName,
     customerPhone,
+    salesRepName,
     notes,
     vehicleId: vehicle.id,
     manufacturer: vehicle.manufacturer,
@@ -278,6 +283,8 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
     exteriorColor: vehicle.exteriorColor,
     interiorColor: vehicle.interiorColor,
     chassisNumber: vehicle.chassisNumber,
+    validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+    createdBy: salesRepName || "مجهول",
     basePrice: vehicle.price || 0,
     finalPrice: vehicle.price || 0,
     createdAt: new Date(),
@@ -344,6 +351,20 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
                     onChange={(e) => setCustomerPhone(e.target.value)}
                     placeholder="أدخل رقم الهاتف"
                     className="text-right"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="salesRepName" className="text-right block">
+                    اسم المندوب
+                  </Label>
+                  <Input
+                    id="salesRepName"
+                    value={salesRepName}
+                    onChange={(e) => setSalesRepName(e.target.value)}
+                    placeholder="أدخل اسم المندوب"
+                    className="text-right"
+                    disabled={!!defaultSalesRep}
                   />
                 </div>
 

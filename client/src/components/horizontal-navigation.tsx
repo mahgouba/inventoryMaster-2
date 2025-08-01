@@ -26,6 +26,7 @@ import {
   Upload
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { shouldShowNavItem, UserRole } from "@/utils/permissions";
 
 interface HorizontalNavigationProps {
   userRole: string;
@@ -239,115 +240,133 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       title: "المخزون", 
       href: "/inventory", 
       icon: LayoutDashboard,
-      internal: true
+      internal: true,
+      permission: "inventory"
     },
     { 
       title: "عرض سعر", 
       href: "/quotation-creation", 
       icon: MessageSquare,
-      internal: true
+      internal: true,
+      permission: "quotationCreation"
     },
     { 
       title: "الحجوزات", 
       href: "/reservations", 
       icon: Calendar,
-      internal: true
+      internal: true,
+      permission: "reservations"
     },
     { 
       title: "المبيعات", 
       href: "/sold-vehicles", 
       icon: ShoppingCart,
-      internal: true
+      internal: true,
+      permission: "soldVehicles"
     },
     { 
       title: "التمويل", 
       href: "/financing-calculator", 
       icon: Calculator,
-      internal: true
+      internal: true,
+      permission: "financingCalculator"
     },
     { 
       title: "الإجازات", 
       href: "/leave-requests", 
       icon: UserCheck,
-      internal: true
+      internal: true,
+      permission: "leaveRequests"
     },
     // External pages (will navigate away)
     { 
       title: "البطاقات", 
       href: "/card-view-new", 
       icon: Package,
-      internal: false
+      internal: false,
+      permission: "cardView"
     },
     { 
       title: "بطاقات الأسعار", 
       href: "/price-cards", 
       icon: Receipt,
-      internal: true
+      internal: true,
+      permission: "priceCards"
     },
     { 
       title: "البنوك الشخصية", 
       href: "/banks-personal", 
       icon: CreditCard,
-      internal: false
+      internal: false,
+      permission: "bankManagement"
     },
     { 
       title: "بنوك الشركة", 
       href: "/banks-company", 
       icon: Building2,
-      internal: false
+      internal: false,
+      permission: "bankManagement"
     }
   ];
 
-  const adminItems = userRole === "admin" ? [
+  const adminItems = [
     { 
       title: "الشعارات", 
       href: "/manufacturer-logos", 
       icon: Image,
-      internal: true
+      internal: true,
+      permission: "admin"
     },
     { 
       title: "إدارة القوائم", 
       href: "/list-management", 
       icon: Settings,
-      internal: true
+      internal: true,
+      permission: "admin"
     },
     { 
       title: "المستخدمين", 
       href: "/user-management", 
       icon: Users,
-      internal: true
+      internal: true,
+      permission: "userManagement"
     },
     { 
       title: "إدارة النسب", 
       href: "/bank-management", 
       icon: Landmark,
-      internal: true
+      internal: true,
+      permission: "bankManagement"
     },
     { 
       title: "نسب التمويل", 
       href: "/financing-rates", 
       icon: Percent,
-      internal: true
+      internal: true,
+      permission: "admin"
     },
     { 
       title: "قاعدة البيانات", 
       href: "/database-management", 
       icon: Database,
-      internal: true
+      internal: true,
+      permission: "admin"
     },
     { 
       title: "إدارة الثيمات", 
       href: "/theme-management", 
       icon: Palette,
-      internal: true
+      internal: true,
+      permission: "admin"
     },
     { 
       title: "استيراد السيارات", 
       href: "/car-data-import", 
       icon: Upload,
-      internal: true
+      internal: true,
+      permission: "admin"
     }
-  ] : [];
+  ];
 
   // System items (available for all users)
   const systemItems = [
@@ -360,7 +379,20 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
     }
   ];
 
-  const allItems = [...menuItems, ...adminItems, ...systemItems];
+  // Filter items based on user permissions
+  const filteredMenuItems = menuItems.filter(item => {
+    if (!item.permission) return true; // Show items without permission requirements
+    if (item.permission === "admin") return userRole === "admin";
+    return shouldShowNavItem(userRole as UserRole, item.permission);
+  });
+
+  const filteredAdminItems = adminItems.filter(item => {
+    if (!item.permission) return true;
+    if (item.permission === "admin") return userRole === "admin";
+    return shouldShowNavItem(userRole as UserRole, item.permission);
+  });
+
+  const allItems = [...filteredMenuItems, ...filteredAdminItems, ...systemItems];
 
   const isActive = (href: string) => location === href;
 

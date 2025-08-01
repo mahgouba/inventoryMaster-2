@@ -25,6 +25,7 @@ import { AdvancedPrintDialog } from "@/components/advanced-print-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import { exportToCSV, exportToExcel, printTable, printTableWithSettings } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
+import { canCreateItem, canDeleteItem, UserRole } from "@/utils/permissions";
 
 interface InventoryPageProps {
   userRole: string;
@@ -464,7 +465,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-2 items-center">
                   {/* Add Item Button */}
-                  {userRole === "admin" && (
+                  {canCreateItem(userRole as UserRole, "inventory") && (
                     <Button 
                       onClick={() => setFormOpen(true)}
                       className="glass-button-primary"
@@ -498,7 +499,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   </Button>
 
                   {/* Import Button - Admin Only */}
-                  {userRole === "admin" && (
+                  {canCreateItem(userRole as UserRole, "inventory") && userRole === "admin" && (
                     <Button 
                       onClick={() => setIsExcelImportOpen(true)}
                       variant="outline"
@@ -917,7 +918,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
 
       {/* Animated Floating Action Button */}
       <InventoryFAB
-        onAddItem={userRole === "admin" ? () => setFormOpen(true) : () => {}}
+        onAddItem={canCreateItem(userRole as UserRole, "inventory") ? () => setFormOpen(true) : () => {}}
         onSearch={() => {
           // Focus on search input if visible, or scroll to search area
           const searchInput = document.querySelector('input[placeholder*="البحث"]') as HTMLInputElement;

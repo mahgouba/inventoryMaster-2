@@ -13,6 +13,7 @@ import InventoryForm from "./inventory-form";
 import { ManufacturerLogo } from "./manufacturer-logo";
 import { ReservationDialog } from "./reservation-dialog";
 import { SellVehicleDialog } from "./sell-vehicle-dialog";
+import { canDeleteItem, canEditItem, UserRole } from "@/utils/permissions";
 
 
 interface InventoryTableProps {
@@ -378,26 +379,30 @@ export default function InventoryTable({
                   <TableCell className="text-sm text-white/80">{item.notes || '-'}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-1 space-x-reverse">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(item)}
-                        className="text-custom-primary hover:text-custom-primary-dark p-1"
-                        title="تحرير"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                      {canEditItem(userRole as UserRole, "inventory") && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(item)}
+                          className="text-custom-primary hover:text-custom-primary-dark p-1"
+                          title="تحرير"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      )}
 
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(item.id)}
-                        className="text-red-600 hover:text-red-800 p-1"
-                        title="حذف"
-                        disabled={deleteMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      {canDeleteItem(userRole as UserRole, "inventory") && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(item.id)}
+                          className="text-red-600 hover:text-red-800 p-1"
+                          title="حذف"
+                          disabled={deleteMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                       {item.status === "محجوز" ? (
                         <Button
                           variant="ghost"

@@ -13,13 +13,15 @@ import { getStatusColor } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
 import QuickQuoteGenerator from "@/components/quick-quote-generator";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
+import { canDeleteItem, canEditItem, canReserveItem, canShareItem, UserRole } from "@/utils/permissions";
 
 
 interface CardViewPageProps {
   userRole: string;
+  username?: string;
 }
 
-export default function CardViewPage({ userRole }: CardViewPageProps) {
+export default function CardViewPage({ userRole, username }: CardViewPageProps) {
   const [expandedManufacturers, setExpandedManufacturers] = useState<Set<string>>(new Set());
 
   // Get theme settings
@@ -340,25 +342,32 @@ export default function CardViewPage({ userRole }: CardViewPageProps) {
                                   {/* Action buttons */}
                                   <div className="flex justify-between pt-2 border-t border-slate-100">
                                     <div className="flex space-x-2 space-x-reverse">
-                                      {userRole === "admin" && (
-                                        <>
-                                          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
-                                            <Edit className="h-4 w-4" />
-                                          </Button>
-                                          <Button 
-                                            variant="ghost" 
-                                            size="sm" 
-                                            className="text-green-600 hover:text-green-800"
-                                            disabled={item.isSold}
-                                          >
-                                            <DollarSign className="h-4 w-4" />
-                                          </Button>
-                                        </>
+                                      {/* Edit Button - Based on permissions */}
+                                      {canEditItem(userRole as UserRole, "cardView") && (
+                                        <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
+                                          <Edit className="h-4 w-4" />
+                                        </Button>
                                       )}
                                       
-                                      <div className="inline-block">
-                                        <QuickQuoteGenerator vehicle={item} />
-                                      </div>
+                                      {/* Reserve/Quote Button - Based on permissions */}
+                                      {canReserveItem(userRole as UserRole, "cardView") && (
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          className="text-green-600 hover:text-green-800"
+                                          disabled={item.isSold}
+                                          title="حجز السيارة"
+                                        >
+                                          <DollarSign className="h-4 w-4" />
+                                        </Button>
+                                      )}
+                                      
+                                      {/* Share/Quote Generator - Based on permissions */}
+                                      {canShareItem(userRole as UserRole, "cardView") && (
+                                        <div className="inline-block">
+                                          <QuickQuoteGenerator vehicle={item} defaultSalesRep={userRole === "salesperson" ? username : undefined} />
+                                        </div>
+                                      )}
 
                                     </div>
                                     <div className="text-xs text-slate-500">
