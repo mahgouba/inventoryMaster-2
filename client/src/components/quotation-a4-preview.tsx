@@ -497,11 +497,11 @@ export default function QuotationA4Preview({
                   <img 
                     src={companyStamp} 
                     alt="ختم الشركة" 
-                    className="max-h-48 max-w-full object-contain scale-[3]"
+                    className="max-h-16 max-w-full object-contain scale-50"
                   />
                 ) : (
                   <div className="text-center text-black/60 text-sm">
-                    <div className="border-2 border-dashed border-black/20 rounded-lg p-6 w-48 h-48 flex items-center justify-center scale-[3]">
+                    <div className="border-2 border-dashed border-black/20 rounded-lg p-2 w-16 h-16 flex items-center justify-center scale-50">
                       <span className="text-xs">ختم الشركة</span>
                     </div>
                   </div>
