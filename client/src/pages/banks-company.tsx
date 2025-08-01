@@ -1,50 +1,18 @@
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Building2, Copy, Share2, ChevronDown, ChevronUp, MoreVertical, Edit3, Trash2, EyeOff } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Building2, Copy, Share2, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "wouter";
 import type { Bank } from "@shared/schema";
 
 export default function CompanyBanks() {
   const [expandedBanks, setExpandedBanks] = useState<Set<number>>(new Set());
-  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
-  const [hiddenBanks, setHiddenBanks] = useState<Set<number>>(() => {
-    const saved = localStorage.getItem('hiddenBanks');
-    return saved ? new Set(JSON.parse(saved)) : new Set();
-  });
+  const [copiedText, setCopiedText] = useState<string | null>(null);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  // Listen for bank data changes from management page
-  useEffect(() => {
-    const handleDataChange = () => {
-      // Update hidden banks from localStorage
-      const saved = localStorage.getItem('hiddenBanks');
-      const newHiddenBanks = saved ? new Set<number>(JSON.parse(saved)) : new Set<number>();
-      setHiddenBanks(newHiddenBanks);
-      
-      // Refresh the query to get updated data
-      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
-    };
-
-    const handleVisibilityChange = handleDataChange;
-
-    // Listen to both events for comprehensive updates
-    window.addEventListener('bankDataChanged', handleDataChange);
-    window.addEventListener('bankVisibilityChanged', handleVisibilityChange);
-    
-    return () => {
-      window.removeEventListener('bankDataChanged', handleDataChange);
-      window.removeEventListener('bankVisibilityChanged', handleVisibilityChange);
-    };
-  }, [queryClient]);
-
-  const { data: allBanks = [], isLoading } = useQuery({
+  const { data: banks = [], isLoading } = useQuery({
     queryKey: ["/api/banks/type/شركة"],
     queryFn: async () => {
       const response = await fetch("/api/banks/type/شركة");
@@ -53,10 +21,6 @@ export default function CompanyBanks() {
     }
   });
 
-  // Filter out hidden banks
-  const banks = allBanks.filter(bank => !hiddenBanks.has(bank.id));
-
-  // Fetch company logo from appearance settings
   const { data: appearance } = useQuery({
     queryKey: ["/api/appearance"],
     queryFn: async () => {
@@ -76,13 +40,10 @@ export default function CompanyBanks() {
     setExpandedBanks(newExpanded);
   };
 
-  const [copiedText, setCopiedText] = useState<string | null>(null);
-
   const copyToClipboard = async (text: string, label: string, elementId?: string) => {
     try {
       await navigator.clipboard.writeText(text);
       
-      // Trigger animation for specific element
       if (elementId) {
         setCopiedText(elementId);
         setTimeout(() => setCopiedText(null), 1000);
@@ -124,71 +85,6 @@ export default function CompanyBanks() {
     }
   };
 
-  const handleLongPressStart = (bank: Bank) => {
-    const timer = setTimeout(() => {
-      shareBank(bank);
-      toast({
-        title: "تم مشاركة البيانات",
-        description: `تمت مشاركة بيانات ${bank.bankName}`,
-      });
-    }, 800); // 800ms for long press
-    setLongPressTimer(timer);
-  };
-
-  const handleLongPressEnd = () => {
-    if (longPressTimer) {
-      clearTimeout(longPressTimer);
-      setLongPressTimer(null);
-    }
-  };
-
-  // Bank management functions
-  const hideBank = (bankId: number) => {
-    const newHiddenBanks = new Set(hiddenBanks);
-    newHiddenBanks.add(bankId);
-    setHiddenBanks(newHiddenBanks);
-    localStorage.setItem('hiddenBanks', JSON.stringify(Array.from(newHiddenBanks)));
-    
-    // Notify other components about the change
-    window.dispatchEvent(new Event('bankVisibilityChanged'));
-    
-    toast({
-      title: "تم إخفاء البنك",
-      description: "تم إخفاء البنك من العرض بنجاح",
-    });
-  };
-
-  const editBank = (bankId: number) => {
-    // Navigate to bank management page with edit mode
-    window.location.href = `/bank-management?edit=${bankId}&type=شركة`;
-  };
-
-  const deleteBank = async (bankId: number, bankName: string) => {
-    if (confirm(`هل أنت متأكد من حذف بنك ${bankName}؟`)) {
-      try {
-        const response = await fetch(`/api/banks/${bankId}`, {
-          method: 'DELETE',
-        });
-        
-        if (response.ok) {
-          queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
-          toast({
-            title: "تم الحذف",
-            description: `تم حذف بنك ${bankName} بنجاح`,
-          });
-        } else {
-          throw new Error('Failed to delete bank');
-        }
-      } catch (error) {
-        toast({
-          title: "خطأ في الحذف",
-          description: "فشل في حذف البنك",
-          variant: "destructive"
-        });
-      }
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--dark-bg-primary)' }}>
@@ -201,10 +97,9 @@ export default function CompanyBanks() {
   }
 
   return (
-    <TooltipProvider>
     <div className="min-h-screen" style={{ background: 'var(--dark-bg-primary)' }} dir="rtl">
       <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Header with Company Logo and Title - Compact Style */}
+        {/* Header */}
         <div className="glass-container mb-6 p-4">
           <div className="flex items-center justify-center gap-4">
             {appearance?.companyLogo ? (
@@ -236,7 +131,7 @@ export default function CompanyBanks() {
           </div>
         </div>
 
-        {/* Banks Grid - Match Inventory Style */}
+        {/* Banks Grid */}
         {banks.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {banks.map((bank) => {
@@ -249,96 +144,32 @@ export default function CompanyBanks() {
                 >
                   <CardContent className="p-6">
                     <div className="flex flex-col space-y-4">
-                      {/* Bank Header - Dropdown Style */}
+                      {/* Bank Header */}
                       <div 
                         className="w-full flex justify-between items-center cursor-pointer group"
                         onClick={() => toggleExpanded(bank.id)}
                       >
                         <div className="flex items-center justify-between w-full">
                           <div className="flex items-center space-x-4 space-x-reverse">
-                            {bank.logo ? (
-                              <div className="flex items-center space-x-3 space-x-reverse">
+                            <div className="flex items-center space-x-3 space-x-reverse">
+                              {bank.logo ? (
                                 <img 
                                   src={bank.logo} 
                                   alt={bank.bankName} 
-                                  className="h-18 w-18 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110 cursor-pointer"
+                                  className="h-18 w-18 object-contain drop-shadow-lg"
                                   style={{ height: '4.5rem', width: '4.5rem' }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    shareBank(bank);
-                                  }}
-                                  onMouseDown={(e) => {
-                                    e.stopPropagation();
-                                    handleLongPressStart(bank);
-                                  }}
-                                  onMouseUp={(e) => {
-                                    e.stopPropagation();
-                                    handleLongPressEnd();
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.stopPropagation();
-                                    handleLongPressEnd();
-                                  }}
-                                  onTouchStart={(e) => {
-                                    e.stopPropagation();
-                                    handleLongPressStart(bank);
-                                  }}
-                                  onTouchEnd={(e) => {
-                                    e.stopPropagation();
-                                    handleLongPressEnd();
-                                  }}
-                                  onTouchCancel={(e) => {
-                                    e.stopPropagation();
-                                    handleLongPressEnd();
-                                  }}
                                 />
-                                <h3 className="text-lg font-bold text-white drop-shadow-md">
-                                  {bank.bankName}
-                                </h3>
-                              </div>
-                            ) : (
-                              <div className="flex items-center space-x-3 space-x-reverse">
-                                <div 
-                                  className="h-18 w-18 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30 cursor-pointer"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    shareBank(bank);
-                                  }}
-                                  onMouseDown={(e) => {
-                                    e.stopPropagation();
-                                    handleLongPressStart(bank);
-                                  }}
-                                  onMouseUp={(e) => {
-                                    e.stopPropagation();
-                                    handleLongPressEnd();
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.stopPropagation();
-                                    handleLongPressEnd();
-                                  }}
-                                  onTouchStart={(e) => {
-                                    e.stopPropagation();
-                                    handleLongPressStart(bank);
-                                  }}
-                                  onTouchEnd={(e) => {
-                                    e.stopPropagation();
-                                    handleLongPressEnd();
-                                  }}
-                                  onTouchCancel={(e) => {
-                                    e.stopPropagation();
-                                    handleLongPressEnd();
-                                  }}
-                                >
+                              ) : (
+                                <div className="h-18 w-18 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
                                   <Building2 className="w-8 h-8 text-white" />
                                 </div>
-                                <h3 className="text-lg font-bold text-white drop-shadow-md">
-                                  {bank.bankName}
-                                </h3>
-                              </div>
-                            )}
+                              )}
+                              <h3 className="text-lg font-bold text-white drop-shadow-md">
+                                {bank.bankName}
+                              </h3>
+                            </div>
                           </div>
                           
-                          {/* Share Icon Button */}
                           <Button
                             size="sm"
                             variant="ghost"
@@ -351,7 +182,6 @@ export default function CompanyBanks() {
                           >
                             <Share2 className="w-4 h-4 text-[#00627F]" />
                           </Button>
-
                         </div>
                         
                         {isExpanded ? (
@@ -361,14 +191,11 @@ export default function CompanyBanks() {
                         )}
                       </div>
 
-                      {/* Expanded Content - Dropdown */}
+                      {/* Expanded Content */}
                       {isExpanded && (
                         <div className="w-full space-y-4 animate-in slide-in-from-top-2 duration-300">
                           <Separator className="bg-white/30" />
 
-
-
-                          {/* Bank Details Container - Clean Layout */}
                           <div className="space-y-6">
                             {/* Account Name */}
                             <div className="text-center">
@@ -445,8 +272,6 @@ export default function CompanyBanks() {
                               </Button>
                             </div>
                           </div>
-
-
                         </div>
                       )}
                     </div>
@@ -462,10 +287,7 @@ export default function CompanyBanks() {
             <p className="text-white/70 text-lg">لم يتم إضافة أي بنوك شركات حتى الآن</p>
           </div>
         )}
-
-
       </div>
     </div>
-    </TooltipProvider>
   );
 }
