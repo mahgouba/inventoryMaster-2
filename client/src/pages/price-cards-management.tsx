@@ -617,20 +617,20 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
 
                         {/* Price Box */}
                         <div className="flex-1 p-4 text-center">
-                          <div className="text-white text-sm font-semibold mb-2">تفاصيل السعر</div>
+                          <div className="text-black text-sm font-semibold mb-2">تفاصيل السعر</div>
                           <div className="space-y-1">
                             <div className="flex justify-between text-xs">
-                              <span className="text-white">السعر الأساسي:</span>
-                              <span className="text-white font-semibold">﷼ 234,783</span>
+                              <span className="text-black">السعر الأساسي:</span>
+                              <span className="text-black font-semibold">﷼ 234,783</span>
                             </div>
                             <div className="flex justify-between text-xs">
-                              <span className="text-white">قيمة الضريبة (15%):</span>
-                              <span className="text-white font-semibold">﷼ 35,217</span>
+                              <span className="text-black">قيمة الضريبة (15%):</span>
+                              <span className="text-black font-semibold">﷼ 35,217</span>
                             </div>
-                            <div className="border-t border-white/30 pt-1">
+                            <div className="border-t border-gray-300 pt-1">
                               <div className="flex justify-between">
-                                <span className="text-white text-sm font-bold">السعر الإجمالي:</span>
-                                <span className="text-white text-lg font-bold">﷼ 270,000</span>
+                                <span className="text-black text-sm font-bold">السعر الإجمالي:</span>
+                                <span className="text-black text-lg font-bold">﷼ 270,000</span>
                               </div>
                             </div>
                           </div>
