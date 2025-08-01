@@ -137,7 +137,7 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
         {/* PDF Content */}
         <div 
           id="price-card-content"
-          className="bg-white text-black p-8 rounded-lg shadow-lg"
+          className="bg-blue-500 text-black p-8 rounded-lg shadow-lg"
           style={{ 
             width: '794px', 
             height: '1123px',
