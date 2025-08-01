@@ -569,13 +569,11 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                 >
                   {/* Company Logo */}
                   <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
-                    <div className="w-48 h-48 bg-[#CF9B47] rounded-full flex items-center justify-center p-6">
-                      <img 
-                        src="/company-logo.svg" 
-                        alt="شعار الشركة" 
-                        className="w-full h-full object-contain filter brightness-110"
-                      />
-                    </div>
+                    <img 
+                      src="/company-logo.svg" 
+                      alt="شعار الشركة" 
+                      className="w-48 h-48 object-contain filter brightness-110"
+                    />
                   </div>
 
                   {/* Year */}
