@@ -549,67 +549,73 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="flex justify-center">
+              <div className="flex justify-center overflow-x-auto">
                 <div 
-                  className="relative w-[421px] h-[297px] bg-gradient-to-br from-[#00627F] to-[#004A5C] rounded-lg overflow-hidden transform scale-75"
+                  className="relative bg-gradient-to-br from-[#00627F] to-[#004A5C] rounded-lg overflow-hidden"
                   style={{
+                    width: '297mm', // A4 landscape width
+                    height: '210mm', // A4 landscape height
                     fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
                     direction: 'rtl',
-                    backgroundImage: 'linear-gradient(135deg, #00627F 0%, #004A5C 100%)'
+                    backgroundImage: 'linear-gradient(135deg, #00627F 0%, #004A5C 100%)',
+                    minWidth: '297mm',
+                    minHeight: '210mm',
+                    maxWidth: '297mm',
+                    maxHeight: '210mm'
                   }}
                 >
                   {/* Background Pattern */}
                   <div className="absolute inset-0 opacity-10">
-                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#CF9B47] to-transparent">
-                      <div className="h-full flex flex-col justify-center items-center gap-1">
-                        {Array.from({length: 10}).map((_, i) => (
-                          <div key={i} className="w-1 h-1 bg-[#CF9B47] rotate-45 opacity-60"></div>
+                    <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#CF9B47] to-transparent">
+                      <div className="h-full flex flex-col justify-center items-center gap-2">
+                        {Array.from({length: 20}).map((_, i) => (
+                          <div key={i} className="w-2 h-2 bg-[#CF9B47] rotate-45 opacity-60"></div>
                         ))}
                       </div>
                     </div>
                   </div>
 
                   {/* Logo */}
-                  <div className="absolute top-3 left-1/2 transform -translate-x-1/2">
-                    <div className="w-8 h-8 bg-[#CF9B47] rounded-full flex items-center justify-center">
-                      <div className="text-white text-xs font-bold">البريمي</div>
+                  <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
+                    <div className="w-16 h-16 bg-[#CF9B47] rounded-full flex items-center justify-center">
+                      <div className="text-white text-2xl font-bold">البريمي</div>
                     </div>
                   </div>
 
                   {/* Year */}
-                  <div className="absolute top-12 left-1/2 transform -translate-x-1/2">
-                    <div className="text-white text-4xl font-black tracking-wider">
+                  <div className="absolute top-24 left-1/2 transform -translate-x-1/2">
+                    <div className="text-white text-8xl font-black tracking-wider">
                       2025
                     </div>
                   </div>
 
                   {/* Main Content Card */}
-                  <div className="absolute bottom-8 left-4 right-4 bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-2xl">
-                    <div className="grid grid-cols-3 gap-3 h-full text-xs">
+                  <div className="absolute bottom-16 left-8 right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl">
+                    <div className="grid grid-cols-3 gap-6 h-full">
                       {/* Left Section - Logo and Model */}
                       <div className="flex flex-col items-center justify-center">
-                        <div className="w-10 h-10 mb-2 flex items-center justify-center bg-gray-100 rounded-full">
-                          <Car className="w-6 h-6 text-gray-600" />
+                        <div className="w-20 h-20 mb-4 flex items-center justify-center bg-gray-100 rounded-full">
+                          <Car className="w-12 h-12 text-gray-600" />
                         </div>
-                        <div className="text-[#CF9B47] text-lg font-bold text-center">
+                        <div className="text-[#CF9B47] text-4xl font-bold text-center">
                           S 450
                         </div>
                       </div>
 
                       {/* Middle Section - Details */}
-                      <div className="flex flex-col justify-center space-y-2 text-sm">
+                      <div className="flex flex-col justify-center space-y-4 text-lg">
                         <div className="flex items-center justify-between">
                           <span className="text-gray-700 font-semibold">السعـــر :</span>
-                          <span className="text-[#00627F] text-lg font-bold">
+                          <span className="text-[#00627F] text-2xl font-bold">
                             ﷼ 270,000
                           </span>
                         </div>
                         
                         <div className="flex items-center justify-between">
                           <span className="text-gray-700 font-semibold">المماشي :</span>
-                          <div className="flex items-center gap-1">
-                            <span className="text-[#00627F] text-sm font-bold">6000</span>
-                            <div className="w-4 h-4 bg-gray-300 rounded-full flex items-center justify-center">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[#00627F] text-xl font-bold">6000</span>
+                            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
                               <span className="text-xs font-bold">KM</span>
                             </div>
                           </div>
@@ -618,27 +624,27 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
 
                       {/* Right Section - Status */}
                       <div className="flex flex-col items-center justify-center">
-                        <div className="text-right mb-1">
-                          <div className="text-gray-700 text-sm font-semibold">الحالــة :</div>
-                          <div className="text-red-600 text-lg font-bold">مستعمل</div>
+                        <div className="text-right mb-2">
+                          <div className="text-gray-700 text-lg font-semibold">الحالــة :</div>
+                          <div className="text-red-600 text-2xl font-bold">مستعمل</div>
                         </div>
                         
                         {/* Separator Line */}
-                        <div className="w-px h-8 bg-[#CF9B47] my-2"></div>
+                        <div className="w-px h-16 bg-[#CF9B47] my-4"></div>
                         
                         <div className="text-center">
-                          <div className="text-gray-600 text-xs">سعة المحرك</div>
-                          <div className="text-[#00627F] text-sm font-bold">3.0L</div>
+                          <div className="text-gray-600 text-sm">سعة المحرك</div>
+                          <div className="text-[#00627F] text-xl font-bold">3.0L</div>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Bottom Gold Section */}
-                  <div className="absolute bottom-0 left-0 w-20 h-16 bg-[#CF9B47]"></div>
+                  <div className="absolute bottom-0 left-0 w-40 h-32 bg-[#CF9B47]"></div>
 
                   {/* Red Circle (Top Left) */}
-                  <div className="absolute top-4 right-4 w-4 h-4 bg-red-500 rounded-full"></div>
+                  <div className="absolute top-8 right-8 w-8 h-8 bg-red-500 rounded-full"></div>
                 </div>
               </div>
               
