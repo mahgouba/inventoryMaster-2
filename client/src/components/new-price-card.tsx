@@ -160,8 +160,11 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
               </div>
             </div>
 
-            {/* Main Content Card */}
-            <div className="absolute bottom-16 left-8 right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl">
+            {/* Bottom Gold Section */}
+            <div className="absolute bottom-0 left-0 w-40 h-32 bg-[#CF9B47]"></div>
+
+            {/* Main Content Card - Above Gold Section */}
+            <div className="absolute bottom-8 left-8 right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl" style={{ zIndex: 10 }}>
               <div className="grid grid-cols-3 gap-6 h-full">
                 {/* Left Section - Logo and Model */}
                 <div className="flex flex-col items-center justify-center">
@@ -213,9 +216,6 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                 </div>
               </div>
             </div>
-
-            {/* Bottom Gold Section */}
-            <div className="absolute bottom-0 left-0 w-40 h-32 bg-[#CF9B47]"></div>
 
             {/* Red Circle (Top Left) */}
             <div className="absolute top-8 right-8 w-8 h-8 bg-red-500 rounded-full"></div>
