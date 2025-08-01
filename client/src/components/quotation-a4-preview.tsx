@@ -436,7 +436,12 @@ export default function QuotationA4Preview({
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
                   <span className="font-semibold text-black/80">السعر الأساسي:</span>
-                  <span className="text-black/80">{basePrice.toLocaleString()} ريال</span>
+                  <span className="text-black/80">
+                    {isVATInclusive 
+                      ? (basePrice - (basePrice * taxRate / (100 + taxRate))).toLocaleString()
+                      : basePrice.toLocaleString()
+                    } ريال
+                  </span>
                 </div>
                 
                 {includeLicensePlate && (
