@@ -142,7 +142,10 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
             width: '794px', 
             height: '1123px',
             margin: '0 auto',
-            background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+            backgroundImage: 'url(/price-card.svg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
           }}
         >
           {/* Header with Company Logo */}
