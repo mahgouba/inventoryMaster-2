@@ -540,6 +540,117 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
           </Tabs>
         </div>
 
+        {/* Static Price Card Preview Section */}
+        <div className="mt-8">
+          <Card className="glass-container">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-white drop-shadow-lg text-center">
+                معاينة بطاقة السعر
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="flex justify-center">
+                <div 
+                  className="relative w-[421px] h-[297px] bg-gradient-to-br from-[#00627F] to-[#004A5C] rounded-lg overflow-hidden transform scale-75"
+                  style={{
+                    fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
+                    direction: 'rtl',
+                    backgroundImage: 'linear-gradient(135deg, #00627F 0%, #004A5C 100%)'
+                  }}
+                >
+                  {/* Background Pattern */}
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#CF9B47] to-transparent">
+                      <div className="h-full flex flex-col justify-center items-center gap-1">
+                        {Array.from({length: 10}).map((_, i) => (
+                          <div key={i} className="w-1 h-1 bg-[#CF9B47] rotate-45 opacity-60"></div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Logo */}
+                  <div className="absolute top-3 left-1/2 transform -translate-x-1/2">
+                    <div className="w-8 h-8 bg-[#CF9B47] rounded-full flex items-center justify-center">
+                      <div className="text-white text-xs font-bold">البريمي</div>
+                    </div>
+                  </div>
+
+                  {/* Year */}
+                  <div className="absolute top-12 left-1/2 transform -translate-x-1/2">
+                    <div className="text-white text-4xl font-black tracking-wider">
+                      2025
+                    </div>
+                  </div>
+
+                  {/* Main Content Card */}
+                  <div className="absolute bottom-8 left-4 right-4 bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-2xl">
+                    <div className="grid grid-cols-3 gap-3 h-full text-xs">
+                      {/* Left Section - Logo and Model */}
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="w-10 h-10 mb-2 flex items-center justify-center bg-gray-100 rounded-full">
+                          <Car className="w-6 h-6 text-gray-600" />
+                        </div>
+                        <div className="text-[#CF9B47] text-lg font-bold text-center">
+                          S 450
+                        </div>
+                      </div>
+
+                      {/* Middle Section - Details */}
+                      <div className="flex flex-col justify-center space-y-2 text-sm">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-700 font-semibold">السعـــر :</span>
+                          <span className="text-[#00627F] text-lg font-bold">
+                            ﷼ 270,000
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-700 font-semibold">المماشي :</span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-[#00627F] text-sm font-bold">6000</span>
+                            <div className="w-4 h-4 bg-gray-300 rounded-full flex items-center justify-center">
+                              <span className="text-xs font-bold">KM</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right Section - Status */}
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="text-right mb-1">
+                          <div className="text-gray-700 text-sm font-semibold">الحالــة :</div>
+                          <div className="text-red-600 text-lg font-bold">مستعمل</div>
+                        </div>
+                        
+                        {/* Separator Line */}
+                        <div className="w-px h-8 bg-[#CF9B47] my-2"></div>
+                        
+                        <div className="text-center">
+                          <div className="text-gray-600 text-xs">سعة المحرك</div>
+                          <div className="text-[#00627F] text-sm font-bold">3.0L</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom Gold Section */}
+                  <div className="absolute bottom-0 left-0 w-20 h-16 bg-[#CF9B47]"></div>
+
+                  {/* Red Circle (Top Left) */}
+                  <div className="absolute top-4 right-4 w-4 h-4 bg-red-500 rounded-full"></div>
+                </div>
+              </div>
+              
+              <div className="text-center mt-4">
+                <p className="text-white/80 text-sm drop-shadow-sm">
+                  هذا مثال على شكل بطاقة السعر التي سيتم إنتاجها عند اختيار سيارة من المخزون
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Price Card Preview Dialog */}
         <NewPriceCard
           open={priceCardOpen}
