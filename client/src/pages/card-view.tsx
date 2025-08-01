@@ -331,7 +331,7 @@ export default function CardViewPage({ userRole }: CardViewPageProps) {
                                       <div className="flex justify-between">
                                         <span className="text-slate-600">تاريخ البيع:</span>
                                         <span className="font-medium text-red-600">
-                                          {new Date(item.soldDate).toLocaleDateString('ar-SA')}
+                                          {new Date(item.soldDate).toLocaleDateString('en-GB')}
                                         </span>
                                       </div>
                                     )}
@@ -362,7 +362,7 @@ export default function CardViewPage({ userRole }: CardViewPageProps) {
 
                                     </div>
                                     <div className="text-xs text-slate-500">
-                                      {item.entryDate ? new Date(item.entryDate).toLocaleDateString('ar-SA') : ''}
+                                      {item.entryDate ? new Date(item.entryDate).toLocaleDateString('en-GB') : ''}
                                     </div>
                                   </div>
                                 </div>

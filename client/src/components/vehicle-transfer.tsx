@@ -228,7 +228,7 @@ export default function VehicleTransfer({ open, onOpenChange, vehicle }: Vehicle
                 <Calendar className="h-4 w-4" />
                 <span className="text-sm font-medium">تاريخ النقل:</span>
                 <span className="text-sm">
-                  {new Date().toLocaleDateString('ar-SA')}
+                  {new Date().toLocaleDateString('en-GB')}
                 </span>
               </div>
             </div>

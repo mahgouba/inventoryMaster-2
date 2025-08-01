@@ -75,7 +75,7 @@ export default function SoldVehiclesPage() {
 
   const formatDate = (date: string | null | undefined) => {
     if (!date) return "غير محدد";
-    return new Date(date).toLocaleDateString('ar-SA');
+    return new Date(date).toLocaleDateString('en-GB');
   };
 
   const exportToExcel = () => {
@@ -127,7 +127,7 @@ export default function SoldVehiclesPage() {
     ];
     ws['!cols'] = colWidths;
 
-    XLSX.writeFile(wb, `السيارات_المباعة_${new Date().toLocaleDateString('ar-SA').replace(/\//g, '-')}.xlsx`);
+    XLSX.writeFile(wb, `السيارات_المباعة_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}.xlsx`);
   };
 
   const printReport = () => {
@@ -164,7 +164,7 @@ export default function SoldVehiclesPage() {
       <body>
         <div class="header">
           <h1>تقرير السيارات المباعة</h1>
-          <p>تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}</p>
+          <p>تاريخ التقرير: ${new Date().toLocaleDateString('en-GB')}</p>
           <p>إجمالي السيارات المباعة: ${filteredVehicles.length}</p>
         </div>
 
@@ -173,7 +173,7 @@ export default function SoldVehiclesPage() {
           <h3>الفلاتر المطبقة:</h3>
           ${salesRepFilter ? `<span class="filter-item"><strong>مندوب المبيعات:</strong> ${salesRepFilter}</span>` : ''}
           ${paymentMethodFilter ? `<span class="filter-item"><strong>طريقة الدفع:</strong> ${paymentMethodFilter}</span>` : ''}
-          ${dateFilter ? `<span class="filter-item"><strong>تاريخ البيع:</strong> ${new Date(dateFilter).toLocaleDateString('ar-SA')}</span>` : ''}
+          ${dateFilter ? `<span class="filter-item"><strong>تاريخ البيع:</strong> ${new Date(dateFilter).toLocaleDateString('en-GB')}</span>` : ''}
         </div>
         ` : ''}
 

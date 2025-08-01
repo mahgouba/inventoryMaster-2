@@ -1145,7 +1145,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
       
       // Generate filename with Arabic support
       const vehicleInfo = selectedVehicle || editableVehicle;
-      const timestamp = new Date().toLocaleDateString('ar-SA').replace(/\//g, '-');
+      const timestamp = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
       const filename = `عرض_سعر_${vehicleInfo?.manufacturer || 'البريمي'}_${vehicleInfo?.category || 'سيارة'}_${timestamp}.pdf`;
       
       // Save PDF
@@ -3029,7 +3029,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                     </div>
                     <div>
                       <span className="text-gray-600">تاريخ الإدخال:</span>
-                      <p className="font-medium">{new Date(selectedVehicleFromDB.entryDate).toLocaleDateString('ar-SA')}</p>
+                      <p className="font-medium">{new Date(selectedVehicleFromDB.entryDate).toLocaleDateString('en-GB')}</p>
                     </div>
                   </div>
                   
@@ -3261,7 +3261,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
               {companies.find(c => c.id === selectedCompany)?.address || "العنوان"}
             </p>
             <p className="text-sm">
-              {isInvoiceMode ? 'تاريخ الفاتورة' : 'تاريخ العرض'}: {new Date().toLocaleDateString('ar-SA')}
+              {isInvoiceMode ? 'تاريخ الفاتورة' : 'تاريخ العرض'}: {new Date().toLocaleDateString('en-GB')}
             </p>
           </div>
           <div className="print-header-qr">
@@ -3407,7 +3407,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
             <div className="print-row">
               <span className="print-label">صالح حتى:</span>
               <span className="print-value">
-                {new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000).toLocaleDateString('ar-SA')}
+                {new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')}
               </span>
             </div>
           )}

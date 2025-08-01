@@ -330,7 +330,7 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
         heightLeft -= pageHeight;
       }
 
-      pdf.save(`طلب_${request.requestType}_${request.userName}_${new Date().toLocaleDateString('ar-SA')}.pdf`);
+      pdf.save(`طلب_${request.requestType}_${request.userName}_${new Date().toLocaleDateString('en-GB')}.pdf`);
       
       toast({
         title: "تم إنشاء PDF بنجاح",

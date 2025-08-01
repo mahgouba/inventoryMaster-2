@@ -79,7 +79,7 @@ export function exportToExcel(data: any[], filename: string) {
         
         // Format dates
         if (key === 'arrivalDate' || key === 'saleDate' || key === 'createdAt' || key === 'updatedAt') {
-          transformedItem[arabicKey] = value ? new Date(value as string).toLocaleDateString('ar-SA') : '';
+          transformedItem[arabicKey] = value ? new Date(value as string).toLocaleDateString('en-GB') : '';
         }
         // Format boolean values
         else if (key === 'isSold') {
@@ -338,7 +338,7 @@ export function printTableWithSettings(settings: PrintSettings) {
           <img src="/copmany logo.svg" alt="شعار الشركة" class="company-logo" />
           <h1>شركة البريمي للسيارات</h1>
           <h2 style="font-size: 14pt; margin-bottom: 3mm; color: #000;">جدول المخزون</h2>
-          ${settings.includeDate ? `<div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</div>` : ''}
+          ${settings.includeDate ? `<div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')}</div>` : ''}
         </div>
         ` : ''}
         

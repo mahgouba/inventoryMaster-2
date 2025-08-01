@@ -115,7 +115,7 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
       const imgData = canvas.toDataURL('image/png', 1.0);
       pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
       
-      const timestamp = new Date().toLocaleDateString('ar-SA').replace(/\//g, '-');
+      const timestamp = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
       pdf.save(`بطاقة-سعر-${vehicle.manufacturer}-${vehicle.category}-${vehicle.year}-${timestamp}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
@@ -296,7 +296,7 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
           {/* Footer */}
           <div className="text-center mt-8 pt-6 border-t border-gray-300">
             <p className="text-gray-600 text-sm">
-              تاريخ الإصدار: {new Date().toLocaleDateString('ar-SA')} | 
+              تاريخ الإصدار: {new Date().toLocaleDateString('en-GB')} | 
               صالحة لمدة 30 يوماً من تاريخ الإصدار
             </p>
           </div>

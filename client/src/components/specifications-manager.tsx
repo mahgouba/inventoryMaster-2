@@ -355,7 +355,7 @@ export default function SpecificationsManager({ open, onOpenChange }: Specificat
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-3">
                           <div>سعة المحرك: {spec.engineCapacity}</div>
                           <div>الموديل: {spec.modelYear}</div>
-                          <div>تاريخ الإنشاء: {new Date(spec.createdAt).toLocaleDateString('ar-SA')}</div>
+                          <div>تاريخ الإنشاء: {new Date(spec.createdAt).toLocaleDateString('en-GB')}</div>
                         </div>
                         {spec.detailedSpecs && (
                           <div className="bg-gray-50 p-3 rounded-lg text-sm">

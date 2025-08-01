@@ -209,7 +209,7 @@ export default function QuickQuoteGenerator({ vehicle }: QuickQuoteGeneratorProp
         finalHeight
       );
 
-      const timestamp = new Date().toLocaleDateString('ar-SA').replace(/\//g, '-');
+      const timestamp = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
       const filename = `عرض_سعر_${vehicle.manufacturer}_${vehicle.category}_${timestamp}.pdf`;
       pdf.save(filename);
 

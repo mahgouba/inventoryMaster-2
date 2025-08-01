@@ -43,7 +43,7 @@ The system follows a clear separation of concerns, with distinct layers for fron
 - **Financing Calculator**: APR-based calculation with integration to managed financing rates from various Saudi banks.
 - **Leave Request System**: Comprehensive system for managing employee leave requests, including auto-calculation, PDF generation, and role-based approval workflow.
 - **Role-Based Access Control (RBAC)**: Permissions system for admin, accountant, salesperson, and sales manager roles, dynamically adapting UI elements based on user permissions.
-- **Localization**: Arabic-first design with RTL support, consistent Gregorian calendar (DD/MM/YYYY) and 24-hour time format.
+- **Localization**: Arabic-first design with RTL support, Gregorian calendar system (DD/MM/YYYY format) and 24-hour time format.
 - **Print System**: Optimized PDF and JPG exports with high quality, white backgrounds, and proper print-specific CSS for professional document output.
 
 ## External Dependencies

@@ -546,7 +546,7 @@ export default function QuotationA4Preview({
             year: selectedVehicle.year,
             chassisNumber: selectedVehicle.chassisNumber,
             price: basePrice,
-            date: new Date().toLocaleDateString('ar-SA')
+            date: new Date().toLocaleDateString('en-GB')
           };
           
           const qrString = Object.entries(qrData)

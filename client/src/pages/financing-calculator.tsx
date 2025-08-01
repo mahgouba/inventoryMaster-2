@@ -430,7 +430,7 @@ export default function FinancingCalculatorPage() {
           <body>
             <div class="header">
               <h1>حاسبة التمويل</h1>
-              <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</p>
+              <p>تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')}</p>
             </div>
             ${printContent.outerHTML}
           </body>

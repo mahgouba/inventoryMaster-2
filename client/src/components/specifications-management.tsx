@@ -453,8 +453,8 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                         <p className="text-sm whitespace-pre-wrap">{spec.detailedDescription}</p>
                       </div>
                       <div className="flex justify-between text-xs text-slate-500 mt-2">
-                        <span>تم الإنشاء: {new Date(spec.createdAt).toLocaleDateString('ar-SA')}</span>
-                        <span>آخر تحديث: {new Date(spec.updatedAt).toLocaleDateString('ar-SA')}</span>
+                        <span>تم الإنشاء: {new Date(spec.createdAt).toLocaleDateString('en-GB')}</span>
+                        <span>آخر تحديث: {new Date(spec.updatedAt).toLocaleDateString('en-GB')}</span>
                       </div>
                     </CardContent>
                   </Card>

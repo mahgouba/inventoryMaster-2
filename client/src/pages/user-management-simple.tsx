@@ -374,7 +374,7 @@ export default function UserManagementSimple() {
                       <TableCell>{getRoleBadge(user.role)}</TableCell>
                       <TableCell>
                         {user.createdAt 
-                          ? new Date(user.createdAt).toLocaleDateString('ar-SA')
+                          ? new Date(user.createdAt).toLocaleDateString('en-GB')
                           : 'غير محدد'
                         }
                       </TableCell>

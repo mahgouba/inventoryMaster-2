@@ -128,7 +128,7 @@ export default function QuotationManagement({ open, onOpenChange }: QuotationMan
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA');
+    return new Date(dateString).toLocaleDateString('en-GB');
   };
 
   const formatPrice = (price: string) => {

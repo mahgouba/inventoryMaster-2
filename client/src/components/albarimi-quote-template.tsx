@@ -12,7 +12,7 @@ interface AlbarimiQuoteTemplateProps {
 
 const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplateProps>(
   ({ vehicle, company, quotationData, qrCodeUrl, showWatermark = false }, ref) => {
-    const currentDate = new Date().toLocaleDateString('ar-SA');
+    const currentDate = new Date().toLocaleDateString('en-GB');
     const quotationNumber = quotationData?.quotationNumber || generateQuoteNumber();
 
     return (

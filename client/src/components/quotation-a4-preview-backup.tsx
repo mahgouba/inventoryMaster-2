@@ -54,7 +54,7 @@ export default function QuotationA4Preview(props: QuotationA4PreviewProps) {
             <strong>السعر النهائي:</strong> {props.finalPrice.toLocaleString()} ريال
           </div>
           <div>
-            <strong>صالح حتى:</strong> {props.validUntil.toLocaleDateString('ar-SA')}
+            <strong>صالح حتى:</strong> {props.validUntil.toLocaleDateString('en-GB')}
           </div>
         </div>
       </div>
