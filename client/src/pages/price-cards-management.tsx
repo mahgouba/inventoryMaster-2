@@ -569,7 +569,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                 >
                   {/* Company Logo */}
                   <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
-                    <div className="w-16 h-16 bg-[#CF9B47] rounded-full flex items-center justify-center p-2">
+                    <div className="w-48 h-48 bg-[#CF9B47] rounded-full flex items-center justify-center p-6">
                       <img 
                         src="/company-logo.svg" 
                         alt="شعار الشركة" 
@@ -579,8 +579,8 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                   </div>
 
                   {/* Year */}
-                  <div className="absolute top-24 left-1/2 transform -translate-x-1/2">
-                    <div className="text-white text-8xl font-black tracking-wider">
+                  <div className="absolute top-60 left-1/2 transform -translate-x-1/2">
+                    <div className="text-white text-[24rem] font-black tracking-wider leading-none">
                       2025
                     </div>
                   </div>
