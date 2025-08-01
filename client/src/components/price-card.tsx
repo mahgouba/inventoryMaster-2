@@ -137,7 +137,7 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
         {/* PDF Content */}
         <div 
           id="price-card-content"
-          className="bg-blue-500 text-black p-8 rounded-lg shadow-lg"
+          className="bg-blue-500 text-black p-8 rounded-lg shadow-lg relative"
           style={{ 
             width: '794px', 
             height: '1123px',
@@ -148,6 +148,14 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
             backgroundRepeat: 'no-repeat'
           }}
         >
+          {/* Right Side Element */}
+          <div className="absolute top-0 right-0 h-full w-6">
+            <img 
+              src="/right side element.svg" 
+              alt="Right Side Element" 
+              className="h-full w-full object-cover"
+            />
+          </div>
           {/* Header with Company Logo */}
           <div className="text-center mb-8 border-b-2 border-blue-600 pb-6">
             <div className="flex items-center justify-center gap-4 mb-4">
