@@ -662,7 +662,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   });
 
   // New state variables for enhanced features
-  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [whatsappNumber, setWhatsappNumber] = useState("+966");
   const [termsContent, setTermsContent] = useState("");
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [showWhatsappDialog, setShowWhatsappDialog] = useState(false);
@@ -883,9 +883,9 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     }
   };
 
-  // Share via WhatsApp
-  const shareViaWhatsApp = () => {
-    if (!whatsappNumber) {
+  // Share via WhatsApp with PDF generation
+  const shareViaWhatsApp = async () => {
+    if (!whatsappNumber || whatsappNumber === "+966") {
       toast({
         title: "خطأ",
         description: "يرجى إدخال رقم الواتساب",
@@ -894,8 +894,69 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
       return;
     }
 
-    const message = `
-🏢 عرض سعر رقم: ${quoteNumber}
+    try {
+      // Generate PDF first
+      const quotationElement = document.querySelector('[data-pdf-export="quotation"]') as HTMLElement;
+      if (!quotationElement) {
+        toast({
+          title: "خطأ",
+          description: "لا يمكن العثور على معاينة عرض السعر",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Import html2canvas and jspdf dynamically
+      const html2canvas = (await import('html2canvas')).default;
+      const jsPDF = (await import('jspdf')).default;
+
+      // Generate canvas from the quotation
+      const canvas = await html2canvas(quotationElement, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: quotationElement.scrollWidth,
+        height: quotationElement.scrollHeight,
+      });
+
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const canvasAspectRatio = canvas.height / canvas.width;
+      
+      let finalWidth = pdfWidth;
+      let finalHeight = pdfWidth * canvasAspectRatio;
+      
+      if (finalHeight > pdfHeight) {
+        finalHeight = pdfHeight;
+        finalWidth = pdfHeight / canvasAspectRatio;
+      }
+      
+      const xOffset = (pdfWidth - finalWidth) / 2;
+      const yOffset = (pdfHeight - finalHeight) / 2;
+
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+      
+      // Convert PDF to blob
+      const pdfBlob = pdf.output('blob');
+      
+      // Create file and share
+      const file = new File([pdfBlob], `عرض-سعر-${quoteNumber}.pdf`, { type: 'application/pdf' });
+      
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        // Use Web Share API if available
+        await navigator.share({
+          title: `عرض سعر رقم: ${quoteNumber}`,
+          text: `🏢 عرض سعر رقم: ${quoteNumber}\n👤 العميل: ${customerName}\n🚗 السيارة: ${selectedVehicle?.manufacturer} ${selectedVehicle?.category} ${selectedVehicle?.year}\n💰 السعر النهائي: ${calculateTotals().finalTotal.toLocaleString()} ريال`,
+          files: [file]
+        });
+      } else {
+        // Fallback: Open WhatsApp with text message and provide download link for PDF
+        const message = `🏢 عرض سعر رقم: ${quoteNumber}
 
 👤 العميل: ${customerName}
 🚗 السيارة: ${selectedVehicle?.manufacturer} ${selectedVehicle?.category} ${selectedVehicle?.year}
@@ -905,11 +966,40 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
 ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567890"}
 
 🏢 ${selectedCompanyData?.name || "شركة السيارات"}
-`;
 
-    const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-    setShowWhatsappDialog(false);
+📄 ملف PDF سيتم تحميله تلقائياً`;
+
+        // Download PDF automatically
+        const url = URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `عرض-سعر-${quoteNumber}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        // Open WhatsApp
+        const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+      }
+      
+      setShowWhatsappDialog(false);
+      
+      toast({
+        title: "تم بنجاح",
+        description: "تم إنشاء ملف PDF ومشاركته عبر الواتساب",
+        variant: "default",
+      });
+      
+    } catch (error) {
+      console.error('Error sharing via WhatsApp:', error);
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء مشاركة الملف",
+        variant: "destructive",
+      });
+    }
   };
 
   // Handle saving terms and conditions
@@ -3426,14 +3516,19 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="whatsapp-number">رقم الواتساب (مع رمز الدولة)</Label>
-              <Input
-                id="whatsapp-number"
-                placeholder="+966501234567"
-                value={whatsappNumber}
-                onChange={(e) => setWhatsappNumber(e.target.value)}
-                className="text-left"
-              />
+              <Label htmlFor="whatsapp-number">رقم الواتساب</Label>
+              <div className="flex items-center">
+                <div className="bg-gray-100 border border-r-0 rounded-r-md px-3 py-2 text-sm font-medium text-gray-700">
+                  🇸🇦 +966
+                </div>
+                <Input
+                  id="whatsapp-number"
+                  placeholder="501234567"
+                  value={whatsappNumber.replace('+966', '')}
+                  onChange={(e) => setWhatsappNumber('+966' + e.target.value.replace(/^\+966/, ''))}
+                  className="text-left rounded-r-none border-r-0"
+                />
+              </div>
             </div>
             <div className="flex gap-3">
               <Button onClick={shareViaWhatsApp} className="bg-emerald-600 hover:bg-emerald-700">
