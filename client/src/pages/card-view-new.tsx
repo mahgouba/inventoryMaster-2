@@ -35,7 +35,8 @@ import {
   EyeOff,
   CreditCard,
   Plus,
-  Receipt
+  Receipt,
+  UserCheck
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -716,6 +717,18 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   )}
                 </Button>
               </div>
+
+              {/* Leave Request Button */}
+              <Link href="/leave-requests">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="glass-button glass-text-primary"
+                >
+                  <UserCheck size={16} className="ml-1" />
+                  <span className="hidden sm:inline">طلب إجازة وإستئذان</span>
+                </Button>
+              </Link>
 
 
 
