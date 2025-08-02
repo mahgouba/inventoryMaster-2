@@ -603,7 +603,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                       <div className="flex items-center justify-between gap-4">
                         {/* Status and Mileage Box */}
                         <div className="flex-1 p-4 text-center">
-                          <div className="text-gray-700 text-sm font-semibold mb-1">الحالة</div>
+                          <div className="font-semibold mb-1 text-[#03627f] text-[22px]">الحالة</div>
                           <div className="text-red-600 text-xl font-bold mb-2">مستعمل</div>
                           
                           <div className="flex items-center justify-center gap-2">
