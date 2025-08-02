@@ -3962,6 +3962,299 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Comprehensive Data Import from data.base.json
+  app.post("/api/database/import-data-base", async (req, res) => {
+    try {
+      console.log("Starting comprehensive data import from data.base.json...");
+      
+      // Read data.base.json file
+      const dataBaseJson = JSON.parse(readFileSync(join(process.cwd(), "data.base.json"), "utf8"));
+      const data = dataBaseJson.data;
+      
+      let importResults = {
+        inventory: 0,
+        banks: 0,
+        users: 0,
+        manufacturers: 0,
+        categories: 0,
+        trimLevels: 0,
+        quotations: 0,
+        companies: 0,
+        exteriorColors: 0,
+        interiorColors: 0,
+        financingRates: 0,
+        skipped: 0
+      };
+
+      // Import manufacturers
+      if (data.manufacturers && Array.isArray(data.manufacturers)) {
+        console.log(`Importing ${data.manufacturers.length} manufacturers...`);
+        for (const manufacturer of data.manufacturers) {
+          try {
+            // Check if manufacturer already exists
+            const existing = await storage.getAllManufacturers();
+            const exists = existing.some(m => m.nameAr === manufacturer.name_ar || m.nameEn === manufacturer.name_en);
+            
+            if (!exists) {
+              await storage.createManufacturer({
+                nameAr: manufacturer.name_ar,
+                nameEn: manufacturer.name_en,
+                logo: manufacturer.logo,
+                isActive: manufacturer.isActive !== false
+              });
+              importResults.manufacturers++;
+            } else {
+              importResults.skipped++;
+            }
+          } catch (error) {
+            console.log(`Skipped manufacturer ${manufacturer.name_ar}:`, error);
+            importResults.skipped++;
+          }
+        }
+      }
+
+      // Import categories
+      if (data.categories && Array.isArray(data.categories)) {
+        console.log(`Importing ${data.categories.length} categories...`);
+        for (const category of data.categories) {
+          try {
+            const existing = await storage.getAllCategories();
+            const exists = existing.some(c => c.nameAr === category.name_ar);
+            
+            if (!exists) {
+              await storage.createCategory({
+                nameAr: category.name_ar,
+                nameEn: category.name_en,
+                isActive: category.isActive !== false
+              });
+              importResults.categories++;
+            } else {
+              importResults.skipped++;
+            }
+          } catch (error) {
+            console.log(`Skipped category ${category.name_ar}:`, error);
+            importResults.skipped++;
+          }
+        }
+      }
+
+      // Import trim levels
+      if (data.trimLevels && Array.isArray(data.trimLevels)) {
+        console.log(`Importing ${data.trimLevels.length} trim levels...`);
+        for (const trimLevel of data.trimLevels) {
+          try {
+            const existing = await storage.getAllTrimLevels();
+            const exists = existing.some(t => 
+              t.manufacturer === trimLevel.manufacturer && 
+              t.category === trimLevel.category && 
+              t.trimLevel === trimLevel.trim_level_ar
+            );
+            
+            if (!exists) {
+              await storage.createTrimLevel({
+                manufacturer: trimLevel.manufacturer,
+                category: trimLevel.category,
+                trimLevel: trimLevel.trim_level_ar,
+                description: trimLevel.trim_level_en || trimLevel.trim_level_ar
+              });
+              importResults.trimLevels++;
+            } else {
+              importResults.skipped++;
+            }
+          } catch (error) {
+            console.log(`Skipped trim level ${trimLevel.trim_level_ar}:`, error);
+            importResults.skipped++;
+          }
+        }
+      }
+
+      // Import banks
+      if (data.banks && Array.isArray(data.banks)) {
+        console.log(`Importing ${data.banks.length} banks...`);
+        for (const bank of data.banks) {
+          try {
+            const existing = await storage.getAllBanks();
+            const exists = existing.some(b => b.accountNumber === bank.accountNumber);
+            
+            if (!exists) {
+              await storage.createBank({
+                bankName: bank.bankName,
+                nameEn: bank.nameEn,
+                accountName: bank.accountName,
+                accountNumber: bank.accountNumber,
+                iban: bank.iban,
+                type: bank.type,
+                isActive: bank.isActive !== false,
+                logo: bank.logo
+              });
+              importResults.banks++;
+            } else {
+              importResults.skipped++;
+            }
+          } catch (error) {
+            console.log(`Skipped bank ${bank.bankName}:`, error);
+            importResults.skipped++;
+          }
+        }
+      }
+
+      // Import users
+      if (data.users && Array.isArray(data.users)) {
+        console.log(`Importing ${data.users.length} users...`);
+        for (const user of data.users) {
+          try {
+            const existing = await storage.getAllUsers();
+            const exists = existing.some(u => u.username === user.username);
+            
+            if (!exists) {
+              await storage.createUser({
+                name: user.name,
+                username: user.username,
+                password: user.password || "defaultpass123",
+                jobTitle: user.jobTitle || "موظف",
+                phoneNumber: user.phoneNumber || "966500000000",
+                role: user.role || "user"
+              });
+              importResults.users++;
+            } else {
+              importResults.skipped++;
+            }
+          } catch (error) {
+            console.log(`Skipped user ${user.username}:`, error);
+            importResults.skipped++;
+          }
+        }
+      }
+
+      // Import inventory
+      if (data.inventory && Array.isArray(data.inventory)) {
+        console.log(`Importing ${data.inventory.length} inventory items...`);
+        for (const item of data.inventory) {
+          try {
+            const existing = await storage.getAllInventoryItems();
+            const exists = existing.some(i => i.chassisNumber === item.chassisNumber);
+            
+            if (!exists) {
+              await storage.createInventoryItem({
+                manufacturer: item.manufacturer,
+                category: item.category,
+                trimLevel: item.trimLevel,
+                engineCapacity: item.engineCapacity,
+                year: item.year,
+                exteriorColor: item.exteriorColor,
+                interiorColor: item.interiorColor,
+                importType: item.importType,
+                ownershipType: item.ownershipType,
+                location: item.location,
+                chassisNumber: item.chassisNumber,
+                status: item.status,
+                images: item.images || [],
+                isSold: item.isSold || false,
+                price: item.price,
+                notes: item.notes,
+                mileage: item.mileage
+              });
+              importResults.inventory++;
+            } else {
+              importResults.skipped++;
+            }
+          } catch (error) {
+            console.log(`Skipped inventory item ${item.chassisNumber}:`, error);
+            importResults.skipped++;
+          }
+        }
+      }
+
+      // Import quotations
+      if (data.quotations && Array.isArray(data.quotations)) {
+        console.log(`Importing ${data.quotations.length} quotations...`);
+        for (const quotation of data.quotations) {
+          try {
+            await storage.createQuotation(quotation);
+            importResults.quotations++;
+          } catch (error) {
+            console.log(`Skipped quotation:`, error);
+            importResults.skipped++;
+          }
+        }
+      }
+
+      // Import companies
+      if (data.companies && Array.isArray(data.companies)) {
+        console.log(`Importing ${data.companies.length} companies...`);
+        for (const company of data.companies) {
+          try {
+            await storage.createCompany(company);
+            importResults.companies++;
+          } catch (error) {
+            console.log(`Skipped company:`, error);
+            importResults.skipped++;
+          }
+        }
+      }
+
+      // Import exterior colors
+      if (data.exteriorColors && Array.isArray(data.exteriorColors)) {
+        console.log(`Importing ${data.exteriorColors.length} exterior colors...`);
+        for (const color of data.exteriorColors) {
+          try {
+            await storage.createExteriorColor(color);
+            importResults.exteriorColors++;
+          } catch (error) {
+            console.log(`Skipped exterior color:`, error);
+            importResults.skipped++;
+          }
+        }
+      }
+
+      // Import interior colors
+      if (data.interiorColors && Array.isArray(data.interiorColors)) {
+        console.log(`Importing ${data.interiorColors.length} interior colors...`);
+        for (const color of data.interiorColors) {
+          try {
+            await storage.createInteriorColor(color);
+            importResults.interiorColors++;
+          } catch (error) {
+            console.log(`Skipped interior color:`, error);
+            importResults.skipped++;
+          }
+        }
+      }
+
+      // Import financing rates
+      if (data.financingRates && Array.isArray(data.financingRates)) {
+        console.log(`Importing ${data.financingRates.length} financing rates...`);
+        for (const rate of data.financingRates) {
+          try {
+            await storage.createFinancingRate(rate);
+            importResults.financingRates++;
+          } catch (error) {
+            console.log(`Skipped financing rate:`, error);
+            importResults.skipped++;
+          }
+        }
+      }
+
+      console.log("Data import completed successfully!");
+      console.log("Import results:", importResults);
+
+      res.json({
+        message: "تم استيراد البيانات من data.base.json بنجاح",
+        messageEn: "Data imported from data.base.json successfully",
+        results: importResults,
+        totalImported: Object.values(importResults).reduce((sum, count) => sum + count, 0) - importResults.skipped
+      });
+
+    } catch (error) {
+      console.error("Error importing from data.base.json:", error);
+      res.status(500).json({ 
+        message: "فشل في استيراد البيانات",
+        messageEn: "Failed to import data",
+        error: error.message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
