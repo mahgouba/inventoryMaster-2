@@ -607,7 +607,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                           <div className="text-red-600 text-xl font-bold mb-2">مستعمل</div>
                           
                           <div className="flex items-center justify-center gap-2">
-                            <span className="text-gray-700 text-sm font-semibold">المماشي:</span>
+                            <span className="font-semibold text-[#23252f] text-[15px]">المماشي:</span>
                             <span className="text-[#00627F] text-lg font-bold">6000</span>
                             <div className="w-5 h-5 bg-gray-400 rounded-full flex items-center justify-center">
                               <span className="text-xs font-bold text-black">KM</span>
