@@ -588,7 +588,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                     <div className="flex flex-col h-full space-y-4">
                       {/* First Row - Category, Trim Level, Manufacturer Logo */}
                       <div className="flex items-center justify-between">
-                        <div className="text-[#CF9B47] text-2xl font-bold">
+                        <div className="text-[#CF9B47] font-bold text-[66px]">
                           S 450
                         </div>
                         <div className="text-[#CF9B47] text-xl font-semibold">
