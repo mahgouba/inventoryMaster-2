@@ -52,7 +52,7 @@ import VehicleShare from "@/components/vehicle-share";
 
 import QuotationManagement from "@/components/quotation-management";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
-import MultiSelectFilter from "@/components/multi-select-filter";
+import ScrollableFilter from "@/components/scrollable-filter";
 import { ReservationDialog } from "@/components/reservation-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import PriceCard from "@/components/price-card";
@@ -998,99 +998,87 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 
                                 {/* Individual Multiple Selection Filters */}
                                 <div className="space-y-3">
-                                  <MultiSelectFilter 
-                                    title="الصانع" 
-                                    items={availableManufacturers} 
-                                    selectedFilters={selectedManufacturer} 
-                                    onFilterToggle={(item) => toggleFilter(selectedManufacturer, setSelectedManufacturer, item)} 
-                                    getCount={(item) => getFilterCount("manufacturer", item)} 
-                                    toggleState={showManufacturerFilter}
-                                    onToggleChange={setShowManufacturerFilter}
+                                  <ScrollableFilter
+                                    title="الصانع"
+                                    items={availableManufacturers}
+                                    selectedItems={selectedManufacturer}
+                                    onItemToggle={(item) => toggleFilter(selectedManufacturer, setSelectedManufacturer, item)}
+                                    onClearSelection={() => setSelectedManufacturer([])}
                                   />
-                                  <MultiSelectFilter 
-                                    title="الفئة" 
-                                    items={availableCategories} 
-                                    selectedFilters={selectedCategory} 
-                                    onFilterToggle={(item) => toggleFilter(selectedCategory, setSelectedCategory, item)} 
-                                    getCount={(item) => getFilterCount("category", item)} 
-                                    toggleState={showCategoryFilter}
-                                    onToggleChange={setShowCategoryFilter}
-                                  />
-                                  <MultiSelectFilter 
-                                    title="درجة التجهيز" 
-                                    items={availableTrimLevels} 
-                                    selectedFilters={selectedTrimLevel} 
-                                    onFilterToggle={(item) => toggleFilter(selectedTrimLevel, setSelectedTrimLevel, item)} 
-                                    getCount={(item) => getFilterCount("trimLevel", item)} 
-                                    toggleState={showTrimLevelFilter}
-                                    onToggleChange={setShowTrimLevelFilter}
-                                  />
-                                  <MultiSelectFilter 
-                                    title="السنة" 
-                                    items={availableYears} 
-                                    selectedFilters={selectedYear} 
-                                    onFilterToggle={(item) => toggleFilter(selectedYear, setSelectedYear, item)} 
-                                    getCount={(item) => getFilterCount("year", item)} 
-                                    toggleState={showYearFilter}
-                                    onToggleChange={setShowYearFilter}
-                                  />
-                                  <MultiSelectFilter 
-                                    title="سعة المحرك" 
-                                    items={availableEngineCapacities} 
-                                    selectedFilters={selectedEngineCapacity} 
-                                    onFilterToggle={(item) => toggleFilter(selectedEngineCapacity, setSelectedEngineCapacity, item)} 
-                                    getCount={(item) => getFilterCount("engineCapacity", item)} 
-                                    toggleState={showEngineCapacityFilter}
-                                    onToggleChange={setShowEngineCapacityFilter}
-                                  />
-                                  <MultiSelectFilter 
-                                    title="اللون الخارجي" 
-                                    items={availableExteriorColors} 
-                                    selectedFilters={selectedExteriorColor} 
-                                    onFilterToggle={(item) => toggleFilter(selectedExteriorColor, setSelectedExteriorColor, item)} 
-                                    getCount={(item) => getFilterCount("exteriorColor", item)} 
-                                    toggleState={showExteriorColorFilter}
-                                    onToggleChange={setShowExteriorColorFilter}
-                                  />
-                                  <MultiSelectFilter 
-                                    title="اللون الداخلي" 
-                                    items={availableInteriorColors} 
-                                    selectedFilters={selectedInteriorColor} 
-                                    onFilterToggle={(item) => toggleFilter(selectedInteriorColor, setSelectedInteriorColor, item)} 
-                                    getCount={(item) => getFilterCount("interiorColor", item)} 
-                                    toggleState={showInteriorColorFilter}
-                                    onToggleChange={setShowInteriorColorFilter}
-                                  />
-                                  <MultiSelectFilter 
-                                    title="الحالة" 
-                                    items={availableStatuses} 
-                                    selectedFilters={selectedStatus} 
-                                    onFilterToggle={(item) => toggleFilter(selectedStatus, setSelectedStatus, item)} 
-                                    getCount={(item) => getFilterCount("status", item)} 
-                                    toggleState={showStatusFilter}
-                                    onToggleChange={setShowStatusFilter}
-                                  />
-                                  <MultiSelectFilter 
-                                    title="نوع الاستيراد" 
-                                    items={availableImportTypes} 
-                                    selectedFilters={selectedImportType} 
-                                    onFilterToggle={(item) => toggleFilter(selectedImportType, setSelectedImportType, item)} 
-                                    getCount={(item) => getFilterCount("importType", item)} 
-                                    toggleState={showImportTypeFilter}
-                                    onToggleChange={setShowImportTypeFilter}
-                                  />
-                                  <MultiSelectFilter 
-                                    title="نوع الملكية" 
-                                    items={availableOwnershipTypes} 
-                                    selectedFilters={selectedOwnershipType} 
-                                    onFilterToggle={(item) => toggleFilter(selectedOwnershipType, setSelectedOwnershipType, item)} 
-                                    getCount={(item) => getFilterCount("ownershipType", item)} 
-                                    toggleState={showOwnershipTypeFilter}
-                                    onToggleChange={setShowOwnershipTypeFilter}
+                                  <ScrollableFilter
+                                    title="الفئة"
+                                    items={availableCategories}
+                                    selectedItems={selectedCategory}
+                                    onItemToggle={(item) => toggleFilter(selectedCategory, setSelectedCategory, item)}
+                                    onClearSelection={() => setSelectedCategory([])}
                                   />
                                   
-                                  {/* Reset Filters Button */}
-                                  <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+                                  <ScrollableFilter
+                                    title="درجة التجهيز"
+                                    items={availableTrimLevels}
+                                    selectedItems={selectedTrimLevel}
+                                    onItemToggle={(item) => toggleFilter(selectedTrimLevel, setSelectedTrimLevel, item)}
+                                    onClearSelection={() => setSelectedTrimLevel([])}
+                                  />
+                                  
+                                  <ScrollableFilter
+                                    title="السنة"
+                                    items={availableYears}
+                                    selectedItems={selectedYear}
+                                    onItemToggle={(item) => toggleFilter(selectedYear, setSelectedYear, item)}
+                                    onClearSelection={() => setSelectedYear([])}
+                                  />
+                                  
+                                  <ScrollableFilter
+                                    title="سعة المحرك"
+                                    items={availableEngineCapacities}
+                                    selectedItems={selectedEngineCapacity}
+                                    onItemToggle={(item) => toggleFilter(selectedEngineCapacity, setSelectedEngineCapacity, item)}
+                                    onClearSelection={() => setSelectedEngineCapacity([])}
+                                  />
+                                  
+                                  <ScrollableFilter
+                                    title="اللون الخارجي"
+                                    items={availableExteriorColors}
+                                    selectedItems={selectedExteriorColor}
+                                    onItemToggle={(item) => toggleFilter(selectedExteriorColor, setSelectedExteriorColor, item)}
+                                    onClearSelection={() => setSelectedExteriorColor([])}
+                                  />
+                                  
+                                  <ScrollableFilter
+                                    title="اللون الداخلي"
+                                    items={availableInteriorColors}
+                                    selectedItems={selectedInteriorColor}
+                                    onItemToggle={(item) => toggleFilter(selectedInteriorColor, setSelectedInteriorColor, item)}
+                                    onClearSelection={() => setSelectedInteriorColor([])}
+                                  />
+                                  
+                                  <ScrollableFilter
+                                    title="الحالة"
+                                    items={availableStatuses}
+                                    selectedItems={selectedStatus}
+                                    onItemToggle={(item) => toggleFilter(selectedStatus, setSelectedStatus, item)}
+                                    onClearSelection={() => setSelectedStatus([])}
+                                  />
+                                  
+                                  <ScrollableFilter
+                                    title="نوع الاستيراد"
+                                    items={availableImportTypes}
+                                    selectedItems={selectedImportType}
+                                    onItemToggle={(item) => toggleFilter(selectedImportType, setSelectedImportType, item)}
+                                    onClearSelection={() => setSelectedImportType([])}
+                                  />
+                                  
+                                  <ScrollableFilter
+                                    title="نوع الملكية"
+                                    items={availableOwnershipTypes}
+                                    selectedItems={selectedOwnershipType}
+                                    onItemToggle={(item) => toggleFilter(selectedOwnershipType, setSelectedOwnershipType, item)}
+                                    onClearSelection={() => setSelectedOwnershipType([])}
+                                  />
+                                  
+                                  {/* Reset All Filters Button */}
+                                  <div className="pt-4 border-t border-white/20">
                                     <Button
                                       variant="outline"
                                       size="sm"
@@ -1106,9 +1094,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                         setSelectedImportType([]);
                                         setSelectedOwnershipType([]);
                                       }}
-                                      className="w-full hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20"
+                                      className="glass-button w-full"
                                     >
-                                      إعادة تعيين جميع الفلاتر
+                                      مسح جميع الفلاتر
                                     </Button>
                                   </div>
                                 </div>

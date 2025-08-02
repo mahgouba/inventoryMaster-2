@@ -73,6 +73,15 @@ input, textarea, [contenteditable] {
   -webkit-touch-callout: none !important;
 }
 
+/* Hide scrollbars completely */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
 /* Prevent text selection in specific UI components */
 [data-radix-dialog-content],
 [data-radix-select-content],

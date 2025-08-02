@@ -16,6 +16,7 @@ import InventoryStats from "@/components/inventory-stats";
 import InventoryTable from "@/components/inventory-table";
 import InventoryFormHierarchical from "@/components/inventory-form-hierarchical";
 import ExcelImport from "@/components/excel-import";
+import ScrollableFilter from "@/components/scrollable-filter";
 
 
 
@@ -644,105 +645,83 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                   
                                   {/* Individual Multiple Selection Filters */}
                                   <div className="space-y-3">
-                                    <MultiSelectFilter 
-                                      title="الصانع" 
-                                      items={manufacturers} 
-                                      selectedFilters={manufacturerFilter} 
-                                      onFilterToggle={(item) => toggleFilter(manufacturerFilter, setManufacturerFilter, item)} 
-                                      getCount={(item) => getFilterCount("manufacturer", item)} 
-                                      showToggle={true}
-                                      toggleState={showManufacturerFilter}
-                                      onToggleChange={setShowManufacturerFilter}
+                                    <ScrollableFilter
+                                      title="الصانع"
+                                      items={manufacturers}
+                                      selectedItems={manufacturerFilter}
+                                      onItemToggle={(item) => toggleFilter(manufacturerFilter, setManufacturerFilter, item)}
+                                      onClearSelection={() => setManufacturerFilter([])}
                                     />
-                                    <MultiSelectFilter 
-                                      title="الفئة" 
-                                      items={categories} 
-                                      selectedFilters={categoryFilter} 
-                                      onFilterToggle={(item) => toggleFilter(categoryFilter, setCategoryFilter, item)} 
-                                      getCount={(item) => getFilterCount("category", item)} 
-                                      showToggle={true}
-                                      toggleState={showCategoryFilter}
-                                      onToggleChange={setShowCategoryFilter}
+                                    
+                                    <ScrollableFilter
+                                      title="الفئة"
+                                      items={categories}
+                                      selectedItems={categoryFilter}
+                                      onItemToggle={(item) => toggleFilter(categoryFilter, setCategoryFilter, item)}
+                                      onClearSelection={() => setCategoryFilter([])}
                                     />
-                                    <MultiSelectFilter 
-                                      title="درجة التجهيز" 
-                                      items={availableTrimLevels} 
-                                      selectedFilters={trimLevelFilter} 
-                                      onFilterToggle={(item) => toggleFilter(trimLevelFilter, setTrimLevelFilter, item)} 
-                                      getCount={(item) => getFilterCount("trimLevel", item)} 
-                                      showToggle={true}
-                                      toggleState={showTrimLevelFilter}
-                                      onToggleChange={setShowTrimLevelFilter}
+                                    
+                                    <ScrollableFilter
+                                      title="درجة التجهيز"
+                                      items={availableTrimLevels}
+                                      selectedItems={trimLevelFilter}
+                                      onItemToggle={(item) => toggleFilter(trimLevelFilter, setTrimLevelFilter, item)}
+                                      onClearSelection={() => setTrimLevelFilter([])}
                                     />
-                                    <MultiSelectFilter 
-                                      title="السنة" 
-                                      items={availableYears} 
-                                      selectedFilters={yearFilter} 
-                                      onFilterToggle={(item) => toggleFilter(yearFilter, setYearFilter, item)} 
-                                      getCount={(item) => getFilterCount("year", item)} 
-                                      showToggle={true}
-                                      toggleState={showYearFilter}
-                                      onToggleChange={setShowYearFilter}
+                                    
+                                    <ScrollableFilter
+                                      title="السنة"
+                                      items={availableYears}
+                                      selectedItems={yearFilter}
+                                      onItemToggle={(item) => toggleFilter(yearFilter, setYearFilter, item)}
+                                      onClearSelection={() => setYearFilter([])}
                                     />
-                                    <MultiSelectFilter 
-                                      title="سعة المحرك" 
-                                      items={availableEngineCapacities} 
-                                      selectedFilters={engineCapacityFilter} 
-                                      onFilterToggle={(item) => toggleFilter(engineCapacityFilter, setEngineCapacityFilter, item)} 
-                                      getCount={(item) => getFilterCount("engineCapacity", item)} 
-                                      showToggle={true}
-                                      toggleState={showEngineCapacityFilter}
-                                      onToggleChange={setShowEngineCapacityFilter}
+                                    
+                                    <ScrollableFilter
+                                      title="سعة المحرك"
+                                      items={availableEngineCapacities}
+                                      selectedItems={engineCapacityFilter}
+                                      onItemToggle={(item) => toggleFilter(engineCapacityFilter, setEngineCapacityFilter, item)}
+                                      onClearSelection={() => setEngineCapacityFilter([])}
                                     />
-                                    <MultiSelectFilter 
-                                      title="اللون الخارجي" 
-                                      items={availableExteriorColors} 
-                                      selectedFilters={exteriorColorFilter} 
-                                      onFilterToggle={(item) => toggleFilter(exteriorColorFilter, setExteriorColorFilter, item)} 
-                                      getCount={(item) => getFilterCount("exteriorColor", item)} 
-                                      showToggle={true}
-                                      toggleState={showExteriorColorFilter}
-                                      onToggleChange={setShowExteriorColorFilter}
+                                    
+                                    <ScrollableFilter
+                                      title="اللون الخارجي"
+                                      items={availableExteriorColors}
+                                      selectedItems={exteriorColorFilter}
+                                      onItemToggle={(item) => toggleFilter(exteriorColorFilter, setExteriorColorFilter, item)}
+                                      onClearSelection={() => setExteriorColorFilter([])}
                                     />
-                                    <MultiSelectFilter 
-                                      title="اللون الداخلي" 
-                                      items={availableInteriorColors} 
-                                      selectedFilters={interiorColorFilter} 
-                                      onFilterToggle={(item) => toggleFilter(interiorColorFilter, setInteriorColorFilter, item)} 
-                                      getCount={(item) => getFilterCount("interiorColor", item)} 
-                                      showToggle={true}
-                                      toggleState={showInteriorColorFilter}
-                                      onToggleChange={setShowInteriorColorFilter}
+                                    
+                                    <ScrollableFilter
+                                      title="اللون الداخلي"
+                                      items={availableInteriorColors}
+                                      selectedItems={interiorColorFilter}
+                                      onItemToggle={(item) => toggleFilter(interiorColorFilter, setInteriorColorFilter, item)}
+                                      onClearSelection={() => setInteriorColorFilter([])}
                                     />
-                                    <MultiSelectFilter 
-                                      title="الحالة" 
-                                      items={availableStatuses} 
-                                      selectedFilters={statusFilter} 
-                                      onFilterToggle={(item) => toggleFilter(statusFilter, setStatusFilter, item)} 
-                                      getCount={(item) => getFilterCount("status", item)} 
-                                      showToggle={true}
-                                      toggleState={showStatusFilter}
-                                      onToggleChange={setShowStatusFilter}
+                                    
+                                    <ScrollableFilter
+                                      title="الحالة"
+                                      items={availableStatuses}
+                                      selectedItems={statusFilter}
+                                      onItemToggle={(item) => toggleFilter(statusFilter, setStatusFilter, item)}
+                                      onClearSelection={() => setStatusFilter([])}
                                     />
-                                    <MultiSelectFilter 
-                                      title="نوع الاستيراد" 
-                                      items={availableImportTypes} 
-                                      selectedFilters={importTypeFilter} 
-                                      onFilterToggle={(item) => toggleFilter(importTypeFilter, setImportTypeFilter, item)} 
-                                      getCount={(item) => getFilterCount("importType", item)} 
-                                      showToggle={true}
-                                      toggleState={showImportTypeFilter}
-                                      onToggleChange={setShowImportTypeFilter}
+                                    <ScrollableFilter
+                                      title="نوع الاستيراد"
+                                      items={availableImportTypes}
+                                      selectedItems={importTypeFilter}
+                                      onItemToggle={(item) => toggleFilter(importTypeFilter, setImportTypeFilter, item)}
+                                      onClearSelection={() => setImportTypeFilter([])}
                                     />
-                                    <MultiSelectFilter 
-                                      title="نوع الملكية" 
-                                      items={availableOwnershipTypes} 
-                                      selectedFilters={ownershipTypeFilter} 
-                                      onFilterToggle={(item) => toggleFilter(ownershipTypeFilter, setOwnershipTypeFilter, item)} 
-                                      getCount={(item) => getFilterCount("ownershipType", item)} 
-                                      showToggle={true}
-                                      toggleState={showOwnershipTypeFilter}
-                                      onToggleChange={setShowOwnershipTypeFilter}
+                                    
+                                    <ScrollableFilter
+                                      title="نوع الملكية"
+                                      items={availableOwnershipTypes}
+                                      selectedItems={ownershipTypeFilter}
+                                      onItemToggle={(item) => toggleFilter(ownershipTypeFilter, setOwnershipTypeFilter, item)}
+                                      onClearSelection={() => setOwnershipTypeFilter([])}
                                     />
                                   </div>
                                 </div>
