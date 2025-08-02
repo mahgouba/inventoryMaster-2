@@ -9,6 +9,7 @@ import { Trash2, Edit2, Plus, Check, X, Settings, Car } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ColorAssociationManager from "@/components/color-association-manager";
 import CarsJsonManager from "@/components/cars-json-manager";
+import DatabaseImportManager from "@/components/database-import-manager";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +29,8 @@ interface ListsData {
   locations: string[];
   exteriorColors: string[];
   interiorColors: string[];
+  categories?: string[];
+  trimLevels?: string[];
 }
 
 export default function ListManagement() {
@@ -44,10 +47,13 @@ export default function ListManagement() {
     importTypes: ["شخصي", "شركة", "مستعمل شخصي"],
     locations: ["المستودع الرئيسي", "معرض الرياض", "معرض جدة", "معرض الدمام"],
     exteriorColors: ["أبيض", "أسود", "فضي", "رمادي", "أحمر", "أزرق", "ذهبي"],
-    interiorColors: ["أسود", "بيج", "بني", "رمادي", "أحمر"]
+    interiorColors: ["أسود", "بيج", "بني", "رمادي", "أحمر"],
+    categories: [],
+    trimLevels: []
   });
 
   const listTypes = [
+    { key: "databaseImport", label: "استيراد من قاعدة البيانات", color: "bg-green-600" },
     { key: "carsJson", label: "بيانات المركبات (cars.json)", color: "bg-blue-500" },
     { key: "engineCapacities", label: "سعات المحرك", color: "bg-green-500" },
     { key: "statuses", label: "حالات المركبة", color: "bg-orange-500" },
@@ -73,7 +79,7 @@ export default function ListManagement() {
   const handleAddItem = (type: string) => {
     if (!newItem.trim()) return;
     
-    const currentList = listsData[type as keyof ListsData];
+    const currentList = listsData[type as keyof ListsData] || [];
     if (currentList.includes(newItem.trim())) {
       toast({
         title: "خطأ",
@@ -91,14 +97,14 @@ export default function ListManagement() {
   const handleEditItem = (type: string, index: number, newValue: string) => {
     if (!newValue.trim()) return;
     
-    const currentList = [...listsData[type as keyof ListsData]];
+    const currentList = [...(listsData[type as keyof ListsData] || [])];
     currentList[index] = newValue.trim();
     handleSave(type, currentList);
     setEditingItem(null);
   };
 
   const handleDeleteItem = (type: string, index: number) => {
-    const currentList = [...listsData[type as keyof ListsData]];
+    const currentList = [...(listsData[type as keyof ListsData] || [])];
     currentList.splice(index, 1);
     handleSave(type, currentList);
     setShowDeleteDialog(null);
@@ -147,8 +153,8 @@ export default function ListManagement() {
           </CardHeader>
           
           <CardContent>
-            <Tabs defaultValue="carsJson" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 lg:grid-cols-8 glass-container border-white/20 mb-6">
+            <Tabs defaultValue="databaseImport" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9 glass-container border-white/20 mb-6">
                 {listTypes.map((listType) => (
                   <TabsTrigger
                     key={listType.key}
@@ -164,11 +170,13 @@ export default function ListManagement() {
 
               {listTypes.map((listType) => (
                 <TabsContent key={listType.key} value={listType.key} className="space-y-4">
-                  {listType.key === "colorAssociations" ? (
+                  {listType.key === "databaseImport" ? (
+                    <DatabaseImportManager />
+                  ) : listType.key === "colorAssociations" ? (
                     <ColorAssociationManager 
                       manufacturers={listsData.manufacturers}
-                      categories={["C-Class", "E-Class", "S-Class", "X3", "X5", "X7", "A4", "A6", "Q5"]}
-                      trimLevels={["ستاندرد", "فل كامل", "AMG", "M Sport", "S-Line"]}
+                      categories={listsData.categories || ["C-Class", "E-Class", "S-Class", "X3", "X5", "X7", "A4", "A6", "Q5"]}
+                      trimLevels={listsData.trimLevels || ["ستاندرد", "فل كامل", "AMG", "M Sport", "S-Line"]}
                       exteriorColors={listsData.exteriorColors}
                       interiorColors={listsData.interiorColors}
                     />
@@ -216,12 +224,12 @@ export default function ListManagement() {
                           <div className={`w-3 h-3 rounded-full ${listType.color}`}></div>
                           {listType.label} الحالية
                           <Badge variant="secondary" className="mr-auto bg-white/10 text-white">
-                            {listsData[listType.key as keyof ListsData].length} عنصر
+                            {(listsData[listType.key as keyof ListsData] || []).length} عنصر
                           </Badge>
                         </h4>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {listsData[listType.key as keyof ListsData].map((item, index) => (
+                          {(listsData[listType.key as keyof ListsData] || []).map((item, index) => (
                             <div
                               key={index}
                               className="flex items-center justify-between p-3 glass-container border-white/20 rounded-lg"

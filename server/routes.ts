@@ -2920,6 +2920,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Database import endpoints for list management
+  app.post("/api/import/manufacturers-from-db", async (req, res) => {
+    try {
+      const manufacturers = await storage.getAllManufacturers();
+      const manufacturerNames = manufacturers.map(m => m.nameAr).filter(Boolean);
+      
+      res.json({
+        success: true,
+        count: manufacturerNames.length,
+        manufacturers: manufacturerNames,
+        message: `تم استيراد ${manufacturerNames.length} صانع من قاعدة البيانات`
+      });
+    } catch (error) {
+      console.error("Error importing manufacturers from database:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "فشل في استيراد الصانعين من قاعدة البيانات" 
+      });
+    }
+  });
+
+  app.post("/api/import/categories-from-db", async (req, res) => {
+    try {
+      const categories = await storage.getAllVehicleCategories();
+      const categoryNames = categories.map(c => c.nameAr).filter(Boolean);
+      
+      res.json({
+        success: true,
+        count: categoryNames.length,
+        categories: categoryNames,
+        message: `تم استيراد ${categoryNames.length} فئة من قاعدة البيانات`
+      });
+    } catch (error) {
+      console.error("Error importing categories from database:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "فشل في استيراد الفئات من قاعدة البيانات" 
+      });
+    }
+  });
+
+  app.post("/api/import/trim-levels-from-db", async (req, res) => {
+    try {
+      const trimLevels = await storage.getAllVehicleTrimLevels();
+      const trimLevelNames = trimLevels.map(t => t.nameAr).filter(Boolean);
+      
+      res.json({
+        success: true,
+        count: trimLevelNames.length,
+        trimLevels: trimLevelNames,
+        message: `تم استيراد ${trimLevelNames.length} درجة تجهيز من قاعدة البيانات`
+      });
+    } catch (error) {
+      console.error("Error importing trim levels from database:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "فشل في استيراد درجات التجهيز من قاعدة البيانات" 
+      });
+    }
+  });
+
+  app.post("/api/import/all-from-db", async (req, res) => {
+    try {
+      const [manufacturers, categories, trimLevels] = await Promise.all([
+        storage.getAllManufacturers(),
+        storage.getAllVehicleCategories(),
+        storage.getAllVehicleTrimLevels()
+      ]);
+
+      const manufacturerNames = manufacturers.map(m => m.nameAr).filter(Boolean);
+      const categoryNames = categories.map(c => c.nameAr).filter(Boolean);
+      const trimLevelNames = trimLevels.map(t => t.nameAr).filter(Boolean);
+      
+      res.json({
+        success: true,
+        data: {
+          manufacturers: manufacturerNames,
+          categories: categoryNames,
+          trimLevels: trimLevelNames
+        },
+        counts: {
+          manufacturers: manufacturerNames.length,
+          categories: categoryNames.length,
+          trimLevels: trimLevelNames.length
+        },
+        message: `تم استيراد ${manufacturerNames.length} صانع، ${categoryNames.length} فئة، ${trimLevelNames.length} درجة تجهيز من قاعدة البيانات`
+      });
+    } catch (error) {
+      console.error("Error importing all data from database:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "فشل في استيراد البيانات من قاعدة البيانات" 
+      });
+    }
+  });
+
   app.get("/api/color-associations/category/:manufacturer/:category", async (req, res) => {
     try {
       const { manufacturer, category } = req.params;
