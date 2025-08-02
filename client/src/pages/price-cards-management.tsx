@@ -591,7 +591,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                         <div className="text-[#CF9B47] font-bold text-[66px]">
                           S 450
                         </div>
-                        <div className="text-[#CF9B47] text-xl font-semibold">
+                        <div className="text-[#CF9B47] font-semibold text-[66px]">
                           الفئة الفاخرة
                         </div>
                         <div className="w-16 h-16 flex items-center justify-center bg-gray-100 rounded-full">
