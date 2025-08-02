@@ -620,11 +620,11 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                           <div className="font-semibold mb-2 text-[#03627f] bg-[#2a2c3700] text-[22px]">تفاصيل السعر</div>
                           <div className="space-y-1">
                             <div className="flex justify-between text-xs">
-                              <span className="text-black">السعر الأساسي:</span>
+                              <span className="text-black font-medium">السعر الأساسي:</span>
                               <span className="text-black font-semibold">﷼ 234,783</span>
                             </div>
                             <div className="flex justify-between text-xs">
-                              <span className="text-black">قيمة الضريبة (15%):</span>
+                              <span className="text-black font-medium">قيمة الضريبة (15%):</span>
                               <span className="text-black font-semibold">﷼ 35,217</span>
                             </div>
                             <div className="border-t border-gray-300 pt-1">
