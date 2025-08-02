@@ -95,6 +95,7 @@ export interface IStorage {
   
   // Manufacturer methods
   getAllManufacturers(): Promise<Manufacturer[]>;
+  getManufacturers(): Promise<any[]>;
   getManufacturer(id: number): Promise<Manufacturer | undefined>;
   createManufacturer(manufacturer: InsertManufacturer): Promise<Manufacturer>;
   updateManufacturer(id: number, manufacturer: Partial<InsertManufacturer>): Promise<Manufacturer | undefined>;
@@ -713,6 +714,10 @@ export class MemStorage implements IStorage {
   async getLocationTransfersByItem(itemId: number): Promise<LocationTransfer[]> { return []; }
   
   async getAllManufacturers(): Promise<Manufacturer[]> { 
+    return Array.from(this.manufacturers.values()); 
+  }
+
+  async getManufacturers(): Promise<any[]> { 
     return Array.from(this.manufacturers.values()); 
   }
   
