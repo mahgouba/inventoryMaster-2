@@ -21,6 +21,8 @@ import {
   type VehicleTrimLevel, type InsertVehicleTrimLevel
 } from "@shared/schema";
 
+import { DatabaseStorage } from "./database-storage";
+
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
