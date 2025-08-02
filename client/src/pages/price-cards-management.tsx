@@ -551,7 +551,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
             <CardContent className="p-6">
               <div className="flex justify-center overflow-x-auto bg-[#00627F]">
                 <div 
-                  className="preview-price-card relative rounded-lg overflow-hidden"
+                  className="preview-price-card relative rounded-lg overflow-hidden bg-[#03627f]"
                   style={{
                     width: '297mm', // A4 landscape width
                     height: '210mm', // A4 landscape height
