@@ -572,7 +572,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                     <img 
                       src="/company-logo.svg" 
                       alt="شعار الشركة" 
-                      className="w-48 h-48 object-contain filter brightness-110"
+                      className="w-64 h-64 object-contain filter brightness-110"
                     />
                   </div>
 
