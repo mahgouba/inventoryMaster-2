@@ -36,10 +36,18 @@ const trimLevelSchema = z.object({
   description: z.string().optional(),
 });
 
-const colorSchema = z.object({
-  name: z.string().min(1, "اسم اللون مطلوب"),
-  type: z.enum(["exterior", "interior"], { required_error: "نوع اللون مطلوب" }),
+const exteriorColorSchema = z.object({
+  name: z.string().min(1, "اسم اللون الخارجي مطلوب"),
   colorCode: z.string().optional(),
+  manufacturer: z.string().optional(),
+  category: z.string().optional(),
+});
+
+const interiorColorSchema = z.object({
+  name: z.string().min(1, "اسم اللون الداخلي مطلوب"),
+  colorCode: z.string().optional(),
+  manufacturer: z.string().optional(),
+  category: z.string().optional(),
 });
 
 const locationSchema = z.object({
@@ -51,7 +59,7 @@ const locationSchema = z.object({
   capacity: z.number().optional(),
 });
 
-type OptionType = "manufacturers" | "categories" | "trimLevels" | "colors" | "locations" | "statuses" | "importTypes" | "engineCapacities";
+type OptionType = "manufacturers" | "categories" | "trimLevels" | "exteriorColors" | "interiorColors" | "locations" | "statuses" | "importTypes" | "engineCapacities";
 
 interface DropdownOption {
   id?: string | number;
@@ -70,6 +78,10 @@ export default function DropdownOptionsManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<DropdownOption | null>(null);
   const [newStaticOption, setNewStaticOption] = useState("");
+  
+  // States for hierarchical relationships
+  const [selectedManufacturer, setSelectedManufacturer] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   // Static options that don't come from database
   const [staticOptions, setStaticOptions] = useState({
@@ -95,6 +107,26 @@ export default function DropdownOptionsManagement() {
     }
   }, []);
 
+  // Fetch manufacturers for dropdowns
+  const { data: manufacturers = [] } = useQuery({
+    queryKey: ['/api/hierarchical/manufacturers'],
+    enabled: true
+  });
+
+  // Fetch categories based on selected manufacturer
+  const { data: categories = [] } = useQuery({
+    queryKey: ['/api/hierarchical/categories', selectedManufacturer],
+    queryFn: () => fetch(`/api/hierarchical/categories?manufacturer=${encodeURIComponent(selectedManufacturer)}`).then(res => res.json()),
+    enabled: !!selectedManufacturer && ["categories", "trimLevels", "exteriorColors", "interiorColors"].includes(selectedOptionType)
+  });
+
+  // Fetch trim levels based on selected category
+  const { data: trimLevels = [] } = useQuery({
+    queryKey: ['/api/hierarchical/trimLevels', selectedManufacturer, selectedCategory],
+    queryFn: () => fetch(`/api/hierarchical/trimLevels?manufacturer=${encodeURIComponent(selectedManufacturer)}&category=${encodeURIComponent(selectedCategory)}`).then(res => res.json()),
+    enabled: !!selectedCategory && ["trimLevels", "exteriorColors", "interiorColors"].includes(selectedOptionType)
+  });
+
   // Fetch data based on selected option type
   const { data: options = [], isLoading } = useQuery({
     queryKey: [`/api/hierarchical/${selectedOptionType}`],
@@ -110,8 +142,10 @@ export default function DropdownOptionsManagement() {
         return categorySchema;
       case "trimLevels":
         return trimLevelSchema;
-      case "colors":
-        return colorSchema;
+      case "exteriorColors":
+        return exteriorColorSchema;
+      case "interiorColors":
+        return interiorColorSchema;
       case "locations":
         return locationSchema;
       default:
@@ -128,12 +162,20 @@ export default function DropdownOptionsManagement() {
   useEffect(() => {
     form.reset();
     setEditingItem(null);
+    setSelectedManufacturer("");
+    setSelectedCategory("");
   }, [selectedOptionType, form]);
 
   // Mutation for adding/updating options
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
-      const endpoint = `/api/hierarchical/${selectedOptionType}`;
+      // Map exteriorColors and interiorColors to colors endpoint
+      let endpoint = `/api/hierarchical/${selectedOptionType}`;
+      if (selectedOptionType === "exteriorColors" || selectedOptionType === "interiorColors") {
+        endpoint = "/api/hierarchical/colors";
+        data.type = selectedOptionType === "exteriorColors" ? "exterior" : "interior";
+      }
+      
       const method = editingItem ? "PUT" : "POST";
       const url = editingItem && editingItem.id ? `${endpoint}/${editingItem.id}` : endpoint;
       return apiRequest(method, url, data);
@@ -141,12 +183,17 @@ export default function DropdownOptionsManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/hierarchical/${selectedOptionType}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/hierarchical/manufacturers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/hierarchical/categories"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/hierarchical/trimLevels"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/hierarchical/colors"] });
       toast({
         title: "تم بنجاح",
         description: editingItem ? "تم تحديث العنصر بنجاح" : "تم إضافة العنصر بنجاح"
       });
       setIsDialogOpen(false);
       setEditingItem(null);
+      setSelectedManufacturer("");
+      setSelectedCategory("");
       form.reset();
     },
     onError: (error) => {
@@ -161,7 +208,12 @@ export default function DropdownOptionsManagement() {
   // Mutation for deleting options
   const deleteMutation = useMutation({
     mutationFn: async (id: string | number) => {
-      return apiRequest("DELETE", `/api/hierarchical/${selectedOptionType}/${id}`);
+      // Map exteriorColors and interiorColors to colors endpoint
+      let endpoint = `/api/hierarchical/${selectedOptionType}`;
+      if (selectedOptionType === "exteriorColors" || selectedOptionType === "interiorColors") {
+        endpoint = "/api/hierarchical/colors";
+      }
+      return apiRequest("DELETE", `${endpoint}/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/hierarchical/${selectedOptionType}`] });
@@ -379,16 +431,27 @@ export default function DropdownOptionsManagement() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-white">الصانع</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="مثال: مرسيدس" dir="rtl" />
-                  </FormControl>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger dir="rtl">
+                        <SelectValue placeholder="اختر الصانع" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {manufacturers.map((manufacturer: any) => (
+                        <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                          {manufacturer.nameAr}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
-              name="category"
+              name="nameAr"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-white">اسم الفئة</FormLabel>
@@ -401,12 +464,12 @@ export default function DropdownOptionsManagement() {
             />
             <FormField
               control={form.control}
-              name="description"
+              name="nameEn"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">الوصف (اختياري)</FormLabel>
+                  <FormLabel className="text-white">الاسم الإنجليزي (اختياري)</FormLabel>
                   <FormControl>
-                    <Textarea {...field} placeholder="وصف الفئة..." dir="rtl" />
+                    <Input {...field} placeholder="E200" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -424,29 +487,60 @@ export default function DropdownOptionsManagement() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-white">الصانع</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="مثال: مرسيدس" dir="rtl" />
-                  </FormControl>
+                  <Select onValueChange={(value) => {
+                    field.onChange(value);
+                    setSelectedManufacturer(value);
+                    setSelectedCategory("");
+                  }} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger dir="rtl">
+                        <SelectValue placeholder="اختر الصانع" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {manufacturers.map((manufacturer: any) => (
+                        <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                          {manufacturer.nameAr}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            {selectedManufacturer && (
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">الفئة</FormLabel>
+                    <Select onValueChange={(value) => {
+                      field.onChange(value);
+                      setSelectedCategory(value);
+                    }} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر الفئة" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categories.map((category: any) => (
+                          <SelectItem key={category.id} value={category.nameAr || category.name_ar}>
+                            {category.nameAr || category.name_ar}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">الفئة</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="مثال: E200" dir="rtl" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="trimLevel"
+              name="nameAr"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-white">درجة التجهيز</FormLabel>
@@ -459,12 +553,12 @@ export default function DropdownOptionsManagement() {
             />
             <FormField
               control={form.control}
-              name="description"
+              name="nameEn"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">الوصف (اختياري)</FormLabel>
+                  <FormLabel className="text-white">الاسم الإنجليزي (اختياري)</FormLabel>
                   <FormControl>
-                    <Textarea {...field} placeholder="وصف درجة التجهيز..." dir="rtl" />
+                    <Input {...field} placeholder="Full Option" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -473,39 +567,74 @@ export default function DropdownOptionsManagement() {
           </>
         );
 
-      case "colors":
+      case "exteriorColors":
         return (
           <>
+            <FormField
+              control={form.control}
+              name="manufacturer"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white">الصانع (اختياري)</FormLabel>
+                  <Select onValueChange={(value) => {
+                    field.onChange(value);
+                    setSelectedManufacturer(value);
+                    setSelectedCategory("");
+                  }} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger dir="rtl">
+                        <SelectValue placeholder="اختر الصانع (أو اتركه فارغاً للجميع)" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="">جميع الصانعين</SelectItem>
+                      {manufacturers.map((manufacturer: any) => (
+                        <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                          {manufacturer.nameAr}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {selectedManufacturer && (
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">الفئة (اختياري)</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر الفئة (أو اتركه فارغاً للجميع)" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">جميع الفئات</SelectItem>
+                        {categories.map((category: any) => (
+                          <SelectItem key={category.id} value={category.nameAr || category.name_ar}>
+                            {category.nameAr || category.name_ar}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">اسم اللون</FormLabel>
+                  <FormLabel className="text-white">اسم اللون الخارجي</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="مثال: أسود" dir="rtl" />
+                    <Input {...field} placeholder="مثال: أبيض لؤلؤي" dir="rtl" />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">نوع اللون</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger dir="rtl">
-                        <SelectValue placeholder="اختر النوع" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="exterior">خارجي</SelectItem>
-                      <SelectItem value="interior">داخلي</SelectItem>
-                    </SelectContent>
-                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -517,7 +646,95 @@ export default function DropdownOptionsManagement() {
                 <FormItem>
                   <FormLabel className="text-white">كود اللون (اختياري)</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="#000000" />
+                    <Input {...field} placeholder="#FFFFFF" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
+        );
+
+      case "interiorColors":
+        return (
+          <>
+            <FormField
+              control={form.control}
+              name="manufacturer"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white">الصانع (اختياري)</FormLabel>
+                  <Select onValueChange={(value) => {
+                    field.onChange(value);
+                    setSelectedManufacturer(value);
+                    setSelectedCategory("");
+                  }} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger dir="rtl">
+                        <SelectValue placeholder="اختر الصانع (أو اتركه فارغاً للجميع)" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="">جميع الصانعين</SelectItem>
+                      {manufacturers.map((manufacturer: any) => (
+                        <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                          {manufacturer.nameAr}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {selectedManufacturer && (
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">الفئة (اختياري)</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر الفئة (أو اتركه فارغاً للجميع)" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">جميع الفئات</SelectItem>
+                        {categories.map((category: any) => (
+                          <SelectItem key={category.id} value={category.nameAr || category.name_ar}>
+                            {category.nameAr || category.name_ar}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white">اسم اللون الداخلي</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="مثال: جلد بيج" dir="rtl" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="colorCode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white">كود اللون (اختياري)</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="#F5F5DC" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -604,9 +821,10 @@ export default function DropdownOptionsManagement() {
 
   const optionTypeNames = {
     manufacturers: "الصانعين",
-    categories: "الفئات",
+    categories: "الفئات", 
     trimLevels: "درجات التجهيز",
-    colors: "الألوان",
+    exteriorColors: "الألوان الخارجية",
+    interiorColors: "الألوان الداخلية",
     locations: "المواقع",
     statuses: "الحالات",
     importTypes: "أنواع الاستيراد",
