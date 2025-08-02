@@ -617,7 +617,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
 
                         {/* Price Box */}
                         <div className="flex-1 p-4 text-center">
-                          <div className="text-sm font-semibold mb-2 text-[#03627f] bg-[#2a2c3700]">تفاصيل السعر</div>
+                          <div className="font-semibold mb-2 text-[#03627f] bg-[#2a2c3700] text-[22px]">تفاصيل السعر</div>
                           <div className="space-y-1">
                             <div className="flex justify-between text-xs">
                               <span className="text-black">السعر الأساسي:</span>
