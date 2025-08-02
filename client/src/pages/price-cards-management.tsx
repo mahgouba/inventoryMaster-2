@@ -549,7 +549,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="flex justify-center overflow-x-auto">
+              <div className="flex justify-center overflow-x-auto bg-[#00627F]">
                 <div 
                   className="preview-price-card relative rounded-lg overflow-hidden"
                   style={{
