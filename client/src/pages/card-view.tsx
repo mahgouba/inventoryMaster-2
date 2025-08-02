@@ -650,14 +650,38 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-black to-purple-950 relative">
+        {/* Company Logo Background */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+          <img 
+            src={companyLogo || "/company-logo.svg"} 
+            alt="شعار الشركة" 
+            className="w-96 h-96 object-contain"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "/copmany logo.svg";
+            }}
+          />
+        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 relative z-10"></div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-purple-950 relative overflow-hidden" dir="rtl">
+      {/* Company Logo Background */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+        <img 
+          src={companyLogo || "/company-logo.svg"} 
+          alt="شعار الشركة" 
+          className="w-96 h-96 object-contain"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = "/copmany logo.svg";
+          }}
+        />
+      </div>
       {/* Background Animation Removed */}
       <div className="relative z-10" dir="rtl">
       {/* Header */}

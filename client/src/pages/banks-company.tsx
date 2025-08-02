@@ -127,8 +127,20 @@ export default function CompanyBanks() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--dark-bg-primary)' }}>
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center relative" style={{ background: 'var(--dark-bg-primary)' }}>
+        {/* Company Logo Background */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+          <img 
+            src={appearance?.companyLogo || "/company-logo.svg"} 
+            alt="شعار الشركة" 
+            className="w-96 h-96 object-contain"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "/copmany logo.svg";
+            }}
+          />
+        </div>
+        <div className="text-center relative z-10">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-white">جاري تحميل البنوك...</p>
         </div>
@@ -137,7 +149,19 @@ export default function CompanyBanks() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--dark-bg-primary)' }} dir="rtl">
+    <div className="min-h-screen relative" style={{ background: 'var(--dark-bg-primary)' }} dir="rtl">
+      {/* Company Logo Background */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+        <img 
+          src={appearance?.companyLogo || "/company-logo.svg"} 
+          alt="شعار الشركة" 
+          className="w-96 h-96 object-contain"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = "/copmany logo.svg";
+          }}
+        />
+      </div>
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
         <div className="glass-container mb-6 p-4">
