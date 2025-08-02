@@ -317,13 +317,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       internal: true,
       permission: "admin"
     },
-    { 
-      title: "إدارة القوائم", 
-      href: "/list-management", 
-      icon: Settings,
-      internal: true,
-      permission: "admin"
-    },
+
     { 
       title: "المستخدمين", 
       href: "/user-management", 
@@ -359,13 +353,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       internal: true,
       permission: "admin"
     },
-    { 
-      title: "استيراد السيارات", 
-      href: "/car-data-import", 
-      icon: Upload,
-      internal: true,
-      permission: "admin"
-    }
+
   ];
 
   // System items (available for all users)

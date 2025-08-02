@@ -69,15 +69,14 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           <Route path="/theme-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/database-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/cars-migration" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
-          <Route path="/car-data-import" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+
           <Route path="/locations" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           
           {/* Admin Routes through Main Dashboard */}
           {user.role === "admin" && (
             <>
               <Route path="/pdf-appearance" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
-              <Route path="/list-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
-              <Route path="/options-list-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+
               <Route path="/manufacturer-logos" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
               <Route path="/user-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
               <Route path="/bank-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />

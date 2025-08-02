@@ -15,7 +15,7 @@ import { useTheme } from "@/hooks/useTheme";
 import InventoryStats from "@/components/inventory-stats";
 import InventoryTable from "@/components/inventory-table";
 import InventoryFormHierarchical from "@/components/inventory-form-hierarchical";
-import ExcelImport from "@/components/excel-import";
+
 import ScrollableFilter from "@/components/scrollable-filter";
 
 
@@ -50,7 +50,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [showSoldCars, setShowSoldCars] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editItem, setEditItem] = useState<InventoryItem | undefined>(undefined);
-  const [isExcelImportOpen, setIsExcelImportOpen] = useState(false);
+
 
 
 
@@ -499,18 +499,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     طباعة مخصصة
                   </Button>
 
-                  {/* Import Button - Admin Only */}
-                  {canCreateItem(userRole as UserRole, "inventory") && userRole === "admin" && (
-                    <Button 
-                      onClick={() => setIsExcelImportOpen(true)}
-                      variant="outline"
-                      size="sm"
-                      className="glass-button glass-text-primary"
-                    >
-                      <FileSpreadsheet className="w-4 h-4 ml-2" />
-                      استيراد
-                    </Button>
-                  )}
+
 
 
 
@@ -918,11 +907,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         editItem={editItem}
       />
 
-      {/* Excel Import Dialog */}
-      <ExcelImport 
-        open={isExcelImportOpen} 
-        onOpenChange={setIsExcelImportOpen} 
-      />
+
 
 
 
