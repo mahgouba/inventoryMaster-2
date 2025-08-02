@@ -2466,8 +2466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Bank Management API Routes
   app.get("/api/banks", async (req, res) => {
     try {
-      // Access the banks directly from the storage instance
-      const banks = Array.from((storage as any).banks.values());
+      const banks = await storage.getAllBanks();
       res.json(banks);
     } catch (error) {
       console.error("Error fetching banks:", error);
@@ -2482,8 +2481,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid bank type" });
       }
       
-      // Access the banks directly from the storage instance
-      const allBanks = Array.from((storage as any).banks.values());
+      const allBanks = await storage.getAllBanks();
       const banks = allBanks.filter((bank: any) => bank.type === type && bank.isActive);
       
       res.json(banks);
