@@ -578,7 +578,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
 
                   {/* Year */}
                   <div className="absolute top-60 left-1/2 transform -translate-x-1/2">
-                    <div className="text-white text-[19.38rem] font-black tracking-wider leading-none mt-[-51px] mb-[-51px]">
+                    <div className="text-white text-[17.83rem] font-black tracking-wider leading-none mt-[-51px] mb-[-51px]">
                       2025
                     </div>
                   </div>
@@ -619,11 +619,11 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                         <div className="flex-1 p-4 text-center">
                           <div className="font-semibold mb-2 text-[#03627f] bg-[#2a2c3700] text-[22px]">تفاصيل السعر</div>
                           <div className="space-y-1">
-                            <div className="flex justify-between text-xs">
+                            <div className="flex justify-between text-xs text-[#23252f]">
                               <span className="text-black font-medium">السعر الأساسي:</span>
                               <span className="text-black font-semibold">﷼ 234,783</span>
                             </div>
-                            <div className="flex justify-between text-xs">
+                            <div className="flex justify-between text-xs text-[#23252f]">
                               <span className="text-black font-medium">قيمة الضريبة (15%):</span>
                               <span className="text-black font-semibold">﷼ 35,217</span>
                             </div>
