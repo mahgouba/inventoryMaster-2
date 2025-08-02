@@ -337,7 +337,7 @@ export default function InventoryTable({
           <TableBody>
             {filteredAndSortedItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={14} className="text-center py-8">
+                <TableCell colSpan={16} className="text-center py-8">
                   <p className="text-white/70">لا توجد عناصر للعرض</p>
                 </TableCell>
               </TableRow>

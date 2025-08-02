@@ -10,6 +10,8 @@ This is a full-stack inventory management system for managing inventory items wi
 - ✅ Fixed bank visibility toggle to use database persistence instead of localStorage
 - ✅ Updated all navigation references to use consolidated page names
 - ✅ Verified application runs correctly on port 5000 with Express + PostgreSQL
+- ✅ Fixed table column alignment issue in inventory management (updated colSpan from 14 to 16)
+- ✅ Optimized price card year display with 8% size reduction and improved margins
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
