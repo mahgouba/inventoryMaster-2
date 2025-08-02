@@ -551,7 +551,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
             <CardContent className="p-6">
               <div className="flex justify-center overflow-x-auto bg-[#00627F]">
                 <div 
-                  className="preview-price-card relative rounded-lg overflow-hidden bg-[#03627f]"
+                  className="preview-price-card relative rounded-lg overflow-hidden"
                   style={{
                     width: '297mm', // A4 landscape width
                     height: '210mm', // A4 landscape height
@@ -567,11 +567,18 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                     maxHeight: '210mm'
                   }}
                 >
-                  
+                  {/* Company Logo */}
+                  <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
+                    <img 
+                      src="/company-logo.svg" 
+                      alt="شعار الشركة" 
+                      className="w-48 h-48 object-contain filter brightness-110"
+                    />
+                  </div>
 
                   {/* Year */}
                   <div className="absolute top-60 left-1/2 transform -translate-x-1/2">
-                    <div className="text-white text-[20.4rem] font-black tracking-wider leading-none mt-[-41px] mb-[-41px]">
+                    <div className="text-white text-[20.4rem] font-black tracking-wider leading-none">
                       2025
                     </div>
                   </div>
