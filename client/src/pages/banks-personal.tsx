@@ -2,7 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { User, Copy, Share2, ChevronDown, ChevronUp } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { User, Copy, Share2, ChevronDown, ChevronUp, MessageCircle, Send } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Bank } from "@shared/schema";
@@ -10,6 +13,9 @@ import type { Bank } from "@shared/schema";
 export default function PersonalBanks() {
   const [expandedBanks, setExpandedBanks] = useState<Set<number>>(new Set());
   const [copiedText, setCopiedText] = useState<string | null>(null);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState("");
   const { toast } = useToast();
 
   const { data: banks = [], isLoading } = useQuery({
@@ -62,27 +68,61 @@ export default function PersonalBanks() {
     }
   };
 
-  const shareBank = async (bank: Bank) => {
-    const shareText = `
-بيانات البنك الشخصي
+  const openShareDialog = (bank: Bank) => {
+    setSelectedBank(bank);
+    setShareDialogOpen(true);
+  };
+
+  const getBankShareText = (bank: Bank) => {
+    return `بيانات البنك الشخصي
 🏦 ${bank.bankName}
 👤 ${bank.accountName}
 💳 رقم الحساب: ${bank.accountNumber}
-🏧 الآيبان: ${bank.iban}
-    `.trim();
+🏧 الآيبان: ${bank.iban}`;
+  };
 
+  const handleCopyBankData = async () => {
+    if (!selectedBank) return;
+    await copyToClipboard(getBankShareText(selectedBank), "بيانات البنك");
+    setShareDialogOpen(false);
+  };
+
+  const handleNativeShare = async () => {
+    if (!selectedBank) return;
+    const shareText = getBankShareText(selectedBank);
+    
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `بيانات ${bank.bankName}`,
+          title: `بيانات ${selectedBank.bankName}`,
           text: shareText
         });
+        setShareDialogOpen(false);
       } catch (error) {
         await copyToClipboard(shareText, "بيانات البنك");
       }
     } else {
       await copyToClipboard(shareText, "بيانات البنك");
     }
+  };
+
+  const handleWhatsAppShare = () => {
+    if (!selectedBank || !phoneNumber.trim()) {
+      toast({
+        title: "خطأ",
+        description: "يرجى إدخال رقم الهاتف",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const shareText = getBankShareText(selectedBank);
+    const formattedPhone = phoneNumber.startsWith('+966') ? phoneNumber : `+966${phoneNumber.replace(/^0/, '')}`;
+    const whatsappUrl = `https://wa.me/${formattedPhone.replace(/\+/g, '')}?text=${encodeURIComponent(shareText)}`;
+    
+    window.open(whatsappUrl, '_blank');
+    setShareDialogOpen(false);
+    setPhoneNumber("");
   };
 
   if (isLoading) {
@@ -175,7 +215,7 @@ export default function PersonalBanks() {
                             variant="ghost"
                             onClick={(e) => {
                               e.stopPropagation();
-                              shareBank(bank);
+                              openShareDialog(bank);
                             }}
                             className="p-2 hover:bg-purple-500/20 rounded-lg transition-all duration-300 backdrop-blur-sm border border-purple-500/30"
                             title="مشاركة معلومات البنك"
@@ -289,6 +329,64 @@ export default function PersonalBanks() {
           </div>
         )}
       </div>
+
+      {/* Share Dialog */}
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent className="glass-container border-white/20 max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle className="text-white text-center mb-4">
+              مشاركة بيانات {selectedBank?.bankName}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Copy Option */}
+            <Button
+              onClick={handleCopyBankData}
+              className="w-full glass-container hover:bg-white/20 text-white border-white/30 flex items-center gap-3 p-4 h-auto"
+            >
+              <Copy className="w-5 h-5" />
+              <span className="text-base">نسخ البيانات</span>
+            </Button>
+
+            {/* Native Share Option */}
+            <Button
+              onClick={handleNativeShare}
+              className="w-full glass-container hover:bg-white/20 text-white border-white/30 flex items-center gap-3 p-4 h-auto"
+            >
+              <Share2 className="w-5 h-5" />
+              <span className="text-base">مشاركة</span>
+            </Button>
+
+            {/* WhatsApp Share Option */}
+            <div className="space-y-3">
+              <Label htmlFor="phone" className="text-white text-base">
+                إرسال عبر الواتساب
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="5xxxxxxxx"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="glass-container border-white/30 text-white placeholder:text-white/50 flex-1"
+                  dir="ltr"
+                />
+                <Button
+                  onClick={handleWhatsAppShare}
+                  className="glass-container hover:bg-green-500/20 text-white border-green-500/30 px-4"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                </Button>
+              </div>
+              <p className="text-white/70 text-xs">
+                أدخل رقم الهاتف بدون +966 (مثال: 512345678)
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
