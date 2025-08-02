@@ -11,9 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertInventoryItemSchema, type InsertInventoryItem, type InventoryItem } from "@shared/schema";
-import { CloudUpload, Settings, Move } from "lucide-react";
-import OptionsEditor from "@/components/options-editor";
-import EditableSelect from "@/components/editable-select";
+import { CloudUpload } from "lucide-react";
 
 interface InventoryFormProps {
   open: boolean;
@@ -220,79 +218,54 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full" draggable={true}>
-        <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Move className="h-4 w-4 text-gray-400" />
-              <DialogTitle className="text-lg font-semibold text-slate-800">
-                {editItem ? "تحرير العنصر" : "إضافة عنصر جديد"}
-              </DialogTitle>
-            </div>
-          </div>
-          <DialogDescription className="text-sm text-slate-600">
-            {editItem ? "قم بتحرير بيانات المركبة وحفظ التغييرات" : "أدخل بيانات المركبة الجديدة لإضافتها للمخزون"}
-          </DialogDescription>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full glass-container border-0">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-xl font-bold text-white text-center">
+            {editItem ? "تحرير المركبة" : "إضافة مركبة جديدة"}
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2 flex items-center justify-between">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditingOptions(!isEditingOptions)}
-                  className="text-xs"
-                >
-                  <Settings className="h-4 w-4 ml-1" />
-                  {isEditingOptions ? "حفظ التعديلات" : "تحرير القوائم"}
-                </Button>
-              </div>
-              {/* Manufacturer Field - First */}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {/* الصانع */}
               <FormField
                 control={form.control}
                 name="manufacturer"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>الصانع</FormLabel>
                     <FormControl>
-                      <EditableSelect
-                        options={editableManufacturers}
-                        value={field.value}
-                        onValueChange={(value) => {
-                          handleManufacturerChange(value);
-                          field.onChange(value);
-                        }}
-                        onAddOption={(newManufacturer) => {
-                          setEditableManufacturers([...editableManufacturers, newManufacturer]);
-                        }}
-                        onDeleteOption={(deletedManufacturer) => {
-                          setEditableManufacturers(editableManufacturers.filter(m => m !== deletedManufacturer));
-                        }}
-                        onEditOption={(oldManufacturer, newManufacturer) => {
-                          setEditableManufacturers(editableManufacturers.map(m => m === oldManufacturer ? newManufacturer : m));
-                        }}
-                        placeholder="اختر الصانع"
-                        className="w-full"
-                      />
+                      <Select onValueChange={(value) => {
+                        handleManufacturerChange(value);
+                        field.onChange(value);
+                      }} value={field.value}>
+                        <SelectTrigger className="glass-input border-white/20 text-white">
+                          <SelectValue placeholder="الصانع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {editableManufacturers.map((manufacturer) => (
+                            <SelectItem key={manufacturer} value={manufacturer}>
+                              {manufacturer}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* الفئة */}
               <FormField
                 control={form.control}
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>الفئة</FormLabel>
                     <FormControl>
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر الفئة" />
+                        <SelectTrigger className="glass-input border-white/20 text-white">
+                          <SelectValue placeholder="الفئة" />
                         </SelectTrigger>
                         <SelectContent>
                           {availableCategories.length > 0 ? (
@@ -303,7 +276,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                             ))
                           ) : (
                             <SelectItem disabled value="no-manufacturer">
-                              يرجى اختيار الصانع أولاً
+                              اختر الصانع أولاً
                             </SelectItem>
                           )}
                         </SelectContent>
@@ -314,15 +287,18 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 )}
               />
 
+              {/* درجة التجهيز */}
               <FormField
                 control={form.control}
                 name="trimLevel"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>درجة التجهيز</FormLabel>
                     <FormControl>
                       <Input 
-                        placeholder="فل كامل، ستاندرد، خاص"
+                        {...field}
+                        placeholder="درجة التجهيز"
+                        className="glass-input border-white/20 text-white placeholder:text-white/60"
+                        dir="rtl"
                         value={field.value || ""}
                         onChange={field.onChange}
                       />
@@ -332,40 +308,42 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 )}
               />
 
+              {/* سعة المحرك */}
               <FormField
                 control={form.control}
                 name="engineCapacity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>سعة المحرك</FormLabel>
                     <FormControl>
-                      <EditableSelect
-                        options={editableEngineCapacities}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        onAddOption={(newCapacity) => {
-                          setEditableEngineCapacities([...editableEngineCapacities, newCapacity]);
-                        }}
-                        placeholder="اختر سعة المحرك"
-                        className="w-full"
-                      />
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="glass-input border-white/20 text-white">
+                          <SelectValue placeholder="سعة المحرك" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {editableEngineCapacities.map((capacity) => (
+                            <SelectItem key={capacity} value={capacity}>
+                              {capacity}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* السنة */}
               <FormField
                 control={form.control}
                 name="year"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>السنة</FormLabel>
                     <FormControl>
                       <Select onValueChange={(value) => field.onChange(parseInt(value))} 
                               value={field.value?.toString()}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر السنة" />
+                        <SelectTrigger className="glass-input border-white/20 text-white">
+                          <SelectValue placeholder="السنة" />
                         </SelectTrigger>
                         <SelectContent>
                           {initialYears.map((year) => (
@@ -381,90 +359,97 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 )}
               />
 
+              {/* اللون الخارجي */}
               <FormField
                 control={form.control}
                 name="exteriorColor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>اللون الخارجي</FormLabel>
                     <FormControl>
-                      <EditableSelect
-                        options={editableExteriorColors}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        onAddOption={(newColor) => {
-                          setEditableExteriorColors([...editableExteriorColors, newColor]);
-                        }}
-                        placeholder="اختر اللون الخارجي"
-                        className="w-full"
-                      />
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="glass-input border-white/20 text-white">
+                          <SelectValue placeholder="اللون الخارجي" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {editableExteriorColors.map((color) => (
+                            <SelectItem key={color} value={color}>
+                              {color}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* اللون الداخلي */}
               <FormField
                 control={form.control}
                 name="interiorColor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>اللون الداخلي</FormLabel>
                     <FormControl>
-                      <EditableSelect
-                        options={editableInteriorColors}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        onAddOption={(newColor) => {
-                          setEditableInteriorColors([...editableInteriorColors, newColor]);
-                        }}
-                        placeholder="اختر اللون الداخلي"
-                        className="w-full"
-                      />
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="glass-input border-white/20 text-white">
+                          <SelectValue placeholder="اللون الداخلي" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {editableInteriorColors.map((color) => (
+                            <SelectItem key={color} value={color}>
+                              {color}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* نوع الاستيراد */}
               <FormField
                 control={form.control}
                 name="importType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>الاستيراد</FormLabel>
                     <FormControl>
-                      <EditableSelect
-                        options={editableImportTypes}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        onAddOption={(newType) => {
-                          setEditableImportTypes([...editableImportTypes, newType]);
-                        }}
-                        placeholder="اختر نوع الاستيراد"
-                        className="w-full"
-                      />
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="glass-input border-white/20 text-white">
+                          <SelectValue placeholder="نوع الاستيراد" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {editableImportTypes.map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Mileage - Only show for used vehicles */}
+              {/* المسافة المقطوعة - للمركبات المستعملة فقط */}
               {(form.watch("importType") === "مستعمل" || form.watch("importType") === "مستعمل شخصي") && (
                 <FormField
                   control={form.control}
                   name="mileage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>ممشي السيارة (كم)</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="أدخل عدد الكيلومترات" 
+                          placeholder="المسافة المقطوعة (كم)" 
                           type="number"
                           min="0"
                           value={field.value || ''}
                           onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                          className="glass-input border-white/20 text-white placeholder:text-white/60"
+                          dir="rtl"
                         />
                       </FormControl>
                       <FormMessage />
@@ -473,101 +458,92 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 />
               )}
 
+              {/* نوع الملكية */}
               <FormField
                 control={form.control}
                 name="ownershipType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>نوع الملكية</FormLabel>
                     <FormControl>
-                      <EditableSelect
-                        options={editableOwnershipTypes}
-                        value={field.value || ""}
-                        onValueChange={field.onChange}
-                        onAddOption={(newType) => {
-                          setEditableOwnershipTypes([...editableOwnershipTypes, newType]);
-                        }}
-                        placeholder="اختر نوع الملكية"
-                        className="w-full"
-                      />
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                        <SelectTrigger className="glass-input border-white/20 text-white">
+                          <SelectValue placeholder="نوع الملكية" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {editableOwnershipTypes.map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* الموقع */}
               <FormField
                 control={form.control}
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>الموقع</FormLabel>
                     <FormControl>
-                      <EditableSelect
-                        options={editableLocations}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        onAddOption={(newLocation) => {
-                          setEditableLocations([...editableLocations, newLocation]);
-                        }}
-                        placeholder="اختر الموقع"
-                        className="w-full"
-                      />
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="glass-input border-white/20 text-white">
+                          <SelectValue placeholder="الموقع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {editableLocations.map((location) => (
+                            <SelectItem key={location} value={location}>
+                              {location}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* الحالة */}
               <FormField
                 control={form.control}
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>الحالة</FormLabel>
                     <FormControl>
-                      <EditableSelect
-                        options={editableStatuses}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        onAddOption={(newStatus) => {
-                          setEditableStatuses([...editableStatuses, newStatus]);
-                        }}
-                        placeholder="اختر الحالة"
-                        className="w-full"
-                      />
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="glass-input border-white/20 text-white">
+                          <SelectValue placeholder="الحالة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {editableStatuses.map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {status}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* رقم الهيكل */}
               <FormField
                 control={form.control}
                 name="chassisNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>رقم الهيكل</FormLabel>
-                    <FormControl>
-                      <Input placeholder="WASSBER0000000" className="font-latin" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>السعر (ريال سعودي)</FormLabel>
                     <FormControl>
                       <Input 
-                        placeholder="150000" 
-                        type="number"
-                        value={field.value || ""}
-                        onChange={field.onChange}
+                        placeholder="رقم الهيكل" 
+                        className="glass-input border-white/20 text-white placeholder:text-white/60 font-latin" 
+                        {...field} 
                       />
                     </FormControl>
                     <FormMessage />
@@ -575,18 +551,38 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 )}
               />
 
-              {/* Is Sold Status */}
+              {/* السعر */}
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input 
+                        placeholder="السعر (ريال سعودي)" 
+                        type="number"
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        className="glass-input border-white/20 text-white placeholder:text-white/60"
+                        dir="rtl"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* حالة البيع */}
               <FormField
                 control={form.control}
                 name="isSold"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>حالة البيع</FormLabel>
                     <FormControl>
                       <Select onValueChange={(value) => field.onChange(value === "true")} 
                               value={field.value ? "true" : "false"}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر حالة البيع" />
+                        <SelectTrigger className="glass-input border-white/20 text-white">
+                          <SelectValue placeholder="حالة البيع" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="false">متوفر</SelectItem>
@@ -599,19 +595,19 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 )}
               />
 
-              {/* Sold Date - Only show if sold */}
+              {/* تاريخ البيع - يظهر فقط عند البيع */}
               {form.watch("isSold") && (
                 <FormField
                   control={form.control}
                   name="soldDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>تاريخ البيع</FormLabel>
                       <FormControl>
                         <Input 
                           type="date"
                           value={field.value ? new Date(field.value).toISOString().split('T')[0] : ""}
                           onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                          className="glass-input border-white/20 text-white"
                         />
                       </FormControl>
                       <FormMessage />
@@ -620,18 +616,18 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 />
               )}
 
-              {/* Reservation Date */}
+              {/* تاريخ الحجز */}
               <FormField
                 control={form.control}
                 name="reservationDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>تاريخ الحجز</FormLabel>
                     <FormControl>
                       <Input 
                         type="date"
                         value={field.value ? new Date(field.value).toISOString().split('T')[0] : ""}
                         onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                        className="glass-input border-white/20 text-white"
                       />
                     </FormControl>
                     <FormMessage />
@@ -639,78 +635,19 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 )}
               />
 
-              {/* Reserved By */}
+              {/* محجوز بواسطة */}
               <FormField
                 control={form.control}
                 name="reservedBy"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>محجوز بواسطة</FormLabel>
                     <FormControl>
                       <Input 
-                        placeholder="اسم العميل الذي حجز السيارة"
+                        placeholder="محجوز بواسطة"
                         value={field.value || ""}
                         onChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Reservation Note */}
-              <FormField
-                control={form.control}
-                name="reservationNote"
-                render={({ field }) => (
-                  <FormItem className="md:col-span-2">
-                    <FormLabel>ملاحظة الحجز</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="تفاصيل الحجز والملاحظات الخاصة بالعميل..."
-                        className="min-h-[80px]"
-                        value={field.value || ""}
-                        onChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Detailed Specifications */}
-              <FormField
-                control={form.control}
-                name="detailedSpecifications"
-                render={({ field }) => (
-                  <FormItem className="md:col-span-2">
-                    <FormLabel>المواصفات التفصيلية</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="المواصفات التفصيلية الخاصة بهذه السيارة (المحرك، الأداء، المميزات، إلخ)..."
-                        className="min-h-[120px]"
-                        value={field.value || ""}
-                        onChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* General Notes */}
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem className="md:col-span-2">
-                    <FormLabel>الملاحظات العامة</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="أدخل الملاحظات العامة هنا..."
-                        className="min-h-[100px]"
-                        value={field.value || ""}
-                        onChange={field.onChange}
+                        className="glass-input border-white/20 text-white placeholder:text-white/60"
+                        dir="rtl"
                       />
                     </FormControl>
                     <FormMessage />
@@ -719,17 +656,86 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
               />
             </div>
 
-            <div className="flex justify-end space-x-4 space-x-reverse pt-6 border-t border-slate-200">
+            {/* الملاحظات والمواصفات */}
+            <div className="grid grid-cols-1 gap-4">
+              {/* ملاحظة الحجز */}
+              <FormField
+                control={form.control}
+                name="reservationNote"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="ملاحظة الحجز"
+                        className="glass-input border-white/20 text-white placeholder:text-white/60 min-h-[80px]"
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        dir="rtl"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* المواصفات التفصيلية */}
+              <FormField
+                control={form.control}
+                name="detailedSpecifications"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="المواصفات التفصيلية"
+                        className="glass-input border-white/20 text-white placeholder:text-white/60 min-h-[100px]"
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        dir="rtl"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* الملاحظات العامة */}
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="الملاحظات العامة"
+                        className="glass-input border-white/20 text-white placeholder:text-white/60 min-h-[80px]"
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        dir="rtl"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* أزرار الحفظ */}
+            <div className="flex justify-center gap-4 pt-6">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
+                className="glass-button px-8"
               >
                 إلغاء
               </Button>
-              <Button type="submit" disabled={isLoading} className="bg-custom-gold hover:bg-custom-gold-dark text-white">
-                {isLoading ? "جاري الحفظ..." : editItem ? "تحديث العنصر" : "حفظ العنصر"}
+              <Button 
+                type="submit" 
+                disabled={isLoading} 
+                className="bg-custom-gold hover:bg-custom-gold-dark text-white px-8"
+              >
+                {isLoading ? "جاري الحفظ..." : editItem ? "تحديث" : "حفظ"}
               </Button>
             </div>
           </form>
