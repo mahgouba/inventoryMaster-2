@@ -341,6 +341,131 @@ export class DatabaseStorage implements IStorage {
   // For brevity, I'm implementing the core CRUD operations for the main entities
   // The remaining methods would follow similar patterns
 
+  // Dropdown Options Management Methods
+  
+  // Manufacturers
+  async getManufacturers(): Promise<any[]> {
+    return await db.select().from(manufacturers).orderBy(manufacturers.nameAr);
+  }
+
+  async addManufacturer(manufacturer: any): Promise<any> {
+    const [newManufacturer] = await db.insert(manufacturers).values(manufacturer).returning();
+    return newManufacturer;
+  }
+
+  async updateManufacturer(id: string, manufacturer: any): Promise<any> {
+    const [updated] = await db.update(manufacturers).set({
+      ...manufacturer,
+      updatedAt: new Date()
+    }).where(eq(manufacturers.id, id)).returning();
+    return updated;
+  }
+
+  async deleteManufacturer(id: string): Promise<boolean> {
+    const result = await db.delete(manufacturers).where(eq(manufacturers.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Categories
+  async getCategories(manufacturer?: string): Promise<any[]> {
+    return await db.select().from(vehicleCategories)
+      .where(manufacturer ? eq(vehicleCategories.manufacturer, manufacturer) : undefined)
+      .orderBy(vehicleCategories.category);
+  }
+
+  async addCategory(category: any): Promise<any> {
+    const [newCategory] = await db.insert(vehicleCategories).values(category).returning();
+    return newCategory;
+  }
+
+  async updateCategory(id: number, category: any): Promise<any> {
+    const [updated] = await db.update(vehicleCategories).set({
+      ...category,
+      updatedAt: new Date()
+    }).where(eq(vehicleCategories.id, id)).returning();
+    return updated;
+  }
+
+  async deleteCategory(id: number): Promise<boolean> {
+    const result = await db.delete(vehicleCategories).where(eq(vehicleCategories.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Trim Levels
+  async getTrimLevels(manufacturer?: string, category?: string): Promise<any[]> {
+    let query = db.select().from(vehicleTrimLevels);
+    const conditions = [];
+    
+    if (manufacturer) conditions.push(eq(vehicleTrimLevels.manufacturer, manufacturer));
+    if (category) conditions.push(eq(vehicleTrimLevels.category, category));
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+    
+    return await query.orderBy(vehicleTrimLevels.trimLevel);
+  }
+
+  async addTrimLevel(trimLevel: any): Promise<any> {
+    const [newTrimLevel] = await db.insert(vehicleTrimLevels).values(trimLevel).returning();
+    return newTrimLevel;
+  }
+
+  async updateTrimLevel(id: number, trimLevel: any): Promise<any> {
+    const [updated] = await db.update(vehicleTrimLevels).set({
+      ...trimLevel,
+      updatedAt: new Date()
+    }).where(eq(vehicleTrimLevels.id, id)).returning();
+    return updated;
+  }
+
+  async deleteTrimLevel(id: number): Promise<boolean> {
+    const result = await db.delete(vehicleTrimLevels).where(eq(vehicleTrimLevels.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Colors (placeholder implementation)
+  async getColors(): Promise<any[]> {
+    // This would need a colors table in the schema
+    return [];
+  }
+
+  async addColor(color: any): Promise<any> {
+    // This would need a colors table in the schema
+    return color;
+  }
+
+  async updateColor(id: number, color: any): Promise<any> {
+    // This would need a colors table in the schema
+    return color;
+  }
+
+  async deleteColor(id: number): Promise<boolean> {
+    // This would need a colors table in the schema
+    return false;
+  }
+
+  // Locations (placeholder implementation)
+  async getLocations(): Promise<any[]> {
+    // This would need a locations table in the schema
+    return [];
+  }
+
+  async addLocation(location: any): Promise<any> {
+    // This would need a locations table in the schema
+    return location;
+  }
+
+  async updateLocation(id: number, location: any): Promise<any> {
+    // This would need a locations table in the schema
+    return location;
+  }
+
+  async deleteLocation(id: number): Promise<boolean> {
+    // This would need a locations table in the schema
+    return false;
+  }
+
   // Stub implementations for remaining interface methods
   async getAllCategories(): Promise<{ category: string }[]> { return []; }
   async getCategoriesByManufacturer(manufacturer: string): Promise<{ category: string }[]> { return []; }

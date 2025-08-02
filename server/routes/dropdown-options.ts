@@ -136,6 +136,81 @@ router.post("/locations", async (req, res) => {
   }
 });
 
+// Update manufacturer
+router.put("/manufacturers/:id", async (req, res) => {
+  try {
+    const storage = req.app.locals.storage as DatabaseStorage;
+    const { id } = req.params;
+    const { nameAr, nameEn, logo } = req.body;
+    
+    await storage.updateManufacturer(id, { nameAr, nameEn, logo });
+    res.json({ message: "Manufacturer updated successfully" });
+  } catch (error) {
+    console.error("Error updating manufacturer:", error);
+    res.status(500).json({ error: "Failed to update manufacturer" });
+  }
+});
+
+// Update category
+router.put("/categories/:id", async (req, res) => {
+  try {
+    const storage = req.app.locals.storage as DatabaseStorage;
+    const { id } = req.params;
+    const { manufacturer, category, description } = req.body;
+    
+    await storage.updateCategory(parseInt(id), { manufacturer, category, description });
+    res.json({ message: "Category updated successfully" });
+  } catch (error) {
+    console.error("Error updating category:", error);
+    res.status(500).json({ error: "Failed to update category" });
+  }
+});
+
+// Update trim level
+router.put("/trimLevels/:id", async (req, res) => {
+  try {
+    const storage = req.app.locals.storage as DatabaseStorage;
+    const { id } = req.params;
+    const { manufacturer, category, trimLevel, description } = req.body;
+    
+    await storage.updateTrimLevel(parseInt(id), { manufacturer, category, trimLevel, description });
+    res.json({ message: "Trim level updated successfully" });
+  } catch (error) {
+    console.error("Error updating trim level:", error);
+    res.status(500).json({ error: "Failed to update trim level" });
+  }
+});
+
+// Update color
+router.put("/colors/:id", async (req, res) => {
+  try {
+    const storage = req.app.locals.storage as DatabaseStorage;
+    const { id } = req.params;
+    const { name, type, colorCode } = req.body;
+    
+    await storage.updateColor(parseInt(id), { name, type, colorCode });
+    res.json({ message: "Color updated successfully" });
+  } catch (error) {
+    console.error("Error updating color:", error);
+    res.status(500).json({ error: "Failed to update color" });
+  }
+});
+
+// Update location
+router.put("/locations/:id", async (req, res) => {
+  try {
+    const storage = req.app.locals.storage as DatabaseStorage;
+    const { id } = req.params;
+    const { name, description, address, manager, phone, capacity } = req.body;
+    
+    await storage.updateLocation(parseInt(id), { name, description, address, manager, phone, capacity });
+    res.json({ message: "Location updated successfully" });
+  } catch (error) {
+    console.error("Error updating location:", error);
+    res.status(500).json({ error: "Failed to update location" });
+  }
+});
+
 // Delete manufacturer
 router.delete("/manufacturers/:id", async (req, res) => {
   try {
@@ -147,6 +222,62 @@ router.delete("/manufacturers/:id", async (req, res) => {
   } catch (error) {
     console.error("Error deleting manufacturer:", error);
     res.status(500).json({ error: "Failed to delete manufacturer" });
+  }
+});
+
+// Delete category
+router.delete("/categories/:id", async (req, res) => {
+  try {
+    const storage = req.app.locals.storage as DatabaseStorage;
+    const { id } = req.params;
+    
+    await storage.deleteCategory(parseInt(id));
+    res.json({ message: "Category deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    res.status(500).json({ error: "Failed to delete category" });
+  }
+});
+
+// Delete trim level
+router.delete("/trimLevels/:id", async (req, res) => {
+  try {
+    const storage = req.app.locals.storage as DatabaseStorage;
+    const { id } = req.params;
+    
+    await storage.deleteTrimLevel(parseInt(id));
+    res.json({ message: "Trim level deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting trim level:", error);
+    res.status(500).json({ error: "Failed to delete trim level" });
+  }
+});
+
+// Delete color
+router.delete("/colors/:id", async (req, res) => {
+  try {
+    const storage = req.app.locals.storage as DatabaseStorage;
+    const { id } = req.params;
+    
+    await storage.deleteColor(parseInt(id));
+    res.json({ message: "Color deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting color:", error);
+    res.status(500).json({ error: "Failed to delete color" });
+  }
+});
+
+// Delete location
+router.delete("/locations/:id", async (req, res) => {
+  try {
+    const storage = req.app.locals.storage as DatabaseStorage;
+    const { id } = req.params;
+    
+    await storage.deleteLocation(parseInt(id));
+    res.json({ message: "Location deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting location:", error);
+    res.status(500).json({ error: "Failed to delete location" });
   }
 });
 

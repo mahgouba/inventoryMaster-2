@@ -78,6 +78,23 @@ export default function DropdownOptionsManagement() {
     engineCapacities: ["1.0L", "1.2L", "1.4L", "1.5L", "1.6L", "1.8L", "2.0L", "2.2L", "2.4L", "2.5L", "2.7L", "3.0L", "3.5L", "4.0L", "4.4L", "5.0L", "6.2L", "V6", "V8", "V12"]
   });
 
+  // Save static options to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('dropdownStaticOptions', JSON.stringify(staticOptions));
+  }, [staticOptions]);
+
+  // Load static options from localStorage on component mount
+  useEffect(() => {
+    const savedOptions = localStorage.getItem('dropdownStaticOptions');
+    if (savedOptions) {
+      try {
+        setStaticOptions(JSON.parse(savedOptions));
+      } catch (error) {
+        console.error('Error loading saved static options:', error);
+      }
+    }
+  }, []);
+
   // Fetch data based on selected option type
   const { data: options = [], isLoading } = useQuery({
     queryKey: [`/api/hierarchical/${selectedOptionType}`],
@@ -181,6 +198,16 @@ export default function DropdownOptionsManagement() {
 
   const handleAddStaticOption = (optionType: keyof typeof staticOptions) => {
     if (newStaticOption.trim()) {
+      // Check if option already exists
+      if (staticOptions[optionType].includes(newStaticOption.trim())) {
+        toast({
+          title: "تحذير",
+          description: "هذا الخيار موجود بالفعل",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       setStaticOptions(prev => ({
         ...prev,
         [optionType]: [...prev[optionType], newStaticOption.trim()]
