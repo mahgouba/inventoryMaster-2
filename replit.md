@@ -15,6 +15,9 @@ This is a full-stack inventory management system for managing inventory items wi
 - ✅ Clean migration completed with proper security practices (secrets management)
 - ✅ Database schema created with all necessary tables (29 tables total)
 - ✅ Project ready for continued development and deployment with persistent data storage
+- ✅ Added dropdown options management page for inventory form customization (August 2025)
+- ✅ Integrated dropdown options management into both horizontal and sidebar navigation menus
+- ✅ Created simple interface for managing static options (statuses, import types, engine capacities)
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

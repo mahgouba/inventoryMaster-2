@@ -27,7 +27,8 @@ import {
   Palette,
   Image,
   Landmark,
-  Database
+  Database,
+  List
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -120,6 +121,12 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
       href: "/theme-management", 
       icon: Palette,
       description: "Theme Management"
+    },
+    { 
+      title: "خيارات القوائم", 
+      href: "/dropdown-options", 
+      icon: List,
+      description: "Dropdown Options"
     },
     { 
       title: "إدارة شعارات الصناع", 
