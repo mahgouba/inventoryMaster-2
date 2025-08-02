@@ -578,7 +578,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
 
                   {/* Year */}
                   <div className="absolute top-60 left-1/2 transform -translate-x-1/2">
-                    <div className="text-white text-[20.4rem] font-black tracking-wider leading-none">
+                    <div className="text-white text-[20.4rem] font-black tracking-wider leading-none mt-[-41px] mb-[-41px]">
                       2025
                     </div>
                   </div>
