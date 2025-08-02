@@ -1260,4 +1260,21 @@ import { DatabaseStorage } from "./database-storage";
 import { db } from "./db";
 
 // Use DatabaseStorage if database is available, otherwise use MemStorage
-export const storage = process.env.DATABASE_URL && db ? new DatabaseStorage() : new MemStorage();
+let storageInstance: IStorage;
+
+try {
+  // Check if DATABASE_URL exists and is valid
+  const dbUrl = process.env.DATABASE_URL;
+  if (dbUrl && !dbUrl.includes('psql')) {
+    console.log('✅ Using DatabaseStorage with PostgreSQL');
+    storageInstance = new DatabaseStorage();
+  } else {
+    console.log('⚠️ Using MemStorage (database not available or invalid URL)');
+    storageInstance = new MemStorage();
+  }
+} catch (error) {
+  console.log('⚠️ Database connection failed, falling back to MemStorage:', error);
+  storageInstance = new MemStorage();
+}
+
+export const storage = storageInstance;
