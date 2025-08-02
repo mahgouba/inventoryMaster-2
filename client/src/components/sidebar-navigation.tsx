@@ -87,7 +87,7 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
     },
     { 
       title: "البطاقات", 
-      href: "/card-view-new", 
+      href: "/card-view", 
       icon: CreditCard,
       description: "Cards"
     },
@@ -297,11 +297,11 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
           </h3>
         )}
         <nav className="space-y-1">
-          <Link href="/card-view-new">
+          <Link href="/card-view">
             <div className={cn(
               "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 glass-button cursor-pointer",
               "hover:bg-golden/10 text-white/90 hover:text-white border-golden/20 hover:border-golden/40",
-              isActive("/card-view-new") && "glass-button-golden border border-golden/50 shadow-lg bg-golden/20"
+              isActive("/card-view") && "glass-button-golden border border-golden/50 shadow-lg bg-golden/20"
             )}>
               <Package className="h-5 w-5 flex-shrink-0 drop-shadow-sm text-golden" />
               {!isCollapsed && (

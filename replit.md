@@ -1,13 +1,22 @@
 # Inventory Management System
 
 ## Overview
-This is a full-stack inventory management system for managing inventory items with support for categories, versions, statuses, and image attachments. The system features an Arabic-first interface. It aims to provide a comprehensive solution for inventory control, offering capabilities for tracking, managing, and reporting on vehicle stock with a focus on ease of use and a modern aesthetic. The project has ambitions to become a robust tool for businesses requiring detailed inventory oversight and efficient sales processes.
+This is a full-stack inventory management system for managing inventory items with support for categories, versions, statuses, and image attachments. The system features an Arabic-first interface. Successfully migrated from Replit Agent to standard Replit environment with clean, organized codebase (30 pages, no duplicates). Features comprehensive vehicle inventory management, quotation system, bank management with database persistence, and multi-role user system.
+
+## Recent Changes (January 2025)
+- ✅ Successfully migrated project from Replit Agent to Replit environment
+- ✅ Cleaned up duplicate files and backup versions (removed .backup, .bak files)
+- ✅ Consolidated similar pages: user-management-simple → user-management, card-view-new → card-view
+- ✅ Fixed bank visibility toggle to use database persistence instead of localStorage
+- ✅ Updated all navigation references to use consolidated page names
+- ✅ Verified application runs correctly on port 5000 with Express + PostgreSQL
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 UI preferences: Add specifications management button next to "Add Item" button for easy access.
 Header navigation: Added "طلب إجازة وإستئذان" (Leave Request and Permission) button next to "وصل اليوم" (Arrived Today) button in the car cards page header for easy access to leave request functionality.
 User Experience: Disabled text selection on long press to prevent unwanted text highlighting when interacting with UI elements, while maintaining text selection for input fields and text areas.
+Project Organization: Clean and organized codebase with no duplicate or backup files - removed all .backup, .bak files and consolidated similar pages.
 
 ## System Architecture
 

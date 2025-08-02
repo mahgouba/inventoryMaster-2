@@ -11,9 +11,9 @@ import FinancingCalculatorPage from "@/pages/financing-calculator";
 import LeaveRequestsPage from "@/pages/leave-requests";
 
 import ManufacturerLogosPage from "@/pages/manufacturer-logos";
-import UserManagementPage from "@/pages/user-management-simple";
+import UserManagementPage from "@/pages/user-management";
 import BankManagement from "@/pages/bank-management";
-import BankManagementFull from "@/pages/bank-management-full";
+// Removed bank-management-full as it was consolidated into bank-management
 import ListManagement from "@/pages/list-management";
 import FinancingRatesPage from "@/pages/financing-rates";
 import ThemeManagementPage from "@/pages/theme-management";
@@ -68,7 +68,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
       case "/bank-management":
         return user.role === "admin" ? <BankManagement /> : null;
       case "/bank-management-full":
-        return user.role === "admin" ? <BankManagementFull /> : null;
+        return user.role === "admin" ? <BankManagement /> : null;
       case "/financing-rates":
         return user.role === "admin" ? <FinancingRatesPage /> : null;
       case "/theme-management":

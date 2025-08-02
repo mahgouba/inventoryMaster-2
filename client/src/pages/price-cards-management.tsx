@@ -220,7 +220,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                   </Button>
                 </Link>
                 
-                <Link href="/card-view-new">
+                <Link href="/card-view">
                   <Button variant="outline" size="sm" className="glass-button glass-text-primary">
                     <Car size={16} className="ml-1" />
                     عرض البطاقات

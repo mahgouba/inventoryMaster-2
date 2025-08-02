@@ -281,7 +281,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
     // External pages (will navigate away)
     { 
       title: "البطاقات", 
-      href: "/card-view-new", 
+      href: "/card-view", 
       icon: Package,
       internal: false,
       permission: "cardView"

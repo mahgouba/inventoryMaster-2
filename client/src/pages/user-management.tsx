@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "wouter";
+import { useState } from "react";
+import { Link } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -12,7 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { 
   Users, 
   Plus, 
@@ -20,69 +19,58 @@ import {
   Trash2, 
   Shield, 
   ShieldCheck, 
-  ArrowRight,
-  Home,
-  UserCircle,
-  LogOut,
-  MoreVertical,
+  ArrowLeft,
   Sun,
   Moon
 } from "lucide-react";
-import SystemGlassWrapper from "@/components/system-glass-wrapper";
-import GlassBackground from "@/components/glass-background";
-import type { User } from "@shared/schema";
 
-interface UserWithStats extends User {
-  createdAt: Date;
-  lastLogin?: string;
+interface User {
+  id: number;
+  name: string;
+  jobTitle: string;
+  phoneNumber: string;
+  username: string;
+  role: string;
+  createdAt?: string;
 }
 
 export default function UserManagement() {
-  const [, navigate] = useLocation();
   const { toast } = useToast();
   const { darkMode, toggleDarkMode } = useTheme();
   const [newUserOpen, setNewUserOpen] = useState(false);
   const [editUserOpen, setEditUserOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<UserWithStats | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Form states
   const [formData, setFormData] = useState({
+    name: "",
+    jobTitle: "",
+    phoneNumber: "",
     username: "",
     password: "",
-    role: "user"
+    role: "seller"
   });
 
-  // Check authentication and role
-  const userRole = localStorage.getItem("auth") === "admin" ? "admin" : "user";
-  
-  useEffect(() => {
-    if (userRole !== "admin") {
-      navigate("/");
-    }
-  }, [userRole, navigate]);
-
   // Fetch users
-  const { data: users = [], isLoading, refetch } = useQuery<UserWithStats[]>({
+  const { data: users = [], isLoading, refetch } = useQuery({
     queryKey: ["/api/users"],
     retry: false,
   });
 
   // Create user mutation
   const createUserMutation = useMutation({
-    mutationFn: async (userData: { username: string; password: string; role: string }) => {
-      return await apiRequest("POST", "/api/users", userData);
+    mutationFn: async (userData: { name: string; jobTitle: string; phoneNumber: string; username: string; password: string; role: string }) => {
+      const response = await apiRequest("POST", "/api/users", userData);
+      return await response.json();
     },
     onSuccess: () => {
       toast({
         title: "تم إنشاء المستخدم بنجاح",
         description: "تم إضافة المستخدم الجديد إلى النظام",
-        variant: "default",
       });
       setNewUserOpen(false);
-      setFormData({ username: "", password: "", role: "user" });
-      refetch();
+      setFormData({ name: "", jobTitle: "", phoneNumber: "", username: "", password: "", role: "seller" });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
     },
     onError: (error: any) => {
       toast({
@@ -95,18 +83,18 @@ export default function UserManagement() {
 
   // Update user mutation
   const updateUserMutation = useMutation({
-    mutationFn: async ({ id, userData }: { id: number; userData: Partial<User> }) => {
-      return await apiRequest("PUT", `/api/users/${id}`, userData);
+    mutationFn: async (userData: Partial<User>) => {
+      const response = await apiRequest("PUT", `/api/users/${userData.id}`, userData);
+      return await response.json();
     },
     onSuccess: () => {
       toast({
         title: "تم تحديث المستخدم بنجاح",
-        description: "تم تحديث بيانات المستخدم",
-        variant: "default",
+        description: "تم حفظ التغييرات",
       });
       setEditUserOpen(false);
       setSelectedUser(null);
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
     },
     onError: (error: any) => {
       toast({
@@ -119,16 +107,15 @@ export default function UserManagement() {
 
   // Delete user mutation
   const deleteUserMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return await apiRequest("DELETE", `/api/users/${id}`);
+    mutationFn: async (userId: number) => {
+      return await apiRequest("DELETE", `/api/users/${userId}`);
     },
     onSuccess: () => {
       toast({
         title: "تم حذف المستخدم بنجاح",
-        description: "تم حذف المستخدم من النظام",
-        variant: "default",
+        description: "تم إزالة المستخدم من النظام",
       });
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
     },
     onError: (error: any) => {
       toast({
@@ -139,20 +126,11 @@ export default function UserManagement() {
     },
   });
 
-  // Filter users based on search and role
-  const filteredUsers = users.filter((user: UserWithStats) => {
-    const matchesSearch = user.username.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = roleFilter === "all" || user.role === roleFilter;
-    return matchesSearch && matchesRole;
-  });
-
-  // Handle form submission
-  const handleCreateUser = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.username || !formData.password) {
+  const handleCreateUser = () => {
+    if (!formData.name || !formData.jobTitle || !formData.phoneNumber || !formData.username || !formData.password) {
       toast({
-        title: "بيانات غير مكتملة",
-        description: "يرجى إدخال اسم المستخدم وكلمة المرور",
+        title: "خطأ في البيانات",
+        description: "يرجى ملء جميع الحقول المطلوبة",
         variant: "destructive",
       });
       return;
@@ -160,9 +138,12 @@ export default function UserManagement() {
     createUserMutation.mutate(formData);
   };
 
-  const handleEditUser = (user: UserWithStats) => {
+  const handleEditUser = (user: User) => {
     setSelectedUser(user);
     setFormData({
+      name: user.name,
+      jobTitle: user.jobTitle,
+      phoneNumber: user.phoneNumber,
       username: user.username,
       password: "",
       role: user.role
@@ -170,340 +151,354 @@ export default function UserManagement() {
     setEditUserOpen(true);
   };
 
-  const handleUpdateUser = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedUser) return;
-    
-    const updateData: Partial<User> = {
+  const handleUpdateUser = () => {
+    if (!formData.name || !formData.jobTitle || !formData.phoneNumber || !formData.username || !selectedUser) {
+      toast({
+        title: "خطأ في البيانات",
+        description: "يرجى ملء جميع الحقول المطلوبة",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const updateData: any = {
+      id: selectedUser.id,
+      name: formData.name,
+      jobTitle: formData.jobTitle,
+      phoneNumber: formData.phoneNumber,
+      username: formData.username,
       role: formData.role
     };
-    
-    // Only update password if provided
+
     if (formData.password) {
       updateData.password = formData.password;
     }
 
-    updateUserMutation.mutate({
-      id: selectedUser.id,
-      userData: updateData
-    });
+    updateUserMutation.mutate(updateData);
   };
 
-  const handleDeleteUser = (user: UserWithStats) => {
-    if (window.confirm(`هل أنت متأكد من حذف المستخدم "${user.username}"؟`)) {
-      deleteUserMutation.mutate(user.id);
+  const handleDeleteUser = (userId: number) => {
+    if (confirm("هل أنت متأكد من حذف هذا المستخدم؟")) {
+      deleteUserMutation.mutate(userId);
     }
   };
 
-  if (userRole !== "admin") {
-    return null;
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case "admin":
+        return <Badge variant="destructive" className="bg-red-600 text-white"><Shield size={12} className="ml-1" />أدمن</Badge>;
+      case "seller":
+        return <Badge variant="secondary" className="bg-blue-600 text-white"><ShieldCheck size={12} className="ml-1" />مستخدم</Badge>;
+      default:
+        return <Badge variant="outline">{role}</Badge>;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600 dark:text-slate-400">جاري تحميل المستخدمين...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <SystemGlassWrapper>
+    <div className="min-h-screen bg-slate-50 dark:bg-black" dir="rtl">
       {/* Header */}
-      <GlassBackground variant="header" className="shadow-sm border-b border-white/20 dark:border-slate-700/30">
+      <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-slate-200 dark:border-gray-700 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4 space-x-reverse">
               <Link href="/">
-                <Button variant="ghost" size="sm" className="text-white/80 hover:text-white drop-shadow-sm">
-                  <Home size={18} className="ml-2" />
-                  الرئيسية
+                <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100">
+                  <ArrowLeft size={18} className="ml-2" />
+                  العودة للرئيسية
                 </Button>
               </Link>
-              <ArrowRight size={16} className="text-white/50" />
-              <h1 className="text-lg font-semibold text-white drop-shadow-sm">إدارة المستخدمين</h1>
+              <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">إدارة المستخدمين</h1>
             </div>
             
-            <div className="flex items-center space-x-4 space-x-reverse">
+            <div className="flex items-center space-x-2 space-x-reverse">
               {/* Dark Mode Toggle */}
-              <Button
-                variant="ghost"
-                size="sm"
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="p-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100" 
                 onClick={toggleDarkMode}
-                className="p-2 text-white/70 hover:text-white drop-shadow-sm"
               >
                 {darkMode ? <Sun size={18} /> : <Moon size={18} />}
               </Button>
-              
-              {/* User Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="p-2 text-white/70 hover:text-white drop-shadow-sm">
-                    <UserCircle size={18} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 glass-dropdown-content">
-                  <DropdownMenuItem className="text-sm text-white/70 cursor-default">
-                    <UserCircle className="mr-2 h-4 w-4" />
-                    المستخدم: أدمن
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    className="text-red-400 hover:bg-red-500/20 cursor-pointer"
-                    onClick={() => {
-                      localStorage.removeItem("auth");
-                      navigate("/login");
-                    }}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    تسجيل الخروج
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           </div>
         </div>
-      </GlassBackground>
+      </header>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pr-16" dir="rtl">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <GlassBackground variant="container" className="p-3">
-            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <h3 className="text-sm font-medium text-white/80 drop-shadow-sm">
-                إجمالي المستخدمين
-              </h3>
-              <Users className="h-4 w-4 text-blue-400 drop-shadow-sm" />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4 space-x-reverse">
+              <Users className="w-8 h-8 text-custom-primary" />
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">المستخدمين</h2>
+                <p className="text-slate-600 dark:text-slate-400">إدارة حسابات المستخدمين في النظام</p>
+              </div>
             </div>
-            <div className="text-2xl font-bold text-white drop-shadow-sm">{users.length}</div>
-          </GlassBackground>
-          
-          <GlassBackground variant="container" className="p-3">
-            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <h3 className="text-sm font-medium text-white/80 drop-shadow-sm">
-                المدراء
-              </h3>
-              <ShieldCheck className="h-4 w-4 text-purple-400 drop-shadow-sm" />
-            </div>
-            <div className="text-2xl font-bold text-white drop-shadow-sm">
-              {users.filter((user: UserWithStats) => user.role === "admin").length}
-            </div>
-          </GlassBackground>
-          
-          <GlassBackground variant="container" className="p-3">
-            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <h3 className="text-sm font-medium text-white/80 drop-shadow-sm">
-                المستخدمون العاديون
-              </h3>
-              <Shield className="h-4 w-4 text-blue-400 drop-shadow-sm" />
-            </div>
-            <div className="text-2xl font-bold text-white drop-shadow-sm">
-              {users.filter((user: UserWithStats) => user.role === "user").length}
-            </div>
-          </GlassBackground>
-        </div>
 
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <Input
-              placeholder="البحث عن مستخدم..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full sm:w-64 glass-search text-white placeholder:text-white/60"
-            />
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-full sm:w-48 glass-container text-white border-white/20">
-                <SelectValue placeholder="تصفية حسب الدور" className="text-white/80" />
-              </SelectTrigger>
-              <SelectContent className="glass-dropdown-content">
-                <SelectItem value="all" className="text-white hover:bg-white/10">جميع الأدوار</SelectItem>
-                <SelectItem value="admin" className="text-white hover:bg-white/10">مدير</SelectItem>
-                <SelectItem value="user" className="text-white hover:bg-white/10">مستخدم</SelectItem>
-              </SelectContent>
-            </Select>
+            <Dialog open={newUserOpen} onOpenChange={setNewUserOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-custom-primary hover:bg-custom-primary-dark text-white">
+                  <Plus size={16} className="ml-2" />
+                  إضافة مستخدم جديد
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md" dir="rtl">
+                <DialogHeader>
+                  <DialogTitle>إضافة مستخدم جديد</DialogTitle>
+                </DialogHeader>
+                <div className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                  أدخل بيانات المستخدم الجديد
+                </div>
+                <div className="space-y-4 mt-4">
+                  <div>
+                    <Label htmlFor="name">الاسم</Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="أدخل الاسم الكامل"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="jobTitle">الوظيفة</Label>
+                    <Input
+                      id="jobTitle"
+                      value={formData.jobTitle}
+                      onChange={(e) => setFormData(prev => ({ ...prev, jobTitle: e.target.value }))}
+                      placeholder="أدخل المسمى الوظيفي"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phoneNumber">رقم الجوال</Label>
+                    <Input
+                      id="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                      placeholder="أدخل رقم الجوال"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="username">اسم المستخدم</Label>
+                    <Input
+                      id="username"
+                      value={formData.username}
+                      onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                      placeholder="أدخل اسم المستخدم"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="password">كلمة المرور</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                      placeholder="أدخل كلمة المرور"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="role">الصلاحيات</Label>
+                    <Select
+                      value={formData.role}
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر نوع الصلاحيات" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="seller">مستخدم عادي</SelectItem>
+                        <SelectItem value="admin">أدمن</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex space-x-2 space-x-reverse pt-4">
+                    <Button
+                      onClick={handleCreateUser}
+                      disabled={createUserMutation.isPending}
+                      className="bg-custom-gold hover:bg-custom-gold-dark text-white flex-1"
+                    >
+                      {createUserMutation.isPending ? "جاري الإنشاء..." : "إنشاء المستخدم"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setNewUserOpen(false)}
+                      className="flex-1"
+                    >
+                      إلغاء
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
-          
-          <Dialog open={newUserOpen} onOpenChange={setNewUserOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-500/80 hover:bg-blue-600/80 text-white backdrop-blur-sm border border-blue-400/30">
-                <Plus className="w-4 h-4 ml-2" />
-                إضافة مستخدم جديد
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md glass-container border-white/20">
-              <DialogHeader>
-                <DialogTitle className="text-white drop-shadow-sm">إضافة مستخدم جديد</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleCreateUser} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="username" className="text-white/90 drop-shadow-sm">اسم المستخدم</Label>
-                  <Input
-                    id="username"
-                    type="text"
-                    value={formData.username}
-                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    placeholder="أدخل اسم المستخدم"
-                    className="glass-search text-white placeholder:text-white/50"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-white/90 drop-shadow-sm">كلمة المرور</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder="أدخل كلمة المرور"
-                    className="glass-search text-white placeholder:text-white/50"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role" className="text-white/90 drop-shadow-sm">الدور</Label>
-                  <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                    <SelectTrigger className="glass-container text-white border-white/20">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="glass-dropdown-content">
-                      <SelectItem value="user" className="text-white hover:bg-white/10">مستخدم عادي</SelectItem>
-                      <SelectItem value="admin" className="text-white hover:bg-white/10">مدير</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex justify-end space-x-2 space-x-reverse">
-                  <Button type="button" variant="outline" onClick={() => setNewUserOpen(false)} 
-                          className="border-white/30 text-white/80 hover:bg-white/10 backdrop-blur-sm">
-                    إلغاء
-                  </Button>
-                  <Button type="submit" disabled={createUserMutation.isPending}
-                          className="bg-blue-500/80 hover:bg-blue-600/80 text-white backdrop-blur-sm border border-blue-400/30">
-                    {createUserMutation.isPending ? "جاري الإنشاء..." : "إنشاء المستخدم"}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
         </div>
 
         {/* Users Table */}
-        <GlassBackground variant="container" className="p-3">
-          <div className="mb-4">
-            <h2 className="text-white drop-shadow-sm font-semibold">قائمة المستخدمين</h2>
-          </div>
-          <div>
-            {isLoading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto"></div>
-                <p className="text-white/70 drop-shadow-sm mt-2">جاري التحميل...</p>
-              </div>
-            ) : (
-              <div className="glass-table">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-white/10">
-                      <TableHead className="text-right text-white/90 drop-shadow-sm">اسم المستخدم</TableHead>
-                      <TableHead className="text-right text-white/90 drop-shadow-sm">الدور</TableHead>
-                      <TableHead className="text-right text-white/90 drop-shadow-sm">تاريخ الإنشاء</TableHead>
-                      <TableHead className="text-right text-white/90 drop-shadow-sm">الإجراءات</TableHead>
+        <Card>
+          <CardHeader>
+            <CardTitle>قائمة المستخدمين ({(users as User[]).length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>الاسم</TableHead>
+                    <TableHead>الوظيفة</TableHead>
+                    <TableHead>رقم الجوال</TableHead>
+                    <TableHead>اسم المستخدم</TableHead>
+                    <TableHead>الصلاحيات</TableHead>
+                    <TableHead>تاريخ الإنشاء</TableHead>
+                    <TableHead>الإجراءات</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(users as User[]).map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium">{user.name || 'غير محدد'}</TableCell>
+                      <TableCell>{user.jobTitle || 'غير محدد'}</TableCell>
+                      <TableCell>{user.phoneNumber || 'غير محدد'}</TableCell>
+                      <TableCell>{user.username}</TableCell>
+                      <TableCell>{getRoleBadge(user.role)}</TableCell>
+                      <TableCell>
+                        {user.createdAt 
+                          ? new Date(user.createdAt).toLocaleDateString('en-GB')
+                          : 'غير محدد'
+                        }
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2 space-x-reverse">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditUser(user)}
+                            className="text-blue-600 hover:text-blue-700"
+                          >
+                            <Edit size={14} className="ml-1" />
+                            تعديل
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 size={14} className="ml-1" />
+                            حذف
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredUsers.map((user: UserWithStats) => (
-                      <TableRow key={user.id} className="border-white/10 hover:bg-white/5">
-                        <TableCell className="font-medium text-white drop-shadow-sm">
-                          {user.username}
-                        </TableCell>
-                        <TableCell>
-                          <span className={`glass-badge inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            user.role === "admin" 
-                              ? "bg-purple-500/20 text-purple-300 border-purple-400/30" 
-                              : "bg-blue-500/20 text-blue-300 border-blue-400/30"
-                          }`}>
-                            {user.role === "admin" ? "مدير" : "مستخدم"}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-white/70 drop-shadow-sm">
-                          {user.createdAt ? new Date(user.createdAt).toLocaleDateString("ar-SA") : "غير محدد"}
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-white/10">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="glass-dropdown-content">
-                              <DropdownMenuItem onClick={() => handleEditUser(user)} className="text-white hover:bg-white/10">
-                                <Edit className="h-4 w-4 mr-2" />
-                                تعديل
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleDeleteUser(user)}
-                                className="text-red-400 hover:bg-red-500/20"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                حذف
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </div>
-        </GlassBackground>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Edit User Dialog */}
         <Dialog open={editUserOpen} onOpenChange={setEditUserOpen}>
-          <DialogContent className="sm:max-w-md glass-container border-white/20">
+          <DialogContent className="sm:max-w-md" dir="rtl">
             <DialogHeader>
-              <DialogTitle className="text-white drop-shadow-sm">تعديل المستخدم</DialogTitle>
+              <DialogTitle>تعديل المستخدم</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleUpdateUser} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-username" className="text-white/90 drop-shadow-sm">اسم المستخدم</Label>
+            <div className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+              تحديث بيانات المستخدم المحدد
+            </div>
+            <div className="space-y-4 mt-4">
+              <div>
+                <Label htmlFor="edit-name">الاسم</Label>
                 <Input
-                  id="edit-username"
-                  type="text"
-                  value={formData.username}
-                  disabled
-                  className="glass-search text-white/50 cursor-not-allowed"
+                  id="edit-name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="أدخل الاسم الكامل"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-password" className="text-white/90 drop-shadow-sm">كلمة المرور الجديدة (اختياري)</Label>
+              <div>
+                <Label htmlFor="edit-jobTitle">الوظيفة</Label>
+                <Input
+                  id="edit-jobTitle"
+                  value={formData.jobTitle}
+                  onChange={(e) => setFormData(prev => ({ ...prev, jobTitle: e.target.value }))}
+                  placeholder="أدخل المسمى الوظيفي"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-phoneNumber">رقم الجوال</Label>
+                <Input
+                  id="edit-phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                  placeholder="أدخل رقم الجوال"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-username">اسم المستخدم</Label>
+                <Input
+                  id="edit-username"
+                  value={formData.username}
+                  onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                  placeholder="أدخل اسم المستخدم"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-password">كلمة المرور الجديدة (اختياري)</Label>
                 <Input
                   id="edit-password"
                   type="password"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="اتركه فارغاً للاحتفاظ بكلمة المرور الحالية"
-                  className="glass-search text-white placeholder:text-white/50"
+                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder="اتركه فارغ للاحتفاظ بكلمة المرور الحالية"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-role" className="text-white/90 drop-shadow-sm">الدور</Label>
-                <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                  <SelectTrigger className="glass-container text-white border-white/20">
-                    <SelectValue />
+              <div>
+                <Label htmlFor="edit-role">الصلاحيات</Label>
+                <Select
+                  value={formData.role}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر نوع الصلاحيات" />
                   </SelectTrigger>
-                  <SelectContent className="glass-dropdown-content">
-                    <SelectItem value="user" className="text-white hover:bg-white/10">مستخدم عادي</SelectItem>
-                    <SelectItem value="admin" className="text-white hover:bg-white/10">مدير</SelectItem>
+                  <SelectContent>
+                    <SelectItem value="seller">مستخدم عادي</SelectItem>
+                    <SelectItem value="admin">أدمن</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex justify-end space-x-2 space-x-reverse">
-                <Button type="button" variant="outline" onClick={() => setEditUserOpen(false)}
-                        className="border-white/30 text-white/80 hover:bg-white/10 backdrop-blur-sm">
+              <div className="flex space-x-2 space-x-reverse pt-4">
+                <Button
+                  onClick={handleUpdateUser}
+                  disabled={updateUserMutation.isPending}
+                  className="bg-custom-primary hover:bg-custom-primary-dark text-white flex-1"
+                >
+                  {updateUserMutation.isPending ? "جاري التحديث..." : "حفظ التغييرات"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setEditUserOpen(false)}
+                  className="flex-1"
+                >
                   إلغاء
                 </Button>
-                <Button type="submit" disabled={updateUserMutation.isPending}
-                        className="bg-blue-500/80 hover:bg-blue-600/80 text-white backdrop-blur-sm border border-blue-400/30">
-                  {updateUserMutation.isPending ? "جاري التحديث..." : "تحديث المستخدم"}
-                </Button>
               </div>
-            </form>
+            </div>
           </DialogContent>
         </Dialog>
-      </div>
-    </SystemGlassWrapper>
+      </main>
+    </div>
   );
 }
