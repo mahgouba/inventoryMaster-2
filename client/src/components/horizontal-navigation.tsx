@@ -347,6 +347,13 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       permission: "admin"
     },
     { 
+      title: "خيارات القوائم", 
+      href: "/dropdown-options", 
+      icon: Settings,
+      internal: true,
+      permission: "admin"
+    },
+    { 
       title: "إدارة الثيمات", 
       href: "/theme-management", 
       icon: Palette,

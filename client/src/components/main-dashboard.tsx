@@ -19,6 +19,7 @@ import FinancingRatesPage from "@/pages/financing-rates";
 import ThemeManagementPage from "@/pages/theme-management";
 import DatabaseManagement from "@/pages/database-management";
 import CarsMigrationPage from "@/pages/cars-migration";
+import DropdownOptionsManagementSimple from "@/pages/DropdownOptionsManagementSimple";
 
 import PriceCardsManagementPage from "@/pages/price-cards-management";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
@@ -74,6 +75,8 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return user.role === "admin" ? <DatabaseManagement /> : null;
       case "/cars-migration":
         return user.role === "admin" ? <CarsMigrationPage /> : null;
+      case "/dropdown-options":
+        return user.role === "admin" ? <DropdownOptionsManagementSimple /> : null;
 
       case "/price-cards":
         return <PriceCardsManagementPage userRole={user.role} username={user.username} onLogout={onLogout} />;
