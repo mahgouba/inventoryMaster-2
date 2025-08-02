@@ -8,7 +8,7 @@ import {
   type VehicleCategory, type InsertVehicleCategory,
   type VehicleTrimLevel, type InsertVehicleTrimLevel
 } from "@shared/schema";
-import { eq, sql, and, or, ilike, desc } from "drizzle-orm";
+import { eq, sql, and, or, ilike, desc, asc } from "drizzle-orm";
 import type { IStorage } from "./storage";
 
 export class DatabaseStorage implements IStorage {
@@ -368,9 +368,25 @@ export class DatabaseStorage implements IStorage {
 
   // Categories
   async getCategories(manufacturer?: string): Promise<any[]> {
-    return await db.select().from(vehicleCategories)
-      .where(manufacturer ? eq(vehicleCategories.manufacturer, manufacturer) : undefined)
-      .orderBy(vehicleCategories.category);
+    try {
+      // Use raw SQL to avoid Drizzle issues
+      if (manufacturer) {
+        const result = await db.execute(sql`
+          SELECT vc.* 
+          FROM vehicle_categories vc 
+          JOIN manufacturers m ON vc.manufacturer_id = m.id 
+          WHERE m.name_ar = ${manufacturer}
+          ORDER BY vc.name_ar
+        `);
+        return result.rows;
+      } else {
+        const result = await db.execute(sql`SELECT * FROM vehicle_categories ORDER BY name_ar`);
+        return result.rows;
+      }
+    } catch (error) {
+      console.error('Error in getCategories:', error);
+      return [];
+    }
   }
 
   async addCategory(category: any): Promise<any> {
@@ -393,17 +409,25 @@ export class DatabaseStorage implements IStorage {
 
   // Trim Levels
   async getTrimLevels(manufacturer?: string, category?: string): Promise<any[]> {
-    let query = db.select().from(vehicleTrimLevels);
-    const conditions = [];
-    
-    if (manufacturer) conditions.push(eq(vehicleTrimLevels.manufacturer, manufacturer));
-    if (category) conditions.push(eq(vehicleTrimLevels.category, category));
-    
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+    try {
+      // Use raw SQL to avoid Drizzle issues
+      if (category) {
+        const result = await db.execute(sql`
+          SELECT vt.* 
+          FROM vehicle_trim_levels vt 
+          JOIN vehicle_categories vc ON vt.category_id = vc.id 
+          WHERE vc.name_ar = ${category}
+          ORDER BY vt.name_ar
+        `);
+        return result.rows;
+      } else {
+        const result = await db.execute(sql`SELECT * FROM vehicle_trim_levels ORDER BY name_ar`);
+        return result.rows;
+      }
+    } catch (error) {
+      console.error('Error in getTrimLevels:', error);
+      return [];
     }
-    
-    return await query.orderBy(vehicleTrimLevels.trimLevel);
   }
 
   async addTrimLevel(trimLevel: any): Promise<any> {

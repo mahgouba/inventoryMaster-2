@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import dropdownOptionsRoutes from "./routes/dropdown-options.js";
 import { 
   insertInventoryItemSchema, 
   insertManufacturerSchema,
@@ -3008,13 +3009,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get manufacturers for inventory form with hierarchical relationships
   app.get("/api/hierarchical/manufacturers", async (req, res) => {
     try {
-      const carsData = readCarsData();
-      const manufacturers = carsData.map(car => ({
-        id: car.brand_ar, // Use Arabic name as ID for compatibility
-        nameAr: car.brand_ar,
-        nameEn: car.brand_en,
-        categoriesCount: car.models.length
-      }));
+      const manufacturers = await storage.getManufacturers();
       res.json(manufacturers);
     } catch (error) {
       console.error("Error fetching manufacturers:", error);
@@ -3023,23 +3018,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get categories by manufacturer with hierarchical relationships
-  app.get("/api/hierarchical/categories/:manufacturer", async (req, res) => {
+  app.get("/api/hierarchical/categories", async (req, res) => {
     try {
-      const { manufacturer } = req.params;
-      const carsData = readCarsData();
-      const brand = carsData.find(car => car.brand_ar === manufacturer || car.brand_en === manufacturer);
-      
-      if (!brand) {
-        return res.status(404).json({ message: "Manufacturer not found" });
-      }
-
-      const categories = brand.models.map(model => ({
-        id: model.model_ar, // Use Arabic name as ID
-        nameAr: model.model_ar,
-        nameEn: model.model_en,
-        manufacturerId: manufacturer,
-        trimLevelsCount: model.trims.length
-      }));
+      const { manufacturer } = req.query;
+      const categories = await storage.getCategories(manufacturer as string);
       res.json(categories);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -3048,28 +3030,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get trim levels by manufacturer and category with hierarchical relationships
-  app.get("/api/hierarchical/trim-levels/:manufacturer/:category", async (req, res) => {
+  app.get("/api/hierarchical/trimLevels", async (req, res) => {
     try {
-      const { manufacturer, category } = req.params;
-      const carsData = readCarsData();
-      const brand = carsData.find(car => car.brand_ar === manufacturer || car.brand_en === manufacturer);
-      
-      if (!brand) {
-        return res.status(404).json({ message: "Manufacturer not found" });
-      }
-
-      const model = brand.models.find(m => m.model_ar === category || m.model_en === category);
-      if (!model) {
-        return res.status(404).json({ message: "Category not found" });
-      }
-
-      const trimLevels = model.trims.map(trim => ({
-        id: trim.trim_ar, // Use Arabic name as ID
-        nameAr: trim.trim_ar,
-        nameEn: trim.trim_en,
-        categoryId: category,
-        manufacturerId: manufacturer
-      }));
+      const { manufacturer, category } = req.query;
+      const trimLevels = await storage.getTrimLevels(manufacturer as string, category as string);
       res.json(trimLevels);
     } catch (error) {
       console.error("Error fetching trim levels:", error);
@@ -3077,42 +3041,178 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get colors for a specific trim level (exterior and interior)
-  app.get("/api/hierarchical/colors/:manufacturer/:category/:trimLevel", async (req, res) => {
+  // Get colors
+  app.get("/api/hierarchical/colors", async (req, res) => {
     try {
-      const { manufacturer, category, trimLevel } = req.params;
-      const colorType = req.query.type as string; // "exterior" or "interior"
-      
-      // Return predefined colors that can be associated with any trim level
-      const defaultColors = {
-        exterior: [
-          { id: "أسود", name: "أسود", code: "#000000" },
-          { id: "أبيض", name: "أبيض", code: "#ffffff" },
-          { id: "رمادي", name: "رمادي", code: "#808080" },
-          { id: "أزرق", name: "أزرق", code: "#0066cc" },
-          { id: "أحمر", name: "أحمر", code: "#cc0000" },
-          { id: "فضي", name: "فضي", code: "#C0C0C0" },
-          { id: "ذهبي", name: "ذهبي", code: "#FFD700" },
-          { id: "بيج", name: "بيج", code: "#F5F5DC" },
-          { id: "بني", name: "بني", code: "#8B4513" }
-        ],
-        interior: [
-          { id: "أسود", name: "أسود", code: "#000000" },
-          { id: "بيج", name: "بيج", code: "#F5F5DC" },
-          { id: "بني", name: "بني", code: "#8B4513" },
-          { id: "رمادي", name: "رمادي", code: "#808080" },
-          { id: "أبيض", name: "أبيض", code: "#ffffff" },
-          { id: "كريمي", name: "كريمي", code: "#FFFDD0" },
-          { id: "أحمر", name: "أحمر", code: "#cc0000" },
-          { id: "أزرق", name: "أزرق", code: "#0066cc" }
-        ]
-      };
-      
-      const colors = colorType === "interior" ? defaultColors.interior : defaultColors.exterior;
+      const colors = await storage.getColors();
       res.json(colors);
     } catch (error) {
       console.error("Error fetching colors:", error);
       res.status(500).json({ message: "Failed to fetch colors" });
+    }
+  });
+
+  // Get locations
+  app.get("/api/hierarchical/locations", async (req, res) => {
+    try {
+      const locations = await storage.getLocations();
+      res.json(locations);
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+      res.status(500).json({ message: "Failed to fetch locations" });
+    }
+  });
+
+  // POST routes for adding new items
+  app.post("/api/hierarchical/manufacturers", async (req, res) => {
+    try {
+      const manufacturer = await storage.addManufacturer(req.body);
+      res.json(manufacturer);
+    } catch (error) {
+      console.error("Error adding manufacturer:", error);
+      res.status(500).json({ message: "Failed to add manufacturer" });
+    }
+  });
+
+  app.post("/api/hierarchical/categories", async (req, res) => {
+    try {
+      const category = await storage.addCategory(req.body);
+      res.json(category);
+    } catch (error) {
+      console.error("Error adding category:", error);
+      res.status(500).json({ message: "Failed to add category" });
+    }
+  });
+
+  app.post("/api/hierarchical/trimLevels", async (req, res) => {
+    try {
+      const trimLevel = await storage.addTrimLevel(req.body);
+      res.json(trimLevel);
+    } catch (error) {
+      console.error("Error adding trim level:", error);
+      res.status(500).json({ message: "Failed to add trim level" });
+    }
+  });
+
+  app.post("/api/hierarchical/colors", async (req, res) => {
+    try {
+      const color = await storage.addColor(req.body);
+      res.json(color);
+    } catch (error) {
+      console.error("Error adding color:", error);
+      res.status(500).json({ message: "Failed to add color" });
+    }
+  });
+
+  app.post("/api/hierarchical/locations", async (req, res) => {
+    try {
+      const location = await storage.addLocation(req.body);
+      res.json(location);
+    } catch (error) {
+      console.error("Error adding location:", error);
+      res.status(500).json({ message: "Failed to add location" });
+    }
+  });
+
+  // PUT routes for updating items
+  app.put("/api/hierarchical/manufacturers/:id", async (req, res) => {
+    try {
+      const manufacturer = await storage.updateManufacturer(req.params.id, req.body);
+      res.json(manufacturer);
+    } catch (error) {
+      console.error("Error updating manufacturer:", error);
+      res.status(500).json({ message: "Failed to update manufacturer" });
+    }
+  });
+
+  app.put("/api/hierarchical/categories/:id", async (req, res) => {
+    try {
+      const category = await storage.updateCategory(parseInt(req.params.id), req.body);
+      res.json(category);
+    } catch (error) {
+      console.error("Error updating category:", error);
+      res.status(500).json({ message: "Failed to update category" });
+    }
+  });
+
+  app.put("/api/hierarchical/trimLevels/:id", async (req, res) => {
+    try {
+      const trimLevel = await storage.updateTrimLevel(parseInt(req.params.id), req.body);
+      res.json(trimLevel);
+    } catch (error) {
+      console.error("Error updating trim level:", error);
+      res.status(500).json({ message: "Failed to update trim level" });
+    }
+  });
+
+  app.put("/api/hierarchical/colors/:id", async (req, res) => {
+    try {
+      const color = await storage.updateColor(parseInt(req.params.id), req.body);
+      res.json(color);
+    } catch (error) {
+      console.error("Error updating color:", error);
+      res.status(500).json({ message: "Failed to update color" });
+    }
+  });
+
+  app.put("/api/hierarchical/locations/:id", async (req, res) => {
+    try {
+      const location = await storage.updateLocation(parseInt(req.params.id), req.body);
+      res.json(location);
+    } catch (error) {
+      console.error("Error updating location:", error);
+      res.status(500).json({ message: "Failed to update location" });
+    }
+  });
+
+  // DELETE routes for removing items
+  app.delete("/api/hierarchical/manufacturers/:id", async (req, res) => {
+    try {
+      const result = await storage.deleteManufacturer(req.params.id);
+      res.json({ success: result });
+    } catch (error) {
+      console.error("Error deleting manufacturer:", error);
+      res.status(500).json({ message: "Failed to delete manufacturer" });
+    }
+  });
+
+  app.delete("/api/hierarchical/categories/:id", async (req, res) => {
+    try {
+      const result = await storage.deleteCategory(parseInt(req.params.id));
+      res.json({ success: result });
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      res.status(500).json({ message: "Failed to delete category" });
+    }
+  });
+
+  app.delete("/api/hierarchical/trimLevels/:id", async (req, res) => {
+    try {
+      const result = await storage.deleteTrimLevel(parseInt(req.params.id));
+      res.json({ success: result });
+    } catch (error) {
+      console.error("Error deleting trim level:", error);
+      res.status(500).json({ message: "Failed to delete trim level" });
+    }
+  });
+
+  app.delete("/api/hierarchical/colors/:id", async (req, res) => {
+    try {
+      const result = await storage.deleteColor(parseInt(req.params.id));
+      res.json({ success: result });
+    } catch (error) {
+      console.error("Error deleting color:", error);
+      res.status(500).json({ message: "Failed to delete color" });
+    }
+  });
+
+  app.delete("/api/hierarchical/locations/:id", async (req, res) => {
+    try {
+      const result = await storage.deleteLocation(parseInt(req.params.id));
+      res.json({ success: result });
+    } catch (error) {
+      console.error("Error deleting location:", error);
+      res.status(500).json({ message: "Failed to delete location" });
     }
   });
 
