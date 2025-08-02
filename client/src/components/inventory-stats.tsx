@@ -165,8 +165,8 @@ export default function InventoryStats() {
       </div>
 
       {/* Manufacturer Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {(Array.isArray(manufacturerStats) ? manufacturerStats : []).slice(0, 6).map((manufacturer: any, index: number) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+        {(Array.isArray(manufacturerStats) ? manufacturerStats : []).map((manufacturer: any, index: number) => {
           const logoPath = getManufacturerLogo(manufacturer.manufacturer);
           return (
             <Card key={index} className="glass-container">
