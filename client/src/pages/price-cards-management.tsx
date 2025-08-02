@@ -639,14 +639,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                     </div>
                   </div>
 
-                  {/* Right Side Element */}
-                  <div className="absolute top-6 right-8">
-                    <img 
-                      src="/right-side-element.svg" 
-                      alt="عنصر الجانب الأيمن" 
-                      className="w-24 h-24 object-contain filter brightness-110"
-                    />
-                  </div>
+
 
                   {/* Import Type Circle - Red for Used */}
                   <div className="absolute top-8 right-8 w-8 h-8 bg-red-500 rounded-full"></div>
