@@ -5,10 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Edit2, Plus, Check, X, Settings, Car, Database, Download } from "lucide-react";
+import { Trash2, Edit2, Plus, Check, X, Settings, Car } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import ColorAssociationManager from "@/components/color-association-manager";
 import CarsJsonManager from "@/components/cars-json-manager";
 import {
@@ -37,28 +35,6 @@ export default function ListManagement() {
   const [editingItem, setEditingItem] = useState<{type: string, index: number, value: string} | null>(null);
   const [newItem, setNewItem] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState<{type: string, index: number, value: string} | null>(null);
-  const [importResult, setImportResult] = useState<any>(null);
-
-  // Data import mutation
-  const importDataBaseMutation = useMutation({
-    mutationFn: () => apiRequest("POST", "/api/database/import-data-base"),
-    onSuccess: (data: any) => {
-      setImportResult(data);
-      toast({
-        title: "تم الاستيراد بنجاح",
-        description: `تم استيراد ${data.totalImported} عنصر من data.base.json`,
-        duration: 5000,
-      });
-    },
-    onError: (error: any) => {
-      toast({ 
-        title: "خطأ في الاستيراد", 
-        description: error.message || "فشل في استيراد البيانات",
-        variant: "destructive",
-        duration: 5000,
-      });
-    },
-  });
 
   // Sample data - in real app this would come from API
   const [listsData, setListsData] = useState<ListsData>({
@@ -72,7 +48,6 @@ export default function ListManagement() {
   });
 
   const listTypes = [
-    { key: "dataBaseImport", label: "استيراد البيانات الأساسية", color: "bg-emerald-500" },
     { key: "carsJson", label: "بيانات المركبات (cars.json)", color: "bg-blue-500" },
     { key: "engineCapacities", label: "سعات المحرك", color: "bg-green-500" },
     { key: "statuses", label: "حالات المركبة", color: "bg-orange-500" },
@@ -172,8 +147,8 @@ export default function ListManagement() {
           </CardHeader>
           
           <CardContent>
-            <Tabs defaultValue="dataBaseImport" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9 glass-container border-white/20 mb-6">
+            <Tabs defaultValue="carsJson" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 lg:grid-cols-8 glass-container border-white/20 mb-6">
                 {listTypes.map((listType) => (
                   <TabsTrigger
                     key={listType.key}
@@ -189,89 +164,7 @@ export default function ListManagement() {
 
               {listTypes.map((listType) => (
                 <TabsContent key={listType.key} value={listType.key} className="space-y-4">
-                  {listType.key === "dataBaseImport" ? (
-                    <div className="space-y-6">
-                      {/* Data Import Section */}
-                      <Card className="glass-container border-white/20">
-                        <CardHeader>
-                          <CardTitle className="text-white flex items-center gap-2">
-                            <Database className="w-5 h-5" />
-                            استيراد البيانات من data.base.json
-                          </CardTitle>
-                          <p className="text-white/70 text-sm">
-                            يتم استيراد الصناع والفئات ودرجات التجهيز والبنوك والمستخدمين والمخزون من ملف data.base.json
-                          </p>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <Button
-                            onClick={() => importDataBaseMutation.mutate()}
-                            disabled={importDataBaseMutation.isPending}
-                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
-                          >
-                            {importDataBaseMutation.isPending ? (
-                              <>
-                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent ml-2" />
-                                جاري الاستيراد...
-                              </>
-                            ) : (
-                              <>
-                                <Download className="w-4 h-4 ml-2" />
-                                استيراد البيانات من data.base.json
-                              </>
-                            )}
-                          </Button>
-
-                          {/* Import Results */}
-                          {importResult && (
-                            <Card className="glass-container border-green-500/30 bg-green-500/10">
-                              <CardHeader>
-                                <CardTitle className="text-green-400 text-lg">نتائج الاستيراد</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-white">{importResult.results.inventory}</div>
-                                    <div className="text-white/70 text-sm">عناصر المخزون</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-white">{importResult.results.manufacturers}</div>
-                                    <div className="text-white/70 text-sm">الصناع</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-white">{importResult.results.categories}</div>
-                                    <div className="text-white/70 text-sm">الفئات</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-white">{importResult.results.trimLevels}</div>
-                                    <div className="text-white/70 text-sm">درجات التجهيز</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-white">{importResult.results.banks}</div>
-                                    <div className="text-white/70 text-sm">البنوك</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-white">{importResult.results.users}</div>
-                                    <div className="text-white/70 text-sm">المستخدمين</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-white">{importResult.results.skipped}</div>
-                                    <div className="text-white/70 text-sm">تم تخطيها</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-green-400">{importResult.totalImported}</div>
-                                    <div className="text-white/70 text-sm">إجمالي المستورد</div>
-                                  </div>
-                                </div>
-                                <div className="mt-4 p-3 bg-white/5 rounded-lg">
-                                  <p className="text-white/80 text-sm">{importResult.message}</p>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </div>
-                  ) : listType.key === "colorAssociations" ? (
+                  {listType.key === "colorAssociations" ? (
                     <ColorAssociationManager 
                       manufacturers={listsData.manufacturers}
                       categories={["C-Class", "E-Class", "S-Class", "X3", "X5", "X7", "A4", "A6", "Q5"]}
