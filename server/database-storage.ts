@@ -12,6 +12,11 @@ import { eq, sql, and, or, ilike, desc } from "drizzle-orm";
 import type { IStorage } from "./storage";
 
 export class DatabaseStorage implements IStorage {
+  constructor() {
+    if (!db) {
+      throw new Error('Database connection not available');
+    }
+  }
   // Users
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));

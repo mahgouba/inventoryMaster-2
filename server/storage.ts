@@ -1257,19 +1257,18 @@ export class MemStorage implements IStorage {
 
 // Initialize storage based on database availability
 import { DatabaseStorage } from "./database-storage";
-import { db } from "./db";
 
 // Use DatabaseStorage if database is available, otherwise use MemStorage
 let storageInstance: IStorage;
 
 try {
-  // Check if DATABASE_URL exists and is valid
+  // Check if DATABASE_URL exists
   const dbUrl = process.env.DATABASE_URL;
-  if (dbUrl && !dbUrl.includes('psql')) {
+  if (dbUrl) {
     console.log('✅ Using DatabaseStorage with PostgreSQL');
     storageInstance = new DatabaseStorage();
   } else {
-    console.log('⚠️ Using MemStorage (database not available or invalid URL)');
+    console.log('⚠️ Using MemStorage (DATABASE_URL not found)');
     storageInstance = new MemStorage();
   }
 } catch (error) {
