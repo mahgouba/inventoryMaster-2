@@ -20,6 +20,7 @@ export default function BankManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBank, setEditingBank] = useState<Bank | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  // Remove localStorage-based hidden banks state since we'll use database isActive field
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -142,6 +143,65 @@ export default function BankManagement() {
     }
   });
 
+  const resetForm = () => {
+    setFormData({
+      logo: "",
+      bankName: "",
+      nameEn: "",
+      accountName: "",
+      accountNumber: "",
+      iban: "",
+      type: "شركة",
+      isActive: true
+    });
+    setLogoPreview(null);
+    setEditingBank(null);
+  };
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setFormData(prev => ({ ...prev, logo: result }));
+        setLogoPreview(result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEdit = (bank: Bank) => {
+    setEditingBank(bank);
+    setFormData({
+      logo: bank.logo || "",
+      bankName: bank.bankName,
+      accountName: bank.accountName,
+      accountNumber: bank.accountNumber,
+      iban: bank.iban,
+      type: bank.type as "شخصي" | "شركة",
+      isActive: bank.isActive
+    });
+    setLogoPreview(bank.logo || null);
+    setIsDialogOpen(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (editingBank) {
+      updateMutation.mutate({ id: editingBank.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  const handleDelete = (id: number) => {
+    if (confirm("هل أنت متأكد من حذف هذا البنك؟")) {
+      deleteMutation.mutate(id);
+    }
+  };
+
   // Mutation for toggling bank visibility
   const toggleVisibilityMutation = useMutation({
     mutationFn: ({ id, isActive }: { id: number; isActive: boolean }) =>
@@ -169,66 +229,9 @@ export default function BankManagement() {
     }
   });
 
-  const resetForm = () => {
-    setFormData({
-      logo: "",
-      bankName: "",
-      nameEn: "",
-      accountName: "",
-      accountNumber: "",
-      iban: "",
-      type: "شركة",
-      isActive: true
-    });
-    setLogoPreview(null);
-  };
-
-  const handleSubmit = () => {
-    if (editingBank) {
-      updateMutation.mutate({ id: editingBank.id, data: formData });
-    } else {
-      createMutation.mutate(formData);
-    }
-  };
-
-  const handleEdit = (bank: Bank) => {
-    setEditingBank(bank);
-    setFormData({
-      logo: bank.logo || "",
-      bankName: bank.bankName,
-      nameEn: bank.nameEn || "",
-      accountName: bank.accountName,
-      accountNumber: bank.accountNumber,
-      iban: bank.iban,
-      type: bank.type,
-      isActive: bank.isActive
-    });
-    setLogoPreview(bank.logo || null);
-    setIsDialogOpen(true);
-  };
-
-  const handleDelete = (id: number) => {
-    if (confirm("هل أنت متأكد من حذف هذا البنك؟")) {
-      deleteMutation.mutate(id);
-    }
-  };
-
   const toggleBankVisibility = (bank: Bank) => {
     const newActiveState = !bank.isActive;
     toggleVisibilityMutation.mutate({ id: bank.id, isActive: newActiveState });
-  };
-
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result as string;
-        setFormData(prev => ({ ...prev, logo: base64 }));
-        setLogoPreview(base64);
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   // Filter banks by type - show all banks (both active and inactive) for management
@@ -243,129 +246,167 @@ export default function BankManagement() {
     <div className="container mx-auto p-6 space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">إدارة البنوك</h1>
-          <p className="text-gray-600">إدارة بيانات البنوك الشخصية والشركات</p>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <Landmark className="w-8 h-8 text-[#00627F]" />
+            إدارة البنوك
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            إدارة بيانات البنوك والحسابات المصرفية
+          </p>
         </div>
+
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => {
-              setEditingBank(null);
-              resetForm();
-            }}>
+            <Button 
+              className="bg-[#00627F] hover:bg-[#004f66] text-white"
+              onClick={resetForm}
+            >
               <Plus className="w-4 h-4 ml-2" />
               إضافة بنك جديد
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md" dir="rtl">
+          <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>
-                {editingBank ? "تعديل بيانات البنك" : "إضافة بنك جديد"}
+                {editingBank ? "تعديل البنك" : "إضافة بنك جديد"}
               </DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
                 <Label htmlFor="logo">شعار البنك</Label>
                 <Input
                   id="logo"
                   type="file"
                   accept="image/*"
                   onChange={handleLogoUpload}
-                  className="mt-1"
+                  className="cursor-pointer"
                 />
                 {logoPreview && (
                   <div className="mt-2">
-                    <img src={logoPreview} alt="Logo preview" className="w-16 h-16 object-contain rounded" />
+                    <img 
+                      src={logoPreview} 
+                      alt="معاينة الشعار" 
+                      className="w-20 h-20 object-contain border rounded"
+                    />
                   </div>
                 )}
               </div>
-              
-              <div>
-                <Label htmlFor="bankName">اسم البنك</Label>
+
+              <div className="space-y-2">
+                <Label htmlFor="bankName">اسم البنك *</Label>
                 <Input
                   id="bankName"
                   value={formData.bankName}
                   onChange={(e) => setFormData(prev => ({ ...prev, bankName: e.target.value }))}
-                  placeholder="البنك الأهلي السعودي"
+                  placeholder="مثال: مصرف الراجحي"
                   required
                 />
               </div>
-
-              <div>
+              
+              <div className="space-y-2">
                 <Label htmlFor="nameEn">الاسم الإنجليزي</Label>
                 <Input
                   id="nameEn"
                   value={formData.nameEn || ""}
                   onChange={(e) => setFormData(prev => ({ ...prev, nameEn: e.target.value }))}
-                  placeholder="National Commercial Bank"
+                  placeholder="Example: Al Rajhi Bank"
                 />
               </div>
 
-              <div>
-                <Label htmlFor="accountName">اسم الحساب</Label>
+              <div className="space-y-2">
+                <Label htmlFor="accountName">اسم الحساب *</Label>
                 <Input
                   id="accountName"
                   value={formData.accountName}
                   onChange={(e) => setFormData(prev => ({ ...prev, accountName: e.target.value }))}
-                  placeholder="شركة البريمي للسيارات"
+                  placeholder="مثال: شركة البريمي للسيارات"
                   required
                 />
               </div>
 
-              <div>
-                <Label htmlFor="accountNumber">رقم الحساب</Label>
+              <div className="space-y-2">
+                <Label htmlFor="accountNumber">رقم الحساب *</Label>
                 <Input
                   id="accountNumber"
                   value={formData.accountNumber}
                   onChange={(e) => setFormData(prev => ({ ...prev, accountNumber: e.target.value }))}
-                  placeholder="12345678901234567890"
+                  placeholder="575608010000904"
                   required
                 />
               </div>
 
-              <div>
-                <Label htmlFor="iban">رقم الآيبان</Label>
+              <div className="space-y-2">
+                <Label htmlFor="iban">رقم الآيبان *</Label>
                 <Input
                   id="iban"
                   value={formData.iban}
                   onChange={(e) => setFormData(prev => ({ ...prev, iban: e.target.value }))}
-                  placeholder="SA0312345678901234567890"
+                  placeholder="SA8080000575608010000904"
                   required
                 />
               </div>
 
-              <div>
-                <Label htmlFor="type">نوع البنك</Label>
-                <Select value={formData.type} onValueChange={(value: typeof BANK_TYPES[number]) => 
-                  setFormData(prev => ({ ...prev, type: value }))
-                }>
+              <div className="space-y-2">
+                <Label htmlFor="type">النوع *</Label>
+                <Select 
+                  value={formData.type} 
+                  onValueChange={(value: "شخصي" | "شركة") => 
+                    setFormData(prev => ({ ...prev, type: value }))
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {BANK_TYPES.map(type => (
-                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    {BANK_TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        <div className="flex items-center gap-2">
+                          {type === "شخصي" ? (
+                            <User className="w-4 h-4" />
+                          ) : (
+                            <Building2 className="w-4 h-4" />
+                          )}
+                          {type}
+                        </div>
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                إلغاء
-              </Button>
-              <Button 
-                onClick={handleSubmit}
-                disabled={createMutation.isPending || updateMutation.isPending}
-              >
-                {editingBank ? "تحديث" : "إضافة"}
-              </Button>
-            </DialogFooter>
+
+              <DialogFooter>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  إلغاء
+                </Button>
+                <Button 
+                  type="submit" 
+                  className="bg-[#00627F] hover:bg-[#004f66]"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                >
+                  {editingBank ? "تحديث" : "إنشاء"}
+                </Button>
+              </DialogFooter>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">إجمالي البنوك</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-[#00627F]">{activeBanks.length}</div>
+          </CardContent>
+        </Card>
+        
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">البنوك الشخصية</CardTitle>
@@ -421,11 +462,10 @@ export default function BankManagement() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => toggleBankVisibility(bank)}
-                              title={!bank.isActive ? "إظهار البنك" : "إخفاء البنك"}
-                              disabled={toggleVisibilityMutation.isPending}
+                              onClick={() => toggleBankVisibility(bank.id)}
+                              title={hiddenBanks.has(bank.id) ? "إظهار البنك" : "إخفاء البنك"}
                             >
-                              {!bank.isActive ? (
+                              {hiddenBanks.has(bank.id) ? (
                                 <EyeOff className="w-3 h-3" />
                               ) : (
                                 <Eye className="w-3 h-3" />
@@ -504,11 +544,10 @@ export default function BankManagement() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => toggleBankVisibility(bank)}
-                              title={!bank.isActive ? "إظهار البنك" : "إخفاء البنك"}
-                              disabled={toggleVisibilityMutation.isPending}
+                              onClick={() => toggleBankVisibility(bank.id)}
+                              title={hiddenBanks.has(bank.id) ? "إظهار البنك" : "إخفاء البنك"}
                             >
-                              {!bank.isActive ? (
+                              {hiddenBanks.has(bank.id) ? (
                                 <EyeOff className="w-3 h-3" />
                               ) : (
                                 <Eye className="w-3 h-3" />
