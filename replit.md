@@ -12,6 +12,7 @@ This is a full-stack inventory management system for managing inventory items wi
 - ✅ Verified application runs correctly on port 5000 with Express + PostgreSQL
 - ✅ Fixed table column alignment issue in inventory management (updated colSpan from 14 to 16)
 - ✅ Optimized price card year display with 8% size reduction and improved margins
+- ✅ Added bulk inventory clearing functionality and cleared all inventory items as requested
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

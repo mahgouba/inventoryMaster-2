@@ -666,6 +666,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clear all inventory items
+  app.delete("/api/inventory", async (req, res) => {
+    try {
+      const cleared = await storage.clearAllInventoryItems();
+      if (!cleared) {
+        return res.status(500).json({ message: "Failed to clear inventory" });
+      }
+      
+      res.json({ message: "All inventory items cleared successfully" });
+    } catch (error) {
+      console.error("Error clearing inventory:", error);
+      res.status(500).json({ message: "Failed to clear inventory items" });
+    }
+  });
+
   // Manufacturers endpoints
   app.get("/api/manufacturers", async (req, res) => {
     try {
