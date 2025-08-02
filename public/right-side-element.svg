@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="60%" style="stop-color:#FF8C00;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Main intertwined design -->
+  <g transform="translate(100,100)" filter="url(#glow)">
+    <!-- First oval ring -->
+    <ellipse cx="0" cy="0" rx="80" ry="25" 
+             fill="none" 
+             stroke="url(#goldGradient)" 
+             stroke-width="8" 
+             transform="rotate(45)" />
+    
+    <!-- Second oval ring -->
+    <ellipse cx="0" cy="0" rx="80" ry="25" 
+             fill="none" 
+             stroke="url(#goldGradient)" 
+             stroke-width="8" 
+             transform="rotate(-45)" />
+    
+    <!-- Third oval ring -->
+    <ellipse cx="0" cy="0" rx="65" ry="20" 
+             fill="none" 
+             stroke="url(#goldGradient)" 
+             stroke-width="6" 
+             transform="rotate(0)" />
+    
+    <!-- Center highlight -->
+    <circle cx="0" cy="0" r="8" 
+            fill="url(#goldGradient)" 
+            opacity="0.8" />
+  </g>
+</svg>
