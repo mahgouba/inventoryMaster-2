@@ -594,8 +594,8 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                         <div className="text-[#CF9B47] font-semibold text-[66px]">
                           الفئة الفاخرة
                         </div>
-                        <div className="w-16 h-16 flex items-center justify-center bg-gray-100 rounded-full">
-                          <Car className="w-10 h-10 text-[#CF9B47]" />
+                        <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded-full">
+                          <Car className="w-16 h-16 text-[#CF9B47]" />
                         </div>
                       </div>
 
