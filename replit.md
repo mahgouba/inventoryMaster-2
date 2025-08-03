@@ -46,7 +46,8 @@ This is a full-stack inventory management system for managing inventory items wi
 - ✅ Enhanced price cards management page layout (August 3, 2025)
 - ✅ Removed fixed preview panel per user request - simplified layout to show only cards grid
 - ✅ Restored original grid layout for better focus on price cards management
-- ✅ Maintained popup preview functionality for individual price cards
+- ✅ Modified price card preview dialog to display fixed A4 size (210mm x 297mm) that remains consistent across all devices
+- ✅ Updated dialog layout to center A4 preview with proper scaling and responsive constraints
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

@@ -127,23 +127,30 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-auto bg-white/90 backdrop-blur-sm border border-white/20">
+      <DialogContent className="max-w-[90vw] max-h-[90vh] overflow-auto bg-white/90 backdrop-blur-sm border border-white/20 p-2">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-gray-800">
+          <DialogTitle className="text-xl font-bold text-gray-800 text-center mb-4">
             بطاقة سعر - {vehicle.manufacturer} {vehicle.category} {vehicle.year}
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-4">
-          {/* Price Card Design */}
-          <div 
-            id="new-price-card-content"
-            className="relative w-[842px] h-[595px] rounded-lg overflow-hidden bg-gradient-to-b from-[#00627F] to-[#004A61]"
-            style={{
-              fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
-              direction: 'rtl'
-            }}
-          >
+          {/* Fixed A4 Size Preview */}
+          <div className="flex justify-center items-center w-full">
+            <div 
+              id="new-price-card-content"
+              className="relative bg-white shadow-2xl border-2 border-gray-200"
+              style={{
+                width: '210mm',
+                height: '297mm',
+                maxWidth: '80vw',
+                maxHeight: '80vh',
+                fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
+                direction: 'rtl',
+                fontSize: '12px',
+                overflow: 'hidden'
+              }}
+            >
             {/* Company Logo */}
             <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
               <div className="w-48 h-48 flex items-center justify-center">
@@ -214,6 +221,7 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
 
             {/* Import Type Circle */}
             <div className={`absolute top-8 right-8 w-8 h-8 rounded-full ${getImportTypeColor()}`}></div>
+            </div>
           </div>
 
           {/* Action Buttons */}
