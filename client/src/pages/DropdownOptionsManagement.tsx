@@ -451,7 +451,7 @@ export default function DropdownOptionsManagement() {
             />
             <FormField
               control={form.control}
-              name="nameAr"
+              name="category"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-white">اسم الفئة</FormLabel>
@@ -464,12 +464,12 @@ export default function DropdownOptionsManagement() {
             />
             <FormField
               control={form.control}
-              name="nameEn"
+              name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">الاسم الإنجليزي (اختياري)</FormLabel>
+                  <FormLabel className="text-white">الوصف (اختياري)</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="E200" />
+                    <Input {...field} placeholder="وصف الفئة" dir="rtl" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -540,7 +540,7 @@ export default function DropdownOptionsManagement() {
             )}
             <FormField
               control={form.control}
-              name="nameAr"
+              name="trimLevel"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-white">درجة التجهيز</FormLabel>
@@ -553,12 +553,12 @@ export default function DropdownOptionsManagement() {
             />
             <FormField
               control={form.control}
-              name="nameEn"
+              name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">الاسم الإنجليزي (اختياري)</FormLabel>
+                  <FormLabel className="text-white">الوصف (اختياري)</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Full Option" />
+                    <Input {...field} placeholder="وصف درجة التجهيز" dir="rtl" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
