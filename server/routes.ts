@@ -4409,6 +4409,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Leave Requests API endpoints
+  app.get("/api/leave-requests", async (req, res) => {
+    try {
+      const leaveRequests = await storage.getAllLeaveRequests();
+      res.json(leaveRequests);
+    } catch (error) {
+      console.error("Error fetching leave requests:", error);
+      res.status(500).json({ message: "Failed to fetch leave requests" });
+    }
+  });
+
+  app.get("/api/leave-requests/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid leave request ID" });
+      }
+
+      const leaveRequest = await storage.getLeaveRequest(id);
+      if (!leaveRequest) {
+        return res.status(404).json({ message: "Leave request not found" });
+      }
+
+      res.json(leaveRequest);
+    } catch (error) {
+      console.error("Error fetching leave request:", error);
+      res.status(500).json({ message: "Failed to fetch leave request" });
+    }
+  });
+
+  app.post("/api/leave-requests", async (req, res) => {
+    try {
+      const validation = insertLeaveRequestSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid data", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const leaveRequest = await storage.createLeaveRequest(validation.data);
+      res.status(201).json(leaveRequest);
+    } catch (error) {
+      console.error("Error creating leave request:", error);
+      res.status(500).json({ message: "Failed to create leave request" });
+    }
+  });
+
+  app.put("/api/leave-requests/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid leave request ID" });
+      }
+
+      const validation = insertLeaveRequestSchema.partial().safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid data", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const leaveRequest = await storage.updateLeaveRequest(id, validation.data);
+      if (!leaveRequest) {
+        return res.status(404).json({ message: "Leave request not found" });
+      }
+
+      res.json(leaveRequest);
+    } catch (error) {
+      console.error("Error updating leave request:", error);
+      res.status(500).json({ message: "Failed to update leave request" });
+    }
+  });
+
+  app.delete("/api/leave-requests/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid leave request ID" });
+      }
+
+      const success = await storage.deleteLeaveRequest(id);
+      if (!success) {
+        return res.status(404).json({ message: "Leave request not found" });
+      }
+
+      res.json({ message: "Leave request deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting leave request:", error);
+      res.status(500).json({ message: "Failed to delete leave request" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
