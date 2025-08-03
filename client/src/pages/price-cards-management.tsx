@@ -411,8 +411,11 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                 </CardContent>
               </Card>
 
-              {/* Price Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Split Layout - Cards List and Fixed Preview */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Price Cards List */}
+                <div className="lg:col-span-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredPriceCards.map((record) => (
                   <Card key={record.id} className="glass-card hover:scale-105 transition-transform duration-200">
                     <CardContent className="p-6">
@@ -471,7 +474,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          onClick={() => handlePreview(record)}
+                          onClick={() => setPreviewVehicle(record.vehicle)}
                           className="flex-1 bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white"
                         >
                           <Eye size={16} className="ml-1" />
@@ -515,27 +518,151 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                     </CardContent>
                   </Card>
                 ))}
-              </div>
 
-              {/* Empty State */}
-              {filteredPriceCards.length === 0 && (
-                <Card className="glass-container">
-                  <CardContent className="p-12 text-center">
-                    <Receipt className="mx-auto h-16 w-16 text-white/40 mb-4 drop-shadow-lg" />
-                    <h3 className="text-lg font-semibold text-white mb-2 drop-shadow-lg">لا توجد بطاقات أسعار</h3>
-                    <p className="text-white/70 mb-4 drop-shadow-sm">
-                      {searchQuery || selectedManufacturer !== "all" || selectedStatus !== "all"
-                        ? "لا توجد بطاقات أسعار تطابق معايير البحث"
-                        : "لم يتم إنشاء أي بطاقات أسعار بعد"
-                      }
-                    </p>
-                    <Button onClick={() => setShowCreateDialog(true)} className="bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white">
-                      <Plus size={16} className="ml-2" />
-                      إنشاء بطاقة سعر جديدة
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
+                    {/* Empty State */}
+                    {filteredPriceCards.length === 0 && (
+                      <div className="md:col-span-2">
+                        <Card className="glass-container">
+                          <CardContent className="p-12 text-center">
+                            <Receipt className="mx-auto h-16 w-16 text-white/40 mb-4 drop-shadow-lg" />
+                            <h3 className="text-lg font-semibold text-white mb-2 drop-shadow-lg">لا توجد بطاقات أسعار</h3>
+                            <p className="text-white/70 mb-4 drop-shadow-sm">
+                              {searchQuery || selectedManufacturer !== "all" || selectedStatus !== "all"
+                                ? "لا توجد بطاقات أسعار تطابق معايير البحث"
+                                : "لم يتم إنشاء أي بطاقات أسعار بعد"
+                              }
+                            </p>
+                            <Button onClick={() => setShowCreateDialog(true)} className="bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white">
+                              <Plus size={16} className="ml-2" />
+                              إنشاء بطاقة سعر جديدة
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Fixed Preview Panel */}
+                <div className="lg:col-span-1">
+                  <div className="sticky top-24">
+                    <Card className="glass-container">
+                      <CardHeader>
+                        <CardTitle className="text-lg text-white drop-shadow-lg flex items-center gap-2">
+                          <Eye size={18} />
+                          معاينة بطاقة السعر
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {previewVehicle ? (
+                          <div className="space-y-4">
+                            {/* Vehicle Header */}
+                            <div className="flex items-center gap-3 pb-3 border-b border-white/20">
+                              <ManufacturerLogo 
+                                manufacturerName={previewVehicle.manufacturer} 
+                                size="sm" 
+                                className="w-12 h-12"
+                              />
+                              <div>
+                                <h3 className="font-bold text-white drop-shadow-md">
+                                  {previewVehicle.manufacturer} {previewVehicle.category}
+                                </h3>
+                                <p className="text-sm text-white/80 drop-shadow-sm">
+                                  {previewVehicle.year} - {previewVehicle.trimLevel}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Preview Image */}
+                            <div className="relative bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                              <div className="text-center space-y-3">
+                                <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500/20 to-purple-600/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
+                                  <Car size={32} className="text-white drop-shadow-lg" />
+                                </div>
+                                <div>
+                                  <h4 className="font-bold text-xl text-white drop-shadow-lg">
+                                    {previewVehicle.manufacturer}
+                                  </h4>
+                                  <p className="text-white/90 drop-shadow-sm">
+                                    {previewVehicle.category} {previewVehicle.year}
+                                  </p>
+                                  <p className="text-sm text-white/70 drop-shadow-sm">
+                                    {previewVehicle.trimLevel}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Price Display */}
+                            <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                              <div className="text-center">
+                                <p className="text-sm text-white/70 drop-shadow-sm mb-1">السعر</p>
+                                <p className="text-2xl font-bold text-white drop-shadow-lg">
+                                  {new Intl.NumberFormat('ar-SA', {
+                                    style: 'currency',
+                                    currency: 'SAR',
+                                    minimumFractionDigits: 0
+                                  }).format(parseFloat(previewVehicle.price?.toString() || '0'))}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Vehicle Details */}
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-white/70 drop-shadow-sm">الحالة:</span>
+                                <span className="text-white drop-shadow-md">{previewVehicle.status}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-white/70 drop-shadow-sm">نوع الاستيراد:</span>
+                                <span className="text-white drop-shadow-md">{previewVehicle.importType}</span>
+                              </div>
+                              {previewVehicle.exteriorColor && (
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-white/70 drop-shadow-sm">اللون الخارجي:</span>
+                                  <span className="text-white drop-shadow-md">{previewVehicle.exteriorColor}</span>
+                                </div>
+                              )}
+                              {previewVehicle.interiorColor && (
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-white/70 drop-shadow-sm">اللون الداخلي:</span>
+                                  <span className="text-white drop-shadow-md">{previewVehicle.interiorColor}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-2 pt-3">
+                              <Button
+                                size="sm"
+                                onClick={() => setPriceCardOpen(true)}
+                                className="flex-1 bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white"
+                              >
+                                <Printer size={14} className="ml-1" />
+                                طباعة
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="glass-button p-2"
+                              >
+                                <Download size={14} />
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center py-8">
+                            <Eye className="mx-auto h-12 w-12 text-white/40 mb-3 drop-shadow-lg" />
+                            <p className="text-white/70 drop-shadow-sm">
+                              اختر بطاقة سعر لمعاينتها
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
