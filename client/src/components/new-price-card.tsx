@@ -151,25 +151,24 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                 overflow: 'hidden'
               }}
             >
-            {/* Company Logo */}
-            <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
-              <div className="w-48 h-48 flex items-center justify-center">
+            {/* Logo and Year Container - Centered */}
+            <div className="absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+              {/* Company Logo - 30% smaller */}
+              <div className="w-32 h-32 flex items-center justify-center mb-4">
                 <img 
                   src="/copmany logo.svg" 
                   alt="شعار الشركة" 
                   className="w-full h-full object-contain filter brightness-110 drop-shadow-lg"
                 />
               </div>
-            </div>
 
-            {/* Year */}
-            <div className="absolute top-24 left-1/2 transform -translate-x-1/2">
-              <div className="text-white text-8xl font-black tracking-wider drop-shadow-lg">
+              {/* Year - 3x larger */}
+              <div className="text-white font-black tracking-wider drop-shadow-lg" style={{ fontSize: '15rem' }}>
                 {vehicle.year || '2025'}
               </div>
             </div>
 
-            {/* Main Content Card - Above Gold Section */}
+            {/* Main Content Card */}
             <div className="absolute bottom-8 left-8 right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl" style={{ zIndex: 10 }}>
               <div className="flex flex-col h-full space-y-4">
                 {/* First Row - Category, Trim Level, Manufacturer Logo */}
