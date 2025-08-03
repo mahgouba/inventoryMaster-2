@@ -14,7 +14,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useTheme } from "@/hooks/useTheme";
 import InventoryStats from "@/components/inventory-stats";
 import InventoryTable from "@/components/inventory-table";
-import InventoryFormHierarchical from "@/components/inventory-form-hierarchical";
+import InventoryForm from "@/components/inventory-form";
 
 import ScrollableFilter from "@/components/scrollable-filter";
 
@@ -900,8 +900,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         onVoiceChat={() => {}}
       />
 
-      {/* Add/Edit Form - Hierarchical */}
-      <InventoryFormHierarchical 
+      {/* Add/Edit Form */}
+      <InventoryForm 
         open={formOpen} 
         onOpenChange={handleFormClose} 
         editItem={editItem}
