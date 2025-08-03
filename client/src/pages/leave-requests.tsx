@@ -239,23 +239,32 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
 
     try {
       console.log("Sending request data:", requestData);
+      console.log("About to make fetch request to:", "/api/leave-requests");
       
-      const response = await fetch("/api/leave-requests", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-        credentials: "include",
+      // Alternative approach - using XMLHttpRequest
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/leave-requests", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.withCredentials = true;
+      
+      const response = await new Promise<any>((resolve, reject) => {
+        xhr.onload = function() {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const result = JSON.parse(xhr.responseText);
+              resolve(result);
+            } catch (e) {
+              resolve(xhr.responseText);
+            }
+          } else {
+            reject(new Error(`HTTP ${xhr.status}: ${xhr.responseText}`));
+          }
+        };
+        xhr.onerror = () => reject(new Error("Network error"));
+        xhr.send(JSON.stringify(requestData));
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
-      const result = await response.json();
-      console.log("Request created successfully:", result);
+      console.log("Request created successfully:", response);
 
       toast({
         title: "تم إنشاء الطلب بنجاح",
