@@ -52,8 +52,6 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [selectedManufacturerId, setSelectedManufacturerId] = useState<number | null>(null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [isEditingOptions, setIsEditingOptions] = useState(false);
   
   // Fetch manufacturers from database
@@ -62,16 +60,30 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
     enabled: open, // Only fetch when dialog is open
   });
   
+  // Get current manufacturer name for categories query
+  const selectedManufacturerName = form.watch("manufacturer");
+  
+  // Get current category name for trim levels query  
+  const selectedCategoryName = form.watch("category");
+  
   // Fetch categories based on selected manufacturer
   const { data: categories = [], isLoading: isLoadingCategories } = useQuery<Category[]>({
-    queryKey: ["/api/hierarchical/categories", selectedManufacturerId],
-    enabled: open && !!selectedManufacturerId,
+    queryKey: ["/api/hierarchical/categories", selectedManufacturerName],
+    queryFn: () => 
+      selectedManufacturerName 
+        ? fetch(`/api/hierarchical/categories?manufacturer=${encodeURIComponent(selectedManufacturerName)}`).then(res => res.json())
+        : Promise.resolve([]),
+    enabled: open && !!selectedManufacturerName,
   });
   
   // Fetch trim levels based on selected category
   const { data: trimLevels = [], isLoading: isLoadingTrimLevels } = useQuery<TrimLevel[]>({
-    queryKey: ["/api/hierarchical/trimLevels", selectedCategoryId],
-    enabled: open && !!selectedCategoryId,
+    queryKey: ["/api/hierarchical/trimLevels", selectedManufacturerName, selectedCategoryName],
+    queryFn: () => 
+      selectedManufacturerName && selectedCategoryName
+        ? fetch(`/api/hierarchical/trimLevels?manufacturer=${encodeURIComponent(selectedManufacturerName)}&category=${encodeURIComponent(selectedCategoryName)}`).then(res => res.json())
+        : Promise.resolve([]),
+    enabled: open && !!selectedManufacturerName && !!selectedCategoryName,
   });
   
   // Local state for editable lists (keeping the same structure for other dropdowns)
@@ -117,14 +129,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
 
   // Handle manufacturer change
   const handleManufacturerChange = (manufacturerName: string) => {
-    // Find the manufacturer ID from the selected name
-    const manufacturer = manufacturers.find(m => m.nameAr === manufacturerName);
-    if (manufacturer) {
-      setSelectedManufacturerId(manufacturer.id);
-      setSelectedCategoryId(null); // Reset category when manufacturer changes
-    }
-    
-    // Update form values
+    // Update form values and reset dependent fields
     form.setValue("manufacturer", manufacturerName);
     form.setValue("category", "");
     form.setValue("trimLevel", "");
@@ -132,13 +137,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
 
   // Handle category change
   const handleCategoryChange = (categoryName: string) => {
-    // Find the category ID from the selected name
-    const category = categories.find(c => c.nameAr === categoryName);
-    if (category) {
-      setSelectedCategoryId(category.id);
-    }
-    
-    // Update form values
+    // Update form values and reset dependent fields
     form.setValue("category", categoryName);
     form.setValue("trimLevel", "");
   };
@@ -174,14 +173,6 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
       };
       
       form.reset(formData);
-      
-      // Set the manufacturer and category IDs for hierarchical dropdown
-      if (editItem.manufacturer && manufacturers.length > 0) {
-        const manufacturer = manufacturers.find(m => m.nameAr === editItem.manufacturer);
-        if (manufacturer) {
-          setSelectedManufacturerId(manufacturer.id);
-        }
-      }
     } else {
       // Reset to empty form when creating new item
       form.reset({
@@ -204,10 +195,8 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
         isSold: false,
         mileage: undefined,
       });
-      setSelectedManufacturerId(null);
-      setSelectedCategoryId(null);
     }
-  }, [editItem, form, manufacturers]);
+  }, [editItem]); // Remove form and manufacturers from dependencies to prevent infinite loop
 
   const createMutation = useMutation({
     mutationFn: (data: InsertInventoryItem) => apiRequest("POST", "/api/inventory", data),
@@ -333,7 +322,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                             <SelectItem disabled value="loading">
                               جاري التحميل...
                             </SelectItem>
-                          ) : !selectedManufacturerId ? (
+                          ) : !selectedManufacturerName ? (
                             <SelectItem disabled value="no-manufacturer">
                               اختر الصانع أولاً
                             </SelectItem>
@@ -372,7 +361,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                             <SelectItem disabled value="loading">
                               جاري التحميل...
                             </SelectItem>
-                          ) : !selectedCategoryId ? (
+                          ) : !selectedCategoryName ? (
                             <SelectItem disabled value="no-category">
                               اختر الفئة أولاً
                             </SelectItem>
