@@ -512,10 +512,9 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
                     </Button>
                     <Button
                       onClick={handleCreateRequest}
-                      disabled={createLeaveRequestMutation.isPending}
                       className="bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white"
                     >
-                      {createLeaveRequestMutation.isPending ? "جاري الإنشاء..." : "إنشاء الطلب"}
+                      إنشاء الطلب
                     </Button>
                   </div>
                 </div>
