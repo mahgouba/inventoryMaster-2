@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import dropdownOptionsRoutes from "./routes/dropdown-options.js";
+import railwayImportRoutes from "./routes/railway-import.js";
 import { 
   insertInventoryItemSchema, 
   insertManufacturerSchema,
@@ -4650,6 +4651,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update leave request status" });
     }
   });
+
+  // Railway import routes
+  app.use("/api/railway", railwayImportRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
