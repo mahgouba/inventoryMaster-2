@@ -4503,6 +4503,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update leave request status (approve/reject)
+  app.put("/api/leave-requests/:id/status", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid leave request ID" });
+      }
+
+      const { status, rejectionReason, approvedBy, approvedByName } = req.body;
+      
+      if (!status || !["approved", "rejected"].includes(status)) {
+        return res.status(400).json({ message: "Invalid status. Must be 'approved' or 'rejected'" });
+      }
+
+      const updateData: any = {
+        status,
+        approvedBy,
+        approvedByName,
+        approvedAt: new Date(),
+      };
+
+      if (status === "rejected" && rejectionReason) {
+        updateData.rejectionReason = rejectionReason;
+      }
+
+      const leaveRequest = await storage.updateLeaveRequest(id, updateData);
+      if (!leaveRequest) {
+        return res.status(404).json({ message: "Leave request not found" });
+      }
+
+      res.json(leaveRequest);
+    } catch (error) {
+      console.error("Error updating leave request status:", error);
+      res.status(500).json({ message: "Failed to update leave request status" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

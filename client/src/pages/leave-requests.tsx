@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -130,17 +131,9 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
   // Create leave request mutation
   const createLeaveRequestMutation = useMutation({
     mutationFn: async (requestData: any) => {
-      const response = await fetch("/api/leave-requests", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create leave request");
-      }
-      return response.json();
+      console.log("Creating leave request:", requestData);
+      const response = await apiRequest("POST", "/api/leave-requests", requestData);
+      return await response.json();
     },
     onSuccess: () => {
       toast({
@@ -163,22 +156,13 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
   // Approve/Reject mutations
   const updateRequestStatusMutation = useMutation({
     mutationFn: async ({ id, status, rejectionReason }: { id: number; status: string; rejectionReason?: string }) => {
-      const response = await fetch(`/api/leave-requests/${id}/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
-          status, 
-          rejectionReason,
-          approvedBy: userId,
-          approvedByName: username
-        }),
+      const response = await apiRequest("PUT", `/api/leave-requests/${id}/status`, { 
+        status, 
+        rejectionReason,
+        approvedBy: userId,
+        approvedByName: username
       });
-      if (!response.ok) {
-        throw new Error("Failed to update request status");
-      }
-      return response.json();
+      return await response.json();
     },
     onSuccess: (_, variables) => {
       toast({
