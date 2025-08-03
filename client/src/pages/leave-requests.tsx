@@ -127,49 +127,7 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
     return matchesName && matchesStatus;
   });
 
-  // Create leave request mutation
-  const createLeaveRequestMutation = useMutation({
-    mutationFn: async (requestData: any) => {
-      console.log("Creating leave request:", requestData);
-      try {
-        const response = await fetch("/api/leave-requests", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-          credentials: "include",
-        });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP ${response.status}: ${errorText}`);
-        }
-        
-        return await response.json();
-      } catch (error) {
-        console.error("Fetch error:", error);
-        throw error;
-      }
-    },
-    onSuccess: () => {
-      toast({
-        title: "تم إنشاء الطلب بنجاح",
-        description: "تم إرسال طلب الإجازة/الاستئذان للمراجعة",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/leave-requests"] });
-      setIsCreateDialogOpen(false);
-      resetForm();
-    },
-    onError: (error) => {
-      console.error("Error creating leave request:", error);
-      toast({
-        title: "خطأ في إنشاء الطلب",
-        description: "حدث خطأ أثناء إنشاء الطلب",
-        variant: "destructive",
-      });
-    },
-  });
+  // Note: Direct fetch approach instead of using mutation to avoid potential conflicts
 
   // Approve/Reject mutations
   const updateRequestStatusMutation = useMutation({
@@ -241,7 +199,7 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
     setReason("");
   };
 
-  const handleCreateRequest = () => {
+  const handleCreateRequest = async () => {
     if (!selectedUserId || !requestType || !startDate || !duration || !reason) {
       toast({
         title: "بيانات ناقصة",
@@ -279,7 +237,43 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
       requestedByName: username,
     };
 
-    createLeaveRequestMutation.mutate(requestData);
+    try {
+      console.log("Sending request data:", requestData);
+      
+      const response = await fetch("/api/leave-requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log("Request created successfully:", result);
+
+      toast({
+        title: "تم إنشاء الطلب بنجاح",
+        description: "تم إرسال طلب الإجازة/الاستئذان للمراجعة",
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["/api/leave-requests"] });
+      setIsCreateDialogOpen(false);
+      resetForm();
+
+    } catch (error) {
+      console.error("Error creating leave request:", error);
+      toast({
+        title: "خطأ في إنشاء الطلب",
+        description: "حدث خطأ أثناء إنشاء الطلب",
+        variant: "destructive",
+      });
+    }
   };
 
   // PDF Generation functionality
