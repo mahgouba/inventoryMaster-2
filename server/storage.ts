@@ -21,8 +21,6 @@ import {
   type VehicleTrimLevel, type InsertVehicleTrimLevel
 } from "@shared/schema";
 
-import { DatabaseStorage } from "./database-storage";
-
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -1260,25 +1258,6 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Initialize storage based on database availability
-import { DatabaseStorage } from "./database-storage";
-
-// Use DatabaseStorage if database is available, otherwise use MemStorage
-let storageInstance: IStorage;
-
-try {
-  // Check if DATABASE_URL exists
-  const dbUrl = process.env.DATABASE_URL;
-  if (dbUrl) {
-    console.log('✅ Using DatabaseStorage with PostgreSQL');
-    storageInstance = new DatabaseStorage();
-  } else {
-    console.log('⚠️ Using MemStorage (DATABASE_URL not found)');
-    storageInstance = new MemStorage();
-  }
-} catch (error) {
-  console.log('⚠️ Database connection failed, falling back to MemStorage:', error);
-  storageInstance = new MemStorage();
-}
-
-export const storage = storageInstance;
+// For now, always use MemStorage to ensure compatibility
+// Database integration will be handled separately
+export const storage = new MemStorage();
