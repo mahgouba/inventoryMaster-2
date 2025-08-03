@@ -164,6 +164,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Hierarchical data endpoint
+  app.get("/api/hierarchy/full", async (req, res) => {
+    try {
+      const manufacturerFilter = req.query.manufacturer as string;
+      
+      // Get all manufacturers or filter by specific one
+      const manufacturers = await storage.getAllManufacturers();
+      const filteredManufacturers = manufacturerFilter && manufacturerFilter !== 'all' 
+        ? manufacturers.filter(m => m.nameAr === manufacturerFilter)
+        : manufacturers;
+
+      const hierarchyData = [];
+
+      for (const manufacturer of filteredManufacturers) {
+        // Get categories for this manufacturer
+        const categories = await storage.getCategoriesByManufacturer(manufacturer.nameAr);
+        
+        const categoriesWithTrimLevels = [];
+        let totalVehicles = 0;
+
+        for (const category of categories) {
+          // Get trim levels for this category
+          const trimLevels = await storage.getTrimLevelsByCategory(manufacturer.nameAr, category.name_ar || category.nameAr);
+          
+          // Count vehicles for this manufacturer/category combination
+          const allInventory = await storage.getAllInventoryItems();
+          const vehicleCount = allInventory.filter(item => 
+            item.manufacturer === manufacturer.nameAr && 
+            item.category === (category.name_ar || category.nameAr)
+          ).length;
+
+          totalVehicles += vehicleCount;
+
+          categoriesWithTrimLevels.push({
+            category,
+            trimLevels,
+            vehicleCount
+          });
+        }
+
+        hierarchyData.push({
+          manufacturer,
+          categories: categoriesWithTrimLevels,
+          totalVehicles
+        });
+      }
+
+      res.json(hierarchyData);
+    } catch (error) {
+      console.error("Error fetching hierarchical data:", error);
+      res.status(500).json({ message: "Failed to fetch hierarchical data" });
+    }
+  });
+
   // Search inventory items
   app.get("/api/inventory/search", async (req, res) => {
     try {
