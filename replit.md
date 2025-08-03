@@ -49,6 +49,9 @@ This is a full-stack inventory management system for managing inventory items wi
 - ✅ Modified price card preview dialog to display fixed A4 size (210mm x 297mm) that remains consistent across all devices
 - ✅ Updated dialog layout to center A4 preview with proper scaling and responsive constraints
 - ✅ Changed price card background to blue gradient (from #00627F to #004A61) per user request (August 3, 2025)
+- ✅ Made price card content fixed and non-responsive - same size across all devices (mobile/desktop)
+- ✅ Converted all elements to absolute positioning with fixed pixel dimensions
+- ✅ Applied 0.6 scale transformation to fit content appropriately in dialog
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

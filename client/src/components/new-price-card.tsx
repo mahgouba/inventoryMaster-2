@@ -141,85 +141,131 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
               id="new-price-card-content"
               className="relative shadow-2xl border-2 border-gray-200 bg-gradient-to-b from-[#00627F] to-[#004A61]"
               style={{
-                width: '210mm',
-                height: '297mm',
-                maxWidth: '80vw',
-                maxHeight: '80vh',
+                width: '794px',
+                height: '1123px',
                 fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
                 direction: 'rtl',
-                fontSize: '12px',
-                overflow: 'hidden'
+                fontSize: '16px',
+                overflow: 'hidden',
+                transform: 'scale(0.6)',
+                transformOrigin: 'center center'
               }}
             >
             {/* Logo and Year Container - Centered */}
-            <div className="absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-              {/* Company Logo - 30% smaller */}
-              <div className="w-32 h-32 flex items-center justify-center mb-4">
+            <div className="absolute flex flex-col items-center" style={{ top: '40px', left: '50%', transform: 'translateX(-50%)' }}>
+              {/* Company Logo - Fixed size */}
+              <div style={{ width: '180px', height: '180px', marginBottom: '20px' }}>
                 <img 
                   src="/copmany logo.svg" 
                   alt="شعار الشركة" 
-                  className="w-full h-full object-contain filter brightness-110 drop-shadow-lg"
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'brightness(1.1) drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}
                 />
               </div>
 
-              {/* Year - 3x larger */}
-              <div className="text-white font-black tracking-wider drop-shadow-lg" style={{ fontSize: '15rem' }}>
+              {/* Year - Fixed large size */}
+              <div style={{ 
+                color: 'white', 
+                fontSize: '180px', 
+                fontWeight: '900', 
+                letterSpacing: '8px',
+                textShadow: '0 4px 8px rgba(0,0,0,0.3)'
+              }}>
                 {vehicle.year || '2025'}
               </div>
             </div>
 
-            {/* Main Content Card */}
-            <div className="absolute bottom-8 left-8 right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl" style={{ zIndex: 10 }}>
-              <div className="flex flex-col h-full space-y-4">
+            {/* Main Content Card - Fixed positioning and sizes */}
+            <div style={{
+              position: 'absolute',
+              bottom: '40px',
+              left: '40px',
+              right: '40px',
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(8px)',
+              borderRadius: '20px',
+              padding: '30px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              zIndex: 10
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {/* First Row - Category, Trim Level, Manufacturer Logo */}
-                <div className="flex items-center justify-between">
-                  <div className="text-[#CF9B47] text-2xl font-bold">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ color: '#CF9B47', fontSize: '32px', fontWeight: 'bold' }}>
                     {vehicle.category}
                   </div>
-                  <div className="text-[#CF9B47] text-xl font-semibold">
+                  <div style={{ color: '#CF9B47', fontSize: '24px', fontWeight: '600' }}>
                     {vehicle.trimLevel || 'الفئة الأساسية'}
                   </div>
-                  <div className="w-16 h-16 flex items-center justify-center bg-gray-100 rounded-full">
+                  <div style={{ 
+                    width: '80px', 
+                    height: '80px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    backgroundColor: '#f3f4f6',
+                    borderRadius: '50%'
+                  }}>
                     <ManufacturerLogo 
                       manufacturerName={vehicle.manufacturer} 
-                      className="w-full h-full object-contain filter brightness-110"
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     />
                   </div>
                 </div>
 
                 {/* Second Row - Status, Mileage and Price */}
-                <div className="flex items-center justify-between gap-4">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
                   {/* Status and Mileage Box */}
-                  <div className="flex-1 p-4 text-center">
-                    <div className="text-gray-700 text-sm font-semibold mb-1">الحالة</div>
-                    <div className={`text-xl font-bold mb-2 ${
-                      getCarStatus() === 'مستعمل' ? 'text-red-600' : 'text-green-600'
-                    }`}>
+                  <div style={{ flex: 1, padding: '20px', textAlign: 'center' }}>
+                    <div style={{ color: '#374151', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>الحالة</div>
+                    <div style={{ 
+                      fontSize: '24px', 
+                      fontWeight: 'bold', 
+                      marginBottom: '12px',
+                      color: getCarStatus() === 'مستعمل' ? '#dc2626' : '#16a34a'
+                    }}>
                       {getCarStatus() === 'مستعمل' ? 'مستعمل' : 'جديد'}
                     </div>
                     
                     {getCarStatus() === 'مستعمل' && (
-                      <div className="flex items-center justify-center gap-2">
-                        <span className="text-gray-700 text-sm font-semibold">المماشي:</span>
-                        <span className="text-[#00627F] text-lg font-bold">{getMileage()}</span>
-                        <div className="w-5 h-5 bg-gray-400 rounded-full flex items-center justify-center">
-                          <span className="text-xs font-bold text-white">KM</span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <span style={{ color: '#374151', fontSize: '18px', fontWeight: '600' }}>المماشي:</span>
+                        <span style={{ color: '#00627F', fontSize: '22px', fontWeight: 'bold' }}>{getMileage()}</span>
+                        <div style={{ 
+                          width: '24px', 
+                          height: '24px', 
+                          backgroundColor: '#9ca3af', 
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>KM</span>
                         </div>
                       </div>
                     )}
                   </div>
 
                   {/* Price Box */}
-                  <div className="flex-1 p-4 text-center">
-                    <div className="text-gray-700 text-sm font-semibold mb-1">السعر</div>
-                    <div className="text-[#00627F] text-xl font-bold">﷼ {formatPrice(vehicle.price || 0)}</div>
+                  <div style={{ flex: 1, padding: '20px', textAlign: 'center' }}>
+                    <div style={{ color: '#374151', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>السعر</div>
+                    <div style={{ color: '#00627F', fontSize: '28px', fontWeight: 'bold' }}>﷼ {formatPrice(vehicle.price || 0)}</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Import Type Circle */}
-            <div className={`absolute top-8 right-8 w-8 h-8 rounded-full ${getImportTypeColor()}`}></div>
+            {/* Import Type Circle - Fixed positioning */}
+            <div style={{
+              position: 'absolute',
+              top: '40px',
+              right: '40px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: vehicle.status === 'مستعمل' ? '#ef4444' : 
+                              vehicle.importType === 'شخصي' || vehicle.importType === 'personal' ? '#22c55e' : '#ffffff',
+              border: vehicle.importType === 'شركة' ? '3px solid #d1d5db' : 'none'
+            }}></div>
             </div>
           </div>
 
