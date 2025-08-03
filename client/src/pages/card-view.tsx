@@ -56,6 +56,7 @@ import ScrollableFilter from "@/components/scrollable-filter";
 import { ReservationDialog } from "@/components/reservation-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import PriceCard from "@/components/price-card";
+import { LeaveRequestForm } from "@/components/leave-request-form";
 
 import type { InventoryItem } from "@shared/schema";
 
@@ -100,6 +101,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [priceCardOpen, setPriceCardOpen] = useState(false);
   const [priceCardVehicle, setPriceCardVehicle] = useState<InventoryItem | null>(null);
   const [arrivedTodayOpen, setArrivedTodayOpen] = useState(false);
+  const [leaveRequestDialogOpen, setLeaveRequestDialogOpen] = useState(false);
   
   // Toggle states for individual filters - default to false (closed)
   const [showManufacturerFilter, setShowManufacturerFilter] = useState(false);
@@ -743,16 +745,15 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               </div>
 
               {/* Leave Request Button */}
-              <Link href="/leave-requests">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="glass-button glass-text-primary"
-                >
-                  <UserCheck size={16} className="ml-1" />
-                  <span className="hidden sm:inline">طلب إجازة وإستئذان</span>
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="glass-button glass-text-primary"
+                onClick={() => setLeaveRequestDialogOpen(true)}
+              >
+                <UserCheck size={16} className="ml-1" />
+                <span className="hidden sm:inline">طلب إجازة وإستئذان</span>
+              </Button>
 
 
 
@@ -1621,6 +1622,13 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Leave Request Form Dialog */}
+      <LeaveRequestForm
+        open={leaveRequestDialogOpen}
+        onOpenChange={setLeaveRequestDialogOpen}
+        username={username}
+      />
       </div>
     </div>
   );
