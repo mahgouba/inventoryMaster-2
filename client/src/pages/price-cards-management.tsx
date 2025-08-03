@@ -567,14 +567,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                     maxHeight: '210mm'
                   }}
                 >
-                  {/* Company Logo */}
-                  <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
-                    <img 
-                      src="/company-logo.svg" 
-                      alt="شعار الشركة" 
-                      className="w-64 h-64 object-contain filter brightness-110"
-                    />
-                  </div>
+                  
 
                   {/* Year */}
                   <div className="absolute top-60 left-1/2 transform -translate-x-1/2">
