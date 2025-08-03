@@ -411,11 +411,8 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                 </CardContent>
               </Card>
 
-              {/* Split Layout - Cards List and Fixed Preview */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Price Cards List */}
-                <div className="lg:col-span-2">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Price Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredPriceCards.map((record) => (
                   <Card key={record.id} className="glass-card hover:scale-105 transition-transform duration-200">
                     <CardContent className="p-6">
@@ -474,7 +471,7 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          onClick={() => setPreviewVehicle(record.vehicle)}
+                          onClick={() => handlePreview(record)}
                           className="flex-1 bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white"
                         >
                           <Eye size={16} className="ml-1" />
@@ -518,211 +515,27 @@ export default function PriceCardsManagementPage({ userRole, username, onLogout 
                     </CardContent>
                   </Card>
                 ))}
-
-                    {/* Empty State */}
-                    {filteredPriceCards.length === 0 && (
-                      <div className="md:col-span-2">
-                        <Card className="glass-container">
-                          <CardContent className="p-12 text-center">
-                            <Receipt className="mx-auto h-16 w-16 text-white/40 mb-4 drop-shadow-lg" />
-                            <h3 className="text-lg font-semibold text-white mb-2 drop-shadow-lg">لا توجد بطاقات أسعار</h3>
-                            <p className="text-white/70 mb-4 drop-shadow-sm">
-                              {searchQuery || selectedManufacturer !== "all" || selectedStatus !== "all"
-                                ? "لا توجد بطاقات أسعار تطابق معايير البحث"
-                                : "لم يتم إنشاء أي بطاقات أسعار بعد"
-                              }
-                            </p>
-                            <Button onClick={() => setShowCreateDialog(true)} className="bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white">
-                              <Plus size={16} className="ml-2" />
-                              إنشاء بطاقة سعر جديدة
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Fixed A4 Preview Panel */}
-                <div className="lg:col-span-1">
-                  <div className="sticky top-24">
-                    <Card className="glass-container">
-                      <CardHeader>
-                        <CardTitle className="text-lg text-white drop-shadow-lg flex items-center gap-2">
-                          <Eye size={18} />
-                          معاينة بطاقة السعر - حجم A4
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-2">
-                        {previewVehicle ? (
-                          <div 
-                            className="bg-white rounded-lg shadow-2xl"
-                            style={{
-                              width: '210mm',
-                              height: '297mm',
-                              maxWidth: '100%',
-                              aspectRatio: '210/297',
-                              transform: 'scale(0.28)',
-                              transformOrigin: 'top center',
-                              margin: '0 auto'
-                            }}
-                          >
-                            {/* A4 Price Card Content */}
-                            <div className="w-full h-full p-8 text-black relative overflow-hidden" dir="rtl">
-                              {/* Header with Logo */}
-                              <div className="flex justify-between items-start mb-8">
-                                <div className="flex items-center gap-4">
-                                  <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: '#00627F' }}>
-                                    <img src="/copmany logo.svg" alt="شعار الشركة" className="w-10 h-10 object-contain" />
-                                  </div>
-                                  <div>
-                                    <h1 className="text-2xl font-bold text-gray-800">البريمي للسيارات</h1>
-                                    <p className="text-gray-600">Al-Braimi Auto Trading</p>
-                                  </div>
-                                </div>
-                                <div className="text-left">
-                                  <p className="text-sm text-gray-600">التاريخ: {new Date().toLocaleDateString('ar-SA')}</p>
-                                  <p className="text-sm text-gray-600">الوقت: {new Date().toLocaleTimeString('ar-SA', { hour12: false })}</p>
-                                </div>
-                              </div>
-
-                              {/* Vehicle Image Area */}
-                              <div className="w-full h-64 bg-gradient-to-br from-blue-50 to-gray-100 rounded-lg mb-8 flex items-center justify-center border-2 border-gray-200">
-                                <div className="text-center">
-                                  <ManufacturerLogo 
-                                    manufacturerName={previewVehicle.manufacturer} 
-                                    size="lg" 
-                                    className="w-24 h-24 mx-auto mb-4"
-                                  />
-                                  <Car size={48} className="text-gray-400 mx-auto" />
-                                  <p className="text-gray-500 mt-2">صورة السيارة</p>
-                                </div>
-                              </div>
-
-                              {/* Vehicle Information */}
-                              <div className="grid grid-cols-2 gap-8 mb-8">
-                                <div>
-                                  <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                                    {previewVehicle.manufacturer}
-                                  </h2>
-                                  <h3 className="text-2xl text-gray-700 mb-2">
-                                    {previewVehicle.category}
-                                  </h3>
-                                  <p className="text-xl text-gray-600 mb-4">
-                                    موديل {previewVehicle.year}
-                                  </p>
-                                  <p className="text-lg text-gray-600">
-                                    {previewVehicle.trimLevel}
-                                  </p>
-                                </div>
-
-                                <div className="space-y-4">
-                                  <div className="flex justify-between border-b border-gray-200 pb-2">
-                                    <span className="font-semibold text-gray-700">الحالة:</span>
-                                    <span className="text-gray-600">{previewVehicle.status}</span>
-                                  </div>
-                                  <div className="flex justify-between border-b border-gray-200 pb-2">
-                                    <span className="font-semibold text-gray-700">نوع الاستيراد:</span>
-                                    <span className="text-gray-600">{previewVehicle.importType}</span>
-                                  </div>
-                                  {previewVehicle.exteriorColor && (
-                                    <div className="flex justify-between border-b border-gray-200 pb-2">
-                                      <span className="font-semibold text-gray-700">اللون الخارجي:</span>
-                                      <span className="text-gray-600">{previewVehicle.exteriorColor}</span>
-                                    </div>
-                                  )}
-                                  {previewVehicle.interiorColor && (
-                                    <div className="flex justify-between border-b border-gray-200 pb-2">
-                                      <span className="font-semibold text-gray-700">اللون الداخلي:</span>
-                                      <span className="text-gray-600">{previewVehicle.interiorColor}</span>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Price Section */}
-                              <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 mb-8 border-2 border-green-200">
-                                <div className="text-center">
-                                  <p className="text-lg text-gray-700 mb-2">السعر</p>
-                                  <p className="text-4xl font-bold text-green-600">
-                                    {new Intl.NumberFormat('ar-SA', {
-                                      style: 'currency',
-                                      currency: 'SAR',
-                                      minimumFractionDigits: 0
-                                    }).format(parseFloat(previewVehicle.price?.toString() || '0'))}
-                                  </p>
-                                  <p className="text-sm text-gray-500 mt-2">شامل ضريبة القيمة المضافة</p>
-                                </div>
-                              </div>
-
-                              {/* Contact Information */}
-                              <div className="absolute bottom-8 left-8 right-8">
-                                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                                  <div className="grid grid-cols-3 gap-4 text-center">
-                                    <div>
-                                      <p className="font-semibold text-gray-700">الهاتف</p>
-                                      <p className="text-gray-600">+966 XX XXX XXXX</p>
-                                    </div>
-                                    <div>
-                                      <p className="font-semibold text-gray-700">البريد الإلكتروني</p>
-                                      <p className="text-gray-600">info@albraimi.com</p>
-                                    </div>
-                                    <div>
-                                      <p className="font-semibold text-gray-700">الموقع</p>
-                                      <p className="text-gray-600">www.albraimi.com</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div 
-                            className="bg-gray-100 rounded-lg flex items-center justify-center"
-                            style={{
-                              width: '210mm',
-                              height: '297mm',
-                              maxWidth: '100%',
-                              aspectRatio: '210/297',
-                              transform: 'scale(0.28)',
-                              transformOrigin: 'top center',
-                              margin: '0 auto'
-                            }}
-                          >
-                            <div className="text-center">
-                              <Eye className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-                              <p className="text-gray-600 text-xl">
-                                اختر بطاقة سعر لمعاينتها
-                              </p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Action Buttons */}
-                        {previewVehicle && (
-                          <div className="flex gap-2 mt-4">
-                            <Button
-                              size="sm"
-                              onClick={() => setPriceCardOpen(true)}
-                              className="flex-1 bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white"
-                            >
-                              <Printer size={14} className="ml-1" />
-                              طباعة كاملة
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="glass-button p-2"
-                            >
-                              <Download size={14} />
-                            </Button>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
               </div>
+
+              {/* Empty State */}
+              {filteredPriceCards.length === 0 && (
+                <Card className="glass-container">
+                  <CardContent className="p-12 text-center">
+                    <Receipt className="mx-auto h-16 w-16 text-white/40 mb-4 drop-shadow-lg" />
+                    <h3 className="text-lg font-semibold text-white mb-2 drop-shadow-lg">لا توجد بطاقات أسعار</h3>
+                    <p className="text-white/70 mb-4 drop-shadow-sm">
+                      {searchQuery || selectedManufacturer !== "all" || selectedStatus !== "all"
+                        ? "لا توجد بطاقات أسعار تطابق معايير البحث"
+                        : "لم يتم إنشاء أي بطاقات أسعار بعد"
+                      }
+                    </p>
+                    <Button onClick={() => setShowCreateDialog(true)} className="bg-blue-600/80 hover:bg-blue-700/90 backdrop-blur-sm border border-white/20 text-white">
+                      <Plus size={16} className="ml-2" />
+                      إنشاء بطاقة سعر جديدة
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
           </Tabs>
         </div>
