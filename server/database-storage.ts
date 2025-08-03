@@ -1,12 +1,13 @@
 import { db } from "./db";
 import { 
-  users, inventoryItems, banks, manufacturers, vehicleCategories, vehicleTrimLevels,
+  users, inventoryItems, banks, manufacturers, vehicleCategories, vehicleTrimLevels, colorAssociations,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Bank, type InsertBank,
   type Manufacturer, type InsertManufacturer,
   type VehicleCategory, type InsertVehicleCategory,
-  type VehicleTrimLevel, type InsertVehicleTrimLevel
+  type VehicleTrimLevel, type InsertVehicleTrimLevel,
+  type ColorAssociation, type InsertColorAssociation
 } from "@shared/schema";
 import { eq, sql, and, or, ilike, desc, asc } from "drizzle-orm";
 import type { IStorage } from "./storage";
@@ -586,4 +587,122 @@ export class DatabaseStorage implements IStorage {
   async createStockSettings(settings: any): Promise<any> { return settings; }
   async updateStockSettings(id: number, settings: any): Promise<any> { return null; }
   async deleteStockSettings(id: number): Promise<boolean> { return false; }
+
+  // Color management methods
+  async getExteriorColors(): Promise<any[]> {
+    try {
+      const result = await db.execute(sql`SELECT * FROM exterior_colors ORDER BY name_ar ASC`);
+      return result.rows || [];
+    } catch (error) {
+      console.error('Error fetching exterior colors:', error);
+      return [];
+    }
+  }
+
+  async getInteriorColors(): Promise<any[]> {
+    try {
+      const result = await db.execute(sql`SELECT * FROM interior_colors ORDER BY name_ar ASC`);
+      return result.rows || [];
+    } catch (error) {
+      console.error('Error fetching interior colors:', error);
+      return [];
+    }
+  }
+
+  async createExteriorColor(colorData: any): Promise<any> {
+    try {
+      const { name_ar, name_en, hex_code } = colorData;
+      const result = await db.execute(
+        sql`INSERT INTO exterior_colors (name_ar, name_en, hex_code) 
+            VALUES (${name_ar}, ${name_en}, ${hex_code}) 
+            RETURNING *`
+      );
+      return result.rows[0];
+    } catch (error) {
+      console.error('Error creating exterior color:', error);
+      throw error;
+    }
+  }
+
+  async createInteriorColor(colorData: any): Promise<any> {
+    try {
+      const { name_ar, name_en, hex_code } = colorData;
+      const result = await db.execute(
+        sql`INSERT INTO interior_colors (name_ar, name_en, hex_code) 
+            VALUES (${name_ar}, ${name_en}, ${hex_code}) 
+            RETURNING *`
+      );
+      return result.rows[0];
+    } catch (error) {
+      console.error('Error creating interior color:', error);
+      throw error;
+    }
+  }
+
+  async getColorAssociations(filters: any = {}): Promise<ColorAssociation[]> {
+    try {
+      let query = sql`SELECT * FROM color_associations WHERE is_active = true`;
+      
+      if (filters.manufacturer) {
+        query = sql`${query} AND manufacturer = ${filters.manufacturer}`;
+      }
+      if (filters.category) {
+        query = sql`${query} AND category = ${filters.category}`;
+      }
+      if (filters.trimLevel) {
+        query = sql`${query} AND trim_level = ${filters.trimLevel}`;
+      }
+      if (filters.colorType) {
+        query = sql`${query} AND color_type = ${filters.colorType}`;
+      }
+      
+      query = sql`${query} ORDER BY created_at DESC`;
+      
+      const result = await db.execute(query);
+      return result.rows as ColorAssociation[];
+    } catch (error) {
+      console.error('Error fetching color associations:', error);
+      return [];
+    }
+  }
+
+  async createColorAssociation(associationData: InsertColorAssociation): Promise<ColorAssociation> {
+    try {
+      const [association] = await db.insert(colorAssociations).values(associationData).returning();
+      return association;
+    } catch (error) {
+      console.error('Error creating color association:', error);
+      throw error;
+    }
+  }
+
+  async deleteColorAssociation(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(colorAssociations).where(eq(colorAssociations.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error('Error deleting color association:', error);
+      return false;
+    }
+  }
+
+  async createCategory(categoryData: { name_ar: string; name_en?: string; manufacturer_id: number }): Promise<any> {
+    try {
+      const [category] = await db.insert(vehicleCategories).values(categoryData).returning();
+      return category;
+    } catch (error) {
+      console.error('Error creating category:', error);
+      throw error;
+    }
+  }
+
+  async createTrimLevel(trimLevelData: { name_ar: string; name_en?: string; category_id: number }): Promise<any> {
+    try {
+      const [trimLevel] = await db.insert(vehicleTrimLevels).values(trimLevelData).returning();
+      return trimLevel;
+    } catch (error) {
+      console.error('Error creating trim level:', error);
+      throw error;
+    }
+  }
 }

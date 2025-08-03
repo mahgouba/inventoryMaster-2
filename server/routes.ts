@@ -1131,6 +1131,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Color management API endpoints
+  app.get("/api/colors/exterior", async (req, res) => {
+    try {
+      const colors = await storage.getExteriorColors();
+      res.json(colors);
+    } catch (error) {
+      console.error("Error fetching exterior colors:", error);
+      res.status(500).json({ message: "Failed to fetch exterior colors" });
+    }
+  });
+
+  app.get("/api/colors/interior", async (req, res) => {
+    try {
+      const colors = await storage.getInteriorColors();
+      res.json(colors);
+    } catch (error) {
+      console.error("Error fetching interior colors:", error);
+      res.status(500).json({ message: "Failed to fetch interior colors" });
+    }
+  });
+
+  app.post("/api/colors/exterior", async (req, res) => {
+    try {
+      const colorData = req.body;
+      const color = await storage.createExteriorColor(colorData);
+      res.status(201).json(color);
+    } catch (error) {
+      console.error("Error creating exterior color:", error);
+      res.status(500).json({ message: "Failed to create exterior color" });
+    }
+  });
+
+  app.post("/api/colors/interior", async (req, res) => {
+    try {
+      const colorData = req.body;
+      const color = await storage.createInteriorColor(colorData);
+      res.status(201).json(color);
+    } catch (error) {
+      console.error("Error creating interior color:", error);
+      res.status(500).json({ message: "Failed to create interior color" });
+    }
+  });
+
+  // Color associations management
+  app.get("/api/color-associations", async (req, res) => {
+    try {
+      const { manufacturer, category, trimLevel, colorType, scope } = req.query;
+      const associations = await storage.getColorAssociations({
+        manufacturer: manufacturer as string,
+        category: category as string,
+        trimLevel: trimLevel as string,
+        colorType: colorType as 'interior' | 'exterior',
+        scope: scope as string
+      });
+      res.json(associations);
+    } catch (error) {
+      console.error("Error fetching color associations:", error);
+      res.status(500).json({ message: "Failed to fetch color associations" });
+    }
+  });
+
+  app.post("/api/color-associations", async (req, res) => {
+    try {
+      const associationData = insertColorAssociationSchema.parse(req.body);
+      const association = await storage.createColorAssociation(associationData);
+      res.status(201).json(association);
+    } catch (error) {
+      console.error("Error creating color association:", error);
+      res.status(500).json({ message: "Failed to create color association" });
+    }
+  });
+
+  app.delete("/api/color-associations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteColorAssociation(id);
+      if (success) {
+        res.json({ message: "Color association deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Color association not found" });
+      }
+    } catch (error) {
+      console.error("Error deleting color association:", error);
+      res.status(500).json({ message: "Failed to delete color association" });
+    }
+  });
+
+  // Categories management
+  app.post("/api/categories", async (req, res) => {
+    try {
+      const { name_ar, name_en, manufacturer_id } = req.body;
+      const category = await storage.createCategory({ name_ar, name_en, manufacturer_id });
+      res.status(201).json(category);
+    } catch (error) {
+      console.error("Error creating category:", error);
+      res.status(500).json({ message: "Failed to create category" });
+    }
+  });
+
+  // Trim levels management
+  app.post("/api/trim-levels", async (req, res) => {
+    try {
+      const { name_ar, name_en, category_id } = req.body;
+      const trimLevel = await storage.createTrimLevel({ name_ar, name_en, category_id });
+      res.status(201).json(trimLevel);
+    } catch (error) {
+      console.error("Error creating trim level:", error);
+      res.status(500).json({ message: "Failed to create trim level" });
+    }
+  });
+
 
 
   // User Management APIs (Admin only)
