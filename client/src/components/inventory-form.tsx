@@ -281,7 +281,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                         </SelectTrigger>
                         <SelectContent>
                           {isLoadingManufacturers ? (
-                            <SelectItem disabled value="loading">
+                            <SelectItem key="loading" disabled value="loading">
                               جاري التحميل...
                             </SelectItem>
                           ) : manufacturers.length > 0 ? (
@@ -291,7 +291,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                               </SelectItem>
                             ))
                           ) : (
-                            <SelectItem disabled value="no-data">
+                            <SelectItem key="no-data" disabled value="no-data">
                               لا توجد بيانات
                             </SelectItem>
                           )}
@@ -319,11 +319,11 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                         </SelectTrigger>
                         <SelectContent>
                           {isLoadingCategories ? (
-                            <SelectItem disabled value="loading">
+                            <SelectItem key="loading" disabled value="loading">
                               جاري التحميل...
                             </SelectItem>
                           ) : !selectedManufacturerName ? (
-                            <SelectItem disabled value="no-manufacturer">
+                            <SelectItem key="no-manufacturer" disabled value="no-manufacturer">
                               اختر الصانع أولاً
                             </SelectItem>
                           ) : categories.length > 0 ? (
@@ -333,7 +333,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                               </SelectItem>
                             ))
                           ) : (
-                            <SelectItem disabled value="no-categories">
+                            <SelectItem key="no-categories" disabled value="no-categories">
                               لا توجد فئات لهذا الصانع
                             </SelectItem>
                           )}
@@ -358,11 +358,11 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                         </SelectTrigger>
                         <SelectContent>
                           {isLoadingTrimLevels ? (
-                            <SelectItem disabled value="loading">
+                            <SelectItem key="loading" disabled value="loading">
                               جاري التحميل...
                             </SelectItem>
                           ) : !selectedCategoryName ? (
-                            <SelectItem disabled value="no-category">
+                            <SelectItem key="no-category" disabled value="no-category">
                               اختر الفئة أولاً
                             </SelectItem>
                           ) : trimLevels.length > 0 ? (
@@ -372,7 +372,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                               </SelectItem>
                             ))
                           ) : (
-                            <SelectItem disabled value="no-trim-levels">
+                            <SelectItem key="no-trim-levels" disabled value="no-trim-levels">
                               لا توجد درجات تجهيز لهذه الفئة
                             </SelectItem>
                           )}
