@@ -146,7 +146,7 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
           >
             {/* Company Logo */}
             <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
-              <div className="w-16 h-16 bg-transparent rounded-full flex items-center justify-center p-2">
+              <div className="w-48 h-48 flex items-center justify-center">
                 <img 
                   src="/company-logo.svg" 
                   alt="شعار الشركة" 
