@@ -144,7 +144,8 @@ export default function LeaveRequestsPage({ userRole, username, userId }: LeaveR
       setIsCreateDialogOpen(false);
       resetForm();
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Error creating leave request:", error);
       toast({
         title: "خطأ في إنشاء الطلب",
         description: "حدث خطأ أثناء إنشاء الطلب",
