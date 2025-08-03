@@ -37,7 +37,7 @@ export function LeaveRequestForm({ open, onOpenChange, username }: LeaveRequestF
   const form = useForm<LeaveRequestFormData>({
     resolver: zodResolver(leaveRequestSchema),
     defaultValues: {
-      requestType: "",
+      requestType: "إجازة",
       startDate: "",
       endDate: "",
       duration: 1,
@@ -308,7 +308,7 @@ export function LeaveRequestForm({ open, onOpenChange, username }: LeaveRequestF
             <div className="glass-container p-3 border-l-4 border-yellow-500">
               <p className="text-yellow-200 text-sm flex items-center gap-2">
                 <CheckCircle size={16} />
-                سيتم إرسال الطلب مع حالة "قيد الموافقة" وسيظهر في الصفحة الرئيسية
+                سيتم إرسال الطلب مع حالة "قيد الموافقة" ويمكن مراجعته في صفحة طلبات الإجازة
               </p>
             </div>
 

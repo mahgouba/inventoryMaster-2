@@ -57,6 +57,7 @@ import { ReservationDialog } from "@/components/reservation-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import PriceCard from "@/components/price-card";
 import { LeaveRequestForm } from "@/components/leave-request-form";
+import { PendingLeaveRequests } from "@/components/pending-leave-requests";
 
 import type { InventoryItem } from "@shared/schema";
 
@@ -1137,6 +1138,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
             )}
           </div>
         )}
+
+        {/* Pending Leave Requests Section */}
+        <div className="p-6">
+          <PendingLeaveRequests />
+        </div>
 
         {/* Vehicle Cards by Manufacturer */}
         <div className="space-y-8 p-6">
