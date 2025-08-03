@@ -3,14 +3,14 @@ import { users, inventoryItems, manufacturers, banks } from "@shared/schema";
 import bcrypt from "bcryptjs";
 
 const sampleManufacturers = [
-  { name: "مرسيدس" },
-  { name: "بي ام دبليو" },
-  { name: "لاند روفر" },
-  { name: "اودي" },
-  { name: "لكزس" },
-  { name: "تويوتا" },
-  { name: "نيسان" },
-  { name: "بورش" },
+  { nameAr: "مرسيدس", nameEn: "Mercedes", logo: null },
+  { nameAr: "بي ام دبليو", nameEn: "BMW", logo: null },
+  { nameAr: "لاند روفر", nameEn: "Land Rover", logo: null },
+  { nameAr: "اودي", nameEn: "Audi", logo: null },
+  { nameAr: "لكزس", nameEn: "Lexus", logo: null },
+  { nameAr: "تويوتا", nameEn: "Toyota", logo: null },
+  { nameAr: "نيسان", nameEn: "Nissan", logo: null },
+  { nameAr: "بورش", nameEn: "Porsche", logo: null },
 ];
 
 const sampleBanks = [
