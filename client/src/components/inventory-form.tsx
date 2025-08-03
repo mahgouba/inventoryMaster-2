@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -19,18 +19,27 @@ interface InventoryFormProps {
   editItem?: InventoryItem;
 }
 
-const manufacturerCategories: Record<string, string[]> = {
-  "مرسيدس": ["E200", "C200", "C300", "S500", "GLE", "CLA", "A200"],
-  "بي ام دبليو": ["X5", "X3", "X6", "320i", "520i", "730i", "M3"],
-  "اودي": ["A4", "A6", "Q5", "Q7", "A3", "TT", "RS6"],
-  "تويوتا": ["كامري", "كورولا", "لاند كروزر", "هايلاندر", "يارس", "أفالون"],
-  "نيسان": ["التيما", "ماكسيما", "باترول", "اكس تريل", "سنترا", "مورانو"],
-  "هوندا": ["أكورد", "سيفيك", "بايلوت", "CR-V", "HR-V"],
-  "فورد": ["فوكس", "فيوجن", "اكسبلورر", "F-150", "موستانغ"],
-  "هيونداي": ["النترا", "سوناتا", "توسان", "سانتا في", "أكسنت"]
-};
+// Database types for hierarchical data
+interface Manufacturer {
+  id: number;
+  nameAr: string;
+  nameEn: string;
+  logo?: string;
+}
 
-const initialManufacturers = Object.keys(manufacturerCategories);
+interface Category {
+  id: number;
+  manufacturer_id: number;
+  nameAr: string;
+  nameEn: string;
+}
+
+interface TrimLevel {
+  id: number;
+  category_id: number;
+  nameAr: string;
+  nameEn: string;
+}
 const initialEngineCapacities = ["2.0L", "1.5L", "3.0L", "4.0L", "5.0L", "V6", "V8"];
 const initialYears = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018];
 const initialStatuses = ["متوفر", "في الطريق", "قيد الصيانة"];
@@ -43,14 +52,29 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [selectedManufacturer, setSelectedManufacturer] = useState(editItem?.manufacturer || "");
-  const [availableCategories, setAvailableCategories] = useState<string[]>(
-    editItem?.manufacturer ? manufacturerCategories[editItem.manufacturer] || [] : []
-  );
+  const [selectedManufacturerId, setSelectedManufacturerId] = useState<number | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [isEditingOptions, setIsEditingOptions] = useState(false);
   
-  // Local state for editable lists
-  const [editableManufacturers, setEditableManufacturers] = useState<string[]>(initialManufacturers);
+  // Fetch manufacturers from database
+  const { data: manufacturers = [], isLoading: isLoadingManufacturers } = useQuery<Manufacturer[]>({
+    queryKey: ["/api/hierarchical/manufacturers"],
+    enabled: open, // Only fetch when dialog is open
+  });
+  
+  // Fetch categories based on selected manufacturer
+  const { data: categories = [], isLoading: isLoadingCategories } = useQuery<Category[]>({
+    queryKey: ["/api/hierarchical/categories", selectedManufacturerId],
+    enabled: open && !!selectedManufacturerId,
+  });
+  
+  // Fetch trim levels based on selected category
+  const { data: trimLevels = [], isLoading: isLoadingTrimLevels } = useQuery<TrimLevel[]>({
+    queryKey: ["/api/hierarchical/trimLevels", selectedCategoryId],
+    enabled: open && !!selectedCategoryId,
+  });
+  
+  // Local state for editable lists (keeping the same structure for other dropdowns)
   const [editableEngineCapacities, setEditableEngineCapacities] = useState<string[]>(initialEngineCapacities);
   const [editableStatuses, setEditableStatuses] = useState<string[]>(initialStatuses);
   const [editableImportTypes, setEditableImportTypes] = useState<string[]>(initialImportTypes);
@@ -92,13 +116,31 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   });
 
   // Handle manufacturer change
-  const handleManufacturerChange = (manufacturer: string) => {
-    setSelectedManufacturer(manufacturer);
-    setAvailableCategories(manufacturerCategories[manufacturer] || []);
+  const handleManufacturerChange = (manufacturerName: string) => {
+    // Find the manufacturer ID from the selected name
+    const manufacturer = manufacturers.find(m => m.nameAr === manufacturerName);
+    if (manufacturer) {
+      setSelectedManufacturerId(manufacturer.id);
+      setSelectedCategoryId(null); // Reset category when manufacturer changes
+    }
     
-    // Reset category when manufacturer changes
-    form.setValue("manufacturer", manufacturer);
+    // Update form values
+    form.setValue("manufacturer", manufacturerName);
     form.setValue("category", "");
+    form.setValue("trimLevel", "");
+  };
+
+  // Handle category change
+  const handleCategoryChange = (categoryName: string) => {
+    // Find the category ID from the selected name
+    const category = categories.find(c => c.nameAr === categoryName);
+    if (category) {
+      setSelectedCategoryId(category.id);
+    }
+    
+    // Update form values
+    form.setValue("category", categoryName);
+    form.setValue("trimLevel", "");
   };
 
   // Update form when editItem changes
@@ -132,8 +174,14 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
       };
       
       form.reset(formData);
-      setSelectedManufacturer(editItem.manufacturer || "");
-      setAvailableCategories(manufacturerCategories[editItem.manufacturer] || []);
+      
+      // Set the manufacturer and category IDs for hierarchical dropdown
+      if (editItem.manufacturer && manufacturers.length > 0) {
+        const manufacturer = manufacturers.find(m => m.nameAr === editItem.manufacturer);
+        if (manufacturer) {
+          setSelectedManufacturerId(manufacturer.id);
+        }
+      }
     } else {
       // Reset to empty form when creating new item
       form.reset({
@@ -156,10 +204,10 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
         isSold: false,
         mileage: undefined,
       });
-      setSelectedManufacturer("");
-      setAvailableCategories([]);
+      setSelectedManufacturerId(null);
+      setSelectedCategoryId(null);
     }
-  }, [editItem, form]);
+  }, [editItem, form, manufacturers]);
 
   const createMutation = useMutation({
     mutationFn: (data: InsertInventoryItem) => apiRequest("POST", "/api/inventory", data),
@@ -243,11 +291,21 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                           <SelectValue placeholder="الصانع" />
                         </SelectTrigger>
                         <SelectContent>
-                          {editableManufacturers.map((manufacturer) => (
-                            <SelectItem key={manufacturer} value={manufacturer}>
-                              {manufacturer}
+                          {isLoadingManufacturers ? (
+                            <SelectItem disabled value="loading">
+                              جاري التحميل...
                             </SelectItem>
-                          ))}
+                          ) : manufacturers.length > 0 ? (
+                            manufacturers.map((manufacturer) => (
+                              <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                                {manufacturer.nameAr}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem disabled value="no-data">
+                              لا توجد بيانات
+                            </SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -263,20 +321,31 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={(value) => {
+                        handleCategoryChange(value);
+                        field.onChange(value);
+                      }} value={field.value}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="الفئة" />
                         </SelectTrigger>
                         <SelectContent>
-                          {availableCategories.length > 0 ? (
-                            availableCategories.map((category) => (
-                              <SelectItem key={category} value={category}>
-                                {category}
+                          {isLoadingCategories ? (
+                            <SelectItem disabled value="loading">
+                              جاري التحميل...
+                            </SelectItem>
+                          ) : !selectedManufacturerId ? (
+                            <SelectItem disabled value="no-manufacturer">
+                              اختر الصانع أولاً
+                            </SelectItem>
+                          ) : categories.length > 0 ? (
+                            categories.map((category) => (
+                              <SelectItem key={category.id} value={category.nameAr}>
+                                {category.nameAr}
                               </SelectItem>
                             ))
                           ) : (
-                            <SelectItem disabled value="no-manufacturer">
-                              اختر الصانع أولاً
+                            <SelectItem disabled value="no-categories">
+                              لا توجد فئات لهذا الصانع
                             </SelectItem>
                           )}
                         </SelectContent>
@@ -294,14 +363,32 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input 
-                        {...field}
-                        placeholder="درجة التجهيز"
-                        className="glass-input border-white/20 text-white placeholder:text-white/60"
-                        dir="rtl"
-                        value={field.value || ""}
-                        onChange={field.onChange}
-                      />
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                        <SelectTrigger className="glass-input border-white/20 text-white">
+                          <SelectValue placeholder="درجة التجهيز" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {isLoadingTrimLevels ? (
+                            <SelectItem disabled value="loading">
+                              جاري التحميل...
+                            </SelectItem>
+                          ) : !selectedCategoryId ? (
+                            <SelectItem disabled value="no-category">
+                              اختر الفئة أولاً
+                            </SelectItem>
+                          ) : trimLevels.length > 0 ? (
+                            trimLevels.map((trimLevel) => (
+                              <SelectItem key={trimLevel.id} value={trimLevel.nameAr}>
+                                {trimLevel.nameAr}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem disabled value="no-trim-levels">
+                              لا توجد درجات تجهيز لهذه الفئة
+                            </SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
