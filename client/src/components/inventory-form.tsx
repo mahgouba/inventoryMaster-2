@@ -692,67 +692,73 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 />
               )}
 
-              {/* تاريخ الحجز */}
-              <FormField
-                control={form.control}
-                name="reservationDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input 
-                        type="date"
-                        value={field.value ? new Date(field.value).toISOString().split('T')[0] : ""}
-                        onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
-                        className="glass-input border-white/20 text-white"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* تاريخ الحجز - مخفي في نافذة الإضافة */}
+              {false && (
+                <FormField
+                  control={form.control}
+                  name="reservationDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input 
+                          type="date"
+                          value={field.value ? new Date(field.value).toISOString().split('T')[0] : ""}
+                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                          className="glass-input border-white/20 text-white"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
-              {/* محجوز بواسطة */}
-              <FormField
-                control={form.control}
-                name="reservedBy"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input 
-                        placeholder="محجوز بواسطة"
-                        value={field.value || ""}
-                        onChange={field.onChange}
-                        className="glass-input border-white/20 text-white placeholder:text-white/60"
-                        dir="rtl"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* محجوز بواسطة - مخفي في نافذة الإضافة */}
+              {false && (
+                <FormField
+                  control={form.control}
+                  name="reservedBy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input 
+                          placeholder="محجوز بواسطة"
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          className="glass-input border-white/20 text-white placeholder:text-white/60"
+                          dir="rtl"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
 
             {/* الملاحظات والمواصفات */}
             <div className="grid grid-cols-1 gap-4">
-              {/* ملاحظة الحجز */}
-              <FormField
-                control={form.control}
-                name="reservationNote"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="ملاحظة الحجز"
-                        className="glass-input border-white/20 text-white placeholder:text-white/60 min-h-[80px]"
-                        value={field.value || ""}
-                        onChange={field.onChange}
-                        dir="rtl"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* ملاحظة الحجز - مخفي في نافذة الإضافة */}
+              {false && (
+                <FormField
+                  control={form.control}
+                  name="reservationNote"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="ملاحظة الحجز"
+                          className="glass-input border-white/20 text-white placeholder:text-white/60 min-h-[80px]"
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          dir="rtl"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               {/* المواصفات التفصيلية */}
               <FormField
