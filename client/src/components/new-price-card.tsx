@@ -138,14 +138,10 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
           {/* Price Card Design */}
           <div 
             id="new-price-card-content"
-            className="relative w-[842px] h-[595px] rounded-lg overflow-hidden"
+            className="relative w-[842px] h-[595px] rounded-lg overflow-hidden bg-gradient-to-b from-[#00627F] to-[#004A61]"
             style={{
               fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
-              direction: 'rtl',
-              backgroundImage: 'url(/price-card.svg)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
+              direction: 'rtl'
             }}
           >
             {/* Company Logo */}
