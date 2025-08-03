@@ -139,7 +139,7 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
           <div className="flex justify-center items-center w-full">
             <div 
               id="new-price-card-content"
-              className="relative bg-white shadow-2xl border-2 border-gray-200"
+              className="relative shadow-2xl border-2 border-gray-200 bg-gradient-to-b from-[#00627F] to-[#004A61]"
               style={{
                 width: '210mm',
                 height: '297mm',
@@ -155,7 +155,7 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
             <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
               <div className="w-48 h-48 flex items-center justify-center">
                 <img 
-                  src="/company-logo.svg" 
+                  src="/copmany logo.svg" 
                   alt="شعار الشركة" 
                   className="w-full h-full object-contain filter brightness-110 drop-shadow-lg"
                 />
@@ -164,7 +164,7 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
 
             {/* Year */}
             <div className="absolute top-24 left-1/2 transform -translate-x-1/2">
-              <div className="text-white text-8xl font-black tracking-wider">
+              <div className="text-white text-8xl font-black tracking-wider drop-shadow-lg">
                 {vehicle.year || '2025'}
               </div>
             </div>
