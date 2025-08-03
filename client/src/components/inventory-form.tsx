@@ -54,38 +54,6 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   
   const [isEditingOptions, setIsEditingOptions] = useState(false);
   
-  // Fetch manufacturers from database
-  const { data: manufacturers = [], isLoading: isLoadingManufacturers } = useQuery<Manufacturer[]>({
-    queryKey: ["/api/hierarchical/manufacturers"],
-    enabled: open, // Only fetch when dialog is open
-  });
-  
-  // Get current manufacturer name for categories query
-  const selectedManufacturerName = form.watch("manufacturer");
-  
-  // Get current category name for trim levels query  
-  const selectedCategoryName = form.watch("category");
-  
-  // Fetch categories based on selected manufacturer
-  const { data: categories = [], isLoading: isLoadingCategories } = useQuery<Category[]>({
-    queryKey: ["/api/hierarchical/categories", selectedManufacturerName],
-    queryFn: () => 
-      selectedManufacturerName 
-        ? fetch(`/api/hierarchical/categories?manufacturer=${encodeURIComponent(selectedManufacturerName)}`).then(res => res.json())
-        : Promise.resolve([]),
-    enabled: open && !!selectedManufacturerName,
-  });
-  
-  // Fetch trim levels based on selected category
-  const { data: trimLevels = [], isLoading: isLoadingTrimLevels } = useQuery<TrimLevel[]>({
-    queryKey: ["/api/hierarchical/trimLevels", selectedManufacturerName, selectedCategoryName],
-    queryFn: () => 
-      selectedManufacturerName && selectedCategoryName
-        ? fetch(`/api/hierarchical/trimLevels?manufacturer=${encodeURIComponent(selectedManufacturerName)}&category=${encodeURIComponent(selectedCategoryName)}`).then(res => res.json())
-        : Promise.resolve([]),
-    enabled: open && !!selectedManufacturerName && !!selectedCategoryName,
-  });
-  
   // Local state for editable lists (keeping the same structure for other dropdowns)
   const [editableEngineCapacities, setEditableEngineCapacities] = useState<string[]>(initialEngineCapacities);
   const [editableStatuses, setEditableStatuses] = useState<string[]>(initialStatuses);
@@ -125,6 +93,38 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
       reservationNote: "",
       mileage: undefined,
     },
+  });
+
+  // Fetch manufacturers from database
+  const { data: manufacturers = [], isLoading: isLoadingManufacturers } = useQuery<Manufacturer[]>({
+    queryKey: ["/api/hierarchical/manufacturers"],
+    enabled: open, // Only fetch when dialog is open
+  });
+  
+  // Get current manufacturer name for categories query
+  const selectedManufacturerName = form.watch("manufacturer");
+  
+  // Get current category name for trim levels query  
+  const selectedCategoryName = form.watch("category");
+  
+  // Fetch categories based on selected manufacturer
+  const { data: categories = [], isLoading: isLoadingCategories } = useQuery<Category[]>({
+    queryKey: ["/api/hierarchical/categories", selectedManufacturerName],
+    queryFn: () => 
+      selectedManufacturerName 
+        ? fetch(`/api/hierarchical/categories?manufacturer=${encodeURIComponent(selectedManufacturerName)}`).then(res => res.json())
+        : Promise.resolve([]),
+    enabled: open && !!selectedManufacturerName,
+  });
+  
+  // Fetch trim levels based on selected category
+  const { data: trimLevels = [], isLoading: isLoadingTrimLevels } = useQuery<TrimLevel[]>({
+    queryKey: ["/api/hierarchical/trimLevels", selectedManufacturerName, selectedCategoryName],
+    queryFn: () => 
+      selectedManufacturerName && selectedCategoryName
+        ? fetch(`/api/hierarchical/trimLevels?manufacturer=${encodeURIComponent(selectedManufacturerName)}&category=${encodeURIComponent(selectedCategoryName)}`).then(res => res.json())
+        : Promise.resolve([]),
+    enabled: open && !!selectedManufacturerName && !!selectedCategoryName,
   });
 
   // Handle manufacturer change
