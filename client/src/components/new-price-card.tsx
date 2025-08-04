@@ -323,8 +323,7 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                   width: '100%', 
                   height: '100%', 
                   objectFit: 'contain', 
-                  filter: 'brightness(1.5) sepia(1) hue-rotate(38deg) saturate(2)',
-                  dropShadow: '0 4px 8px rgba(0,0,0,0.3)'
+                  filter: 'brightness(1.5) sepia(1) hue-rotate(38deg) saturate(2) drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
                 }}
               />
             </div>
@@ -387,7 +386,8 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                   }}>
                     <ManufacturerLogo 
                       manufacturerName={vehicle.manufacturer} 
-                      style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(0.8)' }}
+                      className="w-full h-full object-contain"
+                      style={{ filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(0.8)' }}
                     />
                   </div>
                 </div>
