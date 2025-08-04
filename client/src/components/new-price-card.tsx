@@ -296,16 +296,7 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
             >
 
 
-            {/* Red Circle - Top Left */}
-            <div style={{
-              position: 'absolute',
-              top: '40px',
-              left: '40px',
-              width: '60px',
-              height: '60px',
-              backgroundColor: '#FF0000',
-              borderRadius: '50%'
-            }}></div>
+
 
             {/* Company Logo - Top Center */}
             <div style={{
