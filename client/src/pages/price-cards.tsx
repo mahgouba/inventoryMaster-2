@@ -452,41 +452,39 @@ export default function PriceCardsPage() {
             </div>
 
             {/* Main Content Card - Bottom Center */}
-            <div className="text-[#cf9b46]" style={{
+            <div style={{
               position: 'absolute',
-              bottom: '60px',
+              bottom: '40px',
               left: '50%',
               transform: 'translateX(-50%)',
               width: '1080px',
-              height: '240px',
+              height: '280px',
               backgroundColor: 'transparent',
-              padding: '30px',
+              padding: '20px',
               zIndex: 10,
-              overflow: 'hidden'
+              overflow: 'visible'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '48px' }}>
-                {/* Right Section - Vehicle Info */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', justifyContent: 'center' }}>
-                  <div className="bg-[#ffffff00]" style={{ color: '#CF9B47', fontSize: '45px', fontWeight: 'bold', letterSpacing: '3px', textAlign: 'center' }}>
-                    {priceCardData.category || 'الفئة'}
-                  </div>
-                  
-                  <div style={{ color: '#CF9B47', fontSize: '24px', fontWeight: '600', textAlign: 'center' }}>
-                    {priceCardData.model || 'الموديل'}
-                  </div>
-
-                  {/* Manufacturer Logo */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '60px', height: '100%' }}>
+                
+                {/* Right Section - Vehicle Details Box */}
+                <div style={{ 
+                  flex: 1, 
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  borderRadius: '20px',
+                  padding: '25px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                  position: 'relative',
+                  minHeight: '240px'
+                }}>
+                  {/* Manufacturer Logo - Top */}
                   {priceCardData.manufacturer && priceCardData.manufacturer.trim() !== "" && (
                     <div style={{ 
-                      width: '200px', 
-                      height: '200px', 
+                      width: '120px', 
+                      height: '80px', 
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'center',
-                      backgroundColor: 'transparent',
-                      position: 'absolute',
-                      bottom: '-100px',
-                      right: '20px'
+                      margin: '0 auto 20px auto'
                     }}>
                       <div style={{ filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(1.2)' }}>
                         <ManufacturerLogo 
@@ -496,29 +494,131 @@ export default function PriceCardsPage() {
                       </div>
                     </div>
                   )}
+                  
+                  {/* Category */}
+                  <div style={{ 
+                    color: '#CF9B47', 
+                    fontSize: '32px', 
+                    fontWeight: 'bold', 
+                    textAlign: 'center',
+                    marginBottom: '10px'
+                  }}>
+                    {priceCardData.category || 'الفئة'}
+                  </div>
+                  
+                  {/* Trim Level */}
+                  <div style={{ 
+                    color: '#CF9B47', 
+                    fontSize: '20px', 
+                    fontWeight: '600', 
+                    textAlign: 'center'
+                  }}>
+                    {priceCardData.model || 'درجة التجهيز'}
+                  </div>
                 </div>
 
                 {/* Divider */}
-                <div style={{ width: '5px', height: '180px', backgroundColor: 'white', borderRadius: '2px' }}></div>
+                <div style={{ width: '4px', height: '200px', backgroundColor: 'white', borderRadius: '2px', alignSelf: 'center' }}></div>
 
-                {/* Left Section - Price and Status */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '15px', justifyContent: 'center' }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ color: '#00627F', fontSize: '18px', fontWeight: '600', marginBottom: '5px' }}>السعر</div>
-                    <div style={{ color: '#00627F', fontSize: '36px', fontWeight: 'bold' }}>﷼ {formatPrice(priceCardData.price || 0)}</div>
+                {/* Left Section - Price and Details Box */}
+                <div style={{ 
+                  flex: 1, 
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  borderRadius: '20px',
+                  padding: '25px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                  position: 'relative',
+                  minHeight: '240px'
+                }}>
+                  {/* Price */}
+                  <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                    <div style={{ color: '#00627F', fontSize: '16px', fontWeight: '600', marginBottom: '5px' }}>السعر</div>
+                    <div style={{ color: '#00627F', fontSize: '28px', fontWeight: 'bold' }}>﷼ {formatPrice(priceCardData.price || 0)}</div>
                   </div>
 
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ color: '#00627F', fontSize: '18px', fontWeight: '600', marginBottom: '5px' }}>الحالة</div>
+                  {/* Status */}
+                  <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                    <div style={{ color: '#00627F', fontSize: '16px', fontWeight: '600', marginBottom: '5px' }}>الحالة</div>
                     <div style={{ 
-                      fontSize: '28px', 
+                      fontSize: '22px', 
                       fontWeight: 'bold',
-                      color: '#16a34a'
+                      color: priceCardData.status === 'مستعمل' ? '#f59e0b' : '#16a34a'
                     }}>
                       {getCarStatus()}
                     </div>
                   </div>
+
+                  {/* Mileage (if used) */}
+                  {priceCardData.status === 'مستعمل' && (
+                    <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                      <div style={{ color: '#00627F', fontSize: '16px', fontWeight: '600', marginBottom: '5px' }}>الممشي</div>
+                      <div style={{ color: '#00627F', fontSize: '20px', fontWeight: 'bold' }}>
+                        {priceCardData.mileage ? `${formatPrice(priceCardData.mileage)} كم` : 'غير محدد'}
+                      </div>
+                    </div>
+                  )}
                 </div>
+              </div>
+
+              {/* QR Code - Bottom Left */}
+              <div style={{
+                position: 'absolute',
+                bottom: '10px',
+                left: '20px',
+                width: '80px',
+                height: '80px',
+                backgroundColor: 'white',
+                borderRadius: '10px',
+                padding: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+              }}>
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  background: `url("data:image/svg+xml,${encodeURIComponent(`
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                      <rect width="100" height="100" fill="white"/>
+                      <g fill="black">
+                        <rect x="0" y="0" width="10" height="10"/>
+                        <rect x="20" y="0" width="10" height="10"/>
+                        <rect x="40" y="0" width="10" height="10"/>
+                        <rect x="70" y="0" width="30" height="10"/>
+                        <rect x="0" y="10" width="10" height="10"/>
+                        <rect x="60" y="10" width="10" height="10"/>
+                        <rect x="90" y="10" width="10" height="10"/>
+                        <rect x="0" y="20" width="10" height="10"/>
+                        <rect x="20" y="20" width="30" height="10"/>
+                        <rect x="70" y="20" width="10" height="10"/>
+                        <rect x="90" y="20" width="10" height="10"/>
+                        <rect x="0" y="30" width="50" height="10"/>
+                        <rect x="60" y="30" width="40" height="10"/>
+                        <rect x="10" y="40" width="20" height="10"/>
+                        <rect x="40" y="40" width="20" height="10"/>
+                        <rect x="70" y="40" width="30" height="10"/>
+                        <rect x="0" y="50" width="30" height="10"/>
+                        <rect x="50" y="50" width="50" height="10"/>
+                        <rect x="20" y="60" width="30" height="10"/>
+                        <rect x="60" y="60" width="40" height="10"/>
+                        <rect x="0" y="70" width="40" height="10"/>
+                        <rect x="50" y="70" width="20" height="10"/>
+                        <rect x="80" y="70" width="20" height="10"/>
+                        <rect x="10" y="80" width="40" height="10"/>
+                        <rect x="60" y="80" width="10" height="10"/>
+                        <rect x="80" y="80" width="20" height="10"/>
+                        <rect x="0" y="90" width="20" height="10"/>
+                        <rect x="30" y="90" width="40" height="10"/>
+                        <rect x="80" y="90" width="20" height="10"/>
+                      </g>
+                      <text x="50" y="50" text-anchor="middle" dy="0.35em" font-size="8" fill="black">${priceCardData.id || '1'}</text>
+                    </svg>
+                  `)}")`,
+                  backgroundSize: 'contain',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center'
+                }} />
               </div>
             </div>
           </div>
