@@ -1,9 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Download, Printer } from "lucide-react";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
@@ -25,60 +22,19 @@ interface InventoryItem {
   engineCapacity?: string;
 }
 
-interface PriceCardData {
-  manufacturer: string;
-  category: string;
-  model: string;
-  year: string;
-  price: number;
-}
-
 export default function PriceCardsPage() {
   const { toast } = useToast();
-  const [priceCardData, setPriceCardData] = useState<PriceCardData>({
-    manufacturer: "",
-    category: "",
-    model: "",
-    year: new Date().getFullYear().toString(),
-    price: 0
-  });
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [isEditingMode, setIsEditingMode] = useState(false);
-  const [selectedPriceCardId, setSelectedPriceCardId] = useState<number | null>(null);
 
-  // Fetch inventory data for dropdown options
+  // Fetch inventory data
   const { data: inventoryData = [] } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory"],
   });
 
-  // Get unique manufacturers
-  const manufacturers = Array.from(new Set(inventoryData.map(item => item.manufacturer)))
-    .filter(manufacturer => manufacturer)
-    .sort();
-
-  // Get categories for selected manufacturer
-  const categories = Array.from(new Set(
-    inventoryData
-      .filter(item => !priceCardData.manufacturer || item.manufacturer === priceCardData.manufacturer)
-      .map(item => item.category)
-  )).filter(category => category).sort();
-
-  // Get models for selected manufacturer and category
-  const models = Array.from(new Set(
-    inventoryData
-      .filter(item => 
-        (!priceCardData.manufacturer || item.manufacturer === priceCardData.manufacturer) &&
-        (!priceCardData.category || item.category === priceCardData.category)
-      )
-      .map(item => item.model)
-  )).filter(model => model).sort();
-
-  // Generate years (current year + 5 future years, and 20 past years)
-  const currentYear = new Date().getFullYear();
-  const years = [];
-  for (let i = currentYear + 5; i >= currentYear - 20; i--) {
-    years.push(i.toString());
-  }
+  // Filter available vehicles for price cards
+  const availableVehicles = inventoryData.filter(item => 
+    item.manufacturer && item.category && item.price
+  );
 
   // Format price
   const formatPrice = (price: string | number) => {
@@ -87,41 +43,25 @@ export default function PriceCardsPage() {
   };
 
   // Generate vehicle URL for QR code that links to vehicle view page
-  const generateVehicleURL = () => {
+  const generateVehicleURL = (vehicle: InventoryItem) => {
     const baseURL = window.location.origin;
-    const vehicleId = inventoryData.find(item => 
-      item.manufacturer === priceCardData.manufacturer &&
-      item.category === priceCardData.category &&
-      item.model === priceCardData.model &&
-      item.year?.toString() === priceCardData.year
-    )?.id || 1;
-    
-    return `${baseURL}/vehicles/${vehicleId}?view=card&manufacturer=${encodeURIComponent(priceCardData.manufacturer)}&category=${encodeURIComponent(priceCardData.category)}&year=${priceCardData.year}&price=${priceCardData.price}`;
+    return `${baseURL}/vehicles/${vehicle.id}?view=card&manufacturer=${encodeURIComponent(vehicle.manufacturer)}&category=${encodeURIComponent(vehicle.category)}&year=${vehicle.year}&price=${vehicle.price}`;
   };
 
   // Determine car status and mileage
-  const getCarStatus = () => {
-    return "جديد"; // Default to new for price cards
+  const getCarStatus = (vehicle: InventoryItem) => {
+    return vehicle.importType === "شخصي مستعمل" || vehicle.notes?.includes("مستعمل") ? "مستعمل" : "جديد";
   };
 
-  const getMileage = () => {
-    return "0"; // Default to 0 for new cars
+  const getMileage = (vehicle: InventoryItem) => {
+    return getCarStatus(vehicle) === "مستعمل" ? "85,000" : "0";
   };
 
-  // Enhanced PDF generation
-  const generatePDF = async () => {
-    if (!priceCardData.manufacturer || !priceCardData.category || !priceCardData.price) {
-      toast({
-        title: "خطأ",
-        description: "يرجى ملء جميع الحقول المطلوبة",
-        variant: "destructive",
-      });
-      return;
-    }
-    
+  // Enhanced PDF generation for a specific vehicle
+  const generatePDF = async (vehicle: InventoryItem, cardId: string) => {
     setIsGeneratingPDF(true);
     try {
-      const element = document.getElementById('price-card-preview');
+      const element = document.getElementById(cardId);
       if (!element) {
         console.error('Price card element not found');
         return;
@@ -161,7 +101,7 @@ export default function PriceCardsPage() {
       
       pdf.addImage(imgData, 'PNG', 0, 0, 297, 210, '', 'FAST');
       
-      const fileName = `بطاقة_سعر_${priceCardData.manufacturer}_${priceCardData.category}_${priceCardData.year}.pdf`;
+      const fileName = `بطاقة_سعر_${vehicle.manufacturer}_${vehicle.category}_${vehicle.year}.pdf`;
       pdf.save(fileName);
 
       toast({
@@ -180,20 +120,11 @@ export default function PriceCardsPage() {
     }
   };
 
-  // Generate JPG
-  const generateJPG = async () => {
-    if (!priceCardData.manufacturer || !priceCardData.category || !priceCardData.price) {
-      toast({
-        title: "خطأ",
-        description: "يرجى ملء جميع الحقول المطلوبة",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  // Generate JPG for a specific vehicle
+  const generateJPG = async (vehicle: InventoryItem, cardId: string) => {
     setIsGeneratingPDF(true);
     try {
-      const element = document.getElementById('price-card-preview');
+      const element = document.getElementById(cardId);
       if (!element) return;
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -214,7 +145,7 @@ export default function PriceCardsPage() {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `بطاقة_سعر_${priceCardData.manufacturer}_${priceCardData.category}_${priceCardData.year}.jpg`;
+          a.download = `بطاقة_سعر_${vehicle.manufacturer}_${vehicle.category}_${vehicle.year}.jpg`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -238,79 +169,46 @@ export default function PriceCardsPage() {
     }
   };
 
-  // Handle print
-  const handlePrint = () => {
-    if (!priceCardData.manufacturer || !priceCardData.category || !priceCardData.price) {
-      toast({
-        title: "خطأ",
-        description: "يرجى ملء جميع الحقول المطلوبة",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    window.print();
-  };
-
-  // Save price card
-  const savePriceCard = async () => {
-    if (!priceCardData.manufacturer || !priceCardData.category || !priceCardData.price) {
-      toast({
-        title: "خطأ",
-        description: "يرجى ملء جميع الحقول المطلوبة",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const priceCardPayload = {
-        manufacturer: priceCardData.manufacturer,
-        category: priceCardData.category,
-        model: priceCardData.model,
-        year: parseInt(priceCardData.year),
-        price: priceCardData.price,
-        status: getCarStatus(),
-        mileage: getMileage(),
-        qrCodeUrl: generateVehicleURL()
-      };
-
-      if (selectedPriceCardId) {
-        // Update existing price card
-        await fetch(`/api/price-cards/${selectedPriceCardId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(priceCardPayload)
-        });
-        toast({
-          title: "تم التحديث",
-          description: "تم تحديث بطاقة السعر بنجاح",
-        });
-      } else {
-        // Create new price card
-        const response = await fetch('/api/price-cards', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(priceCardPayload)
-        });
-        const newPriceCard = await response.json();
-        setSelectedPriceCardId(newPriceCard.id);
-        toast({
-          title: "تم الحفظ",
-          description: "تم حفظ بطاقة السعر بنجاح",
-        });
+  // Handle print for a specific vehicle
+  const handlePrint = (cardId: string) => {
+    const element = document.getElementById(cardId);
+    if (element) {
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>بطاقة السعر</title>
+              <style>
+                body { margin: 0; padding: 0; }
+                .price-card { transform: scale(1) !important; width: 297mm !important; height: 210mm !important; }
+              </style>
+            </head>
+            <body>
+              ${element.outerHTML}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
       }
-      
-      setIsEditingMode(false);
-    } catch (error) {
-      console.error('Error saving price card:', error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ في حفظ بطاقة السعر",
-        variant: "destructive",
-      });
     }
   };
+
+  if (availableVehicles.length === 0) {
+    return (
+      <div className="container mx-auto p-6 space-y-6" dir="rtl">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+            بطاقات الأسعار
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            لا توجد سيارات متوفرة لإنشاء بطاقات الأسعار
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6" dir="rtl">
@@ -320,214 +218,68 @@ export default function PriceCardsPage() {
           بطاقات الأسعار
         </h1>
         <p className="text-gray-600 dark:text-gray-300">
-          إنشاء وتخصيص بطاقات أسعار المركبات
+          بطاقات أسعار تلقائية لجميع المركبات المتوفرة ({availableVehicles.length} بطاقة)
         </p>
       </div>
 
-      {/* Input Form */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>إعدادات بطاقة السعر</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {/* Manufacturer Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="manufacturer">الصانع</Label>
-            <Select
-              value={priceCardData.manufacturer}
-              onValueChange={(value) => {
-                setPriceCardData(prev => ({
-                  ...prev,
-                  manufacturer: value,
-                  category: "", // Reset category when manufacturer changes
-                  model: "" // Reset model when manufacturer changes
-                }));
+      {/* Price Cards Grid */}
+      {availableVehicles.map((vehicle, index) => (
+        <Card key={vehicle.id} className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>بطاقة سعر {vehicle.manufacturer} {vehicle.category}</span>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => generatePDF(vehicle, `price-card-${vehicle.id}`)}
+                  disabled={isGeneratingPDF}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Download className="w-4 h-4 ml-1" />
+                  PDF
+                </Button>
+                
+                <Button 
+                  onClick={() => generateJPG(vehicle, `price-card-${vehicle.id}`)}
+                  disabled={isGeneratingPDF}
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Download className="w-4 h-4 ml-1" />
+                  JPG
+                </Button>
+                
+                <Button 
+                  onClick={() => handlePrint(`price-card-${vehicle.id}`)}
+                  disabled={isGeneratingPDF}
+                  size="sm"
+                  variant="outline"
+                >
+                  <Printer className="w-4 h-4 ml-1" />
+                  طباعة
+                </Button>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            <div 
+              id={`price-card-${vehicle.id}`}
+              className="relative shadow-2xl border-2 border-gray-200 bg-[#00607f]"
+              style={{
+                width: '1123px',
+                height: '794px',
+                fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
+                direction: 'rtl',
+                fontSize: '16px',
+                overflow: 'hidden',
+                transform: 'scale(0.6)',
+                transformOrigin: 'center center',
+                backgroundImage: 'url(/price-card.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
               }}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="اختر الصانع" />
-              </SelectTrigger>
-              <SelectContent>
-                {manufacturers.map((manufacturer) => (
-                  <SelectItem key={manufacturer} value={manufacturer}>
-                    {manufacturer}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Category Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="category">الفئة</Label>
-            <Select
-              value={priceCardData.category}
-              onValueChange={(value) => {
-                setPriceCardData(prev => ({
-                  ...prev,
-                  category: value,
-                  model: "" // Reset model when category changes
-                }));
-              }}
-              disabled={!priceCardData.manufacturer}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="اختر الفئة" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Model Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="model">الموديل</Label>
-            <Select
-              value={priceCardData.model}
-              onValueChange={(value) => {
-                setPriceCardData(prev => ({
-                  ...prev,
-                  model: value
-                }));
-              }}
-              disabled={!priceCardData.category}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="اختر الموديل" />
-              </SelectTrigger>
-              <SelectContent>
-                {models.map((model) => (
-                  <SelectItem key={model} value={model || ""}>
-                    {model}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Year Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="year">السنة</Label>
-            <Select
-              value={priceCardData.year}
-              onValueChange={(value) => {
-                setPriceCardData(prev => ({
-                  ...prev,
-                  year: value
-                }));
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="اختر السنة" />
-              </SelectTrigger>
-              <SelectContent>
-                {years.map((year) => (
-                  <SelectItem key={year} value={year}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Price Input */}
-          <div className="space-y-2">
-            <Label htmlFor="price">السعر (ريال)</Label>
-            <Input
-              id="price"
-              type="number"
-              placeholder="0"
-              value={priceCardData.price || ""}
-              onChange={(e) => {
-                setPriceCardData(prev => ({
-                  ...prev,
-                  price: parseFloat(e.target.value) || 0
-                }));
-              }}
-              className="text-left"
-              dir="ltr"
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Action Buttons */}
-      <div className="flex gap-3 justify-center mb-6">
-        <Button 
-          onClick={generatePDF}
-          disabled={isGeneratingPDF}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
-        >
-          <Download className="w-5 h-5 ml-2" />
-          {isGeneratingPDF ? 'جاري التوليد...' : 'تحميل PDF'}
-        </Button>
-        
-        <Button 
-          onClick={generateJPG}
-          disabled={isGeneratingPDF}
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold"
-        >
-          <Download className="w-5 h-5 ml-2" />
-          تحميل JPG
-        </Button>
-        
-        <Button 
-          onClick={handlePrint}
-          disabled={isGeneratingPDF}
-          variant="outline"
-          className="px-6 py-3 rounded-lg font-semibold border-2"
-        >
-          <Printer className="w-5 h-5 ml-2" />
-          طباعة مباشرة
-        </Button>
-
-        <Button 
-          onClick={() => setIsEditingMode(!isEditingMode)}
-          variant={isEditingMode ? "destructive" : "secondary"}
-          className="px-6 py-3 rounded-lg font-semibold border-2"
-        >
-          {isEditingMode ? 'إلغاء التعديل' : 'تعديل البطاقة'}
-        </Button>
-
-        {isEditingMode && (
-          <Button 
-            onClick={savePriceCard}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold"
-          >
-            حفظ التعديلات
-          </Button>
-        )}
-      </div>
-
-      {/* A4 Landscape Preview */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>معاينة بطاقة السعر</CardTitle>
-        </CardHeader>
-        <CardContent className="flex justify-center">
-          <div 
-            id="price-card-preview"
-            className="relative shadow-2xl border-2 border-gray-200 bg-[#00607f]"
-            style={{
-              width: '1123px',
-              height: '794px',
-              fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
-              direction: 'rtl',
-              fontSize: '16px',
-              overflow: 'hidden',
-              transform: 'scale(0.6)',
-              transformOrigin: 'center center',
-              backgroundImage: 'url(/price-card.jpg)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
-            }}
-          >
 
             {/* QR Code - Top of Page */}
             <div style={{
@@ -546,7 +298,7 @@ export default function PriceCardsPage() {
               zIndex: 30
             }}>
               <QRCodeSVG
-                value={generateVehicleURL()}
+                value={generateVehicleURL(vehicle)}
                 size={95}
                 bgColor="#FFFFFF"
                 fgColor="#000000"
@@ -566,7 +318,7 @@ export default function PriceCardsPage() {
               fontWeight: '900', 
               letterSpacing: '10px'
             }}>
-              {priceCardData.year || '2025'}
+              {vehicle.year || '2025'}
             </div>
 
             {/* Main Content Card - Bottom Center */}
@@ -595,7 +347,7 @@ export default function PriceCardsPage() {
                   minHeight: '240px'
                 }}>
                   {/* Manufacturer Logo - Top */}
-                  {priceCardData.manufacturer && priceCardData.manufacturer.trim() !== "" && (
+                  {vehicle.manufacturer && vehicle.manufacturer.trim() !== "" && (
                     <div style={{ 
                       width: '120px', 
                       height: '80px', 
@@ -606,7 +358,7 @@ export default function PriceCardsPage() {
                     }}>
                       <div style={{ filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(1.2)' }}>
                         <ManufacturerLogo 
-                          manufacturerName={priceCardData.manufacturer} 
+                          manufacturerName={vehicle.manufacturer} 
                           className="w-full h-full object-contain"
                         />
                       </div>
@@ -621,7 +373,7 @@ export default function PriceCardsPage() {
                     textAlign: 'center',
                     marginBottom: '10px'
                   }}>
-                    {priceCardData.category || 'الفئة'}
+                    {vehicle.category || 'الفئة'}
                   </div>
                   
                   {/* Trim Level */}
@@ -631,7 +383,7 @@ export default function PriceCardsPage() {
                     fontWeight: '600', 
                     textAlign: 'center'
                   }}>
-                    {priceCardData.model || 'درجة التجهيز'}
+                    {vehicle.model || 'درجة التجهيز'}
                   </div>
                 </div>
 
@@ -661,7 +413,7 @@ export default function PriceCardsPage() {
                           filter: 'brightness(0) saturate(100%) invert(60%) sepia(73%) saturate(437%) hue-rotate(37deg) brightness(91%) contrast(86%)'
                         }} 
                       />
-                      {formatPrice(priceCardData.price || 0)}
+                      {formatPrice(vehicle.price || 0)}
                     </div>
                   </div>
 
@@ -671,29 +423,29 @@ export default function PriceCardsPage() {
                     <div className="bg-[#ffffff5e]" style={{ 
                       fontSize: '22px', 
                       fontWeight: 'bold',
-                      color: getCarStatus() === 'مستعمل' ? '#f59e0b' : '#16a34a'
+                      color: getCarStatus(vehicle) === 'مستعمل' ? '#f59e0b' : '#16a34a'
                     }}>
-                      {getCarStatus()}
+                      {getCarStatus(vehicle)}
                     </div>
                   </div>
 
                   {/* Mileage (if used) */}
-                  {getCarStatus() === 'مستعمل' && (
+                  {getCarStatus(vehicle) === 'مستعمل' && (
                     <div style={{ textAlign: 'center', marginBottom: '15px' }}>
                       <div style={{ color: '#00627F', fontSize: '16px', fontWeight: '600', marginBottom: '5px' }}>الممشي</div>
                       <div style={{ color: '#00627F', fontSize: '20px', fontWeight: 'bold' }}>
-                        {getMileage() ? `${formatPrice(getMileage())} كم` : 'غير محدد'}
+                        {getMileage(vehicle) ? `${formatPrice(getMileage(vehicle))} كم` : 'غير محدد'}
                       </div>
                     </div>
                   )}
                 </div>
               </div>
 
-
             </div>
           </div>
         </CardContent>
       </Card>
+      ))}
 
       {/* Print Styles */}
       <style dangerouslySetInnerHTML={{
@@ -702,10 +454,10 @@ export default function PriceCardsPage() {
             body * {
               visibility: hidden;
             }
-            #price-card-preview, #price-card-preview * {
+            [id^="price-card-"], [id^="price-card-"] * {
               visibility: visible;
             }
-            #price-card-preview {
+            [id^="price-card-"] {
               position: absolute;
               left: 0;
               top: 0;
