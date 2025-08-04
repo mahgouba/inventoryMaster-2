@@ -28,7 +28,9 @@ import {
   Image,
   Landmark,
   Database,
-  List
+  List,
+  Wrench,
+  ImageIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -104,6 +106,18 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
       href: "/leave-requests", 
       icon: UserCheck,
       description: "Leave Requests"
+    },
+    { 
+      title: "المواصفات التفصيلية", 
+      href: "/detailed-specifications", 
+      icon: Wrench,
+      description: "Detailed Specifications"
+    },
+    { 
+      title: "إدارة الصور", 
+      href: "/images-management", 
+      icon: ImageIcon,
+      description: "Images Management"
     }
   ] : [];
 
