@@ -419,7 +419,7 @@ export default function PriceCardsPage() {
         <CardContent className="flex justify-center">
           <div 
             id="price-card-preview"
-            className="relative shadow-2xl border-2 border-gray-200 bg-[#23252f]"
+            className="relative shadow-2xl border-2 border-gray-200 bg-[#00607f]"
             style={{
               width: '1123px',
               height: '794px',
