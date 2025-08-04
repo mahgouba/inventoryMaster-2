@@ -547,6 +547,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const item = await storage.createInventoryItem(validation.data);
+      
+      // Automatically create price card data when a new vehicle is added
+      try {
+        await storage.createPriceCard({
+          inventoryItemId: item.id,
+          manufacturer: item.manufacturer,
+          category: item.category,
+          model: item.trimLevel || item.category,
+          year: item.year.toString(),
+          price: parseFloat(item.price || "0"),
+          chassisNumber: item.chassisNumber,
+          exteriorColor: item.exteriorColor,
+          interiorColor: item.interiorColor,
+          status: item.status,
+          engineCapacity: item.engineCapacity,
+          createdAt: new Date()
+        });
+        console.log("Price card data created automatically for vehicle:", item.id);
+      } catch (priceCardError) {
+        console.error("Failed to create price card data:", priceCardError);
+        // Don't fail the entire request if price card creation fails
+      }
+      
       res.status(201).json(item);
     } catch (error: any) {
       console.error("Create inventory item error:", error);
@@ -3899,6 +3922,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error in bulk import:", error);
       res.status(500).json({ message: "Failed to process bulk import" });
+    }
+  });
+
+  // Price Cards API endpoints
+  app.get("/api/price-cards", async (req, res) => {
+    try {
+      const priceCards = await storage.getAllPriceCards();
+      res.json(priceCards);
+    } catch (error) {
+      console.error("Error fetching price cards:", error);
+      res.status(500).json({ message: "Failed to fetch price cards" });
+    }
+  });
+
+  app.get("/api/price-cards/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid price card ID" });
+      }
+
+      const priceCard = await storage.getPriceCard(id);
+      if (!priceCard) {
+        return res.status(404).json({ message: "Price card not found" });
+      }
+
+      res.json(priceCard);
+    } catch (error) {
+      console.error("Error fetching price card:", error);
+      res.status(500).json({ message: "Failed to fetch price card" });
+    }
+  });
+
+  app.post("/api/price-cards", async (req, res) => {
+    try {
+      const priceCard = await storage.createPriceCard(req.body);
+      res.status(201).json(priceCard);
+    } catch (error) {
+      console.error("Error creating price card:", error);
+      res.status(500).json({ message: "Failed to create price card" });
+    }
+  });
+
+  app.put("/api/price-cards/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid price card ID" });
+      }
+
+      const priceCard = await storage.updatePriceCard(id, req.body);
+      if (!priceCard) {
+        return res.status(404).json({ message: "Price card not found" });
+      }
+
+      res.json(priceCard);
+    } catch (error) {
+      console.error("Error updating price card:", error);
+      res.status(500).json({ message: "Failed to update price card" });
+    }
+  });
+
+  app.delete("/api/price-cards/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid price card ID" });
+      }
+
+      const success = await storage.deletePriceCard(id);
+      if (!success) {
+        return res.status(404).json({ message: "Price card not found" });
+      }
+
+      res.json({ message: "Price card deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting price card:", error);
+      res.status(500).json({ message: "Failed to delete price card" });
+    }
+  });
+
+  app.get("/api/price-cards/vehicle/:vehicleId", async (req, res) => {
+    try {
+      const vehicleId = parseInt(req.params.vehicleId);
+      if (isNaN(vehicleId)) {
+        return res.status(400).json({ message: "Invalid vehicle ID" });
+      }
+
+      const priceCard = await storage.getPriceCardByVehicleId(vehicleId);
+      if (!priceCard) {
+        return res.status(404).json({ message: "Price card not found for this vehicle" });
+      }
+
+      res.json(priceCard);
+    } catch (error) {
+      console.error("Error fetching price card by vehicle ID:", error);
+      res.status(500).json({ message: "Failed to fetch price card" });
     }
   });
 

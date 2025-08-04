@@ -10,6 +10,7 @@ import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import { useToast } from "@/hooks/use-toast";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { QRCodeSVG } from "qrcode.react";
 
 interface InventoryItem {
   id: number;
@@ -42,6 +43,8 @@ export default function PriceCardsPage() {
     price: 0
   });
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [isEditingMode, setIsEditingMode] = useState(false);
+  const [selectedPriceCardId, setSelectedPriceCardId] = useState<number | null>(null);
 
   // Fetch inventory data for dropdown options
   const { data: inventoryData = [] } = useQuery<InventoryItem[]>({
@@ -81,6 +84,19 @@ export default function PriceCardsPage() {
   const formatPrice = (price: string | number) => {
     const numPrice = typeof price === 'string' ? parseFloat(price) : price;
     return new Intl.NumberFormat('ar-SA').format(numPrice || 0);
+  };
+
+  // Generate vehicle URL for QR code that links to vehicle view page
+  const generateVehicleURL = () => {
+    const baseURL = window.location.origin;
+    const vehicleId = inventoryData.find(item => 
+      item.manufacturer === priceCardData.manufacturer &&
+      item.category === priceCardData.category &&
+      item.model === priceCardData.model &&
+      item.year.toString() === priceCardData.year
+    )?.id || 1;
+    
+    return `${baseURL}/vehicles/${vehicleId}?view=card&manufacturer=${encodeURIComponent(priceCardData.manufacturer)}&category=${encodeURIComponent(priceCardData.category)}&year=${priceCardData.year}&price=${priceCardData.price}`;
   };
 
   // Determine car status and mileage
@@ -234,6 +250,66 @@ export default function PriceCardsPage() {
     }
 
     window.print();
+  };
+
+  // Save price card
+  const savePriceCard = async () => {
+    if (!priceCardData.manufacturer || !priceCardData.category || !priceCardData.price) {
+      toast({
+        title: "خطأ",
+        description: "يرجى ملء جميع الحقول المطلوبة",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const priceCardPayload = {
+        manufacturer: priceCardData.manufacturer,
+        category: priceCardData.category,
+        model: priceCardData.model,
+        year: parseInt(priceCardData.year),
+        price: priceCardData.price,
+        status: getCarStatus(),
+        mileage: getMileage(),
+        qrCodeUrl: generateVehicleURL()
+      };
+
+      if (selectedPriceCardId) {
+        // Update existing price card
+        await fetch(`/api/price-cards/${selectedPriceCardId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(priceCardPayload)
+        });
+        toast({
+          title: "تم التحديث",
+          description: "تم تحديث بطاقة السعر بنجاح",
+        });
+      } else {
+        // Create new price card
+        const response = await fetch('/api/price-cards', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(priceCardPayload)
+        });
+        const newPriceCard = await response.json();
+        setSelectedPriceCardId(newPriceCard.id);
+        toast({
+          title: "تم الحفظ",
+          description: "تم حفظ بطاقة السعر بنجاح",
+        });
+      }
+      
+      setIsEditingMode(false);
+    } catch (error) {
+      console.error('Error saving price card:', error);
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ في حفظ بطاقة السعر",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -409,6 +485,23 @@ export default function PriceCardsPage() {
           <Printer className="w-5 h-5 ml-2" />
           طباعة مباشرة
         </Button>
+
+        <Button 
+          onClick={() => setIsEditingMode(!isEditingMode)}
+          variant={isEditingMode ? "destructive" : "secondary"}
+          className="px-6 py-3 rounded-lg font-semibold border-2"
+        >
+          {isEditingMode ? 'إلغاء التعديل' : 'تعديل البطاقة'}
+        </Button>
+
+        {isEditingMode && (
+          <Button 
+            onClick={savePriceCard}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold"
+          >
+            حفظ التعديلات
+          </Button>
+        )}
       </div>
 
       {/* A4 Landscape Preview */}
@@ -571,54 +664,28 @@ export default function PriceCardsPage() {
                 borderRadius: '10px',
                 padding: '8px',
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
               }}>
+                <QRCodeSVG
+                  value={generateVehicleURL()}
+                  size={60}
+                  bgColor="#FFFFFF"
+                  fgColor="#000000"
+                  level="M"
+                  includeMargin={false}
+                />
                 <div style={{
-                  width: '100%',
-                  height: '100%',
-                  background: `url("data:image/svg+xml,${encodeURIComponent(`
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                      <rect width="100" height="100" fill="white"/>
-                      <g fill="black">
-                        <rect x="0" y="0" width="10" height="10"/>
-                        <rect x="20" y="0" width="10" height="10"/>
-                        <rect x="40" y="0" width="10" height="10"/>
-                        <rect x="70" y="0" width="30" height="10"/>
-                        <rect x="0" y="10" width="10" height="10"/>
-                        <rect x="60" y="10" width="10" height="10"/>
-                        <rect x="90" y="10" width="10" height="10"/>
-                        <rect x="0" y="20" width="10" height="10"/>
-                        <rect x="20" y="20" width="30" height="10"/>
-                        <rect x="70" y="20" width="10" height="10"/>
-                        <rect x="90" y="20" width="10" height="10"/>
-                        <rect x="0" y="30" width="50" height="10"/>
-                        <rect x="60" y="30" width="40" height="10"/>
-                        <rect x="10" y="40" width="20" height="10"/>
-                        <rect x="40" y="40" width="20" height="10"/>
-                        <rect x="70" y="40" width="30" height="10"/>
-                        <rect x="0" y="50" width="30" height="10"/>
-                        <rect x="50" y="50" width="50" height="10"/>
-                        <rect x="20" y="60" width="30" height="10"/>
-                        <rect x="60" y="60" width="40" height="10"/>
-                        <rect x="0" y="70" width="40" height="10"/>
-                        <rect x="50" y="70" width="20" height="10"/>
-                        <rect x="80" y="70" width="20" height="10"/>
-                        <rect x="10" y="80" width="40" height="10"/>
-                        <rect x="60" y="80" width="10" height="10"/>
-                        <rect x="80" y="80" width="20" height="10"/>
-                        <rect x="0" y="90" width="20" height="10"/>
-                        <rect x="30" y="90" width="40" height="10"/>
-                        <rect x="80" y="90" width="20" height="10"/>
-                      </g>
-                      <text x="50" y="50" text-anchor="middle" dy="0.35em" font-size="8" fill="black">${priceCardData.id || '1'}</text>
-                    </svg>
-                  `)}")`,
-                  backgroundSize: 'contain',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'center'
-                }} />
+                  fontSize: '6px',
+                  fontWeight: 'bold',
+                  color: '#000',
+                  textAlign: 'center',
+                  marginTop: '2px'
+                }}>
+                  مسح للعرض
+                </div>
               </div>
             </div>
           </div>
