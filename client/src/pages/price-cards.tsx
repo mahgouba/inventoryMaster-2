@@ -440,10 +440,10 @@ export default function PriceCardsPage() {
             {/* Year - Large Center */}
             <div style={{ 
               position: 'absolute',
-              top: '50%',
+              top: '35mm',
               left: '50%',
-              transform: 'translate(-50%, -50%)',
-              color: 'white', 
+              transform: 'translate(-50%, 0)',
+              color: '#CF9B47', 
               fontSize: '200px', 
               fontWeight: '900', 
               letterSpacing: '10px',
