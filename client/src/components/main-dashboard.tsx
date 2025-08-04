@@ -16,7 +16,7 @@ import BankManagement from "@/pages/bank-management";
 // Removed bank-management-full as it was consolidated into bank-management
 
 import FinancingRatesPage from "@/pages/financing-rates";
-import ThemeManagementPage from "@/pages/theme-management";
+
 import DatabaseManagement from "@/pages/database-management";
 import CarsMigrationPage from "@/pages/cars-migration";
 import DropdownOptionsManagement from "@/pages/DropdownOptionsManagement";
@@ -70,8 +70,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return user.role === "admin" ? <BankManagement /> : null;
       case "/financing-rates":
         return user.role === "admin" ? <FinancingRatesPage /> : null;
-      case "/theme-management":
-        return user.role === "admin" ? <ThemeManagementPage /> : null;
+
       case "/database-management":
         return user.role === "admin" ? <DatabaseManagement /> : null;
       case "/cars-migration":

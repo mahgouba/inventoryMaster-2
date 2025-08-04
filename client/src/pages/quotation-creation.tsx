@@ -36,7 +36,7 @@ import {
   Info
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { useTheme } from "@/hooks/useTheme";
+
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import GlassBackground from "@/components/glass-background";
@@ -280,7 +280,9 @@ interface PricingDetails {
 }
 
 export default function QuotationCreationPage({ vehicleData }: QuotationCreationPageProps) {
-  const { companyName, companyLogo, darkMode } = useTheme();
+  const companyName = "";
+  const companyLogo = "";
+  const darkMode = false;
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [location, navigate] = useLocation();

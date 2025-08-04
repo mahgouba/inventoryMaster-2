@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useTheme } from "@/hooks/useTheme";
+
 import { cn } from "@/lib/utils";
 
 interface SidebarNavigationProps {
@@ -48,8 +48,7 @@ interface SidebarNavigationProps {
 export default function SidebarNavigation({ user, onLogout, onCollapseChange }: SidebarNavigationProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [location] = useLocation();
-  const { settings, toggleDarkMode } = useTheme();
-  const isDarkMode = settings?.darkMode || false;
+  const isDarkMode = false;
 
   const handleCollapseToggle = () => {
     const newCollapsed = !isCollapsed;
@@ -116,12 +115,7 @@ export default function SidebarNavigation({ user, onLogout, onCollapseChange }: 
   ] : [];
 
   const adminItems = user.role === "admin" ? [
-    { 
-      title: "إدارة الثيمات", 
-      href: "/theme-management", 
-      icon: Palette,
-      description: "Theme Management"
-    },
+
     { 
       title: "خيارات القوائم", 
       href: "/dropdown-options", 

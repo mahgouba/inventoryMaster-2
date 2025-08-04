@@ -32,7 +32,7 @@ import {
   Settings2
 } from "lucide-react";
 import { Link, useLocation, useRoute } from "wouter";
-import { useTheme } from "@/hooks/useTheme";
+
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -60,7 +60,7 @@ export default function QuotationEditPage({}: QuotationEditPageProps) {
   });
 
   // Theme state
-  const { companyLogo } = useTheme();
+  const companyLogo = null;
   
   // Management states
   const [showA4Preview, setShowA4Preview] = useState(false);

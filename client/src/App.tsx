@@ -5,10 +5,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useTheme } from "@/hooks/useTheme";
-import { ThemeStyles } from "@/components/theme-styles";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
-import UniversalGlass from "@/components/universal-glass";
 // import SidebarNavigation from "@/components/sidebar-navigation";
 import MainDashboard from "@/components/main-dashboard";
 import CardViewPage from "@/pages/card-view";
@@ -28,14 +25,7 @@ interface User {
 }
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // This component loads and applies theme settings
-  useTheme();
-  return (
-    <>
-      <ThemeStyles themeStyle="glass" darkMode={false} />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }
 
 function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
@@ -66,7 +56,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           <Route path="/financing-calculator" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/financing-rates" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/leave-requests" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
-          <Route path="/theme-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+
           <Route path="/database-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/cars-migration" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/dropdown-options-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
@@ -147,7 +137,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <UniversalGlass />
+
         <TooltipProvider>
           <div dir="rtl" className="font-arabic">
             <Toaster />
