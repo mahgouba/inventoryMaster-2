@@ -490,7 +490,7 @@ export default function PriceCardsPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '48px' }}>
                 {/* Right Section - Vehicle Info */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', justifyContent: 'center' }}>
-                  <div style={{ color: '#CF9B47', fontSize: '45px', fontWeight: 'bold', letterSpacing: '3px', textAlign: 'center' }}>
+                  <div className="bg-[#ffffff00]" style={{ color: '#CF9B47', fontSize: '45px', fontWeight: 'bold', letterSpacing: '3px', textAlign: 'center' }}>
                     {priceCardData.category || 'الفئة'}
                   </div>
                   
