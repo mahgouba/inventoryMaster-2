@@ -74,6 +74,7 @@ This is a full-stack inventory management system for managing inventory items wi
 - ✅ Fixed ManufacturerLogo component styling by wrapping with filter div to resolve TypeScript errors
 - ✅ Removed red circle element from price card design per user request (August 4, 2025)
 - ✅ Removed price card preview section, keeping only action buttons per user request (August 4, 2025)
+- ✅ Restored price card preview with backgorun-price-card.jpg background image per user request (August 4, 2025)
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

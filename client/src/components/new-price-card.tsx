@@ -274,6 +274,155 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-4">
+          {/* Fixed A4 Size Preview */}
+          <div className="flex justify-center items-center w-full">
+            <div 
+              id="new-price-card-content"
+              className="relative shadow-2xl border-2 border-gray-200"
+              style={{
+                width: '1123px',
+                height: '794px',
+                fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
+                direction: 'rtl',
+                fontSize: '16px',
+                overflow: 'hidden',
+                transform: 'scale(0.7)',
+                transformOrigin: 'center center',
+                backgroundImage: 'url(/backgorun-price-card.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            >
+            {/* Company Logo - Top Center */}
+            <div style={{
+              position: 'absolute',
+              top: '20px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '120px',
+              height: '120px'
+            }}>
+              <img 
+                src="/copmany logo.svg" 
+                alt="شعار الشركة" 
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  objectFit: 'contain', 
+                  filter: 'brightness(1.5) sepia(1) hue-rotate(38deg) saturate(2) drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+                }}
+              />
+            </div>
+
+            {/* Year - Large Center */}
+            <div style={{ 
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              color: 'white', 
+              fontSize: '200px', 
+              fontWeight: '900', 
+              letterSpacing: '10px',
+              textShadow: '0 8px 16px rgba(0,0,0,0.4)'
+            }}>
+              {vehicle.year || '2025'}
+            </div>
+
+            {/* Main Content Card - Bottom Center */}
+            <div style={{
+              position: 'absolute',
+              bottom: '60px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '1080px',
+              height: '240px',
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(8px)',
+              borderRadius: '25px',
+              padding: '30px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              zIndex: 10,
+              overflow: 'hidden'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '48px' }}>
+                {/* Right Section - Vehicle Info */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', justifyContent: 'center' }}>
+                  <div style={{ color: '#CF9B47', fontSize: '45px', fontWeight: 'bold', letterSpacing: '3px', textAlign: 'center' }}>
+                    {vehicle.category}
+                  </div>
+                  
+                  <div style={{ color: '#CF9B47', fontSize: '24px', fontWeight: '600', textAlign: 'center' }}>
+                    {vehicle.trimLevel || 'الفئة الأساسية'}
+                  </div>
+
+                  {/* Manufacturer Logo */}
+                  <div style={{ 
+                    width: '288px', 
+                    height: '288px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    backgroundColor: 'transparent',
+                    position: 'absolute',
+                    bottom: '-150px',
+                    right: '20px'
+                  }}>
+                    <div style={{ filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(0.8)' }}>
+                      <ManufacturerLogo 
+                        manufacturerName={vehicle.manufacturer} 
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div style={{ width: '5px', height: '180px', backgroundColor: '#CF9B47', borderRadius: '2px' }}></div>
+
+                {/* Left Section - Price and Status */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '15px', justifyContent: 'center' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ color: '#00627F', fontSize: '18px', fontWeight: '600', marginBottom: '5px' }}>السعر</div>
+                    <div style={{ color: '#00627F', fontSize: '36px', fontWeight: 'bold' }}>﷼ {formatPrice(vehicle.price || 0)}</div>
+                  </div>
+
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ color: '#00627F', fontSize: '18px', fontWeight: '600', marginBottom: '5px' }}>الحالة</div>
+                    <div style={{ 
+                      fontSize: '28px', 
+                      fontWeight: 'bold',
+                      color: getCarStatus() === 'مستعمل' ? '#dc2626' : '#16a34a'
+                    }}>
+                      {getCarStatus() === 'مستعمل' ? 'مستعمل' : 'جديد'}
+                    </div>
+                  </div>
+
+                  {getCarStatus() === 'مستعمل' && (
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ color: '#00627F', fontSize: '18px', fontWeight: '600', marginBottom: '5px' }}>المماشي</div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <span style={{ color: '#00627F', fontSize: '28px', fontWeight: 'bold' }}>{getMileage()}</span>
+                        <div style={{ 
+                          width: '28px', 
+                          height: '28px', 
+                          backgroundColor: '#00627F', 
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>KM</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
 
           {/* Enhanced Action Buttons */}
           <div className="flex gap-3 mt-6 justify-center">
