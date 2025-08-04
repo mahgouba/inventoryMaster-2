@@ -6,7 +6,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
-// import SidebarNavigation from "@/components/sidebar-navigation";
 import MainDashboard from "@/components/main-dashboard";
 import CardViewPage from "@/pages/card-view";
 
@@ -31,15 +30,7 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
   const [location] = useLocation();
   
-  // Pages that should not show sidebar (bank pages and card view)
-  const pagesWithoutSidebar = [
-    '/banks-personal', 
-    '/banks-company', 
-    '/card-view', 
-    '/cards'
-  ];
-  
-  const shouldShowSidebar = !pagesWithoutSidebar.includes(location);
+
 
   return (
     <div className="min-h-screen">
