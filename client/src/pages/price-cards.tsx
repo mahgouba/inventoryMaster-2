@@ -391,7 +391,7 @@ export default function PriceCardsPage() {
   };
 
   // Print function for direct printing
-  const printCard = (card: PriceCard, cardId: string) => {
+  const printCard = async (card: PriceCard, cardId: string) => {
     const element = document.getElementById(cardId);
     if (!element) {
       toast({
@@ -402,97 +402,115 @@ export default function PriceCardsPage() {
       return;
     }
 
-    // Create a new window for printing
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      toast({
-        title: "خطأ",
-        description: "لا يمكن فتح نافذة الطباعة",
-        variant: "destructive",
+    try {
+      // Generate high-quality canvas first
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 1123,
+        height: 794,
+        scrollX: 0,
+        scrollY: 0
       });
-      return;
-    }
 
-    // Get the card HTML content
-    const cardHTML = element.outerHTML;
-    
-    // Create print-specific HTML
-    const printHTML = `
-      <!DOCTYPE html>
-      <html dir="rtl">
-      <head>
-        <meta charset="UTF-8">
-        <title>بطاقة سعر - ${card.manufacturer} ${card.category} ${card.year}</title>
-        <style>
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-          
-          body {
-            font-family: 'Noto Sans Arabic', Arial, sans-serif;
-            direction: rtl;
-            margin: 0;
-            padding: 0;
-            background: white;
-          }
-          
-          @page {
-            size: A4 landscape;
-            margin: 0;
-          }
-          
-          @media print {
-            body {
+      const imgData = canvas.toDataURL('image/png', 1.0);
+
+      // Create a new window for printing
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        toast({
+          title: "خطأ",
+          description: "لا يمكن فتح نافذة الطباعة",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create print-specific HTML with the image
+      const printHTML = `
+        <!DOCTYPE html>
+        <html dir="rtl">
+        <head>
+          <meta charset="UTF-8">
+          <title>بطاقة سعر - ${card.manufacturer} ${card.category} ${card.year}</title>
+          <style>
+            * {
               margin: 0;
               padding: 0;
+              box-sizing: border-box;
+            }
+            
+            body {
+              font-family: 'Noto Sans Arabic', Arial, sans-serif;
+              direction: rtl;
+              margin: 0;
+              padding: 0;
+              background: white;
+            }
+            
+            @page {
+              size: A4 landscape;
+              margin: 0;
+            }
+            
+            @media print {
+              body {
+                margin: 0;
+                padding: 0;
+              }
             }
             
             #print-container {
-              width: 297mm;
-              height: 210mm;
-              transform: none !important;
-              margin: 0;
-              page-break-inside: avoid;
+              width: 100vw;
+              height: 100vh;
               display: flex;
               justify-content: center;
               align-items: center;
             }
             
-            .price-card {
-              transform: none !important;
-              width: 297mm !important;
-              height: 210mm !important;
+            .price-card-image {
+              max-width: 100%;
+              max-height: 100%;
+              width: auto;
+              height: auto;
             }
-          }
-        </style>
-      </head>
-      <body>
-        <div id="print-container">
-          ${cardHTML.replace(/transform:\s*scale\([^)]*\)/, 'transform: none').replace(/width:\s*'1123px'/, "width: '297mm'").replace(/height:\s*'794px'/, "height: '210mm'")}
-        </div>
-        <script>
-          window.onload = function() {
-            setTimeout(() => {
-              window.print();
-              window.onafterprint = function() {
-                window.close();
-              };
-            }, 500);
-          };
-        </script>
-      </body>
-      </html>
-    `;
-    
-    printWindow.document.write(printHTML);
-    printWindow.document.close();
-    
-    toast({
-      title: "تم بنجاح",
-      description: "تم فتح نافذة الطباعة",
-    });
+          </style>
+        </head>
+        <body>
+          <div id="print-container">
+            <img src="${imgData}" alt="بطاقة سعر ${card.manufacturer} ${card.category}" class="price-card-image" />
+          </div>
+          <script>
+            window.onload = function() {
+              setTimeout(() => {
+                window.print();
+                window.onafterprint = function() {
+                  window.close();
+                };
+              }, 1000);
+            };
+          </script>
+        </body>
+        </html>
+      `;
+      
+      printWindow.document.write(printHTML);
+      printWindow.document.close();
+      
+      toast({
+        title: "تم بنجاح",
+        description: "تم فتح نافذة الطباعة",
+      });
+    } catch (error) {
+      console.error('Error preparing print:', error);
+      toast({
+        title: "خطأ في الطباعة",
+        description: "حدث خطأ أثناء تحضير البطاقة للطباعة",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
