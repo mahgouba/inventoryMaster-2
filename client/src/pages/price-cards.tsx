@@ -47,6 +47,7 @@ interface PriceCard {
   price?: number;
   features: string[];
   status: string;
+  importType?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -389,6 +390,111 @@ export default function PriceCardsPage() {
     }
   };
 
+  // Print function for direct printing
+  const printCard = (card: PriceCard, cardId: string) => {
+    const element = document.getElementById(cardId);
+    if (!element) {
+      toast({
+        title: "خطأ",
+        description: "لم يتم العثور على البطاقة",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast({
+        title: "خطأ",
+        description: "لا يمكن فتح نافذة الطباعة",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Get the card HTML content
+    const cardHTML = element.outerHTML;
+    
+    // Create print-specific HTML
+    const printHTML = `
+      <!DOCTYPE html>
+      <html dir="rtl">
+      <head>
+        <meta charset="UTF-8">
+        <title>بطاقة سعر - ${card.manufacturer} ${card.category} ${card.year}</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            font-family: 'Noto Sans Arabic', Arial, sans-serif;
+            direction: rtl;
+            margin: 0;
+            padding: 0;
+            background: white;
+          }
+          
+          @page {
+            size: A4 landscape;
+            margin: 0;
+          }
+          
+          @media print {
+            body {
+              margin: 0;
+              padding: 0;
+            }
+            
+            #print-container {
+              width: 297mm;
+              height: 210mm;
+              transform: none !important;
+              margin: 0;
+              page-break-inside: avoid;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+            
+            .price-card {
+              transform: none !important;
+              width: 297mm !important;
+              height: 210mm !important;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div id="print-container">
+          ${cardHTML.replace(/transform:\s*scale\([^)]*\)/, 'transform: none').replace(/width:\s*'1123px'/, "width: '297mm'").replace(/height:\s*'794px'/, "height: '210mm'")}
+        </div>
+        <script>
+          window.onload = function() {
+            setTimeout(() => {
+              window.print();
+              window.onafterprint = function() {
+                window.close();
+              };
+            }, 500);
+          };
+        </script>
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printHTML);
+    printWindow.document.close();
+    
+    toast({
+      title: "تم بنجاح",
+      description: "تم فتح نافذة الطباعة",
+    });
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6" dir="rtl">
       {/* Header */}
@@ -616,6 +722,19 @@ export default function PriceCardsPage() {
                   >
                     <Trash2 className="w-4 h-4 ml-1" />
                     حذف
+                  </Button>
+                  
+                  <Button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      printCard(card, `price-card-${card.id}`);
+                    }}
+                    size="sm"
+                    variant="outline"
+                    className="text-green-600 hover:text-green-700"
+                  >
+                    <Printer className="w-4 h-4 ml-1" />
+                    طباعة
                   </Button>
                   
                   <Button 
