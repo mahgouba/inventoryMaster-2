@@ -132,6 +132,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create user
       const newUser = await storage.createUser({
+        name: username, // Use username as name for now
+        jobTitle: "مستخدم", // Default job title
+        phoneNumber: "000000000", // Default phone number
         username,
         password: hashedPassword,
         role
@@ -1263,6 +1266,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const newUser = await storage.createUser({
+        name: username, // Use username as name for now
+        jobTitle: "مستخدم", // Default job title
+        phoneNumber: "000000000", // Default phone number
         username,
         password,
         role

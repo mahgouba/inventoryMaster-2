@@ -438,37 +438,37 @@ export class MemStorage implements IStorage {
     const sampleRates = [
       {
         bankId: 1,
-        rateName: "موظف حكومي",
-        rateValue: 6.5,
+        categoryName: "موظف حكومي",
+        interestRate: "6.5",
         years: 5,
         isActive: true
       },
       {
         bankId: 1,
-        rateName: "موظف قطاع خاص",
-        rateValue: 7.2,
+        categoryName: "موظف قطاع خاص",
+        interestRate: "7.2",
         years: 5,
         isActive: true
       },
       {
         bankId: 1,
-        rateName: "عسكري",
-        rateValue: 6.0,
+        categoryName: "عسكري",
+        interestRate: "6.0",
         years: 7,
         isActive: true
       },
       // Sample rates for bank ID 2 (SNB)
       {
         bankId: 2,
-        rateName: "موظف حكومي",
-        rateValue: 6.8,
+        categoryName: "موظف حكومي",
+        interestRate: "6.8",
         years: 5,
         isActive: true
       },
       {
         bankId: 2,
-        rateName: "موظف قطاع خاص",
-        rateValue: 7.5,
+        categoryName: "موظف قطاع خاص",
+        interestRate: "7.5",
         years: 5,
         isActive: true
       }
@@ -548,7 +548,7 @@ export class MemStorage implements IStorage {
       soldDate: itemData.soldDate || null,
       reservationDate: itemData.reservationDate || null,
       reservedBy: itemData.reservedBy || null,
-      reservationNotes: itemData.reservationNotes || null,
+      reservationNote: itemData.reservationNote || null,
       entryDate: itemData.entryDate || new Date(),
       mileage: itemData.mileage || null
     };
@@ -965,7 +965,12 @@ export class MemStorage implements IStorage {
   async createCompany(company: InsertCompany): Promise<Company> {
     const newCompany: Company = {
       id: this.currentCompanyId++,
-      ...company
+      ...company,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      logo: company.logo || null,
+      isActive: company.isActive !== undefined ? company.isActive : true,
+      phone: company.phone || null
     };
     this.companies.set(newCompany.id, newCompany);
     return newCompany;
@@ -1094,6 +1099,11 @@ export class MemStorage implements IStorage {
         (association.category === category || !association.category) &&
         (association.trimLevel === trimLevel || !association.trimLevel)
     );
+  }
+
+  // Add missing method to satisfy interface
+  async getColorAssociations(): Promise<ColorAssociation[]> {
+    return this.getAllColorAssociations();
   }
 
   async getAllImageLinks(): Promise<string[]> {
