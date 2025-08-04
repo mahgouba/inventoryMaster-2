@@ -58,7 +58,7 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
     }
   };
 
-  // توليد PDF
+  // Enhanced PDF generation with better quality and print optimization
   const generatePDF = async () => {
     if (!vehicle) return;
     
@@ -70,59 +70,198 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
         return;
       }
 
-      // Wait for content to load
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Wait for fonts and images to load
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // High-quality canvas
-      const canvas = await html2canvas(element, {
-        scale: 3,
+      // Create a temporary element for PDF with print-specific styling
+      const printElement = element.cloneNode(true) as HTMLElement;
+      printElement.style.transform = 'scale(1)';
+      printElement.style.transformOrigin = 'top left';
+      printElement.style.width = '297mm';
+      printElement.style.height = '210mm';
+      printElement.style.position = 'absolute';
+      printElement.style.top = '-9999px';
+      printElement.style.left = '-9999px';
+      printElement.style.backgroundColor = '#ffffff';
+      document.body.appendChild(printElement);
+
+      // High-quality canvas generation
+      const canvas = await html2canvas(printElement, {
+        scale: 4,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
         foreignObjectRendering: false,
-        imageTimeout: 15000,
+        imageTimeout: 20000,
         logging: false,
-        height: element.scrollHeight,
-        width: element.scrollWidth,
+        width: 1123,
+        height: 794,
         scrollX: 0,
-        scrollY: 0
+        scrollY: 0,
+        removeContainer: true
       });
 
+      // Remove temporary element
+      document.body.removeChild(printElement);
+
+      // Create PDF with optimal settings for printing
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
         format: 'a4',
-        compress: true
+        compress: false // Better quality for printing
       });
       
-      // Calculate proper scaling for A4 landscape
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const canvasAspectRatio = canvas.height / canvas.width;
-      
-      let finalWidth = pdfWidth;
-      let finalHeight = pdfWidth * canvasAspectRatio;
-      
-      // If height exceeds page, scale down
-      if (finalHeight > pdfHeight) {
-        finalHeight = pdfHeight;
-        finalWidth = pdfHeight / canvasAspectRatio;
-      }
-      
-      // Center the content
-      const xOffset = (pdfWidth - finalWidth) / 2;
-      const yOffset = (pdfHeight - finalHeight) / 2;
+      // A4 landscape dimensions
+      const pdfWidth = 297;
+      const pdfHeight = 210;
 
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+      // Convert canvas to high-quality image
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       
-      const timestamp = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
-      pdf.save(`بطاقة-سعر-${vehicle.manufacturer}-${vehicle.category}-${vehicle.year}-${timestamp}.pdf`);
+      // Add image to PDF with exact A4 dimensions
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+      
+      // Generate filename with Arabic support
+      const timestamp = new Date().toLocaleDateString('ar-SA').replace(/\//g, '-');
+      const filename = `Price-Card-${vehicle.manufacturer}-${vehicle.category}-${vehicle.year}-${timestamp}.pdf`;
+      
+      pdf.save(filename);
     } catch (error) {
       console.error('Error generating PDF:', error);
+      alert('خطأ في توليد ملف PDF. يرجى المحاولة مرة أخرى.');
     } finally {
       setIsGeneratingPDF(false);
     }
+  };
+
+  // Generate high-quality JPG for printing
+  const generateJPG = async () => {
+    if (!vehicle) return;
+    
+    setIsGeneratingPDF(true);
+    try {
+      const element = document.getElementById('new-price-card-content');
+      if (!element) {
+        console.error('Price card element not found');
+        return;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Create temporary element for JPG export
+      const printElement = element.cloneNode(true) as HTMLElement;
+      printElement.style.transform = 'scale(1)';
+      printElement.style.transformOrigin = 'top left';
+      printElement.style.width = '297mm';
+      printElement.style.height = '210mm';
+      printElement.style.position = 'absolute';
+      printElement.style.top = '-9999px';
+      printElement.style.left = '-9999px';
+      printElement.style.backgroundColor = '#ffffff';
+      document.body.appendChild(printElement);
+
+      const canvas = await html2canvas(printElement, {
+        scale: 5, // Even higher quality for JPG
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        foreignObjectRendering: false,
+        imageTimeout: 20000,
+        logging: false,
+        width: 1123,
+        height: 794,
+        scrollX: 0,
+        scrollY: 0,
+        removeContainer: true
+      });
+
+      document.body.removeChild(printElement);
+
+      // Convert to JPG and download
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = `Price-Card-${vehicle.manufacturer}-${vehicle.category}-${vehicle.year}.jpg`;
+          link.href = url;
+          link.click();
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/jpeg', 0.95);
+      
+    } catch (error) {
+      console.error('Error generating JPG:', error);
+      alert('خطأ في توليد ملف الصورة. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  // Print directly from browser
+  const handlePrint = () => {
+    const element = document.getElementById('new-price-card-content');
+    if (!element) return;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Price Card - ${vehicle.manufacturer} ${vehicle.category}</title>
+          <style>
+            @page {
+              size: A4 landscape;
+              margin: 0;
+            }
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            body {
+              font-family: 'Noto Sans Arabic', Arial, sans-serif;
+              direction: rtl;
+              background: white;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+            }
+            .print-container {
+              width: 297mm;
+              height: 210mm;
+              background: linear-gradient(135deg, #00627F 0%, #004A61 100%);
+              position: relative;
+              overflow: hidden;
+            }
+            @media print {
+              body { margin: 0; }
+              .print-container { 
+                width: 100vw; 
+                height: 100vh; 
+                page-break-inside: avoid;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="print-container">
+            ${element.innerHTML}
+          </div>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 1000);
   };
 
   return (
@@ -305,24 +444,34 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 mt-4">
+          {/* Enhanced Action Buttons */}
+          <div className="flex gap-3 mt-6 justify-center">
             <Button 
               onClick={generatePDF}
               disabled={isGeneratingPDF}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
             >
-              <Download className="w-4 h-4 ml-2" />
+              <Download className="w-5 h-5 ml-2" />
               {isGeneratingPDF ? 'جاري التوليد...' : 'تحميل PDF'}
             </Button>
             
             <Button 
-              onClick={() => window.print()}
-              variant="outline"
-              className="px-6 py-2 rounded-lg"
+              onClick={generateJPG}
+              disabled={isGeneratingPDF}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold"
             >
-              <Printer className="w-4 h-4 ml-2" />
-              طباعة
+              <Download className="w-5 h-5 ml-2" />
+              تحميل JPG
+            </Button>
+            
+            <Button 
+              onClick={handlePrint}
+              disabled={isGeneratingPDF}
+              variant="outline"
+              className="px-6 py-3 rounded-lg font-semibold border-2"
+            >
+              <Printer className="w-5 h-5 ml-2" />
+              طباعة مباشرة
             </Button>
           </div>
         </div>
