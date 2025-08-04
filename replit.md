@@ -58,6 +58,8 @@ This is a full-stack inventory management system for managing inventory items wi
 - ✅ Large white year text centered on card background
 - ✅ White content card at bottom with manufacturer logo, model, price, and status
 - ✅ Applied appropriate color scheme: teal background, golden accents, white text
+- ✅ Reorganized content layout: vehicle info (category, trim, manufacturer logo) on right, price/status info on left
+- ✅ Enlarged white content box by 20% for better visibility and readability
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
