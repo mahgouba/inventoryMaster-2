@@ -104,10 +104,7 @@ export default function PriceCardsPage() {
               features: [],
               status: vehicle.status || "متوفر"
             };
-            const result = await apiRequest("/api/price-cards", {
-              method: "POST",
-              body: priceCardData,
-            });
+            const result = await apiRequest("POST", "/api/price-cards", priceCardData);
             results.push(result);
           } catch (error) {
             console.error(`Error creating price card for vehicle ${vehicle.id}:`, error);
@@ -356,7 +353,7 @@ export default function PriceCardsPage() {
               <SelectContent>
                 <SelectItem value="all">جميع الحالات</SelectItem>
                 {statuses.slice(1).map((status) => (
-                  <SelectItem key={status} value={status}>
+                  <SelectItem key={status} value={status || ""}>
                     {status}
                   </SelectItem>
                 ))}
@@ -371,7 +368,7 @@ export default function PriceCardsPage() {
               <SelectContent>
                 <SelectItem value="all">جميع الأنواع</SelectItem>
                 {importTypes.slice(1).map((type) => (
-                  <SelectItem key={type} value={type}>
+                  <SelectItem key={type} value={type || ""}>
                     {type}
                   </SelectItem>
                 ))}
