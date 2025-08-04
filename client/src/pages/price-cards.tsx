@@ -478,17 +478,17 @@ export default function PriceCardsPage() {
                   {/* Manufacturer Logo */}
                   {priceCardData.manufacturer && priceCardData.manufacturer.trim() !== "" && (
                     <div style={{ 
-                      width: '288px', 
-                      height: '288px', 
+                      width: '200px', 
+                      height: '200px', 
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'center',
                       backgroundColor: 'transparent',
                       position: 'absolute',
-                      bottom: '-150px',
+                      bottom: '-100px',
                       right: '20px'
                     }}>
-                      <div style={{ filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(0.8)' }}>
+                      <div style={{ filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(1.2)' }}>
                         <ManufacturerLogo 
                           manufacturerName={priceCardData.manufacturer} 
                           className="w-full h-full object-contain"
