@@ -463,6 +463,32 @@ export const insertInvoiceSchema = createInsertSchema(invoices).omit({
   updatedAt: true,
 });
 
+// Price Cards table for managing price cards
+export const priceCards = pgTable("price_cards", {
+  id: serial("id").primaryKey(),
+  inventoryItemId: integer("inventory_item_id").references(() => inventoryItems.id).notNull(),
+  manufacturer: text("manufacturer").notNull(), // الصانع
+  category: text("category").notNull(), // الفئة
+  trimLevel: text("trim_level"), // درجة التجهيز
+  model: text("model"), // الموديل
+  year: integer("year").notNull(), // السنة
+  price: decimal("price", { precision: 10, scale: 2 }), // السعر
+  features: text("features").array().default([]), // المميزات
+  status: text("status").notNull().default("نشط"), // الحالة
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertPriceCardSchema = createInsertSchema(priceCards).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type PriceCard = typeof priceCards.$inferSelect;
+export type InsertPriceCard = z.infer<typeof insertPriceCardSchema>;
+
 // Terms and conditions table
 export const termsAndConditions = pgTable("terms_and_conditions", {
   id: serial("id").primaryKey(),
@@ -918,32 +944,4 @@ export type InsertVehicleCategory = z.infer<typeof insertVehicleCategorySchema>;
 export type VehicleTrimLevel = typeof vehicleTrimLevels.$inferSelect;
 export type InsertVehicleTrimLevel = z.infer<typeof insertVehicleTrimLevelSchema>;
 
-// Price Cards table for managing vehicle price cards
-export const priceCards = pgTable("price_cards", {
-  id: serial("id").primaryKey(),
-  inventoryItemId: integer("inventory_item_id").references(() => inventoryItems.id),
-  manufacturer: text("manufacturer").notNull(),
-  category: text("category").notNull(),
-  model: text("model").notNull(),
-  year: text("year").notNull(),
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  chassisNumber: text("chassis_number"),
-  exteriorColor: text("exterior_color"),
-  interiorColor: text("interior_color"),
-  status: text("status"),
-  engineCapacity: text("engine_capacity"),
-  mileage: text("mileage"),
-  qrCodeUrl: text("qr_code_url"),
-  isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
 
-export const insertPriceCardSchema = createInsertSchema(priceCards).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export type PriceCard = typeof priceCards.$inferSelect;
-export type InsertPriceCard = z.infer<typeof insertPriceCardSchema>;

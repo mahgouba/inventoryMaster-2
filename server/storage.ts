@@ -11,6 +11,7 @@ import {
   type Specification, type InsertSpecification,
   type TrimLevel, type InsertTrimLevel,
   type Quotation, type InsertQuotation,
+  type PriceCard, type InsertPriceCard,
   type FinancingCalculation, type InsertFinancingCalculation,
   type Bank, type InsertBank,
   type LeaveRequest, type InsertLeaveRequest,
@@ -134,6 +135,14 @@ export interface IStorage {
   deleteQuotation(id: number): Promise<boolean>;
   getQuotationsByStatus(status: string): Promise<Quotation[]>;
   getQuotationByNumber(quoteNumber: string): Promise<Quotation | undefined>;
+
+  // Price Cards methods
+  getAllPriceCards(): Promise<PriceCard[]>;
+  getPriceCardById(id: number): Promise<PriceCard | undefined>;
+  createPriceCard(priceCard: InsertPriceCard): Promise<PriceCard>;
+  updatePriceCard(id: number, priceCard: Partial<InsertPriceCard>): Promise<PriceCard | undefined>;
+  deletePriceCard(id: number): Promise<boolean>;
+  getPriceCardByVehicleId(vehicleId: number): Promise<PriceCard | undefined>;
   
   // Terms and Conditions methods
   getAllTermsConditions(): Promise<Array<{ id: number; term_text: string; display_order: number }>>;
@@ -278,12 +287,7 @@ export interface IStorage {
   updateColor(id: number, colorData: any): Promise<any>;
   deleteCategory(id: number): Promise<boolean>;
   deleteColor(id: number): Promise<boolean>;
-  getAllPriceCards(): Promise<any[]>;
-  getPriceCard(id: number): Promise<any>;
-  createPriceCard(cardData: any): Promise<any>;
-  updatePriceCard(id: number, cardData: any): Promise<any>;
-  deletePriceCard(id: number): Promise<boolean>;
-  getPriceCardByVehicleId(vehicleId: number): Promise<any>;
+
   saveImageLink(linkData: any): Promise<any>;
   getLeaveRequest(id: number): Promise<LeaveRequest | undefined>;
   updateLeaveRequest(id: number, requestData: any): Promise<LeaveRequest | undefined>;
@@ -307,6 +311,7 @@ export class MemStorage implements IStorage {
   private colorAssociations = new Map<number, ColorAssociation>();
   private vehicleCategories = new Map<number, VehicleCategory>();
   private vehicleTrimLevels = new Map<number, VehicleTrimLevel>();
+  private priceCards = new Map<number, PriceCard>();
   
   private currentUserId = 1;
   private currentInventoryId = 1;
@@ -325,6 +330,7 @@ export class MemStorage implements IStorage {
   private currentColorAssociationId = 1;
   private currentVehicleCategoryId = 1;
   private currentVehicleTrimLevelId = 1;
+  private currentPriceCardId = 1;
   
   private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
   private systemSettings = new Map<string, string>();
@@ -396,6 +402,9 @@ export class MemStorage implements IStorage {
     
     // Initialize sample bank interest rates
     this.initializeBankInterestRates();
+    
+    // Initialize sample price cards
+    this.initializePriceCards();
   }
 
   private initializeBanks() {
@@ -484,6 +493,46 @@ export class MemStorage implements IStorage {
         updatedAt: new Date(),
       };
       this.bankInterestRates.set(id, rate);
+    });
+  }
+
+  private initializePriceCards() {
+    const samplePriceCards = [
+      {
+        inventoryItemId: 1,
+        manufacturer: "تويوتا",
+        category: "كامري",
+        trimLevel: "GLE",
+        model: "كامري 2023",
+        year: 2023,
+        price: "125000.00",
+        features: ["فتحة سقف", "شاشة لمس 12 بوصة", "كاميرا خلفية", "تحكم مناخي أوتوماتيكي", "مقاعد جلدية"],
+        status: "نشط",
+        isActive: true
+      },
+      {
+        inventoryItemId: 2,
+        manufacturer: "تويوتا",
+        category: "كامري",
+        trimLevel: "GLX",
+        model: "كامري 2023",
+        year: 2023,
+        price: "135000.00",
+        features: ["نظام ملاحة", "شاشة لمس 15 بوصة", "كاميرا 360 درجة", "مقاعد كهربائية", "مقاعد مدفأة"],
+        status: "نشط",
+        isActive: true
+      }
+    ];
+
+    samplePriceCards.forEach(cardData => {
+      const id = this.currentPriceCardId++;
+      const priceCard: PriceCard = {
+        id,
+        ...cardData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      this.priceCards.set(id, priceCard);
     });
   }
 
@@ -879,6 +928,48 @@ export class MemStorage implements IStorage {
   async deleteQuotation(id: number): Promise<boolean> { return false; }
   async getQuotationsByStatus(status: string): Promise<Quotation[]> { return []; }
   async getQuotationByNumber(quoteNumber: string): Promise<Quotation | undefined> { return undefined; }
+
+  // Price Cards implementation
+  async getAllPriceCards(): Promise<PriceCard[]> {
+    return Array.from(this.priceCards.values());
+  }
+
+  async getPriceCardById(id: number): Promise<PriceCard | undefined> {
+    return this.priceCards.get(id);
+  }
+
+  async createPriceCard(priceCard: InsertPriceCard): Promise<PriceCard> {
+    const newPriceCard: PriceCard = {
+      id: this.currentPriceCardId++,
+      ...priceCard,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.priceCards.set(newPriceCard.id, newPriceCard);
+    return newPriceCard;
+  }
+
+  async updatePriceCard(id: number, priceCard: Partial<InsertPriceCard>): Promise<PriceCard | undefined> {
+    const existing = this.priceCards.get(id);
+    if (!existing) return undefined;
+
+    const updated: PriceCard = {
+      ...existing,
+      ...priceCard,
+      updatedAt: new Date().toISOString()
+    };
+    this.priceCards.set(id, updated);
+    return updated;
+  }
+
+  async deletePriceCard(id: number): Promise<boolean> {
+    return this.priceCards.delete(id);
+  }
+
+  async getPriceCardByVehicleId(vehicleId: number): Promise<PriceCard | undefined> {
+    return Array.from(this.priceCards.values()).find(card => card.inventoryItemId === vehicleId);
+  }
   
   async getAllTermsConditions(): Promise<Array<{ id: number; term_text: string; display_order: number }>> {
     return this.storedTermsConditions;
@@ -1539,30 +1630,7 @@ export class MemStorage implements IStorage {
     return this.deleteColorAssociation(id);
   }
 
-  async getAllPriceCards(): Promise<any[]> {
-    return [];
-  }
 
-  async getPriceCard(id: number): Promise<any> {
-    return { id };
-  }
-
-  async createPriceCard(cardData: any): Promise<any> {
-    const id = Date.now(); // Simple ID generation
-    return { id, ...cardData, createdAt: new Date() };
-  }
-
-  async updatePriceCard(id: number, cardData: any): Promise<any> {
-    return { id, ...cardData };
-  }
-
-  async deletePriceCard(id: number): Promise<boolean> {
-    return true;
-  }
-
-  async getPriceCardByVehicleId(vehicleId: number): Promise<any> {
-    return { id: 1, vehicleId };
-  }
 
   async saveImageLink(linkData: any): Promise<any> {
     return this.createImageLink(linkData);

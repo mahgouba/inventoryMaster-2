@@ -13,6 +13,7 @@ import {
   insertSpecificationSchema,
   insertTrimLevelSchema,
   insertQuotationSchema,
+  insertPriceCardSchema,
 
   insertImportTypeSchema,
   insertVehicleStatusSchema,
@@ -3889,102 +3890,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Price Cards API endpoints
-  app.get("/api/price-cards", async (req, res) => {
-    try {
-      const priceCards = await storage.getAllPriceCards();
-      res.json(priceCards);
-    } catch (error) {
-      console.error("Error fetching price cards:", error);
-      res.status(500).json({ message: "Failed to fetch price cards" });
-    }
-  });
 
-  app.get("/api/price-cards/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid price card ID" });
-      }
-
-      const priceCard = await storage.getPriceCard(id);
-      if (!priceCard) {
-        return res.status(404).json({ message: "Price card not found" });
-      }
-
-      res.json(priceCard);
-    } catch (error) {
-      console.error("Error fetching price card:", error);
-      res.status(500).json({ message: "Failed to fetch price card" });
-    }
-  });
-
-  app.post("/api/price-cards", async (req, res) => {
-    try {
-      const priceCard = await storage.createPriceCard(req.body);
-      res.status(201).json(priceCard);
-    } catch (error) {
-      console.error("Error creating price card:", error);
-      res.status(500).json({ message: "Failed to create price card" });
-    }
-  });
-
-  app.put("/api/price-cards/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid price card ID" });
-      }
-
-      const priceCard = await storage.updatePriceCard(id, req.body);
-      if (!priceCard) {
-        return res.status(404).json({ message: "Price card not found" });
-      }
-
-      res.json(priceCard);
-    } catch (error) {
-      console.error("Error updating price card:", error);
-      res.status(500).json({ message: "Failed to update price card" });
-    }
-  });
-
-  app.delete("/api/price-cards/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid price card ID" });
-      }
-
-      const success = await storage.deletePriceCard(id);
-      if (!success) {
-        return res.status(404).json({ message: "Price card not found" });
-      }
-
-      res.json({ message: "Price card deleted successfully" });
-    } catch (error) {
-      console.error("Error deleting price card:", error);
-      res.status(500).json({ message: "Failed to delete price card" });
-    }
-  });
-
-  app.get("/api/price-cards/vehicle/:vehicleId", async (req, res) => {
-    try {
-      const vehicleId = parseInt(req.params.vehicleId);
-      if (isNaN(vehicleId)) {
-        return res.status(400).json({ message: "Invalid vehicle ID" });
-      }
-
-      const priceCard = await storage.getPriceCardByVehicleId(vehicleId);
-      if (!priceCard) {
-        return res.status(404).json({ message: "Price card not found for this vehicle" });
-      }
-
-      res.json(priceCard);
-    } catch (error) {
-      console.error("Error fetching price card by vehicle ID:", error);
-      res.status(500).json({ message: "Failed to fetch price card" });
-    }
-  });
 
   // Database Management - Export data (selective or full)
   app.get("/api/database/export", async (req, res) => {
@@ -4733,6 +4639,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating leave request status:", error);
       res.status(500).json({ message: "Failed to update leave request status" });
+    }
+  });
+
+  // Price Cards API endpoints
+  app.get("/api/price-cards", async (req, res) => {
+    try {
+      const priceCards = await storage.getAllPriceCards();
+      res.json(priceCards);
+    } catch (error) {
+      console.error("Error fetching price cards:", error);
+      res.status(500).json({ message: "Failed to fetch price cards" });
+    }
+  });
+
+  app.get("/api/price-cards/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid price card ID" });
+      }
+      
+      const priceCard = await storage.getPriceCardById(id);
+      if (!priceCard) {
+        return res.status(404).json({ message: "Price card not found" });
+      }
+      
+      res.json(priceCard);
+    } catch (error) {
+      console.error("Error fetching price card:", error);
+      res.status(500).json({ message: "Failed to fetch price card" });
+    }
+  });
+
+  app.post("/api/price-cards", async (req, res) => {
+    try {
+      const validation = insertPriceCardSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid data", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const priceCard = await storage.createPriceCard(validation.data);
+      res.status(201).json(priceCard);
+    } catch (error) {
+      console.error("Error creating price card:", error);
+      res.status(500).json({ message: "Failed to create price card" });
+    }
+  });
+
+  app.patch("/api/price-cards/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid price card ID" });
+      }
+
+      const validation = insertPriceCardSchema.partial().safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid data", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const priceCard = await storage.updatePriceCard(id, validation.data);
+      if (!priceCard) {
+        return res.status(404).json({ message: "Price card not found" });
+      }
+      
+      res.json(priceCard);
+    } catch (error) {
+      console.error("Error updating price card:", error);
+      res.status(500).json({ message: "Failed to update price card" });
+    }
+  });
+
+  app.delete("/api/price-cards/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid price card ID" });
+      }
+
+      const success = await storage.deletePriceCard(id);
+      if (!success) {
+        return res.status(404).json({ message: "Price card not found" });
+      }
+      
+      res.json({ message: "Price card deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting price card:", error);
+      res.status(500).json({ message: "Failed to delete price card" });
     }
   });
 
