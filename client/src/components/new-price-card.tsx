@@ -288,19 +288,13 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                 overflow: 'hidden',
                 transform: 'scale(0.7)',
                 transformOrigin: 'center center',
-                background: 'linear-gradient(135deg, #00627F 0%, #004A61 100%)'
+                backgroundImage: 'url(/background-price-card.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
               }}
             >
-            {/* Golden Pattern on Right Side */}
-            <div style={{
-              position: 'absolute',
-              right: '0',
-              top: '0',
-              width: '80px',
-              height: '100%',
-              background: 'repeating-linear-gradient(45deg, #CF9B47 0px, #CF9B47 10px, transparent 10px, transparent 20px)',
-              opacity: '0.6'
-            }}></div>
+
 
             {/* Red Circle - Top Left */}
             <div style={{
