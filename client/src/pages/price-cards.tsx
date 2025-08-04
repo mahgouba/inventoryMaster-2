@@ -539,7 +539,7 @@ export default function PriceCardsPage() {
                   {/* Status */}
                   <div style={{ textAlign: 'center', marginBottom: '15px' }}>
                     <div style={{ color: '#00627F', fontSize: '16px', fontWeight: '600', marginBottom: '5px' }}>الحالة</div>
-                    <div style={{ 
+                    <div className="bg-[#ffffff5e]" style={{ 
                       fontSize: '22px', 
                       fontWeight: 'bold',
                       color: priceCardData.status === 'مستعمل' ? '#f59e0b' : '#16a34a'
