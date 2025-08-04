@@ -114,8 +114,11 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
             {/* Fixed Navigation */}
             <HorizontalNavigation userRole={user.role} onLogout={onLogout} />
 
-            {/* Page Content with padding for navigation bar */}
-            <div className="relative z-10 sm:pt-16 pt-[5px] pb-[5px] pr-16">
+            {/* Sidebar for Specs and Images */}
+            <SidebarSpecsImages />
+
+            {/* Page Content with padding for navigation bar and sidebar */}
+            <div className="relative z-10 sm:pt-16 pt-[5px] pb-[5px] pr-16 pl-16">
               {renderPage()}
             </div>
           </div>
