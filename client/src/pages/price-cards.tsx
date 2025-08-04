@@ -553,15 +553,6 @@ export default function PriceCardsPage() {
                 level="M"
                 includeMargin={false}
               />
-              <div style={{
-                fontSize: '8px',
-                fontWeight: 'bold',
-                color: '#000',
-                textAlign: 'center',
-                marginTop: '3px'
-              }}>
-                مسح للعرض
-              </div>
             </div>
 
             {/* Year - Large Center */}
