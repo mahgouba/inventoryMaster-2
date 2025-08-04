@@ -651,7 +651,18 @@ export default function PriceCardsPage() {
                   {/* Price */}
                   <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                     <div style={{ color: '#00627F', fontSize: '16px', fontWeight: '600', marginBottom: '5px' }}>السعر</div>
-                    <div style={{ color: '#00627F', fontSize: '28px', fontWeight: 'bold' }}>﷼ {formatPrice(priceCardData.price || 0)}</div>
+                    <div style={{ color: '#00627F', fontSize: '28px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                      <img 
+                        src="/Saudi_Riyal_Symbol.svg" 
+                        alt="ريال سعودي" 
+                        style={{ 
+                          width: '24px', 
+                          height: '24px', 
+                          filter: 'brightness(0) saturate(100%) invert(60%) sepia(73%) saturate(437%) hue-rotate(37deg) brightness(91%) contrast(86%)'
+                        }} 
+                      />
+                      {formatPrice(priceCardData.price || 0)}
+                    </div>
                   </div>
 
                   {/* Status */}
