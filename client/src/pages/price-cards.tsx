@@ -453,7 +453,7 @@ export default function PriceCardsPage() {
             </div>
 
             {/* Main Content Card - Bottom Center */}
-            <div style={{
+            <div className="text-[#cf9b46]" style={{
               position: 'absolute',
               bottom: '60px',
               left: '50%',
