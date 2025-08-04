@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import HorizontalNavigation from "@/components/horizontal-navigation";
+import SidebarSpecsImages from "@/components/sidebar-specs-images";
 import InventoryPage from "@/pages/inventory";
 import QuotationCreationPage from "@/pages/quotation-creation";
 import QuotationManagementPage from "@/pages/quotation-management";
