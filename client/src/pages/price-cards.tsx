@@ -444,10 +444,9 @@ export default function PriceCardsPage() {
               left: '50%',
               transform: 'translate(-50%, 0)',
               color: '#CF9B47', 
-              fontSize: '200px', 
+              fontSize: '250px', 
               fontWeight: '900', 
-              letterSpacing: '10px',
-              textShadow: '0 8px 16px rgba(0,0,0,0.4)'
+              letterSpacing: '10px'
             }}>
               {priceCardData.year || '2025'}
             </div>
