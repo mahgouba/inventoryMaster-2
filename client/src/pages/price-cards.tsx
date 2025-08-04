@@ -820,32 +820,15 @@ export default function PriceCardsPage() {
                             <div style={{ 
                               fontSize: '22px', 
                               fontWeight: 'bold',
-                              color: card.status === 'متوفر' ? '#16a34a' : '#f59e0b'
+                              color: (() => {
+                                if (card.importType === 'مستعمل') return '#dc2626'; // أحمر للمستعمل
+                                if (card.importType === 'شخصي') return '#16a34a'; // أخضر للشخصي
+                                return '#00627F'; // أزرق للشركة
+                              })()
                             }}>
-                              {card.status}
+                              {card.importType === 'مستعمل' ? 'مستعمل' : 'جديد'}
                             </div>
                           </div>
-
-                          {/* Features */}
-                          {card.features && card.features.length > 0 && (
-                            <div style={{ textAlign: 'center' }}>
-                              <div style={{ 
-                                color: '#00627F', 
-                                fontSize: '14px', 
-                                fontWeight: '600', 
-                                marginBottom: '8px' 
-                              }}>
-                                المميزات
-                              </div>
-                              <div style={{ 
-                                fontSize: '16px', 
-                                color: '#00627F',
-                                lineHeight: '1.3'
-                              }}>
-                                {card.features.slice(0, 3).join(' • ')}
-                              </div>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>
