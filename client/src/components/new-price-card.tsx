@@ -141,20 +141,25 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
               id="new-price-card-content"
               className="relative shadow-2xl border-2 border-gray-200 bg-gradient-to-b from-[#00627F] to-[#004A61]"
               style={{
-                width: '794px',
-                height: '1123px',
+                width: '1123px',
+                height: '794px',
                 fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
                 direction: 'rtl',
                 fontSize: '16px',
                 overflow: 'hidden',
-                transform: 'scale(0.6)',
+                transform: 'scale(0.7)',
                 transformOrigin: 'center center'
               }}
             >
-            {/* Logo and Year Container - Centered */}
-            <div className="absolute flex flex-col items-center" style={{ top: '40px', left: '50%', transform: 'translateX(-50%)' }}>
-              {/* Company Logo - Fixed size */}
-              <div style={{ width: '180px', height: '180px', marginBottom: '20px' }}>
+            {/* Logo and Year Container - Left side for landscape */}
+            <div className="absolute flex flex-col items-center justify-center" style={{ 
+              top: '50%', 
+              left: '200px', 
+              transform: 'translateY(-50%)',
+              height: '100%'
+            }}>
+              {/* Company Logo - Adjusted for landscape */}
+              <div style={{ width: '140px', height: '140px', marginBottom: '30px' }}>
                 <img 
                   src="/copmany logo.svg" 
                   alt="شعار الشركة" 
@@ -162,43 +167,48 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                 />
               </div>
 
-              {/* Year - Fixed large size */}
+              {/* Year - Adjusted for landscape */}
               <div style={{ 
                 color: 'white', 
-                fontSize: '180px', 
+                fontSize: '120px', 
                 fontWeight: '900', 
-                letterSpacing: '8px',
+                letterSpacing: '6px',
                 textShadow: '0 4px 8px rgba(0,0,0,0.3)'
               }}>
                 {vehicle.year || '2025'}
               </div>
             </div>
 
-            {/* Main Content Card - Fixed positioning and sizes */}
+            {/* Main Content Card - Right side for landscape */}
             <div style={{
               position: 'absolute',
-              bottom: '40px',
-              left: '40px',
+              top: '50%',
               right: '40px',
+              width: '600px',
               backgroundColor: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(8px)',
               borderRadius: '20px',
               padding: '30px',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              transform: 'translateY(-50%)',
               zIndex: 10
             }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                {/* First Row - Category, Trim Level, Manufacturer Logo */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ color: '#CF9B47', fontSize: '32px', fontWeight: 'bold' }}>
+                {/* Vehicle Title Section */}
+                <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                  <div style={{ color: '#CF9B47', fontSize: '36px', fontWeight: 'bold', marginBottom: '10px' }}>
                     {vehicle.category}
                   </div>
                   <div style={{ color: '#CF9B47', fontSize: '24px', fontWeight: '600' }}>
                     {vehicle.trimLevel || 'الفئة الأساسية'}
                   </div>
+                </div>
+
+                {/* Manufacturer Logo Section */}
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
                   <div style={{ 
-                    width: '80px', 
-                    height: '80px', 
+                    width: '120px', 
+                    height: '120px', 
                     display: 'flex', 
                     alignItems: 'center', 
                     justifyContent: 'center',
@@ -212,43 +222,43 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                   </div>
                 </div>
 
-                {/* Second Row - Status, Mileage and Price */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
+                {/* Status and Price Row */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: '40px' }}>
                   {/* Status and Mileage Box */}
-                  <div style={{ flex: 1, padding: '20px', textAlign: 'center' }}>
-                    <div style={{ color: '#374151', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>الحالة</div>
+                  <div style={{ textAlign: 'center', padding: '20px' }}>
+                    <div style={{ color: '#374151', fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>الحالة</div>
                     <div style={{ 
-                      fontSize: '24px', 
+                      fontSize: '28px', 
                       fontWeight: 'bold', 
-                      marginBottom: '12px',
+                      marginBottom: '15px',
                       color: getCarStatus() === 'مستعمل' ? '#dc2626' : '#16a34a'
                     }}>
                       {getCarStatus() === 'مستعمل' ? 'مستعمل' : 'جديد'}
                     </div>
                     
                     {getCarStatus() === 'مستعمل' && (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                        <span style={{ color: '#374151', fontSize: '18px', fontWeight: '600' }}>المماشي:</span>
-                        <span style={{ color: '#00627F', fontSize: '22px', fontWeight: 'bold' }}>{getMileage()}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                        <span style={{ color: '#374151', fontSize: '20px', fontWeight: '600' }}>المماشي:</span>
+                        <span style={{ color: '#00627F', fontSize: '24px', fontWeight: 'bold' }}>{getMileage()}</span>
                         <div style={{ 
-                          width: '24px', 
-                          height: '24px', 
+                          width: '28px', 
+                          height: '28px', 
                           backgroundColor: '#9ca3af', 
                           borderRadius: '50%',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center'
                         }}>
-                          <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>KM</span>
+                          <span style={{ fontSize: '14px', fontWeight: 'bold', color: 'white' }}>KM</span>
                         </div>
                       </div>
                     )}
                   </div>
 
                   {/* Price Box */}
-                  <div style={{ flex: 1, padding: '20px', textAlign: 'center' }}>
-                    <div style={{ color: '#374151', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>السعر</div>
-                    <div style={{ color: '#00627F', fontSize: '28px', fontWeight: 'bold' }}>﷼ {formatPrice(vehicle.price || 0)}</div>
+                  <div style={{ textAlign: 'center', padding: '20px' }}>
+                    <div style={{ color: '#374151', fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>السعر</div>
+                    <div style={{ color: '#00627F', fontSize: '32px', fontWeight: 'bold' }}>﷼ {formatPrice(vehicle.price || 0)}</div>
                   </div>
                 </div>
               </div>

@@ -51,7 +51,9 @@ This is a full-stack inventory management system for managing inventory items wi
 - ✅ Changed price card background to blue gradient (from #00627F to #004A61) per user request (August 3, 2025)
 - ✅ Made price card content fixed and non-responsive - same size across all devices (mobile/desktop)
 - ✅ Converted all elements to absolute positioning with fixed pixel dimensions
-- ✅ Applied 0.6 scale transformation to fit content appropriately in dialog
+- ✅ Changed price card to A4 landscape orientation (1123px x 794px)
+- ✅ Redesigned layout for landscape: logo/year on left, content card on right
+- ✅ Applied 0.7 scale transformation for optimal landscape display
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
