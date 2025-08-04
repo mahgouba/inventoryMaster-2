@@ -288,7 +288,7 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                 overflow: 'hidden',
                 transform: 'scale(0.7)',
                 transformOrigin: 'center center',
-                backgroundImage: 'url(/backgorun-price-card.jpg)',
+                backgroundImage: 'url(/price-card.jpg)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat'
