@@ -278,6 +278,20 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       internal: true,
       permission: "leaveRequests"
     },
+    { 
+      title: "المواصفات التفصيلية", 
+      href: "/detailed-specifications", 
+      icon: Settings,
+      internal: true,
+      permission: "inventory"
+    },
+    { 
+      title: "الصور", 
+      href: "/images-management", 
+      icon: Image,
+      internal: true,
+      permission: "inventory"
+    },
     // External pages (will navigate away)
     { 
       title: "البطاقات", 
