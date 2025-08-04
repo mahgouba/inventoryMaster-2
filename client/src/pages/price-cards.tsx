@@ -5,10 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Download, Printer, Search, Filter, Plus, RefreshCw } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { Download, Printer, Search, Filter, Plus, RefreshCw, Edit, Trash2, Eye, EyeOff, Save } from "lucide-react";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { QRCodeSVG } from "qrcode.react";
@@ -17,26 +23,63 @@ interface InventoryItem {
   id: number;
   manufacturer: string;
   category: string;
+  trimLevel?: string;
   model?: string;
-  year?: string;
+  year?: number;
   price?: number;
   status?: string;
   importType?: string;
   notes?: string;
   engineCapacity?: string;
+  exteriorColor?: string;
+  interiorColor?: string;
+  chassisNumber?: string;
 }
+
+interface PriceCard {
+  id: number;
+  inventoryItemId: number;
+  manufacturer: string;
+  category: string;
+  trimLevel?: string;
+  model?: string;
+  year: number;
+  price?: number;
+  features: string[];
+  status: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const priceCardSchema = z.object({
+  inventoryItemId: z.number(),
+  manufacturer: z.string().min(1, "الصانع مطلوب"),
+  category: z.string().min(1, "الفئة مطلوبة"),
+  trimLevel: z.string().optional(),
+  model: z.string().optional(),
+  year: z.number().min(2000).max(2030),
+  price: z.string().optional(),
+  features: z.array(z.string()).default([]),
+  status: z.string().default("نشط"),
+});
+
+type PriceCardFormData = z.infer<typeof priceCardSchema>;
 
 export default function PriceCardsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [isCreatingAll, setIsCreatingAll] = useState(false);
+  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
+  const [editingCard, setEditingCard] = useState<PriceCard | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
-  // Filter states
+  // Enhanced filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedManufacturer, setSelectedManufacturer] = useState<string>("all");
-  const [selectedStatus, setSelectedStatus] = useState<string>("all");
-  const [selectedImportType, setSelectedImportType] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedTrimLevel, setSelectedTrimLevel] = useState<string>("all");
+  const [selectedModel, setSelectedModel] = useState<string>("all");
 
   // Fetch inventory data
   const { data: inventoryData = [] } = useQuery<InventoryItem[]>({
@@ -44,28 +87,58 @@ export default function PriceCardsPage() {
   });
 
   // Fetch existing price cards
-  const { data: priceCards = [] } = useQuery<any[]>({
+  const { data: priceCards = [] } = useQuery<PriceCard[]>({
     queryKey: ["/api/price-cards"],
   });
 
-  // Filter available vehicles for price cards
-  const filteredVehicles = inventoryData.filter(item => {
+  // Form for editing price cards
+  const form = useForm<PriceCardFormData>({
+    resolver: zodResolver(priceCardSchema),
+    defaultValues: {
+      inventoryItemId: 0,
+      manufacturer: "",
+      category: "",
+      trimLevel: "",
+      model: "",
+      year: new Date().getFullYear(),
+      price: "",
+      features: [],
+      status: "نشط",
+    },
+  });
+
+  // Filter price cards based on all filters
+  const filteredCards = priceCards.filter(card => {
     const matchesSearch = searchTerm === "" || 
-      item.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.model?.toLowerCase().includes(searchTerm.toLowerCase());
+      card.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      card.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      card.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      card.trimLevel?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesManufacturer = selectedManufacturer === "all" || item.manufacturer === selectedManufacturer;
-    const matchesStatus = selectedStatus === "all" || item.status === selectedStatus;
-    const matchesImportType = selectedImportType === "all" || item.importType === selectedImportType;
+    const matchesManufacturer = selectedManufacturer === "all" || card.manufacturer === selectedManufacturer;
+    const matchesCategory = selectedCategory === "all" || card.category === selectedCategory;
+    const matchesTrimLevel = selectedTrimLevel === "all" || card.trimLevel === selectedTrimLevel;
+    const matchesModel = selectedModel === "all" || card.model === selectedModel;
     
-    return matchesSearch && matchesManufacturer && matchesStatus && matchesImportType;
+    return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesModel;
   });
 
   // Get unique values for filters
-  const manufacturers = ["all", ...new Set(inventoryData.map(item => item.manufacturer).filter(Boolean))];
-  const statuses = ["all", ...new Set(inventoryData.map(item => item.status).filter(Boolean))];
-  const importTypes = ["all", ...new Set(inventoryData.map(item => item.importType).filter(Boolean))];
+  const manufacturers = ["all", ...new Set(priceCards.map(card => card.manufacturer).filter(Boolean))];
+  const categories = ["all", ...new Set(priceCards.map(card => card.category).filter(Boolean))];
+  const trimLevels = ["all", ...new Set(priceCards.map(card => card.trimLevel).filter(Boolean))];
+  const models = ["all", ...new Set(priceCards.map(card => card.model).filter(Boolean))];
+
+  // Toggle card expansion
+  const toggleCardExpansion = (cardId: number) => {
+    const newExpanded = new Set(expandedCards);
+    if (newExpanded.has(cardId)) {
+      newExpanded.delete(cardId);
+    } else {
+      newExpanded.add(cardId);
+    }
+    setExpandedCards(newExpanded);
+  };
 
   // Format price
   const formatPrice = (price: string | number) => {
@@ -73,22 +146,42 @@ export default function PriceCardsPage() {
     return new Intl.NumberFormat('ar-SA').format(numPrice || 0);
   };
 
-  // Generate vehicle URL for QR code that links to vehicle view page
-  const generateVehicleURL = (vehicle: InventoryItem) => {
+  // Generate vehicle URL for QR code
+  const generateVehicleURL = (card: PriceCard) => {
     const baseURL = window.location.origin;
-    return `${baseURL}/vehicles/${vehicle.id}?view=card&manufacturer=${encodeURIComponent(vehicle.manufacturer)}&category=${encodeURIComponent(vehicle.category)}&year=${vehicle.year}&price=${vehicle.price}`;
+    return `${baseURL}/vehicles/${card.inventoryItemId}?view=card&manufacturer=${encodeURIComponent(card.manufacturer)}&category=${encodeURIComponent(card.category)}&year=${card.year}&price=${card.price}`;
   };
 
-  // Determine car status and mileage
-  const getCarStatus = (vehicle: InventoryItem) => {
-    return vehicle.importType === "شخصي مستعمل" || vehicle.notes?.includes("مستعمل") ? "مستعمل" : "جديد";
+  // Create price card from inventory
+  const createPriceCardFromInventory = async (inventoryItem: InventoryItem) => {
+    try {
+      const priceCardData = {
+        inventoryItemId: inventoryItem.id,
+        manufacturer: inventoryItem.manufacturer,
+        category: inventoryItem.category,
+        trimLevel: inventoryItem.trimLevel || "",
+        model: inventoryItem.model || "",
+        year: inventoryItem.year || new Date().getFullYear(),
+        price: inventoryItem.price?.toString() || "",
+        features: [],
+        status: "نشط"
+      };
+      await apiRequest("POST", "/api/price-cards", priceCardData);
+      queryClient.invalidateQueries({ queryKey: ["/api/price-cards"] });
+      toast({
+        title: "تم بنجاح",
+        description: "تم إنشاء بطاقة السعر بنجاح",
+      });
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ في إنشاء بطاقة السعر",
+        variant: "destructive",
+      });
+    }
   };
 
-  const getMileage = (vehicle: InventoryItem) => {
-    return getCarStatus(vehicle) === "مستعمل" ? "85,000" : "0";
-  };
-
-  // Create price cards for all inventory items
+  // Create all price cards mutation
   const createAllPriceCardsMutation = useMutation({
     mutationFn: async () => {
       const results = [];
@@ -96,13 +189,15 @@ export default function PriceCardsPage() {
         if (vehicle.manufacturer && vehicle.category) {
           try {
             const priceCardData = {
-              vehicleId: vehicle.id,
+              inventoryItemId: vehicle.id,
               manufacturer: vehicle.manufacturer,
               category: vehicle.category,
+              trimLevel: vehicle.trimLevel || "",
+              model: vehicle.model || "",
               year: vehicle.year || new Date().getFullYear(),
-              price: vehicle.price || 0,
+              price: vehicle.price?.toString() || "",
               features: [],
-              status: vehicle.status || "متوفر"
+              status: "نشط"
             };
             const result = await apiRequest("POST", "/api/price-cards", priceCardData);
             results.push(result);
@@ -120,8 +215,7 @@ export default function PriceCardsPage() {
         description: `تم إنشاء ${results.length} بطاقة سعر تلقائياً`,
       });
     },
-    onError: (error) => {
-      console.error('Error creating price cards:', error);
+    onError: () => {
       toast({
         title: "خطأ",
         description: "حدث خطأ في إنشاء بطاقات الأسعار",
@@ -130,18 +224,103 @@ export default function PriceCardsPage() {
     },
   });
 
-  const handleCreateAllPriceCards = () => {
-    setIsCreatingAll(true);
-    createAllPriceCardsMutation.mutate();
+  // Create price card mutation
+  const createPriceCardMutation = useMutation({
+    mutationFn: async (data: PriceCardFormData) => {
+      return await apiRequest("POST", "/api/price-cards", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/price-cards"] });
+      setIsEditDialogOpen(false);
+      form.reset();
+      toast({
+        title: "تم بنجاح",
+        description: "تم إنشاء بطاقة السعر بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ في إنشاء بطاقة السعر",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update price card mutation
+  const updatePriceCardMutation = useMutation({
+    mutationFn: async (data: PriceCardFormData) => {
+      if (!editingCard) throw new Error("No card being edited");
+      return await apiRequest("PUT", `/api/price-cards/${editingCard.id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/price-cards"] });
+      setIsEditDialogOpen(false);
+      setEditingCard(null);
+      form.reset();
+      toast({
+        title: "تم بنجاح",
+        description: "تم تحديث بطاقة السعر بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ في تحديث بطاقة السعر",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete price card mutation
+  const deletePriceCardMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest("DELETE", `/api/price-cards/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/price-cards"] });
+      toast({
+        title: "تم بنجاح",
+        description: "تم حذف بطاقة السعر بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ في حذف بطاقة السعر",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handle form submission
+  const onSubmit = (data: PriceCardFormData) => {
+    if (editingCard) {
+      updatePriceCardMutation.mutate(data);
+    } else {
+      createPriceCardMutation.mutate(data);
+    }
   };
 
-  // Fix mutation state when complete
-  if (createAllPriceCardsMutation.isSuccess && isCreatingAll) {
-    setIsCreatingAll(false);
-  }
+  // Handle edit card
+  const handleEditCard = (card: PriceCard) => {
+    setEditingCard(card);
+    form.reset({
+      inventoryItemId: card.inventoryItemId,
+      manufacturer: card.manufacturer,
+      category: card.category,
+      trimLevel: card.trimLevel || "",
+      model: card.model || "",
+      year: card.year,
+      price: card.price?.toString() || "",
+      features: card.features || [],
+      status: card.status,
+    });
+    setIsEditDialogOpen(true);
+  };
 
-  // Enhanced PDF generation for a specific vehicle
-  const generatePDF = async (vehicle: InventoryItem, cardId: string) => {
+  // Enhanced PDF generation
+  const generatePDF = async (card: PriceCard, cardId: string) => {
     setIsGeneratingPDF(true);
     try {
       const element = document.getElementById(cardId);
@@ -157,8 +336,8 @@ export default function PriceCardsPage() {
       const printElement = element.cloneNode(true) as HTMLElement;
       printElement.style.transform = 'scale(1)';
       printElement.style.transformOrigin = 'top left';
-      printElement.style.width = '297mm';
-      printElement.style.height = '210mm';
+      printElement.style.width = '1123px';
+      printElement.style.height = '794px';
       printElement.style.position = 'absolute';
       printElement.style.top = '-9999px';
       printElement.style.left = '-9999px';
@@ -172,20 +351,27 @@ export default function PriceCardsPage() {
         allowTaint: true,
         backgroundColor: '#ffffff',
         width: 1123,
-        height: 794,
-        logging: false
+        height: 794
       });
 
+      // Remove the temporary element
       document.body.removeChild(printElement);
 
-      // Convert to PDF
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      const pdf = new jsPDF('landscape', 'mm', 'a4');
+      // Create PDF in landscape orientation (A4)
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       
-      pdf.addImage(imgData, 'PNG', 0, 0, 297, 210, '', 'FAST');
+      // A4 landscape dimensions: 297mm x 210mm
+      pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
       
-      const fileName = `بطاقة_سعر_${vehicle.manufacturer}_${vehicle.category}_${vehicle.year}.pdf`;
-      pdf.save(fileName);
+      // Save with Arabic filename
+      const filename = `بطاقة_سعر_${card.manufacturer}_${card.category}_${card.year}.pdf`;
+      pdf.save(filename);
 
       toast({
         title: "تم بنجاح",
@@ -195,86 +381,11 @@ export default function PriceCardsPage() {
       console.error('Error generating PDF:', error);
       toast({
         title: "خطأ",
-        description: "حدث خطأ في توليد ملف PDF",
+        description: "حدث خطأ في إنشاء ملف PDF",
         variant: "destructive",
       });
     } finally {
       setIsGeneratingPDF(false);
-    }
-  };
-
-  // Generate JPG for a specific vehicle
-  const generateJPG = async (vehicle: InventoryItem, cardId: string) => {
-    setIsGeneratingPDF(true);
-    try {
-      const element = document.getElementById(cardId);
-      if (!element) return;
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const canvas = await html2canvas(element, {
-        scale: 3,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        width: 1123,
-        height: 794,
-        logging: false
-      });
-
-      // Convert to blob and download
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `بطاقة_سعر_${vehicle.manufacturer}_${vehicle.category}_${vehicle.year}.jpg`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }
-      }, 'image/jpeg', 0.95);
-
-      toast({
-        title: "تم بنجاح",
-        description: "تم تحميل بطاقة السعر بصيغة JPG",
-      });
-    } catch (error) {
-      console.error('Error generating JPG:', error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ في توليد صورة JPG",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGeneratingPDF(false);
-    }
-  };
-
-  // Handle print for a specific vehicle
-  const handlePrint = (cardId: string) => {
-    const element = document.getElementById(cardId);
-    if (element) {
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(`
-          <html>
-            <head>
-              <title>بطاقة السعر</title>
-              <style>
-                body { margin: 0; padding: 0; }
-                .price-card { transform: scale(1) !important; width: 297mm !important; height: 210mm !important; }
-              </style>
-            </head>
-            <body>
-              ${element.outerHTML}
-            </body>
-          </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-      }
     }
   };
 
@@ -282,19 +393,19 @@ export default function PriceCardsPage() {
     <div className="container mx-auto p-6 space-y-6" dir="rtl">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
-          بطاقات الأسعار
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          إدارة بطاقات الأسعار
         </h1>
         <p className="text-gray-600 dark:text-gray-300">
-          إنشاء وإدارة بطاقات أسعار تلقائية للمركبات ({filteredVehicles.length} من {inventoryData.length})
+          إنشاء وإدارة بطاقات أسعار تفاعلية للمركبات ({filteredCards.length} من {priceCards.length})
         </p>
       </div>
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-4 justify-center mb-6">
         <Button 
-          onClick={handleCreateAllPriceCards}
-          disabled={isCreatingAll || createAllPriceCardsMutation.isPending}
+          onClick={() => createAllPriceCardsMutation.mutate()}
+          disabled={createAllPriceCardsMutation.isPending}
           className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg"
         >
           {createAllPriceCardsMutation.isPending ? (
@@ -304,26 +415,42 @@ export default function PriceCardsPage() {
           )}
           إنشاء بطاقات لكل المخزون ({inventoryData.length})
         </Button>
+        
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogTrigger asChild>
+            <Button 
+              onClick={() => {
+                setEditingCard(null);
+                form.reset();
+              }}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg"
+            >
+              <Plus className="w-4 h-4 ml-2" />
+              إنشاء بطاقة جديدة
+            </Button>
+          </DialogTrigger>
+        </Dialog>
+        
         <Badge variant="secondary" className="text-sm">
           {priceCards.length} بطاقة موجودة
         </Badge>
       </div>
 
-      {/* Filters */}
+      {/* Enhanced Filters */}
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Filter className="w-5 h-5" />
-            الفلاتر والبحث
+            الفلاتر والبحث المتقدم
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
             {/* Search */}
             <div className="relative">
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
-                placeholder="البحث في المركبات..."
+                placeholder="البحث في بطاقات الأسعار..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pr-10"
@@ -333,43 +460,58 @@ export default function PriceCardsPage() {
             {/* Manufacturer Filter */}
             <Select value={selectedManufacturer} onValueChange={setSelectedManufacturer}>
               <SelectTrigger>
-                <SelectValue placeholder="اختر الماركة" />
+                <SelectValue placeholder="الصانع" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">جميع الماركات</SelectItem>
+                <SelectItem value="all">جميع الصناع</SelectItem>
                 {manufacturers.slice(1).map((manufacturer) => (
-                  <SelectItem key={manufacturer} value={manufacturer}>
+                  <SelectItem key={manufacturer} value={manufacturer || ""}>
                     {manufacturer}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            {/* Status Filter */}
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            {/* Category Filter */}
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger>
-                <SelectValue placeholder="اختر الحالة" />
+                <SelectValue placeholder="الفئة" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">جميع الحالات</SelectItem>
-                {statuses.slice(1).map((status) => (
-                  <SelectItem key={status} value={status || ""}>
-                    {status}
+                <SelectItem value="all">جميع الفئات</SelectItem>
+                {categories.slice(1).map((category) => (
+                  <SelectItem key={category} value={category || ""}>
+                    {category}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            {/* Import Type Filter */}
-            <Select value={selectedImportType} onValueChange={setSelectedImportType}>
+            {/* Trim Level Filter */}
+            <Select value={selectedTrimLevel} onValueChange={setSelectedTrimLevel}>
               <SelectTrigger>
-                <SelectValue placeholder="نوع الاستيراد" />
+                <SelectValue placeholder="درجة التجهيز" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">جميع الأنواع</SelectItem>
-                {importTypes.slice(1).map((type) => (
-                  <SelectItem key={type} value={type || ""}>
-                    {type}
+                <SelectItem value="all">جميع درجات التجهيز</SelectItem>
+                {trimLevels.slice(1).map((trimLevel) => (
+                  <SelectItem key={trimLevel} value={trimLevel || ""}>
+                    {trimLevel}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Model Filter */}
+            <Select value={selectedModel} onValueChange={setSelectedModel}>
+              <SelectTrigger>
+                <SelectValue placeholder="الموديل" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">جميع الموديلات</SelectItem>
+                {models.slice(1).map((model) => (
+                  <SelectItem key={model} value={model || ""}>
+                    {model}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -377,266 +519,501 @@ export default function PriceCardsPage() {
           </div>
 
           {/* Filter Summary */}
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             {searchTerm && (
               <Badge variant="outline">البحث: {searchTerm}</Badge>
             )}
             {selectedManufacturer !== "all" && (
-              <Badge variant="outline">الماركة: {selectedManufacturer}</Badge>
+              <Badge variant="outline">الصانع: {selectedManufacturer}</Badge>
             )}
-            {selectedStatus !== "all" && (
-              <Badge variant="outline">الحالة: {selectedStatus}</Badge>
+            {selectedCategory !== "all" && (
+              <Badge variant="outline">الفئة: {selectedCategory}</Badge>
             )}
-            {selectedImportType !== "all" && (
-              <Badge variant="outline">النوع: {selectedImportType}</Badge>
+            {selectedTrimLevel !== "all" && (
+              <Badge variant="outline">درجة التجهيز: {selectedTrimLevel}</Badge>
+            )}
+            {selectedModel !== "all" && (
+              <Badge variant="outline">الموديل: {selectedModel}</Badge>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {filteredVehicles.length === 0 ? (
+      {/* Results Summary */}
+      {filteredCards.length === 0 ? (
         <div className="text-center py-12">
           <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
-            لا توجد مركبات تطابق الفلاتر المحددة
+            لا توجد بطاقات تطابق الفلاتر المحددة
           </h3>
           <p className="text-gray-500 dark:text-gray-400">
-            جرب تعديل الفلاتر أو إزالة بعض الخيارات
+            جرب تعديل الفلاتر أو إنشاء بطاقات جديدة
           </p>
         </div>
       ) : (
         <div className="text-center mb-4">
           <Badge variant="secondary" className="text-sm">
-            عرض {filteredVehicles.length} مركبة من {inventoryData.length}
+            عرض {filteredCards.length} بطاقة من {priceCards.length}
           </Badge>
         </div>
       )}
 
-      {/* Price Cards Grid */}
-      {filteredVehicles.map((vehicle, index) => (
-        <Card key={vehicle.id} className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>بطاقة سعر {vehicle.manufacturer} {vehicle.category}</span>
-              <div className="flex gap-2">
-                <Button 
-                  onClick={() => generatePDF(vehicle, `price-card-${vehicle.id}`)}
-                  disabled={isGeneratingPDF}
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  <Download className="w-4 h-4 ml-1" />
-                  PDF
-                </Button>
-                
-                <Button 
-                  onClick={() => generateJPG(vehicle, `price-card-${vehicle.id}`)}
-                  disabled={isGeneratingPDF}
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                >
-                  <Download className="w-4 h-4 ml-1" />
-                  JPG
-                </Button>
-                
-                <Button 
-                  onClick={() => handlePrint(`price-card-${vehicle.id}`)}
-                  disabled={isGeneratingPDF}
-                  size="sm"
-                  variant="outline"
-                >
-                  <Printer className="w-4 h-4 ml-1" />
-                  طباعة
-                </Button>
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <div 
-              id={`price-card-${vehicle.id}`}
-              className="relative shadow-2xl border-2 border-gray-200 bg-[#00607f]"
-              style={{
-                width: '1123px',
-                height: '794px',
-                fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
-                direction: 'rtl',
-                fontSize: '16px',
-                overflow: 'hidden',
-                transform: 'scale(0.6)',
-                transformOrigin: 'center center',
-                backgroundImage: 'url(/price-card.jpg)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }}
+      {/* Price Cards Grid - Collapsible Cards */}
+      {filteredCards.map((card) => {
+        const isExpanded = expandedCards.has(card.id);
+        
+        return (
+          <Card key={card.id} className="mb-6 border-2 hover:border-blue-300 transition-colors">
+            {/* Card Header - Always Visible */}
+            <CardHeader 
+              className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              onClick={() => toggleCardExpansion(card.id)}
             >
-
-            {/* QR Code - Top of Page */}
-            <div style={{
-              position: 'absolute',
-              top: '20px',
-              right: '20px',
-              width: '120px',
-              height: '120px',
-              backgroundColor: 'white',
-              borderRadius: '15px',
-              padding: '10px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 30
-            }}>
-              <QRCodeSVG
-                value={generateVehicleURL(vehicle)}
-                size={95}
-                bgColor="#FFFFFF"
-                fgColor="#000000"
-                level="M"
-                includeMargin={false}
-              />
-            </div>
-
-            {/* Year - Large Center */}
-            <div style={{ 
-              position: 'absolute',
-              top: '35mm',
-              left: '50%',
-              transform: 'translate(-50%, 0)',
-              color: '#CF9B47', 
-              fontSize: '250px', 
-              fontWeight: '900', 
-              letterSpacing: '10px'
-            }}>
-              {vehicle.year || '2025'}
-            </div>
-
-            {/* Main Content Card - Bottom Center */}
-            <div style={{
-              position: 'absolute',
-              bottom: '40px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '1080px',
-              height: '280px',
-              backgroundColor: 'transparent',
-              padding: '20px',
-              zIndex: 10,
-              overflow: 'visible'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '60px', height: '100%' }}>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    {isExpanded ? (
+                      <EyeOff className="w-5 h-5 text-blue-600" />
+                    ) : (
+                      <Eye className="w-5 h-5 text-gray-400" />
+                    )}
+                    <span>بطاقة سعر {card.manufacturer} {card.category}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Badge variant="outline">{card.year}</Badge>
+                    {card.trimLevel && (
+                      <Badge variant="secondary">{card.trimLevel}</Badge>
+                    )}
+                    {card.model && (
+                      <Badge variant="default">{card.model}</Badge>
+                    )}
+                  </div>
+                </div>
                 
-                {/* Right Section - Vehicle Details Box */}
-                <div style={{ 
-                  flex: 1, 
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  borderRadius: '20px',
-                  padding: '25px',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                  position: 'relative',
-                  minHeight: '240px'
-                }}>
-                  {/* Manufacturer Logo - Top */}
-                  {vehicle.manufacturer && vehicle.manufacturer.trim() !== "" && (
-                    <div style={{ 
-                      width: '120px', 
-                      height: '80px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditCard(card);
+                    }}
+                    size="sm"
+                    variant="outline"
+                    className="text-blue-600 hover:text-blue-700"
+                  >
+                    <Edit className="w-4 h-4 ml-1" />
+                    تحرير
+                  </Button>
+                  
+                  <Button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm('هل أنت متأكد من حذف هذه البطاقة؟')) {
+                        deletePriceCardMutation.mutate(card.id);
+                      }
+                    }}
+                    size="sm"
+                    variant="outline"
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="w-4 h-4 ml-1" />
+                    حذف
+                  </Button>
+                  
+                  <Button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      generatePDF(card, `price-card-${card.id}`);
+                    }}
+                    disabled={isGeneratingPDF}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Download className="w-4 h-4 ml-1" />
+                    PDF
+                  </Button>
+                </div>
+              </CardTitle>
+            </CardHeader>
+
+            {/* Card Content - Shown only when expanded */}
+            {isExpanded && (
+              <CardContent className="pt-0">
+                <div className="flex justify-center">
+                  <div 
+                    id={`price-card-${card.id}`}
+                    className="relative shadow-2xl border-2 border-gray-200 bg-[#00607f]"
+                    style={{
+                      width: '1123px',   // Fixed A4 landscape width in pixels
+                      height: '794px',   // Fixed A4 landscape height in pixels
+                      fontFamily: "'Noto Sans Arabic', Arial, sans-serif",
+                      direction: 'rtl',
+                      fontSize: '16px',
+                      overflow: 'hidden',
+                      transform: 'scale(0.6)', // Scale down for display
+                      transformOrigin: 'center center',
+                      backgroundImage: 'url(/price-card.svg)',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat'
+                    }}
+                  >
+                    {/* QR Code - Top Right */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '20px',
+                      right: '20px',
+                      width: '120px',
+                      height: '120px',
+                      backgroundColor: 'white',
+                      borderRadius: '15px',
+                      padding: '10px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
                       justifyContent: 'center',
-                      margin: '0 auto 20px auto'
+                      zIndex: 30
                     }}>
-                      <div style={{ filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(1.2)' }}>
-                        <ManufacturerLogo 
-                          manufacturerName={vehicle.manufacturer} 
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Category */}
-                  <div style={{ 
-                    color: '#CF9B47', 
-                    fontSize: '32px', 
-                    fontWeight: 'bold', 
-                    textAlign: 'center',
-                    marginBottom: '10px'
-                  }}>
-                    {vehicle.category || 'الفئة'}
-                  </div>
-                  
-                  {/* Trim Level */}
-                  <div style={{ 
-                    color: '#CF9B47', 
-                    fontSize: '20px', 
-                    fontWeight: '600', 
-                    textAlign: 'center'
-                  }}>
-                    {vehicle.model || 'درجة التجهيز'}
-                  </div>
-                </div>
-
-                {/* Divider */}
-                <div style={{ width: '4px', height: '200px', backgroundColor: 'white', borderRadius: '2px', alignSelf: 'center' }}></div>
-
-                {/* Left Section - Price and Details Box */}
-                <div style={{ 
-                  flex: 1, 
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  borderRadius: '20px',
-                  padding: '25px',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                  position: 'relative',
-                  minHeight: '240px'
-                }}>
-                  {/* Price */}
-                  <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                    <div style={{ color: '#00627F', fontSize: '16px', fontWeight: '600', marginBottom: '5px' }}>السعر</div>
-                    <div style={{ color: '#00627F', fontSize: '28px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                      <img 
-                        src="/Saudi_Riyal_Symbol.svg" 
-                        alt="ريال سعودي" 
-                        style={{ 
-                          width: '24px', 
-                          height: '24px', 
-                          filter: 'brightness(0) saturate(100%) invert(60%) sepia(73%) saturate(437%) hue-rotate(37deg) brightness(91%) contrast(86%)'
-                        }} 
+                      <QRCodeSVG
+                        value={generateVehicleURL(card)}
+                        size={95}
+                        bgColor="#FFFFFF"
+                        fgColor="#000000"
+                        level="M"
+                        includeMargin={false}
                       />
-                      {formatPrice(vehicle.price || 0)}
                     </div>
-                  </div>
 
-                  {/* Status */}
-                  <div style={{ textAlign: 'center', marginBottom: '15px' }}>
-                    <div style={{ color: '#00627F', fontSize: '16px', fontWeight: '600', marginBottom: '5px' }}>الحالة</div>
-                    <div className="bg-[#ffffff5e]" style={{ 
-                      fontSize: '22px', 
-                      fontWeight: 'bold',
-                      color: getCarStatus(vehicle) === 'مستعمل' ? '#f59e0b' : '#16a34a'
+                    {/* Year - Large Center */}
+                    <div style={{ 
+                      position: 'absolute',
+                      top: '35mm',
+                      left: '50%',
+                      transform: 'translate(-50%, 0)',
+                      color: '#CF9B47', 
+                      fontSize: '250px', 
+                      fontWeight: '900', 
+                      letterSpacing: '10px'
                     }}>
-                      {getCarStatus(vehicle)}
+                      {card.year}
                     </div>
-                  </div>
 
-                  {/* Mileage (if used) */}
-                  {getCarStatus(vehicle) === 'مستعمل' && (
-                    <div style={{ textAlign: 'center', marginBottom: '15px' }}>
-                      <div style={{ color: '#00627F', fontSize: '16px', fontWeight: '600', marginBottom: '5px' }}>الممشي</div>
-                      <div style={{ color: '#00627F', fontSize: '20px', fontWeight: 'bold' }}>
-                        {getMileage(vehicle) ? `${formatPrice(getMileage(vehicle))} كم` : 'غير محدد'}
+                    {/* Main Content Card - Bottom Center */}
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '40px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: '1080px',
+                      height: '280px',
+                      backgroundColor: 'transparent',
+                      padding: '20px',
+                      zIndex: 10,
+                      overflow: 'visible'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '60px', height: '100%' }}>
+                        
+                        {/* Right Section - Vehicle Details Box */}
+                        <div style={{ 
+                          flex: 1, 
+                          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                          borderRadius: '20px',
+                          padding: '25px',
+                          boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                          position: 'relative',
+                          minHeight: '240px'
+                        }}>
+                          {/* Manufacturer Logo */}
+                          {card.manufacturer && (
+                            <div style={{ 
+                              width: '120px', 
+                              height: '80px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center',
+                              margin: '0 auto 20px auto'
+                            }}>
+                              <div style={{ filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(1.2)' }}>
+                                <ManufacturerLogo 
+                                  manufacturerName={card.manufacturer} 
+                                  className="w-full h-full object-contain"
+                                />
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Category */}
+                          <div style={{ 
+                            color: '#CF9B47', 
+                            fontSize: '32px', 
+                            fontWeight: 'bold', 
+                            textAlign: 'center',
+                            marginBottom: '10px'
+                          }}>
+                            {card.category}
+                          </div>
+                          
+                          {/* Trim Level & Model */}
+                          <div style={{ 
+                            color: '#CF9B47', 
+                            fontSize: '20px', 
+                            fontWeight: '600', 
+                            textAlign: 'center'
+                          }}>
+                            {[card.trimLevel, card.model].filter(Boolean).join(' - ')}
+                          </div>
+                        </div>
+
+                        {/* Divider */}
+                        <div style={{ width: '4px', height: '200px', backgroundColor: 'white', borderRadius: '2px', alignSelf: 'center' }}></div>
+
+                        {/* Left Section - Price and Details Box */}
+                        <div style={{ 
+                          flex: 1, 
+                          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                          borderRadius: '20px',
+                          padding: '25px',
+                          boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                          position: 'relative',
+                          minHeight: '240px'
+                        }}>
+                          {/* Price */}
+                          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                            <div style={{ 
+                              color: '#00627F', 
+                              fontSize: '16px', 
+                              fontWeight: '600', 
+                              marginBottom: '5px' 
+                            }}>
+                              السعر
+                            </div>
+                            <div style={{ 
+                              color: '#00627F', 
+                              fontSize: '28px', 
+                              fontWeight: 'bold', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              gap: '8px' 
+                            }}>
+                              <img 
+                                src="/Saudi_Riyal_Symbol.svg" 
+                                alt="ريال سعودي" 
+                                style={{ 
+                                  width: '24px', 
+                                  height: '24px', 
+                                  filter: 'brightness(0) saturate(100%) invert(60%) sepia(73%) saturate(437%) hue-rotate(37deg) brightness(91%) contrast(86%)'
+                                }} 
+                              />
+                              {formatPrice(card.price || 0)}
+                            </div>
+                          </div>
+
+                          {/* Status */}
+                          <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                            <div style={{ 
+                              color: '#00627F', 
+                              fontSize: '16px', 
+                              fontWeight: '600', 
+                              marginBottom: '5px' 
+                            }}>
+                              الحالة
+                            </div>
+                            <div style={{ 
+                              fontSize: '22px', 
+                              fontWeight: 'bold',
+                              color: card.status === 'متوفر' ? '#16a34a' : '#f59e0b'
+                            }}>
+                              {card.status}
+                            </div>
+                          </div>
+
+                          {/* Features */}
+                          {card.features && card.features.length > 0 && (
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{ 
+                                color: '#00627F', 
+                                fontSize: '14px', 
+                                fontWeight: '600', 
+                                marginBottom: '8px' 
+                              }}>
+                                المميزات
+                              </div>
+                              <div style={{ 
+                                fontSize: '16px', 
+                                color: '#00627F',
+                                lineHeight: '1.3'
+                              }}>
+                                {card.features.slice(0, 3).join(' • ')}
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
+              </CardContent>
+            )}
+          </Card>
+        );
+      })}
+
+      {/* Edit Price Card Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-md mx-auto" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>
+              {editingCard ? 'تحرير بطاقة السعر' : 'إنشاء بطاقة سعر جديدة'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="manufacturer"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الصانع</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="مثال: تويوتا" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الفئة</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="مثال: كامري" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="trimLevel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>درجة التجهيز</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="مثال: فل كامل" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="model"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>الموديل</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="مثال: GLE" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      ))}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="year"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>السنة</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          {...field} 
+                          onChange={(e) => field.onChange(parseInt(e.target.value))}
+                          value={field.value || ''}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-      {/* Print Styles */}
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>السعر</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="150000" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الحالة</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر الحالة" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="نشط">نشط</SelectItem>
+                        <SelectItem value="متوفر">متوفر</SelectItem>
+                        <SelectItem value="محجوز">محجوز</SelectItem>
+                        <SelectItem value="مباع">مباع</SelectItem>
+                        <SelectItem value="غير متوفر">غير متوفر</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex gap-2 pt-4">
+                <Button
+                  type="submit"
+                  disabled={createPriceCardMutation.isPending || updatePriceCardMutation.isPending}
+                  className="flex-1"
+                >
+                  {createPriceCardMutation.isPending || updatePriceCardMutation.isPending ? (
+                    <RefreshCw className="w-4 h-4 ml-2 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4 ml-2" />
+                  )}
+                  {editingCard ? 'تحديث' : 'إنشاء'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditDialogOpen(false)}
+                  className="flex-1"
+                >
+                  إلغاء
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Print Styles for Fixed A4 Layout */}
       <style dangerouslySetInnerHTML={{
         __html: `
           @media print {
@@ -651,8 +1028,8 @@ export default function PriceCardsPage() {
               left: 0;
               top: 0;
               transform: scale(1) !important;
-              width: 297mm !important;
-              height: 210mm !important;
+              width: 1123px !important;
+              height: 794px !important;
             }
           }
         `
