@@ -22,7 +22,7 @@ import CarsMigrationPage from "@/pages/cars-migration";
 import DropdownOptionsManagement from "@/pages/DropdownOptionsManagement";
 import HierarchicalView from "@/pages/HierarchicalView";
 
-
+import PriceCardsPage from "@/pages/price-cards";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
 
@@ -81,7 +81,8 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
       case "/hierarchy":
         return user.role === "admin" ? <HierarchicalView /> : null;
 
-
+      case "/price-cards":
+        return <PriceCardsPage />;
       default:
         return <InventoryPage userRole={user.role} username={user.username} onLogout={onLogout} />;
     }

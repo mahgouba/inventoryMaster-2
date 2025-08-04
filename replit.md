@@ -77,6 +77,7 @@ This is a full-stack inventory management system for managing inventory items wi
 - ✅ Restored price card preview with backgorun-price-card.jpg background image per user request (August 4, 2025)
 - ✅ Updated background image reference to price-card.jpg per user request (August 4, 2025)
 - ✅ Completely removed price cards management page from application per user request (August 4, 2025)
+- ✅ Rebuilt price cards page with custom form inputs and A4 landscape preview per user request (August 4, 2025)
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

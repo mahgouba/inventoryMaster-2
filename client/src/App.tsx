@@ -91,7 +91,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           {/* External Pages - separate routes */}
           <Route path="/cards" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
           <Route path="/card-view" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-
+          <Route path="/price-cards" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/banks-personal" component={PersonalBanks} />
           <Route path="/banks-company" component={CompanyBanks} />
           
