@@ -149,7 +149,7 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                 overflow: 'hidden',
                 transform: 'scale(0.7)',
                 transformOrigin: 'center center',
-                background: 'linear-gradient(135deg, #2B7F94 0%, #1E5F73 100%)'
+                background: 'linear-gradient(135deg, #00627F 0%, #004A61 100%)'
               }}
             >
             {/* Golden Pattern on Right Side */}
@@ -256,13 +256,13 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                     {/* Price */}
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ color: '#2B7F94', fontSize: '16px', fontWeight: '600' }}>السعر :</div>
-                      <div style={{ color: '#2B7F94', fontSize: '32px', fontWeight: 'bold' }}>﷼ {formatPrice(vehicle.price || 0)}</div>
+                      <div style={{ color: '#00627F', fontSize: '16px', fontWeight: '600' }}>السعر :</div>
+                      <div style={{ color: '#00627F', fontSize: '32px', fontWeight: 'bold' }}>﷼ {formatPrice(vehicle.price || 0)}</div>
                     </div>
 
                     {/* Status */}
                     <div style={{ textAlign: 'left' }}>
-                      <div style={{ color: '#2B7F94', fontSize: '16px', fontWeight: '600' }}>الحالة :</div>
+                      <div style={{ color: '#00627F', fontSize: '16px', fontWeight: '600' }}>الحالة :</div>
                       <div style={{ 
                         fontSize: '24px', 
                         fontWeight: 'bold',
@@ -276,12 +276,12 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                   {/* Mileage if used */}
                   {getCarStatus() === 'مستعمل' && (
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '15px' }}>
-                      <span style={{ color: '#2B7F94', fontSize: '18px', fontWeight: '600' }}>المماشي :</span>
-                      <span style={{ color: '#2B7F94', fontSize: '24px', fontWeight: 'bold' }}>{getMileage()}</span>
+                      <span style={{ color: '#00627F', fontSize: '18px', fontWeight: '600' }}>المماشي :</span>
+                      <span style={{ color: '#00627F', fontSize: '24px', fontWeight: 'bold' }}>{getMileage()}</span>
                       <div style={{ 
                         width: '24px', 
                         height: '24px', 
-                        backgroundColor: '#2B7F94', 
+                        backgroundColor: '#00627F', 
                         borderRadius: '50%',
                         display: 'flex',
                         alignItems: 'center',
