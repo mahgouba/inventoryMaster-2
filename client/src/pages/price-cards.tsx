@@ -543,7 +543,6 @@ export default function PriceCardsPage() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
               zIndex: 30
             }}>
               <QRCodeSVG
