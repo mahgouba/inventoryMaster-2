@@ -12,7 +12,7 @@ import UniversalGlass from "@/components/universal-glass";
 // import SidebarNavigation from "@/components/sidebar-navigation";
 import MainDashboard from "@/components/main-dashboard";
 import CardViewPage from "@/pages/card-view";
-import PriceCardsManagementPage from "@/pages/price-cards-management";
+
 import LoginPage from "@/pages/login";
 import NotFound from "@/pages/not-found";
 import QuotationEditPage from "@/pages/quotation-edit";
@@ -91,7 +91,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           {/* External Pages - separate routes */}
           <Route path="/cards" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
           <Route path="/card-view" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
-          <Route path="/price-cards" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+
           <Route path="/banks-personal" component={PersonalBanks} />
           <Route path="/banks-company" component={CompanyBanks} />
           
