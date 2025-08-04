@@ -67,6 +67,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
               <Route path="/database-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
               <Route path="/dropdown-options" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
               <Route path="/hierarchy" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/hierarchy-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
               <Route path="/bank-management-full" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
             </>
           )}

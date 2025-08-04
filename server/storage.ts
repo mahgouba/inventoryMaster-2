@@ -19,7 +19,9 @@ import {
   type FinancingRate, type InsertFinancingRate,
   type ColorAssociation, type InsertColorAssociation,
   type VehicleCategory, type InsertVehicleCategory,
-  type VehicleTrimLevel, type InsertVehicleTrimLevel
+  type VehicleTrimLevel, type InsertVehicleTrimLevel,
+  type VehicleSpecification, type InsertVehicleSpecification,
+  type VehicleImageLink, type InsertVehicleImageLink
 } from "@shared/schema";
 
 export interface IStorage {
@@ -288,6 +290,22 @@ export interface IStorage {
   deleteCategory(id: number): Promise<boolean>;
   deleteColor(id: number): Promise<boolean>;
 
+  // Vehicle Specifications methods
+  getAllVehicleSpecifications(): Promise<VehicleSpecification[]>;
+  getVehicleSpecification(id: number): Promise<VehicleSpecification | undefined>;
+  createVehicleSpecification(spec: InsertVehicleSpecification): Promise<VehicleSpecification>;
+  updateVehicleSpecification(id: number, spec: Partial<InsertVehicleSpecification>): Promise<VehicleSpecification | undefined>;
+  deleteVehicleSpecification(id: number): Promise<boolean>;
+  getSpecificationsByHierarchy(manufacturer: string, category: string, trimLevel: string, model: string): Promise<VehicleSpecification[]>;
+  
+  // Vehicle Image Links methods
+  getAllVehicleImageLinks(): Promise<VehicleImageLink[]>;
+  getVehicleImageLink(id: number): Promise<VehicleImageLink | undefined>;
+  createVehicleImageLink(link: InsertVehicleImageLink): Promise<VehicleImageLink>;
+  updateVehicleImageLink(id: number, link: Partial<InsertVehicleImageLink>): Promise<VehicleImageLink | undefined>;
+  deleteVehicleImageLink(id: number): Promise<boolean>;
+  getImageLinksByHierarchy(manufacturer: string, category: string, trimLevel: string, exteriorColor: string, interiorColor: string): Promise<VehicleImageLink[]>;
+
   saveImageLink(linkData: any): Promise<any>;
   getLeaveRequest(id: number): Promise<LeaveRequest | undefined>;
   updateLeaveRequest(id: number, requestData: any): Promise<LeaveRequest | undefined>;
@@ -312,6 +330,8 @@ export class MemStorage implements IStorage {
   private vehicleCategories = new Map<number, VehicleCategory>();
   private vehicleTrimLevels = new Map<number, VehicleTrimLevel>();
   private priceCards = new Map<number, PriceCard>();
+  private vehicleSpecifications = new Map<number, VehicleSpecification>();
+  private vehicleImageLinks = new Map<number, VehicleImageLink>();
   
   private currentUserId = 1;
   private currentInventoryId = 1;
@@ -331,6 +351,8 @@ export class MemStorage implements IStorage {
   private currentVehicleCategoryId = 1;
   private currentVehicleTrimLevelId = 1;
   private currentPriceCardId = 1;
+  private currentVehicleSpecificationId = 1;
+  private currentVehicleImageLinkId = 1;
   
   private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
   private systemSettings = new Map<string, string>();
@@ -1651,6 +1673,99 @@ export class MemStorage implements IStorage {
     };
     this.leaveRequests.set(id, updated);
     return updated;
+  }
+
+  // Vehicle Specifications methods implementation
+  async getAllVehicleSpecifications(): Promise<VehicleSpecification[]> {
+    return Array.from(this.vehicleSpecifications.values());
+  }
+
+  async getVehicleSpecification(id: number): Promise<VehicleSpecification | undefined> {
+    return this.vehicleSpecifications.get(id);
+  }
+
+  async createVehicleSpecification(spec: InsertVehicleSpecification): Promise<VehicleSpecification> {
+    const newSpec: VehicleSpecification = {
+      id: this.currentVehicleSpecificationId++,
+      ...spec,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.vehicleSpecifications.set(newSpec.id, newSpec);
+    return newSpec;
+  }
+
+  async updateVehicleSpecification(id: number, spec: Partial<InsertVehicleSpecification>): Promise<VehicleSpecification | undefined> {
+    const existing = this.vehicleSpecifications.get(id);
+    if (!existing) return undefined;
+    
+    const updated = {
+      ...existing,
+      ...spec,
+      updatedAt: new Date()
+    };
+    this.vehicleSpecifications.set(id, updated);
+    return updated;
+  }
+
+  async deleteVehicleSpecification(id: number): Promise<boolean> {
+    return this.vehicleSpecifications.delete(id);
+  }
+
+  async getSpecificationsByHierarchy(manufacturer: string, category: string, trimLevel: string, model: string): Promise<VehicleSpecification[]> {
+    return Array.from(this.vehicleSpecifications.values()).filter(spec => 
+      spec.manufacturer === manufacturer &&
+      spec.category === category &&
+      spec.trimLevel === trimLevel &&
+      spec.model === model
+    );
+  }
+
+  // Vehicle Image Links methods implementation
+  async getAllVehicleImageLinks(): Promise<VehicleImageLink[]> {
+    return Array.from(this.vehicleImageLinks.values());
+  }
+
+  async getVehicleImageLink(id: number): Promise<VehicleImageLink | undefined> {
+    return this.vehicleImageLinks.get(id);
+  }
+
+  async createVehicleImageLink(link: InsertVehicleImageLink): Promise<VehicleImageLink> {
+    const newLink: VehicleImageLink = {
+      id: this.currentVehicleImageLinkId++,
+      ...link,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.vehicleImageLinks.set(newLink.id, newLink);
+    return newLink;
+  }
+
+  async updateVehicleImageLink(id: number, link: Partial<InsertVehicleImageLink>): Promise<VehicleImageLink | undefined> {
+    const existing = this.vehicleImageLinks.get(id);
+    if (!existing) return undefined;
+    
+    const updated = {
+      ...existing,
+      ...link,
+      updatedAt: new Date()
+    };
+    this.vehicleImageLinks.set(id, updated);
+    return updated;
+  }
+
+  async deleteVehicleImageLink(id: number): Promise<boolean> {
+    return this.vehicleImageLinks.delete(id);
+  }
+
+  async getImageLinksByHierarchy(manufacturer: string, category: string, trimLevel: string, exteriorColor: string, interiorColor: string): Promise<VehicleImageLink[]> {
+    return Array.from(this.vehicleImageLinks.values()).filter(link => 
+      link.manufacturer === manufacturer &&
+      link.category === category &&
+      link.trimLevel === trimLevel &&
+      link.exteriorColor === exteriorColor &&
+      link.interiorColor === interiorColor
+    );
   }
 }
 

@@ -21,6 +21,7 @@ import DatabaseManagement from "@/pages/database-management";
 import CarsMigrationPage from "@/pages/cars-migration";
 import DropdownOptionsManagement from "@/pages/DropdownOptionsManagement";
 import HierarchicalView from "@/pages/HierarchicalView";
+import HierarchyManagementPage from "@/pages/hierarchy-management";
 
 import PriceCardsPage from "@/pages/price-cards";
 import DetailedSpecificationsPage from "@/pages/detailed-specifications";
@@ -85,6 +86,8 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return user.role === "admin" ? <DropdownOptionsManagement /> : null;
       case "/hierarchy":
         return user.role === "admin" ? <HierarchicalView /> : null;
+      case "/hierarchy-management":
+        return user.role === "admin" ? <HierarchyManagementPage /> : null;
 
       case "/price-cards":
         return <PriceCardsPage />;

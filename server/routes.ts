@@ -23,7 +23,9 @@ import {
   insertBankInterestRateSchema,
   insertLeaveRequestSchema,
   insertFinancingRateSchema,
-  insertColorAssociationSchema
+  insertColorAssociationSchema,
+  insertVehicleSpecificationSchema,
+  insertVehicleImageLinkSchema
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";

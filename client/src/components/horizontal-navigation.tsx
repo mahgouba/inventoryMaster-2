@@ -23,7 +23,8 @@ import {
   LogOut,
   Percent,
   Database,
-  Upload
+  Upload,
+  TreePine
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { shouldShowNavItem, UserRole } from "@/utils/permissions";
@@ -291,6 +292,13 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       icon: Image,
       internal: true,
       permission: "inventory"
+    },
+    { 
+      title: "التسلسل الهرمي", 
+      href: "/hierarchy-management", 
+      icon: TreePine,
+      internal: true,
+      permission: "admin"
     },
     // External pages (will navigate away)
     { 
