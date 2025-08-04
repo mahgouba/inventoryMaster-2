@@ -93,7 +93,7 @@ export default function PriceCardsPage() {
       item.manufacturer === priceCardData.manufacturer &&
       item.category === priceCardData.category &&
       item.model === priceCardData.model &&
-      item.year.toString() === priceCardData.year
+      item.year?.toString() === priceCardData.year
     )?.id || 1;
     
     return `${baseURL}/vehicles/${vehicleId}?view=card&manufacturer=${encodeURIComponent(priceCardData.manufacturer)}&category=${encodeURIComponent(priceCardData.category)}&year=${priceCardData.year}&price=${priceCardData.price}`;
@@ -402,7 +402,7 @@ export default function PriceCardsPage() {
               </SelectTrigger>
               <SelectContent>
                 {models.map((model) => (
-                  <SelectItem key={model} value={model}>
+                  <SelectItem key={model} value={model || ""}>
                     {model}
                   </SelectItem>
                 ))}
@@ -635,18 +635,18 @@ export default function PriceCardsPage() {
                     <div className="bg-[#ffffff5e]" style={{ 
                       fontSize: '22px', 
                       fontWeight: 'bold',
-                      color: priceCardData.status === 'مستعمل' ? '#f59e0b' : '#16a34a'
+                      color: getCarStatus() === 'مستعمل' ? '#f59e0b' : '#16a34a'
                     }}>
                       {getCarStatus()}
                     </div>
                   </div>
 
                   {/* Mileage (if used) */}
-                  {priceCardData.status === 'مستعمل' && (
+                  {getCarStatus() === 'مستعمل' && (
                     <div style={{ textAlign: 'center', marginBottom: '15px' }}>
                       <div style={{ color: '#00627F', fontSize: '16px', fontWeight: '600', marginBottom: '5px' }}>الممشي</div>
                       <div style={{ color: '#00627F', fontSize: '20px', fontWeight: 'bold' }}>
-                        {priceCardData.mileage ? `${formatPrice(priceCardData.mileage)} كم` : 'غير محدد'}
+                        {getMileage() ? `${formatPrice(getMileage())} كم` : 'غير محدد'}
                       </div>
                     </div>
                   )}
