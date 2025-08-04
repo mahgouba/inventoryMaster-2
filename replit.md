@@ -70,6 +70,8 @@ This is a full-stack inventory management system for managing inventory items wi
 - ✅ All migration checklist items completed and project fully operational in Replit
 - ✅ Fixed LSP diagnostics errors in price card component (August 4, 2025)
 - ✅ Replaced background image with user-specified design from attached assets
+- ✅ Updated background image reference to backgorun-price-card.jpg per user request (August 4, 2025)
+- ✅ Fixed ManufacturerLogo component styling by wrapping with filter div to resolve TypeScript errors
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

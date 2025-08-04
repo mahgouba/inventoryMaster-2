@@ -288,7 +288,7 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                 overflow: 'hidden',
                 transform: 'scale(0.7)',
                 transformOrigin: 'center center',
-                backgroundImage: 'url(/background-price-card.jpg)',
+                backgroundImage: 'url(/backgorun-price-card.jpg)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat'
@@ -384,11 +384,12 @@ export default function NewPriceCard({ open, onOpenChange, vehicle }: NewPriceCa
                     bottom: '-150px',
                     right: '20px'
                   }}>
-                    <ManufacturerLogo 
-                      manufacturerName={vehicle.manufacturer} 
-                      className="w-full h-full object-contain"
-                      style={{ filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(0.8)' }}
-                    />
+                    <div style={{ filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(0.8)' }}>
+                      <ManufacturerLogo 
+                        manufacturerName={vehicle.manufacturer} 
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
                   </div>
                 </div>
 
