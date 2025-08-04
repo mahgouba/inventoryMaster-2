@@ -650,7 +650,7 @@ export default function PriceCardsPage() {
                       overflow: 'hidden',
                       transform: 'scale(0.6)', // Scale down for display
                       transformOrigin: 'center center',
-                      backgroundImage: 'url(/price-card-background.jpg)',
+                      backgroundImage: 'url(/price-card.jpg)',
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       backgroundRepeat: 'no-repeat'
