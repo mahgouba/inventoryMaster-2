@@ -36,7 +36,7 @@ interface User {
 
 export default function UserManagement() {
   const { toast } = useToast();
-  const darkMode = false;
+  const { darkMode, toggleDarkMode } = useTheme();
   const [newUserOpen, setNewUserOpen] = useState(false);
   const [editUserOpen, setEditUserOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);

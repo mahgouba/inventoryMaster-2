@@ -30,6 +30,12 @@ import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import multer from "multer";
 import * as XLSX from "xlsx";
+import OpenAI from "openai";
+
+// Initialize OpenAI client
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+}) : null;
 
 // Cars.json management utility functions
 interface CarData {

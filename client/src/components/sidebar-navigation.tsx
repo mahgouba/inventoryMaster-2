@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/hooks/useTheme";
 
 interface SidebarNavigationProps {
   user: {
@@ -48,7 +49,14 @@ interface SidebarNavigationProps {
 export default function SidebarNavigation({ user, onLogout, onCollapseChange }: SidebarNavigationProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [location] = useLocation();
-  const isDarkMode = false;
+  const { companyName, companyLogo, darkMode, toggleDarkMode } = useTheme();
+  const isDarkMode = darkMode;
+  
+  // Settings object for compatibility
+  const settings = {
+    companyName: companyName,
+    companyLogo: companyLogo
+  };
 
   const handleCollapseToggle = () => {
     const newCollapsed = !isCollapsed;

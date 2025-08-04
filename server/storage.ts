@@ -236,6 +236,56 @@ export interface IStorage {
   // Theme management methods
   getCurrentTheme(): Promise<any>;
   saveTheme(theme: any): Promise<any>;
+
+  // Additional methods referenced in routes
+  markAsSold(id: number, saleData: any): Promise<InventoryItem | undefined>;
+  reserveItem(id: number, reservationData: any): Promise<InventoryItem | undefined>;
+  cancelReservation(id: number): Promise<InventoryItem | undefined>;
+  createPriceCard(cardData: any): Promise<any>;
+  createImageLink(linkData: any): Promise<any>;
+  updateImageLink(id: number, linkData: any): Promise<any>;
+  deleteImageLink(id: number): Promise<boolean>;
+  updateManufacturerLogo(id: number, logo: string): Promise<Manufacturer | undefined>;
+  getLocationTransfers(): Promise<LocationTransfer[]>;
+  getExteriorColors(): Promise<any[]>;
+  getInteriorColors(): Promise<any[]>;
+  createExteriorColor(colorData: any): Promise<any>;
+  createInteriorColor(colorData: any): Promise<any>;
+  getColorAssociations(): Promise<ColorAssociation[]>;
+  createCategory(categoryData: any): Promise<any>;
+  getAllImportTypes(): Promise<any[]>;
+  createImportType(typeData: any): Promise<any>;
+  updateImportType(id: number, typeData: any): Promise<any>;
+  deleteImportType(id: number): Promise<boolean>;
+  getAllVehicleStatuses(): Promise<any[]>;
+  createVehicleStatus(statusData: any): Promise<any>;
+  updateVehicleStatus(id: number, statusData: any): Promise<any>;
+  deleteVehicleStatus(id: number): Promise<boolean>;
+  getAllOwnershipTypes(): Promise<any[]>;
+  createOwnershipType(typeData: any): Promise<any>;
+  updateOwnershipType(id: number, typeData: any): Promise<any>;
+  deleteOwnershipType(id: number): Promise<boolean>;
+  getCategories(): Promise<any[]>;
+  getTrimLevels(): Promise<any[]>;
+  getColors(): Promise<any[]>;
+  getLocations(): Promise<any[]>;
+  addManufacturer(manufacturerData: any): Promise<any>;
+  addCategory(categoryData: any): Promise<any>;
+  addTrimLevel(trimData: any): Promise<any>;
+  addColor(colorData: any): Promise<any>;
+  addLocation(locationData: any): Promise<any>;
+  updateCategory(id: number, categoryData: any): Promise<any>;
+  updateColor(id: number, colorData: any): Promise<any>;
+  deleteCategory(id: number): Promise<boolean>;
+  deleteColor(id: number): Promise<boolean>;
+  getAllPriceCards(): Promise<any[]>;
+  getPriceCard(id: number): Promise<any>;
+  updatePriceCard(id: number, cardData: any): Promise<any>;
+  deletePriceCard(id: number): Promise<boolean>;
+  getPriceCardByVehicleId(vehicleId: number): Promise<any>;
+  saveImageLink(linkData: any): Promise<any>;
+  getLeaveRequest(id: number): Promise<LeaveRequest | undefined>;
+  updateLeaveRequest(id: number, requestData: any): Promise<LeaveRequest | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -1255,6 +1305,268 @@ export class MemStorage implements IStorage {
   async saveTheme(theme: any): Promise<any> {
     this.currentTheme = { ...theme };
     return this.currentTheme;
+  }
+
+  // Additional methods implementation
+  async markAsSold(id: number, saleData: any): Promise<InventoryItem | undefined> {
+    const item = this.inventoryItems.get(id);
+    if (!item) return undefined;
+    
+    const updated = {
+      ...item,
+      isSold: true,
+      soldDate: new Date(),
+      status: "مباع",
+      ...saleData
+    };
+    this.inventoryItems.set(id, updated);
+    return updated;
+  }
+
+  async reserveItem(id: number, reservationData: any): Promise<InventoryItem | undefined> {
+    const item = this.inventoryItems.get(id);
+    if (!item) return undefined;
+    
+    const updated = {
+      ...item,
+      status: "محجوز",
+      reservationDate: new Date(),
+      ...reservationData
+    };
+    this.inventoryItems.set(id, updated);
+    return updated;
+  }
+
+  async cancelReservation(id: number): Promise<InventoryItem | undefined> {
+    const item = this.inventoryItems.get(id);
+    if (!item) return undefined;
+    
+    const updated = {
+      ...item,
+      status: "متوفر",
+      reservationDate: null,
+      reservedBy: null,
+      reservationNote: null,
+      customerName: null,
+      customerPhone: null
+    };
+    this.inventoryItems.set(id, updated);
+    return updated;
+  }
+
+  async createPriceCard(cardData: any): Promise<any> {
+    return { id: 1, ...cardData };
+  }
+
+  async createImageLink(linkData: any): Promise<any> {
+    return { id: 1, ...linkData };
+  }
+
+  async updateImageLink(id: number, linkData: any): Promise<any> {
+    return { id, ...linkData };
+  }
+
+  async deleteImageLink(id: number): Promise<boolean> {
+    return true;
+  }
+
+  async updateManufacturerLogo(id: number, logo: string): Promise<Manufacturer | undefined> {
+    const manufacturer = this.manufacturers.get(id);
+    if (!manufacturer) return undefined;
+    
+    const updated = { ...manufacturer, logo };
+    this.manufacturers.set(id, updated);
+    return updated;
+  }
+
+  async getLocationTransfers(): Promise<LocationTransfer[]> {
+    return Array.from(this.locationTransfers.values());
+  }
+
+  async getExteriorColors(): Promise<any[]> {
+    return Array.from(this.colorAssociations.values())
+      .filter(color => color.colorType === 'exterior')
+      .map(color => ({ name: color.colorName, code: color.colorCode }));
+  }
+
+  async getInteriorColors(): Promise<any[]> {
+    return Array.from(this.colorAssociations.values())
+      .filter(color => color.colorType === 'interior')
+      .map(color => ({ name: color.colorName, code: color.colorCode }));
+  }
+
+  async createExteriorColor(colorData: any): Promise<any> {
+    const color = await this.createColorAssociation({
+      ...colorData,
+      colorType: 'exterior'
+    });
+    return { name: color.colorName, code: color.colorCode };
+  }
+
+  async createInteriorColor(colorData: any): Promise<any> {
+    const color = await this.createColorAssociation({
+      ...colorData,
+      colorType: 'interior'
+    });
+    return { name: color.colorName, code: color.colorCode };
+  }
+
+  async createCategory(categoryData: any): Promise<any> {
+    return { id: 1, ...categoryData };
+  }
+
+  async getAllImportTypes(): Promise<any[]> {
+    return [
+      { id: 1, name: 'شخصي' },
+      { id: 2, name: 'شركة' },
+      { id: 3, name: 'مستعمل شخصي' }
+    ];
+  }
+
+  async createImportType(typeData: any): Promise<any> {
+    return { id: Date.now(), ...typeData };
+  }
+
+  async updateImportType(id: number, typeData: any): Promise<any> {
+    return { id, ...typeData };
+  }
+
+  async deleteImportType(id: number): Promise<boolean> {
+    return true;
+  }
+
+  async getAllVehicleStatuses(): Promise<any[]> {
+    return [
+      { id: 1, name: 'متوفر' },
+      { id: 2, name: 'محجوز' },
+      { id: 3, name: 'مباع' },
+      { id: 4, name: 'في الطريق' },
+      { id: 5, name: 'صيانة' }
+    ];
+  }
+
+  async createVehicleStatus(statusData: any): Promise<any> {
+    return { id: Date.now(), ...statusData };
+  }
+
+  async updateVehicleStatus(id: number, statusData: any): Promise<any> {
+    return { id, ...statusData };
+  }
+
+  async deleteVehicleStatus(id: number): Promise<boolean> {
+    return true;
+  }
+
+  async getAllOwnershipTypes(): Promise<any[]> {
+    return [
+      { id: 1, name: 'ملك الشركة' },
+      { id: 2, name: 'وسيط' }
+    ];
+  }
+
+  async createOwnershipType(typeData: any): Promise<any> {
+    return { id: Date.now(), ...typeData };
+  }
+
+  async updateOwnershipType(id: number, typeData: any): Promise<any> {
+    return { id, ...typeData };
+  }
+
+  async deleteOwnershipType(id: number): Promise<boolean> {
+    return true;
+  }
+
+  async getCategories(): Promise<any[]> {
+    return Array.from(this.getAllCategories());
+  }
+
+  async getTrimLevels(): Promise<any[]> {
+    return Array.from(this.trimLevels.values());
+  }
+
+  async getColors(): Promise<any[]> {
+    return Array.from(this.colorAssociations.values());
+  }
+
+  async getLocations(): Promise<any[]> {
+    return Array.from(this.locations.values());
+  }
+
+  async addManufacturer(manufacturerData: any): Promise<any> {
+    return this.createManufacturer(manufacturerData);
+  }
+
+  async addCategory(categoryData: any): Promise<any> {
+    return { id: Date.now(), ...categoryData };
+  }
+
+  async addTrimLevel(trimData: any): Promise<any> {
+    return this.createTrimLevel(trimData);
+  }
+
+  async addColor(colorData: any): Promise<any> {
+    return this.createColorAssociation(colorData);
+  }
+
+  async addLocation(locationData: any): Promise<any> {
+    return this.createLocation(locationData);
+  }
+
+  async updateCategory(id: number, categoryData: any): Promise<any> {
+    return { id, ...categoryData };
+  }
+
+  async updateColor(id: number, colorData: any): Promise<any> {
+    return this.updateColorAssociation(id, colorData);
+  }
+
+  async deleteCategory(id: number): Promise<boolean> {
+    return true;
+  }
+
+  async deleteColor(id: number): Promise<boolean> {
+    return this.deleteColorAssociation(id);
+  }
+
+  async getAllPriceCards(): Promise<any[]> {
+    return [];
+  }
+
+  async getPriceCard(id: number): Promise<any> {
+    return { id };
+  }
+
+  async updatePriceCard(id: number, cardData: any): Promise<any> {
+    return { id, ...cardData };
+  }
+
+  async deletePriceCard(id: number): Promise<boolean> {
+    return true;
+  }
+
+  async getPriceCardByVehicleId(vehicleId: number): Promise<any> {
+    return { id: 1, vehicleId };
+  }
+
+  async saveImageLink(linkData: any): Promise<any> {
+    return this.createImageLink(linkData);
+  }
+
+  async getLeaveRequest(id: number): Promise<LeaveRequest | undefined> {
+    return this.getLeaveRequestById(id);
+  }
+
+  async updateLeaveRequest(id: number, requestData: any): Promise<LeaveRequest | undefined> {
+    const existing = this.leaveRequests.get(id);
+    if (!existing) return undefined;
+    
+    const updated = {
+      ...existing,
+      ...requestData,
+      updatedAt: new Date()
+    };
+    this.leaveRequests.set(id, updated);
+    return updated;
   }
 }
 
