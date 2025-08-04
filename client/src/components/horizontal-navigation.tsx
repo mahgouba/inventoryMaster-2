@@ -279,7 +279,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       permission: "leaveRequests"
     },
     { 
-      title: "المواصفات التفصيلية", 
+      title: "المواصفات", 
       href: "/detailed-specifications", 
       icon: Settings,
       internal: true,
