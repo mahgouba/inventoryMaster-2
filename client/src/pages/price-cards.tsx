@@ -1,10 +1,14 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Printer } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Download, Printer, Search, Filter, Plus, RefreshCw } from "lucide-react";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { QRCodeSVG } from "qrcode.react";
@@ -24,17 +28,44 @@ interface InventoryItem {
 
 export default function PriceCardsPage() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [isCreatingAll, setIsCreatingAll] = useState(false);
+  
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedManufacturer, setSelectedManufacturer] = useState<string>("all");
+  const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [selectedImportType, setSelectedImportType] = useState<string>("all");
 
   // Fetch inventory data
   const { data: inventoryData = [] } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory"],
   });
 
+  // Fetch existing price cards
+  const { data: priceCards = [] } = useQuery<any[]>({
+    queryKey: ["/api/price-cards"],
+  });
+
   // Filter available vehicles for price cards
-  const availableVehicles = inventoryData.filter(item => 
-    item.manufacturer && item.category && item.price
-  );
+  const filteredVehicles = inventoryData.filter(item => {
+    const matchesSearch = searchTerm === "" || 
+      item.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.model?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesManufacturer = selectedManufacturer === "all" || item.manufacturer === selectedManufacturer;
+    const matchesStatus = selectedStatus === "all" || item.status === selectedStatus;
+    const matchesImportType = selectedImportType === "all" || item.importType === selectedImportType;
+    
+    return matchesSearch && matchesManufacturer && matchesStatus && matchesImportType;
+  });
+
+  // Get unique values for filters
+  const manufacturers = ["all", ...new Set(inventoryData.map(item => item.manufacturer).filter(Boolean))];
+  const statuses = ["all", ...new Set(inventoryData.map(item => item.status).filter(Boolean))];
+  const importTypes = ["all", ...new Set(inventoryData.map(item => item.importType).filter(Boolean))];
 
   // Format price
   const formatPrice = (price: string | number) => {
@@ -56,6 +87,61 @@ export default function PriceCardsPage() {
   const getMileage = (vehicle: InventoryItem) => {
     return getCarStatus(vehicle) === "مستعمل" ? "85,000" : "0";
   };
+
+  // Create price cards for all inventory items
+  const createAllPriceCardsMutation = useMutation({
+    mutationFn: async () => {
+      const results = [];
+      for (const vehicle of inventoryData) {
+        if (vehicle.manufacturer && vehicle.category) {
+          try {
+            const priceCardData = {
+              vehicleId: vehicle.id,
+              manufacturer: vehicle.manufacturer,
+              category: vehicle.category,
+              year: vehicle.year || new Date().getFullYear(),
+              price: vehicle.price || 0,
+              features: [],
+              status: vehicle.status || "متوفر"
+            };
+            const result = await apiRequest("/api/price-cards", {
+              method: "POST",
+              body: priceCardData,
+            });
+            results.push(result);
+          } catch (error) {
+            console.error(`Error creating price card for vehicle ${vehicle.id}:`, error);
+          }
+        }
+      }
+      return results;
+    },
+    onSuccess: (results) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/price-cards"] });
+      toast({
+        title: "تم بنجاح",
+        description: `تم إنشاء ${results.length} بطاقة سعر تلقائياً`,
+      });
+    },
+    onError: (error) => {
+      console.error('Error creating price cards:', error);
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ في إنشاء بطاقات الأسعار",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCreateAllPriceCards = () => {
+    setIsCreatingAll(true);
+    createAllPriceCardsMutation.mutate();
+  };
+
+  // Fix mutation state when complete
+  if (createAllPriceCardsMutation.isSuccess && isCreatingAll) {
+    setIsCreatingAll(false);
+  }
 
   // Enhanced PDF generation for a specific vehicle
   const generatePDF = async (vehicle: InventoryItem, cardId: string) => {
@@ -195,21 +281,6 @@ export default function PriceCardsPage() {
     }
   };
 
-  if (availableVehicles.length === 0) {
-    return (
-      <div className="container mx-auto p-6 space-y-6" dir="rtl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
-            بطاقات الأسعار
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            لا توجد سيارات متوفرة لإنشاء بطاقات الأسعار
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto p-6 space-y-6" dir="rtl">
       {/* Header */}
@@ -218,12 +289,133 @@ export default function PriceCardsPage() {
           بطاقات الأسعار
         </h1>
         <p className="text-gray-600 dark:text-gray-300">
-          بطاقات أسعار تلقائية لجميع المركبات المتوفرة ({availableVehicles.length} بطاقة)
+          إنشاء وإدارة بطاقات أسعار تلقائية للمركبات ({filteredVehicles.length} من {inventoryData.length})
         </p>
       </div>
 
+      {/* Action Buttons */}
+      <div className="flex flex-wrap gap-4 justify-center mb-6">
+        <Button 
+          onClick={handleCreateAllPriceCards}
+          disabled={isCreatingAll || createAllPriceCardsMutation.isPending}
+          className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg"
+        >
+          {createAllPriceCardsMutation.isPending ? (
+            <RefreshCw className="w-4 h-4 ml-2 animate-spin" />
+          ) : (
+            <Plus className="w-4 h-4 ml-2" />
+          )}
+          إنشاء بطاقات لكل المخزون ({inventoryData.length})
+        </Button>
+        <Badge variant="secondary" className="text-sm">
+          {priceCards.length} بطاقة موجودة
+        </Badge>
+      </div>
+
+      {/* Filters */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="w-5 h-5" />
+            الفلاتر والبحث
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="البحث في المركبات..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pr-10"
+              />
+            </div>
+
+            {/* Manufacturer Filter */}
+            <Select value={selectedManufacturer} onValueChange={setSelectedManufacturer}>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر الماركة" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">جميع الماركات</SelectItem>
+                {manufacturers.slice(1).map((manufacturer) => (
+                  <SelectItem key={manufacturer} value={manufacturer}>
+                    {manufacturer}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Status Filter */}
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر الحالة" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">جميع الحالات</SelectItem>
+                {statuses.slice(1).map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {status}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Import Type Filter */}
+            <Select value={selectedImportType} onValueChange={setSelectedImportType}>
+              <SelectTrigger>
+                <SelectValue placeholder="نوع الاستيراد" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">جميع الأنواع</SelectItem>
+                {importTypes.slice(1).map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filter Summary */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {searchTerm && (
+              <Badge variant="outline">البحث: {searchTerm}</Badge>
+            )}
+            {selectedManufacturer !== "all" && (
+              <Badge variant="outline">الماركة: {selectedManufacturer}</Badge>
+            )}
+            {selectedStatus !== "all" && (
+              <Badge variant="outline">الحالة: {selectedStatus}</Badge>
+            )}
+            {selectedImportType !== "all" && (
+              <Badge variant="outline">النوع: {selectedImportType}</Badge>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {filteredVehicles.length === 0 ? (
+        <div className="text-center py-12">
+          <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
+            لا توجد مركبات تطابق الفلاتر المحددة
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400">
+            جرب تعديل الفلاتر أو إزالة بعض الخيارات
+          </p>
+        </div>
+      ) : (
+        <div className="text-center mb-4">
+          <Badge variant="secondary" className="text-sm">
+            عرض {filteredVehicles.length} مركبة من {inventoryData.length}
+          </Badge>
+        </div>
+      )}
+
       {/* Price Cards Grid */}
-      {availableVehicles.map((vehicle, index) => (
+      {filteredVehicles.map((vehicle, index) => (
         <Card key={vehicle.id} className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">

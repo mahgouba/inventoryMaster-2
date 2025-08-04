@@ -280,6 +280,7 @@ export interface IStorage {
   deleteColor(id: number): Promise<boolean>;
   getAllPriceCards(): Promise<any[]>;
   getPriceCard(id: number): Promise<any>;
+  createPriceCard(cardData: any): Promise<any>;
   updatePriceCard(id: number, cardData: any): Promise<any>;
   deletePriceCard(id: number): Promise<boolean>;
   getPriceCardByVehicleId(vehicleId: number): Promise<any>;
@@ -1544,6 +1545,11 @@ export class MemStorage implements IStorage {
 
   async getPriceCard(id: number): Promise<any> {
     return { id };
+  }
+
+  async createPriceCard(cardData: any): Promise<any> {
+    const id = Date.now(); // Simple ID generation
+    return { id, ...cardData, createdAt: new Date() };
   }
 
   async updatePriceCard(id: number, cardData: any): Promise<any> {
