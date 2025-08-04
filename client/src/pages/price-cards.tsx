@@ -435,26 +435,7 @@ export default function PriceCardsPage() {
               backgroundRepeat: 'no-repeat'
             }}
           >
-            {/* Company Logo - Top Center */}
-            <div style={{
-              position: 'absolute',
-              top: '20px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '84px',
-              height: '84px'
-            }}>
-              <img 
-                src="/copmany logo.svg" 
-                alt="شعار الشركة" 
-                style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  objectFit: 'contain', 
-                  filter: 'brightness(1.5) sepia(1) hue-rotate(38deg) saturate(2) drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
-                }}
-              />
-            </div>
+
 
             {/* Year - Large Center */}
             <div style={{ 
@@ -479,11 +460,8 @@ export default function PriceCardsPage() {
               transform: 'translateX(-50%)',
               width: '1080px',
               height: '240px',
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(8px)',
-              borderRadius: '25px',
+              backgroundColor: 'transparent',
               padding: '30px',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
               zIndex: 10,
               overflow: 'hidden'
             }}>
@@ -522,7 +500,7 @@ export default function PriceCardsPage() {
                 </div>
 
                 {/* Divider */}
-                <div style={{ width: '5px', height: '180px', backgroundColor: '#CF9B47', borderRadius: '2px' }}></div>
+                <div style={{ width: '5px', height: '180px', backgroundColor: 'white', borderRadius: '2px' }}></div>
 
                 {/* Left Section - Price and Status */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '15px', justifyContent: 'center' }}>
