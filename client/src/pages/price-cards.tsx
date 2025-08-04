@@ -653,36 +653,37 @@ export default function PriceCardsPage() {
                 </div>
               </div>
 
-              {/* QR Code - Bottom Left */}
+              {/* QR Code - Top Right */}
               <div style={{
                 position: 'absolute',
-                bottom: '10px',
-                left: '20px',
-                width: '80px',
-                height: '80px',
+                top: '-50px',
+                right: '20px',
+                width: '120px',
+                height: '120px',
                 backgroundColor: 'white',
-                borderRadius: '10px',
-                padding: '8px',
+                borderRadius: '15px',
+                padding: '10px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
+                zIndex: 20
               }}>
                 <QRCodeSVG
                   value={generateVehicleURL()}
-                  size={60}
+                  size={95}
                   bgColor="#FFFFFF"
                   fgColor="#000000"
                   level="M"
                   includeMargin={false}
                 />
                 <div style={{
-                  fontSize: '6px',
+                  fontSize: '8px',
                   fontWeight: 'bold',
                   color: '#000',
                   textAlign: 'center',
-                  marginTop: '2px'
+                  marginTop: '3px'
                 }}>
                   مسح للعرض
                 </div>
