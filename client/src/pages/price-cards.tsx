@@ -441,8 +441,8 @@ export default function PriceCardsPage() {
               top: '20px',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '120px',
-              height: '120px'
+              width: '84px',
+              height: '84px'
             }}>
               <img 
                 src="/copmany logo.svg" 
