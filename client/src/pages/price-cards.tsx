@@ -147,6 +147,50 @@ export default function PriceCardsPage() {
     return new Intl.NumberFormat('ar-SA').format(numPrice || 0);
   };
 
+  // حساب الأسعار والضرائب حسب نوع الاستيراد
+  const calculatePricing = (card: PriceCard) => {
+    const basePrice = typeof card.price === 'string' ? parseFloat(card.price || '0') : (card.price || 0);
+    const isUsed = card.importType === 'مستعمل' || card.importType === 'مستعمل شخصي';
+    const isCompanyImport = card.importType === 'شركة';
+    const isPersonalImport = card.importType === 'شخصي';
+    
+    if (isCompanyImport && !isUsed) {
+      // استيراد شركة جديد - إظهار تفصيل الضريبة
+      const vatRate = 0.15; // 15% ضريبة القيمة المضافة
+      const priceExcludingVat = basePrice / (1 + vatRate);
+      const vatAmount = basePrice - priceExcludingVat;
+      
+      return {
+        type: 'company_new',
+        basePrice: priceExcludingVat,
+        vatAmount: vatAmount,
+        totalPrice: basePrice,
+        showBreakdown: true,
+        statusText: 'جديد',
+        statusColor: '#16a34a' // أخضر
+      };
+    } else if (isPersonalImport && !isUsed) {
+      // استيراد شخصي جديد - سعر بسيط بدون تفصيل
+      return {
+        type: 'personal_new',
+        totalPrice: basePrice,
+        showBreakdown: false,
+        statusText: 'جديد',
+        statusColor: '#16a34a' // أخضر
+      };
+    } else {
+      // مستعمل أو مستعمل شخصي - سعر بسيط مع إظهار الممشي
+      return {
+        type: 'used',
+        totalPrice: basePrice,
+        showBreakdown: false,
+        showMileage: true,
+        statusText: 'مستعمل',
+        statusColor: '#dc2626' // أحمر
+      };
+    }
+  };
+
   // Generate vehicle URL for QR code
   const generateVehicleURL = (card: PriceCard) => {
     const baseURL = window.location.origin;
@@ -870,30 +914,67 @@ export default function PriceCardsPage() {
                               color: 'white', 
                               fontSize: '16px', 
                               fontWeight: '600', 
-                              marginBottom: '5px' 
+                              marginBottom: '10px' 
                             }}>
                               السعر
                             </div>
-                            <div style={{ 
-                              color: 'white', 
-                              fontSize: '28px', 
-                              fontWeight: 'bold', 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              justifyContent: 'center', 
-                              gap: '8px' 
-                            }}>
-                              <img 
-                                src="/Saudi_Riyal_Symbol.svg" 
-                                alt="ريال سعودي" 
-                                style={{ 
-                                  width: '24px', 
-                                  height: '24px', 
-                                  filter: 'brightness(0) saturate(100%) invert(60%) sepia(73%) saturate(437%) hue-rotate(37deg) brightness(91%) contrast(86%)'
-                                }} 
-                              />
-                              {formatPrice(card.price || 0)}
-                            </div>
+                            
+                            {(() => {
+                              const pricing = calculatePricing(card);
+                              
+                              if (pricing.showBreakdown) {
+                                // عرض تفصيل الضريبة للاستيراد شركة
+                                return (
+                                  <div style={{ color: 'white' }}>
+                                    <div style={{ fontSize: '14px', marginBottom: '5px' }}>السعر الأساسي</div>
+                                    <div style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>
+                                      {formatPrice(pricing.basePrice || 0)}
+                                    </div>
+                                    
+                                    <div style={{ fontSize: '14px', marginBottom: '5px' }}>الضريبة (15%)</div>
+                                    <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px', color: '#FFD700' }}>
+                                      {formatPrice(pricing.vatAmount || 0)}
+                                    </div>
+                                    
+                                    <div style={{ 
+                                      borderTop: '1px solid rgba(255,255,255,0.3)', 
+                                      paddingTop: '8px',
+                                      fontSize: '14px', 
+                                      marginBottom: '5px' 
+                                    }}>
+                                      السعر الشامل
+                                    </div>
+                                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#00FF00' }}>
+                                      {formatPrice(pricing.totalPrice || 0)}
+                                    </div>
+                                  </div>
+                                );
+                              } else {
+                                // عرض السعر البسيط
+                                return (
+                                  <div style={{ 
+                                    color: 'white', 
+                                    fontSize: '28px', 
+                                    fontWeight: 'bold', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center', 
+                                    gap: '8px' 
+                                  }}>
+                                    <img 
+                                      src="/Saudi_Riyal_Symbol.svg" 
+                                      alt="ريال سعودي" 
+                                      style={{ 
+                                        width: '24px', 
+                                        height: '24px', 
+                                        filter: 'brightness(0) saturate(100%) invert(100%)'
+                                      }} 
+                                    />
+                                    {formatPrice(pricing.totalPrice || 0)}
+                                  </div>
+                                );
+                              }
+                            })()}
                           </div>
 
                           {/* Status */}
@@ -906,18 +987,48 @@ export default function PriceCardsPage() {
                             }}>
                               الحالة
                             </div>
-                            <div style={{ 
-                              fontSize: '22px', 
-                              fontWeight: 'bold',
-                              color: (() => {
-                                if (card.importType === 'مستعمل') return '#dc2626'; // أحمر للمستعمل
-                                if (card.importType === 'شخصي') return '#16a34a'; // أخضر للشخصي
-                                return '#00627F'; // أزرق للشركة
-                              })()
-                            }}>
-                              {card.importType === 'مستعمل' ? 'مستعمل' : 'جديد'}
-                            </div>
+                            {(() => {
+                              const pricing = calculatePricing(card);
+                              return (
+                                <div style={{ 
+                                  fontSize: '22px', 
+                                  fontWeight: 'bold',
+                                  color: pricing.statusColor
+                                }}>
+                                  {pricing.statusText}
+                                </div>
+                              );
+                            })()}
                           </div>
+
+                          {/* Mileage for used vehicles */}
+                          {(() => {
+                            const pricing = calculatePricing(card);
+                            if (pricing.showMileage) {
+                              // الممشي للسيارات المستعملة - قيمة افتراضية أو من البيانات
+                              const mileage = card.mileage ? `${card.mileage.toLocaleString('ar-SA')} كم` : "85,000 كم";
+                              return (
+                                <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                                  <div style={{ 
+                                    color: 'white', 
+                                    fontSize: '16px', 
+                                    fontWeight: '600', 
+                                    marginBottom: '5px' 
+                                  }}>
+                                    الممشي
+                                  </div>
+                                  <div style={{ 
+                                    fontSize: '20px', 
+                                    fontWeight: 'bold',
+                                    color: '#FFD700' // ذهبي للممشي
+                                  }}>
+                                    {mileage}
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })()}
                         </div>
                       </div>
                     </div>
