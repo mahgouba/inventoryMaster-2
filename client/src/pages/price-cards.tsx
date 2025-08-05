@@ -644,7 +644,7 @@ export default function PriceCardsPage() {
         const isExpanded = expandedCards.has(card.id);
         
         return (
-          <Card key={card.id} className="mb-6 border-2 hover:border-blue-300 transition-colors">
+          <Card key={card.id} className="mb-6 border-2 hover:border-blue-300 transition-colors text-[#ffffff]">
             {/* Card Header - Always Visible */}
             <CardHeader 
               className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
