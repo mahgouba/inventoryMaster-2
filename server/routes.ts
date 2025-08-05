@@ -201,13 +201,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         for (const category of categories) {
           // Get trim levels for this category
-          const trimLevels = await getStorage().getTrimLevelsByCategory(manufacturer.nameAr, category.name_ar || category.nameAr);
+          const trimLevels = await getStorage().getTrimLevelsByCategory(manufacturer.nameAr, category.nameAr || category.category);
           
           // Count vehicles for this manufacturer/category combination
           const allInventory = await getStorage().getAllInventoryItems();
           const vehicleCount = allInventory.filter(item => 
             item.manufacturer === manufacturer.nameAr && 
-            item.category === (category.name_ar || category.nameAr)
+            item.category === (category.nameAr || category.category)
           ).length;
 
           totalVehicles += vehicleCount;
@@ -793,7 +793,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if manufacturer already exists
       const existingManufacturers = await getStorage().getAllManufacturers();
       const existingManufacturer = existingManufacturers.find(
-        m => m.name.toLowerCase() === manufacturerData.name.toLowerCase()
+        m => m.nameAr.toLowerCase() === manufacturerData.nameAr.toLowerCase()
       );
       
       if (existingManufacturer) {
@@ -856,7 +856,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Allow empty string to clear logo
       const manufacturer = await getStorage().updateManufacturerLogo(id, logo);
       if (manufacturer) {
-        console.log(`Successfully updated logo for manufacturer: ${manufacturer.name}`);
+        console.log(`Successfully updated logo for manufacturer: ${manufacturer.nameAr}`);
         res.json(manufacturer);
       } else {
         console.error(`Manufacturer with ID ${id} not found`);
@@ -1212,7 +1212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/categories", async (req, res) => {
     try {
       const { name_ar, name_en, manufacturer_id } = req.body;
-      const category = await getStorage().createCategory({ name_ar, name_en, manufacturer_id });
+      const category = await getStorage().createVehicleCategory({ nameAr: name_ar, nameEn: name_en, manufacturerId: manufacturer_id });
       res.status(201).json(category);
     } catch (error) {
       console.error("Error creating category:", error);
@@ -1224,7 +1224,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/trim-levels", async (req, res) => {
     try {
       const { name_ar, name_en, category_id } = req.body;
-      const trimLevel = await getStorage().createTrimLevel({ name_ar, name_en, category_id });
+      const trimLevel = await getStorage().createVehicleTrimLevel({ nameAr: name_ar, nameEn: name_en, categoryId: category_id });
       res.status(201).json(trimLevel);
     } catch (error) {
       console.error("Error creating trim level:", error);
@@ -3912,7 +3912,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid price card ID" });
       }
 
-      const priceCard = await getStorage().getPriceCard(id);
+      const priceCard = await getStorage().getAllPriceCards().then(cards => cards.find(c => c.id === id));
       if (!priceCard) {
         return res.status(404).json({ message: "Price card not found" });
       }
@@ -4744,7 +4744,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Price Cards API endpoints
   app.get("/api/price-cards", async (req, res) => {
     try {
-      const priceCards = await storage.getAllPriceCards();
+      const priceCards = await getStorage().getAllPriceCards();
       res.json(priceCards);
     } catch (error) {
       console.error("Error fetching price cards:", error);
@@ -4759,7 +4759,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid price card ID" });
       }
       
-      const priceCard = await storage.getPriceCardById(id);
+      const priceCard = await getStorage().getAllPriceCards().then(cards => cards.find(c => c.id === id));
       if (!priceCard) {
         return res.status(404).json({ message: "Price card not found" });
       }
@@ -4781,7 +4781,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const priceCard = await storage.createPriceCard(validation.data);
+      const priceCard = await getStorage().createPriceCard(validation.data);
       res.status(201).json(priceCard);
     } catch (error) {
       console.error("Error creating price card:", error);
@@ -4804,7 +4804,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const priceCard = await storage.updatePriceCard(id, validation.data);
+      const priceCard = await getStorage().updatePriceCard(id, validation.data);
       if (!priceCard) {
         return res.status(404).json({ message: "Price card not found" });
       }
@@ -4823,7 +4823,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid price card ID" });
       }
 
-      const success = await storage.deletePriceCard(id);
+      const success = await getStorage().deletePriceCard(id);
       if (!success) {
         return res.status(404).json({ message: "Price card not found" });
       }
