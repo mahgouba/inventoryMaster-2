@@ -930,51 +930,79 @@ export default function PriceCardsPage() {
                                 // عرض تفصيل الضريبة للاستيراد شركة
                                 return (
                                   <div style={{ color: 'white' }}>
-                                    <div style={{ fontSize: '14px', marginBottom: '5px' }}>السعر الأساسي</div>
-                                    <div style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>
-                                      {formatPrice(pricing.basePrice || 0)}
+                                    {/* السعر الأساسي */}
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      justifyContent: 'space-between', 
+                                      alignItems: 'center',
+                                      marginBottom: '8px'
+                                    }}>
+                                      <span style={{ fontSize: '14px' }}>السعر الأساسي:</span>
+                                      <span style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                                        {formatPrice(pricing.basePrice || 0)}
+                                      </span>
                                     </div>
                                     
-                                    <div style={{ fontSize: '14px', marginBottom: '5px' }}>الضريبة (15%)</div>
-                                    <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px', color: '#FFD700' }}>
-                                      {formatPrice(pricing.vatAmount || 0)}
+                                    {/* الضريبة */}
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      justifyContent: 'space-between', 
+                                      alignItems: 'center',
+                                      marginBottom: '8px'
+                                    }}>
+                                      <span style={{ fontSize: '14px' }}>الضريبة (15%):</span>
+                                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#FFD700' }}>
+                                        {formatPrice(pricing.vatAmount || 0)}
+                                      </span>
                                     </div>
                                     
+                                    {/* خط فاصل */}
                                     <div style={{ 
                                       borderTop: '1px solid rgba(255,255,255,0.3)', 
-                                      paddingTop: '8px',
-                                      fontSize: '14px', 
-                                      marginBottom: '5px' 
+                                      margin: '8px 0'
+                                    }}></div>
+                                    
+                                    {/* السعر الشامل */}
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      justifyContent: 'space-between', 
+                                      alignItems: 'center'
                                     }}>
-                                      السعر الشامل
-                                    </div>
-                                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#00FF00' }}>
-                                      {formatPrice(pricing.totalPrice || 0)}
+                                      <span style={{ fontSize: '16px', fontWeight: 'bold' }}>السعر الشامل:</span>
+                                      <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#00FF00' }}>
+                                        {formatPrice(pricing.totalPrice || 0)}
+                                      </span>
                                     </div>
                                   </div>
                                 );
                               } else {
-                                // عرض السعر البسيط
+                                // عرض السعر البسيط - القيمة بجوار التعريف
                                 return (
                                   <div style={{ 
-                                    color: 'white', 
-                                    fontSize: '28px', 
-                                    fontWeight: 'bold', 
                                     display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'center', 
-                                    gap: '8px' 
+                                    justifyContent: 'space-between', 
+                                    alignItems: 'center',
+                                    color: 'white'
                                   }}>
-                                    <img 
-                                      src="/Saudi_Riyal_Symbol.svg" 
-                                      alt="ريال سعودي" 
-                                      style={{ 
-                                        width: '24px', 
-                                        height: '24px', 
-                                        filter: 'brightness(0) saturate(100%) invert(100%)'
-                                      }} 
-                                    />
-                                    {formatPrice(pricing.totalPrice || 0)}
+                                    <span style={{ fontSize: '18px', fontWeight: '600' }}>السعر:</span>
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      alignItems: 'center', 
+                                      gap: '8px' 
+                                    }}>
+                                      <img 
+                                        src="/Saudi_Riyal_Symbol.svg" 
+                                        alt="ريال سعودي" 
+                                        style={{ 
+                                          width: '20px', 
+                                          height: '20px', 
+                                          filter: 'brightness(0) saturate(100%) invert(100%)'
+                                        }} 
+                                      />
+                                      <span style={{ fontSize: '24px', fontWeight: 'bold' }}>
+                                        {formatPrice(pricing.totalPrice || 0)}
+                                      </span>
+                                    </div>
                                   </div>
                                 );
                               }
