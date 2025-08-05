@@ -863,10 +863,7 @@ export default function PriceCardsPage() {
                         {/* Left Section - Price and Details Box */}
                         <div style={{ 
                           flex: 1, 
-                          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                          borderRadius: '20px',
                           padding: '25px',
-                          boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
                           position: 'relative',
                           minHeight: '240px'
                         }}>
