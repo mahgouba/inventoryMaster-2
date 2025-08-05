@@ -273,11 +273,11 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       permission: "financingCalculator"
     },
     { 
-      title: "الإجازات", 
-      href: "/leave-requests", 
+      title: "إدارة الحضور والإنصراف", 
+      href: "/attendance-management", 
       icon: UserCheck,
       internal: true,
-      permission: "leaveRequests"
+      permission: "attendanceManagement"
     },
     { 
       title: "المواصفات", 

@@ -827,6 +827,61 @@ export const leaveRequests = pgTable("leave_requests", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Employee Work Schedules table
+export const employeeWorkSchedules = pgTable("employee_work_schedules", {
+  id: serial("id").primaryKey(),
+  employeeId: integer("employee_id").references(() => users.id).notNull(),
+  employeeName: text("employee_name").notNull(),
+  salary: decimal("salary", { precision: 10, scale: 2 }).notNull(), // راتب الموظف
+  scheduleType: text("schedule_type").notNull(), // "متصل" أو "منفصل"
+  // للدوام المتصل
+  continuousStartTime: text("continuous_start_time"), // وقت الحضور للدوام المتصل
+  continuousEndTime: text("continuous_end_time"), // وقت الانصراف للدوام المتصل
+  // للدوام المنفصل - الفترة الأولى
+  morningStartTime: text("morning_start_time"), // وقت حضور الفترة الصباحية
+  morningEndTime: text("morning_end_time"), // وقت انصراف الفترة الصباحية
+  // للدوام المنفصل - الفترة الثانية
+  eveningStartTime: text("evening_start_time"), // وقت حضور الفترة المسائية
+  eveningEndTime: text("evening_end_time"), // وقت انصراف الفترة المسائية
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Daily Attendance table
+export const dailyAttendance = pgTable("daily_attendance", {
+  id: serial("id").primaryKey(),
+  employeeId: integer("employee_id").references(() => users.id).notNull(),
+  employeeName: text("employee_name").notNull(),
+  date: timestamp("date").notNull(), // تاريخ اليوم
+  scheduleType: text("schedule_type").notNull(), // "متصل" أو "منفصل"
+  
+  // للدوام المتصل
+  continuousCheckinTime: text("continuous_checkin_time"), // وقت الحضور الفعلي
+  continuousCheckoutTime: text("continuous_checkout_time"), // وقت الانصراف الفعلي
+  continuousCheckinStatus: text("continuous_checkin_status"), // "في الوقت" أو "متأخر"
+  continuousCheckoutStatus: text("continuous_checkout_status"), // "في الوقت" أو "مبكر"
+  
+  // للدوام المنفصل - الفترة الأولى
+  morningCheckinTime: text("morning_checkin_time"), // وقت حضور الفترة الصباحية الفعلي
+  morningCheckoutTime: text("morning_checkout_time"), // وقت انصراف الفترة الصباحية الفعلي
+  morningCheckinStatus: text("morning_checkin_status"), // "في الوقت" أو "متأخر"
+  morningCheckoutStatus: text("morning_checkout_status"), // "في الوقت" أو "مبكر"
+  
+  // للدوام المنفصل - الفترة الثانية
+  eveningCheckinTime: text("evening_checkin_time"), // وقت حضور الفترة المسائية الفعلي
+  eveningCheckoutTime: text("evening_checkout_time"), // وقت انصراف الفترة المسائية الفعلي
+  eveningCheckinStatus: text("evening_checkin_status"), // "في الوقت" أو "متأخر"
+  eveningCheckoutStatus: text("evening_checkout_status"), // "في الوقت" أو "مبكر"
+  
+  totalHoursWorked: decimal("total_hours_worked", { precision: 4, scale: 2 }), // إجمالي ساعات العمل
+  notes: text("notes"), // ملاحظات
+  createdBy: integer("created_by").references(() => users.id), // من أنشأ السجل
+  createdByName: text("created_by_name"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const insertLeaveRequestSchema = createInsertSchema(leaveRequests).omit({
   id: true,
   createdAt: true,
@@ -849,6 +904,33 @@ export const insertLeaveRequestSchema = createInsertSchema(leaveRequests).omit({
 
 export type InsertLeaveRequest = z.infer<typeof insertLeaveRequestSchema>;
 export type LeaveRequest = typeof leaveRequests.$inferSelect;
+
+// Employee Work Schedule schemas
+export const insertEmployeeWorkScheduleSchema = createInsertSchema(employeeWorkSchedules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertEmployeeWorkSchedule = z.infer<typeof insertEmployeeWorkScheduleSchema>;
+export type EmployeeWorkSchedule = typeof employeeWorkSchedules.$inferSelect;
+
+// Daily Attendance schemas
+export const insertDailyAttendanceSchema = createInsertSchema(dailyAttendance).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  date: z.union([z.string(), z.date()]).transform((val) => {
+    if (typeof val === 'string') {
+      return new Date(val);
+    }
+    return val;
+  }),
+});
+
+export type InsertDailyAttendance = z.infer<typeof insertDailyAttendanceSchema>;
+export type DailyAttendance = typeof dailyAttendance.$inferSelect;
 
 // Financing Rates table - for bank financing management
 export const financingRates = pgTable("financing_rates", {

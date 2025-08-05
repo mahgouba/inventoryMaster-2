@@ -194,6 +194,24 @@ export interface IStorage {
   updateLeaveRequestStatus(id: number, status: string, approvedBy?: number, approvedByName?: string, rejectionReason?: string): Promise<LeaveRequest | undefined>;
   deleteLeaveRequest(id: number): Promise<boolean>;
 
+  // Employee Work Schedule methods
+  getAllEmployeeWorkSchedules(): Promise<EmployeeWorkSchedule[]>;
+  getEmployeeWorkScheduleById(id: number): Promise<EmployeeWorkSchedule | undefined>;
+  getEmployeeWorkScheduleByEmployeeId(employeeId: number): Promise<EmployeeWorkSchedule | undefined>;
+  createEmployeeWorkSchedule(schedule: InsertEmployeeWorkSchedule): Promise<EmployeeWorkSchedule>;
+  updateEmployeeWorkSchedule(id: number, schedule: InsertEmployeeWorkSchedule): Promise<EmployeeWorkSchedule | undefined>;
+  deleteEmployeeWorkSchedule(id: number): Promise<boolean>;
+
+  // Daily Attendance methods
+  getAllDailyAttendance(): Promise<DailyAttendance[]>;
+  getDailyAttendanceById(id: number): Promise<DailyAttendance | undefined>;
+  getDailyAttendanceByEmployeeAndDate(employeeId: number, date: Date): Promise<DailyAttendance | undefined>;
+  getDailyAttendanceByEmployeeAndDateRange(employeeId: number, startDate: Date, endDate: Date): Promise<DailyAttendance[]>;
+  getDailyAttendanceByDate(date: Date): Promise<DailyAttendance[]>;
+  createDailyAttendance(attendance: InsertDailyAttendance): Promise<DailyAttendance>;
+  updateDailyAttendance(id: number, attendance: InsertDailyAttendance): Promise<DailyAttendance | undefined>;
+  deleteDailyAttendance(id: number): Promise<boolean>;
+
   // Company methods
   getAllCompanies(): Promise<Company[]>;
   getCompany(id: number): Promise<Company | undefined>;
@@ -333,6 +351,8 @@ export class MemStorage implements IStorage {
   private priceCards = new Map<number, PriceCard>();
   private vehicleSpecifications = new Map<number, VehicleSpecification>();
   private vehicleImageLinks = new Map<number, VehicleImageLink>();
+  private employeeWorkSchedules = new Map<number, EmployeeWorkSchedule>();
+  private dailyAttendance = new Map<number, DailyAttendance>();
   
   private currentUserId = 1;
   private currentInventoryId = 1;
@@ -354,6 +374,8 @@ export class MemStorage implements IStorage {
   private currentPriceCardId = 1;
   private currentVehicleSpecificationId = 1;
   private currentVehicleImageLinkId = 1;
+  private currentEmployeeWorkScheduleId = 1;
+  private currentDailyAttendanceId = 1;
   
   private storedTermsConditions: Array<{ id: number; term_text: string; display_order: number }> = [];
   private systemSettings = new Map<string, string>();
@@ -1081,6 +1103,109 @@ export class MemStorage implements IStorage {
   
   async deleteLeaveRequest(id: number): Promise<boolean> { 
     return this.leaveRequests.delete(id);
+  }
+
+  // Employee Work Schedule methods implementation
+  async getAllEmployeeWorkSchedules(): Promise<EmployeeWorkSchedule[]> {
+    return Array.from(this.employeeWorkSchedules.values());
+  }
+
+  async getEmployeeWorkScheduleById(id: number): Promise<EmployeeWorkSchedule | undefined> {
+    return this.employeeWorkSchedules.get(id);
+  }
+
+  async getEmployeeWorkScheduleByEmployeeId(employeeId: number): Promise<EmployeeWorkSchedule | undefined> {
+    return Array.from(this.employeeWorkSchedules.values()).find(schedule => schedule.employeeId === employeeId);
+  }
+
+  async createEmployeeWorkSchedule(schedule: InsertEmployeeWorkSchedule): Promise<EmployeeWorkSchedule> {
+    const newSchedule: EmployeeWorkSchedule = {
+      id: this.currentEmployeeWorkScheduleId++,
+      ...schedule,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.employeeWorkSchedules.set(newSchedule.id, newSchedule);
+    return newSchedule;
+  }
+
+  async updateEmployeeWorkSchedule(id: number, schedule: InsertEmployeeWorkSchedule): Promise<EmployeeWorkSchedule | undefined> {
+    const existingSchedule = this.employeeWorkSchedules.get(id);
+    if (!existingSchedule) return undefined;
+    
+    const updatedSchedule = {
+      ...existingSchedule,
+      ...schedule,
+      updatedAt: new Date()
+    };
+    
+    this.employeeWorkSchedules.set(id, updatedSchedule);
+    return updatedSchedule;
+  }
+
+  async deleteEmployeeWorkSchedule(id: number): Promise<boolean> {
+    return this.employeeWorkSchedules.delete(id);
+  }
+
+  // Daily Attendance methods implementation
+  async getAllDailyAttendance(): Promise<DailyAttendance[]> {
+    return Array.from(this.dailyAttendance.values());
+  }
+
+  async getDailyAttendanceById(id: number): Promise<DailyAttendance | undefined> {
+    return this.dailyAttendance.get(id);
+  }
+
+  async getDailyAttendanceByEmployeeAndDate(employeeId: number, date: Date): Promise<DailyAttendance | undefined> {
+    const dateStr = date.toISOString().split('T')[0];
+    return Array.from(this.dailyAttendance.values()).find(attendance => 
+      attendance.employeeId === employeeId && 
+      attendance.date.toISOString().split('T')[0] === dateStr
+    );
+  }
+
+  async getDailyAttendanceByEmployeeAndDateRange(employeeId: number, startDate: Date, endDate: Date): Promise<DailyAttendance[]> {
+    return Array.from(this.dailyAttendance.values()).filter(attendance => 
+      attendance.employeeId === employeeId && 
+      attendance.date >= startDate && 
+      attendance.date <= endDate
+    );
+  }
+
+  async getDailyAttendanceByDate(date: Date): Promise<DailyAttendance[]> {
+    const dateStr = date.toISOString().split('T')[0];
+    return Array.from(this.dailyAttendance.values()).filter(attendance => 
+      attendance.date.toISOString().split('T')[0] === dateStr
+    );
+  }
+
+  async createDailyAttendance(attendance: InsertDailyAttendance): Promise<DailyAttendance> {
+    const newAttendance: DailyAttendance = {
+      id: this.currentDailyAttendanceId++,
+      ...attendance,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.dailyAttendance.set(newAttendance.id, newAttendance);
+    return newAttendance;
+  }
+
+  async updateDailyAttendance(id: number, attendance: InsertDailyAttendance): Promise<DailyAttendance | undefined> {
+    const existingAttendance = this.dailyAttendance.get(id);
+    if (!existingAttendance) return undefined;
+    
+    const updatedAttendance = {
+      ...existingAttendance,
+      ...attendance,
+      updatedAt: new Date()
+    };
+    
+    this.dailyAttendance.set(id, updatedAttendance);
+    return updatedAttendance;
+  }
+
+  async deleteDailyAttendance(id: number): Promise<boolean> {
+    return this.dailyAttendance.delete(id);
   }
 
   // Company methods

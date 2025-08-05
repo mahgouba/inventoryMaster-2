@@ -27,6 +27,7 @@ export const PERMISSIONS: Record<UserRole, Record<string, Permission>> = {
     userManagement: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
     bankManagement: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
     leaveRequests: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
+    attendanceManagement: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
   },
   
   accountant: {
@@ -43,6 +44,7 @@ export const PERMISSIONS: Record<UserRole, Record<string, Permission>> = {
     userManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
     bankManagement: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: true, canReserve: false },
     leaveRequests: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: false, canReserve: false },
+    attendanceManagement: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: false, canReserve: false },
   },
 
   salesperson: {
@@ -59,6 +61,7 @@ export const PERMISSIONS: Record<UserRole, Record<string, Permission>> = {
     userManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
     bankManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
     leaveRequests: { canView: true, canCreate: true, canEdit: false, canDelete: false, canShare: false, canReserve: false },
+    attendanceManagement: { canView: true, canCreate: true, canEdit: false, canDelete: false, canShare: false, canReserve: false },
   },
 
   sales_manager: {
@@ -75,6 +78,7 @@ export const PERMISSIONS: Record<UserRole, Record<string, Permission>> = {
     userManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
     bankManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
     leaveRequests: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: false, canReserve: false },
+    attendanceManagement: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: false, canReserve: false },
   }
 };
 

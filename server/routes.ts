@@ -25,7 +25,9 @@ import {
   insertFinancingRateSchema,
   insertColorAssociationSchema,
   insertVehicleSpecificationSchema,
-  insertVehicleImageLinkSchema
+  insertVehicleImageLinkSchema,
+  insertEmployeeWorkScheduleSchema,
+  insertDailyAttendanceSchema
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -2864,6 +2866,170 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting leave request:", error);
       res.status(500).json({ message: "Failed to delete leave request" });
+    }
+  });
+
+  // Employee Work Schedules API Routes
+  app.get("/api/employee-work-schedules", async (req, res) => {
+    try {
+      const schedules = await getStorage().getAllEmployeeWorkSchedules();
+      res.json(schedules);
+    } catch (error) {
+      console.error("Error fetching employee work schedules:", error);
+      res.status(500).json({ message: "Failed to fetch employee work schedules" });
+    }
+  });
+
+  app.get("/api/employee-work-schedules/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid schedule ID" });
+      }
+
+      const schedule = await getStorage().getEmployeeWorkScheduleById(id);
+      if (!schedule) {
+        return res.status(404).json({ message: "Employee work schedule not found" });
+      }
+
+      res.json(schedule);
+    } catch (error) {
+      console.error("Error fetching employee work schedule:", error);
+      res.status(500).json({ message: "Failed to fetch employee work schedule" });
+    }
+  });
+
+  app.post("/api/employee-work-schedules", async (req, res) => {
+    try {
+      const scheduleData = insertEmployeeWorkScheduleSchema.parse(req.body);
+      const schedule = await getStorage().createEmployeeWorkSchedule(scheduleData);
+      res.status(201).json(schedule);
+    } catch (error) {
+      console.error("Error creating employee work schedule:", error);
+      res.status(500).json({ message: "Failed to create employee work schedule" });
+    }
+  });
+
+  app.put("/api/employee-work-schedules/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid schedule ID" });
+      }
+
+      const scheduleData = insertEmployeeWorkScheduleSchema.parse(req.body);
+      const schedule = await getStorage().updateEmployeeWorkSchedule(id, scheduleData);
+      
+      if (!schedule) {
+        return res.status(404).json({ message: "Employee work schedule not found" });
+      }
+
+      res.json(schedule);
+    } catch (error) {
+      console.error("Error updating employee work schedule:", error);
+      res.status(500).json({ message: "Failed to update employee work schedule" });
+    }
+  });
+
+  app.delete("/api/employee-work-schedules/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid schedule ID" });
+      }
+
+      const success = await getStorage().deleteEmployeeWorkSchedule(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Employee work schedule not found" });
+      }
+
+      res.json({ message: "Employee work schedule deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting employee work schedule:", error);
+      res.status(500).json({ message: "Failed to delete employee work schedule" });
+    }
+  });
+
+  // Daily Attendance API Routes
+  app.get("/api/daily-attendance", async (req, res) => {
+    try {
+      const { employeeId, date, startDate, endDate } = req.query;
+      let attendance;
+      
+      if (employeeId && date) {
+        attendance = await getStorage().getDailyAttendanceByEmployeeAndDate(
+          parseInt(employeeId as string), 
+          new Date(date as string)
+        );
+      } else if (employeeId && startDate && endDate) {
+        attendance = await getStorage().getDailyAttendanceByEmployeeAndDateRange(
+          parseInt(employeeId as string), 
+          new Date(startDate as string), 
+          new Date(endDate as string)
+        );
+      } else if (date) {
+        attendance = await getStorage().getDailyAttendanceByDate(new Date(date as string));
+      } else {
+        attendance = await getStorage().getAllDailyAttendance();
+      }
+      
+      res.json(attendance);
+    } catch (error) {
+      console.error("Error fetching daily attendance:", error);
+      res.status(500).json({ message: "Failed to fetch daily attendance" });
+    }
+  });
+
+  app.post("/api/daily-attendance", async (req, res) => {
+    try {
+      const attendanceData = insertDailyAttendanceSchema.parse(req.body);
+      const attendance = await getStorage().createDailyAttendance(attendanceData);
+      res.status(201).json(attendance);
+    } catch (error) {
+      console.error("Error creating daily attendance:", error);
+      res.status(500).json({ message: "Failed to create daily attendance" });
+    }
+  });
+
+  app.put("/api/daily-attendance/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid attendance ID" });
+      }
+
+      const attendanceData = insertDailyAttendanceSchema.parse(req.body);
+      const attendance = await getStorage().updateDailyAttendance(id, attendanceData);
+      
+      if (!attendance) {
+        return res.status(404).json({ message: "Daily attendance record not found" });
+      }
+
+      res.json(attendance);
+    } catch (error) {
+      console.error("Error updating daily attendance:", error);
+      res.status(500).json({ message: "Failed to update daily attendance" });
+    }
+  });
+
+  app.delete("/api/daily-attendance/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid attendance ID" });
+      }
+
+      const success = await getStorage().deleteDailyAttendance(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Daily attendance record not found" });
+      }
+
+      res.json({ message: "Daily attendance record deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting daily attendance:", error);
+      res.status(500).json({ message: "Failed to delete daily attendance" });
     }
   });
 
