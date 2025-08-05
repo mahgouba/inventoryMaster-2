@@ -321,7 +321,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         title: "تم تحديث الحضور",
         description: "تم تحديث بيانات الحضور بنجاح",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/daily-attendance", { date: selectedDate }] });
+      queryClient.invalidateQueries({ queryKey: ["/api/daily-attendance"] });
+      setIsAttendanceDialogOpen(false); // إغلاق الـ Dialog بعد النجاح
     },
     onError: () => {
       toast({
@@ -386,7 +387,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
 
   // Create daily attendance record
   const createAttendanceMutation = useMutation({
-    mutationFn: async (data: { employeeId: number; date: string; scheduleType: string }) => {
+    mutationFn: async (data: any) => {
       const response = await fetch("/api/daily-attendance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -397,10 +398,12 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/daily-attendance"] });
-      toast({ title: "تم إنشاء سجل الحضور بنجاح" });
+      toast({ title: "تم تسجيل الحضور بنجاح" });
+      setIsAttendanceDialogOpen(false); // إغلاق الـ Dialog بعد النجاح
     },
-    onError: () => {
-      toast({ title: "خطأ في إنشاء سجل الحضور", variant: "destructive" });
+    onError: (error) => {
+      console.error("Attendance creation error:", error);
+      toast({ title: "خطأ في تسجيل الحضور", variant: "destructive" });
     },
   });
 
@@ -418,6 +421,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/daily-attendance"] });
       toast({ title: "تم تحديث حالة الإجازة بنجاح" });
+      setIsAttendanceDialogOpen(false); // إغلاق الـ Dialog بعد النجاح
     },
     onError: () => {
       toast({ title: "خطأ في تحديث حالة الإجازة", variant: "destructive" });
@@ -504,8 +508,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       handleAttendanceUpdate(attendance.id, field, time);
     }
     
-    // Close the dialog after successful confirmation
-    setIsAttendanceDialogOpen(false);
+    // Dialog will be closed by the mutation success handler
   };
 
   // Check if employee is late

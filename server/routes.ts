@@ -2983,8 +2983,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/daily-attendance", async (req, res) => {
     try {
-      const attendanceData = insertDailyAttendanceSchema.parse(req.body);
-      const attendance = await getStorage().createDailyAttendance(attendanceData);
+      const rawData = req.body;
+      
+      // Ensure required fields are provided with defaults if missing
+      const attendanceData = {
+        ...rawData,
+        employeeName: rawData.employeeName || "موظف",
+        scheduleType: rawData.scheduleType || "متصل",
+      };
+      
+      // Validate with schema
+      const validatedData = insertDailyAttendanceSchema.parse(attendanceData);
+      const attendance = await getStorage().createDailyAttendance(validatedData);
       res.status(201).json(attendance);
     } catch (error) {
       console.error("Error creating daily attendance:", error);
