@@ -173,7 +173,7 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
           </div>
 
           {/* Vehicle Information Card */}
-          <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
+          <div className="rounded-xl p-8 mb-8">
             {/* Manufacturer Logo and Basic Info */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
@@ -264,13 +264,13 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
           </div>
 
           {/* Price Section */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl shadow-lg p-8 mb-8">
+          <div className="text-black rounded-xl p-8 mb-8">
             <div className="text-center">
               <h3 className="text-2xl font-bold mb-4">السعر المطلوب</h3>
               <div className="text-5xl font-bold mb-2">
                 {formatPrice(vehicle.price || 0)}
               </div>
-              <p className="text-blue-100 text-lg">شامل ضريبة القيمة المضافة</p>
+              <p className="text-gray-600 text-lg">شامل ضريبة القيمة المضافة</p>
             </div>
           </div>
 
