@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { db } from "./db";
 import type { IStorage } from "./storage";
 
@@ -5,6 +6,10 @@ export async function createStorageInstance(): Promise<IStorage> {
   try {
     // Check if DATABASE_URL exists
     const dbUrl = process.env.DATABASE_URL;
+    console.log('🔍 Checking database configuration...');
+    console.log('📋 DATABASE_URL:', dbUrl ? 'Found' : 'Not found');
+    console.log('🔗 Database connection:', db ? 'Available' : 'Not available');
+    
     if (dbUrl && db) {
       console.log('✅ Using DatabaseStorage with PostgreSQL');
       // Dynamic import to avoid circular dependency

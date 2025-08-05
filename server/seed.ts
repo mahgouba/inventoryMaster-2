@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { db } from "./db";
 import { users, inventoryItems, manufacturers, banks, companies } from "@shared/schema";
 import bcrypt from "bcryptjs";
@@ -192,4 +193,15 @@ export async function seedDatabase() {
     console.error("❌ Database seeding failed:", error);
     return false;
   }
+}
+
+// Run if called directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  seedDatabase().then(() => {
+    console.log('✅ Database seeding complete');
+    process.exit(0);
+  }).catch((error) => {
+    console.error('❌ Database seeding failed:', error);
+    process.exit(1);
+  });
 }

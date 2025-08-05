@@ -34,3 +34,6 @@ if (process.env.DATABASE_URL) {
 }
 
 export { pool, db };
+
+// Export a default db instance for easier imports
+export default db;

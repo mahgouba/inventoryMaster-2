@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { db } from "./db";
 import { 
   users, inventoryItems, banks, manufacturers, vehicleCategories, vehicleTrimLevels, colorAssociations,
@@ -14,9 +15,12 @@ import type { IStorage } from "./storage";
 
 export class DatabaseStorage implements IStorage {
   constructor() {
+    console.log('🔌 Initializing DatabaseStorage...');
     if (!db) {
+      console.error('❌ Database connection not available');
       throw new Error('Database connection not available');
     }
+    console.log('✅ DatabaseStorage initialized successfully');
   }
   // Users
   async getUser(id: number): Promise<User | undefined> {

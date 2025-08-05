@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { 
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
@@ -1580,6 +1581,38 @@ export class MemStorage implements IStorage {
   }
 }
 
-// For now, always use MemStorage to ensure compatibility
-// Database integration will be handled separately
-export const storage = new MemStorage();
+// Use createStorageInstance to automatically choose between DatabaseStorage and MemStorage
+import { createStorageInstance } from "./storage-init";
+
+// Create storage instance based on database availability
+let storageInstance: IStorage | null = null;
+
+// Initialize storage asynchronously
+(async () => {
+  try {
+    console.log('🚀 Initializing storage system...');
+    storageInstance = await createStorageInstance();
+    console.log('✅ Storage initialized successfully');
+  } catch (error) {
+    console.error('❌ Failed to initialize storage, using MemStorage:', error);
+    storageInstance = new MemStorage();
+  }
+})();
+
+// Export a function to get the storage instance
+export function getStorage(): IStorage {
+  if (storageInstance) {
+    console.log('📦 Using initialized storage instance');
+    return storageInstance;
+  } else {
+    console.log('📦 Using fallback MemStorage');
+    return new MemStorage();
+  }
+}
+
+// For backward compatibility, export a default instance
+export const storage = new MemStorage(); // Fallback for immediate use
+
+// Log the current storage configuration
+console.log('🔧 Storage configuration loaded');
+console.log('📋 DATABASE_URL:', process.env.DATABASE_URL ? 'Available' : 'Not available');

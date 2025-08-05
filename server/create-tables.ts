@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { db } from "./db";
 import fs from 'fs/promises';
 import path from 'path';
