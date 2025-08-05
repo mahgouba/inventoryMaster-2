@@ -285,7 +285,7 @@ svg {
 }
 
 /* Component Specific Dark Styling - Lighter/More Transparent */
-.card {
+.card, .glass-container {
   background: rgba(255, 255, 255, 0.08) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   backdrop-filter: blur(15px) !important;
@@ -296,13 +296,13 @@ svg {
 }
 
 /* Input and Form Elements */
-input, textarea, select {
+input, textarea, select, .glass-input {
   background: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: var(--text-primary) !important;
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus, textarea:focus, select:focus, .glass-input:focus {
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: rgba(59, 130, 246, 0.4) !important;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;

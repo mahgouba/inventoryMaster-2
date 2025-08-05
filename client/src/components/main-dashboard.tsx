@@ -21,8 +21,11 @@ import DatabaseManagement from "@/pages/database-management";
 import CarsMigrationPage from "@/pages/cars-migration";
 import DropdownOptionsManagement from "@/pages/DropdownOptionsManagement";
 import HierarchicalView from "@/pages/HierarchicalView";
+import HierarchyManagementPage from "@/pages/hierarchy-management";
 
 import PriceCardsPage from "@/pages/price-cards";
+import DetailedSpecificationsPage from "@/pages/detailed-specifications";
+import ImagesManagementPage from "@/pages/images-management";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
 
@@ -58,6 +61,10 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return <FinancingCalculatorPage />;
       case "/leave-requests":
         return <LeaveRequestsPage userRole={user.role} username={user.username} userId={user.id} />;
+      case "/detailed-specifications":
+        return <DetailedSpecificationsPage />;
+      case "/images-management":
+        return <ImagesManagementPage />;
 
       case "/manufacturer-logos":
         return user.role === "admin" ? <ManufacturerLogosPage userRole={user.role} onLogout={onLogout} /> : null;
@@ -79,6 +86,8 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return user.role === "admin" ? <DropdownOptionsManagement /> : null;
       case "/hierarchy":
         return user.role === "admin" ? <HierarchicalView /> : null;
+      case "/hierarchy-management":
+        return user.role === "admin" ? <HierarchyManagementPage /> : null;
 
       case "/price-cards":
         return <PriceCardsPage />;

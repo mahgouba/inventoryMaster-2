@@ -123,7 +123,35 @@ export const colorAssociations = pgTable("color_associations", {
   colorType: text("color_type").notNull(), // نوع اللون: "exterior" أو "interior"
   colorName: text("color_name").notNull(), // اسم اللون
   colorCode: text("color_code"), // كود اللون (hex أو أي نوع آخر)
-  isActive: boolean("is_active").default(true).notNull(), // نشط
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Vehicle Specifications table for detailed specifications
+export const vehicleSpecifications = pgTable("vehicle_specifications", {
+  id: serial("id").primaryKey(),
+  manufacturer: text("manufacturer").notNull(), // الصانع
+  category: text("category").notNull(), // الفئة
+  trimLevel: text("trim_level").notNull(), // درجة التجهيز
+  model: text("model").notNull(), // الموديل
+  chassisNumber: text("chassis_number"), // رقم الهيكل (اختياري لربط مواصفة بسيارة محددة)
+  specifications: jsonb("specifications").notNull(), // المواصفات التفصيلية كـ JSON
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Vehicle Image Links table for linking images to vehicle hierarchy
+export const vehicleImageLinks = pgTable("vehicle_image_links", {
+  id: serial("id").primaryKey(),
+  manufacturer: text("manufacturer").notNull(), // الصانع
+  category: text("category").notNull(), // الفئة
+  trimLevel: text("trim_level").notNull(), // درجة التجهيز
+  exteriorColor: text("exterior_color").notNull(), // اللون الخارجي
+  interiorColor: text("interior_color").notNull(), // اللون الداخلي
+  chassisNumber: text("chassis_number"), // رقم الهيكل (اختياري لربط رابط بسيارة محددة)
+  imageUrls: text("image_urls").array().notNull(), // روابط الصور
+  description: text("description"), // وصف الصور
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -462,6 +490,52 @@ export const insertInvoiceSchema = createInsertSchema(invoices).omit({
   createdAt: true,
   updatedAt: true,
 });
+
+// Price Cards table for managing price cards
+export const priceCards = pgTable("price_cards", {
+  id: serial("id").primaryKey(),
+  inventoryItemId: integer("inventory_item_id").references(() => inventoryItems.id).notNull(),
+  manufacturer: text("manufacturer").notNull(), // الصانع
+  category: text("category").notNull(), // الفئة
+  trimLevel: text("trim_level"), // درجة التجهيز
+  model: text("model"), // الموديل
+  year: integer("year").notNull(), // السنة
+  price: decimal("price", { precision: 10, scale: 2 }), // السعر
+  features: text("features").array().default([]), // المميزات
+  status: text("status").notNull().default("نشط"), // الحالة
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertPriceCardSchema = createInsertSchema(priceCards).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type PriceCard = typeof priceCards.$inferSelect;
+export type InsertPriceCard = z.infer<typeof insertPriceCardSchema>;
+
+// Vehicle Specifications schemas
+export const insertVehicleSpecificationSchema = createInsertSchema(vehicleSpecifications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type VehicleSpecification = typeof vehicleSpecifications.$inferSelect;
+export type InsertVehicleSpecification = z.infer<typeof insertVehicleSpecificationSchema>;
+
+// Vehicle Image Links schemas
+export const insertVehicleImageLinkSchema = createInsertSchema(vehicleImageLinks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type VehicleImageLink = typeof vehicleImageLinks.$inferSelect;
+export type InsertVehicleImageLink = z.infer<typeof insertVehicleImageLinkSchema>;
 
 // Terms and conditions table
 export const termsAndConditions = pgTable("terms_and_conditions", {
@@ -918,32 +992,4 @@ export type InsertVehicleCategory = z.infer<typeof insertVehicleCategorySchema>;
 export type VehicleTrimLevel = typeof vehicleTrimLevels.$inferSelect;
 export type InsertVehicleTrimLevel = z.infer<typeof insertVehicleTrimLevelSchema>;
 
-// Price Cards table for managing vehicle price cards
-export const priceCards = pgTable("price_cards", {
-  id: serial("id").primaryKey(),
-  inventoryItemId: integer("inventory_item_id").references(() => inventoryItems.id),
-  manufacturer: text("manufacturer").notNull(),
-  category: text("category").notNull(),
-  model: text("model").notNull(),
-  year: text("year").notNull(),
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  chassisNumber: text("chassis_number"),
-  exteriorColor: text("exterior_color"),
-  interiorColor: text("interior_color"),
-  status: text("status"),
-  engineCapacity: text("engine_capacity"),
-  mileage: text("mileage"),
-  qrCodeUrl: text("qr_code_url"),
-  isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
 
-export const insertPriceCardSchema = createInsertSchema(priceCards).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export type PriceCard = typeof priceCards.$inferSelect;
-export type InsertPriceCard = z.infer<typeof insertPriceCardSchema>;
