@@ -62,9 +62,9 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Serve the app on port 3001 (changed from 3000 due to Docker conflict)
+  // Serve the app on port 5000 for Replit compatibility
   // this serves both the API and the client.
-  const port = 3001;
+  const port = process.env.PORT || 5000;
   server.listen({
     port,
     host: "0.0.0.0",
