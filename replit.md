@@ -50,6 +50,10 @@ The system follows a clear separation of concerns, with distinct layers for fron
 - **Role-Based Access Control (RBAC)**: Permissions system for admin, accountant, salesperson, and sales manager roles, dynamically adapting UI.
 - **Localization**: Arabic-first design with RTL support, Gregorian calendar (DD/MM/YYYY) and 24-hour time.
 - **Print System**: Optimized PDF and JPG exports with high quality and proper print-specific CSS.
+- **Smart Pricing Display**: Dynamic pricing system in price cards that handles different import types with appropriate VAT calculations and color coding:
+  - Company imports (استيراد شركة) with new condition: Shows base price (excluding VAT), VAT amount (15%), and total price
+  - Personal imports (استيراد شخصي) with new condition: Shows simple price without breakdown (green status badge)
+  - Used/personal used (مستعمل/مستعمل شخصي): Shows simple price with mileage display (red status badge)
 
 ## External Dependencies
 - **@neondatabase/serverless**: Neon PostgreSQL driver.

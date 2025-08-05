@@ -21,8 +21,12 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
   if (!vehicle) return null;
 
   // تحديد حالة السيارة (جديدة/مستعملة)
-  const isUsed = vehicle.importType === "شخصي مستعمل" || vehicle.notes?.includes("مستعمل");
-  const mileage = isUsed ? "85,000 كم" : "0 كم"; // يمكن استخراج هذا من البيانات الفعلية
+  const isUsed = vehicle.importType === "شخصي مستعمل" || vehicle.importType === "مستعمل" || vehicle.notes?.includes("مستعمل");
+  const isCompanyImport = vehicle.importType === "شركة";
+  const isPersonalImport = vehicle.importType === "شخصي";
+  
+  // الممشي - استخدام القيمة الفعلية من البيانات أو قيمة افتراضية
+  const mileage = isUsed ? (vehicle.mileage ? `${vehicle.mileage.toLocaleString('ar-SA')} كم` : "85,000 كم") : "0 كم";
 
   // تنسيق السعر
   const formatPrice = (price: string | number) => {
@@ -34,6 +38,43 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
       maximumFractionDigits: 0
     }).format(numPrice || 0);
   };
+
+  // حساب الضريبة والأسعار حسب نوع الاستيراد
+  const calculatePricing = () => {
+    const basePrice = typeof vehicle.price === 'string' ? parseFloat(vehicle.price) : (vehicle.price || 0);
+    
+    if (isCompanyImport && !isUsed) {
+      // استيراد شركة جديد - إظهار تفصيل الضريبة
+      const vatRate = 0.15; // 15% ضريبة القيمة المضافة
+      const priceExcludingVat = basePrice / (1 + vatRate);
+      const vatAmount = basePrice - priceExcludingVat;
+      
+      return {
+        type: 'company_new',
+        basePrice: priceExcludingVat,
+        vatAmount: vatAmount,
+        totalPrice: basePrice,
+        showBreakdown: true
+      };
+    } else if (isPersonalImport && !isUsed) {
+      // استيراد شخصي جديد - سعر بسيط بدون تفصيل
+      return {
+        type: 'personal_new',
+        totalPrice: basePrice,
+        showBreakdown: false
+      };
+    } else {
+      // مستعمل أو مستعمل شخصي - سعر بسيط مع إظهار الممشي
+      return {
+        type: 'used',
+        totalPrice: basePrice,
+        showBreakdown: false,
+        showMileage: true
+      };
+    }
+  };
+
+  const pricing = calculatePricing();
 
   // توليد PDF
   const generatePDF = async () => {
@@ -196,8 +237,10 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
                 <Badge 
                   className={`text-lg px-4 py-2 ${
                     isUsed 
-                      ? 'bg-orange-100 text-orange-800 border border-orange-300' 
-                      : 'bg-green-100 text-green-800 border border-green-300'
+                      ? 'bg-red-100 text-red-800 border border-red-300' 
+                      : (isPersonalImport 
+                          ? 'bg-green-100 text-green-800 border border-green-300'
+                          : 'bg-blue-100 text-blue-800 border border-blue-300')
                   }`}
                 >
                   {isUsed ? 'مستعملة' : 'جديدة'}
@@ -237,7 +280,7 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
                 
                 <div className="flex justify-between border-b border-gray-200 pb-2">
                   <span className="font-semibold text-gray-700">المسافة المقطوعة:</span>
-                  <span className="text-gray-900 font-bold">{mileage}</span>
+                  <span className={`font-bold ${isUsed ? 'text-red-800' : 'text-gray-900'}`}>{mileage}</span>
                 </div>
                 
                 <div className="flex justify-between border-b border-gray-200 pb-2">
@@ -266,11 +309,50 @@ export default function PriceCard({ open, onOpenChange, vehicle }: PriceCardProp
           {/* Price Section */}
           <div className="text-black rounded-xl p-8 mb-8">
             <div className="text-center">
-              <h3 className="text-2xl font-bold mb-4">السعر المطلوب</h3>
-              <div className="text-5xl font-bold mb-2">
-                {formatPrice(vehicle.price || 0)}
-              </div>
-              <p className="text-gray-600 text-lg">شامل ضريبة القيمة المضافة</p>
+              <h3 className="text-2xl font-bold mb-6">السعر المطلوب</h3>
+              
+              {pricing.showBreakdown ? (
+                // عرض تفصيل الضريبة للاستيراد شركة
+                <div className="space-y-4">
+                  <div className="bg-gray-50 rounded-lg p-4 border">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-lg font-semibold text-gray-700">السعر الأساسي:</span>
+                      <span className="text-2xl font-bold text-gray-900">{formatPrice(pricing.basePrice || 0)}</span>
+                    </div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-lg font-semibold text-gray-700">ضريبة القيمة المضافة (15%):</span>
+                      <span className="text-2xl font-bold text-blue-600">{formatPrice(pricing.vatAmount || 0)}</span>
+                    </div>
+                    <hr className="my-3 border-gray-300" />
+                    <div className="flex justify-between items-center">
+                      <span className="text-xl font-bold text-gray-800">السعر الشامل:</span>
+                      <span className="text-4xl font-bold text-green-600">{formatPrice(pricing.totalPrice || 0)}</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // عرض السعر البسيط
+                <div>
+                  <div className="text-5xl font-bold mb-2">
+                    {formatPrice(pricing.totalPrice || 0)}
+                  </div>
+                  {!isUsed && (
+                    <p className="text-gray-600 text-lg">
+                      {isPersonalImport ? "السعر النهائي" : "شامل ضريبة القيمة المضافة"}
+                    </p>
+                  )}
+                </div>
+              )}
+              
+              {/* إظهار الممشي للسيارات المستعملة */}
+              {pricing.showMileage && (
+                <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold text-yellow-800">الممشي:</span>
+                    <span className="text-2xl font-bold text-yellow-900">{mileage}</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
