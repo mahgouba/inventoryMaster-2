@@ -1160,7 +1160,7 @@ export class MemStorage implements IStorage {
     const dateStr = date.toISOString().split('T')[0];
     return Array.from(this.dailyAttendance.values()).find(attendance => 
       attendance.employeeId === employeeId && 
-      attendance.date.toISOString().split('T')[0] === dateStr
+      (typeof attendance.date === 'string' ? attendance.date : attendance.date.toISOString().split('T')[0]) === dateStr
     );
   }
 
@@ -1175,7 +1175,7 @@ export class MemStorage implements IStorage {
   async getDailyAttendanceByDate(date: Date): Promise<DailyAttendance[]> {
     const dateStr = date.toISOString().split('T')[0];
     return Array.from(this.dailyAttendance.values()).filter(attendance => 
-      attendance.date.toISOString().split('T')[0] === dateStr
+      (typeof attendance.date === 'string' ? attendance.date : attendance.date.toISOString().split('T')[0]) === dateStr
     );
   }
 

@@ -3059,7 +3059,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Create new holiday record
         const newAttendance = await getStorage().createDailyAttendance({
           employeeId: parseInt(employeeId),
-          date: new Date(date).toISOString().split('T')[0],
+          employeeName: "موظف", // Default employee name, should be fetched from user data
+          date: date, // Keep as string for consistency
           scheduleType: "متصل", // Default schedule type
           notes: isHoliday ? 'إجازة' : null
         });
