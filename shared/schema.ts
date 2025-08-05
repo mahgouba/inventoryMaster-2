@@ -921,6 +921,7 @@ export const insertDailyAttendanceSchema = createInsertSchema(dailyAttendance).o
   createdAt: true,
   updatedAt: true,
 }).extend({
+  employeeName: z.string().min(1, "اسم الموظف مطلوب"),
   date: z.union([z.string(), z.date()]).transform((val) => {
     if (typeof val === 'string') {
       return new Date(val);

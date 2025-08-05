@@ -465,12 +465,15 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     );
 
     if (!attendance) {
-      // Create new attendance record
-      createAttendanceMutation.mutate({
+      // Create new attendance record with proper typing
+      const attendanceData = {
         employeeId: selectedEmployeeForDialog.employeeId,
+        employeeName: selectedEmployeeForDialog.employeeName,
         date: dateStr,
         scheduleType: selectedEmployeeForDialog.scheduleType
-      });
+      } as any; // Temporary type assertion until types are regenerated
+      
+      createAttendanceMutation.mutate(attendanceData);
     } else {
       // Update existing attendance
       let field: string;
@@ -1057,6 +1060,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                       {selectedDayForAttendance && format(selectedDayForAttendance, "EEEE، dd MMMM yyyy", { locale: ar })}
                     </p>
                   </DialogHeader>
+                  
+                  <div className="sr-only" aria-describedby="attendance-dialog-description">
+                    إدارة حضور وانصراف الموظف للتاريخ المحدد مع إمكانية تعديل الأوقات وتحديد الإجازات
+                  </div>
                   
                   {selectedEmployeeForDialog && selectedDayForAttendance && (() => {
                     const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
