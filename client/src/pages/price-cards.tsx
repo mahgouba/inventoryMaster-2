@@ -520,6 +520,73 @@ export default function PriceCardsPage() {
     });
   };
 
+  // Generate JPG from price card
+  const generateJPG = async (card: PriceCard, cardId: string) => {
+    setIsGeneratingPDF(true);
+    try {
+      const element = document.getElementById(cardId);
+      if (!element) {
+        console.error('Price card element not found');
+        return;
+      }
+
+      // Wait for fonts and images to load
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Create a temporary element for JPG with high-quality styling
+      const printElement = element.cloneNode(true) as HTMLElement;
+      printElement.style.transform = 'scale(1)';
+      printElement.style.transformOrigin = 'top left';
+      printElement.style.width = '1123px';
+      printElement.style.height = '794px';
+      printElement.style.position = 'absolute';
+      printElement.style.top = '-9999px';
+      printElement.style.left = '-9999px';
+      printElement.style.backgroundColor = '#ffffff';
+      document.body.appendChild(printElement);
+
+      // High-quality canvas generation for JPG
+      const canvas = await html2canvas(printElement, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 1123,
+        height: 794
+      });
+
+      // Remove the temporary element
+      document.body.removeChild(printElement);
+
+      // Convert to JPG with high quality
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `بطاقة_سعر_${card.manufacturer}_${card.category}_${card.year}.jpg`;
+      link.href = imgData;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "تم بنجاح",
+        description: "تم تحميل بطاقة السعر بصيغة JPG",
+      });
+    } catch (error) {
+      console.error('Error generating JPG:', error);
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ في إنشاء ملف JPG",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6" dir="rtl">
       {/* Header */}
@@ -773,6 +840,19 @@ export default function PriceCardsPage() {
                   >
                     <Download className="w-4 h-4 ml-1" />
                     PDF
+                  </Button>
+                  
+                  <Button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      generateJPG(card, `price-card-${card.id}`);
+                    }}
+                    disabled={isGeneratingPDF}
+                    size="sm"
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                  >
+                    <Download className="w-4 h-4 ml-1" />
+                    JPG
                   </Button>
                 </div>
               </CardTitle>
