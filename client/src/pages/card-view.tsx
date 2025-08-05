@@ -55,7 +55,7 @@ import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import ScrollableFilter from "@/components/scrollable-filter";
 import { ReservationDialog } from "@/components/reservation-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
-import PriceCard from "@/components/price-card";
+
 import { LeaveRequestForm } from "@/components/leave-request-form";
 import { PendingLeaveRequests } from "@/components/pending-leave-requests";
 
@@ -99,8 +99,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
   const [quotationManagementOpen, setQuotationManagementOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [priceCardOpen, setPriceCardOpen] = useState(false);
-  const [priceCardVehicle, setPriceCardVehicle] = useState<InventoryItem | null>(null);
+
   const [arrivedTodayOpen, setArrivedTodayOpen] = useState(false);
   const [leaveRequestDialogOpen, setLeaveRequestDialogOpen] = useState(false);
   
@@ -629,11 +628,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     window.location.href = '/quotation-creation';
   };
 
-  // Handle price card creation
-  const handleCreatePriceCard = (item: InventoryItem) => {
-    setPriceCardVehicle(item);
-    setPriceCardOpen(true);
-  };
+
 
   // Status color mapping
   const getStatusColor = (status: string) => {
@@ -1466,12 +1461,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         onSuccess={handleReservationSuccess}
       />
 
-      {/* Price Card Dialog */}
-      <PriceCard
-        open={priceCardOpen}
-        onOpenChange={setPriceCardOpen}
-        vehicle={priceCardVehicle}
-      />
+
 
       {/* Arrived Today Dialog */}
       <Dialog open={arrivedTodayOpen} onOpenChange={setArrivedTodayOpen}>
