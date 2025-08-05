@@ -159,16 +159,17 @@ export default function PriceCardsPage() {
     const isPersonalImport = importType === 'شخصي';
     
     if (isCompanyImport && !isUsed) {
-      // استيراد شركة جديد - إظهار تفصيل الضريبة
+      // استيراد شركة جديد - السعر في المخزون شامل الضريبة، نحتاج لاستبعادها
       const vatRate = 0.15; // 15% ضريبة القيمة المضافة
-      const priceExcludingVat = basePrice / (1 + vatRate);
-      const vatAmount = basePrice - priceExcludingVat;
+      const totalPriceWithVat = basePrice; // السعر الأصلي من المخزون (شامل الضريبة)
+      const priceExcludingVat = totalPriceWithVat / (1 + vatRate); // السعر بعد استبعاد الضريبة
+      const vatAmount = totalPriceWithVat - priceExcludingVat; // قيمة الضريبة المستبعدة
       
       return {
         type: 'company_new',
-        basePrice: priceExcludingVat,
-        vatAmount: vatAmount,
-        totalPrice: basePrice,
+        basePrice: priceExcludingVat, // السعر الأساسي (بعد استبعاد الضريبة)
+        vatAmount: vatAmount, // قيمة الضريبة (15%)
+        totalPrice: totalPriceWithVat, // السعر الشامل (من المخزون)
         showBreakdown: true,
         statusText: 'جديد',
         statusColor: '#16a34a' // أخضر
