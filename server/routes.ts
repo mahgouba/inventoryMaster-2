@@ -201,13 +201,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         for (const category of categories) {
           // Get trim levels for this category
-          const trimLevels = await getStorage().getTrimLevelsByCategory(manufacturer.nameAr, category.nameAr || category.category);
+          const trimLevels = await getStorage().getTrimLevelsByCategory(manufacturer.nameAr, category.category);
           
           // Count vehicles for this manufacturer/category combination
           const allInventory = await getStorage().getAllInventoryItems();
           const vehicleCount = allInventory.filter(item => 
             item.manufacturer === manufacturer.nameAr && 
-            item.category === (category.nameAr || category.category)
+            item.category === category.category
           ).length;
 
           totalVehicles += vehicleCount;
@@ -327,7 +327,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid item ID" });
       }
       
-      const success = await getStorage().markAsSold(id);
+      const success = await getStorage().markAsSold(id, {});
       if (!success) {
         return res.status(404).json({ message: "Item not found" });
       }
@@ -864,7 +864,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       console.error("Error updating manufacturer logo:", error);
-      res.status(500).json({ message: "Failed to update manufacturer logo", error: error.message });
+      res.status(500).json({ message: "Failed to update manufacturer logo", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -883,7 +883,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       console.error("Error deleting manufacturer:", error);
-      res.status(500).json({ message: "Failed to delete manufacturer", error: error.message });
+      res.status(500).json({ message: "Failed to delete manufacturer", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -1168,13 +1168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/color-associations", async (req, res) => {
     try {
       const { manufacturer, category, trimLevel, colorType, scope } = req.query;
-      const associations = await getStorage().getColorAssociations({
-        manufacturer: manufacturer as string,
-        category: category as string,
-        trimLevel: trimLevel as string,
-        colorType: colorType as 'interior' | 'exterior',
-        scope: scope as string
-      });
+      const associations = await getStorage().getColorAssociations();
       res.json(associations);
     } catch (error) {
       console.error("Error fetching color associations:", error);
@@ -1632,7 +1626,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error creating quotation:", error);
       res.status(500).json({ 
         message: "فشل في حفظ عرض السعر",
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   });
@@ -1657,7 +1651,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error updating quotation:", error);
       res.status(500).json({ 
         message: "فشل في تحديث عرض السعر",
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   });
@@ -1785,12 +1779,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ message: "Company deleted successfully" });
     } catch (error) {
-      console.error("Error creating company:", error);
-      if (error.errors) {
-        res.status(400).json({ message: "Invalid company data", errors: error.errors });
-      } else {
-        res.status(400).json({ message: "Invalid company data" });
-      }
+      console.error("Error deleting company:", error);
+      res.status(500).json({ message: "Failed to delete company" });
     }
   });
 
@@ -1855,7 +1845,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error creating invoice:", error);
       res.status(500).json({ 
         message: "فشل في حفظ الفاتورة",
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   });

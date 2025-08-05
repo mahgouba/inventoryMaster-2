@@ -552,8 +552,8 @@ export class MemStorage implements IStorage {
       const priceCard: PriceCard = {
         id,
         ...cardData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
       this.priceCards.set(id, priceCard);
     });
@@ -611,19 +611,30 @@ export class MemStorage implements IStorage {
     const item: InventoryItem = {
       id,
       ...itemData,
-      trimLevel: itemData.trimLevel || null,
-      price: itemData.price || null,
-      notes: itemData.notes || null,
-      detailedSpecifications: itemData.detailedSpecifications || null,
-      logo: itemData.logo || null,
-      images: itemData.images || [],
-      isSold: itemData.isSold || false,
-      soldDate: itemData.soldDate || null,
-      reservationDate: itemData.reservationDate || null,
-      reservedBy: itemData.reservedBy || null,
-      reservationNote: itemData.reservationNote || null,
-      entryDate: itemData.entryDate || new Date(),
-      mileage: itemData.mileage || null
+      trimLevel: itemData.trimLevel ?? null,
+      price: itemData.price ?? null,
+      notes: itemData.notes ?? null,
+      detailedSpecifications: itemData.detailedSpecifications ?? null,
+      logo: itemData.logo ?? null,
+      images: itemData.images ?? [],
+      isSold: itemData.isSold ?? false,
+      soldDate: itemData.soldDate ?? null,
+      reservationDate: itemData.reservationDate ?? null,
+      reservedBy: itemData.reservedBy ?? null,
+      salesRepresentative: itemData.salesRepresentative ?? null,
+      reservationNote: itemData.reservationNote ?? null,
+      entryDate: itemData.entryDate ?? new Date(),
+      mileage: itemData.mileage ?? null,
+      customerName: itemData.customerName ?? null,
+      customerPhone: itemData.customerPhone ?? null,
+      paidAmount: itemData.paidAmount ?? null,
+      salePrice: itemData.salePrice ?? null,
+      paymentMethod: itemData.paymentMethod ?? null,
+      bankName: itemData.bankName ?? null,
+      soldToCustomerName: itemData.soldToCustomerName ?? null,
+      soldToCustomerPhone: itemData.soldToCustomerPhone ?? null,
+      soldBySalesRep: itemData.soldBySalesRep ?? null,
+      saleNotes: itemData.saleNotes ?? null
     };
     this.inventoryItems.set(id, item);
     return item;
@@ -757,6 +768,9 @@ export class MemStorage implements IStorage {
     const bank: Bank = {
       id,
       ...bankData,
+      logo: bankData.logo ?? null,
+      nameEn: bankData.nameEn ?? null,
+      isActive: bankData.isActive ?? true,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -796,6 +810,7 @@ export class MemStorage implements IStorage {
     const rate: BankInterestRate = {
       id,
       ...rateData,
+      isActive: rateData.isActive ?? true,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -966,8 +981,8 @@ export class MemStorage implements IStorage {
       id: this.currentPriceCardId++,
       ...priceCard,
       isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     this.priceCards.set(newPriceCard.id, newPriceCard);
     return newPriceCard;
@@ -980,7 +995,7 @@ export class MemStorage implements IStorage {
     const updated: PriceCard = {
       ...existing,
       ...priceCard,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date()
     };
     this.priceCards.set(id, updated);
     return updated;
