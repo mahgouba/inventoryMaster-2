@@ -534,6 +534,28 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     return false;
   };
 
+  // Check if day is a holiday/leave
+  const isDayHoliday = (employee: EmployeeWorkSchedule, day: Date): boolean => {
+    const dateStr = format(day, "yyyy-MM-dd");
+    const attendance = dailyAttendance.find(a => 
+      a.employeeId === employee.employeeId && 
+      a.date === dateStr
+    );
+    
+    return attendance?.notes === "إجازة";
+  };
+
+  // Check if employee has approved leave for a specific day
+  const hasApprovedLeave = (employeeId: number, day: Date): boolean => {
+    const dateStr = format(day, "yyyy-MM-dd");
+    return (leaveRequestsQuery.data || []).some(request => 
+      request.userId === employeeId &&
+      request.status === "approved" &&
+      format(new Date(request.startDate), "yyyy-MM-dd") <= dateStr &&
+      (request.endDate ? format(new Date(request.endDate), "yyyy-MM-dd") >= dateStr : format(new Date(request.startDate), "yyyy-MM-dd") === dateStr)
+    );
+  };
+
   // Mark day as holiday
   const handleMarkHoliday = () => {
     if (!selectedDayForAttendance || !selectedEmployeeForDialog) return;
@@ -1001,7 +1023,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               const isToday = isSameDay(day, new Date());
                               const hasAttendance = !!dayAttendance;
                               const isHoliday = dayAttendance?.notes === 'إجازة';
-                              const isLate = hasAttendance && !isHoliday && isEmployeeLate(schedule, day);
+                              const hasApprovedLeaveForDay = hasApprovedLeave(schedule.employeeId, day);
+                              const isLate = hasAttendance && !isHoliday && !hasApprovedLeaveForDay && isEmployeeLate(schedule, day);
                               
                               return (
                                 <div
@@ -1010,9 +1033,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                     p-2 text-center cursor-pointer rounded-lg transition-all duration-200
                                     ${isToday ? 'ring-2 ring-blue-400' : ''}
                                     ${isLate ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30' : ''}
-                                    ${hasAttendance && !isHoliday && !isLate ? 'bg-green-500/20 text-green-300 hover:bg-green-500/30' : ''}
-                                    ${isHoliday ? 'bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30' : ''}
-                                    ${!hasAttendance && !isHoliday ? 'bg-white/5 text-gray-300 hover:bg-white/10' : ''}
+                                    ${hasAttendance && !isHoliday && !isLate && !hasApprovedLeaveForDay ? 'bg-green-500/20 text-green-300 hover:bg-green-500/30' : ''}
+                                    ${isHoliday || hasApprovedLeaveForDay ? 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30' : ''}
+                                    ${!hasAttendance && !isHoliday && !hasApprovedLeaveForDay ? 'bg-white/5 text-gray-300 hover:bg-white/10' : ''}
                                     hover:scale-105
                                   `}
                                   onClick={() => handleDayClick(day, schedule)}
@@ -1047,8 +1070,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               <span className="text-gray-300">تأخير</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <div className="w-3 h-3 bg-yellow-500/20 rounded"></div>
-                              <span className="text-gray-300">إجازة</span>
+                              <div className="w-3 h-3 bg-purple-500/20 rounded"></div>
+                              <span className="text-gray-300">إجازة معتمدة</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <div className="w-3 h-3 bg-white/5 rounded"></div>
@@ -1159,20 +1182,20 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                             {/* Quick Actions */}
                             <div className="grid grid-cols-2 gap-3">
                               <Button
-                                onClick={() => handleConfirmAttendance('checkin', format(new Date(), "HH:mm"))}
+                                onClick={() => handleConfirmAttendance('checkin', selectedEmployeeForDialog.continuousStartTime)}
                                 className="bg-green-600 hover:bg-green-700 text-white"
                                 disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                               >
                                 <Check className="w-4 h-4 mr-2" />
-                                تأكيد الحضور الآن
+                                حضور في الوقت
                               </Button>
                               <Button
-                                onClick={() => handleConfirmAttendance('checkout', format(new Date(), "HH:mm"))}
+                                onClick={() => handleConfirmAttendance('checkout', selectedEmployeeForDialog.continuousEndTime)}
                                 className="bg-blue-600 hover:bg-blue-700 text-white"
                                 disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                               >
                                 <Clock className="w-4 h-4 mr-2" />
-                                تأكيد الانصراف الآن
+                                انصراف في الوقت
                               </Button>
                             </div>
                           </div>
@@ -1222,22 +1245,22 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               {/* Morning Quick Actions */}
                               <div className="grid grid-cols-2 gap-2">
                                 <Button
-                                  onClick={() => handleConfirmAttendance('checkin', format(new Date(), "HH:mm"), 'morning')}
+                                  onClick={() => handleConfirmAttendance('checkin', selectedEmployeeForDialog.morningStartTime, 'morning')}
                                   size="sm"
                                   className="bg-green-600 hover:bg-green-700 text-white"
                                   disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                                 >
                                   <Check className="w-3 h-3 mr-1" />
-                                  حضور صباحي
+                                  حضور في الوقت
                                 </Button>
                                 <Button
-                                  onClick={() => handleConfirmAttendance('checkout', format(new Date(), "HH:mm"), 'morning')}
+                                  onClick={() => handleConfirmAttendance('checkout', selectedEmployeeForDialog.morningEndTime, 'morning')}
                                   size="sm"
                                   className="bg-blue-600 hover:bg-blue-700 text-white"
                                   disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                                 >
                                   <Clock className="w-3 h-3 mr-1" />
-                                  انصراف صباحي
+                                  انصراف في الوقت
                                 </Button>
                               </div>
                             </div>
@@ -1283,22 +1306,22 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               {/* Evening Quick Actions */}
                               <div className="grid grid-cols-2 gap-2">
                                 <Button
-                                  onClick={() => handleConfirmAttendance('checkin', format(new Date(), "HH:mm"), 'evening')}
+                                  onClick={() => handleConfirmAttendance('checkin', selectedEmployeeForDialog.eveningStartTime, 'evening')}
                                   size="sm"
                                   className="bg-green-600 hover:bg-green-700 text-white"
                                   disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                                 >
                                   <Check className="w-3 h-3 mr-1" />
-                                  حضور مسائي
+                                  حضور في الوقت
                                 </Button>
                                 <Button
-                                  onClick={() => handleConfirmAttendance('checkout', format(new Date(), "HH:mm"), 'evening')}
+                                  onClick={() => handleConfirmAttendance('checkout', selectedEmployeeForDialog.eveningEndTime, 'evening')}
                                   size="sm"
                                   className="bg-blue-600 hover:bg-blue-700 text-white"
                                   disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                                 >
                                   <Clock className="w-3 h-3 mr-1" />
-                                  انصراف مسائي
+                                  انصراف في الوقت
                                 </Button>
                               </div>
                             </div>
