@@ -465,13 +465,25 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     );
 
     if (!attendance) {
-      // Create new attendance record with proper typing
+      // Create new attendance record with proper timing data
       const attendanceData = {
         employeeId: selectedEmployeeForDialog.employeeId,
         employeeName: selectedEmployeeForDialog.employeeName,
         date: dateStr,
-        scheduleType: selectedEmployeeForDialog.scheduleType
-      } as any; // Temporary type assertion until types are regenerated
+        scheduleType: selectedEmployeeForDialog.scheduleType,
+        // Add the timing data immediately when creating
+        ...(selectedEmployeeForDialog.scheduleType === "متصل" 
+          ? {
+              [type === 'checkin' ? 'continuousCheckinTime' : 'continuousCheckoutTime']: time
+            }
+          : {
+              ...(period === 'morning' 
+                ? { [type === 'checkin' ? 'morningCheckinTime' : 'morningCheckoutTime']: time }
+                : { [type === 'checkin' ? 'eveningCheckinTime' : 'eveningCheckoutTime']: time }
+              )
+            }
+        )
+      };
       
       createAttendanceMutation.mutate(attendanceData);
     } else {
@@ -491,6 +503,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       
       handleAttendanceUpdate(attendance.id, field, time);
     }
+    
+    // Close the dialog after successful confirmation
+    setIsAttendanceDialogOpen(false);
   };
 
   // Check if employee is late
@@ -691,10 +706,17 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                         إضافة جدول عمل
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-md">
+                    <DialogContent 
+                      className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-md"
+                      aria-describedby="schedule-dialog-description"
+                    >
                       <DialogHeader>
                         <DialogTitle>إنشاء جدول عمل جديد</DialogTitle>
                       </DialogHeader>
+                      
+                      <div id="schedule-dialog-description" className="sr-only">
+                        إنشاء جدول عمل جديد للموظف مع تحديد نوع الدوام والأوقات المطلوبة
+                      </div>
                       
                       <div className="space-y-4">
                         <div>
@@ -1051,7 +1073,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
 
               {/* Enhanced Attendance Dialog */}
               <Dialog open={isAttendanceDialogOpen} onOpenChange={setIsAttendanceDialogOpen}>
-                <DialogContent className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-lg">
+                <DialogContent 
+                  className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-lg"
+                  aria-describedby="attendance-dialog-description"
+                >
                   <DialogHeader>
                     <DialogTitle className="text-xl">
                       إدارة الحضور - {selectedEmployeeForDialog?.employeeName}
@@ -1061,7 +1086,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                     </p>
                   </DialogHeader>
                   
-                  <div className="sr-only" aria-describedby="attendance-dialog-description">
+                  <div id="attendance-dialog-description" className="sr-only">
                     إدارة حضور وانصراف الموظف للتاريخ المحدد مع إمكانية تعديل الأوقات وتحديد الإجازات
                   </div>
                   
