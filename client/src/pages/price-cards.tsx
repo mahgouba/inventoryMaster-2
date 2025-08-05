@@ -870,7 +870,7 @@ export default function PriceCardsPage() {
                           {/* Price */}
                           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                             <div style={{ 
-                              color: '#00627F', 
+                              color: 'white', 
                               fontSize: '16px', 
                               fontWeight: '600', 
                               marginBottom: '5px' 
@@ -878,7 +878,7 @@ export default function PriceCardsPage() {
                               السعر
                             </div>
                             <div style={{ 
-                              color: '#00627F', 
+                              color: 'white', 
                               fontSize: '28px', 
                               fontWeight: 'bold', 
                               display: 'flex', 
@@ -902,7 +902,7 @@ export default function PriceCardsPage() {
                           {/* Status */}
                           <div style={{ textAlign: 'center', marginBottom: '15px' }}>
                             <div style={{ 
-                              color: '#00627F', 
+                              color: 'white', 
                               fontSize: '16px', 
                               fontWeight: '600', 
                               marginBottom: '5px' 
