@@ -455,7 +455,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   };
 
   // Confirm attendance for a specific day
-  const handleConfirmAttendance = (type: 'checkin' | 'checkout', time: string) => {
+  const handleConfirmAttendance = (type: 'checkin' | 'checkout', time: string, period?: 'morning' | 'evening') => {
     if (!selectedDayForAttendance || !selectedEmployeeForDialog) return;
     
     const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
@@ -473,12 +473,44 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       });
     } else {
       // Update existing attendance
-      const field = selectedEmployeeForDialog.scheduleType === "متصل" 
-        ? (type === 'checkin' ? 'continuousCheckinTime' : 'continuousCheckoutTime')
-        : (type === 'checkin' ? 'morningCheckinTime' : 'morningCheckoutTime');
+      let field: string;
+      
+      if (selectedEmployeeForDialog.scheduleType === "متصل") {
+        field = type === 'checkin' ? 'continuousCheckinTime' : 'continuousCheckoutTime';
+      } else {
+        // For split schedule, determine field based on period
+        if (period === 'morning') {
+          field = type === 'checkin' ? 'morningCheckinTime' : 'morningCheckoutTime';
+        } else {
+          field = type === 'checkin' ? 'eveningCheckinTime' : 'eveningCheckoutTime';
+        }
+      }
       
       handleAttendanceUpdate(attendance.id, field, time);
     }
+  };
+
+  // Check if employee is late
+  const isEmployeeLate = (employee: EmployeeWorkSchedule, day: Date): boolean => {
+    const dateStr = format(day, "yyyy-MM-dd");
+    const attendance = dailyAttendance.find(a => 
+      a.employeeId === employee.employeeId && 
+      a.date === dateStr
+    );
+
+    if (!attendance) return false;
+
+    if (employee.scheduleType === "متصل") {
+      if (attendance.continuousCheckinTime && employee.continuousStartTime) {
+        return attendance.continuousCheckinTime > employee.continuousStartTime;
+      }
+    } else {
+      if (attendance.morningCheckinTime && employee.morningStartTime) {
+        return attendance.morningCheckinTime > employee.morningStartTime;
+      }
+    }
+
+    return false;
   };
 
   // Mark day as holiday
@@ -941,6 +973,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               const isToday = isSameDay(day, new Date());
                               const hasAttendance = !!dayAttendance;
                               const isHoliday = dayAttendance?.notes === 'إجازة';
+                              const isLate = hasAttendance && !isHoliday && isEmployeeLate(schedule, day);
                               
                               return (
                                 <div
@@ -948,7 +981,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   className={`
                                     p-2 text-center cursor-pointer rounded-lg transition-all duration-200
                                     ${isToday ? 'ring-2 ring-blue-400' : ''}
-                                    ${hasAttendance && !isHoliday ? 'bg-green-500/20 text-green-300 hover:bg-green-500/30' : ''}
+                                    ${isLate ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30' : ''}
+                                    ${hasAttendance && !isHoliday && !isLate ? 'bg-green-500/20 text-green-300 hover:bg-green-500/30' : ''}
                                     ${isHoliday ? 'bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30' : ''}
                                     ${!hasAttendance && !isHoliday ? 'bg-white/5 text-gray-300 hover:bg-white/10' : ''}
                                     hover:scale-105
@@ -962,6 +996,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                     <div className="text-xs mt-1">
                                       {isHoliday ? (
                                         <Coffee className="w-3 h-3 mx-auto" />
+                                      ) : isLate ? (
+                                        <XCircle className="w-3 h-3 mx-auto" />
                                       ) : (
                                         <CheckCircle className="w-3 h-3 mx-auto" />
                                       )}
@@ -976,7 +1012,11 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                           <div className="flex gap-4 text-xs">
                             <div className="flex items-center gap-1">
                               <div className="w-3 h-3 bg-green-500/20 rounded"></div>
-                              <span className="text-gray-300">حضور</span>
+                              <span className="text-gray-300">حضور في الوقت</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 bg-red-500/20 rounded"></div>
+                              <span className="text-gray-300">تأخير</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <div className="w-3 h-3 bg-yellow-500/20 rounded"></div>
@@ -1006,11 +1046,11 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                 </div>
               )}
 
-              {/* Attendance Dialog */}
+              {/* Enhanced Attendance Dialog */}
               <Dialog open={isAttendanceDialogOpen} onOpenChange={setIsAttendanceDialogOpen}>
-                <DialogContent className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-md">
+                <DialogContent className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-lg">
                   <DialogHeader>
-                    <DialogTitle>
+                    <DialogTitle className="text-xl">
                       إدارة الحضور - {selectedEmployeeForDialog?.employeeName}
                     </DialogTitle>
                     <p className="text-gray-300">
@@ -1018,46 +1058,241 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                     </p>
                   </DialogHeader>
                   
-                  {selectedEmployeeForDialog && selectedDayForAttendance && (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-3">
-                        <Button
-                          onClick={() => handleConfirmAttendance('checkin', format(new Date(), "HH:mm"))}
-                          className="bg-green-600 hover:bg-green-700 text-white"
-                          disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
-                        >
-                          <Check className="w-4 h-4 mr-2" />
-                          تأكيد الحضور
-                        </Button>
-                        <Button
-                          onClick={() => handleConfirmAttendance('checkout', format(new Date(), "HH:mm"))}
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                          disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
-                        >
-                          <Clock className="w-4 h-4 mr-2" />
-                          تأكيد الانصراف
-                        </Button>
+                  {selectedEmployeeForDialog && selectedDayForAttendance && (() => {
+                    const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
+                    const existingAttendance = dailyAttendance.find(a => 
+                      a.employeeId === selectedEmployeeForDialog.employeeId && 
+                      a.date === dateStr
+                    );
+                    
+                    return (
+                      <div className="space-y-6">
+                        {/* Schedule Information */}
+                        <div className="bg-white/5 rounded-lg p-4">
+                          <h3 className="text-sm font-medium text-gray-300 mb-2">معلومات الدوام</h3>
+                          <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                              <span className="text-gray-400">نوع الدوام:</span>
+                              <p className="text-white">{selectedEmployeeForDialog.scheduleType}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">الراتب:</span>
+                              <p className="text-white">{selectedEmployeeForDialog.salary} ريال</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {selectedEmployeeForDialog.scheduleType === "متصل" ? (
+                          /* Continuous Schedule */
+                          <div className="space-y-4">
+                            <h3 className="text-lg font-medium text-white">الدوام المتصل</h3>
+                            
+                            {/* Schedule Times */}
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                              <div className="bg-white/5 rounded-lg p-3">
+                                <Label className="text-gray-300 text-sm">وقت الحضور المحدد</Label>
+                                <p className="text-white font-mono">{selectedEmployeeForDialog.continuousStartTime}</p>
+                              </div>
+                              <div className="bg-white/5 rounded-lg p-3">
+                                <Label className="text-gray-300 text-sm">وقت الانصراف المحدد</Label>
+                                <p className="text-white font-mono">{selectedEmployeeForDialog.continuousEndTime}</p>
+                              </div>
+                            </div>
+
+                            {/* Attendance Times */}
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-gray-300 text-sm">وقت الحضور الفعلي</Label>
+                                <Input
+                                  type="time"
+                                  value={existingAttendance?.continuousCheckinTime || ""}
+                                  onChange={(e) => existingAttendance && handleAttendanceUpdate(existingAttendance.id, 'continuousCheckinTime', e.target.value)}
+                                  className="bg-white/10 border-white/20 text-white mt-1"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-gray-300 text-sm">وقت الانصراف الفعلي</Label>
+                                <Input
+                                  type="time"
+                                  value={existingAttendance?.continuousCheckoutTime || ""}
+                                  onChange={(e) => existingAttendance && handleAttendanceUpdate(existingAttendance.id, 'continuousCheckoutTime', e.target.value)}
+                                  className="bg-white/10 border-white/20 text-white mt-1"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Quick Actions */}
+                            <div className="grid grid-cols-2 gap-3">
+                              <Button
+                                onClick={() => handleConfirmAttendance('checkin', format(new Date(), "HH:mm"))}
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                                disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
+                              >
+                                <Check className="w-4 h-4 mr-2" />
+                                تأكيد الحضور الآن
+                              </Button>
+                              <Button
+                                onClick={() => handleConfirmAttendance('checkout', format(new Date(), "HH:mm"))}
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                                disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
+                              >
+                                <Clock className="w-4 h-4 mr-2" />
+                                تأكيد الانصراف الآن
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          /* Split Schedule */
+                          <div className="space-y-4">
+                            <h3 className="text-lg font-medium text-white">الدوام المنفصل</h3>
+                            
+                            {/* Morning Schedule */}
+                            <div className="bg-white/5 rounded-lg p-4">
+                              <h4 className="text-md font-medium text-white mb-3">الفترة الصباحية</h4>
+                              
+                              {/* Morning Schedule Times */}
+                              <div className="grid grid-cols-2 gap-4 mb-3">
+                                <div className="bg-white/5 rounded-lg p-2">
+                                  <Label className="text-gray-400 text-xs">وقت الحضور المحدد</Label>
+                                  <p className="text-white font-mono text-sm">{selectedEmployeeForDialog.morningStartTime}</p>
+                                </div>
+                                <div className="bg-white/5 rounded-lg p-2">
+                                  <Label className="text-gray-400 text-xs">وقت الانصراف المحدد</Label>
+                                  <p className="text-white font-mono text-sm">{selectedEmployeeForDialog.morningEndTime}</p>
+                                </div>
+                              </div>
+
+                              {/* Morning Attendance Times */}
+                              <div className="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                  <Label className="text-gray-300 text-xs">الحضور الفعلي</Label>
+                                  <Input
+                                    type="time"
+                                    value={existingAttendance?.morningCheckinTime || ""}
+                                    onChange={(e) => existingAttendance && handleAttendanceUpdate(existingAttendance.id, 'morningCheckinTime', e.target.value)}
+                                    className="bg-white/10 border-white/20 text-white text-sm mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-gray-300 text-xs">الانصراف الفعلي</Label>
+                                  <Input
+                                    type="time"
+                                    value={existingAttendance?.morningCheckoutTime || ""}
+                                    onChange={(e) => existingAttendance && handleAttendanceUpdate(existingAttendance.id, 'morningCheckoutTime', e.target.value)}
+                                    className="bg-white/10 border-white/20 text-white text-sm mt-1"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Morning Quick Actions */}
+                              <div className="grid grid-cols-2 gap-2">
+                                <Button
+                                  onClick={() => handleConfirmAttendance('checkin', format(new Date(), "HH:mm"), 'morning')}
+                                  size="sm"
+                                  className="bg-green-600 hover:bg-green-700 text-white"
+                                  disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
+                                >
+                                  <Check className="w-3 h-3 mr-1" />
+                                  حضور صباحي
+                                </Button>
+                                <Button
+                                  onClick={() => handleConfirmAttendance('checkout', format(new Date(), "HH:mm"), 'morning')}
+                                  size="sm"
+                                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                                  disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
+                                >
+                                  <Clock className="w-3 h-3 mr-1" />
+                                  انصراف صباحي
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* Evening Schedule */}
+                            <div className="bg-white/5 rounded-lg p-4">
+                              <h4 className="text-md font-medium text-white mb-3">الفترة المسائية</h4>
+                              
+                              {/* Evening Schedule Times */}
+                              <div className="grid grid-cols-2 gap-4 mb-3">
+                                <div className="bg-white/5 rounded-lg p-2">
+                                  <Label className="text-gray-400 text-xs">وقت الحضور المحدد</Label>
+                                  <p className="text-white font-mono text-sm">{selectedEmployeeForDialog.eveningStartTime}</p>
+                                </div>
+                                <div className="bg-white/5 rounded-lg p-2">
+                                  <Label className="text-gray-400 text-xs">وقت الانصراف المحدد</Label>
+                                  <p className="text-white font-mono text-sm">{selectedEmployeeForDialog.eveningEndTime}</p>
+                                </div>
+                              </div>
+
+                              {/* Evening Attendance Times */}
+                              <div className="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                  <Label className="text-gray-300 text-xs">الحضور الفعلي</Label>
+                                  <Input
+                                    type="time"
+                                    value={existingAttendance?.eveningCheckinTime || ""}
+                                    onChange={(e) => existingAttendance && handleAttendanceUpdate(existingAttendance.id, 'eveningCheckinTime', e.target.value)}
+                                    className="bg-white/10 border-white/20 text-white text-sm mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-gray-300 text-xs">الانصراف الفعلي</Label>
+                                  <Input
+                                    type="time"
+                                    value={existingAttendance?.eveningCheckoutTime || ""}
+                                    onChange={(e) => existingAttendance && handleAttendanceUpdate(existingAttendance.id, 'eveningCheckoutTime', e.target.value)}
+                                    className="bg-white/10 border-white/20 text-white text-sm mt-1"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Evening Quick Actions */}
+                              <div className="grid grid-cols-2 gap-2">
+                                <Button
+                                  onClick={() => handleConfirmAttendance('checkin', format(new Date(), "HH:mm"), 'evening')}
+                                  size="sm"
+                                  className="bg-green-600 hover:bg-green-700 text-white"
+                                  disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
+                                >
+                                  <Check className="w-3 h-3 mr-1" />
+                                  حضور مسائي
+                                </Button>
+                                <Button
+                                  onClick={() => handleConfirmAttendance('checkout', format(new Date(), "HH:mm"), 'evening')}
+                                  size="sm"
+                                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                                  disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
+                                >
+                                  <Clock className="w-3 h-3 mr-1" />
+                                  انصراف مسائي
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Bottom Actions */}
+                        <div className="flex gap-3 pt-4 border-t border-white/10">
+                          <Button
+                            onClick={handleMarkHoliday}
+                            variant="outline"
+                            className="flex-1 border-yellow-400 text-yellow-300 hover:bg-yellow-400/10"
+                            disabled={markHolidayMutation.isPending}
+                          >
+                            <Coffee className="w-4 h-4 mr-2" />
+                            تحديد كإجازة
+                          </Button>
+                          
+                          <Button
+                            onClick={() => setIsAttendanceDialogOpen(false)}
+                            variant="outline"
+                            className="flex-1 border-white/20 text-white hover:bg-white/10"
+                          >
+                            إغلاق
+                          </Button>
+                        </div>
                       </div>
-                      
-                      <Button
-                        onClick={handleMarkHoliday}
-                        variant="outline"
-                        className="w-full border-yellow-400 text-yellow-300 hover:bg-yellow-400/10"
-                        disabled={markHolidayMutation.isPending}
-                      >
-                        <Coffee className="w-4 h-4 mr-2" />
-                        تحديد كإجازة
-                      </Button>
-                      
-                      <Button
-                        onClick={() => setIsAttendanceDialogOpen(false)}
-                        variant="outline"
-                        className="w-full border-white/20 text-white hover:bg-white/10"
-                      >
-                        إلغاء
-                      </Button>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </DialogContent>
               </Dialog>
             </GlassContainer>
