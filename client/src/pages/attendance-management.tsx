@@ -25,10 +25,14 @@ import {
   Settings,
   Timer,
   CheckCircle,
-  XCircle
+  XCircle,
+  ChevronRight,
+  ChevronLeft,
+  Calendar as CalendarIcon,
+  Coffee
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay, parseISO } from "date-fns";
 import { ar } from "date-fns/locale";
 
 // Glass Background Components
@@ -154,6 +158,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   const [employeeFilter, setEmployeeFilter] = useState("");
   const [selectedDate, setSelectedDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [selectedEmployeeForAttendance, setSelectedEmployeeForAttendance] = useState<number | null>(null);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDayForAttendance, setSelectedDayForAttendance] = useState<Date | null>(null);
+  const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState(false);
+  const [selectedEmployeeForDialog, setSelectedEmployeeForDialog] = useState<EmployeeWorkSchedule | null>(null);
 
   // Schedule form states
   const [continuousStartTime, setContinuousStartTime] = useState("09:00");
@@ -374,6 +382,116 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
 
   const handleAttendanceUpdate = (attendanceId: number, field: string, value: string) => {
     updateAttendanceMutation.mutate({ attendanceId, field, value });
+  };
+
+  // Create daily attendance record
+  const createAttendanceMutation = useMutation({
+    mutationFn: async (data: { employeeId: number; date: string; scheduleType: string }) => {
+      const response = await fetch("/api/daily-attendance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("فشل في إنشاء سجل الحضور");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/daily-attendance"] });
+      toast({ title: "تم إنشاء سجل الحضور بنجاح" });
+    },
+    onError: () => {
+      toast({ title: "خطأ في إنشاء سجل الحضور", variant: "destructive" });
+    },
+  });
+
+  // Mark day as holiday
+  const markHolidayMutation = useMutation({
+    mutationFn: async (data: { employeeId: number; date: string; isHoliday: boolean }) => {
+      const response = await fetch("/api/daily-attendance/holiday", {
+        method: "POST", 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("فشل في تحديث حالة الإجازة");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/daily-attendance"] });
+      toast({ title: "تم تحديث حالة الإجازة بنجاح" });
+    },
+    onError: () => {
+      toast({ title: "خطأ في تحديث حالة الإجازة", variant: "destructive" });
+    },
+  });
+
+  // Get calendar days for current month
+  const getMonthDays = () => {
+    const start = startOfMonth(currentMonth);
+    const end = endOfMonth(currentMonth);
+    return eachDayOfInterval({ start, end });
+  };
+
+  // Get attendance for specific employee and month
+  const getEmployeeMonthAttendance = (employeeId: number) => {
+    const start = format(startOfMonth(currentMonth), "yyyy-MM-dd");
+    const end = format(endOfMonth(currentMonth), "yyyy-MM-dd");
+    return dailyAttendance.filter(attendance => 
+      attendance.employeeId === employeeId && 
+      attendance.date >= start && 
+      attendance.date <= end
+    );
+  };
+
+  // Handle clicking on employee to show monthly calendar
+  const handleEmployeeClick = (employee: EmployeeWorkSchedule) => {
+    setSelectedEmployeeForAttendance(employee.employeeId);
+  };
+
+  // Handle day click to show attendance dialog
+  const handleDayClick = (day: Date, employee: EmployeeWorkSchedule) => {
+    setSelectedDayForAttendance(day);
+    setSelectedEmployeeForDialog(employee);
+    setIsAttendanceDialogOpen(true);
+  };
+
+  // Confirm attendance for a specific day
+  const handleConfirmAttendance = (type: 'checkin' | 'checkout', time: string) => {
+    if (!selectedDayForAttendance || !selectedEmployeeForDialog) return;
+    
+    const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
+    let attendance = dailyAttendance.find(a => 
+      a.employeeId === selectedEmployeeForDialog.employeeId && 
+      a.date === dateStr
+    );
+
+    if (!attendance) {
+      // Create new attendance record
+      createAttendanceMutation.mutate({
+        employeeId: selectedEmployeeForDialog.employeeId,
+        date: dateStr,
+        scheduleType: selectedEmployeeForDialog.scheduleType
+      });
+    } else {
+      // Update existing attendance
+      const field = selectedEmployeeForDialog.scheduleType === "متصل" 
+        ? (type === 'checkin' ? 'continuousCheckinTime' : 'continuousCheckoutTime')
+        : (type === 'checkin' ? 'morningCheckinTime' : 'morningCheckoutTime');
+      
+      handleAttendanceUpdate(attendance.id, field, time);
+    }
+  };
+
+  // Mark day as holiday
+  const handleMarkHoliday = () => {
+    if (!selectedDayForAttendance || !selectedEmployeeForDialog) return;
+    
+    const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
+    markHolidayMutation.mutate({
+      employeeId: selectedEmployeeForDialog.employeeId,
+      date: dateStr,
+      isHoliday: true
+    });
+    setIsAttendanceDialogOpen(false);
   };
 
   const calculateHoursWorked = (schedule: EmployeeWorkSchedule, attendance: DailyAttendance): string => {
@@ -744,169 +862,133 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
             <GlassContainer className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-white">الحضور اليومي</h2>
-                <div>
-                  <Label className="text-gray-300 text-sm">التاريخ</Label>
-                  <Input
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="bg-white/10 border-white/20 text-white"
-                    data-testid="date-selector"
-                  />
+                <div className="flex items-center gap-4">
+                  <Button
+                    onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+                    variant="outline"
+                    size="sm"
+                    className="border-white/20 text-white hover:bg-white/10"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                  <div className="text-center">
+                    <p className="text-white font-semibold">
+                      {format(currentMonth, "MMMM yyyy", { locale: ar })}
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+                    variant="outline"
+                    size="sm"
+                    className="border-white/20 text-white hover:bg-white/10"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
 
-              <div className="grid gap-4">
+              {/* Employee List */}
+              <div className="grid gap-4 mb-6">
                 {workSchedules.map((schedule) => {
-                  const attendance = dailyAttendance.find(a => a.employeeId === schedule.employeeId);
-                  const hoursWorked = attendance ? calculateHoursWorked(schedule, attendance) : "0.00";
+                  const isExpanded = selectedEmployeeForAttendance === schedule.employeeId;
+                  const monthAttendance = getEmployeeMonthAttendance(schedule.employeeId);
+                  const monthDays = getMonthDays();
                   
                   return (
                     <GlassCard key={schedule.id} className="p-4">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3 className="font-semibold text-white text-lg">{schedule.employeeName}</h3>
-                          <p className="text-gray-300">{schedule.scheduleType}</p>
+                      <div 
+                        className="flex justify-between items-center cursor-pointer"
+                        onClick={() => handleEmployeeClick(schedule)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <UserCheck className="w-5 h-5 text-blue-400" />
+                          <div>
+                            <h3 className="font-semibold text-white text-lg">{schedule.employeeName}</h3>
+                            <p className="text-gray-300 text-sm">{schedule.scheduleType} • {schedule.salary} ريال</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm text-gray-300">ساعات العمل</p>
-                          <p className="text-white font-semibold">{hoursWorked} ساعة</p>
+                        <div className="flex items-center gap-3">
+                          <Badge 
+                            variant="outline" 
+                            className="border-blue-400 text-blue-300 bg-blue-400/10"
+                          >
+                            {monthAttendance.length} يوم حضور هذا الشهر
+                          </Badge>
+                          <ChevronLeft 
+                            className={`w-5 h-5 text-gray-300 transition-transform ${
+                              isExpanded ? 'rotate-90' : ''
+                            }`} 
+                          />
                         </div>
                       </div>
-                      
-                      {schedule.scheduleType === "متصل" ? (
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label className="text-gray-300 text-sm">الحضور</Label>
-                            <div className="flex gap-2 items-center mt-1">
-                              <Input
-                                type="time"
-                                value={attendance?.continuousCheckinTime || ""}
-                                onChange={(e) => attendance && handleAttendanceUpdate(attendance.id, 'continuousCheckinTime', e.target.value)}
-                                className="bg-white/10 border-white/20 text-white"
-                                disabled={!canManageAttendance}
-                              />
-                              <Badge 
-                                variant="outline" 
-                                className={attendance?.continuousCheckinStatus === "في الوقت" 
-                                  ? "border-green-400 text-green-300 bg-green-400/10"
-                                  : "border-red-400 text-red-300 bg-red-400/10"
-                                }
-                              >
-                                {attendance?.continuousCheckinStatus || "غير محدد"}
-                              </Badge>
-                            </div>
+
+                      {/* Calendar View when expanded */}
+                      {isExpanded && (
+                        <div className="mt-6 space-y-4">
+                          {/* Calendar Grid */}
+                          <div className="grid grid-cols-7 gap-1">
+                            {/* Day Headers */}
+                            {['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'].map((day) => (
+                              <div key={day} className="p-2 text-center text-gray-400 text-sm font-medium">
+                                {day}
+                              </div>
+                            ))}
+                            
+                            {/* Calendar Days */}
+                            {monthDays.map((day) => {
+                              const dayStr = format(day, "yyyy-MM-dd");
+                              const dayAttendance = monthAttendance.find(a => a.date === dayStr);
+                              const isToday = isSameDay(day, new Date());
+                              const hasAttendance = !!dayAttendance;
+                              const isHoliday = dayAttendance?.notes === 'إجازة';
+                              
+                              return (
+                                <div
+                                  key={day.toISOString()}
+                                  className={`
+                                    p-2 text-center cursor-pointer rounded-lg transition-all duration-200
+                                    ${isToday ? 'ring-2 ring-blue-400' : ''}
+                                    ${hasAttendance && !isHoliday ? 'bg-green-500/20 text-green-300 hover:bg-green-500/30' : ''}
+                                    ${isHoliday ? 'bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30' : ''}
+                                    ${!hasAttendance && !isHoliday ? 'bg-white/5 text-gray-300 hover:bg-white/10' : ''}
+                                    hover:scale-105
+                                  `}
+                                  onClick={() => handleDayClick(day, schedule)}
+                                >
+                                  <div className="text-sm font-medium">
+                                    {format(day, "d")}
+                                  </div>
+                                  {hasAttendance && (
+                                    <div className="text-xs mt-1">
+                                      {isHoliday ? (
+                                        <Coffee className="w-3 h-3 mx-auto" />
+                                      ) : (
+                                        <CheckCircle className="w-3 h-3 mx-auto" />
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
-                          <div>
-                            <Label className="text-gray-300 text-sm">الانصراف</Label>
-                            <div className="flex gap-2 items-center mt-1">
-                              <Input
-                                type="time"
-                                value={attendance?.continuousCheckoutTime || ""}
-                                onChange={(e) => attendance && handleAttendanceUpdate(attendance.id, 'continuousCheckoutTime', e.target.value)}
-                                className="bg-white/10 border-white/20 text-white"
-                                disabled={!canManageAttendance}
-                              />
-                              <Badge 
-                                variant="outline" 
-                                className={attendance?.continuousCheckoutStatus === "في الوقت" 
-                                  ? "border-green-400 text-green-300 bg-green-400/10"
-                                  : "border-red-400 text-red-300 bg-red-400/10"
-                                }
-                              >
-                                {attendance?.continuousCheckoutStatus || "غير محدد"}
-                              </Badge>
+
+                          {/* Legend */}
+                          <div className="flex gap-4 text-xs">
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 bg-green-500/20 rounded"></div>
+                              <span className="text-gray-300">حضور</span>
                             </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label className="text-gray-300 text-sm">الحضور الصباحي</Label>
-                              <div className="flex gap-2 items-center mt-1">
-                                <Input
-                                  type="time"
-                                  value={attendance?.morningCheckinTime || ""}
-                                  onChange={(e) => attendance && handleAttendanceUpdate(attendance.id, 'morningCheckinTime', e.target.value)}
-                                  className="bg-white/10 border-white/20 text-white"
-                                  disabled={!canManageAttendance}
-                                />
-                                <Badge 
-                                  variant="outline" 
-                                  className={attendance?.morningCheckinStatus === "في الوقت" 
-                                    ? "border-green-400 text-green-300 bg-green-400/10"
-                                    : "border-red-400 text-red-300 bg-red-400/10"
-                                  }
-                                >
-                                  {attendance?.morningCheckinStatus || "غير محدد"}
-                                </Badge>
-                              </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 bg-yellow-500/20 rounded"></div>
+                              <span className="text-gray-300">إجازة</span>
                             </div>
-                            <div>
-                              <Label className="text-gray-300 text-sm">الانصراف الصباحي</Label>
-                              <div className="flex gap-2 items-center mt-1">
-                                <Input
-                                  type="time"
-                                  value={attendance?.morningCheckoutTime || ""}
-                                  onChange={(e) => attendance && handleAttendanceUpdate(attendance.id, 'morningCheckoutTime', e.target.value)}
-                                  className="bg-white/10 border-white/20 text-white"
-                                  disabled={!canManageAttendance}
-                                />
-                                <Badge 
-                                  variant="outline" 
-                                  className={attendance?.morningCheckoutStatus === "في الوقت" 
-                                    ? "border-green-400 text-green-300 bg-green-400/10"
-                                    : "border-red-400 text-red-300 bg-red-400/10"
-                                  }
-                                >
-                                  {attendance?.morningCheckoutStatus || "غير محدد"}
-                                </Badge>
-                              </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 bg-white/5 rounded"></div>
+                              <span className="text-gray-300">لا يوجد سجل</span>
                             </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label className="text-gray-300 text-sm">الحضور المسائي</Label>
-                              <div className="flex gap-2 items-center mt-1">
-                                <Input
-                                  type="time"
-                                  value={attendance?.eveningCheckinTime || ""}
-                                  onChange={(e) => attendance && handleAttendanceUpdate(attendance.id, 'eveningCheckinTime', e.target.value)}
-                                  className="bg-white/10 border-white/20 text-white"
-                                  disabled={!canManageAttendance}
-                                />
-                                <Badge 
-                                  variant="outline" 
-                                  className={attendance?.eveningCheckinStatus === "في الوقت" 
-                                    ? "border-green-400 text-green-300 bg-green-400/10"
-                                    : "border-red-400 text-red-300 bg-red-400/10"
-                                  }
-                                >
-                                  {attendance?.eveningCheckinStatus || "غير محدد"}
-                                </Badge>
-                              </div>
-                            </div>
-                            <div>
-                              <Label className="text-gray-300 text-sm">الانصراف المسائي</Label>
-                              <div className="flex gap-2 items-center mt-1">
-                                <Input
-                                  type="time"
-                                  value={attendance?.eveningCheckoutTime || ""}
-                                  onChange={(e) => attendance && handleAttendanceUpdate(attendance.id, 'eveningCheckoutTime', e.target.value)}
-                                  className="bg-white/10 border-white/20 text-white"
-                                  disabled={!canManageAttendance}
-                                />
-                                <Badge 
-                                  variant="outline" 
-                                  className={attendance?.eveningCheckoutStatus === "في الوقت" 
-                                    ? "border-green-400 text-green-300 bg-green-400/10"
-                                    : "border-red-400 text-red-300 bg-red-400/10"
-                                  }
-                                >
-                                  {attendance?.eveningCheckoutStatus || "غير محدد"}
-                                </Badge>
-                              </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 border border-blue-400 rounded"></div>
+                              <span className="text-gray-300">اليوم</span>
                             </div>
                           </div>
                         </div>
@@ -923,6 +1005,61 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   <p className="text-gray-400">يجب إنشاء جداول عمل للموظفين أولاً لتتمكن من إدارة الحضور</p>
                 </div>
               )}
+
+              {/* Attendance Dialog */}
+              <Dialog open={isAttendanceDialogOpen} onOpenChange={setIsAttendanceDialogOpen}>
+                <DialogContent className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>
+                      إدارة الحضور - {selectedEmployeeForDialog?.employeeName}
+                    </DialogTitle>
+                    <p className="text-gray-300">
+                      {selectedDayForAttendance && format(selectedDayForAttendance, "EEEE، dd MMMM yyyy", { locale: ar })}
+                    </p>
+                  </DialogHeader>
+                  
+                  {selectedEmployeeForDialog && selectedDayForAttendance && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <Button
+                          onClick={() => handleConfirmAttendance('checkin', format(new Date(), "HH:mm"))}
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
+                        >
+                          <Check className="w-4 h-4 mr-2" />
+                          تأكيد الحضور
+                        </Button>
+                        <Button
+                          onClick={() => handleConfirmAttendance('checkout', format(new Date(), "HH:mm"))}
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                          disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
+                        >
+                          <Clock className="w-4 h-4 mr-2" />
+                          تأكيد الانصراف
+                        </Button>
+                      </div>
+                      
+                      <Button
+                        onClick={handleMarkHoliday}
+                        variant="outline"
+                        className="w-full border-yellow-400 text-yellow-300 hover:bg-yellow-400/10"
+                        disabled={markHolidayMutation.isPending}
+                      >
+                        <Coffee className="w-4 h-4 mr-2" />
+                        تحديد كإجازة
+                      </Button>
+                      
+                      <Button
+                        onClick={() => setIsAttendanceDialogOpen(false)}
+                        variant="outline"
+                        className="w-full border-white/20 text-white hover:bg-white/10"
+                      >
+                        إلغاء
+                      </Button>
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
             </GlassContainer>
           </TabsContent>
         </Tabs>

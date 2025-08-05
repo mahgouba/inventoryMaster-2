@@ -3033,6 +3033,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Mark day as holiday endpoint
+  app.post("/api/daily-attendance/holiday", async (req, res) => {
+    try {
+      const { employeeId, date, isHoliday } = req.body;
+      
+      if (!employeeId || !date) {
+        return res.status(400).json({ message: "Employee ID and date are required" });
+      }
+
+      // Check if attendance record exists for this employee and date
+      let attendance = await getStorage().getDailyAttendanceByEmployeeAndDate(
+        parseInt(employeeId), 
+        new Date(date)
+      );
+
+      if (attendance) {
+        // Update existing record to mark as holiday
+        const updatedAttendance = await getStorage().updateDailyAttendance(attendance.id, {
+          ...attendance,
+          notes: isHoliday ? 'إجازة' : null
+        });
+        res.json(updatedAttendance);
+      } else {
+        // Create new holiday record
+        const newAttendance = await getStorage().createDailyAttendance({
+          employeeId: parseInt(employeeId),
+          date: new Date(date).toISOString().split('T')[0],
+          scheduleType: "متصل", // Default schedule type
+          notes: isHoliday ? 'إجازة' : null
+        });
+        res.status(201).json(newAttendance);
+      }
+    } catch (error) {
+      console.error("Error marking holiday:", error);
+      res.status(500).json({ message: "Failed to mark day as holiday" });
+    }
+  });
+
   // Financing Rates API Routes
   app.get("/api/financing-rates", async (req, res) => {
     try {
