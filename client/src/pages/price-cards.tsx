@@ -34,6 +34,7 @@ interface InventoryItem {
   exteriorColor?: string;
   interiorColor?: string;
   chassisNumber?: string;
+  mileage?: number;
 }
 
 interface PriceCard {
@@ -141,18 +142,21 @@ export default function PriceCardsPage() {
     setExpandedCards(newExpanded);
   };
 
-  // Format price
+  // Format price with English numbers
   const formatPrice = (price: string | number) => {
     const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-    return new Intl.NumberFormat('ar-SA').format(numPrice || 0);
+    return new Intl.NumberFormat('en-US').format(numPrice || 0);
   };
 
   // حساب الأسعار والضرائب حسب نوع الاستيراد
   const calculatePricing = (card: PriceCard) => {
-    const basePrice = typeof card.price === 'string' ? parseFloat(card.price || '0') : (card.price || 0);
-    const isUsed = card.importType === 'مستعمل' || card.importType === 'مستعمل شخصي';
-    const isCompanyImport = card.importType === 'شركة';
-    const isPersonalImport = card.importType === 'شخصي';
+    // البحث عن العنصر المقابل في المخزون للحصول على البيانات الكاملة
+    const inventoryItem = inventoryData.find(item => item.id === card.inventoryItemId);
+    const basePrice = inventoryItem?.price ? (typeof inventoryItem.price === 'string' ? parseFloat(inventoryItem.price) : inventoryItem.price) : 0;
+    const importType = inventoryItem?.importType || card.importType;
+    const isUsed = importType === 'مستعمل' || importType === 'مستعمل شخصي';
+    const isCompanyImport = importType === 'شركة';
+    const isPersonalImport = importType === 'شخصي';
     
     if (isCompanyImport && !isUsed) {
       // استيراد شركة جديد - إظهار تفصيل الضريبة
@@ -1005,8 +1009,11 @@ export default function PriceCardsPage() {
                           {(() => {
                             const pricing = calculatePricing(card);
                             if (pricing.showMileage) {
-                              // الممشي للسيارات المستعملة - قيمة افتراضية أو من البيانات
-                              const mileage = card.mileage ? `${card.mileage.toLocaleString('ar-SA')} كم` : "85,000 كم";
+                              // الحصول على الممشي من بيانات المخزون
+                              const inventoryItem = inventoryData.find(item => item.id === card.inventoryItemId);
+                              const mileage = inventoryItem?.mileage ? 
+                                `${new Intl.NumberFormat('en-US').format(inventoryItem.mileage)} كم` : 
+                                "85,000 كم";
                               return (
                                 <div style={{ textAlign: 'center', marginBottom: '15px' }}>
                                   <div style={{ 
