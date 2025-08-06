@@ -1199,12 +1199,13 @@ export default function PriceCardsPage() {
                             {/* First Row: Category, Trim Level, Engine Capacity */}
                             <div style={{ 
                               display: 'flex', 
-                              justifyContent: 'space-between', 
+                              justifyContent: 'center', 
                               alignItems: 'center',
                               gap: '5px',
                               color: '#CF9B47', 
                               fontSize: '72px', 
-                              fontWeight: 'bold'
+                              fontWeight: 'bold',
+                              flexWrap: 'wrap'
                             }}>
                               {!getFieldVisibility(card.id, 'category') && card.category && (
                                 <span>{card.category}</span>
