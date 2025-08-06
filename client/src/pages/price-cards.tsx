@@ -842,7 +842,7 @@ export default function PriceCardsPage() {
                   </div>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex gap-2 no-print">
                   {/* عناصر التحكم في إخفاء البيانات */}
                   <div className="flex gap-1 ml-4 border-l pl-2">
                     <Button
@@ -1414,42 +1414,77 @@ export default function PriceCardsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Print Styles for Fixed A4 Layout */}
+      {/* Print Styles for A4 Landscape Layout */}
       <style dangerouslySetInnerHTML={{
         __html: `
           @media print {
+            @page {
+              size: A4 landscape;
+              margin: 0;
+            }
+            
+            html, body {
+              width: 297mm;
+              height: 210mm;
+              margin: 0;
+              padding: 0;
+              overflow: hidden;
+            }
+            
             body * {
               visibility: hidden;
             }
+            
             [id^="price-card-"], [id^="price-card-"] * {
               visibility: visible;
             }
+            
             [id^="price-card-"] {
               position: absolute !important;
               left: 0 !important;
               top: 0 !important;
-              transform: scale(1) !important;
-              width: 1123px !important;
-              height: 794px !important;
+              width: 297mm !important;
+              height: 210mm !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              transform: none !important;
               overflow: hidden !important;
+              background-size: cover !important;
+              background-position: center !important;
+              page-break-inside: avoid !important;
             }
+            
             [id^="price-card-"] * {
               position: relative !important;
             }
+            
             [id^="price-card-"] div[style*="position: absolute"] {
               position: absolute !important;
             }
+            
             [id^="price-card-"] div[style*="top: 80px"] {
               position: absolute !important;
               top: 80px !important;
               left: 50% !important;
               transform: translateX(-50%) !important;
             }
+            
             [id^="price-card-"] div[style*="bottom: 100px"] {
               position: absolute !important;
               bottom: 100px !important;
               left: 50% !important;
               transform: translateX(-50%) !important;
+            }
+            
+            /* ضبط حجم العناصر للطباعة */
+            [id^="price-card-"] img {
+              max-width: 100% !important;
+              height: auto !important;
+            }
+            
+            /* إخفاء أزرار التحكم عند الطباعة */
+            .no-print, button {
+              display: none !important;
             }
           }
         `
