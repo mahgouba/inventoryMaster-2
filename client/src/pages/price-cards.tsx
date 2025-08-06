@@ -1079,8 +1079,8 @@ export default function PriceCardsPage() {
                           {(!hiddenFields[card.id]?.trimLevel && card.trimLevel) && (
                             <div style={{ 
                               color: '#CF9B47', 
-                              fontSize: '30px', 
-                              fontWeight: '600', 
+                              fontSize: '48px', 
+                              fontWeight: 'bold', 
                               textAlign: 'center'
                             }}>
                               {[card.trimLevel, card.model].filter(Boolean).join(' - ')}
