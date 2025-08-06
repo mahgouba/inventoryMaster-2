@@ -1354,12 +1354,31 @@ export default function PriceCardsPage() {
               visibility: visible;
             }
             [id^="price-card-"] {
-              position: absolute;
-              left: 0;
-              top: 0;
+              position: absolute !important;
+              left: 0 !important;
+              top: 0 !important;
               transform: scale(1) !important;
               width: 1123px !important;
               height: 794px !important;
+              overflow: hidden !important;
+            }
+            [id^="price-card-"] * {
+              position: relative !important;
+            }
+            [id^="price-card-"] div[style*="position: absolute"] {
+              position: absolute !important;
+            }
+            [id^="price-card-"] div[style*="top: 130px"] {
+              position: absolute !important;
+              top: 130px !important;
+              left: 50% !important;
+              transform: translateX(-50%) !important;
+            }
+            [id^="price-card-"] div[style*="bottom: 40px"] {
+              position: absolute !important;
+              bottom: 40px !important;
+              left: 50% !important;
+              transform: translateX(-50%) !important;
             }
           }
         `
