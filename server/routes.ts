@@ -209,8 +209,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const categoriesWithTrimLevels = [];
         
         for (const vehicleCategory of vehicleCategories) {
-          // Get trim levels for this category
-          const trimLevels = await getStorage().getVehicleTrimLevelsByCategory(vehicleCategory.id);
+          // Get trim levels for this category - check both vehicle trim levels and regular trim levels
+          const vehicleTrimLevels = await getStorage().getVehicleTrimLevelsByCategory(vehicleCategory.id);
+          const allTrimLevels = await getStorage().getAllTrimLevels();
+          const categoryTrimLevels = allTrimLevels.filter(t => t.categoryId === vehicleCategory.id);
           
           // Count vehicles for this category
           const categoryVehicleCount = manufacturerInventory.filter(item => 
@@ -224,9 +226,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               .map(item => item.trimLevel)
           )];
           
-          // Combine database trim levels with inventory trim levels
+          // Combine all trim level sources
           const allTrims = new Set([
-            ...trimLevels.map(t => t.name_ar || t.nameAr),
+            ...vehicleTrimLevels.map(t => t.nameAr),
+            ...categoryTrimLevels.map(t => t.nameAr),
             ...inventoryTrims
           ]);
           
@@ -235,19 +238,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
               id: vehicleCategory.id,
               category: vehicleCategory.nameAr,
               nameAr: vehicleCategory.nameAr,
-              nameEn: vehicleCategory.nameEn 
+              name_ar: vehicleCategory.nameAr,
+              nameEn: vehicleCategory.nameEn,
+              name_en: vehicleCategory.nameEn
             },
             trimLevels: Array.from(allTrims).map(trimLevel => {
               const trimCount = manufacturerInventory.filter(item => 
                 item.category === vehicleCategory.nameAr && item.trimLevel === trimLevel
               ).length;
               
+              // Find trim level from any source
+              const dbTrimLevel = vehicleTrimLevels.find(t => t.nameAr === trimLevel) || 
+                                categoryTrimLevels.find(t => t.nameAr === trimLevel);
+              
               return {
-                id: trimLevels.find(t => (t.name_ar || t.nameAr) === trimLevel)?.id || Math.random(),
+                id: dbTrimLevel?.id || Math.random(),
                 name_ar: trimLevel,
-                name_en: trimLevels.find(t => (t.name_ar || t.nameAr) === trimLevel)?.name_en || trimLevels.find(t => (t.name_ar || t.nameAr) === trimLevel)?.nameEn,
                 nameAr: trimLevel, // Keep for backward compatibility
-                nameEn: trimLevels.find(t => (t.name_ar || t.nameAr) === trimLevel)?.name_en || trimLevels.find(t => (t.name_ar || t.nameAr) === trimLevel)?.nameEn,
+                name_en: dbTrimLevel?.nameEn,
+                nameEn: dbTrimLevel?.nameEn,
                 vehicleCount: trimCount
               };
             }),

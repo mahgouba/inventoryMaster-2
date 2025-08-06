@@ -22,9 +22,12 @@ interface Manufacturer {
 
 interface Category {
   id: number;
-  manufacturer_id: number;
-  name_ar: string;
+  manufacturer_id?: number;
+  name_ar?: string;
+  nameAr?: string;
   name_en?: string;
+  nameEn?: string;
+  category?: string;
 }
 
 interface TrimLevel {
@@ -472,10 +475,10 @@ export default function HierarchicalView() {
                       item.categories?.filter(catData => 
                         catData.category?.id && 
                         catData.category.id.toString().trim() !== '' &&
-                        (catData.category?.name_ar || catData.category?.nameAr || catData.category?.category)
+                        (catData.category?.name_ar || catData.category?.nameAr)
                       ).map(catData => (
                         <SelectItem key={catData.category.id} value={catData.category.id.toString()}>
-                          {item.manufacturer.nameAr} - {catData.category.name_ar || catData.category.nameAr || catData.category.category}
+                          {item.manufacturer.nameAr} - {catData.category.name_ar || catData.category.nameAr}
                         </SelectItem>
                       )) || []
                     )}
@@ -785,7 +788,7 @@ export default function HierarchicalView() {
                             </Button>
                             <Car className="h-4 w-4 text-green-400" />
                             <div className="text-right">
-                              <h4 className="font-medium text-white">{catData.category.name_ar || catData.category.nameAr || catData.category.category}</h4>
+                              <h4 className="font-medium text-white">{catData.category.name_ar || catData.category.nameAr}</h4>
                               {(catData.category.name_en || catData.category.nameEn) && (
                                 <p className="text-xs text-gray-400">{catData.category.name_en || catData.category.nameEn}</p>
                               )}
