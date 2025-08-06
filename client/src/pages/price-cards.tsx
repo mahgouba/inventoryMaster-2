@@ -494,68 +494,90 @@ export default function PriceCardsPage() {
       return;
     }
 
-    // Store original styles
-    const originalStyles = document.body.style.cssText;
-    const originalOverflow = document.documentElement.style.overflow;
+    // إنشاء نافذة جديدة للطباعة
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast({
+        title: "خطأ",
+        description: "لا يمكن فتح نافذة الطباعة",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    // Create print styles
-    const printStyles = `
-      <style id="print-styles">
-        @media print {
-          * {
-            visibility: hidden;
-          }
-          
-          #${cardId}, #${cardId} * {
-            visibility: visible;
-          }
-          
-          #${cardId} {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            transform: none !important;
-            width: 297mm !important;
-            height: 210mm !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            page-break-inside: avoid !important;
-          }
-          
-          @page {
-            size: A4 landscape;
-            margin: 0;
-          }
-          
-          body {
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-        }
-      </style>
+    // استنساخ محتوى البطاقة
+    const cardClone = element.cloneNode(true) as HTMLElement;
+    
+    // إنشاء HTML للطباعة
+    const printHTML = `
+      <!DOCTYPE html>
+      <html lang="ar" dir="rtl">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>طباعة بطاقة السعر</title>
+          <style>
+            @page {
+              size: A4 landscape;
+              margin: 0;
+            }
+            
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            
+            html, body {
+              width: 297mm;
+              height: 210mm;
+              margin: 0;
+              padding: 0;
+              overflow: hidden;
+              font-family: 'Noto Sans Arabic', Arial, sans-serif;
+            }
+            
+            .print-container {
+              width: 297mm;
+              height: 210mm;
+              position: relative;
+              background-size: cover;
+              background-position: center;
+              overflow: hidden;
+            }
+            
+            /* إخفاء الأزرار */
+            .no-print, button, .flex.gap-2 {
+              display: none !important;
+            }
+            
+            /* ضبط الخطوط */
+            * {
+              -webkit-print-color-adjust: exact !important;
+              color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="print-container">
+            ${cardClone.outerHTML}
+          </div>
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+                window.close();
+              }, 500);
+            };
+          </script>
+        </body>
+      </html>
     `;
 
-    // Add print styles to head
-    document.head.insertAdjacentHTML('beforeend', printStyles);
-
-    // Trigger print
-    window.print();
-
-    // Clean up after printing
-    window.addEventListener('afterprint', function cleanup() {
-      // Remove print styles
-      const printStylesElement = document.getElementById('print-styles');
-      if (printStylesElement) {
-        printStylesElement.remove();
-      }
-      
-      // Restore original styles
-      document.body.style.cssText = originalStyles;
-      document.documentElement.style.overflow = originalOverflow;
-      
-      // Remove event listener
-      window.removeEventListener('afterprint', cleanup);
-    });
+    // كتابة HTML في النافذة الجديدة
+    printWindow.document.write(printHTML);
+    printWindow.document.close();
 
     toast({
       title: "تم بنجاح",
