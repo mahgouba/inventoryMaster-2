@@ -10,6 +10,7 @@ Header navigation: Added "طلب إجازة وإستئذان" (Leave Request and
 User Experience: Disabled text selection on long press to prevent unwanted text highlighting when interacting with UI elements, while maintaining text selection for input fields and text areas.
 Project Organization: Clean and organized codebase with no duplicate or backup files - removed all .backup, .bak files and consolidated similar pages. Removed duplicate price card component (/components/price-card.tsx) to eliminate confusion and maintain clean architecture with single unified price card solution in /pages/price-cards.tsx.
 Navigation: Single horizontal navigation system at the top - removed duplicate sidebar navigation component to eliminate confusion and maintain clean architecture.
+Print Requirements: Price card printing should be clean without shadows, borders, or extra white space at the bottom. All visual elements must be properly positioned for A4 landscape printing.
 
 ## System Architecture
 

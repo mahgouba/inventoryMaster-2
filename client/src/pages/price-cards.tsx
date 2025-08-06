@@ -557,6 +557,10 @@ export default function PriceCardsPage() {
               background-repeat: no-repeat !important;
               overflow: hidden;
               transform: none !important;
+              box-shadow: none !important;
+              border: none !important;
+              margin: 0 !important;
+              padding: 0 !important;
             }
             
             /* إخفاء الأزرار */
@@ -570,6 +574,10 @@ export default function PriceCardsPage() {
               height: 100% !important;
               transform: none !important;
               position: relative !important;
+              box-shadow: none !important;
+              border: none !important;
+              margin: 0 !important;
+              padding: 0 !important;
             }
             
             /* ضبط النصوص والعناصر */
@@ -1521,6 +1529,8 @@ export default function PriceCardsPage() {
               background-position: center !important;
               background-repeat: no-repeat !important;
               page-break-inside: avoid !important;
+              box-shadow: none !important;
+              border: none !important;
             }
             
             [id^="price-card-"] * {
@@ -1551,6 +1561,13 @@ export default function PriceCardsPage() {
             [id^="price-card-"] svg {
               width: 100% !important;
               height: 100% !important;
+            }
+            
+            /* إزالة الظلال والحدود والهوامش في الطباعة */
+            *, *::before, *::after {
+              box-shadow: none !important;
+              border: none !important;
+              margin: 0 !important;
             }
             
             /* إخفاء أزرار التحكم عند الطباعة */
