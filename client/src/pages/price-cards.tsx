@@ -977,7 +977,7 @@ export default function PriceCardsPage() {
                         {/* Right Section - Vehicle Details Box */}
                         <div style={{ 
                           flex: 1, 
-                          padding: '25px',
+                          padding: '10px 25px',
                           position: 'relative',
                           minHeight: '240px'
                         }}>
@@ -989,7 +989,7 @@ export default function PriceCardsPage() {
                               display: 'flex', 
                               alignItems: 'center', 
                               justifyContent: 'center',
-                              margin: '0 auto 20px auto'
+                              margin: '0 auto 10px auto'
                             }}>
                               <div style={{ filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(1.2)' }}>
                                 <ManufacturerLogo 
