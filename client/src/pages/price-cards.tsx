@@ -1196,7 +1196,29 @@ export default function PriceCardsPage() {
                             textAlign: 'center',
                             marginBottom: '15px'
                           }}>
-
+                            {/* First Row: Category, Trim Level, Engine Capacity */}
+                            <div style={{ 
+                              display: 'flex', 
+                              justifyContent: 'space-between', 
+                              alignItems: 'center',
+                              gap: '15px',
+                              color: '#CF9B47', 
+                              fontSize: '24px', 
+                              fontWeight: 'bold'
+                            }}>
+                              {!getFieldVisibility(card.id, 'category') && card.category && (
+                                <span>{card.category}</span>
+                              )}
+                              {!getFieldVisibility(card.id, 'trimLevel') && card.trimLevel && (
+                                <span>{card.trimLevel}</span>
+                              )}
+                              {!getFieldVisibility(card.id, 'engineCapacity') && (() => {
+                                const inventoryItem = inventoryData.find(item => item.id === card.inventoryItemId);
+                                return inventoryItem?.engineCapacity && (
+                                  <span>{inventoryItem.engineCapacity}</span>
+                                );
+                              })()}
+                            </div>
                             
                             {/* Model (separate line) */}
                             {(!getFieldVisibility(card.id, 'model') && card.model) && (
