@@ -1034,14 +1034,6 @@ export default function PriceCardsPage() {
                         }}>
                           {/* Price */}
                           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                            <div style={{ 
-                              color: 'white', 
-                              fontSize: '16px', 
-                              fontWeight: '600', 
-                              marginBottom: '10px' 
-                            }}>
-                              السعر
-                            </div>
                             
                             {(() => {
                               const pricing = calculatePricing(card);
