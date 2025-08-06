@@ -3679,6 +3679,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Fresh database import route
+  app.post("/api/admin/fresh-import", async (req, res) => {
+    try {
+      console.log('🚀 بدء عملية إعادة تهيئة قاعدة البيانات...');
+      const { recreateDatabase } = await import('./fresh-import');
+      const stats = await recreateDatabase();
+      res.json({
+        success: true,
+        message: 'تم تحديث قاعدة البيانات بنجاح',
+        stats
+      });
+    } catch (error: any) {
+      console.error('Fresh import error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'فشل في تحديث قاعدة البيانات',
+        error: error.message
+      });
+    }
+  });
+
   app.delete("/api/hierarchical/locations/:id", async (req, res) => {
     try {
       const result = await getStorage().deleteLocation(parseInt(req.params.id));

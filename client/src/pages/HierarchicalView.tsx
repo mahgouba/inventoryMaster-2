@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Trash2, Save, X } from "lucide-react";
 import * as Collapsible from "@radix-ui/react-collapsible";
+import { FreshImportButton } from "@/components/FreshImportButton";
 
 interface Manufacturer {
   id: number;
@@ -266,8 +267,12 @@ export default function HierarchicalView() {
             التسلسل الهرمي للمركبات
           </h1>
           
-          {/* Add Manufacturer Button */}
-          <Dialog open={isAddManufacturerOpen} onOpenChange={setIsAddManufacturerOpen}>
+          <div className="flex gap-2">
+            {/* Fresh Import Button */}
+            <FreshImportButton />
+            
+            {/* Add Manufacturer Button */}
+            <Dialog open={isAddManufacturerOpen} onOpenChange={setIsAddManufacturerOpen}>
             <DialogTrigger asChild>
               <Button className="glass-button flex items-center gap-2">
                 <Plus className="h-4 w-4" />
@@ -329,6 +334,7 @@ export default function HierarchicalView() {
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
         <p className="text-gray-300 text-right mt-2">
           عرض العلاقة الهرمية بين الصانعين والفئات ودرجات التجهيز مع إمكانيات الإضافة والتعديل والحذف
@@ -364,7 +370,7 @@ export default function HierarchicalView() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">جميع الصانعين</SelectItem>
-                {(manufacturers as Manufacturer[]).map((manufacturer: Manufacturer) => (
+                {Array.isArray(manufacturers) && manufacturers.map((manufacturer: Manufacturer) => (
                   <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
                     {manufacturer.nameAr}
                   </SelectItem>
@@ -392,12 +398,12 @@ export default function HierarchicalView() {
             <div className="space-y-4">
               <div>
                 <Label className="text-right block mb-2">الصانع *</Label>
-                <Select value={selectedManufacturerForCategory?.toString()} onValueChange={(value) => setSelectedManufacturerForCategory(Number(value))}>
+                <Select value={selectedManufacturerForCategory?.toString() || ""} onValueChange={(value) => setSelectedManufacturerForCategory(Number(value))}>
                   <SelectTrigger dir="rtl">
                     <SelectValue placeholder="اختر الصانع" />
                   </SelectTrigger>
                   <SelectContent>
-                    {(manufacturers as Manufacturer[]).map((manufacturer: Manufacturer) => (
+                    {Array.isArray(manufacturers) && manufacturers.map((manufacturer: Manufacturer) => (
                       <SelectItem key={manufacturer.id} value={manufacturer.id.toString()}>
                         {manufacturer.nameAr}
                       </SelectItem>
@@ -463,12 +469,12 @@ export default function HierarchicalView() {
             <div className="space-y-4">
               <div>
                 <Label className="text-right block mb-2">الفئة *</Label>
-                <Select value={selectedCategoryForTrimLevel?.toString()} onValueChange={(value) => setSelectedCategoryForTrimLevel(Number(value))}>
+                <Select value={selectedCategoryForTrimLevel?.toString() || ""} onValueChange={(value) => setSelectedCategoryForTrimLevel(Number(value))}>
                   <SelectTrigger dir="rtl">
                     <SelectValue placeholder="اختر الفئة" />
                   </SelectTrigger>
                   <SelectContent>
-                    {hierarchyData.flatMap((item: HierarchyData) => 
+                    {Array.isArray(hierarchyData) && hierarchyData.flatMap((item: HierarchyData) => 
                       item.categories.map(catData => (
                         <SelectItem key={catData.category.id} value={catData.category.id.toString()}>
                           {item.manufacturer.nameAr} - {catData.category.name_ar}
