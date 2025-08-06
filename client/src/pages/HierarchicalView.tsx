@@ -593,7 +593,7 @@ export default function HierarchicalView() {
                       <SelectValue placeholder="اختر الصانع (اختياري)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">بدون تحديد صانع</SelectItem>
+                      <SelectItem value="none">بدون تحديد صانع</SelectItem>
                       {Array.isArray(manufacturers) && manufacturers.filter(m => m.id && m.nameAr).map((manufacturer: Manufacturer) => (
                         <SelectItem key={`color-mfg-${manufacturer.id}`} value={manufacturer.id.toString()}>
                           {manufacturer.nameAr}
@@ -610,7 +610,7 @@ export default function HierarchicalView() {
                       <SelectValue placeholder="اختر الفئة (اختياري)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">بدون تحديد فئة</SelectItem>
+                      <SelectItem value="none">بدون تحديد فئة</SelectItem>
                       {Array.isArray(hierarchyData) && hierarchyData.flatMap((item: HierarchyData) => 
                         item.categories?.filter(catData => catData.category?.id && catData.category?.name_ar).map(catData => (
                           <SelectItem key={`color-cat-${catData.category.id}`} value={catData.category.id.toString()}>
@@ -629,7 +629,7 @@ export default function HierarchicalView() {
                       <SelectValue placeholder="اختر درجة التجهيز (اختياري)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">بدون تحديد درجة تجهيز</SelectItem>
+                      <SelectItem value="none">بدون تحديد درجة تجهيز</SelectItem>
                       {Array.isArray(hierarchyData) && hierarchyData.flatMap((item: HierarchyData) => 
                         item.categories?.flatMap(catData => 
                           catData.trimLevels?.filter(trim => trim.id && trim.name_ar).map(trim => (

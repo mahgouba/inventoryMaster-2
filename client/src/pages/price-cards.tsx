@@ -831,8 +831,8 @@ export default function PriceCardsPage() {
               <SelectContent>
                 <SelectItem value="all">جميع الصناع</SelectItem>
                 {manufacturers.slice(1).map((manufacturer) => (
-                  <SelectItem key={manufacturer} value={manufacturer || ""}>
-                    {manufacturer}
+                  <SelectItem key={manufacturer} value={manufacturer || "empty"}>
+                    {manufacturer || "غير محدد"}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -846,8 +846,8 @@ export default function PriceCardsPage() {
               <SelectContent>
                 <SelectItem value="all">جميع الفئات</SelectItem>
                 {categories.slice(1).map((category) => (
-                  <SelectItem key={category} value={category || ""}>
-                    {category}
+                  <SelectItem key={category} value={category || "empty"}>
+                    {category || "غير محدد"}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -861,8 +861,8 @@ export default function PriceCardsPage() {
               <SelectContent>
                 <SelectItem value="all">جميع درجات التجهيز</SelectItem>
                 {trimLevels.slice(1).map((trimLevel) => (
-                  <SelectItem key={trimLevel} value={trimLevel || ""}>
-                    {trimLevel}
+                  <SelectItem key={trimLevel} value={trimLevel || "empty"}>
+                    {trimLevel || "غير محدد"}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -876,8 +876,8 @@ export default function PriceCardsPage() {
               <SelectContent>
                 <SelectItem value="all">جميع الموديلات</SelectItem>
                 {models.slice(1).map((model) => (
-                  <SelectItem key={model} value={model || ""}>
-                    {model}
+                  <SelectItem key={model} value={model || "empty"}>
+                    {model || "غير محدد"}
                   </SelectItem>
                 ))}
               </SelectContent>
