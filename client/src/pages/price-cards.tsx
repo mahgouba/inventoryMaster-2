@@ -1126,7 +1126,7 @@ export default function PriceCardsPage() {
                             {(() => {
                               const pricing = calculatePricing(card);
                               return (
-                                <div style={{ 
+                                <div className="bg-[#cf9b46] p-3 rounded-lg" style={{ 
                                   display: 'flex', 
                                   justifyContent: 'space-between', 
                                   alignItems: 'center'
@@ -1141,7 +1141,7 @@ export default function PriceCardsPage() {
                                   <span style={{ 
                                     fontSize: '24px', 
                                     fontWeight: 'bold',
-                                    color: pricing.statusColor
+                                    color: 'white'
                                   }}>
                                     {pricing.statusText}
                                   </span>
