@@ -76,23 +76,44 @@ export default function PriceCardsPage() {
   const [editingCard, setEditingCard] = useState<PriceCard | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
-  // حالات إخفاء البيانات
+  // حالات إخفاء البيانات - الوضع التلقائي: الفئة وسعة المحرك مخفية
   const [hiddenFields, setHiddenFields] = useState<{[cardId: number]: {
     category?: boolean;
     trimLevel?: boolean;
     model?: boolean;
     manufacturer?: boolean;
+    engineCapacity?: boolean;
   }}>({});
+
+  // وظيفة للحصول على حالة الإخفاء مع القيم التلقائية
+  const getFieldVisibility = (cardId: number, field: string) => {
+    if (field === 'category' || field === 'engineCapacity') {
+      return hiddenFields[cardId]?.[field] !== false; // مخفي بشكل تلقائي
+    }
+    return hiddenFields[cardId]?.[field] || false; // ظاهر بشكل تلقائي
+  };
   
   // وظيفة تبديل إخفاء الحقول
-  const toggleFieldVisibility = (cardId: number, field: 'category' | 'trimLevel' | 'model' | 'manufacturer') => {
-    setHiddenFields(prev => ({
-      ...prev,
-      [cardId]: {
-        ...prev[cardId],
-        [field]: !prev[cardId]?.[field]
-      }
-    }));
+  const toggleFieldVisibility = (cardId: number, field: 'category' | 'trimLevel' | 'model' | 'manufacturer' | 'engineCapacity') => {
+    if (field === 'category' || field === 'engineCapacity') {
+      // للحقول المخفية بشكل تلقائي
+      setHiddenFields(prev => ({
+        ...prev,
+        [cardId]: {
+          ...prev[cardId],
+          [field]: prev[cardId]?.[field] === false ? true : false
+        }
+      }));
+    } else {
+      // للحقول الظاهرة بشكل تلقائي
+      setHiddenFields(prev => ({
+        ...prev,
+        [cardId]: {
+          ...prev[cardId],
+          [field]: !prev[cardId]?.[field]
+        }
+      }));
+    }
   };
   
   // Enhanced filter states
@@ -202,13 +223,21 @@ export default function PriceCardsPage() {
         statusColor: '#16a34a' // أخضر
       };
     } else if (isPersonalImport && !isUsed) {
-      // استيراد شخصي جديد - سعر بسيط بدون تفصيل
+      // استيراد شخصي جديد - عرض تفصيل باللون الأخضر
+      const vatRate = 0.15; // 15% ضريبة القيمة المضافة
+      const totalPriceWithVat = basePrice; // السعر الأصلي من المخزون (شامل الضريبة)
+      const priceExcludingVat = totalPriceWithVat / (1 + vatRate); // السعر بعد استبعاد الضريبة
+      const vatAmount = totalPriceWithVat - priceExcludingVat; // قيمة الضريبة المستبعدة
+      
       return {
         type: 'personal_new',
-        totalPrice: basePrice,
-        showBreakdown: false,
+        basePrice: priceExcludingVat, // السعر الأساسي (بعد استبعاد الضريبة)
+        vatAmount: vatAmount, // قيمة الضريبة (15%)
+        totalPrice: totalPriceWithVat, // السعر الشامل (من المخزون)
+        showBreakdown: true,
         statusText: 'جديد',
-        statusColor: '#16a34a' // أخضر
+        statusColor: '#16a34a', // أخضر
+        priceColor: '#22c55e' // أخضر للأسعار
       };
     } else {
       // مستعمل أو مستعمل شخصي - سعر بسيط مع إظهار الممشي
@@ -943,29 +972,42 @@ export default function PriceCardsPage() {
                     </Button>
                     <Button
                       size="sm"
-                      variant={hiddenFields[card.id]?.category ? "default" : "outline"}
+                      variant={getFieldVisibility(card.id, 'category') ? "default" : "outline"}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleFieldVisibility(card.id, 'category');
                       }}
-                      title={hiddenFields[card.id]?.category ? "إظهار الفئة" : "إخفاء الفئة"}
+                      title={getFieldVisibility(card.id, 'category') ? "إظهار الفئة" : "إخفاء الفئة"}
                       className="px-2 text-xs"
                     >
-                      {hiddenFields[card.id]?.category ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                      {getFieldVisibility(card.id, 'category') ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                       فئة
                     </Button>
                     <Button
                       size="sm"
-                      variant={hiddenFields[card.id]?.trimLevel ? "default" : "outline"}
+                      variant={getFieldVisibility(card.id, 'trimLevel') ? "default" : "outline"}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleFieldVisibility(card.id, 'trimLevel');
                       }}
-                      title={hiddenFields[card.id]?.trimLevel ? "إظهار درجة التجهيز" : "إخفاء درجة التجهيز"}
+                      title={getFieldVisibility(card.id, 'trimLevel') ? "إظهار درجة التجهيز" : "إخفاء درجة التجهيز"}
                       className="px-2 text-xs"
                     >
-                      {hiddenFields[card.id]?.trimLevel ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                      {getFieldVisibility(card.id, 'trimLevel') ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                       تجهيز
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={getFieldVisibility(card.id, 'engineCapacity') ? "default" : "outline"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFieldVisibility(card.id, 'engineCapacity');
+                      }}
+                      title={getFieldVisibility(card.id, 'engineCapacity') ? "إظهار سعة المحرك" : "إخفاء سعة المحرك"}
+                      className="px-2 text-xs"
+                    >
+                      {getFieldVisibility(card.id, 'engineCapacity') ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                      محرك
                     </Button>
                   </div>
 
@@ -1146,30 +1188,61 @@ export default function PriceCardsPage() {
                             </div>
                           )}
                           
-                          {/* Category */}
-                          {!hiddenFields[card.id]?.category && (
-                            <div style={{ 
-                              color: '#CF9B47', 
-                              fontSize: '48px', 
-                              fontWeight: 'bold', 
-                              textAlign: 'center',
-                              marginBottom: '15px'
-                            }}>
-                              {card.category}
-                            </div>
-                          )}
-                          
-                          {/* Trim Level & Model */}
-                          {(!hiddenFields[card.id]?.trimLevel && card.trimLevel) && (
-                            <div style={{ 
-                              color: '#CF9B47', 
-                              fontSize: '48px', 
-                              fontWeight: 'bold', 
-                              textAlign: 'center'
-                            }}>
-                              {[card.trimLevel, card.model].filter(Boolean).join(' - ')}
-                            </div>
-                          )}
+                          {/* Vehicle Details Row - Category, Trim Level, Engine Capacity */}
+                          <div style={{ 
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            gap: '10px',
+                            textAlign: 'center',
+                            marginBottom: '15px'
+                          }}>
+                            {/* Category, Trim Level, Engine Capacity in same row */}
+                            {(() => {
+                              const inventoryItem = inventoryData.find(item => item.id === card.inventoryItemId);
+                              const parts = [];
+                              
+                              // Add category if visible
+                              if (!getFieldVisibility(card.id, 'category') && card.category) {
+                                parts.push(card.category);
+                              }
+                              
+                              // Add trim level if visible and available
+                              if (!getFieldVisibility(card.id, 'trimLevel') && card.trimLevel) {
+                                parts.push(card.trimLevel);
+                              }
+                              
+                              // Add engine capacity if visible and available
+                              if (!getFieldVisibility(card.id, 'engineCapacity') && inventoryItem?.engineCapacity) {
+                                parts.push(inventoryItem.engineCapacity);
+                              }
+                              
+                              if (parts.length > 0) {
+                                return (
+                                  <div style={{ 
+                                    color: '#CF9B47', 
+                                    fontSize: '42px', 
+                                    fontWeight: 'bold', 
+                                    textAlign: 'center'
+                                  }}>
+                                    {parts.join(' - ')}
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })()}
+                            
+                            {/* Model (separate line) */}
+                            {(!getFieldVisibility(card.id, 'model') && card.model) && (
+                              <div style={{ 
+                                color: '#CF9B47', 
+                                fontSize: '38px', 
+                                fontWeight: 'bold', 
+                                textAlign: 'center'
+                              }}>
+                                {card.model}
+                              </div>
+                            )}
+                          </div>
                         </div>
 
                         {/* Divider */}
@@ -1189,9 +1262,10 @@ export default function PriceCardsPage() {
                               const pricing = calculatePricing(card);
                               
                               if (pricing.showBreakdown) {
-                                // عرض تفصيل الضريبة للاستيراد شركة
+                                // عرض تفصيل الضريبة للاستيراد شركة والشخصي
+                                const textColor = pricing.priceColor || 'white';
                                 return (
-                                  <div style={{ color: 'white' }}>
+                                  <div style={{ color: textColor }}>
                                     {/* السعر الأساسي */}
                                     <div style={{ 
                                       display: 'flex', 
@@ -1199,8 +1273,8 @@ export default function PriceCardsPage() {
                                       alignItems: 'center',
                                       marginBottom: '10px'
                                     }}>
-                                      <span style={{ fontSize: '16px', color: 'white' }}>السعر الأساسي:</span>
-                                      <span style={{ fontSize: '22px', fontWeight: 'bold', color: 'white' }}>
+                                      <span style={{ fontSize: '16px', color: textColor }}>السعر الأساسي:</span>
+                                      <span style={{ fontSize: '22px', fontWeight: 'bold', color: textColor }}>
                                         {formatPrice(pricing.basePrice || 0)}
                                       </span>
                                     </div>
@@ -1212,15 +1286,15 @@ export default function PriceCardsPage() {
                                       alignItems: 'center',
                                       marginBottom: '10px'
                                     }}>
-                                      <span style={{ fontSize: '16px', color: 'white' }}>الضريبة (15%):</span>
-                                      <span style={{ fontSize: '22px', fontWeight: 'bold', color: 'white' }}>
+                                      <span style={{ fontSize: '16px', color: textColor }}>الضريبة (15%):</span>
+                                      <span style={{ fontSize: '22px', fontWeight: 'bold', color: textColor }}>
                                         {formatPrice(pricing.vatAmount || 0)}
                                       </span>
                                     </div>
                                     
                                     {/* خط فاصل */}
                                     <div style={{ 
-                                      borderTop: '1px solid rgba(255,255,255,0.3)', 
+                                      borderTop: `1px solid ${pricing.priceColor ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.3)'}`, 
                                       margin: '10px 0'
                                     }}></div>
                                     
@@ -1230,8 +1304,8 @@ export default function PriceCardsPage() {
                                       justifyContent: 'space-between', 
                                       alignItems: 'center'
                                     }}>
-                                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'white' }}>السعر الشامل:</span>
-                                      <span style={{ fontSize: '26px', fontWeight: 'bold', color: 'white' }}>
+                                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: textColor }}>السعر الشامل:</span>
+                                      <span style={{ fontSize: '26px', fontWeight: 'bold', color: textColor }}>
                                         {formatPrice(pricing.totalPrice || 0)}
                                       </span>
                                     </div>
