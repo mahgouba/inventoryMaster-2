@@ -403,6 +403,19 @@ export default function PriceCardsPage() {
       printElement.style.top = '-9999px';
       printElement.style.left = '-9999px';
       printElement.style.backgroundColor = '#ffffff';
+      
+      // تثبيت تموضع السنة في PDF
+      const yearElements = printElement.querySelectorAll('[style*="fontSize: 250px"]');
+      yearElements.forEach((elem: any) => {
+        if (elem.style) {
+          elem.style.position = 'absolute';
+          elem.style.top = '130px';
+          elem.style.left = '50%';
+          elem.style.transform = 'translateX(-50%)';
+          elem.style.textAlign = 'center';
+        }
+      });
+      
       document.body.appendChild(printElement);
 
       // High-quality canvas generation
@@ -554,6 +567,19 @@ export default function PriceCardsPage() {
       printElement.style.top = '-9999px';
       printElement.style.left = '-9999px';
       printElement.style.backgroundColor = '#ffffff';
+      
+      // تثبيت تموضع السنة في JPG
+      const yearElements = printElement.querySelectorAll('[style*="fontSize: 250px"]');
+      yearElements.forEach((elem: any) => {
+        if (elem.style) {
+          elem.style.position = 'absolute';
+          elem.style.top = '130px';
+          elem.style.left = '50%';
+          elem.style.transform = 'translateX(-50%)';
+          elem.style.textAlign = 'center';
+        }
+      });
+      
       document.body.appendChild(printElement);
 
       // High-quality canvas generation for JPG
@@ -919,13 +945,16 @@ export default function PriceCardsPage() {
                     {/* Year - Large Center */}
                     <div style={{ 
                       position: 'absolute',
-                      top: '35mm',
+                      top: '130px',
                       left: '50%',
-                      transform: 'translate(-50%, 0)',
+                      transform: 'translateX(-50%)',
                       color: '#CF9B47', 
                       fontSize: '250px', 
                       fontWeight: '900', 
-                      letterSpacing: '10px'
+                      letterSpacing: '10px',
+                      textAlign: 'center',
+                      width: 'auto',
+                      height: 'auto'
                     }}>
                       {card.year}
                     </div>
