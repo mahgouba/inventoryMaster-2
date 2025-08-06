@@ -1129,7 +1129,7 @@ export default function PriceCardsPage() {
                                       marginBottom: '10px'
                                     }}>
                                       <span style={{ fontSize: '16px', color: 'white' }}>الضريبة (15%):</span>
-                                      <span style={{ fontSize: '22px', fontWeight: 'bold', color: '#FFD700' }}>
+                                      <span style={{ fontSize: '22px', fontWeight: 'bold', color: 'white' }}>
                                         {formatPrice(pricing.vatAmount || 0)}
                                       </span>
                                     </div>
@@ -1147,7 +1147,7 @@ export default function PriceCardsPage() {
                                       alignItems: 'center'
                                     }}>
                                       <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'white' }}>السعر الشامل:</span>
-                                      <span style={{ fontSize: '26px', fontWeight: 'bold', color: '#00FF00' }}>
+                                      <span style={{ fontSize: '26px', fontWeight: 'bold', color: 'white' }}>
                                         {formatPrice(pricing.totalPrice || 0)}
                                       </span>
                                     </div>
