@@ -472,10 +472,10 @@ export default function HierarchicalView() {
                       item.categories?.filter(catData => 
                         catData.category?.id && 
                         catData.category.id.toString().trim() !== '' &&
-                        (catData.category?.nameAr || catData.category?.category)
+                        (catData.category?.name_ar || catData.category?.nameAr || catData.category?.category)
                       ).map(catData => (
                         <SelectItem key={catData.category.id} value={catData.category.id.toString()}>
-                          {item.manufacturer.nameAr} - {catData.category.nameAr || catData.category.category}
+                          {item.manufacturer.nameAr} - {catData.category.name_ar || catData.category.nameAr || catData.category.category}
                         </SelectItem>
                       )) || []
                     )}
@@ -502,9 +502,9 @@ export default function HierarchicalView() {
               <div className="flex gap-2 pt-4">
                 <Button
                   onClick={() => addTrimLevelMutation.mutate({
-                    nameAr: newTrimLevelNameAr,
-                    nameEn: newTrimLevelNameEn || undefined,
-                    categoryId: selectedCategoryForTrimLevel!
+                    name_ar: newTrimLevelNameAr,
+                    name_en: newTrimLevelNameEn || undefined,
+                    category_id: selectedCategoryForTrimLevel!
                   })}
                   disabled={!newTrimLevelNameAr || !selectedCategoryForTrimLevel || addTrimLevelMutation.isPending}
                   className="glass-button flex-1"
@@ -785,9 +785,9 @@ export default function HierarchicalView() {
                             </Button>
                             <Car className="h-4 w-4 text-green-400" />
                             <div className="text-right">
-                              <h4 className="font-medium text-white">{catData.category.nameAr || catData.category.category}</h4>
-                              {catData.category.nameEn && (
-                                <p className="text-xs text-gray-400">{catData.category.nameEn}</p>
+                              <h4 className="font-medium text-white">{catData.category.name_ar}</h4>
+                              {catData.category.name_en && (
+                                <p className="text-xs text-gray-400">{catData.category.name_en}</p>
                               )}
                             </div>
                           </div>
@@ -831,16 +831,12 @@ export default function HierarchicalView() {
                                   <div className="flex items-center gap-2">
                                     <Settings className="h-3 w-3 text-purple-400" />
                                     <div className="text-right">
-                                      <span className="text-sm text-white">{trimLevel.nameAr || trimLevel.name_ar}</span>
-                                      {(trimLevel.nameEn || trimLevel.name_en) && (
-                                        <span className="text-xs text-gray-400 block">{trimLevel.nameEn || trimLevel.name_en}</span>
+                                      <span className="text-sm text-white">{trimLevel.name_ar}</span>
+                                      {trimLevel.name_en && (
+                                        <span className="text-xs text-gray-400 block">{trimLevel.name_en}</span>
                                       )}
                                     </div>
-                                    {trimLevel.vehicleCount !== undefined && (
-                                      <Badge variant="secondary" className="glass-badge text-xs ml-2">
-                                        {trimLevel.vehicleCount} مركبة
-                                      </Badge>
-                                    )}
+
                                   </div>
                                   
                                   {/* Trim Level Actions */}
