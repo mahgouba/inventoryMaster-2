@@ -962,7 +962,7 @@ export default function PriceCardsPage() {
                     {/* Main Content Card - Bottom Center */}
                     <div style={{
                       position: 'absolute',
-                      bottom: '80px',
+                      bottom: '40px',
                       left: '50%',
                       transform: 'translateX(-50%)',
                       width: '1080px',
