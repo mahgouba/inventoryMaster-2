@@ -788,7 +788,6 @@ export default function PriceCardsPage() {
                     <span>بطاقة سعر {card.manufacturer} {card.category}</span>
                   </div>
                   <div className="flex gap-2">
-                    <Badge variant="outline">{card.year}</Badge>
                     {card.trimLevel && (
                       <Badge variant="secondary">{card.trimLevel}</Badge>
                     )}
