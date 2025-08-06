@@ -1220,17 +1220,7 @@ export default function PriceCardsPage() {
                               })()}
                             </div>
                             
-                            {/* Model (separate line) */}
-                            {(!getFieldVisibility(card.id, 'model') && card.model) && (
-                              <div style={{ 
-                                color: '#CF9B47', 
-                                fontSize: '38px', 
-                                fontWeight: 'bold', 
-                                textAlign: 'center'
-                              }}>
-                                {card.model}
-                              </div>
-                            )}
+                            
                           </div>
                         </div>
 
