@@ -264,10 +264,10 @@ export default function HierarchicalView() {
     const searchLower = searchTerm.toLowerCase();
     const manufacturerMatch = item.manufacturer.nameAr.toLowerCase().includes(searchLower);
     const categoryMatch = item.categories.some(cat => 
-      cat.category.name_ar.toLowerCase().includes(searchLower)
+      cat.category.category.toLowerCase().includes(searchLower)
     );
     const trimMatch = item.categories.some(cat =>
-      cat.trimLevels.some(trim => trim.name_ar.toLowerCase().includes(searchLower))
+      cat.trimLevels.some(trim => trim.trimLevel.toLowerCase().includes(searchLower))
     );
     
     return manufacturerMatch || categoryMatch || trimMatch;
@@ -424,12 +424,12 @@ export default function HierarchicalView() {
                         لون داخلي
                       </Button>
                     </div>
-                    {manufacturerData.categories.map((categoryData) => (
-                      <Card key={categoryData.category.id} className="bg-white/5 border-white/10">
+                    {manufacturerData.categories.map((categoryData, categoryIndex) => (
+                      <Card key={`${manufacturerData.manufacturer.id}-${categoryData.category.category}`} className="bg-white/5 border-white/10">
                         <Collapsible.Root>
                           <Collapsible.Trigger 
                             className="w-full"
-                            onClick={() => toggleExpanded(`category-${categoryData.category.id}`)}
+                            onClick={() => toggleExpanded(`category-${manufacturerData.manufacturer.id}-${categoryData.category.category}`)}
                           >
                             <CardHeader className="py-3 hover:bg-white/5 transition-colors cursor-pointer">
                               <div className="flex items-center justify-between">
@@ -444,9 +444,9 @@ export default function HierarchicalView() {
                                 <div className="flex items-center gap-3">
                                   <span className="text-white font-medium flex items-center gap-2">
                                     <Car className="h-4 w-4 text-green-400" />
-                                    {categoryData.category.name_ar}
+                                    {categoryData.category.category}
                                   </span>
-                                  {expandedItems.has(`category-${categoryData.category.id}`) ? (
+                                  {expandedItems.has(`category-${manufacturerData.manufacturer.id}-${categoryData.category.category}`) ? (
                                     <ChevronDown className="h-4 w-4 text-gray-400" />
                                   ) : (
                                     <ChevronRight className="h-4 w-4 text-gray-400" />
@@ -464,7 +464,7 @@ export default function HierarchicalView() {
                                   size="sm"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    setSelectedCategoryForAction(categoryData.category.id);
+                                    setSelectedCategoryForAction(categoryIndex);
                                     setIsAddTrimLevelOpen(true);
                                   }}
                                   className="bg-orange-600/80 hover:bg-orange-700/90 text-white"
@@ -476,7 +476,7 @@ export default function HierarchicalView() {
                                   size="sm"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    setSelectedCategoryForAction(categoryData.category.id);
+                                    setSelectedCategoryForAction(categoryIndex);
                                     setColorScope('category');
                                     setColorType('exterior');
                                     setIsAddColorOpen(true);
@@ -490,7 +490,7 @@ export default function HierarchicalView() {
                                   size="sm"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    setSelectedCategoryForAction(categoryData.category.id);
+                                    setSelectedCategoryForAction(categoryIndex);
                                     setColorScope('category');
                                     setColorType('interior');
                                     setIsAddColorOpen(true);
@@ -501,9 +501,9 @@ export default function HierarchicalView() {
                                   لون داخلي
                                 </Button>
                               </div>
-                              {categoryData.trimLevels.map((trimLevel) => (
+                              {categoryData.trimLevels.map((trimLevel, trimIndex) => (
                                 <div 
-                                  key={trimLevel.id}
+                                  key={`${manufacturerData.manufacturer.id}-${categoryData.category.category}-${trimLevel.trimLevel}`}
                                   className="p-3 bg-white/5 rounded-lg border border-white/10 space-y-2"
                                 >
                                   <div className="flex items-center justify-between">
@@ -512,7 +512,7 @@ export default function HierarchicalView() {
                                     </Badge>
                                     <span className="text-white font-medium flex items-center gap-2">
                                       <Settings className="h-4 w-4 text-purple-400" />
-                                      {trimLevel.name_ar}
+                                      {trimLevel.trimLevel}
                                     </span>
                                   </div>
                                   
@@ -522,7 +522,7 @@ export default function HierarchicalView() {
                                       size="sm"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        setSelectedTrimLevelForAction(trimLevel.id);
+                                        setSelectedTrimLevelForAction(trimIndex);
                                         setColorScope('trim');
                                         setColorType('exterior');
                                         setIsAddColorOpen(true);
@@ -536,7 +536,7 @@ export default function HierarchicalView() {
                                       size="sm"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        setSelectedTrimLevelForAction(trimLevel.id);
+                                        setSelectedTrimLevelForAction(trimIndex);
                                         setColorScope('trim');
                                         setColorType('interior');
                                         setIsAddColorOpen(true);
