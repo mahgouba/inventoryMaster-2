@@ -658,28 +658,53 @@ export default function HierarchicalView() {
 
               <div className="flex gap-2 pt-4">
                 <Button
-                  onClick={() => {
-                    // إنشاء كائن اللون بناءً على المستوى المحدد
-                    const colorData = {
-                      name: colorName,
-                      type: colorType,
-                      code: colorCode,
-                      manufacturer_id: colorManufacturer ? Number(colorManufacturer) : undefined,
-                      category_id: colorCategory ? Number(colorCategory) : undefined,
-                      trim_level_id: colorTrimLevel ? Number(colorTrimLevel) : undefined
-                    };
-                    
-                    console.log('Color data to save:', colorData);
-                    // هنا سيتم إضافة استدعاء API لحفظ اللون
-                    
-                    // إعادة تعيين النموذج
-                    setColorType("");
-                    setColorName("");
-                    setColorCode("");
-                    setColorManufacturer("");
-                    setColorCategory("");
-                    setColorTrimLevel("");
-                    setIsAddColorOpen(false);
+                  onClick={async () => {
+                    try {
+                      // تحديد البيانات المطلوبة للألوان
+                      const manufacturerData = Array.isArray(manufacturers) ? 
+                        manufacturers.find((m: any) => m.id === Number(colorManufacturer)) : null;
+                      const categoryData = Array.isArray(hierarchyData) ? 
+                        hierarchyData.find((h: any) => h.manufacturer?.id === Number(colorManufacturer))
+                        ?.categories?.find((c: any) => c.category?.id === Number(colorCategory)) : null;
+                      const trimLevelData = categoryData?.trimLevels?.find((t: any) => t.id === Number(colorTrimLevel));
+
+                      const colorData = {
+                        manufacturer: manufacturerData?.nameAr || "",
+                        category: categoryData?.category?.nameAr || categoryData?.category?.name_ar || "",
+                        trimLevel: trimLevelData?.name_ar || "",
+                        colorType: colorType,
+                        colorName: colorName,
+                        colorCode: colorCode || "#FFFFFF"
+                      };
+                      
+                      console.log('Color data to save:', colorData);
+                      
+                      // إرسال البيانات إلى API
+                      await apiRequest('POST', '/api/color-associations', colorData);
+                      
+                      // تحديث البيانات
+                      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+                      
+                      toast({
+                        title: "تمت إضافة اللون",
+                        description: `تم إضافة لون "${colorName}" بنجاح`,
+                      });
+                      
+                      // إعادة تعيين النموذج
+                      setColorType("");
+                      setColorName("");
+                      setColorCode("");
+                      setColorManufacturer("");
+                      setColorCategory("");
+                      setColorTrimLevel("");
+                      setIsAddColorOpen(false);
+                    } catch (error) {
+                      toast({
+                        title: "خطأ",
+                        description: "فشل في إضافة اللون",
+                        variant: "destructive",
+                      });
+                    }
                   }}
                   disabled={!colorName || !colorType}
                   className="glass-button flex-1"
@@ -963,6 +988,83 @@ export default function HierarchicalView() {
             <p className="text-gray-400">لا توجد بيانات هرمية متطابقة مع البحث الحالي</p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Edit Mode Dialog */}
+      {isEditMode && (
+        <Dialog open={true} onOpenChange={() => setIsEditMode(null)}>
+          <DialogContent className="glass-modal" dir="rtl">
+            <DialogHeader>
+              <DialogTitle className="text-right">
+                تعديل {isEditMode.type === 'manufacturer' ? 'الصانع' : 
+                       isEditMode.type === 'category' ? 'الفئة' : 'درجة التجهيز'}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {isEditMode.type === 'manufacturer' && (
+                <>
+                  <div>
+                    <Label className="text-right block mb-2">اسم الصانع بالعربية *</Label>
+                    <Input
+                      value={manufacturerNameAr || isEditMode.data?.nameAr || ''}
+                      onChange={(e) => setManufacturerNameAr(e.target.value)}
+                      placeholder="اسم الصانع"
+                      dir="rtl"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-right block mb-2">اسم الصانع بالإنجليزية</Label>
+                    <Input
+                      value={manufacturerNameEn || isEditMode.data?.nameEn || ''}
+                      onChange={(e) => setManufacturerNameEn(e.target.value)}
+                      placeholder="Manufacturer Name"
+                      dir="ltr"
+                    />
+                  </div>
+                </>
+              )}
+              
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={async () => {
+                    try {
+                      if (isEditMode.type === 'manufacturer') {
+                        await apiRequest('PUT', `/api/hierarchical/manufacturers/${isEditMode.id}`, {
+                          nameAr: manufacturerNameAr,
+                          nameEn: manufacturerNameEn
+                        });
+                      }
+                      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+                      queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
+                      toast({ title: "تم التحديث بنجاح" });
+                      setManufacturerNameAr('');
+                      setManufacturerNameEn('');
+                      setIsEditMode(null);
+                    } catch (error) {
+                      toast({
+                        title: "خطأ",
+                        description: "فشل في التحديث",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  className="glass-button flex-1"
+                >
+                  <Save className="h-4 w-4 ml-2" />
+                  حفظ التغييرات
+                </Button>
+                <Button
+                  onClick={() => setIsEditMode(null)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <X className="h-4 w-4 ml-2" />
+                  إلغاء
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
