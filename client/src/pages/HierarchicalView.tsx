@@ -383,7 +383,7 @@ export default function HierarchicalView() {
             <div className="space-y-4">
               <div>
                 <Label className="text-right block mb-2">الصانع *</Label>
-                <Select value={selectedManufacturerForCategory?.toString() || ""} onValueChange={(value) => setSelectedManufacturerForCategory(Number(value))}>
+                <Select value={selectedManufacturerForCategory ? selectedManufacturerForCategory.toString() : ""} onValueChange={(value) => setSelectedManufacturerForCategory(Number(value))}>
                   <SelectTrigger dir="rtl">
                     <SelectValue placeholder="اختر الصانع" />
                   </SelectTrigger>
@@ -454,7 +454,7 @@ export default function HierarchicalView() {
             <div className="space-y-4">
               <div>
                 <Label className="text-right block mb-2">الفئة *</Label>
-                <Select value={selectedCategoryForTrimLevel?.toString() || ""} onValueChange={(value) => setSelectedCategoryForTrimLevel(Number(value))}>
+                <Select value={selectedCategoryForTrimLevel ? selectedCategoryForTrimLevel.toString() : ""} onValueChange={(value) => setSelectedCategoryForTrimLevel(Number(value))}>
                   <SelectTrigger dir="rtl">
                     <SelectValue placeholder="اختر الفئة" />
                   </SelectTrigger>
