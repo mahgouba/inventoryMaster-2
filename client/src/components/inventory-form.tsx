@@ -275,7 +275,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                       <Select onValueChange={(value) => {
                         handleManufacturerChange(value);
                         field.onChange(value);
-                      }} value={field.value}>
+                      }} value={field.value || ""}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="الصانع" />
                         </SelectTrigger>
@@ -313,7 +313,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                       <Select onValueChange={(value) => {
                         handleCategoryChange(value);
                         field.onChange(value);
-                      }} value={field.value}>
+                      }} value={field.value || ""}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="الفئة" />
                         </SelectTrigger>
@@ -391,12 +391,12 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="سعة المحرك" />
                         </SelectTrigger>
                         <SelectContent>
-                          {editableEngineCapacities.map((capacity) => (
+                          {editableEngineCapacities.filter(capacity => capacity && capacity.trim()).map((capacity) => (
                             <SelectItem key={capacity} value={capacity}>
                               {capacity}
                             </SelectItem>
@@ -442,12 +442,12 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="اللون الخارجي" />
                         </SelectTrigger>
                         <SelectContent>
-                          {editableExteriorColors.map((color) => (
+                          {editableExteriorColors.filter(color => color && color.trim()).map((color) => (
                             <SelectItem key={color} value={color}>
                               {color}
                             </SelectItem>
@@ -467,12 +467,12 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="اللون الداخلي" />
                         </SelectTrigger>
                         <SelectContent>
-                          {editableInteriorColors.map((color) => (
+                          {editableInteriorColors.filter(color => color && color.trim()).map((color) => (
                             <SelectItem key={color} value={color}>
                               {color}
                             </SelectItem>
@@ -492,12 +492,12 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="نوع الاستيراد" />
                         </SelectTrigger>
                         <SelectContent>
-                          {editableImportTypes.map((type) => (
+                          {editableImportTypes.filter(type => type && type.trim()).map((type) => (
                             <SelectItem key={type} value={type}>
                               {type}
                             </SelectItem>
@@ -546,7 +546,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                           <SelectValue placeholder="نوع الملكية" />
                         </SelectTrigger>
                         <SelectContent>
-                          {editableOwnershipTypes.map((type) => (
+                          {editableOwnershipTypes.filter(type => type && type.trim()).map((type) => (
                             <SelectItem key={type} value={type}>
                               {type}
                             </SelectItem>
@@ -566,12 +566,12 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="الموقع" />
                         </SelectTrigger>
                         <SelectContent>
-                          {editableLocations.map((location) => (
+                          {editableLocations.filter(location => location && location.trim()).map((location) => (
                             <SelectItem key={location} value={location}>
                               {location}
                             </SelectItem>
@@ -591,12 +591,12 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="الحالة" />
                         </SelectTrigger>
                         <SelectContent>
-                          {editableStatuses.map((status) => (
+                          {editableStatuses.filter(status => status && status.trim()).map((status) => (
                             <SelectItem key={status} value={status}>
                               {status}
                             </SelectItem>
