@@ -36,6 +36,7 @@ import { join } from "path";
 import multer from "multer";
 import * as XLSX from "xlsx";
 import OpenAI from "openai";
+import { importFromExternalDatabase } from "./import-external-db.js";
 
 // Initialize OpenAI client
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
@@ -5097,6 +5098,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching monthly attendance:", error);
       res.status(500).json({ message: "Failed to fetch monthly attendance" });
+    }
+  });
+
+  // External Database Import API
+  app.post("/api/database/import-external", async (req, res) => {
+    try {
+      const { externalDbUrl } = req.body;
+      
+      if (!externalDbUrl) {
+        return res.status(400).json({ 
+          message: "External database URL is required",
+          messageAr: "مطلوب رابط قاعدة البيانات الخارجية" 
+        });
+      }
+
+      console.log('🚀 Starting external database import...');
+      const result = await importFromExternalDatabase(externalDbUrl);
+
+      if (result.success) {
+        res.json({
+          message: result.message,
+          success: true
+        });
+      } else {
+        res.status(500).json({
+          message: result.message,
+          success: false
+        });
+      }
+    } catch (error) {
+      console.error("Error in external database import:", error);
+      res.status(500).json({ 
+        message: "Failed to import from external database",
+        messageAr: "فشل في استيراد البيانات من قاعدة البيانات الخارجية",
+        error: error.message
+      });
     }
   });
 
