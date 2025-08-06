@@ -1047,10 +1047,10 @@ export default function PriceCardsPage() {
                                       display: 'flex', 
                                       justifyContent: 'space-between', 
                                       alignItems: 'center',
-                                      marginBottom: '8px'
+                                      marginBottom: '10px'
                                     }}>
-                                      <span style={{ fontSize: '14px' }}>السعر الأساسي:</span>
-                                      <span style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                                      <span style={{ fontSize: '16px', color: 'white' }}>السعر الأساسي:</span>
+                                      <span style={{ fontSize: '22px', fontWeight: 'bold', color: 'white' }}>
                                         {formatPrice(pricing.basePrice || 0)}
                                       </span>
                                     </div>
@@ -1060,10 +1060,10 @@ export default function PriceCardsPage() {
                                       display: 'flex', 
                                       justifyContent: 'space-between', 
                                       alignItems: 'center',
-                                      marginBottom: '8px'
+                                      marginBottom: '10px'
                                     }}>
-                                      <span style={{ fontSize: '14px' }}>الضريبة (15%):</span>
-                                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#FFD700' }}>
+                                      <span style={{ fontSize: '16px', color: 'white' }}>الضريبة (15%):</span>
+                                      <span style={{ fontSize: '22px', fontWeight: 'bold', color: '#FFD700' }}>
                                         {formatPrice(pricing.vatAmount || 0)}
                                       </span>
                                     </div>
@@ -1071,7 +1071,7 @@ export default function PriceCardsPage() {
                                     {/* خط فاصل */}
                                     <div style={{ 
                                       borderTop: '1px solid rgba(255,255,255,0.3)', 
-                                      margin: '8px 0'
+                                      margin: '10px 0'
                                     }}></div>
                                     
                                     {/* السعر الشامل */}
@@ -1080,8 +1080,8 @@ export default function PriceCardsPage() {
                                       justifyContent: 'space-between', 
                                       alignItems: 'center'
                                     }}>
-                                      <span style={{ fontSize: '16px', fontWeight: 'bold' }}>السعر الشامل:</span>
-                                      <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#00FF00' }}>
+                                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'white' }}>السعر الشامل:</span>
+                                      <span style={{ fontSize: '26px', fontWeight: 'bold', color: '#00FF00' }}>
                                         {formatPrice(pricing.totalPrice || 0)}
                                       </span>
                                     </div>
@@ -1096,7 +1096,7 @@ export default function PriceCardsPage() {
                                     alignItems: 'center',
                                     color: 'white'
                                   }}>
-                                    <span style={{ fontSize: '18px', fontWeight: '600' }}>السعر:</span>
+                                    <span style={{ fontSize: '20px', fontWeight: '600', color: 'white' }}>السعر:</span>
                                     <div style={{ 
                                       display: 'flex', 
                                       alignItems: 'center', 
@@ -1106,12 +1106,12 @@ export default function PriceCardsPage() {
                                         src="/Saudi_Riyal_Symbol.svg" 
                                         alt="ريال سعودي" 
                                         style={{ 
-                                          width: '20px', 
-                                          height: '20px', 
+                                          width: '24px', 
+                                          height: '24px', 
                                           filter: 'brightness(0) saturate(100%) invert(100%)'
                                         }} 
                                       />
-                                      <span style={{ fontSize: '24px', fontWeight: 'bold' }}>
+                                      <span style={{ fontSize: '28px', fontWeight: 'bold', color: 'white' }}>
                                         {formatPrice(pricing.totalPrice || 0)}
                                       </span>
                                     </div>
@@ -1123,23 +1123,28 @@ export default function PriceCardsPage() {
 
                           {/* Status */}
                           <div style={{ textAlign: 'center', marginBottom: '15px' }}>
-                            <div style={{ 
-                              color: 'white', 
-                              fontSize: '16px', 
-                              fontWeight: '600', 
-                              marginBottom: '5px' 
-                            }}>
-                              الحالة
-                            </div>
                             {(() => {
                               const pricing = calculatePricing(card);
                               return (
                                 <div style={{ 
-                                  fontSize: '22px', 
-                                  fontWeight: 'bold',
-                                  color: pricing.statusColor
+                                  display: 'flex', 
+                                  justifyContent: 'space-between', 
+                                  alignItems: 'center'
                                 }}>
-                                  {pricing.statusText}
+                                  <span style={{ 
+                                    color: 'white', 
+                                    fontSize: '18px', 
+                                    fontWeight: '600'
+                                  }}>
+                                    الحالة
+                                  </span>
+                                  <span style={{ 
+                                    fontSize: '24px', 
+                                    fontWeight: 'bold',
+                                    color: pricing.statusColor
+                                  }}>
+                                    {pricing.statusText}
+                                  </span>
                                 </div>
                               );
                             })()}
