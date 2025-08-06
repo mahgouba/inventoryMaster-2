@@ -76,6 +76,25 @@ export default function PriceCardsPage() {
   const [editingCard, setEditingCard] = useState<PriceCard | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
+  // حالات إخفاء البيانات
+  const [hiddenFields, setHiddenFields] = useState<{[cardId: number]: {
+    category?: boolean;
+    trimLevel?: boolean;
+    model?: boolean;
+    manufacturer?: boolean;
+  }}>({});
+  
+  // وظيفة تبديل إخفاء الحقول
+  const toggleFieldVisibility = (cardId: number, field: 'category' | 'trimLevel' | 'model' | 'manufacturer') => {
+    setHiddenFields(prev => ({
+      ...prev,
+      [cardId]: {
+        ...prev[cardId],
+        [field]: !prev[cardId]?.[field]
+      }
+    }));
+  };
+  
   // Enhanced filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedManufacturer, setSelectedManufacturer] = useState<string>("all");
@@ -824,6 +843,49 @@ export default function PriceCardsPage() {
                 </div>
                 
                 <div className="flex gap-2">
+                  {/* عناصر التحكم في إخفاء البيانات */}
+                  <div className="flex gap-1 ml-4 border-l pl-2">
+                    <Button
+                      size="sm"
+                      variant={hiddenFields[card.id]?.manufacturer ? "default" : "outline"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFieldVisibility(card.id, 'manufacturer');
+                      }}
+                      title={hiddenFields[card.id]?.manufacturer ? "إظهار الشعار" : "إخفاء الشعار"}
+                      className="px-2 text-xs"
+                    >
+                      {hiddenFields[card.id]?.manufacturer ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                      شعار
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={hiddenFields[card.id]?.category ? "default" : "outline"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFieldVisibility(card.id, 'category');
+                      }}
+                      title={hiddenFields[card.id]?.category ? "إظهار الفئة" : "إخفاء الفئة"}
+                      className="px-2 text-xs"
+                    >
+                      {hiddenFields[card.id]?.category ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                      فئة
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={hiddenFields[card.id]?.trimLevel ? "default" : "outline"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFieldVisibility(card.id, 'trimLevel');
+                      }}
+                      title={hiddenFields[card.id]?.trimLevel ? "إظهار درجة التجهيز" : "إخفاء درجة التجهيز"}
+                      className="px-2 text-xs"
+                    >
+                      {hiddenFields[card.id]?.trimLevel ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                      تجهيز
+                    </Button>
+                  </div>
+
                   <Button 
                     onClick={(e) => {
                       e.stopPropagation();
@@ -982,7 +1044,7 @@ export default function PriceCardsPage() {
                           minHeight: '240px'
                         }}>
                           {/* Manufacturer Logo */}
-                          {card.manufacturer && (
+                          {card.manufacturer && !hiddenFields[card.id]?.manufacturer && (
                             <div style={{ 
                               width: '240px', 
                               height: '160px', 
@@ -1001,25 +1063,29 @@ export default function PriceCardsPage() {
                           )}
                           
                           {/* Category */}
-                          <div style={{ 
-                            color: '#CF9B47', 
-                            fontSize: '48px', 
-                            fontWeight: 'bold', 
-                            textAlign: 'center',
-                            marginBottom: '15px'
-                          }}>
-                            {card.category}
-                          </div>
+                          {!hiddenFields[card.id]?.category && (
+                            <div style={{ 
+                              color: '#CF9B47', 
+                              fontSize: '48px', 
+                              fontWeight: 'bold', 
+                              textAlign: 'center',
+                              marginBottom: '15px'
+                            }}>
+                              {card.category}
+                            </div>
+                          )}
                           
                           {/* Trim Level & Model */}
-                          <div style={{ 
-                            color: '#CF9B47', 
-                            fontSize: '30px', 
-                            fontWeight: '600', 
-                            textAlign: 'center'
-                          }}>
-                            {[card.trimLevel, card.model].filter(Boolean).join(' - ')}
-                          </div>
+                          {(!hiddenFields[card.id]?.trimLevel && card.trimLevel) && (
+                            <div style={{ 
+                              color: '#CF9B47', 
+                              fontSize: '30px', 
+                              fontWeight: '600', 
+                              textAlign: 'center'
+                            }}>
+                              {[card.trimLevel, card.model].filter(Boolean).join(' - ')}
+                            </div>
+                          )}
                         </div>
 
                         {/* Divider */}
