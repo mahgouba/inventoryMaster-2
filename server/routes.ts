@@ -5040,6 +5040,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Attendance Requests API (replacing Leave Requests for attendance interface)
+  app.get("/api/attendance-requests", async (req, res) => {
+    try {
+      // For now, return empty array - this will be expanded when connected to database
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching attendance requests:", error);
+      res.status(500).json({ message: "Failed to fetch attendance requests" });
+    }
+  });
+
+  app.post("/api/attendance-requests", async (req, res) => {
+    try {
+      // For now, just return success - this will be expanded when connected to database
+      const requestData = req.body;
+      console.log("Attendance request received:", requestData);
+      res.status(201).json({ 
+        id: Date.now(), 
+        ...requestData, 
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error creating attendance request:", error);
+      res.status(500).json({ message: "Failed to create attendance request" });
+    }
+  });
+
+  // Monthly Attendance API
+  app.get("/api/attendance/monthly", async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+      // For now, return sample data - this will be expanded when connected to database
+      const sampleData = [
+        {
+          date: '2025-01-01',
+          hours: 8,
+          status: 'full',
+          requests: []
+        },
+        {
+          date: '2025-01-02',
+          hours: 6,
+          status: 'partial',
+          requests: []
+        },
+        {
+          date: '2025-01-03',
+          hours: 0,
+          status: 'leave',
+          requests: []
+        }
+      ];
+      res.json(sampleData);
+    } catch (error) {
+      console.error("Error fetching monthly attendance:", error);
+      res.status(500).json({ message: "Failed to fetch monthly attendance" });
+    }
+  });
+
   // Railway import routes
   app.use("/api/railway", railwayImportRoutes);
 

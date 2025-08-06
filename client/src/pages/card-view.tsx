@@ -56,8 +56,7 @@ import ScrollableFilter from "@/components/scrollable-filter";
 import { ReservationDialog } from "@/components/reservation-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
-import { LeaveRequestForm } from "@/components/leave-request-form";
-import { PendingLeaveRequests } from "@/components/pending-leave-requests";
+import { AttendanceInterface } from "@/components/attendance-interface";
 
 import type { InventoryItem } from "@shared/schema";
 
@@ -101,7 +100,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [arrivedTodayOpen, setArrivedTodayOpen] = useState(false);
-  const [leaveRequestDialogOpen, setLeaveRequestDialogOpen] = useState(false);
+  const [attendanceInterfaceOpen, setAttendanceInterfaceOpen] = useState(false);
   
   // Toggle states for individual filters - default to false (closed)
   const [showManufacturerFilter, setShowManufacturerFilter] = useState(false);
@@ -740,15 +739,15 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                 </Button>
               </div>
 
-              {/* Leave Request Button */}
+              {/* Attendance Interface Button */}
               <Button 
                 variant="outline" 
                 size="sm" 
                 className="glass-button glass-text-primary"
-                onClick={() => setLeaveRequestDialogOpen(true)}
+                onClick={() => setAttendanceInterfaceOpen(true)}
               >
-                <UserCheck size={16} className="ml-1" />
-                <span className="hidden sm:inline">طلب إجازة وإستئذان</span>
+                <Calendar size={16} className="ml-1" />
+                <span className="hidden sm:inline">واجهة الدوام</span>
               </Button>
 
 
@@ -1134,10 +1133,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           </div>
         )}
 
-        {/* Pending Leave Requests Section */}
-        <div className="p-6">
-          <PendingLeaveRequests />
-        </div>
+
 
         {/* Vehicle Cards by Manufacturer */}
         <div className="space-y-8 p-6">
@@ -1619,11 +1615,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         </DialogContent>
       </Dialog>
 
-      {/* Leave Request Form Dialog */}
-      <LeaveRequestForm
-        open={leaveRequestDialogOpen}
-        onOpenChange={setLeaveRequestDialogOpen}
-        username={username}
+      {/* Attendance Interface Dialog */}
+      <AttendanceInterface
+        open={attendanceInterfaceOpen}
+        onOpenChange={setAttendanceInterfaceOpen}
       />
       </div>
     </div>
