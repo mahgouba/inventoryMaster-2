@@ -1136,10 +1136,14 @@ export default function PriceCardsPage() {
                               justifyContent: 'center',
                               margin: '0 auto 10px auto'
                             }}>
-                              <div style={{ filter: 'sepia(100%) saturate(200%) hue-rotate(38deg) brightness(1.3) contrast(1.2)' }}>
+                              <div style={{ 
+                                filter: 'brightness(0) saturate(100%) invert(77%) sepia(28%) saturate(385%) hue-rotate(13deg) brightness(95%) contrast(92%)',
+                                color: '#cf9b46'
+                              }}>
                                 <ManufacturerLogo 
                                   manufacturerName={card.manufacturer} 
                                   className="w-full h-full object-contain"
+                                  style={{ filter: 'brightness(0) saturate(100%) invert(77%) sepia(28%) saturate(385%) hue-rotate(13deg) brightness(95%) contrast(92%)' }}
                                 />
                               </div>
                             </div>
