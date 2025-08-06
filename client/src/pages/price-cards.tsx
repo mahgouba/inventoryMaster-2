@@ -984,8 +984,8 @@ export default function PriceCardsPage() {
                           {/* Manufacturer Logo */}
                           {card.manufacturer && (
                             <div style={{ 
-                              width: '120px', 
-                              height: '80px', 
+                              width: '240px', 
+                              height: '160px', 
                               display: 'flex', 
                               alignItems: 'center', 
                               justifyContent: 'center',
@@ -1003,10 +1003,10 @@ export default function PriceCardsPage() {
                           {/* Category */}
                           <div style={{ 
                             color: '#CF9B47', 
-                            fontSize: '32px', 
+                            fontSize: '48px', 
                             fontWeight: 'bold', 
                             textAlign: 'center',
-                            marginBottom: '10px'
+                            marginBottom: '15px'
                           }}>
                             {card.category}
                           </div>
@@ -1014,7 +1014,7 @@ export default function PriceCardsPage() {
                           {/* Trim Level & Model */}
                           <div style={{ 
                             color: '#CF9B47', 
-                            fontSize: '20px', 
+                            fontSize: '30px', 
                             fontWeight: '600', 
                             textAlign: 'center'
                           }}>
