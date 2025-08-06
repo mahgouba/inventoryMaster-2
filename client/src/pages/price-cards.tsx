@@ -1152,7 +1152,8 @@ export default function PriceCardsPage() {
                       bottom: '100px',
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      width: '1080px',
+                      width: 'auto',
+                      minWidth: '1080px',
                       height: '280px',
                       backgroundColor: 'transparent',
                       padding: '20px',
@@ -1166,7 +1167,8 @@ export default function PriceCardsPage() {
                           flex: 1, 
                           padding: '10px 25px',
                           position: 'relative',
-                          minHeight: '240px'
+                          minHeight: '240px',
+                          minWidth: 'fit-content'
                         }}>
                           {/* Manufacturer Logo */}
                           {card.manufacturer && !hiddenFields[card.id]?.manufacturer && (
@@ -1201,11 +1203,13 @@ export default function PriceCardsPage() {
                               display: 'flex', 
                               justifyContent: 'center', 
                               alignItems: 'center',
-                              gap: '5px',
+                              gap: '15px',
                               color: '#CF9B47', 
                               fontSize: '72px', 
                               fontWeight: 'bold',
-                              flexWrap: 'wrap'
+                              flexWrap: 'nowrap',
+                              whiteSpace: 'nowrap',
+                              overflow: 'visible'
                             }}>
                               {!getFieldVisibility(card.id, 'category') && card.category && (
                                 <span>{card.category}</span>
