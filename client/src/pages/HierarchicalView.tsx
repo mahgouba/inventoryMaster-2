@@ -84,10 +84,7 @@ export default function HierarchicalView() {
   // Add manufacturer mutation
   const addManufacturerMutation = useMutation({
     mutationFn: async (data: { nameAr: string; nameEn?: string; logo?: string }) => {
-      return apiRequest('/api/hierarchical/manufacturers', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('POST', '/api/hierarchical/manufacturers', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
@@ -113,10 +110,7 @@ export default function HierarchicalView() {
   // Add category mutation
   const addCategoryMutation = useMutation({
     mutationFn: async (data: { name_ar: string; name_en?: string; manufacturer_id: number }) => {
-      return apiRequest('/api/hierarchical/categories', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('POST', '/api/hierarchical/categories', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
@@ -141,10 +135,7 @@ export default function HierarchicalView() {
   // Add trim level mutation
   const addTrimLevelMutation = useMutation({
     mutationFn: async (data: { name_ar: string; name_en?: string; category_id: number }) => {
-      return apiRequest('/api/hierarchical/trimLevels', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('POST', '/api/hierarchical/trimLevels', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
@@ -169,9 +160,7 @@ export default function HierarchicalView() {
   // Delete mutations
   const deleteManufacturerMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/hierarchical/manufacturers/${id}`, {
-        method: 'DELETE',
-      });
+      return apiRequest('DELETE', `/api/hierarchical/manufacturers/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
@@ -182,9 +171,7 @@ export default function HierarchicalView() {
 
   const deleteCategoryMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/hierarchical/categories/${id}`, {
-        method: 'DELETE',
-      });
+      return apiRequest('DELETE', `/api/hierarchical/categories/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
@@ -194,9 +181,7 @@ export default function HierarchicalView() {
 
   const deleteTrimLevelMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/hierarchical/trimLevels/${id}`, {
-        method: 'DELETE',
-      });
+      return apiRequest('DELETE', `/api/hierarchical/trimLevels/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
