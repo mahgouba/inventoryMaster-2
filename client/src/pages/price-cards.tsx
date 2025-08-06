@@ -942,16 +942,17 @@ export default function PriceCardsPage() {
                       />
                     </div>
 
-                    {/* Year - Top Left in White Section */}
+                    {/* Year - Large Center in White Section */}
                     <div style={{ 
                       position: 'absolute',
-                      top: '50px',
-                      left: '50px',
+                      top: '80px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
                       color: '#CF9B47', 
-                      fontSize: '120px', 
+                      fontSize: '200px', 
                       fontWeight: '900', 
-                      letterSpacing: '5px',
-                      textAlign: 'left',
+                      letterSpacing: '8px',
+                      textAlign: 'center',
                       width: 'auto',
                       height: 'auto'
                     }}>
@@ -1367,11 +1368,11 @@ export default function PriceCardsPage() {
             [id^="price-card-"] div[style*="position: absolute"] {
               position: absolute !important;
             }
-            [id^="price-card-"] div[style*="top: 50px"] {
+            [id^="price-card-"] div[style*="top: 80px"] {
               position: absolute !important;
-              top: 50px !important;
-              left: 50px !important;
-              transform: none !important;
+              top: 80px !important;
+              left: 50% !important;
+              transform: translateX(-50%) !important;
             }
             [id^="price-card-"] div[style*="bottom: 40px"] {
               position: absolute !important;
