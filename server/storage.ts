@@ -1762,7 +1762,8 @@ export class MemStorage implements IStorage {
   }
 
   async addCategory(categoryData: any): Promise<any> {
-    return { id: Date.now(), ...categoryData };
+    const newCategory = await this.createVehicleCategory(categoryData);
+    return newCategory;
   }
 
   async addTrimLevel(trimData: any): Promise<any> {

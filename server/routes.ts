@@ -3451,7 +3451,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/hierarchical/categories", async (req, res) => {
     try {
-      const category = await getStorage().addCategory(req.body);
+      const { name_ar, name_en, manufacturer_id } = req.body;
+      
+      if (!name_ar || !manufacturer_id) {
+        return res.status(400).json({ message: "Name (Arabic) and manufacturer ID are required" });
+      }
+
+      const categoryData = {
+        nameAr: name_ar,
+        nameEn: name_en || name_ar,
+        manufacturerId: parseInt(manufacturer_id)
+      };
+
+      const category = await getStorage().addCategory(categoryData);
       res.json(category);
     } catch (error) {
       console.error("Error adding category:", error);
