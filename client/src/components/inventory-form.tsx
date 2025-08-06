@@ -275,7 +275,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                       <Select onValueChange={(value) => {
                         handleManufacturerChange(value);
                         field.onChange(value);
-                      }} value={field.value || ""}>
+                      }} value={field.value || undefined}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="الصانع" />
                         </SelectTrigger>
@@ -313,7 +313,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                       <Select onValueChange={(value) => {
                         handleCategoryChange(value);
                         field.onChange(value);
-                      }} value={field.value || ""}>
+                      }} value={field.value || undefined}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="الفئة" />
                         </SelectTrigger>
@@ -352,7 +352,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="درجة التجهيز" />
                         </SelectTrigger>
@@ -391,7 +391,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="سعة المحرك" />
                         </SelectTrigger>
@@ -442,7 +442,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="اللون الخارجي" />
                         </SelectTrigger>
@@ -467,7 +467,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="اللون الداخلي" />
                         </SelectTrigger>
@@ -492,7 +492,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="نوع الاستيراد" />
                         </SelectTrigger>
@@ -541,7 +541,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="نوع الملكية" />
                         </SelectTrigger>
@@ -566,7 +566,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="الموقع" />
                         </SelectTrigger>
@@ -591,7 +591,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="الحالة" />
                         </SelectTrigger>
