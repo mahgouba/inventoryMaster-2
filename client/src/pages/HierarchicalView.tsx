@@ -8,8 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag } from "lucide-react";
-// Import Collapsible from Radix UI directly since it's not in the shadcn/ui components
+import { apiRequest } from "@/lib/queryClient";
+import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Trash2, Save, X } from "lucide-react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 
 interface Manufacturer {
@@ -33,25 +33,6 @@ interface TrimLevel {
   name_en?: string;
 }
 
-interface Color {
-  id: number;
-  name_ar: string;
-  name_en?: string;
-  hex_code?: string;
-  image_url?: string;
-}
-
-interface ColorAssociation {
-  id: number;
-  manufacturer?: string;
-  category?: string;
-  trim_level?: string;
-  color_type: 'interior' | 'exterior';
-  color_name: string;
-  color_code?: string;
-  is_active: boolean;
-}
-
 interface HierarchyData {
   manufacturer: Manufacturer;
   categories: Array<{
@@ -68,20 +49,23 @@ export default function HierarchicalView() {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   
   // Dialog states
+  const [isAddManufacturerOpen, setIsAddManufacturerOpen] = useState(false);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isAddTrimLevelOpen, setIsAddTrimLevelOpen] = useState(false);
-  const [isAddColorOpen, setIsAddColorOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState<{ type: string; id: number | string; data: any } | null>(null);
   
   // Form states
-  const [selectedManufacturerForAction, setSelectedManufacturerForAction] = useState<number | null>(null);
-  const [selectedCategoryForAction, setSelectedCategoryForAction] = useState<number | null>(null);
-  const [selectedTrimLevelForAction, setSelectedTrimLevelForAction] = useState<number | null>(null);
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const [newTrimLevelName, setNewTrimLevelName] = useState("");
-  const [newColorName, setNewColorName] = useState("");
-  const [newColorCode, setNewColorCode] = useState("#000000");
-  const [colorType, setColorType] = useState<'interior' | 'exterior'>('exterior');
-  const [colorScope, setColorScope] = useState<'global' | 'manufacturer' | 'category' | 'trim'>('global');
+  const [manufacturerNameAr, setManufacturerNameAr] = useState("");
+  const [manufacturerNameEn, setManufacturerNameEn] = useState("");
+  const [manufacturerLogo, setManufacturerLogo] = useState("");
+  
+  const [newCategoryNameAr, setNewCategoryNameAr] = useState("");
+  const [newCategoryNameEn, setNewCategoryNameEn] = useState("");
+  const [selectedManufacturerForCategory, setSelectedManufacturerForCategory] = useState<number | null>(null);
+  
+  const [newTrimLevelNameAr, setNewTrimLevelNameAr] = useState("");
+  const [newTrimLevelNameEn, setNewTrimLevelNameEn] = useState("");
+  const [selectedCategoryForTrimLevel, setSelectedCategoryForTrimLevel] = useState<number | null>(null);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -91,166 +75,133 @@ export default function HierarchicalView() {
     queryKey: ['/api/hierarchical/manufacturers'],
   });
 
-  // Add category mutation
-  const addCategoryMutation = useMutation({
-    mutationFn: async (data: { name_ar: string; manufacturer_id: number }) => {
-      const response = await fetch('/api/categories', {
+  // Fetch hierarchy data
+  const { data: hierarchyData = [], isLoading, error } = useQuery({
+    queryKey: ['/api/hierarchy/full'],
+  });
+
+  // Add manufacturer mutation
+  const addManufacturerMutation = useMutation({
+    mutationFn: async (data: { nameAr: string; nameEn?: string; logo?: string }) => {
+      return apiRequest('/api/hierarchical/manufacturers', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      if (!response.ok) throw new Error('Failed to add category');
-      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تمت إضافة الصانع",
+        description: `تم إضافة صانع "${manufacturerNameAr}" بنجاح`,
+      });
+      setManufacturerNameAr("");
+      setManufacturerNameEn("");
+      setManufacturerLogo("");
+      setIsAddManufacturerOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ",
+        description: "فشل في إضافة الصانع",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Add category mutation
+  const addCategoryMutation = useMutation({
+    mutationFn: async (data: { name_ar: string; name_en?: string; manufacturer_id: number }) => {
+      return apiRequest('/api/hierarchical/categories', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
       toast({
         title: "تمت إضافة الفئة",
-        description: `تم إضافة فئة "${newCategoryName}" بنجاح`,
+        description: `تم إضافة فئة "${newCategoryNameAr}" بنجاح`,
       });
-      setNewCategoryName("");
+      setNewCategoryNameAr("");
+      setNewCategoryNameEn("");
+      setSelectedManufacturerForCategory(null);
       setIsAddCategoryOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ",
+        description: "فشل في إضافة الفئة",
+        variant: "destructive",
+      });
     }
   });
 
   // Add trim level mutation
   const addTrimLevelMutation = useMutation({
-    mutationFn: async (data: { name_ar: string; category_id: number }) => {
-      const response = await fetch('/api/trim-levels', {
+    mutationFn: async (data: { name_ar: string; name_en?: string; category_id: number }) => {
+      return apiRequest('/api/hierarchical/trimLevels', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      if (!response.ok) throw new Error('Failed to add trim level');
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
       toast({
         title: "تمت إضافة درجة التجهيز",
-        description: `تم إضافة درجة التجهيز "${newTrimLevelName}" بنجاح`,
+        description: `تم إضافة درجة التجهيز "${newTrimLevelNameAr}" بنجاح`,
       });
-      setNewTrimLevelName("");
+      setNewTrimLevelNameAr("");
+      setNewTrimLevelNameEn("");
+      setSelectedCategoryForTrimLevel(null);
       setIsAddTrimLevelOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ",
+        description: "فشل في إضافة درجة التجهيز",
+        variant: "destructive",
+      });
     }
   });
 
-  // Add color mutation
-  const addColorMutation = useMutation({
-    mutationFn: async (data: { 
-      name_ar: string; 
-      hex_code: string; 
-      colorType: 'interior' | 'exterior';
-      scope: string;
-      manufacturer_id?: number;
-      category_id?: number;
-      trim_level_id?: number;
-    }) => {
-      // First add the color to the appropriate color table
-      const colorEndpoint = data.colorType === 'exterior' ? '/api/colors/exterior' : '/api/colors/interior';
-      const colorResponse = await fetch(colorEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name_ar: data.name_ar,
-          hex_code: data.hex_code
-        }),
+  // Delete mutations
+  const deleteManufacturerMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest(`/api/hierarchical/manufacturers/${id}`, {
+        method: 'DELETE',
       });
-      
-      if (!colorResponse.ok) throw new Error('Failed to add color');
-      
-      // If not global, create association
-      if (data.scope !== 'global') {
-        let associationData: any = {
-          colorType: data.colorType,
-          colorName: data.name_ar,
-          colorCode: data.hex_code,
-          isActive: true
-        };
-
-        // Set association based on scope
-        if (data.scope === 'manufacturer' && selectedManufacturerForAction) {
-          const manufacturer = (manufacturers as Manufacturer[]).find(m => m.id === selectedManufacturerForAction);
-          associationData.manufacturer = manufacturer?.nameAr;
-        } else if (data.scope === 'category' && selectedCategoryForAction) {
-          // Get category info from hierarchy data
-          const categoryInfo = hierarchyData.find((mData: HierarchyData) => 
-            mData.categories.some(cat => cat.category.id === selectedCategoryForAction)
-          );
-          if (categoryInfo) {
-            const category = categoryInfo.categories.find(cat => cat.category.id === selectedCategoryForAction);
-            associationData.manufacturer = categoryInfo.manufacturer.nameAr;
-            associationData.category = category?.category.name_ar;
-          }
-        } else if (data.scope === 'trim' && selectedTrimLevelForAction) {
-          // Get trim level info from hierarchy data
-          let trimInfo: any = null;
-          hierarchyData.forEach((mData: HierarchyData) => {
-            mData.categories.forEach(catData => {
-              const trimLevel = catData.trimLevels.find(trim => trim.id === selectedTrimLevelForAction);
-              if (trimLevel) {
-                trimInfo = {
-                  manufacturer: mData.manufacturer.nameAr,
-                  category: catData.category.name_ar,
-                  trimLevel: trimLevel.name_ar
-                };
-              }
-            });
-          });
-          
-          if (trimInfo) {
-            associationData.manufacturer = trimInfo.manufacturer;
-            associationData.category = trimInfo.category;
-            associationData.trimLevel = trimInfo.trimLevel;
-          }
-        }
-
-        const associationResponse = await fetch('/api/color-associations', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(associationData),
-        });
-        
-        if (!associationResponse.ok) throw new Error('Failed to create color association');
-      }
-      
-      return colorResponse.json();
     },
     onSuccess: () => {
-      toast({
-        title: "تمت إضافة اللون",
-        description: `تم إضافة اللون "${newColorName}" بنجاح`,
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({ title: "تم حذف الصانع بنجاح" });
+    }
+  });
+
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest(`/api/hierarchical/categories/${id}`, {
+        method: 'DELETE',
       });
-      setNewColorName("");
-      setNewColorCode("#000000");
-      setIsAddColorOpen(false);
-      resetForms();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({ title: "تم حذف الفئة بنجاح" });
     }
   });
 
-  // Fetch hierarchical data
-  const { data: hierarchyData = [], isLoading, error } = useQuery({
-    queryKey: ['/api/hierarchy/full', selectedManufacturer],
-    queryFn: async () => {
-      const response = await fetch(`/api/hierarchy/full${selectedManufacturer !== 'all' ? `?manufacturer=${encodeURIComponent(selectedManufacturer)}` : ''}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch hierarchy data');
-      }
-      const data = await response.json();
-      return Array.isArray(data) ? data : [];
+  const deleteTrimLevelMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest(`/api/hierarchical/trimLevels/${id}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({ title: "تم حذف درجة التجهيز بنجاح" });
     }
   });
-
-  // Reset form states when dialog closes
-  const resetForms = () => {
-    setNewCategoryName("");
-    setNewTrimLevelName("");
-    setNewColorName("");
-    setNewColorCode("#000000");
-    setSelectedManufacturerForAction(null);
-    setSelectedCategoryForAction(null);
-    setSelectedTrimLevelForAction(null);
-  };
 
   const toggleExpanded = (itemId: string) => {
     const newExpanded = new Set(expandedItems);
@@ -268,10 +219,10 @@ export default function HierarchicalView() {
     const searchLower = searchTerm.toLowerCase();
     const manufacturerMatch = item.manufacturer.nameAr.toLowerCase().includes(searchLower);
     const categoryMatch = item.categories.some(cat => 
-      cat.category.category.toLowerCase().includes(searchLower)
+      cat.category.name_ar.toLowerCase().includes(searchLower)
     );
     const trimMatch = item.categories.some(cat =>
-      cat.trimLevels.some(trim => trim.trimLevel.toLowerCase().includes(searchLower))
+      cat.trimLevels.some(trim => trim.name_ar.toLowerCase().includes(searchLower))
     );
     
     return manufacturerMatch || categoryMatch || trimMatch;
@@ -309,12 +260,78 @@ export default function HierarchicalView() {
     <div className="space-y-6 p-6">
       {/* Header */}
       <div className="glass-header p-4 rounded-lg">
-        <h1 className="text-2xl font-bold text-white text-right flex items-center gap-2">
-          <Building2 className="h-6 w-6" />
-          التسلسل الهرمي للمركبات
-        </h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-white text-right flex items-center gap-2">
+            <Building2 className="h-6 w-6" />
+            التسلسل الهرمي للمركبات
+          </h1>
+          
+          {/* Add Manufacturer Button */}
+          <Dialog open={isAddManufacturerOpen} onOpenChange={setIsAddManufacturerOpen}>
+            <DialogTrigger asChild>
+              <Button className="glass-button flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                إضافة صانع
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="glass-modal" dir="rtl">
+              <DialogHeader>
+                <DialogTitle className="text-right">إضافة صانع جديد</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-right block mb-2">الاسم العربي *</Label>
+                  <Input
+                    value={manufacturerNameAr}
+                    onChange={(e) => setManufacturerNameAr(e.target.value)}
+                    placeholder="اسم الصانع بالعربية"
+                    dir="rtl"
+                  />
+                </div>
+                <div>
+                  <Label className="text-right block mb-2">الاسم الإنجليزي</Label>
+                  <Input
+                    value={manufacturerNameEn}
+                    onChange={(e) => setManufacturerNameEn(e.target.value)}
+                    placeholder="Manufacturer Name in English"
+                  />
+                </div>
+                <div>
+                  <Label className="text-right block mb-2">رابط الشعار</Label>
+                  <Input
+                    value={manufacturerLogo}
+                    onChange={(e) => setManufacturerLogo(e.target.value)}
+                    placeholder="/logo.png"
+                  />
+                </div>
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    onClick={() => addManufacturerMutation.mutate({
+                      nameAr: manufacturerNameAr,
+                      nameEn: manufacturerNameEn || undefined,
+                      logo: manufacturerLogo || undefined
+                    })}
+                    disabled={!manufacturerNameAr || addManufacturerMutation.isPending}
+                    className="glass-button flex-1"
+                  >
+                    <Save className="h-4 w-4 ml-2" />
+                    {addManufacturerMutation.isPending ? 'جاري الحفظ...' : 'حفظ'}
+                  </Button>
+                  <Button
+                    onClick={() => setIsAddManufacturerOpen(false)}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <X className="h-4 w-4 ml-2" />
+                    إلغاء
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
         <p className="text-gray-300 text-right mt-2">
-          عرض العلاقة الهرمية بين الصانعين والفئات ودرجات التجهيز
+          عرض العلاقة الهرمية بين الصانعين والفئات ودرجات التجهيز مع إمكانيات الإضافة والتعديل والحذف
         </p>
       </div>
 
@@ -323,7 +340,7 @@ export default function HierarchicalView() {
         <CardHeader className="glass-header">
           <CardTitle className="text-white text-right flex items-center gap-2">
             <Filter className="h-5 w-5" />
-            الفلاتر والبحث
+            البحث والفلاتر
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -358,443 +375,331 @@ export default function HierarchicalView() {
         </CardContent>
       </Card>
 
+      {/* Action Buttons */}
+      <div className="flex gap-4 justify-center">
+        {/* Add Category Button */}
+        <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
+          <DialogTrigger asChild>
+            <Button className="glass-button flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              إضافة فئة
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="glass-modal" dir="rtl">
+            <DialogHeader>
+              <DialogTitle className="text-right">إضافة فئة جديدة</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-right block mb-2">الصانع *</Label>
+                <Select value={selectedManufacturerForCategory?.toString()} onValueChange={(value) => setSelectedManufacturerForCategory(Number(value))}>
+                  <SelectTrigger dir="rtl">
+                    <SelectValue placeholder="اختر الصانع" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(manufacturers as Manufacturer[]).map((manufacturer: Manufacturer) => (
+                      <SelectItem key={manufacturer.id} value={manufacturer.id.toString()}>
+                        {manufacturer.nameAr}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-right block mb-2">اسم الفئة بالعربية *</Label>
+                <Input
+                  value={newCategoryNameAr}
+                  onChange={(e) => setNewCategoryNameAr(e.target.value)}
+                  placeholder="اسم الفئة"
+                  dir="rtl"
+                />
+              </div>
+              <div>
+                <Label className="text-right block mb-2">اسم الفئة بالإنجليزية</Label>
+                <Input
+                  value={newCategoryNameEn}
+                  onChange={(e) => setNewCategoryNameEn(e.target.value)}
+                  placeholder="Category Name"
+                />
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={() => addCategoryMutation.mutate({
+                    name_ar: newCategoryNameAr,
+                    name_en: newCategoryNameEn || undefined,
+                    manufacturer_id: selectedManufacturerForCategory!
+                  })}
+                  disabled={!newCategoryNameAr || !selectedManufacturerForCategory || addCategoryMutation.isPending}
+                  className="glass-button flex-1"
+                >
+                  <Save className="h-4 w-4 ml-2" />
+                  {addCategoryMutation.isPending ? 'جاري الحفظ...' : 'حفظ'}
+                </Button>
+                <Button
+                  onClick={() => setIsAddCategoryOpen(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <X className="h-4 w-4 ml-2" />
+                  إلغاء
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Trim Level Button */}
+        <Dialog open={isAddTrimLevelOpen} onOpenChange={setIsAddTrimLevelOpen}>
+          <DialogTrigger asChild>
+            <Button className="glass-button flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              إضافة درجة تجهيز
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="glass-modal" dir="rtl">
+            <DialogHeader>
+              <DialogTitle className="text-right">إضافة درجة تجهيز جديدة</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-right block mb-2">الفئة *</Label>
+                <Select value={selectedCategoryForTrimLevel?.toString()} onValueChange={(value) => setSelectedCategoryForTrimLevel(Number(value))}>
+                  <SelectTrigger dir="rtl">
+                    <SelectValue placeholder="اختر الفئة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {hierarchyData.flatMap((item: HierarchyData) => 
+                      item.categories.map(catData => (
+                        <SelectItem key={catData.category.id} value={catData.category.id.toString()}>
+                          {item.manufacturer.nameAr} - {catData.category.name_ar}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-right block mb-2">اسم درجة التجهيز بالعربية *</Label>
+                <Input
+                  value={newTrimLevelNameAr}
+                  onChange={(e) => setNewTrimLevelNameAr(e.target.value)}
+                  placeholder="درجة التجهيز"
+                  dir="rtl"
+                />
+              </div>
+              <div>
+                <Label className="text-right block mb-2">اسم درجة التجهيز بالإنجليزية</Label>
+                <Input
+                  value={newTrimLevelNameEn}
+                  onChange={(e) => setNewTrimLevelNameEn(e.target.value)}
+                  placeholder="Trim Level Name"
+                />
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={() => addTrimLevelMutation.mutate({
+                    name_ar: newTrimLevelNameAr,
+                    name_en: newTrimLevelNameEn || undefined,
+                    category_id: selectedCategoryForTrimLevel!
+                  })}
+                  disabled={!newTrimLevelNameAr || !selectedCategoryForTrimLevel || addTrimLevelMutation.isPending}
+                  className="glass-button flex-1"
+                >
+                  <Save className="h-4 w-4 ml-2" />
+                  {addTrimLevelMutation.isPending ? 'جاري الحفظ...' : 'حفظ'}
+                </Button>
+                <Button
+                  onClick={() => setIsAddTrimLevelOpen(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <X className="h-4 w-4 ml-2" />
+                  إلغاء
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
       {/* Hierarchy Display */}
       <div className="space-y-4">
-        {filteredData.length === 0 ? (
-          <Card className="glass-container">
-            <CardContent className="p-8 text-center">
-              <Car className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-white text-lg">لا توجد بيانات متاحة</p>
-              <p className="text-gray-400">جرب تغيير المرشحات أو البحث</p>
-            </CardContent>
-          </Card>
-        ) : (
-          filteredData.map((manufacturerData: HierarchyData) => (
-            <Card key={manufacturerData.manufacturer.id} className="glass-container">
-              <Collapsible.Root>
-                <Collapsible.Trigger 
-                  className="w-full"
-                  onClick={() => toggleExpanded(`manufacturer-${manufacturerData.manufacturer.id}`)}
-                >
-                  <CardHeader className="glass-header hover:bg-white/10 transition-colors cursor-pointer">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Badge variant="outline" className="text-blue-400 border-blue-400">
-                          {manufacturerData.totalVehicles} مركبة
-                        </Badge>
-                        <Badge variant="secondary">
-                          {manufacturerData.categories.length} فئة
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <CardTitle className="text-white text-right flex items-center gap-2">
-                          <Building2 className="h-5 w-5 text-blue-400" />
-                          {manufacturerData.manufacturer.nameAr}
-                        </CardTitle>
-                        {expandedItems.has(`manufacturer-${manufacturerData.manufacturer.id}`) ? (
-                          <ChevronDown className="h-5 w-5 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="h-5 w-5 text-gray-400" />
-                        )}
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Collapsible.Trigger>
+        {filteredData.map((item: HierarchyData) => (
+          <Card key={item.manufacturer.id} className="glass-container">
+            <CardHeader className="glass-header">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleExpanded(`manufacturer-${item.manufacturer.id}`)}
+                    className="text-white hover:bg-white/10"
+                  >
+                    {expandedItems.has(`manufacturer-${item.manufacturer.id}`) ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <Building2 className="h-5 w-5 text-blue-400" />
+                  <div className="text-right">
+                    <h3 className="text-lg font-semibold text-white">{item.manufacturer.nameAr}</h3>
+                    {item.manufacturer.nameEn && (
+                      <p className="text-sm text-gray-400">{item.manufacturer.nameEn}</p>
+                    )}
+                  </div>
+                </div>
                 
-                <Collapsible.Content>
-                  <CardContent className="space-y-3">
-                    {/* Action Buttons for Manufacturer */}
-                    <div className="flex flex-wrap gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                      <Button
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedManufacturerForAction(manufacturerData.manufacturer.id);
-                          setIsAddCategoryOpen(true);
-                        }}
-                        className="bg-green-600/80 hover:bg-green-700/90 text-white"
-                      >
-                        <Plus className="h-4 w-4 ml-1" />
-                        إضافة فئة
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedManufacturerForAction(manufacturerData.manufacturer.id);
-                          setColorScope('manufacturer');
-                          setIsAddColorOpen(true);
-                        }}
-                        className="bg-purple-600/80 hover:bg-purple-700/90 text-white"
-                      >
-                        <Palette className="h-4 w-4 ml-1" />
-                        لون خارجي
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedManufacturerForAction(manufacturerData.manufacturer.id);
-                          setColorType('interior');
-                          setColorScope('manufacturer');
-                          setIsAddColorOpen(true);
-                        }}
-                        className="bg-indigo-600/80 hover:bg-indigo-700/90 text-white"
-                      >
-                        <Palette className="h-4 w-4 ml-1" />
-                        لون داخلي
-                      </Button>
-                    </div>
-                    {manufacturerData.categories.map((categoryData, categoryIndex) => (
-                      <Card key={`${manufacturerData.manufacturer.id}-${categoryData.category.category}`} className="bg-white/5 border-white/10">
-                        <Collapsible.Root>
-                          <Collapsible.Trigger 
-                            className="w-full"
-                            onClick={() => toggleExpanded(`category-${manufacturerData.manufacturer.id}-${categoryData.category.category}`)}
-                          >
-                            <CardHeader className="py-3 hover:bg-white/5 transition-colors cursor-pointer">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="text-green-400 border-green-400">
-                                    {categoryData.vehicleCount} مركبة
-                                  </Badge>
-                                  <Badge variant="secondary">
-                                    {categoryData.trimLevels.length} درجة تجهيز
-                                  </Badge>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                  <span className="text-white font-medium flex items-center gap-2">
-                                    <Car className="h-4 w-4 text-green-400" />
-                                    {categoryData.category.category}
-                                  </span>
-                                  {expandedItems.has(`category-${manufacturerData.manufacturer.id}-${categoryData.category.category}`) ? (
-                                    <ChevronDown className="h-4 w-4 text-gray-400" />
-                                  ) : (
-                                    <ChevronRight className="h-4 w-4 text-gray-400" />
-                                  )}
-                                </div>
-                              </div>
-                            </CardHeader>
-                          </Collapsible.Trigger>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="glass-badge">
+                    {item.totalVehicles} مركبة
+                  </Badge>
+                  <Badge variant="outline" className="glass-badge">
+                    {item.categories.length} فئة
+                  </Badge>
+                  
+                  {/* Manufacturer Actions */}
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsEditMode({ type: 'manufacturer', id: item.manufacturer.id, data: item.manufacturer })}
+                      className="text-yellow-400 hover:bg-yellow-400/10"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteManufacturerMutation.mutate(item.manufacturer.id.toString())}
+                      className="text-red-400 hover:bg-red-400/10"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+            
+            {/* Categories */}
+            <Collapsible.Root open={expandedItems.has(`manufacturer-${item.manufacturer.id}`)}>
+              <Collapsible.Content>
+                <CardContent className="pt-0">
+                  <div className="space-y-3 mr-8">
+                    {item.categories.map((catData) => (
+                      <div key={catData.category.id} className="glass-section p-3 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleExpanded(`category-${catData.category.id}`)}
+                              className="text-white hover:bg-white/10"
+                            >
+                              {expandedItems.has(`category-${catData.category.id}`) ? (
+                                <ChevronDown className="h-3 w-3" />
+                              ) : (
+                                <ChevronRight className="h-3 w-3" />
+                              )}
+                            </Button>
+                            <Car className="h-4 w-4 text-green-400" />
+                            <div className="text-right">
+                              <h4 className="font-medium text-white">{catData.category.name_ar}</h4>
+                              {catData.category.name_en && (
+                                <p className="text-xs text-gray-400">{catData.category.name_en}</p>
+                              )}
+                            </div>
+                          </div>
                           
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="glass-badge text-xs">
+                              {catData.vehicleCount} مركبة
+                            </Badge>
+                            <Badge variant="outline" className="glass-badge text-xs">
+                              {catData.trimLevels.length} درجة
+                            </Badge>
+                            
+                            {/* Category Actions */}
+                            <div className="flex gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setIsEditMode({ type: 'category', id: catData.category.id, data: catData.category })}
+                                className="text-yellow-400 hover:bg-yellow-400/10"
+                              >
+                                <Edit className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteCategoryMutation.mutate(catData.category.id)}
+                                className="text-red-400 hover:bg-red-400/10"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Trim Levels */}
+                        <Collapsible.Root open={expandedItems.has(`category-${catData.category.id}`)}>
                           <Collapsible.Content>
-                            <CardContent className="pt-0 space-y-2">
-                              {/* Action Buttons for Category */}
-                              <div className="flex flex-wrap gap-2 p-3 bg-white/5 rounded-lg border border-white/10 mb-3">
-                                <Button
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedCategoryForAction(categoryIndex);
-                                    setIsAddTrimLevelOpen(true);
-                                  }}
-                                  className="bg-orange-600/80 hover:bg-orange-700/90 text-white"
-                                >
-                                  <Plus className="h-4 w-4 ml-1" />
-                                  إضافة درجة تجهيز
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedCategoryForAction(categoryIndex);
-                                    setColorScope('category');
-                                    setColorType('exterior');
-                                    setIsAddColorOpen(true);
-                                  }}
-                                  className="bg-purple-600/80 hover:bg-purple-700/90 text-white"
-                                >
-                                  <Palette className="h-4 w-4 ml-1" />
-                                  لون خارجي
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedCategoryForAction(categoryIndex);
-                                    setColorScope('category');
-                                    setColorType('interior');
-                                    setIsAddColorOpen(true);
-                                  }}
-                                  className="bg-indigo-600/80 hover:bg-indigo-700/90 text-white"
-                                >
-                                  <Palette className="h-4 w-4 ml-1" />
-                                  لون داخلي
-                                </Button>
-                              </div>
-                              {categoryData.trimLevels.map((trimLevel, trimIndex) => (
-                                <div 
-                                  key={`${manufacturerData.manufacturer.id}-${categoryData.category.category}-${trimLevel.trimLevel}`}
-                                  className="p-3 bg-white/5 rounded-lg border border-white/10 space-y-2"
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <Badge variant="outline" className="text-purple-400 border-purple-400">
-                                      درجة التجهيز
-                                    </Badge>
-                                    <span className="text-white font-medium flex items-center gap-2">
-                                      <Settings className="h-4 w-4 text-purple-400" />
-                                      {trimLevel.trimLevel}
-                                    </span>
+                            <div className="space-y-2 mr-6">
+                              {catData.trimLevels.map((trimLevel) => (
+                                <div key={trimLevel.id} className="flex items-center justify-between p-2 glass-item rounded">
+                                  <div className="flex items-center gap-2">
+                                    <Settings className="h-3 w-3 text-purple-400" />
+                                    <div className="text-right">
+                                      <span className="text-sm text-white">{trimLevel.name_ar}</span>
+                                      {trimLevel.name_en && (
+                                        <span className="text-xs text-gray-400 block">{trimLevel.name_en}</span>
+                                      )}
+                                    </div>
                                   </div>
                                   
-                                  {/* Action Buttons for Trim Level */}
-                                  <div className="flex flex-wrap gap-2">
+                                  {/* Trim Level Actions */}
+                                  <div className="flex gap-1">
                                     <Button
+                                      variant="ghost"
                                       size="sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedTrimLevelForAction(trimIndex);
-                                        setColorScope('trim');
-                                        setColorType('exterior');
-                                        setIsAddColorOpen(true);
-                                      }}
-                                      className="bg-purple-600/80 hover:bg-purple-700/90 text-white text-xs"
+                                      onClick={() => setIsEditMode({ type: 'trimLevel', id: trimLevel.id, data: trimLevel })}
+                                      className="text-yellow-400 hover:bg-yellow-400/10"
                                     >
-                                      <Palette className="h-3 w-3 ml-1" />
-                                      لون خارجي
+                                      <Edit className="h-3 w-3" />
                                     </Button>
                                     <Button
+                                      variant="ghost"
                                       size="sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedTrimLevelForAction(trimIndex);
-                                        setColorScope('trim');
-                                        setColorType('interior');
-                                        setIsAddColorOpen(true);
-                                      }}
-                                      className="bg-indigo-600/80 hover:bg-indigo-700/90 text-white text-xs"
+                                      onClick={() => deleteTrimLevelMutation.mutate(trimLevel.id)}
+                                      className="text-red-400 hover:bg-red-400/10"
                                     >
-                                      <Palette className="h-3 w-3 ml-1" />
-                                      لون داخلي
+                                      <Trash2 className="h-3 w-3" />
                                     </Button>
                                   </div>
                                 </div>
                               ))}
-                              
-                              {categoryData.trimLevels.length === 0 && (
-                                <div className="text-center py-6 text-gray-400">
-                                  لا توجد درجات تجهيز محددة لهذه الفئة
-                                </div>
-                              )}
-                            </CardContent>
+                            </div>
                           </Collapsible.Content>
                         </Collapsible.Root>
-                      </Card>
-                    ))}
-                    
-                    {manufacturerData.categories.length === 0 && (
-                      <div className="text-center py-6 text-gray-400">
-                        لا توجد فئات مسجلة لهذا الصانع
                       </div>
-                    )}
-                  </CardContent>
-                </Collapsible.Content>
-              </Collapsible.Root>
-            </Card>
-          ))
-        )}
+                    ))}
+                  </div>
+                </CardContent>
+              </Collapsible.Content>
+            </Collapsible.Root>
+          </Card>
+        ))}
       </div>
 
-      {/* Global Color Management Button */}
-      <div className="fixed bottom-6 left-6">
-        <Button
-          onClick={() => {
-            setColorScope('global');
-            setIsAddColorOpen(true);
-          }}
-          className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg"
-          size="lg"
-        >
-          <Palette className="h-5 w-5 ml-2" />
-          إدارة الألوان العامة
-        </Button>
-      </div>
-
-      {/* Add Category Dialog */}
-      <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
-        <DialogContent className="glass-container max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-white text-right">إضافة فئة جديدة</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label className="text-white/90">اسم الفئة</Label>
-              <Input
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                placeholder="أدخل اسم الفئة الجديدة"
-                className="bg-white/10 border-white/20 text-white"
-                dir="rtl"
-              />
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button
-                variant="outline"
-                onClick={() => setIsAddCategoryOpen(false)}
-                className="bg-white/10 border-white/20 text-white"
-              >
-                إلغاء
-              </Button>
-              <Button
-                onClick={() => {
-                  if (newCategoryName.trim() && selectedManufacturerForAction) {
-                    addCategoryMutation.mutate({
-                      name_ar: newCategoryName.trim(),
-                      manufacturer_id: selectedManufacturerForAction
-                    });
-                  }
-                }}
-                disabled={!newCategoryName.trim() || addCategoryMutation.isPending}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                {addCategoryMutation.isPending ? "جاري الإضافة..." : "إضافة"}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Add Trim Level Dialog */}
-      <Dialog open={isAddTrimLevelOpen} onOpenChange={setIsAddTrimLevelOpen}>
-        <DialogContent className="glass-container max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-white text-right">إضافة درجة تجهيز جديدة</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label className="text-white/90">اسم درجة التجهيز</Label>
-              <Input
-                value={newTrimLevelName}
-                onChange={(e) => setNewTrimLevelName(e.target.value)}
-                placeholder="أدخل اسم درجة التجهيز الجديدة"
-                className="bg-white/10 border-white/20 text-white"
-                dir="rtl"
-              />
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button
-                variant="outline"
-                onClick={() => setIsAddTrimLevelOpen(false)}
-                className="bg-white/10 border-white/20 text-white"
-              >
-                إلغاء
-              </Button>
-              <Button
-                onClick={() => {
-                  if (newTrimLevelName.trim() && selectedCategoryForAction) {
-                    addTrimLevelMutation.mutate({
-                      name_ar: newTrimLevelName.trim(),
-                      category_id: selectedCategoryForAction
-                    });
-                  }
-                }}
-                disabled={!newTrimLevelName.trim() || addTrimLevelMutation.isPending}
-                className="bg-orange-600 hover:bg-orange-700"
-              >
-                {addTrimLevelMutation.isPending ? "جاري الإضافة..." : "إضافة"}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Add Color Dialog */}
-      <Dialog open={isAddColorOpen} onOpenChange={setIsAddColorOpen}>
-        <DialogContent className="glass-container max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="text-white text-right">
-              إضافة لون {colorType === 'exterior' ? 'خارجي' : 'داخلي'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label className="text-white/90">نطاق اللون</Label>
-              <Select value={colorScope} onValueChange={(value: any) => setColorScope(value)}>
-                <SelectTrigger className="bg-white/10 border-white/20 text-white" dir="rtl">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="global">عام (لجميع المركبات)</SelectItem>
-                  <SelectItem value="manufacturer">خاص بالصانع</SelectItem>
-                  <SelectItem value="category">خاص بالفئة</SelectItem>
-                  <SelectItem value="trim">خاص بدرجة التجهيز</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label className="text-white/90">نوع اللون</Label>
-              <Select value={colorType} onValueChange={(value: any) => setColorType(value)}>
-                <SelectTrigger className="bg-white/10 border-white/20 text-white" dir="rtl">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="exterior">لون خارجي</SelectItem>
-                  <SelectItem value="interior">لون داخلي</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label className="text-white/90">اسم اللون</Label>
-              <Input
-                value={newColorName}
-                onChange={(e) => setNewColorName(e.target.value)}
-                placeholder="أدخل اسم اللون"
-                className="bg-white/10 border-white/20 text-white"
-                dir="rtl"
-              />
-            </div>
-
-            <div>
-              <Label className="text-white/90">كود اللون</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={newColorCode}
-                  onChange={(e) => setNewColorCode(e.target.value)}
-                  className="w-16 h-10 bg-white/10 border-white/20"
-                />
-                <Input
-                  value={newColorCode}
-                  onChange={(e) => setNewColorCode(e.target.value)}
-                  placeholder="#000000"
-                  className="bg-white/10 border-white/20 text-white"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-2 justify-end">
-              <Button
-                variant="outline"
-                onClick={() => setIsAddColorOpen(false)}
-                className="bg-white/10 border-white/20 text-white"
-              >
-                إلغاء
-              </Button>
-              <Button
-                onClick={() => {
-                  if (newColorName.trim()) {
-                    addColorMutation.mutate({
-                      name_ar: newColorName.trim(),
-                      hex_code: newColorCode,
-                      colorType,
-                      scope: colorScope,
-                      manufacturer_id: selectedManufacturerForAction || undefined,
-                      category_id: selectedCategoryForAction || undefined,
-                      trim_level_id: selectedTrimLevelForAction || undefined
-                    });
-                  }
-                }}
-                disabled={!newColorName.trim() || addColorMutation.isPending}
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                {addColorMutation.isPending ? "جاري الإضافة..." : "إضافة اللون"}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {filteredData.length === 0 && (
+        <Card className="glass-container">
+          <CardContent className="text-center py-12">
+            <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-white mb-2">لا توجد بيانات</h3>
+            <p className="text-gray-400">لا توجد بيانات هرمية متطابقة مع البحث الحالي</p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

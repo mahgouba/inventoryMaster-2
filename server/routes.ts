@@ -3479,6 +3479,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PUT routes for updating items
+  app.put("/api/hierarchical/manufacturers/:id", async (req, res) => {
+    try {
+      const manufacturer = await getStorage().updateManufacturer(req.params.id, req.body);
+      res.json(manufacturer);
+    } catch (error) {
+      console.error("Error updating manufacturer:", error);
+      res.status(500).json({ message: "Failed to update manufacturer" });
+    }
+  });
+
+  app.put("/api/hierarchical/categories/:id", async (req, res) => {
+    try {
+      const category = await getStorage().updateCategory(parseInt(req.params.id), req.body);
+      res.json(category);
+    } catch (error) {
+      console.error("Error updating category:", error);
+      res.status(500).json({ message: "Failed to update category" });
+    }
+  });
+
+  app.put("/api/hierarchical/trimLevels/:id", async (req, res) => {
+    try {
+      const trimLevel = await getStorage().updateTrimLevel(parseInt(req.params.id), req.body);
+      res.json(trimLevel);
+    } catch (error) {
+      console.error("Error updating trim level:", error);
+      res.status(500).json({ message: "Failed to update trim level" });
+    }
+  });
+
+  app.put("/api/hierarchical/colors/:id", async (req, res) => {
+    try {
+      const color = await getStorage().updateColor(parseInt(req.params.id), req.body);
+      res.json(color);
+    } catch (error) {
+      console.error("Error updating color:", error);
+      res.status(500).json({ message: "Failed to update color" });
+    }
+  });
+
+  // DELETE routes for removing items
+  app.delete("/api/hierarchical/manufacturers/:id", async (req, res) => {
+    try {
+      const success = await getStorage().deleteManufacturer(req.params.id);
+      if (success) {
+        res.json({ message: "Manufacturer deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Manufacturer not found" });
+      }
+    } catch (error) {
+      console.error("Error deleting manufacturer:", error);
+      res.status(500).json({ message: "Failed to delete manufacturer" });
+    }
+  });
+
+  app.delete("/api/hierarchical/categories/:id", async (req, res) => {
+    try {
+      const success = await getStorage().deleteCategory(parseInt(req.params.id));
+      if (success) {
+        res.json({ message: "Category deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Category not found" });
+      }
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      res.status(500).json({ message: "Failed to delete category" });
+    }
+  });
+
+  app.delete("/api/hierarchical/trimLevels/:id", async (req, res) => {
+    try {
+      const success = await getStorage().deleteTrimLevel(parseInt(req.params.id));
+      if (success) {
+        res.json({ message: "Trim level deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Trim level not found" });
+      }
+    } catch (error) {
+      console.error("Error deleting trim level:", error);
+      res.status(500).json({ message: "Failed to delete trim level" });
+    }
+  });
+
+  app.delete("/api/hierarchical/colors/:id", async (req, res) => {
+    try {
+      const success = await getStorage().deleteColor(parseInt(req.params.id));
+      if (success) {
+        res.json({ message: "Color deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Color not found" });
+      }
+    } catch (error) {
+      console.error("Error deleting color:", error);
+      res.status(500).json({ message: "Failed to delete color" });
+    }
+  });
+
   app.post("/api/hierarchical/locations", async (req, res) => {
     try {
       const location = await getStorage().addLocation(req.body);
