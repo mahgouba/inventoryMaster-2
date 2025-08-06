@@ -548,10 +548,20 @@ export default function PriceCardsPage() {
               background: white;
             }
             
+            body {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            
             .print-container {
               width: 297mm;
               height: 210mm;
-              position: relative;
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
               background-size: cover !important;
               background-position: center !important;
               background-repeat: no-repeat !important;
@@ -1516,9 +1526,11 @@ export default function PriceCardsPage() {
             }
             
             [id^="price-card-"] {
-              position: absolute !important;
+              position: fixed !important;
               left: 0 !important;
               top: 0 !important;
+              right: 0 !important;
+              bottom: 0 !important;
               width: 297mm !important;
               height: 210mm !important;
               margin: 0 !important;
@@ -1568,6 +1580,17 @@ export default function PriceCardsPage() {
               box-shadow: none !important;
               border: none !important;
               margin: 0 !important;
+            }
+            
+            /* التأكد من ملء الصفحة بالكامل */
+            .print-container > div {
+              width: 297mm !important;
+              height: 210mm !important;
+              position: absolute !important;
+              top: 0 !important;
+              left: 0 !important;
+              right: 0 !important;
+              bottom: 0 !important;
             }
             
             /* إخفاء أزرار التحكم عند الطباعة */
