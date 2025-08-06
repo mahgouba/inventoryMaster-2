@@ -1136,7 +1136,7 @@ export default function PriceCardsPage() {
                               justifyContent: 'center',
                               margin: '0 auto 10px auto'
                             }}>
-                              <div style={{ filter: 'sepia(1) hue-rotate(38deg) saturate(2) brightness(1.2)' }}>
+                              <div style={{ filter: 'sepia(100%) saturate(200%) hue-rotate(38deg) brightness(1.3) contrast(1.2)' }}>
                                 <ManufacturerLogo 
                                   manufacturerName={card.manufacturer} 
                                   className="w-full h-full object-contain"
