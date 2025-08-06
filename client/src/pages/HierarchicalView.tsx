@@ -469,7 +469,11 @@ export default function HierarchicalView() {
                   </SelectTrigger>
                   <SelectContent>
                     {Array.isArray(hierarchyData) && hierarchyData.flatMap((item: HierarchyData) => 
-                      item.categories?.filter(catData => catData.category?.id && (catData.category?.nameAr || catData.category?.category)).map(catData => (
+                      item.categories?.filter(catData => 
+                        catData.category?.id && 
+                        catData.category.id.toString().trim() !== '' &&
+                        (catData.category?.nameAr || catData.category?.category)
+                      ).map(catData => (
                         <SelectItem key={catData.category.id} value={catData.category.id.toString()}>
                           {item.manufacturer.nameAr} - {catData.category.nameAr || catData.category.category}
                         </SelectItem>
@@ -498,9 +502,9 @@ export default function HierarchicalView() {
               <div className="flex gap-2 pt-4">
                 <Button
                   onClick={() => addTrimLevelMutation.mutate({
-                    name_ar: newTrimLevelNameAr,
-                    name_en: newTrimLevelNameEn || undefined,
-                    category_id: selectedCategoryForTrimLevel!
+                    nameAr: newTrimLevelNameAr,
+                    nameEn: newTrimLevelNameEn || undefined,
+                    categoryId: selectedCategoryForTrimLevel!
                   })}
                   disabled={!newTrimLevelNameAr || !selectedCategoryForTrimLevel || addTrimLevelMutation.isPending}
                   className="glass-button flex-1"
@@ -827,11 +831,16 @@ export default function HierarchicalView() {
                                   <div className="flex items-center gap-2">
                                     <Settings className="h-3 w-3 text-purple-400" />
                                     <div className="text-right">
-                                      <span className="text-sm text-white">{trimLevel.name_ar}</span>
-                                      {trimLevel.name_en && (
-                                        <span className="text-xs text-gray-400 block">{trimLevel.name_en}</span>
+                                      <span className="text-sm text-white">{trimLevel.nameAr || trimLevel.name_ar}</span>
+                                      {(trimLevel.nameEn || trimLevel.name_en) && (
+                                        <span className="text-xs text-gray-400 block">{trimLevel.nameEn || trimLevel.name_en}</span>
                                       )}
                                     </div>
+                                    {trimLevel.vehicleCount !== undefined && (
+                                      <Badge variant="secondary" className="glass-badge text-xs ml-2">
+                                        {trimLevel.vehicleCount} مركبة
+                                      </Badge>
+                                    )}
                                   </div>
                                   
                                   {/* Trim Level Actions */}

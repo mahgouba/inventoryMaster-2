@@ -237,9 +237,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
               nameAr: vehicleCategory.nameAr,
               nameEn: vehicleCategory.nameEn 
             },
-            trimLevels: Array.from(allTrims).map(trimLevel => ({
-              trimLevel: trimLevel
-            })),
+            trimLevels: Array.from(allTrims).map(trimLevel => {
+              const trimCount = manufacturerInventory.filter(item => 
+                item.category === vehicleCategory.nameAr && item.trimLevel === trimLevel
+              ).length;
+              
+              return {
+                id: trimLevels.find(t => t.nameAr === trimLevel)?.id || Math.random(),
+                nameAr: trimLevel,
+                nameEn: trimLevels.find(t => t.nameAr === trimLevel)?.nameEn,
+                vehicleCount: trimCount
+              };
+            }),
             vehicleCount: categoryVehicleCount
           });
         }
@@ -247,9 +256,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const totalVehicles = manufacturerInventory.length;
 
         hierarchyData.push({
-          manufacturer,
+          manufacturer: {
+            ...manufacturer,
+            vehicleCount: totalVehicles,
+            categoryCount: categoriesWithTrimLevels.length
+          },
           categories: categoriesWithTrimLevels,
-          totalVehicles
+          totalVehicles,
+          categoryCount: categoriesWithTrimLevels.length,
+          trimLevelCount: categoriesWithTrimLevels.reduce((sum, cat) => sum + cat.trimLevels.length, 0)
         });
       }
 
