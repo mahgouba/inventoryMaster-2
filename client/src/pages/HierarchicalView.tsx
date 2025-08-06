@@ -388,8 +388,8 @@ export default function HierarchicalView() {
                     <SelectValue placeholder="اختر الصانع" />
                   </SelectTrigger>
                   <SelectContent>
-                    {Array.isArray(manufacturers) && manufacturers.map((manufacturer: Manufacturer) => (
-                      <SelectItem key={manufacturer.id} value={manufacturer.id ? manufacturer.id.toString() : ""}>
+                    {Array.isArray(manufacturers) && manufacturers.filter(m => m.id && m.nameAr).map((manufacturer: Manufacturer) => (
+                      <SelectItem key={manufacturer.id} value={manufacturer.id.toString()}>
                         {manufacturer.nameAr}
                       </SelectItem>
                     ))}
@@ -460,11 +460,11 @@ export default function HierarchicalView() {
                   </SelectTrigger>
                   <SelectContent>
                     {Array.isArray(hierarchyData) && hierarchyData.flatMap((item: HierarchyData) => 
-                      item.categories.map(catData => (
-                        <SelectItem key={catData.category.id} value={catData.category?.id ? catData.category.id.toString() : ""}>
+                      item.categories?.filter(catData => catData.category?.id && catData.category?.name_ar).map(catData => (
+                        <SelectItem key={catData.category.id} value={catData.category.id.toString()}>
                           {item.manufacturer.nameAr} - {catData.category.name_ar}
                         </SelectItem>
-                      ))
+                      )) || []
                     )}
                   </SelectContent>
                 </Select>
@@ -504,6 +504,67 @@ export default function HierarchicalView() {
                   variant="outline"
                   className="flex-1"
                 >
+                  <X className="h-4 w-4 ml-2" />
+                  إلغاء
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Color Button */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="glass-button flex items-center gap-2">
+              <Palette className="h-4 w-4" />
+              إضافة لون
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="glass-modal" dir="rtl">
+            <DialogHeader>
+              <DialogTitle className="text-right">إضافة لون جديد</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-right block mb-2">نوع اللون</Label>
+                <Select>
+                  <SelectTrigger dir="rtl">
+                    <SelectValue placeholder="اختر نوع اللون" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="exterior">لون خارجي</SelectItem>
+                    <SelectItem value="interior">لون داخلي</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-right block mb-2">اسم اللون</Label>
+                <Input placeholder="اسم اللون" dir="rtl" />
+              </div>
+              <div>
+                <Label className="text-right block mb-2">كود اللون</Label>
+                <Input placeholder="#ffffff" />
+              </div>
+              <div>
+                <Label className="text-right block mb-2">ربط اللون بـ</Label>
+                <Select>
+                  <SelectTrigger dir="rtl">
+                    <SelectValue placeholder="اختر نطاق اللون" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="global">عام (جميع المركبات)</SelectItem>
+                    <SelectItem value="manufacturer">صانع محدد</SelectItem>
+                    <SelectItem value="category">فئة محددة</SelectItem>
+                    <SelectItem value="trimlevel">درجة تجهيز محددة</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button className="glass-button flex-1">
+                  <Save className="h-4 w-4 ml-2" />
+                  حفظ اللون
+                </Button>
+                <Button variant="outline" className="flex-1">
                   <X className="h-4 w-4 ml-2" />
                   إلغاء
                 </Button>
