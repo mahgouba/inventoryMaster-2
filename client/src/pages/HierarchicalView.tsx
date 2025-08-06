@@ -229,11 +229,15 @@ export default function HierarchicalView() {
   });
 
   // Fetch hierarchical data
-  const { data: hierarchyData = [], isLoading } = useQuery({
+  const { data: hierarchyData = [], isLoading, error } = useQuery({
     queryKey: ['/api/hierarchy/full', selectedManufacturer],
     queryFn: async () => {
       const response = await fetch(`/api/hierarchy/full${selectedManufacturer !== 'all' ? `?manufacturer=${encodeURIComponent(selectedManufacturer)}` : ''}`);
-      return response.json();
+      if (!response.ok) {
+        throw new Error('Failed to fetch hierarchy data');
+      }
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
     }
   });
 
@@ -258,7 +262,7 @@ export default function HierarchicalView() {
     setExpandedItems(newExpanded);
   };
 
-  const filteredData = hierarchyData.filter((item: HierarchyData) => {
+  const filteredData = Array.isArray(hierarchyData) ? hierarchyData.filter((item: HierarchyData) => {
     if (!searchTerm) return true;
     
     const searchLower = searchTerm.toLowerCase();
@@ -271,7 +275,7 @@ export default function HierarchicalView() {
     );
     
     return manufacturerMatch || categoryMatch || trimMatch;
-  });
+  }) : [];
 
   if (isLoading) {
     return (
@@ -279,6 +283,23 @@ export default function HierarchicalView() {
         <div className="text-center text-white">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           جاري تحميل التسلسل الهرمي...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center text-white">
+          <div className="text-red-400 text-lg mb-4">خطأ في تحميل البيانات</div>
+          <p className="text-gray-400">حدث خطأ أثناء تحميل التسلسل الهرمي. يرجى المحاولة مرة أخرى.</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            إعادة المحاولة
+          </button>
         </div>
       </div>
     );
