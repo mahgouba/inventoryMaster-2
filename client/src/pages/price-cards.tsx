@@ -174,7 +174,7 @@ export default function PriceCardsPage() {
     
     // استخدام سعر بطاقة السعر أولاً، ثم سعر المخزون كبديل
     let basePrice = 0;
-    if (card.price && card.price !== "" && card.price !== "0") {
+    if (card.price && String(card.price) !== "" && String(card.price) !== "0") {
       basePrice = typeof card.price === 'string' ? parseFloat(card.price) : card.price;
     } else if (inventoryItem?.price) {
       basePrice = typeof inventoryItem.price === 'string' ? parseFloat(inventoryItem.price) : inventoryItem.price;
@@ -508,6 +508,12 @@ export default function PriceCardsPage() {
     // استنساخ محتوى البطاقة
     const cardClone = element.cloneNode(true) as HTMLElement;
     
+    // إزالة التحويل والحجم للطباعة
+    cardClone.style.transform = 'none';
+    cardClone.style.width = '297mm';
+    cardClone.style.height = '210mm';
+    cardClone.style.position = 'relative';
+    
     // إنشاء HTML للطباعة
     const printHTML = `
       <!DOCTYPE html>
@@ -516,6 +522,7 @@ export default function PriceCardsPage() {
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>طباعة بطاقة السعر</title>
+          <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
           <style>
             @page {
               size: A4 landscape;
@@ -526,6 +533,9 @@ export default function PriceCardsPage() {
               margin: 0;
               padding: 0;
               box-sizing: border-box;
+              -webkit-print-color-adjust: exact !important;
+              color-adjust: exact !important;
+              print-color-adjust: exact !important;
             }
             
             html, body {
@@ -535,27 +545,57 @@ export default function PriceCardsPage() {
               padding: 0;
               overflow: hidden;
               font-family: 'Noto Sans Arabic', Arial, sans-serif;
+              background: white;
             }
             
             .print-container {
               width: 297mm;
               height: 210mm;
               position: relative;
-              background-size: cover;
-              background-position: center;
+              background-size: cover !important;
+              background-position: center !important;
+              background-repeat: no-repeat !important;
               overflow: hidden;
+              transform: none !important;
             }
             
             /* إخفاء الأزرار */
-            .no-print, button, .flex.gap-2 {
+            .no-print, button, .flex.gap-2, [class*="gap-2"] button {
               display: none !important;
             }
             
-            /* ضبط الخطوط */
-            * {
-              -webkit-print-color-adjust: exact !important;
-              color-adjust: exact !important;
-              print-color-adjust: exact !important;
+            /* ضبط المحتوى الداخلي */
+            .print-container > div {
+              width: 100% !important;
+              height: 100% !important;
+              transform: none !important;
+              position: relative !important;
+            }
+            
+            /* ضبط النصوص والعناصر */
+            div[style*="position: absolute"] {
+              position: absolute !important;
+            }
+            
+            /* ضبط الخط الكبير للسنة */
+            div[style*="fontSize: 250px"], div[style*="font-size: 250px"] {
+              position: absolute !important;
+              font-size: 250px !important;
+              font-weight: bold !important;
+              color: #C49632 !important;
+              z-index: 10 !important;
+            }
+            
+            /* ضبط صور الشركات */
+            img {
+              max-width: 100% !important;
+              height: auto !important;
+            }
+            
+            /* ضبط QR Code */
+            svg {
+              width: 100% !important;
+              height: 100% !important;
             }
           </style>
         </head>
@@ -565,10 +605,13 @@ export default function PriceCardsPage() {
           </div>
           <script>
             window.onload = function() {
+              // انتظار تحميل الخطوط والصور
               setTimeout(function() {
                 window.print();
-                window.close();
-              }, 500);
+                window.onafterprint = function() {
+                  window.close();
+                };
+              }, 1000);
             };
           </script>
         </body>
@@ -1451,6 +1494,9 @@ export default function PriceCardsPage() {
               margin: 0;
               padding: 0;
               overflow: hidden;
+              -webkit-print-color-adjust: exact !important;
+              color-adjust: exact !important;
+              print-color-adjust: exact !important;
             }
             
             body * {
@@ -1473,6 +1519,7 @@ export default function PriceCardsPage() {
               overflow: hidden !important;
               background-size: cover !important;
               background-position: center !important;
+              background-repeat: no-repeat !important;
               page-break-inside: avoid !important;
             }
             
@@ -1484,18 +1531,14 @@ export default function PriceCardsPage() {
               position: absolute !important;
             }
             
-            [id^="price-card-"] div[style*="top: 80px"] {
+            /* ضبط النص الكبير للسنة */
+            [id^="price-card-"] div[style*="fontSize: 250px"], 
+            [id^="price-card-"] div[style*="font-size: 250px"] {
               position: absolute !important;
-              top: 80px !important;
-              left: 50% !important;
-              transform: translateX(-50%) !important;
-            }
-            
-            [id^="price-card-"] div[style*="bottom: 100px"] {
-              position: absolute !important;
-              bottom: 100px !important;
-              left: 50% !important;
-              transform: translateX(-50%) !important;
+              font-size: 250px !important;
+              font-weight: bold !important;
+              color: #C49632 !important;
+              z-index: 10 !important;
             }
             
             /* ضبط حجم العناصر للطباعة */
@@ -1504,8 +1547,14 @@ export default function PriceCardsPage() {
               height: auto !important;
             }
             
+            /* ضبط QR Code */
+            [id^="price-card-"] svg {
+              width: 100% !important;
+              height: 100% !important;
+            }
+            
             /* إخفاء أزرار التحكم عند الطباعة */
-            .no-print, button {
+            .no-print, button, .flex.gap-2, [class*="gap-2"] button {
               display: none !important;
             }
           }
