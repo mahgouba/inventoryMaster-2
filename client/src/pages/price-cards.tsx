@@ -152,7 +152,15 @@ export default function PriceCardsPage() {
   const calculatePricing = (card: PriceCard) => {
     // البحث عن العنصر المقابل في المخزون للحصول على البيانات الكاملة
     const inventoryItem = inventoryData.find(item => item.id === card.inventoryItemId);
-    const basePrice = inventoryItem?.price ? (typeof inventoryItem.price === 'string' ? parseFloat(inventoryItem.price) : inventoryItem.price) : 0;
+    
+    // استخدام سعر بطاقة السعر أولاً، ثم سعر المخزون كبديل
+    let basePrice = 0;
+    if (card.price && card.price !== "" && card.price !== "0") {
+      basePrice = typeof card.price === 'string' ? parseFloat(card.price) : card.price;
+    } else if (inventoryItem?.price) {
+      basePrice = typeof inventoryItem.price === 'string' ? parseFloat(inventoryItem.price) : inventoryItem.price;
+    }
+    
     const importType = inventoryItem?.importType || card.importType;
     const isUsed = importType === 'مستعمل' || importType === 'مستعمل شخصي';
     const isCompanyImport = importType === 'شركة';
@@ -235,8 +243,11 @@ export default function PriceCardsPage() {
   const createAllPriceCardsMutation = useMutation({
     mutationFn: async () => {
       const results = [];
+      const existingInventoryIds = new Set(priceCards.map(card => card.inventoryItemId));
+      
       for (const vehicle of inventoryData) {
-        if (vehicle.manufacturer && vehicle.category) {
+        // تجنب إنشاء بطاقات مكررة للمركبات التي لديها بطاقات بالفعل
+        if (vehicle.manufacturer && vehicle.category && !existingInventoryIds.has(vehicle.id)) {
           try {
             const priceCardData = {
               inventoryItemId: vehicle.id,
