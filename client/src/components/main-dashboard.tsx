@@ -20,7 +20,7 @@ import FinancingRatesPage from "@/pages/financing-rates";
 
 import DatabaseManagement from "@/pages/database-management";
 import CarsMigrationPage from "@/pages/cars-migration";
-import DropdownOptionsManagement from "@/pages/DropdownOptionsManagement";
+
 import HierarchicalView from "@/pages/HierarchicalView";
 import HierarchyManagementPage from "@/pages/hierarchy-management";
 
@@ -85,8 +85,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return user.role === "admin" ? <DatabaseManagement /> : null;
       case "/cars-migration":
         return user.role === "admin" ? <CarsMigrationPage /> : null;
-      case "/dropdown-options":
-        return user.role === "admin" ? <DropdownOptionsManagement /> : null;
+
       case "/hierarchy":
         return user.role === "admin" ? <HierarchicalView /> : null;
       case "/hierarchy-management":

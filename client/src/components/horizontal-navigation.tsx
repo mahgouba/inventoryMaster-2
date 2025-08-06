@@ -368,13 +368,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       internal: true,
       permission: "admin"
     },
-    { 
-      title: "خيارات القوائم", 
-      href: "/dropdown-options", 
-      icon: Settings,
-      internal: true,
-      permission: "admin"
-    },
+
     { 
       title: "التسلسل الهرمي", 
       href: "/hierarchy", 
