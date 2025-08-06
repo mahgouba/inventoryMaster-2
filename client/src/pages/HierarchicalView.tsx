@@ -203,13 +203,13 @@ export default function HierarchicalView() {
     if (!searchTerm) return true;
     
     const searchLower = searchTerm.toLowerCase();
-    const manufacturerMatch = item.manufacturer.nameAr.toLowerCase().includes(searchLower);
-    const categoryMatch = item.categories.some(cat => 
-      cat.category.name_ar.toLowerCase().includes(searchLower)
-    );
-    const trimMatch = item.categories.some(cat =>
-      cat.trimLevels.some(trim => trim.name_ar.toLowerCase().includes(searchLower))
-    );
+    const manufacturerMatch = item.manufacturer?.nameAr?.toLowerCase().includes(searchLower) || false;
+    const categoryMatch = item.categories?.some(cat => 
+      cat.category?.name_ar?.toLowerCase().includes(searchLower)
+    ) || false;
+    const trimMatch = item.categories?.some(cat =>
+      cat.trimLevels?.some(trim => trim.name_ar?.toLowerCase().includes(searchLower))
+    ) || false;
     
     return manufacturerMatch || categoryMatch || trimMatch;
   }) : [];
@@ -389,7 +389,7 @@ export default function HierarchicalView() {
                   </SelectTrigger>
                   <SelectContent>
                     {Array.isArray(manufacturers) && manufacturers.map((manufacturer: Manufacturer) => (
-                      <SelectItem key={manufacturer.id} value={manufacturer.id.toString()}>
+                      <SelectItem key={manufacturer.id} value={manufacturer.id ? manufacturer.id.toString() : ""}>
                         {manufacturer.nameAr}
                       </SelectItem>
                     ))}
@@ -461,7 +461,7 @@ export default function HierarchicalView() {
                   <SelectContent>
                     {Array.isArray(hierarchyData) && hierarchyData.flatMap((item: HierarchyData) => 
                       item.categories.map(catData => (
-                        <SelectItem key={catData.category.id} value={catData.category.id.toString()}>
+                        <SelectItem key={catData.category.id} value={catData.category?.id ? catData.category.id.toString() : ""}>
                           {item.manufacturer.nameAr} - {catData.category.name_ar}
                         </SelectItem>
                       ))
@@ -515,8 +515,14 @@ export default function HierarchicalView() {
 
       {/* Hierarchy Display */}
       <div className="space-y-4">
-        {filteredData.map((item: HierarchyData) => (
-          <Card key={item.manufacturer.id} className="glass-container">
+        {filteredData.map((item: HierarchyData) => {
+          // Safety check for item validity
+          if (!item?.manufacturer?.id || !item?.manufacturer?.nameAr) {
+            return null;
+          }
+          
+          return (
+          <Card key={`manufacturer-${item.manufacturer.id}`} className="glass-container">
             <CardHeader className="glass-header">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -562,7 +568,7 @@ export default function HierarchicalView() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => deleteManufacturerMutation.mutate(item.manufacturer.id.toString())}
+                      onClick={() => deleteManufacturerMutation.mutate(item.manufacturer?.id ? item.manufacturer.id.toString() : "")}
                       className="text-red-400 hover:bg-red-400/10"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -679,7 +685,8 @@ export default function HierarchicalView() {
               </Collapsible.Content>
             </Collapsible.Root>
           </Card>
-        ))}
+          );
+        })}
       </div>
 
       {filteredData.length === 0 && (
