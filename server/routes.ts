@@ -196,40 +196,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hierarchyData = [];
 
       for (const manufacturer of filteredManufacturers) {
-        // Get all inventory items for this manufacturer to build hierarchy
+        // Get all vehicle categories for this manufacturer
+        const vehicleCategories = await getStorage().getVehicleCategoriesByManufacturer(manufacturer.id);
+        
+        // Get inventory items for vehicle count
         const allInventory = await getStorage().getAllInventoryItems();
         const manufacturerInventory = allInventory.filter(item => 
           item.manufacturer === manufacturer.nameAr
         );
         
-        // Group by categories
-        const categoryMap = new Map();
-        for (const item of manufacturerInventory) {
-          if (!categoryMap.has(item.category)) {
-            categoryMap.set(item.category, {
-              category: { category: item.category },
-              trimLevels: new Set(),
-              vehicleCount: 0
-            });
-          }
-          
-          const categoryData = categoryMap.get(item.category);
-          categoryData.vehicleCount++;
-          
-          // Add trim level if exists
-          if (item.trimLevel) {
-            categoryData.trimLevels.add(item.trimLevel);
-          }
-        }
+        // Build categories with trim levels and counts
+        const categoriesWithTrimLevels = [];
         
-        // Convert to final structure
-        const categoriesWithTrimLevels = Array.from(categoryMap.values()).map(categoryData => ({
-          category: categoryData.category,
-          trimLevels: Array.from(categoryData.trimLevels).map(trimLevel => ({
-            trimLevel: trimLevel
-          })),
-          vehicleCount: categoryData.vehicleCount
-        }));
+        for (const vehicleCategory of vehicleCategories) {
+          // Get trim levels for this category
+          const trimLevels = await getStorage().getVehicleTrimLevelsByCategory(vehicleCategory.id);
+          
+          // Count vehicles for this category
+          const categoryVehicleCount = manufacturerInventory.filter(item => 
+            item.category === vehicleCategory.nameAr
+          ).length;
+          
+          // Get unique trim levels from inventory for this category
+          const inventoryTrims = [...new Set(
+            manufacturerInventory
+              .filter(item => item.category === vehicleCategory.nameAr && item.trimLevel)
+              .map(item => item.trimLevel)
+          )];
+          
+          // Combine database trim levels with inventory trim levels
+          const allTrims = new Set([
+            ...trimLevels.map(t => t.nameAr),
+            ...inventoryTrims
+          ]);
+          
+          categoriesWithTrimLevels.push({
+            category: { 
+              id: vehicleCategory.id,
+              category: vehicleCategory.nameAr,
+              nameAr: vehicleCategory.nameAr,
+              nameEn: vehicleCategory.nameEn 
+            },
+            trimLevels: Array.from(allTrims).map(trimLevel => ({
+              trimLevel: trimLevel
+            })),
+            vehicleCount: categoryVehicleCount
+          });
+        }
         
         const totalVehicles = manufacturerInventory.length;
 
