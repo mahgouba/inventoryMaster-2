@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Trash2, Save, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Trash2, Save, X, Eye, EyeOff, Edit2, Layers } from "lucide-react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { FreshImportButton } from "@/components/FreshImportButton";
 
@@ -53,6 +53,15 @@ export default function HierarchicalView() {
   const [isAddManufacturerOpen, setIsAddManufacturerOpen] = useState(false);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isAddTrimLevelOpen, setIsAddTrimLevelOpen] = useState(false);
+  const [isAddColorOpen, setIsAddColorOpen] = useState(false);
+  
+  // Color form states
+  const [colorType, setColorType] = useState("");
+  const [colorName, setColorName] = useState("");
+  const [colorCode, setColorCode] = useState("");
+  const [colorManufacturer, setColorManufacturer] = useState("");
+  const [colorCategory, setColorCategory] = useState("");
+  const [colorTrimLevel, setColorTrimLevel] = useState("");
   const [isEditMode, setIsEditMode] = useState<{ type: string; id: number | string; data: any } | null>(null);
   
   // Form states
@@ -513,7 +522,7 @@ export default function HierarchicalView() {
         </Dialog>
 
         {/* Add Color Button */}
-        <Dialog>
+        <Dialog open={isAddColorOpen} onOpenChange={setIsAddColorOpen}>
           <DialogTrigger asChild>
             <Button className="glass-button flex items-center gap-2">
               <Palette className="h-4 w-4" />
@@ -523,48 +532,158 @@ export default function HierarchicalView() {
           <DialogContent className="glass-modal" dir="rtl">
             <DialogHeader>
               <DialogTitle className="text-right">إضافة لون جديد</DialogTitle>
+              <DialogDescription className="text-right">
+                قم بإدخال تفاصيل اللون الجديد وحدد نطاق الربط (صانع، فئة، أو درجة تجهيز)
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <div>
-                <Label className="text-right block mb-2">نوع اللون</Label>
-                <Select>
-                  <SelectTrigger dir="rtl">
-                    <SelectValue placeholder="اختر نوع اللون" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="exterior">لون خارجي</SelectItem>
-                    <SelectItem value="interior">لون داخلي</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-right block mb-2">نوع اللون *</Label>
+                  <Select value={colorType} onValueChange={setColorType}>
+                    <SelectTrigger dir="rtl">
+                      <SelectValue placeholder="اختر نوع اللون" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="exterior">لون خارجي</SelectItem>
+                      <SelectItem value="interior">لون داخلي</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-right block mb-2">كود اللون</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={colorCode}
+                      onChange={(e) => setColorCode(e.target.value)}
+                      placeholder="#ffffff"
+                      className="flex-1"
+                    />
+                    {colorCode && (
+                      <div 
+                        className="w-8 h-8 rounded border border-gray-300" 
+                        style={{ backgroundColor: colorCode }}
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
+              
               <div>
-                <Label className="text-right block mb-2">اسم اللون</Label>
-                <Input placeholder="اسم اللون" dir="rtl" />
+                <Label className="text-right block mb-2">اسم اللون *</Label>
+                <Input
+                  value={colorName}
+                  onChange={(e) => setColorName(e.target.value)}
+                  placeholder="اسم اللون"
+                  dir="rtl"
+                />
               </div>
-              <div>
-                <Label className="text-right block mb-2">كود اللون</Label>
-                <Input placeholder="#ffffff" />
+
+              <div className="space-y-3">
+                <Label className="text-right block text-sm font-medium">ربط اللون (اختياري - يمكن اختيار مستوى واحد أو أكثر)</Label>
+                
+                <div>
+                  <Label className="text-right block mb-2 text-sm">الصانع</Label>
+                  <Select value={colorManufacturer} onValueChange={setColorManufacturer}>
+                    <SelectTrigger dir="rtl">
+                      <SelectValue placeholder="اختر الصانع (اختياري)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">بدون تحديد صانع</SelectItem>
+                      {Array.isArray(manufacturers) && manufacturers.filter(m => m.id && m.nameAr).map((manufacturer: Manufacturer) => (
+                        <SelectItem key={`color-mfg-${manufacturer.id}`} value={manufacturer.id.toString()}>
+                          {manufacturer.nameAr}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-right block mb-2 text-sm">الفئة</Label>
+                  <Select value={colorCategory} onValueChange={setColorCategory}>
+                    <SelectTrigger dir="rtl">
+                      <SelectValue placeholder="اختر الفئة (اختياري)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">بدون تحديد فئة</SelectItem>
+                      {Array.isArray(hierarchyData) && hierarchyData.flatMap((item: HierarchyData) => 
+                        item.categories?.filter(catData => catData.category?.id && catData.category?.name_ar).map(catData => (
+                          <SelectItem key={`color-cat-${catData.category.id}`} value={catData.category.id.toString()}>
+                            {item.manufacturer.nameAr} - {catData.category.name_ar}
+                          </SelectItem>
+                        )) || []
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-right block mb-2 text-sm">درجة التجهيز</Label>
+                  <Select value={colorTrimLevel} onValueChange={setColorTrimLevel}>
+                    <SelectTrigger dir="rtl">
+                      <SelectValue placeholder="اختر درجة التجهيز (اختياري)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">بدون تحديد درجة تجهيز</SelectItem>
+                      {Array.isArray(hierarchyData) && hierarchyData.flatMap((item: HierarchyData) => 
+                        item.categories?.flatMap(catData => 
+                          catData.trimLevels?.filter(trim => trim.id && trim.name_ar).map(trim => (
+                            <SelectItem key={`color-trim-${trim.id}`} value={trim.id.toString()}>
+                              {item.manufacturer.nameAr} - {catData.category.name_ar} - {trim.name_ar}
+                            </SelectItem>
+                          )) || []
+                        ) || []
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div>
-                <Label className="text-right block mb-2">ربط اللون بـ</Label>
-                <Select>
-                  <SelectTrigger dir="rtl">
-                    <SelectValue placeholder="اختر نطاق اللون" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="global">عام (جميع المركبات)</SelectItem>
-                    <SelectItem value="manufacturer">صانع محدد</SelectItem>
-                    <SelectItem value="category">فئة محددة</SelectItem>
-                    <SelectItem value="trimlevel">درجة تجهيز محددة</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+
               <div className="flex gap-2 pt-4">
-                <Button className="glass-button flex-1">
+                <Button
+                  onClick={() => {
+                    // إنشاء كائن اللون بناءً على المستوى المحدد
+                    const colorData = {
+                      name: colorName,
+                      type: colorType,
+                      code: colorCode,
+                      manufacturer_id: colorManufacturer ? Number(colorManufacturer) : undefined,
+                      category_id: colorCategory ? Number(colorCategory) : undefined,
+                      trim_level_id: colorTrimLevel ? Number(colorTrimLevel) : undefined
+                    };
+                    
+                    console.log('Color data to save:', colorData);
+                    // هنا سيتم إضافة استدعاء API لحفظ اللون
+                    
+                    // إعادة تعيين النموذج
+                    setColorType("");
+                    setColorName("");
+                    setColorCode("");
+                    setColorManufacturer("");
+                    setColorCategory("");
+                    setColorTrimLevel("");
+                    setIsAddColorOpen(false);
+                  }}
+                  disabled={!colorName || !colorType}
+                  className="glass-button flex-1"
+                >
                   <Save className="h-4 w-4 ml-2" />
                   حفظ اللون
                 </Button>
-                <Button variant="outline" className="flex-1">
+                <Button
+                  onClick={() => {
+                    setColorType("");
+                    setColorName("");
+                    setColorCode("");
+                    setColorManufacturer("");
+                    setColorCategory("");
+                    setColorTrimLevel("");
+                    setIsAddColorOpen(false);
+                  }}
+                  variant="outline"
+                  className="flex-1"
+                >
                   <X className="h-4 w-4 ml-2" />
                   إلغاء
                 </Button>
