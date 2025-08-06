@@ -30,11 +30,20 @@ interface Category {
   category?: string;
 }
 
+interface Color {
+  id: number;
+  name: string;
+  code?: string;
+  type: 'exterior' | 'interior';
+  vehicleCount: number;
+}
+
 interface TrimLevel {
   id: number;
   category_id: number;
   name_ar: string;
   name_en?: string;
+  colors?: Color[];
 }
 
 interface HierarchyData {
@@ -830,37 +839,106 @@ export default function HierarchicalView() {
                           <Collapsible.Content>
                             <div className="space-y-2 mr-6">
                               {catData.trimLevels.map((trimLevel) => (
-                                <div key={trimLevel.id} className="flex items-center justify-between p-2 glass-item rounded">
-                                  <div className="flex items-center gap-2">
-                                    <Settings className="h-3 w-3 text-purple-400" />
-                                    <div className="text-right">
-                                      <span className="text-sm text-white">{trimLevel.name_ar}</span>
-                                      {trimLevel.name_en && (
-                                        <span className="text-xs text-gray-400 block">{trimLevel.name_en}</span>
-                                      )}
+                                <div key={trimLevel.id} className="glass-item rounded">
+                                  {/* Trim Level Header */}
+                                  <div className="flex items-center justify-between p-2">
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => toggleExpanded(`trim-${trimLevel.id}`)}
+                                        className="text-white hover:bg-white/10 p-1"
+                                      >
+                                        {expandedItems.has(`trim-${trimLevel.id}`) ? (
+                                          <ChevronDown className="h-3 w-3" />
+                                        ) : (
+                                          <ChevronRight className="h-3 w-3" />
+                                        )}
+                                      </Button>
+                                      <Settings className="h-3 w-3 text-purple-400" />
+                                      <div className="text-right">
+                                        <span className="text-sm text-white">{trimLevel.name_ar}</span>
+                                        {trimLevel.name_en && (
+                                          <span className="text-xs text-gray-400 block">{trimLevel.name_en}</span>
+                                        )}
+                                      </div>
                                     </div>
-
+                                    
+                                    <div className="flex items-center gap-2">
+                                      {trimLevel.colors && trimLevel.colors.length > 0 && (
+                                        <Badge variant="outline" className="glass-badge text-xs">
+                                          {trimLevel.colors.length} لون
+                                        </Badge>
+                                      )}
+                                      
+                                      {/* Trim Level Actions */}
+                                      <div className="flex gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => setIsEditMode({ type: 'trimLevel', id: trimLevel.id, data: trimLevel })}
+                                          className="text-yellow-400 hover:bg-yellow-400/10"
+                                        >
+                                          <Edit className="h-3 w-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => deleteTrimLevelMutation.mutate(trimLevel.id)}
+                                          className="text-red-400 hover:bg-red-400/10"
+                                        >
+                                          <Trash2 className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    </div>
                                   </div>
                                   
-                                  {/* Trim Level Actions */}
-                                  <div className="flex gap-1">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => setIsEditMode({ type: 'trimLevel', id: trimLevel.id, data: trimLevel })}
-                                      className="text-yellow-400 hover:bg-yellow-400/10"
-                                    >
-                                      <Edit className="h-3 w-3" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => deleteTrimLevelMutation.mutate(trimLevel.id)}
-                                      className="text-red-400 hover:bg-red-400/10"
-                                    >
-                                      <Trash2 className="h-3 w-3" />
-                                    </Button>
-                                  </div>
+                                  {/* Colors under Trim Level */}
+                                  <Collapsible.Root open={expandedItems.has(`trim-${trimLevel.id}`)}>
+                                    <Collapsible.Content>
+                                      {trimLevel.colors && trimLevel.colors.length > 0 && (
+                                        <div className="px-4 pb-2 mr-6">
+                                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                                            {trimLevel.colors.map((color) => (
+                                              <div key={color.id} className="flex items-center justify-between p-2 bg-black/20 rounded border border-white/10">
+                                                <div className="flex items-center gap-2">
+                                                  <Palette className="h-3 w-3 text-yellow-400" />
+                                                  <div className="flex items-center gap-2">
+                                                    {color.code && (
+                                                      <div 
+                                                        className="w-4 h-4 rounded-full border border-white/30"
+                                                        style={{ backgroundColor: color.code }}
+                                                      />
+                                                    )}
+                                                    <div className="text-right">
+                                                      <span className="text-xs text-white">{color.name}</span>
+                                                      <div className="flex items-center gap-1">
+                                                        <Badge 
+                                                          variant="outline" 
+                                                          className={`text-xs ${
+                                                            color.type === 'exterior' 
+                                                              ? 'border-blue-400 text-blue-400' 
+                                                              : 'border-orange-400 text-orange-400'
+                                                          }`}
+                                                        >
+                                                          {color.type === 'exterior' ? 'خارجي' : 'داخلي'}
+                                                        </Badge>
+                                                        {color.vehicleCount > 0 && (
+                                                          <Badge variant="secondary" className="text-xs">
+                                                            {color.vehicleCount} مركبة
+                                                          </Badge>
+                                                        )}
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
+                                    </Collapsible.Content>
+                                  </Collapsible.Root>
                                 </div>
                               ))}
                             </div>

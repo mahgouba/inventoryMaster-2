@@ -239,16 +239,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ...inventoryTrims
           ]);
           
-          categoriesWithTrimLevels.push({
-            category: { 
-              id: vehicleCategory.id,
-              category: vehicleCategory.nameAr,
-              nameAr: vehicleCategory.nameAr,
-              name_ar: vehicleCategory.nameAr,
-              nameEn: vehicleCategory.nameEn,
-              name_en: vehicleCategory.nameEn
-            },
-            trimLevels: Array.from(allTrims).map(trimLevel => {
+          // Build trim levels with colors
+          const trimLevelsWithColors = await Promise.all(
+            Array.from(allTrims).map(async (trimLevel) => {
               const trimCount = manufacturerInventory.filter(item => 
                 item.category === vehicleCategory.nameAr && item.trimLevel === trimLevel
               ).length;
@@ -260,15 +253,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
                                   return nameAr === trimLevel;
                                 });
               
+              // Get colors for this trim level
+              const trimColors = await getStorage().getColorAssociationsByTrimLevel(manufacturer.nameAr, vehicleCategory.nameAr, trimLevel);
+              
               return {
                 id: dbTrimLevel?.id || Math.random(),
                 name_ar: trimLevel,
                 nameAr: trimLevel, // Keep for backward compatibility
                 name_en: dbTrimLevel?.nameEn,
                 nameEn: dbTrimLevel?.nameEn,
-                vehicleCount: trimCount
+                vehicleCount: trimCount,
+                colors: trimColors.map(color => ({
+                  id: color.id,
+                  name: color.colorName,
+                  code: color.colorCode,
+                  type: color.colorType,
+                  vehicleCount: manufacturerInventory.filter(item => 
+                    item.category === vehicleCategory.nameAr && 
+                    item.trimLevel === trimLevel &&
+                    (color.colorType === 'exterior' ? 
+                      item.exteriorColor === color.colorName : 
+                      item.interiorColor === color.colorName)
+                  ).length
+                }))
               };
-            }),
+            })
+          );
+
+          categoriesWithTrimLevels.push({
+            category: { 
+              id: vehicleCategory.id,
+              category: vehicleCategory.nameAr,
+              nameAr: vehicleCategory.nameAr,
+              name_ar: vehicleCategory.nameAr,
+              nameEn: vehicleCategory.nameEn,
+              name_en: vehicleCategory.nameEn
+            },
+            trimLevels: trimLevelsWithColors,
             vehicleCount: categoryVehicleCount
           });
         }
