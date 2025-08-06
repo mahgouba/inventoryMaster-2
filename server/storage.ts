@@ -623,7 +623,9 @@ export class MemStorage implements IStorage {
 
   // Inventory methods
   async getAllInventoryItems(): Promise<InventoryItem[]> {
-    return Array.from(this.inventoryItems.values());
+    const items = Array.from(this.inventoryItems.values());
+    console.log(`📊 Total inventory items in storage: ${items.length}`);
+    return items;
   }
 
   async getInventoryItem(id: number): Promise<InventoryItem | undefined> {
@@ -661,6 +663,7 @@ export class MemStorage implements IStorage {
       saleNotes: itemData.saleNotes ?? null
     };
     this.inventoryItems.set(id, item);
+    console.log(`✅ Added inventory item ${id} - ${item.manufacturer} ${item.category} (Total: ${this.inventoryItems.size})`);
     return item;
   }
 
@@ -719,10 +722,11 @@ export class MemStorage implements IStorage {
 
   async getInventoryStats(): Promise<any> {
     const items = Array.from(this.inventoryItems.values());
+    console.log(`📊 getInventoryStats: Total items in storage: ${items.length}`);
     const availableItems = items.filter(item => !item.isSold && item.status !== "مباع");
     
     return {
-      total: availableItems.length,
+      total: items.length, // Fixed: show total items, not just available
       available: availableItems.filter(item => item.status === "متوفر").length,
       inTransit: availableItems.filter(item => item.status === "في الطريق").length,
       maintenance: availableItems.filter(item => item.status === "في الصيانة").length,

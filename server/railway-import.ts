@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
-import { storage } from "./storage";
+import { getStorage } from "./storage";
 
 // Railway database connection
 let railwayPool: Pool | null = null;
@@ -51,7 +51,7 @@ export async function importInventoryFromRailway() {
     let importedCount = 0;
     for (const item of railwayItems) {
       try {
-        await storage.createInventoryItem({
+        await getStorage().createInventoryItem({
           manufacturer: item.manufacturer,
           category: item.category,
           trimLevel: item.trimLevel,
@@ -120,7 +120,7 @@ export async function importManufacturersFromRailway() {
     let importedCount = 0;
     for (const manufacturer of railwayManufacturers) {
       try {
-        await storage.createManufacturer({
+        await getStorage().createManufacturer({
           nameAr: manufacturer.nameAr,
           nameEn: manufacturer.nameEn,
           logo: manufacturer.logo,
@@ -155,7 +155,7 @@ export async function importBanksFromRailway() {
     let importedCount = 0;
     for (const bank of railwayBanks) {
       try {
-        await storage.createBank({
+        await getStorage().createBank({
           logo: bank.logo,
           bankName: bank.bankName,
           nameEn: bank.nameEn,
@@ -194,7 +194,7 @@ export async function importUsersFromRailway() {
     let importedCount = 0;
     for (const user of railwayUsers) {
       try {
-        await storage.createUser({
+        await getStorage().createUser({
           name: user.name,
           jobTitle: user.jobTitle,
           phoneNumber: user.phoneNumber,
