@@ -1196,40 +1196,7 @@ export default function PriceCardsPage() {
                             textAlign: 'center',
                             marginBottom: '15px'
                           }}>
-                            {/* Category, Trim Level, Engine Capacity in same row */}
-                            {(() => {
-                              const inventoryItem = inventoryData.find(item => item.id === card.inventoryItemId);
-                              const parts = [];
-                              
-                              // Add category if visible
-                              if (!getFieldVisibility(card.id, 'category') && card.category) {
-                                parts.push(card.category);
-                              }
-                              
-                              // Add trim level if visible and available
-                              if (!getFieldVisibility(card.id, 'trimLevel') && card.trimLevel) {
-                                parts.push(card.trimLevel);
-                              }
-                              
-                              // Add engine capacity if visible and available
-                              if (!getFieldVisibility(card.id, 'engineCapacity') && inventoryItem?.engineCapacity) {
-                                parts.push(inventoryItem.engineCapacity);
-                              }
-                              
-                              if (parts.length > 0) {
-                                return (
-                                  <div style={{ 
-                                    color: '#CF9B47', 
-                                    fontSize: '42px', 
-                                    fontWeight: 'bold', 
-                                    textAlign: 'center'
-                                  }}>
-                                    {parts.join(' - ')}
-                                  </div>
-                                );
-                              }
-                              return null;
-                            })()}
+
                             
                             {/* Model (separate line) */}
                             {(!getFieldVisibility(card.id, 'model') && card.model) && (
@@ -1592,14 +1559,26 @@ export default function PriceCardsPage() {
               print-color-adjust: exact !important;
             }
             
+            /* إخفاء كل شيء ما عدا بطاقة السعر */
             body * {
-              visibility: hidden;
+              visibility: hidden !important;
             }
             
+            /* إظهار بطاقة السعر وجميع عناصرها */
             [id^="price-card-"], [id^="price-card-"] * {
-              visibility: visible;
+              visibility: visible !important;
             }
             
+            /* إخفاء عناصر التحكم والحاويات الخارجية */
+            .container, .max-w-7xl, .mx-auto, .p-6, .space-y-6, 
+            h1, .flex.gap-2, button, .no-print,
+            .card-header, .card-title, .card-content,
+            nav, header, footer, aside, .sidebar {
+              visibility: hidden !important;
+              display: none !important;
+            }
+            
+            /* ضبط بطاقة السعر للطباعة */
             [id^="price-card-"] {
               position: fixed !important;
               left: 0 !important;
@@ -1618,23 +1597,21 @@ export default function PriceCardsPage() {
               page-break-inside: avoid !important;
               box-shadow: none !important;
               border: none !important;
+              z-index: 9999 !important;
             }
             
-            [id^="price-card-"] * {
-              position: relative !important;
-            }
-            
+            /* الحفاظ على المواضع المطلقة */
             [id^="price-card-"] div[style*="position: absolute"] {
               position: absolute !important;
             }
             
             /* ضبط النص الكبير للسنة */
-            [id^="price-card-"] div[style*="fontSize: 250px"], 
-            [id^="price-card-"] div[style*="font-size: 250px"] {
+            [id^="price-card-"] div[style*="fontSize: 200px"], 
+            [id^="price-card-"] div[style*="font-size: 200px"] {
               position: absolute !important;
-              font-size: 250px !important;
-              font-weight: bold !important;
-              color: #C49632 !important;
+              font-size: 200px !important;
+              font-weight: 900 !important;
+              color: #CF9B47 !important;
               z-index: 10 !important;
             }
             
@@ -1650,27 +1627,21 @@ export default function PriceCardsPage() {
               height: 100% !important;
             }
             
-            /* إزالة الظلال والحدود والهوامش في الطباعة */
-            *, *::before, *::after {
+            /* إزالة الظلال والحدود في الطباعة */
+            [id^="price-card-"], [id^="price-card-"] * {
               box-shadow: none !important;
               border: none !important;
-              margin: 0 !important;
             }
             
-            /* التأكد من ملء الصفحة بالكامل */
-            .print-container > div {
-              width: 297mm !important;
-              height: 210mm !important;
-              position: absolute !important;
-              top: 0 !important;
-              left: 0 !important;
-              right: 0 !important;
-              bottom: 0 !important;
-            }
-            
-            /* إخفاء أزرار التحكم عند الطباعة */
-            .no-print, button, .flex.gap-2, [class*="gap-2"] button {
+            /* إخفاء أي أزرار متبقية */
+            button, .btn, .button, [role="button"] {
               display: none !important;
+            }
+            
+            /* ضبط الخط والاتجاه */
+            [id^="price-card-"] {
+              font-family: 'Noto Sans Arabic', Arial, sans-serif !important;
+              direction: rtl !important;
             }
           }
         `
