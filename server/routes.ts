@@ -226,7 +226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Combine database trim levels with inventory trim levels
           const allTrims = new Set([
-            ...trimLevels.map(t => t.nameAr),
+            ...trimLevels.map(t => t.name_ar || t.nameAr),
             ...inventoryTrims
           ]);
           
@@ -243,9 +243,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ).length;
               
               return {
-                id: trimLevels.find(t => t.nameAr === trimLevel)?.id || Math.random(),
-                nameAr: trimLevel,
-                nameEn: trimLevels.find(t => t.nameAr === trimLevel)?.nameEn,
+                id: trimLevels.find(t => (t.name_ar || t.nameAr) === trimLevel)?.id || Math.random(),
+                name_ar: trimLevel,
+                name_en: trimLevels.find(t => (t.name_ar || t.nameAr) === trimLevel)?.name_en || trimLevels.find(t => (t.name_ar || t.nameAr) === trimLevel)?.nameEn,
+                nameAr: trimLevel, // Keep for backward compatibility
+                nameEn: trimLevels.find(t => (t.name_ar || t.nameAr) === trimLevel)?.name_en || trimLevels.find(t => (t.name_ar || t.nameAr) === trimLevel)?.nameEn,
                 vehicleCount: trimCount
               };
             }),

@@ -785,9 +785,9 @@ export default function HierarchicalView() {
                             </Button>
                             <Car className="h-4 w-4 text-green-400" />
                             <div className="text-right">
-                              <h4 className="font-medium text-white">{catData.category.name_ar}</h4>
-                              {catData.category.name_en && (
-                                <p className="text-xs text-gray-400">{catData.category.name_en}</p>
+                              <h4 className="font-medium text-white">{catData.category.name_ar || catData.category.nameAr || catData.category.category}</h4>
+                              {(catData.category.name_en || catData.category.nameEn) && (
+                                <p className="text-xs text-gray-400">{catData.category.name_en || catData.category.nameEn}</p>
                               )}
                             </div>
                           </div>
