@@ -962,7 +962,7 @@ export default function PriceCardsPage() {
                     {/* Main Content Card - Bottom Center */}
                     <div style={{
                       position: 'absolute',
-                      bottom: '60px',
+                      bottom: '80px',
                       left: '50%',
                       transform: 'translateX(-50%)',
                       width: '1080px',
@@ -1374,9 +1374,9 @@ export default function PriceCardsPage() {
               left: 50% !important;
               transform: translateX(-50%) !important;
             }
-            [id^="price-card-"] div[style*="bottom: 60px"] {
+            [id^="price-card-"] div[style*="bottom: 80px"] {
               position: absolute !important;
-              bottom: 60px !important;
+              bottom: 80px !important;
               left: 50% !important;
               transform: translateX(-50%) !important;
             }
