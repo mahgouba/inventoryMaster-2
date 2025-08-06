@@ -22,7 +22,9 @@ import {
   type VehicleCategory, type InsertVehicleCategory,
   type VehicleTrimLevel, type InsertVehicleTrimLevel,
   type VehicleSpecification, type InsertVehicleSpecification,
-  type VehicleImageLink, type InsertVehicleImageLink
+  type VehicleImageLink, type InsertVehicleImageLink,
+  type EmployeeWorkSchedule, type InsertEmployeeWorkSchedule,
+  type DailyAttendance, type InsertDailyAttendance
 } from "@shared/schema";
 
 export interface IStorage {
@@ -645,7 +647,7 @@ export class MemStorage implements IStorage {
       reservedBy: itemData.reservedBy ?? null,
       salesRepresentative: itemData.salesRepresentative ?? null,
       reservationNote: itemData.reservationNote ?? null,
-      entryDate: itemData.entryDate ?? new Date(),
+      entryDate: new Date(),
       mileage: itemData.mileage ?? null,
       customerName: itemData.customerName ?? null,
       customerPhone: itemData.customerPhone ?? null,
@@ -1619,9 +1621,7 @@ export class MemStorage implements IStorage {
     return updated;
   }
 
-  async createPriceCard(cardData: any): Promise<any> {
-    return { id: 1, ...cardData };
-  }
+
 
   async createImageLink(linkData: any): Promise<any> {
     return { id: 1, ...linkData };
