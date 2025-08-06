@@ -1201,9 +1201,9 @@ export default function PriceCardsPage() {
                               display: 'flex', 
                               justifyContent: 'space-between', 
                               alignItems: 'center',
-                              gap: '15px',
+                              gap: '5px',
                               color: '#CF9B47', 
-                              fontSize: '24px', 
+                              fontSize: '72px', 
                               fontWeight: 'bold'
                             }}>
                               {!getFieldVisibility(card.id, 'category') && card.category && (
