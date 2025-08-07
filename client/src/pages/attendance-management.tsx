@@ -345,6 +345,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     }
 
     const requestData = {
+      userId: userId,
       userName: username,
       requestType,
       startDate: requestDate,
@@ -1776,9 +1777,11 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   </Select>
                 </div>
 
-                {/* التاريخ */}
+                {/* تاريخ البداية / الوقت */}
                 <div>
-                  <Label className="text-gray-300">التاريخ</Label>
+                  <Label className="text-gray-300">
+                    {requestType === "إجازة" ? "تاريخ البداية" : "التاريخ"}
+                  </Label>
                   <Select value={requestDate} onValueChange={setRequestDate}>
                     <SelectTrigger className="bg-white/10 border-white/20 text-white">
                       <SelectValue />
