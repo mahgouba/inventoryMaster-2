@@ -1286,24 +1286,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                         // If attendance record exists, show saved time or current time
                         return (existingAttendance as any)[fieldType] || currentTime;
                       } else {
-                        // If no attendance record, show schedule time or current time
-                        if (fieldType.includes('Checkin') || fieldType.includes('Start')) {
-                          if (fieldType.includes('continuous')) {
-                            return selectedEmployeeForDialog.continuousStartTime || currentTime;
-                          } else if (fieldType.includes('morning')) {
-                            return selectedEmployeeForDialog.morningStartTime || currentTime;
-                          } else if (fieldType.includes('evening')) {
-                            return selectedEmployeeForDialog.eveningStartTime || currentTime;
-                          }
-                        } else {
-                          if (fieldType.includes('continuous')) {
-                            return selectedEmployeeForDialog.continuousEndTime || currentTime;
-                          } else if (fieldType.includes('morning')) {
-                            return selectedEmployeeForDialog.morningEndTime || currentTime;
-                          } else if (fieldType.includes('evening')) {
-                            return selectedEmployeeForDialog.eveningEndTime || currentTime;
-                          }
-                        }
+                        // If no attendance record, always show current time as default
                         return currentTime;
                       }
                     };
