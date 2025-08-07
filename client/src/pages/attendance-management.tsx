@@ -201,7 +201,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     refetchInterval: 2000, // Refetch every 2 seconds
   });
 
-  // Set current time when attendance dialog opens
+  // Set default scheduled times when attendance dialog opens
   useEffect(() => {
     if (isAttendanceDialogOpen && selectedEmployeeForDialog) {
       const existingAttendance = dailyAttendance?.find((record: DailyAttendance) => 
@@ -211,12 +211,20 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       
       if (!existingAttendance) {
         setTimeout(() => {
-          const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-          const timeInputs = ['continuous-checkin-time', 'continuous-checkout-time', 'morning-checkin-time', 'morning-checkout-time', 'evening-checkin-time', 'evening-checkout-time'];
-          timeInputs.forEach(inputId => {
+          // Default scheduled times
+          const defaultTimes = {
+            'continuous-checkin-time': '12:00',    // 12:00 PM
+            'continuous-checkout-time': '22:00',   // 10:00 PM
+            'morning-checkin-time': '09:30',       // 09:30 AM
+            'morning-checkout-time': '13:00',      // 01:00 PM
+            'evening-checkin-time': '16:00',       // 04:00 PM
+            'evening-checkout-time': '21:00'       // 09:00 PM
+          };
+          
+          Object.entries(defaultTimes).forEach(([inputId, defaultTime]) => {
             const input = document.getElementById(inputId) as HTMLInputElement;
             if (input) {
-              input.value = currentTime;
+              input.value = defaultTime;
             }
           });
         }, 100);
@@ -1303,14 +1311,27 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                     
                     const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
                     
-                    // Get default times - always show current time for new records
+                    // Get default times - show scheduled times for new records
                     const getDefaultTime = (fieldType: string) => {
                       if (existingAttendance) {
                         // If attendance record exists, show saved time
-                        return (existingAttendance as any)[fieldType] || currentTime;
+                        return (existingAttendance as any)[fieldType] || getScheduledDefaultTime(fieldType);
                       } else {
-                        // If no attendance record, always show current time as default
-                        return currentTime;
+                        // If no attendance record, show scheduled default times
+                        return getScheduledDefaultTime(fieldType);
+                      }
+                    };
+
+                    // Get scheduled default times based on field type
+                    const getScheduledDefaultTime = (fieldType: string) => {
+                      switch (fieldType) {
+                        case 'continuousCheckinTime': return '12:00';   // 12:00 PM
+                        case 'continuousCheckoutTime': return '22:00';  // 10:00 PM
+                        case 'morningCheckinTime': return '09:30';      // 09:30 AM
+                        case 'morningCheckoutTime': return '13:00';     // 01:00 PM
+                        case 'eveningCheckinTime': return '16:00';      // 04:00 PM
+                        case 'eveningCheckoutTime': return '21:00';     // 09:00 PM
+                        default: return currentTime;
                       }
                     };
 
