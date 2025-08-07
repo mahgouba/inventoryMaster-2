@@ -1092,23 +1092,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                       {/* Calendar View when expanded */}
                       {isExpanded && (
                         <div className="mt-6 space-y-4">
-                          {/* Calendar Grid */}
-                          <div className="bg-white/5 rounded-lg p-4">
-                            <div className="grid grid-cols-7 gap-2">
-                              {/* Day Headers */}
-                              {['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'].map((day) => (
-                                <div key={day} className="p-3 text-center text-gray-400 text-sm font-semibold bg-white/10 rounded-lg">
-                                  {day}
-                                </div>
-                              ))}
-                              
-                              {/* Empty cells for proper calendar layout */}
-                              {Array.from({ length: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay() }).map((_, index) => (
-                                <div key={`empty-${index}`} className="p-3"></div>
-                              ))}
-                              
-                              {/* Calendar Days */}
-                              {monthDays.map((day) => {
+                          {/* Bar-style Calendar */}
+                          <div className="bg-white/5 rounded-lg p-6 space-y-3">
+                            {/* Calendar Days as Progress Bars */}
+                            {monthDays.map((day) => {
                               const dayStr = format(day, "yyyy-MM-dd");
                               const dayAttendance = monthAttendance.find(a => a.date === dayStr);
                               const isToday = isSameDay(day, new Date());
@@ -1117,61 +1104,148 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               const hasApprovedLeaveForDay = hasApprovedLeave(schedule.employeeId, day);
                               const isLate = hasAttendance && !isHoliday && !hasApprovedLeaveForDay && isEmployeeLate(schedule, day);
                               
+                              // Calculate hours worked
+                              const hoursWorked = hasAttendance && !isHoliday ? parseFloat(calculateHoursWorked(schedule, dayAttendance)) : 0;
+                              const expectedHours = schedule.scheduleType === "متصل" ? 8 : 8; // Default 8 hours
+                              const workPercentage = Math.min((hoursWorked / expectedHours) * 100, 100);
+                              
+                              // Get day name in Arabic
+                              const dayName = format(day, "EEEE", { locale: ar });
+                              
                               return (
                                 <div
                                   key={day.toISOString()}
                                   className={`
-                                    p-3 text-center cursor-pointer rounded-lg transition-all duration-200 border min-h-[60px] flex flex-col justify-center items-center
-                                    ${isToday ? 'ring-2 ring-blue-400 border-blue-400' : 'border-white/10'}
-                                    ${isLate ? 'bg-red-600/40 text-red-100 hover:bg-red-600/50 border-red-500/50' : ''}
-                                    ${hasAttendance && !isHoliday && !isLate && !hasApprovedLeaveForDay ? 'bg-green-600/40 text-green-100 hover:bg-green-600/50 border-green-500/50' : ''}
-                                    ${isHoliday || hasApprovedLeaveForDay ? 'bg-yellow-600/40 text-yellow-100 hover:bg-yellow-600/50 border-yellow-500/50' : ''}
-                                    ${!hasAttendance && !isHoliday && !hasApprovedLeaveForDay ? 'bg-white/10 text-white hover:bg-white/20 border-white/20' : ''}
-                                    hover:scale-105 hover:shadow-lg
+                                    group cursor-pointer transition-all duration-300 hover:scale-[1.02]
+                                    ${isToday ? 'ring-2 ring-blue-400 rounded-lg p-1' : ''}
                                   `}
                                   onClick={() => handleDayClick(day, schedule)}
                                 >
-                                  <div className="text-lg font-bold">
-                                    {format(day, "d")}
-                                  </div>
-                                  {hasAttendance && (
-                                    <div className="mt-1">
-                                      {isHoliday ? (
-                                        <Coffee className="w-5 h-5 mx-auto" />
-                                      ) : isLate ? (
-                                        <XCircle className="w-5 h-5 mx-auto" />
+                                  <div className="flex items-center gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10">
+                                    {/* Date Info */}
+                                    <div className="flex flex-col items-center min-w-[80px]">
+                                      <div className={`text-2xl font-bold ${isToday ? 'text-blue-400' : 'text-white'}`}>
+                                        {format(day, "d")}
+                                      </div>
+                                      <div className="text-xs text-gray-400 truncate">
+                                        {dayName}
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Progress Bar Container */}
+                                    <div className="flex-1 space-y-1">
+                                      <div className="flex justify-between items-center">
+                                        <div className="text-sm text-gray-300">
+                                          {isHoliday ? 'إجازة' : hasApprovedLeaveForDay ? 'إجازة معتمدة' : hasAttendance ? `${hoursWorked.toFixed(1)} ساعة` : 'لا يوجد سجل'}
+                                        </div>
+                                        <div className="text-xs text-gray-400">
+                                          {hasAttendance && !isHoliday && !hasApprovedLeaveForDay ? `${workPercentage.toFixed(0)}%` : ''}
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Progress Bar */}
+                                      <div className="relative h-6 bg-gray-700/50 rounded-full overflow-hidden">
+                                        {/* Background gradient */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-gray-600/30 to-gray-600/50"></div>
+                                        
+                                        {/* Progress fill */}
+                                        {isHoliday || hasApprovedLeaveForDay ? (
+                                          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-500 flex items-center justify-center">
+                                            <Coffee className="w-4 h-4 text-white" />
+                                          </div>
+                                        ) : hasAttendance ? (
+                                          <div 
+                                            className={`
+                                              h-full transition-all duration-500 flex items-center justify-center
+                                              ${isLate ? 'bg-gradient-to-r from-red-500 to-red-600' : ''}
+                                              ${workPercentage >= 100 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : ''}
+                                              ${workPercentage >= 75 && workPercentage < 100 ? 'bg-gradient-to-r from-blue-500 to-cyan-500' : ''}
+                                              ${workPercentage >= 50 && workPercentage < 75 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : ''}
+                                              ${workPercentage < 50 && workPercentage > 0 ? 'bg-gradient-to-r from-orange-500 to-red-500' : ''}
+                                            `}
+                                            style={{ width: `${Math.max(workPercentage, 10)}%` }}
+                                          >
+                                            {isLate ? (
+                                              <XCircle className="w-3 h-3 text-white" />
+                                            ) : workPercentage >= 100 ? (
+                                              <CheckCircle className="w-3 h-3 text-white" />
+                                            ) : workPercentage > 0 ? (
+                                              <Clock className="w-3 h-3 text-white" />
+                                            ) : null}
+                                          </div>
+                                        ) : (
+                                          <div className="h-full bg-gradient-to-r from-gray-600/20 to-gray-600/30 flex items-center justify-center">
+                                            <div className="w-2 h-2 bg-gray-500 rounded-full opacity-50"></div>
+                                          </div>
+                                        )}
+                                        
+                                        {/* Glow effect for today */}
+                                        {isToday && (
+                                          <div className="absolute inset-0 bg-blue-400/20 animate-pulse"></div>
+                                        )}
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Status Icon */}
+                                    <div className="min-w-[40px] flex justify-center">
+                                      {isHoliday || hasApprovedLeaveForDay ? (
+                                        <Coffee className="w-5 h-5 text-yellow-400" />
+                                      ) : hasAttendance ? (
+                                        isLate ? (
+                                          <XCircle className="w-5 h-5 text-red-400" />
+                                        ) : workPercentage >= 100 ? (
+                                          <CheckCircle className="w-5 h-5 text-green-400" />
+                                        ) : (
+                                          <Clock className="w-5 h-5 text-blue-400" />
+                                        )
                                       ) : (
-                                        <CheckCircle className="w-5 h-5 mx-auto" />
+                                        <div className="w-5 h-5 border-2 border-gray-500 rounded-full opacity-30"></div>
                                       )}
                                     </div>
-                                  )}
+                                  </div>
                                 </div>
                               );
                             })}
-                            </div>
                           </div>
 
-                          {/* Legend */}
-                          <div className="flex gap-4 text-xs flex-wrap">
-                            <div className="flex items-center gap-2">
-                              <div className="w-4 h-4 bg-green-600/30 rounded border border-green-500/30"></div>
-                              <span className="text-green-200 font-medium">حضور في الوقت</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-4 h-4 bg-red-600/30 rounded border border-red-500/30"></div>
-                              <span className="text-red-200 font-medium">تأخير</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-4 h-4 bg-yellow-600/30 rounded border border-yellow-500/30"></div>
-                              <span className="text-yellow-200 font-medium">إجازة</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-4 h-4 bg-gray-600/20 rounded border border-gray-500/20"></div>
-                              <span className="text-gray-300 font-medium">لا يوجد سجل</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-4 h-4 border-2 border-blue-400 rounded bg-transparent"></div>
-                              <span className="text-blue-300 font-medium">اليوم الحالي</span>
+                          {/* Enhanced Legend */}
+                          <div className="bg-white/5 rounded-lg p-4 mt-4">
+                            <h4 className="text-white font-semibold mb-3 text-center">دليل الألوان والحالات</h4>
+                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></div>
+                                <span className="text-green-200 font-medium">100%+ (مكتمل)</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></div>
+                                <span className="text-blue-200 font-medium">75-99% (جيد)</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full"></div>
+                                <span className="text-yellow-200 font-medium">50-74% (مقبول)</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-full"></div>
+                                <span className="text-orange-200 font-medium">25-49% (ضعيف)</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full"></div>
+                                <span className="text-red-200 font-medium">تأخير</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
+                                  <Coffee className="w-2 h-2 text-white" />
+                                </div>
+                                <span className="text-yellow-200 font-medium">إجازة</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-3 bg-gray-600/30 rounded-full"></div>
+                                <span className="text-gray-300 font-medium">لا يوجد سجل</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-3 border-2 border-blue-400 rounded-full bg-blue-400/20"></div>
+                                <span className="text-blue-300 font-medium">اليوم الحالي</span>
+                              </div>
                             </div>
                           </div>
                         </div>
