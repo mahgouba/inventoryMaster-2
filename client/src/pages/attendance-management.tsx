@@ -511,6 +511,63 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     // Dialog will be closed by the mutation success handler
   };
 
+  // Handle both checkin and checkout in one operation
+  const handleConfirmBothAttendance = (checkinTime: string, checkoutTime: string, period?: 'morning' | 'evening') => {
+    if (!selectedDayForAttendance || !selectedEmployeeForDialog) return;
+    
+    const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
+    let attendance = dailyAttendance.find(a => 
+      a.employeeId === selectedEmployeeForDialog.employeeId && 
+      a.date === dateStr
+    );
+
+    if (!attendance) {
+      // Create new attendance record with both times
+      const attendanceData = {
+        employeeId: selectedEmployeeForDialog.employeeId,
+        employeeName: selectedEmployeeForDialog.employeeName,
+        date: dateStr,
+        scheduleType: selectedEmployeeForDialog.scheduleType,
+        // Add both timing data when creating
+        ...(selectedEmployeeForDialog.scheduleType === "متصل" 
+          ? {
+              continuousCheckinTime: checkinTime,
+              continuousCheckoutTime: checkoutTime
+            }
+          : {
+              ...(period === 'morning' 
+                ? { 
+                    morningCheckinTime: checkinTime,
+                    morningCheckoutTime: checkoutTime
+                  }
+                : { 
+                    eveningCheckinTime: checkinTime,
+                    eveningCheckoutTime: checkoutTime
+                  }
+              )
+            }
+        )
+      };
+      
+      createAttendanceMutation.mutate(attendanceData);
+    } else {
+      // Update existing attendance with both times
+      if (selectedEmployeeForDialog.scheduleType === "متصل") {
+        handleAttendanceUpdate(attendance.id, 'continuousCheckinTime', checkinTime);
+        setTimeout(() => handleAttendanceUpdate(attendance.id, 'continuousCheckoutTime', checkoutTime), 100);
+      } else {
+        // For split schedule, determine fields based on period
+        if (period === 'morning') {
+          handleAttendanceUpdate(attendance.id, 'morningCheckinTime', checkinTime);
+          setTimeout(() => handleAttendanceUpdate(attendance.id, 'morningCheckoutTime', checkoutTime), 100);
+        } else {
+          handleAttendanceUpdate(attendance.id, 'eveningCheckinTime', checkinTime);
+          setTimeout(() => handleAttendanceUpdate(attendance.id, 'eveningCheckoutTime', checkoutTime), 100);
+        }
+      }
+    }
+  };
+
   // Check if employee is late
   const isEmployeeLate = (employee: EmployeeWorkSchedule, day: Date): boolean => {
     const dateStr = format(day, "yyyy-MM-dd");
@@ -1188,8 +1245,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                             <div className="grid grid-cols-2 gap-3">
                               <Button
                                 onClick={() => {
-                                  handleConfirmAttendance('checkin', selectedEmployeeForDialog.continuousStartTime);
-                                  handleConfirmAttendance('checkout', selectedEmployeeForDialog.continuousEndTime);
+                                  handleConfirmBothAttendance(selectedEmployeeForDialog.continuousStartTime, selectedEmployeeForDialog.continuousEndTime);
                                 }}
                                 className="bg-green-600 hover:bg-green-700 text-white"
                                 disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
@@ -1200,8 +1256,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               <Button
                                 onClick={() => {
                                   const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-                                  handleConfirmAttendance('checkin', currentTime);
-                                  handleConfirmAttendance('checkout', currentTime);
+                                  handleConfirmBothAttendance(currentTime, currentTime);
                                 }}
                                 className="bg-blue-600 hover:bg-blue-700 text-white"
                                 disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
@@ -1258,8 +1313,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               <div className="grid grid-cols-2 gap-2">
                                 <Button
                                   onClick={() => {
-                                    handleConfirmAttendance('checkin', selectedEmployeeForDialog.morningStartTime, 'morning');
-                                    handleConfirmAttendance('checkout', selectedEmployeeForDialog.morningEndTime, 'morning');
+                                    handleConfirmBothAttendance(selectedEmployeeForDialog.morningStartTime, selectedEmployeeForDialog.morningEndTime, 'morning');
                                   }}
                                   size="sm"
                                   className="bg-green-600 hover:bg-green-700 text-white text-xs"
@@ -1271,8 +1325,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 <Button
                                   onClick={() => {
                                     const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-                                    handleConfirmAttendance('checkin', currentTime, 'morning');
-                                    handleConfirmAttendance('checkout', currentTime, 'morning');
+                                    handleConfirmBothAttendance(currentTime, currentTime, 'morning');
                                   }}
                                   size="sm"
                                   className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
@@ -1326,8 +1379,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               <div className="grid grid-cols-2 gap-2">
                                 <Button
                                   onClick={() => {
-                                    handleConfirmAttendance('checkin', selectedEmployeeForDialog.eveningStartTime, 'evening');
-                                    handleConfirmAttendance('checkout', selectedEmployeeForDialog.eveningEndTime, 'evening');
+                                    handleConfirmBothAttendance(selectedEmployeeForDialog.eveningStartTime, selectedEmployeeForDialog.eveningEndTime, 'evening');
                                   }}
                                   size="sm"
                                   className="bg-green-600 hover:bg-green-700 text-white text-xs"
@@ -1339,8 +1391,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 <Button
                                   onClick={() => {
                                     const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-                                    handleConfirmAttendance('checkin', currentTime, 'evening');
-                                    handleConfirmAttendance('checkout', currentTime, 'evening');
+                                    handleConfirmBothAttendance(currentTime, currentTime, 'evening');
                                   }}
                                   size="sm"
                                   className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
