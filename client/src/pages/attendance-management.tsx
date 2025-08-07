@@ -195,14 +195,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     queryKey: ["/api/employee-work-schedules"],
   });
 
-  // Fetch daily attendance for selected date
-  const { data: dailyAttendance = [] } = useQuery<DailyAttendance[]>({
-    queryKey: ["/api/daily-attendance", { date: selectedDate }],
-    queryFn: async () => {
-      const response = await fetch(`/api/daily-attendance?date=${selectedDate}`);
-      if (!response.ok) throw new Error('Failed to fetch attendance');
-      return response.json();
-    }
+  // Fetch all daily attendance data
+  const { data: dailyAttendance = [], refetch: refetchAttendance } = useQuery<DailyAttendance[]>({
+    queryKey: ["/api/daily-attendance"],
+    refetchInterval: 2000, // Refetch every 2 seconds
   });
 
   // Filter work schedules
@@ -422,9 +418,13 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     onSuccess: (data) => {
       // Force refresh both queries to ensure data consistency
       queryClient.invalidateQueries({ queryKey: ["/api/daily-attendance"] });
+      queryClient.refetchQueries({ queryKey: ["/api/daily-attendance"] });
       
       // Also refresh other related queries
       queryClient.invalidateQueries({ queryKey: ["/api/employee-work-schedules"] });
+      
+      // Force re-fetch attendance data immediately
+      refetchAttendance();
       
       toast({ 
         title: "تم تحديد اليوم كإجازة بنجاح", 
