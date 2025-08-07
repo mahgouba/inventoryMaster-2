@@ -545,10 +545,15 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     return attendance?.notes === "إجازة";
   };
 
+  // Fetch all leave requests for checking approved leave
+  const { data: allLeaveRequests = [] } = useQuery<LeaveRequest[]>({
+    queryKey: ["/api/leave-requests"],
+  });
+
   // Check if employee has approved leave for a specific day
   const hasApprovedLeave = (employeeId: number, day: Date): boolean => {
     const dateStr = format(day, "yyyy-MM-dd");
-    return (leaveRequestsQuery.data || []).some(request => 
+    return allLeaveRequests.some(request => 
       request.userId === employeeId &&
       request.status === "approved" &&
       format(new Date(request.startDate), "yyyy-MM-dd") <= dateStr &&

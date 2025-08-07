@@ -5,9 +5,15 @@ This is a full-stack inventory management system designed for comprehensive inve
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
-Attendance Management: Successfully removed leave request interface as requested - eliminated all leave request forms, API endpoints, and UI components while keeping basic attendance tracking features.
+Attendance Management: Successfully created integrated attendance system:
+- Created monthly attendance interface (/monthly-attendance) that shows only confirmed attendance days for employees
+- Integrated attendance requests with leave request approval workflow system
+- Attendance requests are sent through leave request API and appear in pending approvals
+- Upon approval, attendance requests automatically create daily attendance records
+- Monthly attendance interface displays only confirmed/approved attendance data
 UI preferences: Add specifications management button next to "Add Item" button for easy access.
 Header navigation: Added "طلب إجازة وإستئذان" (Leave Request and Permission) button next to "وصل اليوم" (Arrived Today) button in the car cards page header for easy access to leave request functionality.
+Navigation: Added "واجهة الدوام" (Attendance Interface) link in horizontal navigation for easy access to monthly attendance view.
 User Experience: Disabled text selection on long press to prevent unwanted text highlighting when interacting with UI elements, while maintaining text selection for input fields and text areas.
 Project Organization: Clean and organized codebase with no duplicate or backup files - removed all .backup, .bak files and consolidated similar pages. Removed duplicate price card component (/components/price-card.tsx) to eliminate confusion and maintain clean architecture with single unified price card solution in /pages/price-cards.tsx.
 Navigation: Single horizontal navigation system at the top - removed duplicate sidebar navigation component to eliminate confusion and maintain clean architecture.
@@ -48,6 +54,7 @@ The system follows a clear separation of concerns, with distinct layers for fron
 - **Data Management**: Import/export functionality for various data types via Excel and JSON.
 - **Bank Management**: Management of company and personal bank accounts, including visibility toggles and share functionality.
 - **Financing Calculator**: APR-based calculation with integration to managed financing rates from Saudi banks.
+- **Integrated Attendance System**: Monthly attendance interface showing only confirmed attendance days, with attendance requests integrated into the leave request approval workflow. Attendance requests automatically create daily attendance records upon approval.
 - **Leave Request System**: Comprehensive system for managing employee leave requests, including auto-calculation, PDF generation, and role-based approval workflow.
 - **Role-Based Access Control (RBAC)**: Permissions system for admin, accountant, salesperson, and sales manager roles, dynamically adapting UI.
 - **Localization**: Arabic-first design with RTL support, Gregorian calendar (DD/MM/YYYY) and 24-hour time.
