@@ -1280,6 +1280,34 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                     
                     const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
                     
+                    // Get default times based on schedule or current time if no attendance record exists
+                    const getDefaultTime = (fieldType: string) => {
+                      if (existingAttendance) {
+                        // If attendance record exists, show saved time or current time
+                        return (existingAttendance as any)[fieldType] || currentTime;
+                      } else {
+                        // If no attendance record, show schedule time or current time
+                        if (fieldType.includes('Checkin') || fieldType.includes('Start')) {
+                          if (fieldType.includes('continuous')) {
+                            return selectedEmployeeForDialog.continuousStartTime || currentTime;
+                          } else if (fieldType.includes('morning')) {
+                            return selectedEmployeeForDialog.morningStartTime || currentTime;
+                          } else if (fieldType.includes('evening')) {
+                            return selectedEmployeeForDialog.eveningStartTime || currentTime;
+                          }
+                        } else {
+                          if (fieldType.includes('continuous')) {
+                            return selectedEmployeeForDialog.continuousEndTime || currentTime;
+                          } else if (fieldType.includes('morning')) {
+                            return selectedEmployeeForDialog.morningEndTime || currentTime;
+                          } else if (fieldType.includes('evening')) {
+                            return selectedEmployeeForDialog.eveningEndTime || currentTime;
+                          }
+                        }
+                        return currentTime;
+                      }
+                    };
+                    
                     return (
                       <div className="space-y-6" dir="rtl">
                         {/* Employee Info */}
@@ -1306,10 +1334,12 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 <div className="flex gap-3 justify-center">
                                   <Input
                                     type="time"
-                                    value={existingAttendance?.continuousCheckinTime || currentTime}
+                                    value={getDefaultTime('continuousCheckinTime')}
                                     onChange={(e) => {
                                       if (existingAttendance) {
                                         handleAttendanceUpdate(existingAttendance.id, 'continuousCheckinTime', e.target.value);
+                                      } else {
+                                        handleConfirmBothAttendance(e.target.value, getDefaultTime('continuousCheckoutTime'));
                                       }
                                     }}
                                     className="text-2xl h-16 text-center font-mono bg-white/10 border-white/20 text-white"
@@ -1338,10 +1368,12 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 <div className="flex gap-3 justify-center">
                                   <Input
                                     type="time"
-                                    value={existingAttendance?.continuousCheckoutTime || currentTime}
+                                    value={getDefaultTime('continuousCheckoutTime')}
                                     onChange={(e) => {
                                       if (existingAttendance) {
                                         handleAttendanceUpdate(existingAttendance.id, 'continuousCheckoutTime', e.target.value);
+                                      } else {
+                                        handleConfirmBothAttendance(getDefaultTime('continuousCheckinTime'), e.target.value);
                                       }
                                     }}
                                     className="text-2xl h-16 text-center font-mono bg-white/10 border-white/20 text-white"
@@ -1380,10 +1412,23 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   <div className="flex gap-3 justify-center">
                                     <Input
                                       type="time"
-                                      value={existingAttendance?.morningCheckinTime || currentTime}
+                                      value={getDefaultTime('morningCheckinTime')}
                                       onChange={(e) => {
                                         if (existingAttendance) {
                                           handleAttendanceUpdate(existingAttendance.id, 'morningCheckinTime', e.target.value);
+                                        } else {
+                                          // For new record, create it with default times
+                                          const attendanceData = {
+                                            employeeId: selectedEmployeeForDialog.employeeId,
+                                            employeeName: selectedEmployeeForDialog.employeeName,
+                                            date: dateStr,
+                                            scheduleType: selectedEmployeeForDialog.scheduleType,
+                                            morningCheckinTime: e.target.value,
+                                            morningCheckoutTime: selectedEmployeeForDialog.morningEndTime || currentTime,
+                                            eveningCheckinTime: selectedEmployeeForDialog.eveningStartTime || currentTime,
+                                            eveningCheckoutTime: selectedEmployeeForDialog.eveningEndTime || currentTime
+                                          };
+                                          createAttendanceMutation.mutate(attendanceData);
                                         }
                                       }}
                                       className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
@@ -1412,10 +1457,23 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   <div className="flex gap-3 justify-center">
                                     <Input
                                       type="time"
-                                      value={existingAttendance?.morningCheckoutTime || currentTime}
+                                      value={getDefaultTime('morningCheckoutTime')}
                                       onChange={(e) => {
                                         if (existingAttendance) {
                                           handleAttendanceUpdate(existingAttendance.id, 'morningCheckoutTime', e.target.value);
+                                        } else {
+                                          // For new record, create it with default times
+                                          const attendanceData = {
+                                            employeeId: selectedEmployeeForDialog.employeeId,
+                                            employeeName: selectedEmployeeForDialog.employeeName,
+                                            date: dateStr,
+                                            scheduleType: selectedEmployeeForDialog.scheduleType,
+                                            morningCheckinTime: selectedEmployeeForDialog.morningStartTime || currentTime,
+                                            morningCheckoutTime: e.target.value,
+                                            eveningCheckinTime: selectedEmployeeForDialog.eveningStartTime || currentTime,
+                                            eveningCheckoutTime: selectedEmployeeForDialog.eveningEndTime || currentTime
+                                          };
+                                          createAttendanceMutation.mutate(attendanceData);
                                         }
                                       }}
                                       className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
@@ -1450,10 +1508,23 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   <div className="flex gap-3 justify-center">
                                     <Input
                                       type="time"
-                                      value={existingAttendance?.eveningCheckinTime || currentTime}
+                                      value={getDefaultTime('eveningCheckinTime')}
                                       onChange={(e) => {
                                         if (existingAttendance) {
                                           handleAttendanceUpdate(existingAttendance.id, 'eveningCheckinTime', e.target.value);
+                                        } else {
+                                          // For new record, create it with default times
+                                          const attendanceData = {
+                                            employeeId: selectedEmployeeForDialog.employeeId,
+                                            employeeName: selectedEmployeeForDialog.employeeName,
+                                            date: dateStr,
+                                            scheduleType: selectedEmployeeForDialog.scheduleType,
+                                            morningCheckinTime: selectedEmployeeForDialog.morningStartTime || currentTime,
+                                            morningCheckoutTime: selectedEmployeeForDialog.morningEndTime || currentTime,
+                                            eveningCheckinTime: e.target.value,
+                                            eveningCheckoutTime: selectedEmployeeForDialog.eveningEndTime || currentTime
+                                          };
+                                          createAttendanceMutation.mutate(attendanceData);
                                         }
                                       }}
                                       className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
@@ -1482,10 +1553,23 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   <div className="flex gap-3 justify-center">
                                     <Input
                                       type="time"
-                                      value={existingAttendance?.eveningCheckoutTime || currentTime}
+                                      value={getDefaultTime('eveningCheckoutTime')}
                                       onChange={(e) => {
                                         if (existingAttendance) {
                                           handleAttendanceUpdate(existingAttendance.id, 'eveningCheckoutTime', e.target.value);
+                                        } else {
+                                          // For new record, create it with default times
+                                          const attendanceData = {
+                                            employeeId: selectedEmployeeForDialog.employeeId,
+                                            employeeName: selectedEmployeeForDialog.employeeName,
+                                            date: dateStr,
+                                            scheduleType: selectedEmployeeForDialog.scheduleType,
+                                            morningCheckinTime: selectedEmployeeForDialog.morningStartTime || currentTime,
+                                            morningCheckoutTime: selectedEmployeeForDialog.morningEndTime || currentTime,
+                                            eveningCheckinTime: selectedEmployeeForDialog.eveningStartTime || currentTime,
+                                            eveningCheckoutTime: e.target.value
+                                          };
+                                          createAttendanceMutation.mutate(attendanceData);
                                         }
                                       }}
                                       className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
