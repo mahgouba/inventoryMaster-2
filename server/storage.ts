@@ -978,7 +978,7 @@ export class MemStorage implements IStorage {
     return this.trimLevels.delete(id); 
   }
   
-  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<VehicleTrimLevel[]> {
+  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<TrimLevel[]> {
     // Find the manufacturer first
     const manufacturerObj = Array.from(this.manufacturers.values()).find(
       m => m.nameAr === manufacturer || m.nameEn === manufacturer
@@ -991,8 +991,11 @@ export class MemStorage implements IStorage {
     
     // Find the category for this manufacturer
     const categoryObj = Array.from(this.vehicleCategories.values()).find(
-      c => c.manufacturerId === manufacturerObj.id && (c.nameAr === category || c.nameEn === category) && c.isActive
+      c => c.manufacturerId === manufacturerObj.id && (c.nameAr === category || c.nameEn === category)
     );
+    
+    console.log(`🔍 Looking for category "${category}" in manufacturer "${manufacturer}"`);
+    console.log(`🏷️ All categories for manufacturer:`, Array.from(this.vehicleCategories.values()).filter(c => c.manufacturerId === manufacturerObj.id));
     
     if (!categoryObj) {
       console.log(`❌ Category "${category}" not found for manufacturer "${manufacturer}"`);
@@ -1000,31 +1003,41 @@ export class MemStorage implements IStorage {
     }
     
     // Find trim levels for this category
-    const trimLevels = Array.from(this.vehicleTrimLevels.values()).filter(
-      t => t.categoryId === categoryObj.id && t.isActive
+    const trimLevels = Array.from(this.trimLevels.values()).filter(
+      t => t.categoryId === categoryObj.id
     );
     
+    console.log(`🎚️ All trim levels in this.trimLevels:`, Array.from(this.trimLevels.values()).map(t => ({ id: t.id, categoryId: t.categoryId, nameAr: t.nameAr })));
+    console.log(`🎚️ Looking for categoryId: ${categoryObj.id}`);
     console.log(`🎚️ Found ${trimLevels.length} trim levels for "${manufacturer}" -> "${category}":`, trimLevels.map(t => t.nameAr));
     return trimLevels;
   }
   
   async getAllCategories(): Promise<{ category: string }[]> { return []; }
   async getCategoriesByManufacturer(manufacturer: string): Promise<VehicleCategory[]> {
+    console.log(`🔍 getCategoriesByManufacturer called with manufacturer: "${manufacturer}"`);
+    
     // Find the manufacturer first
     const manufacturerObj = Array.from(this.manufacturers.values()).find(
       m => m.nameAr === manufacturer || m.nameEn === manufacturer
     );
+    
+    console.log(`🏭 All manufacturers:`, Array.from(this.manufacturers.values()).map(m => ({ id: m.id, nameAr: m.nameAr, nameEn: m.nameEn })));
     
     if (!manufacturerObj) {
       console.log(`❌ Manufacturer "${manufacturer}" not found`);
       return [];
     }
     
+    console.log(`✅ Found manufacturer:`, { id: manufacturerObj.id, nameAr: manufacturerObj.nameAr, nameEn: manufacturerObj.nameEn });
+    
     // Find categories for this manufacturer
     const categories = Array.from(this.vehicleCategories.values()).filter(
-      c => c.manufacturerId === manufacturerObj.id && c.isActive
+      c => c.manufacturerId === manufacturerObj.id
     );
     
+    console.log(`📋 All vehicle categories:`, Array.from(this.vehicleCategories.values()).map(c => ({ id: c.id, manufacturerId: c.manufacturerId, nameAr: c.nameAr, nameEn: c.nameEn })));
+    console.log(`📋 Looking for manufacturerId: ${manufacturerObj.id}`);
     console.log(`📋 Found ${categories.length} categories for manufacturer "${manufacturer}":`, categories.map(c => c.nameAr));
     return categories;
   }
