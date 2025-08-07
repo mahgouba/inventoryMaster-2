@@ -1004,13 +1004,23 @@ export class MemStorage implements IStorage {
     
     // Find trim levels for this category
     const trimLevels = Array.from(this.trimLevels.values()).filter(
-      t => t.categoryId === categoryObj.id
+      t => (t as any).category_id === categoryObj.id
     );
     
-    console.log(`🎚️ All trim levels in this.trimLevels:`, Array.from(this.trimLevels.values()).map(t => ({ id: t.id, categoryId: t.categoryId, nameAr: t.nameAr })));
+    console.log(`🎚️ All trim levels in this.trimLevels:`, Array.from(this.trimLevels.values()).map(t => ({ id: t.id, category_id: (t as any).category_id, categoryId: (t as any).categoryId, nameAr: (t as any).name_ar || t.nameAr })));
     console.log(`🎚️ Looking for categoryId: ${categoryObj.id}`);
-    console.log(`🎚️ Found ${trimLevels.length} trim levels for "${manufacturer}" -> "${category}":`, trimLevels.map(t => t.nameAr));
-    return trimLevels;
+    console.log(`🎚️ Found ${trimLevels.length} trim levels for "${manufacturer}" -> "${category}":`, trimLevels.map(t => (t as any).name_ar || t.nameAr));
+    
+    // Transform to match expected interface
+    return trimLevels.map(t => ({
+      id: t.id,
+      categoryId: (t as any).category_id,
+      nameAr: (t as any).name_ar || t.nameAr,
+      nameEn: (t as any).name_en || t.nameEn,
+      isActive: true,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt
+    }));
   }
   
   async getAllCategories(): Promise<{ category: string }[]> { return []; }
