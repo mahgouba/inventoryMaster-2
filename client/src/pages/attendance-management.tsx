@@ -32,7 +32,7 @@ import {
   Coffee
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay, parseISO } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay, parseISO, isBefore } from "date-fns";
 import { ar } from "date-fns/locale";
 
 // Glass Background Components
@@ -428,10 +428,11 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     },
   });
 
-  // Get calendar days for current month
+  // Get calendar days for current month (only current and past days)
   const getMonthDays = () => {
     const start = startOfMonth(currentMonth);
-    const end = endOfMonth(currentMonth);
+    const today = new Date();
+    const end = isBefore(endOfMonth(currentMonth), today) ? endOfMonth(currentMonth) : today;
     return eachDayOfInterval({ start, end });
   };
 
@@ -1092,27 +1093,27 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 <div
                                   key={day.toISOString()}
                                   className={`
-                                    p-2 text-center cursor-pointer rounded-lg transition-all duration-200
-                                    ${isToday ? 'ring-2 ring-blue-400' : ''}
-                                    ${isLate ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30' : ''}
-                                    ${hasAttendance && !isHoliday && !isLate && !hasApprovedLeaveForDay ? 'bg-green-500/20 text-green-300 hover:bg-green-500/30' : ''}
-                                    ${isHoliday || hasApprovedLeaveForDay ? 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30' : ''}
-                                    ${!hasAttendance && !isHoliday && !hasApprovedLeaveForDay ? 'bg-white/5 text-gray-300 hover:bg-white/10' : ''}
-                                    hover:scale-105
+                                    p-3 text-center cursor-pointer rounded-lg transition-all duration-200 border
+                                    ${isToday ? 'ring-2 ring-blue-400 border-blue-400' : 'border-transparent'}
+                                    ${isLate ? 'bg-red-600/30 text-red-200 hover:bg-red-600/40 border-red-500/30' : ''}
+                                    ${hasAttendance && !isHoliday && !isLate && !hasApprovedLeaveForDay ? 'bg-green-600/30 text-green-200 hover:bg-green-600/40 border-green-500/30' : ''}
+                                    ${isHoliday || hasApprovedLeaveForDay ? 'bg-yellow-600/30 text-yellow-200 hover:bg-yellow-600/40 border-yellow-500/30' : ''}
+                                    ${!hasAttendance && !isHoliday && !hasApprovedLeaveForDay ? 'bg-gray-600/20 text-gray-300 hover:bg-gray-600/30 border-gray-500/20' : ''}
+                                    hover:scale-105 hover:shadow-lg
                                   `}
                                   onClick={() => handleDayClick(day, schedule)}
                                 >
-                                  <div className="text-sm font-medium">
+                                  <div className="text-sm font-semibold">
                                     {format(day, "d")}
                                   </div>
                                   {hasAttendance && (
                                     <div className="text-xs mt-1">
                                       {isHoliday ? (
-                                        <Coffee className="w-3 h-3 mx-auto" />
+                                        <Coffee className="w-4 h-4 mx-auto" />
                                       ) : isLate ? (
-                                        <XCircle className="w-3 h-3 mx-auto" />
+                                        <XCircle className="w-4 h-4 mx-auto" />
                                       ) : (
-                                        <CheckCircle className="w-3 h-3 mx-auto" />
+                                        <CheckCircle className="w-4 h-4 mx-auto" />
                                       )}
                                     </div>
                                   )}
@@ -1122,26 +1123,26 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                           </div>
 
                           {/* Legend */}
-                          <div className="flex gap-4 text-xs">
-                            <div className="flex items-center gap-1">
-                              <div className="w-3 h-3 bg-green-500/20 rounded"></div>
-                              <span className="text-gray-300">حضور في الوقت</span>
+                          <div className="flex gap-4 text-xs flex-wrap">
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 bg-green-600/30 rounded border border-green-500/30"></div>
+                              <span className="text-green-200 font-medium">حضور في الوقت</span>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-3 h-3 bg-red-500/20 rounded"></div>
-                              <span className="text-gray-300">تأخير</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 bg-red-600/30 rounded border border-red-500/30"></div>
+                              <span className="text-red-200 font-medium">تأخير</span>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-3 h-3 bg-purple-500/20 rounded"></div>
-                              <span className="text-gray-300">إجازة معتمدة</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 bg-yellow-600/30 rounded border border-yellow-500/30"></div>
+                              <span className="text-yellow-200 font-medium">إجازة</span>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-3 h-3 bg-white/5 rounded"></div>
-                              <span className="text-gray-300">لا يوجد سجل</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 bg-gray-600/20 rounded border border-gray-500/20"></div>
+                              <span className="text-gray-300 font-medium">لا يوجد سجل</span>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-3 h-3 border border-blue-400 rounded"></div>
-                              <span className="text-gray-300">اليوم</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-blue-400 rounded bg-transparent"></div>
+                              <span className="text-blue-300 font-medium">اليوم الحالي</span>
                             </div>
                           </div>
                         </div>
@@ -1434,9 +1435,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                           
                           <Button
                             onClick={() => {
-                              // Save attendance data
+                              // Save attendance data with current form values
                               if (!existingAttendance) {
-                                // Create new attendance record with current form data
+                                // Create new attendance record
                                 const attendanceData = {
                                   employeeId: selectedEmployeeForDialog.employeeId,
                                   employeeName: selectedEmployeeForDialog.employeeName,
@@ -1457,7 +1458,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 };
                                 createAttendanceMutation.mutate(attendanceData);
                               } else {
-                                // Data is already saved via onChange handlers
+                                // Update existing attendance with current form values
+                                toast({ title: "تم حفظ بيانات الحضور بنجاح" });
                                 setIsAttendanceDialogOpen(false);
                               }
                             }}
