@@ -3169,7 +3169,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if attendance record exists for this employee and date
       let attendance = await getStorage().getDailyAttendanceByEmployeeAndDate(
         parseInt(employeeId), 
-        new Date(date)
+        new Date(date + 'T00:00:00')
       );
 
       if (attendance) {

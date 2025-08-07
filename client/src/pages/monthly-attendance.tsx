@@ -108,8 +108,8 @@ export default function MonthlyAttendancePage({ userRole, username, userId }: Mo
     return dailyAttendance.filter(attendance => 
       attendance.employeeId === userId && 
       attendance.date >= start && 
-      attendance.date <= end &&
-      attendance.isConfirmed // Only show confirmed attendance
+      attendance.date <= end
+      // Remove isConfirmed filter to show all attendance records
     );
   };
 
