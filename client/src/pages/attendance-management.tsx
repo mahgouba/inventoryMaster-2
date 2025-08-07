@@ -201,6 +201,29 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     refetchInterval: 2000, // Refetch every 2 seconds
   });
 
+  // Set current time when attendance dialog opens
+  useEffect(() => {
+    if (isAttendanceDialogOpen && selectedEmployeeForDialog) {
+      const existingAttendance = dailyAttendance?.find((record: DailyAttendance) => 
+        record.employeeId === selectedEmployeeForDialog.employeeId && 
+        record.date === selectedDayForAttendance?.toISOString().split('T')[0]
+      );
+      
+      if (!existingAttendance) {
+        setTimeout(() => {
+          const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+          const timeInputs = ['continuous-checkin-time', 'continuous-checkout-time', 'morning-checkin-time', 'morning-checkout-time', 'evening-checkin-time', 'evening-checkout-time'];
+          timeInputs.forEach(inputId => {
+            const input = document.getElementById(inputId) as HTMLInputElement;
+            if (input) {
+              input.value = currentTime;
+            }
+          });
+        }, 100);
+      }
+    }
+  }, [isAttendanceDialogOpen, selectedEmployeeForDialog, selectedDayForAttendance, dailyAttendance]);
+
   // Filter work schedules
   const filteredSchedules = workSchedules.filter(schedule =>
     employeeFilter === "" || 
@@ -1305,13 +1328,6 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                         }, 100);
                       }
                     };
-
-                    // Set current time when dialog opens
-                    useEffect(() => {
-                      if (isAttendanceDialogOpen && selectedEmployeeForDialog) {
-                        setCurrentTimeToInputs();
-                      }
-                    }, [isAttendanceDialogOpen, selectedEmployeeForDialog, existingAttendance]);
                     
                     return (
                       <div className="space-y-6" dir="rtl">
