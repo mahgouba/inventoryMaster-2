@@ -1159,17 +1159,17 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                 </div>
               )}
 
-              {/* Enhanced Attendance Dialog */}
+              {/* Redesigned Attendance Dialog */}
               <Dialog open={isAttendanceDialogOpen} onOpenChange={setIsAttendanceDialogOpen}>
                 <DialogContent 
-                  className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-lg"
+                  className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-4xl max-h-[90vh] overflow-y-auto"
                   aria-describedby="attendance-dialog-description"
                 >
                   <DialogHeader>
-                    <DialogTitle className="text-xl">
+                    <DialogTitle className="text-xl text-center">
                       إدارة الحضور - {selectedEmployeeForDialog?.employeeName}
                     </DialogTitle>
-                    <p className="text-gray-300">
+                    <p className="text-gray-300 text-center">
                       {selectedDayForAttendance && format(selectedDayForAttendance, "EEEE، dd MMMM yyyy", { locale: ar })}
                     </p>
                   </DialogHeader>
@@ -1185,242 +1185,294 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                       a.date === dateStr
                     );
                     
+                    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                    
                     return (
-                      <div className="space-y-6">
-                        {/* Schedule Information */}
-                        <div className="bg-white/5 rounded-lg p-4">
-                          <h3 className="text-sm font-medium text-gray-300 mb-2">معلومات الدوام</h3>
-                          <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="space-y-6" dir="rtl">
+                        {/* Employee Info */}
+                        <div className="bg-white/5 rounded-lg p-4 text-center">
+                          <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                              <span className="text-gray-400">نوع الدوام:</span>
-                              <p className="text-white">{selectedEmployeeForDialog.scheduleType}</p>
+                              <span className="text-gray-400">الموظف: </span>
+                              <span className="text-white font-medium">{selectedEmployeeForDialog.employeeName}</span>
                             </div>
                             <div>
-                              <span className="text-gray-400">الراتب:</span>
-                              <p className="text-white">{selectedEmployeeForDialog.salary} ريال</p>
+                              <span className="text-gray-400">نوع الدوام: </span>
+                              <span className="text-white font-medium">{selectedEmployeeForDialog.scheduleType}</span>
                             </div>
                           </div>
                         </div>
 
                         {selectedEmployeeForDialog.scheduleType === "متصل" ? (
-                          /* Continuous Schedule */
-                          <div className="space-y-4">
-                            <h3 className="text-lg font-medium text-white">الدوام المتصل</h3>
-                            
-                            {/* Schedule Times */}
-                            <div className="grid grid-cols-2 gap-4 mb-4">
-                              <div className="bg-white/5 rounded-lg p-3">
-                                <Label className="text-gray-300 text-sm">وقت الحضور المحدد</Label>
-                                <p className="text-white font-mono">{selectedEmployeeForDialog.continuousStartTime}</p>
+                          /* Continuous Schedule - 2 Fields */
+                          <div className="bg-white/5 rounded-lg p-6">
+                            <h3 className="font-semibold text-lg mb-6 text-center text-blue-300">الدوام المتصل</h3>
+                            <div className="grid grid-cols-2 gap-8">
+                              <div className="space-y-3">
+                                <label className="block text-sm font-medium text-gray-300 text-center">وقت الحضور الفعلي</label>
+                                <div className="flex gap-3 justify-center">
+                                  <Input
+                                    type="time"
+                                    value={existingAttendance?.continuousCheckinTime || currentTime}
+                                    onChange={(e) => {
+                                      if (existingAttendance) {
+                                        handleAttendanceUpdate(existingAttendance.id, 'continuousCheckinTime', e.target.value);
+                                      }
+                                    }}
+                                    className="text-2xl h-16 text-center font-mono bg-white/10 border-white/20 text-white"
+                                  />
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                                      if (existingAttendance) {
+                                        handleAttendanceUpdate(existingAttendance.id, 'continuousCheckinTime', time);
+                                      }
+                                    }}
+                                    className="h-16 px-4 border-white/20 hover:bg-white/10"
+                                  >
+                                    <Clock className="w-5 h-5" />
+                                  </Button>
+                                </div>
+                                <div className="text-xs text-gray-400 text-center">
+                                  الوقت المحدد: {selectedEmployeeForDialog.continuousStartTime}
+                                </div>
                               </div>
-                              <div className="bg-white/5 rounded-lg p-3">
-                                <Label className="text-gray-300 text-sm">وقت الانصراف المحدد</Label>
-                                <p className="text-white font-mono">{selectedEmployeeForDialog.continuousEndTime}</p>
-                              </div>
-                            </div>
 
-                            {/* Attendance Times */}
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <Label className="text-gray-300 text-sm">وقت الحضور الفعلي</Label>
-                                <Input
-                                  type="time"
-                                  value={existingAttendance?.continuousCheckinTime || ""}
-                                  onChange={(e) => existingAttendance && handleAttendanceUpdate(existingAttendance.id, 'continuousCheckinTime', e.target.value)}
-                                  className="bg-white/10 border-white/20 text-white mt-1"
-                                />
+                              <div className="space-y-3">
+                                <label className="block text-sm font-medium text-gray-300 text-center">وقت الانصراف الفعلي</label>
+                                <div className="flex gap-3 justify-center">
+                                  <Input
+                                    type="time"
+                                    value={existingAttendance?.continuousCheckoutTime || currentTime}
+                                    onChange={(e) => {
+                                      if (existingAttendance) {
+                                        handleAttendanceUpdate(existingAttendance.id, 'continuousCheckoutTime', e.target.value);
+                                      }
+                                    }}
+                                    className="text-2xl h-16 text-center font-mono bg-white/10 border-white/20 text-white"
+                                  />
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                                      if (existingAttendance) {
+                                        handleAttendanceUpdate(existingAttendance.id, 'continuousCheckoutTime', time);
+                                      }
+                                    }}
+                                    className="h-16 px-4 border-white/20 hover:bg-white/10"
+                                  >
+                                    <Clock className="w-5 h-5" />
+                                  </Button>
+                                </div>
+                                <div className="text-xs text-gray-400 text-center">
+                                  الوقت المحدد: {selectedEmployeeForDialog.continuousEndTime}
+                                </div>
                               </div>
-                              <div>
-                                <Label className="text-gray-300 text-sm">وقت الانصراف الفعلي</Label>
-                                <Input
-                                  type="time"
-                                  value={existingAttendance?.continuousCheckoutTime || ""}
-                                  onChange={(e) => existingAttendance && handleAttendanceUpdate(existingAttendance.id, 'continuousCheckoutTime', e.target.value)}
-                                  className="bg-white/10 border-white/20 text-white mt-1"
-                                />
-                              </div>
-                            </div>
-
-                            {/* Quick Actions */}
-                            <div className="grid grid-cols-2 gap-3">
-                              <Button
-                                onClick={() => {
-                                  handleConfirmBothAttendance(selectedEmployeeForDialog.continuousStartTime, selectedEmployeeForDialog.continuousEndTime);
-                                }}
-                                className="bg-green-600 hover:bg-green-700 text-white"
-                                disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
-                              >
-                                <Check className="w-4 h-4 mr-2" />
-                                حضور وإنصراف في الوقت
-                              </Button>
-                              <Button
-                                onClick={() => {
-                                  const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-                                  handleConfirmBothAttendance(currentTime, currentTime);
-                                }}
-                                className="bg-blue-600 hover:bg-blue-700 text-white"
-                                disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
-                              >
-                                <Clock className="w-4 h-4 mr-2" />
-                                حضور وإنصراف الوقت الفعلي
-                              </Button>
                             </div>
                           </div>
                         ) : (
-                          /* Split Schedule */
-                          <div className="space-y-4">
-                            <h3 className="text-lg font-medium text-white">الدوام المنفصل</h3>
+                          /* Split Schedule - 4 Fields */
+                          <div className="space-y-6">
+                            <h3 className="font-semibold text-lg text-center text-blue-300">الدوام المنفصل</h3>
                             
-                            {/* Morning Schedule */}
-                            <div className="bg-white/5 rounded-lg p-4">
-                              <h4 className="text-md font-medium text-white mb-3">الفترة الصباحية</h4>
-                              
-                              {/* Morning Schedule Times */}
-                              <div className="grid grid-cols-2 gap-4 mb-3">
-                                <div className="bg-white/5 rounded-lg p-2">
-                                  <Label className="text-gray-400 text-xs">وقت الحضور المحدد</Label>
-                                  <p className="text-white font-mono text-sm">{selectedEmployeeForDialog.morningStartTime}</p>
+                            {/* Morning Period */}
+                            <div className="bg-white/5 rounded-lg p-6">
+                              <h4 className="font-medium mb-4 text-center text-orange-400">الفترة الصباحية</h4>
+                              <div className="grid grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                  <label className="block text-sm font-medium text-gray-300 text-center">وقت الحضور الصباحي</label>
+                                  <div className="flex gap-3 justify-center">
+                                    <Input
+                                      type="time"
+                                      value={existingAttendance?.morningCheckinTime || currentTime}
+                                      onChange={(e) => {
+                                        if (existingAttendance) {
+                                          handleAttendanceUpdate(existingAttendance.id, 'morningCheckinTime', e.target.value);
+                                        }
+                                      }}
+                                      className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
+                                    />
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                                        if (existingAttendance) {
+                                          handleAttendanceUpdate(existingAttendance.id, 'morningCheckinTime', time);
+                                        }
+                                      }}
+                                      className="h-12 px-3 border-white/20 hover:bg-white/10"
+                                    >
+                                      <Clock className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                  <div className="text-xs text-gray-400 text-center">
+                                    الوقت المحدد: {selectedEmployeeForDialog.morningStartTime}
+                                  </div>
                                 </div>
-                                <div className="bg-white/5 rounded-lg p-2">
-                                  <Label className="text-gray-400 text-xs">وقت الانصراف المحدد</Label>
-                                  <p className="text-white font-mono text-sm">{selectedEmployeeForDialog.morningEndTime}</p>
-                                </div>
-                              </div>
 
-                              {/* Morning Attendance Times */}
-                              <div className="grid grid-cols-2 gap-3 mb-3">
-                                <div>
-                                  <Label className="text-gray-300 text-xs">الحضور الفعلي</Label>
-                                  <Input
-                                    type="time"
-                                    value={existingAttendance?.morningCheckinTime || ""}
-                                    onChange={(e) => existingAttendance && handleAttendanceUpdate(existingAttendance.id, 'morningCheckinTime', e.target.value)}
-                                    className="bg-white/10 border-white/20 text-white text-sm mt-1"
-                                  />
+                                <div className="space-y-3">
+                                  <label className="block text-sm font-medium text-gray-300 text-center">وقت الانصراف الصباحي</label>
+                                  <div className="flex gap-3 justify-center">
+                                    <Input
+                                      type="time"
+                                      value={existingAttendance?.morningCheckoutTime || currentTime}
+                                      onChange={(e) => {
+                                        if (existingAttendance) {
+                                          handleAttendanceUpdate(existingAttendance.id, 'morningCheckoutTime', e.target.value);
+                                        }
+                                      }}
+                                      className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
+                                    />
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                                        if (existingAttendance) {
+                                          handleAttendanceUpdate(existingAttendance.id, 'morningCheckoutTime', time);
+                                        }
+                                      }}
+                                      className="h-12 px-3 border-white/20 hover:bg-white/10"
+                                    >
+                                      <Clock className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                  <div className="text-xs text-gray-400 text-center">
+                                    الوقت المحدد: {selectedEmployeeForDialog.morningEndTime}
+                                  </div>
                                 </div>
-                                <div>
-                                  <Label className="text-gray-300 text-xs">الانصراف الفعلي</Label>
-                                  <Input
-                                    type="time"
-                                    value={existingAttendance?.morningCheckoutTime || ""}
-                                    onChange={(e) => existingAttendance && handleAttendanceUpdate(existingAttendance.id, 'morningCheckoutTime', e.target.value)}
-                                    className="bg-white/10 border-white/20 text-white text-sm mt-1"
-                                  />
-                                </div>
-                              </div>
-
-                              {/* Morning Quick Actions */}
-                              <div className="grid grid-cols-2 gap-2">
-                                <Button
-                                  onClick={() => {
-                                    handleConfirmBothAttendance(selectedEmployeeForDialog.morningStartTime, selectedEmployeeForDialog.morningEndTime, 'morning');
-                                  }}
-                                  size="sm"
-                                  className="bg-green-600 hover:bg-green-700 text-white text-xs"
-                                  disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
-                                >
-                                  <Check className="w-3 h-3 mr-1" />
-                                  حضور وإنصراف في الوقت
-                                </Button>
-                                <Button
-                                  onClick={() => {
-                                    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-                                    handleConfirmBothAttendance(currentTime, currentTime, 'morning');
-                                  }}
-                                  size="sm"
-                                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
-                                  disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
-                                >
-                                  <Clock className="w-3 h-3 mr-1" />
-                                  حضور وإنصراف الوقت الفعلي
-                                </Button>
                               </div>
                             </div>
 
-                            {/* Evening Schedule */}
-                            <div className="bg-white/5 rounded-lg p-4">
-                              <h4 className="text-md font-medium text-white mb-3">الفترة المسائية</h4>
-                              
-                              {/* Evening Schedule Times */}
-                              <div className="grid grid-cols-2 gap-4 mb-3">
-                                <div className="bg-white/5 rounded-lg p-2">
-                                  <Label className="text-gray-400 text-xs">وقت الحضور المحدد</Label>
-                                  <p className="text-white font-mono text-sm">{selectedEmployeeForDialog.eveningStartTime}</p>
+                            {/* Evening Period */}
+                            <div className="bg-white/5 rounded-lg p-6">
+                              <h4 className="font-medium mb-4 text-center text-purple-400">الفترة المسائية</h4>
+                              <div className="grid grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                  <label className="block text-sm font-medium text-gray-300 text-center">وقت الحضور المسائي</label>
+                                  <div className="flex gap-3 justify-center">
+                                    <Input
+                                      type="time"
+                                      value={existingAttendance?.eveningCheckinTime || currentTime}
+                                      onChange={(e) => {
+                                        if (existingAttendance) {
+                                          handleAttendanceUpdate(existingAttendance.id, 'eveningCheckinTime', e.target.value);
+                                        }
+                                      }}
+                                      className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
+                                    />
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                                        if (existingAttendance) {
+                                          handleAttendanceUpdate(existingAttendance.id, 'eveningCheckinTime', time);
+                                        }
+                                      }}
+                                      className="h-12 px-3 border-white/20 hover:bg-white/10"
+                                    >
+                                      <Clock className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                  <div className="text-xs text-gray-400 text-center">
+                                    الوقت المحدد: {selectedEmployeeForDialog.eveningStartTime}
+                                  </div>
                                 </div>
-                                <div className="bg-white/5 rounded-lg p-2">
-                                  <Label className="text-gray-400 text-xs">وقت الانصراف المحدد</Label>
-                                  <p className="text-white font-mono text-sm">{selectedEmployeeForDialog.eveningEndTime}</p>
-                                </div>
-                              </div>
 
-                              {/* Evening Attendance Times */}
-                              <div className="grid grid-cols-2 gap-3 mb-3">
-                                <div>
-                                  <Label className="text-gray-300 text-xs">الحضور الفعلي</Label>
-                                  <Input
-                                    type="time"
-                                    value={existingAttendance?.eveningCheckinTime || ""}
-                                    onChange={(e) => existingAttendance && handleAttendanceUpdate(existingAttendance.id, 'eveningCheckinTime', e.target.value)}
-                                    className="bg-white/10 border-white/20 text-white text-sm mt-1"
-                                  />
+                                <div className="space-y-3">
+                                  <label className="block text-sm font-medium text-gray-300 text-center">وقت الانصراف المسائي</label>
+                                  <div className="flex gap-3 justify-center">
+                                    <Input
+                                      type="time"
+                                      value={existingAttendance?.eveningCheckoutTime || currentTime}
+                                      onChange={(e) => {
+                                        if (existingAttendance) {
+                                          handleAttendanceUpdate(existingAttendance.id, 'eveningCheckoutTime', e.target.value);
+                                        }
+                                      }}
+                                      className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
+                                    />
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                                        if (existingAttendance) {
+                                          handleAttendanceUpdate(existingAttendance.id, 'eveningCheckoutTime', time);
+                                        }
+                                      }}
+                                      className="h-12 px-3 border-white/20 hover:bg-white/10"
+                                    >
+                                      <Clock className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                  <div className="text-xs text-gray-400 text-center">
+                                    الوقت المحدد: {selectedEmployeeForDialog.eveningEndTime}
+                                  </div>
                                 </div>
-                                <div>
-                                  <Label className="text-gray-300 text-xs">الانصراف الفعلي</Label>
-                                  <Input
-                                    type="time"
-                                    value={existingAttendance?.eveningCheckoutTime || ""}
-                                    onChange={(e) => existingAttendance && handleAttendanceUpdate(existingAttendance.id, 'eveningCheckoutTime', e.target.value)}
-                                    className="bg-white/10 border-white/20 text-white text-sm mt-1"
-                                  />
-                                </div>
-                              </div>
-
-                              {/* Evening Quick Actions */}
-                              <div className="grid grid-cols-2 gap-2">
-                                <Button
-                                  onClick={() => {
-                                    handleConfirmBothAttendance(selectedEmployeeForDialog.eveningStartTime, selectedEmployeeForDialog.eveningEndTime, 'evening');
-                                  }}
-                                  size="sm"
-                                  className="bg-green-600 hover:bg-green-700 text-white text-xs"
-                                  disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
-                                >
-                                  <Check className="w-3 h-3 mr-1" />
-                                  حضور وإنصراف في الوقت
-                                </Button>
-                                <Button
-                                  onClick={() => {
-                                    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-                                    handleConfirmBothAttendance(currentTime, currentTime, 'evening');
-                                  }}
-                                  size="sm"
-                                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
-                                  disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
-                                >
-                                  <Clock className="w-3 h-3 mr-1" />
-                                  حضور وإنصراف الوقت الفعلي
-                                </Button>
                               </div>
                             </div>
                           </div>
                         )}
-                        
-                        {/* Bottom Actions */}
-                        <div className="flex gap-3 pt-4 border-t border-white/10">
+
+                        {/* Action Buttons */}
+                        <div className="flex justify-center gap-4 pt-6 border-t border-white/10">
                           <Button
-                            onClick={handleMarkHoliday}
+                            onClick={handleMarkAsHoliday}
                             variant="outline"
-                            className="flex-1 border-yellow-400 text-yellow-300 hover:bg-yellow-400/10"
-                            disabled={markHolidayMutation.isPending}
+                            className="bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-300 border-yellow-400/50 px-8"
+                            disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                           >
-                            <Coffee className="w-4 h-4 mr-2" />
+                            <Calendar className="w-4 h-4 mr-2" />
                             تحديد كإجازة
                           </Button>
                           
                           <Button
-                            onClick={() => setIsAttendanceDialogOpen(false)}
+                            onClick={() => {
+                              // Save attendance data
+                              if (!existingAttendance) {
+                                // Create new attendance record with current form data
+                                const attendanceData = {
+                                  employeeId: selectedEmployeeForDialog.employeeId,
+                                  employeeName: selectedEmployeeForDialog.employeeName,
+                                  date: dateStr,
+                                  scheduleType: selectedEmployeeForDialog.scheduleType,
+                                  ...(selectedEmployeeForDialog.scheduleType === "متصل" 
+                                    ? {
+                                        continuousCheckinTime: currentTime,
+                                        continuousCheckoutTime: currentTime
+                                      }
+                                    : {
+                                        morningCheckinTime: currentTime,
+                                        morningCheckoutTime: currentTime,
+                                        eveningCheckinTime: currentTime,
+                                        eveningCheckoutTime: currentTime
+                                      }
+                                  )
+                                };
+                                createAttendanceMutation.mutate(attendanceData);
+                              } else {
+                                // Data is already saved via onChange handlers
+                                setIsAttendanceDialogOpen(false);
+                              }
+                            }}
+                            className="bg-green-600 hover:bg-green-700 text-white px-12"
+                            disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
+                          >
+                            <Check className="w-4 h-4 mr-2" />
+                            حفظ
+                          </Button>
+                          
+                          <Button
                             variant="outline"
-                            className="flex-1 border-white/20 text-white hover:bg-white/10"
+                            onClick={() => setIsAttendanceDialogOpen(false)}
+                            disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
+                            className="px-8 border-white/20 text-white hover:bg-white/10"
                           >
                             إغلاق
                           </Button>
