@@ -1423,7 +1423,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                         {/* Action Buttons */}
                         <div className="flex justify-center gap-4 pt-6 border-t border-white/10">
                           <Button
-                            onClick={handleMarkAsHoliday}
+                            onClick={handleMarkHoliday}
                             variant="outline"
                             className="bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-300 border-yellow-400/50 px-8"
                             disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
