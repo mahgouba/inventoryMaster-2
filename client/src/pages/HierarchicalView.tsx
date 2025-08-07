@@ -70,6 +70,7 @@ export default function HierarchicalView() {
   // Color form states
   const [colorType, setColorType] = useState("");
   const [colorName, setColorName] = useState("");
+  const [colorNameEn, setColorNameEn] = useState("");
   const [colorCode, setColorCode] = useState("");
   const [colorManufacturer, setColorManufacturer] = useState("");
   const [colorCategory, setColorCategory] = useState("");
@@ -586,12 +587,22 @@ export default function HierarchicalView() {
               </div>
               
               <div>
-                <Label className="text-right block mb-2">اسم اللون *</Label>
+                <Label className="text-right block mb-2">اسم اللون بالعربية *</Label>
                 <Input
                   value={colorName}
                   onChange={(e) => setColorName(e.target.value)}
-                  placeholder="اسم اللون"
+                  placeholder="اسم اللون بالعربية"
                   dir="rtl"
+                />
+              </div>
+
+              <div>
+                <Label className="text-right block mb-2">اسم اللون بالإنجليزية</Label>
+                <Input
+                  value={colorNameEn}
+                  onChange={(e) => setColorNameEn(e.target.value)}
+                  placeholder="Color Name in English"
+                  dir="ltr"
                 />
               </div>
 
@@ -674,6 +685,7 @@ export default function HierarchicalView() {
                         trimLevel: trimLevelData?.name_ar || "",
                         colorType: colorType,
                         colorName: colorName,
+                        colorNameEn: colorNameEn || "",
                         colorCode: colorCode || "#FFFFFF"
                       };
                       
@@ -693,6 +705,7 @@ export default function HierarchicalView() {
                       // إعادة تعيين النموذج
                       setColorType("");
                       setColorName("");
+                      setColorNameEn("");
                       setColorCode("");
                       setColorManufacturer("");
                       setColorCategory("");
@@ -716,6 +729,7 @@ export default function HierarchicalView() {
                   onClick={() => {
                     setColorType("");
                     setColorName("");
+                    setColorNameEn("");
                     setColorCode("");
                     setColorManufacturer("");
                     setColorCategory("");
@@ -1107,12 +1121,21 @@ export default function HierarchicalView() {
               {isEditMode.type === 'color' && (
                 <>
                   <div>
-                    <Label className="text-right block mb-2">اسم اللون *</Label>
+                    <Label className="text-right block mb-2">اسم اللون بالعربية *</Label>
                     <Input
                       value={colorName || isEditMode.data?.name || ''}
                       onChange={(e) => setColorName(e.target.value)}
-                      placeholder="اسم اللون"
+                      placeholder="اسم اللون بالعربية"
                       dir="rtl"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-right block mb-2">اسم اللون بالإنجليزية</Label>
+                    <Input
+                      value={colorNameEn || isEditMode.data?.nameEn || ''}
+                      onChange={(e) => setColorNameEn(e.target.value)}
+                      placeholder="Color Name in English"
+                      dir="ltr"
                     />
                   </div>
                   <div>
@@ -1169,6 +1192,7 @@ export default function HierarchicalView() {
                       } else if (isEditMode.type === 'color') {
                         await apiRequest('PUT', `/api/color-associations/${isEditMode.id}`, {
                           colorName: colorName || isEditMode.data?.name,
+                          colorNameEn: colorNameEn || isEditMode.data?.nameEn,
                           colorCode: colorCode || isEditMode.data?.code,
                           colorType: colorType || isEditMode.data?.type
                         });
@@ -1185,6 +1209,7 @@ export default function HierarchicalView() {
                       setNewTrimLevelNameAr('');
                       setNewTrimLevelNameEn('');
                       setColorName('');
+                      setColorNameEn('');
                       setColorCode('');
                       setColorType('');
                       setIsEditMode(null);
