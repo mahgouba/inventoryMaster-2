@@ -1307,7 +1307,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                     };
 
                     // Set current time when dialog opens
-                    React.useEffect(() => {
+                    useEffect(() => {
                       if (isAttendanceDialogOpen && selectedEmployeeForDialog) {
                         setCurrentTimeToInputs();
                       }
