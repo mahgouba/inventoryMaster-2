@@ -1071,16 +1071,22 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                       {isExpanded && (
                         <div className="mt-6 space-y-4">
                           {/* Calendar Grid */}
-                          <div className="grid grid-cols-7 gap-1">
-                            {/* Day Headers */}
-                            {['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'].map((day) => (
-                              <div key={day} className="p-2 text-center text-gray-400 text-sm font-medium">
-                                {day}
-                              </div>
-                            ))}
-                            
-                            {/* Calendar Days */}
-                            {monthDays.map((day) => {
+                          <div className="bg-white/5 rounded-lg p-4">
+                            <div className="grid grid-cols-7 gap-2">
+                              {/* Day Headers */}
+                              {['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'].map((day) => (
+                                <div key={day} className="p-3 text-center text-gray-400 text-sm font-semibold bg-white/10 rounded-lg">
+                                  {day}
+                                </div>
+                              ))}
+                              
+                              {/* Empty cells for proper calendar layout */}
+                              {Array.from({ length: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay() }).map((_, index) => (
+                                <div key={`empty-${index}`} className="p-3"></div>
+                              ))}
+                              
+                              {/* Calendar Days */}
+                              {monthDays.map((day) => {
                               const dayStr = format(day, "yyyy-MM-dd");
                               const dayAttendance = monthAttendance.find(a => a.date === dayStr);
                               const isToday = isSameDay(day, new Date());
@@ -1093,33 +1099,34 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 <div
                                   key={day.toISOString()}
                                   className={`
-                                    p-3 text-center cursor-pointer rounded-lg transition-all duration-200 border
-                                    ${isToday ? 'ring-2 ring-blue-400 border-blue-400' : 'border-transparent'}
-                                    ${isLate ? 'bg-red-600/30 text-red-200 hover:bg-red-600/40 border-red-500/30' : ''}
-                                    ${hasAttendance && !isHoliday && !isLate && !hasApprovedLeaveForDay ? 'bg-green-600/30 text-green-200 hover:bg-green-600/40 border-green-500/30' : ''}
-                                    ${isHoliday || hasApprovedLeaveForDay ? 'bg-yellow-600/30 text-yellow-200 hover:bg-yellow-600/40 border-yellow-500/30' : ''}
-                                    ${!hasAttendance && !isHoliday && !hasApprovedLeaveForDay ? 'bg-gray-600/20 text-gray-300 hover:bg-gray-600/30 border-gray-500/20' : ''}
+                                    p-3 text-center cursor-pointer rounded-lg transition-all duration-200 border min-h-[60px] flex flex-col justify-center items-center
+                                    ${isToday ? 'ring-2 ring-blue-400 border-blue-400' : 'border-white/10'}
+                                    ${isLate ? 'bg-red-600/40 text-red-100 hover:bg-red-600/50 border-red-500/50' : ''}
+                                    ${hasAttendance && !isHoliday && !isLate && !hasApprovedLeaveForDay ? 'bg-green-600/40 text-green-100 hover:bg-green-600/50 border-green-500/50' : ''}
+                                    ${isHoliday || hasApprovedLeaveForDay ? 'bg-yellow-600/40 text-yellow-100 hover:bg-yellow-600/50 border-yellow-500/50' : ''}
+                                    ${!hasAttendance && !isHoliday && !hasApprovedLeaveForDay ? 'bg-white/10 text-white hover:bg-white/20 border-white/20' : ''}
                                     hover:scale-105 hover:shadow-lg
                                   `}
                                   onClick={() => handleDayClick(day, schedule)}
                                 >
-                                  <div className="text-sm font-semibold">
+                                  <div className="text-lg font-bold">
                                     {format(day, "d")}
                                   </div>
                                   {hasAttendance && (
-                                    <div className="text-xs mt-1">
+                                    <div className="mt-1">
                                       {isHoliday ? (
-                                        <Coffee className="w-4 h-4 mx-auto" />
+                                        <Coffee className="w-5 h-5 mx-auto" />
                                       ) : isLate ? (
-                                        <XCircle className="w-4 h-4 mx-auto" />
+                                        <XCircle className="w-5 h-5 mx-auto" />
                                       ) : (
-                                        <CheckCircle className="w-4 h-4 mx-auto" />
+                                        <CheckCircle className="w-5 h-5 mx-auto" />
                                       )}
                                     </div>
                                   )}
                                 </div>
                               );
                             })}
+                            </div>
                           </div>
 
                           {/* Legend */}
