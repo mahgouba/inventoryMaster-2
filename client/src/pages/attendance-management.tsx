@@ -1280,16 +1280,38 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                     
                     const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
                     
-                    // Get default times based on schedule or current time if no attendance record exists
+                    // Get default times - always show current time for new records
                     const getDefaultTime = (fieldType: string) => {
                       if (existingAttendance) {
-                        // If attendance record exists, show saved time or current time
+                        // If attendance record exists, show saved time
                         return (existingAttendance as any)[fieldType] || currentTime;
                       } else {
                         // If no attendance record, always show current time as default
                         return currentTime;
                       }
                     };
+
+                    // Function to set current time in input fields when dialog opens
+                    const setCurrentTimeToInputs = () => {
+                      if (!existingAttendance) {
+                        setTimeout(() => {
+                          const timeInputs = ['continuous-checkin-time', 'continuous-checkout-time', 'morning-checkin-time', 'morning-checkout-time', 'evening-checkin-time', 'evening-checkout-time'];
+                          timeInputs.forEach(inputId => {
+                            const input = document.getElementById(inputId) as HTMLInputElement;
+                            if (input) {
+                              input.value = currentTime;
+                            }
+                          });
+                        }, 100);
+                      }
+                    };
+
+                    // Set current time when dialog opens
+                    React.useEffect(() => {
+                      if (isAttendanceDialogOpen && selectedEmployeeForDialog) {
+                        setCurrentTimeToInputs();
+                      }
+                    }, [isAttendanceDialogOpen, selectedEmployeeForDialog, existingAttendance]);
                     
                     return (
                       <div className="space-y-6" dir="rtl">
