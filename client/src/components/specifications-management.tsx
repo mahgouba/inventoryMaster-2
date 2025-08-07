@@ -195,7 +195,7 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
     setSelectedCategory(spec.category);
     setSelectedTrimLevel(spec.trimLevel);
     setSelectedYear(spec.year.toString());
-    setSelectedEngineCapacity(String(spec.engineCapacity || ''));
+    setSelectedEngineCapacity(spec.engineCapacity ? String(spec.engineCapacity) : '');
     setSelectedChassisNumber(spec.chassisNumber || '');
     setDescription(spec.detailedDescription);
     setShowForm(true);

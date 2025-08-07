@@ -957,6 +957,40 @@ export default function HierarchicalView() {
                                                     </div>
                                                   </div>
                                                 </div>
+
+                                                {/* Color Actions */}
+                                                <div className="flex gap-1">
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => setIsEditMode({ type: 'color', id: color.id, data: color })}
+                                                    className="text-yellow-400 hover:bg-yellow-400/10 p-1"
+                                                  >
+                                                    <Edit className="h-3 w-3" />
+                                                  </Button>
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={async () => {
+                                                      if (confirm("هل أنت متأكد من حذف هذا اللون؟")) {
+                                                        try {
+                                                          await apiRequest('DELETE', `/api/color-associations/${color.id}`);
+                                                          queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+                                                          toast({ title: "تم حذف اللون بنجاح" });
+                                                        } catch (error) {
+                                                          toast({
+                                                            title: "خطأ",
+                                                            description: "فشل في حذف اللون",
+                                                            variant: "destructive",
+                                                          });
+                                                        }
+                                                      }
+                                                    }}
+                                                    className="text-red-400 hover:bg-red-400/10 p-1"
+                                                  >
+                                                    <Trash2 className="h-3 w-3" />
+                                                  </Button>
+                                                </div>
                                               </div>
                                             ))}
                                           </div>
@@ -1023,6 +1057,95 @@ export default function HierarchicalView() {
                   </div>
                 </>
               )}
+
+              {isEditMode.type === 'category' && (
+                <>
+                  <div>
+                    <Label className="text-right block mb-2">اسم الفئة بالعربية *</Label>
+                    <Input
+                      value={newCategoryNameAr || isEditMode.data?.name_ar || isEditMode.data?.nameAr || ''}
+                      onChange={(e) => setNewCategoryNameAr(e.target.value)}
+                      placeholder="اسم الفئة"
+                      dir="rtl"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-right block mb-2">اسم الفئة بالإنجليزية</Label>
+                    <Input
+                      value={newCategoryNameEn || isEditMode.data?.name_en || isEditMode.data?.nameEn || ''}
+                      onChange={(e) => setNewCategoryNameEn(e.target.value)}
+                      placeholder="Category Name"
+                      dir="ltr"
+                    />
+                  </div>
+                </>
+              )}
+
+              {isEditMode.type === 'trimLevel' && (
+                <>
+                  <div>
+                    <Label className="text-right block mb-2">اسم درجة التجهيز بالعربية *</Label>
+                    <Input
+                      value={newTrimLevelNameAr || isEditMode.data?.name_ar || ''}
+                      onChange={(e) => setNewTrimLevelNameAr(e.target.value)}
+                      placeholder="اسم درجة التجهيز"
+                      dir="rtl"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-right block mb-2">اسم درجة التجهيز بالإنجليزية</Label>
+                    <Input
+                      value={newTrimLevelNameEn || isEditMode.data?.name_en || ''}
+                      onChange={(e) => setNewTrimLevelNameEn(e.target.value)}
+                      placeholder="Trim Level Name"
+                      dir="ltr"
+                    />
+                  </div>
+                </>
+              )}
+
+              {isEditMode.type === 'color' && (
+                <>
+                  <div>
+                    <Label className="text-right block mb-2">اسم اللون *</Label>
+                    <Input
+                      value={colorName || isEditMode.data?.name || ''}
+                      onChange={(e) => setColorName(e.target.value)}
+                      placeholder="اسم اللون"
+                      dir="rtl"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-right block mb-2">كود اللون</Label>
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="color"
+                        value={colorCode || isEditMode.data?.code || '#ffffff'}
+                        onChange={(e) => setColorCode(e.target.value)}
+                        className="w-16 h-10 p-1 rounded border"
+                      />
+                      <Input
+                        value={colorCode || isEditMode.data?.code || ''}
+                        onChange={(e) => setColorCode(e.target.value)}
+                        placeholder="#ffffff"
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-right block mb-2">نوع اللون</Label>
+                    <Select value={colorType || isEditMode.data?.type || ''} onValueChange={setColorType}>
+                      <SelectTrigger dir="rtl">
+                        <SelectValue placeholder="اختر نوع اللون" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="exterior">خارجي</SelectItem>
+                        <SelectItem value="interior">داخلي</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              )}
               
               <div className="flex gap-2 pt-4">
                 <Button
@@ -1030,15 +1153,40 @@ export default function HierarchicalView() {
                     try {
                       if (isEditMode.type === 'manufacturer') {
                         await apiRequest('PUT', `/api/hierarchical/manufacturers/${isEditMode.id}`, {
-                          nameAr: manufacturerNameAr,
-                          nameEn: manufacturerNameEn
+                          nameAr: manufacturerNameAr || isEditMode.data?.nameAr,
+                          nameEn: manufacturerNameEn || isEditMode.data?.nameEn
+                        });
+                      } else if (isEditMode.type === 'category') {
+                        await apiRequest('PUT', `/api/hierarchical/categories/${isEditMode.id}`, {
+                          name_ar: newCategoryNameAr || isEditMode.data?.name_ar || isEditMode.data?.nameAr,
+                          name_en: newCategoryNameEn || isEditMode.data?.name_en || isEditMode.data?.nameEn
+                        });
+                      } else if (isEditMode.type === 'trimLevel') {
+                        await apiRequest('PUT', `/api/hierarchical/trimLevels/${isEditMode.id}`, {
+                          name_ar: newTrimLevelNameAr || isEditMode.data?.name_ar,
+                          name_en: newTrimLevelNameEn || isEditMode.data?.name_en
+                        });
+                      } else if (isEditMode.type === 'color') {
+                        await apiRequest('PUT', `/api/color-associations/${isEditMode.id}`, {
+                          colorName: colorName || isEditMode.data?.name,
+                          colorCode: colorCode || isEditMode.data?.code,
+                          colorType: colorType || isEditMode.data?.type
                         });
                       }
                       queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
                       queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
                       toast({ title: "تم التحديث بنجاح" });
+                      
+                      // Reset all form fields
                       setManufacturerNameAr('');
                       setManufacturerNameEn('');
+                      setNewCategoryNameAr('');
+                      setNewCategoryNameEn('');
+                      setNewTrimLevelNameAr('');
+                      setNewTrimLevelNameEn('');
+                      setColorName('');
+                      setColorCode('');
+                      setColorType('');
                       setIsEditMode(null);
                     } catch (error) {
                       toast({
