@@ -3160,6 +3160,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Employee ID and date are required" });
       }
 
+      // Get employee information first
+      const user = await getStorage().getUser(parseInt(employeeId));
+      if (!user) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+
       // Check if attendance record exists for this employee and date
       let attendance = await getStorage().getDailyAttendanceByEmployeeAndDate(
         parseInt(employeeId), 
@@ -3170,17 +3176,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Update existing record to mark as holiday
         const updatedAttendance = await getStorage().updateDailyAttendance(attendance.id, {
           ...attendance,
-          notes: isHoliday ? 'إجازة' : null
+          notes: isHoliday ? 'إجازة' : (attendance.notes !== 'إجازة' ? attendance.notes : null)
         });
         res.json(updatedAttendance);
       } else {
-        // Create new holiday record
+        // Create new holiday record with proper employee info
         const newAttendance = await getStorage().createDailyAttendance({
           employeeId: parseInt(employeeId),
-          employeeName: "موظف", // Default employee name, should be fetched from user data
-          date: date, // Keep as string for consistency
-          scheduleType: "متصل", // Default schedule type
-          notes: isHoliday ? 'إجازة' : null
+          employeeName: user.name,
+          date: date,
+          scheduleType: "متصل",
+          notes: isHoliday ? 'إجازة' : null,
+          isConfirmed: true // Mark holiday records as confirmed
         });
         res.status(201).json(newAttendance);
       }
