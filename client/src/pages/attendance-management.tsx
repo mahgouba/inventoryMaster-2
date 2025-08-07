@@ -1187,20 +1187,27 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                             {/* Quick Actions */}
                             <div className="grid grid-cols-2 gap-3">
                               <Button
-                                onClick={() => handleConfirmAttendance('checkin', selectedEmployeeForDialog.continuousStartTime)}
+                                onClick={() => {
+                                  handleConfirmAttendance('checkin', selectedEmployeeForDialog.continuousStartTime);
+                                  handleConfirmAttendance('checkout', selectedEmployeeForDialog.continuousEndTime);
+                                }}
                                 className="bg-green-600 hover:bg-green-700 text-white"
                                 disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                               >
                                 <Check className="w-4 h-4 mr-2" />
-                                حضور في الوقت
+                                حضور وإنصراف في الوقت
                               </Button>
                               <Button
-                                onClick={() => handleConfirmAttendance('checkout', selectedEmployeeForDialog.continuousEndTime)}
+                                onClick={() => {
+                                  const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                                  handleConfirmAttendance('checkin', currentTime);
+                                  handleConfirmAttendance('checkout', currentTime);
+                                }}
                                 className="bg-blue-600 hover:bg-blue-700 text-white"
                                 disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                               >
                                 <Clock className="w-4 h-4 mr-2" />
-                                انصراف في الوقت
+                                حضور وإنصراف الوقت الفعلي
                               </Button>
                             </div>
                           </div>
@@ -1250,22 +1257,29 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               {/* Morning Quick Actions */}
                               <div className="grid grid-cols-2 gap-2">
                                 <Button
-                                  onClick={() => handleConfirmAttendance('checkin', selectedEmployeeForDialog.morningStartTime, 'morning')}
+                                  onClick={() => {
+                                    handleConfirmAttendance('checkin', selectedEmployeeForDialog.morningStartTime, 'morning');
+                                    handleConfirmAttendance('checkout', selectedEmployeeForDialog.morningEndTime, 'morning');
+                                  }}
                                   size="sm"
-                                  className="bg-green-600 hover:bg-green-700 text-white"
+                                  className="bg-green-600 hover:bg-green-700 text-white text-xs"
                                   disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                                 >
                                   <Check className="w-3 h-3 mr-1" />
-                                  حضور في الوقت
+                                  حضور وإنصراف في الوقت
                                 </Button>
                                 <Button
-                                  onClick={() => handleConfirmAttendance('checkout', selectedEmployeeForDialog.morningEndTime, 'morning')}
+                                  onClick={() => {
+                                    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                                    handleConfirmAttendance('checkin', currentTime, 'morning');
+                                    handleConfirmAttendance('checkout', currentTime, 'morning');
+                                  }}
                                   size="sm"
-                                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
                                   disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                                 >
                                   <Clock className="w-3 h-3 mr-1" />
-                                  انصراف في الوقت
+                                  حضور وإنصراف الوقت الفعلي
                                 </Button>
                               </div>
                             </div>
@@ -1311,22 +1325,29 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               {/* Evening Quick Actions */}
                               <div className="grid grid-cols-2 gap-2">
                                 <Button
-                                  onClick={() => handleConfirmAttendance('checkin', selectedEmployeeForDialog.eveningStartTime, 'evening')}
+                                  onClick={() => {
+                                    handleConfirmAttendance('checkin', selectedEmployeeForDialog.eveningStartTime, 'evening');
+                                    handleConfirmAttendance('checkout', selectedEmployeeForDialog.eveningEndTime, 'evening');
+                                  }}
                                   size="sm"
-                                  className="bg-green-600 hover:bg-green-700 text-white"
+                                  className="bg-green-600 hover:bg-green-700 text-white text-xs"
                                   disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                                 >
                                   <Check className="w-3 h-3 mr-1" />
-                                  حضور في الوقت
+                                  حضور وإنصراف في الوقت
                                 </Button>
                                 <Button
-                                  onClick={() => handleConfirmAttendance('checkout', selectedEmployeeForDialog.eveningEndTime, 'evening')}
+                                  onClick={() => {
+                                    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                                    handleConfirmAttendance('checkin', currentTime, 'evening');
+                                    handleConfirmAttendance('checkout', currentTime, 'evening');
+                                  }}
                                   size="sm"
-                                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
                                   disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                                 >
                                   <Clock className="w-3 h-3 mr-1" />
-                                  انصراف في الوقت
+                                  حضور وإنصراف الوقت الفعلي
                                 </Button>
                               </div>
                             </div>
