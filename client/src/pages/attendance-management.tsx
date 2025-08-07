@@ -1334,15 +1334,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 <div className="flex gap-3 justify-center">
                                   <Input
                                     type="time"
-                                    value={getDefaultTime('continuousCheckinTime')}
-                                    onChange={(e) => {
-                                      if (existingAttendance) {
-                                        handleAttendanceUpdate(existingAttendance.id, 'continuousCheckinTime', e.target.value);
-                                      } else {
-                                        handleConfirmBothAttendance(e.target.value, getDefaultTime('continuousCheckoutTime'));
-                                      }
-                                    }}
+                                    defaultValue={getDefaultTime('continuousCheckinTime')}
                                     className="text-2xl h-16 text-center font-mono bg-white/10 border-white/20 text-white"
+                                    id="continuous-checkin-time"
                                   />
                                   <Button
                                     size="sm"
@@ -1368,15 +1362,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 <div className="flex gap-3 justify-center">
                                   <Input
                                     type="time"
-                                    value={getDefaultTime('continuousCheckoutTime')}
-                                    onChange={(e) => {
-                                      if (existingAttendance) {
-                                        handleAttendanceUpdate(existingAttendance.id, 'continuousCheckoutTime', e.target.value);
-                                      } else {
-                                        handleConfirmBothAttendance(getDefaultTime('continuousCheckinTime'), e.target.value);
-                                      }
-                                    }}
+                                    defaultValue={getDefaultTime('continuousCheckoutTime')}
                                     className="text-2xl h-16 text-center font-mono bg-white/10 border-white/20 text-white"
+                                    id="continuous-checkout-time"
                                   />
                                   <Button
                                     size="sm"
@@ -1412,26 +1400,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   <div className="flex gap-3 justify-center">
                                     <Input
                                       type="time"
-                                      value={getDefaultTime('morningCheckinTime')}
-                                      onChange={(e) => {
-                                        if (existingAttendance) {
-                                          handleAttendanceUpdate(existingAttendance.id, 'morningCheckinTime', e.target.value);
-                                        } else {
-                                          // For new record, create it with default times
-                                          const attendanceData = {
-                                            employeeId: selectedEmployeeForDialog.employeeId,
-                                            employeeName: selectedEmployeeForDialog.employeeName,
-                                            date: dateStr,
-                                            scheduleType: selectedEmployeeForDialog.scheduleType,
-                                            morningCheckinTime: e.target.value,
-                                            morningCheckoutTime: selectedEmployeeForDialog.morningEndTime || currentTime,
-                                            eveningCheckinTime: selectedEmployeeForDialog.eveningStartTime || currentTime,
-                                            eveningCheckoutTime: selectedEmployeeForDialog.eveningEndTime || currentTime
-                                          };
-                                          createAttendanceMutation.mutate(attendanceData);
-                                        }
-                                      }}
+                                      defaultValue={getDefaultTime('morningCheckinTime')}
                                       className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
+                                      id="morning-checkin-time"
                                     />
                                     <Button
                                       size="sm"
@@ -1457,26 +1428,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   <div className="flex gap-3 justify-center">
                                     <Input
                                       type="time"
-                                      value={getDefaultTime('morningCheckoutTime')}
-                                      onChange={(e) => {
-                                        if (existingAttendance) {
-                                          handleAttendanceUpdate(existingAttendance.id, 'morningCheckoutTime', e.target.value);
-                                        } else {
-                                          // For new record, create it with default times
-                                          const attendanceData = {
-                                            employeeId: selectedEmployeeForDialog.employeeId,
-                                            employeeName: selectedEmployeeForDialog.employeeName,
-                                            date: dateStr,
-                                            scheduleType: selectedEmployeeForDialog.scheduleType,
-                                            morningCheckinTime: selectedEmployeeForDialog.morningStartTime || currentTime,
-                                            morningCheckoutTime: e.target.value,
-                                            eveningCheckinTime: selectedEmployeeForDialog.eveningStartTime || currentTime,
-                                            eveningCheckoutTime: selectedEmployeeForDialog.eveningEndTime || currentTime
-                                          };
-                                          createAttendanceMutation.mutate(attendanceData);
-                                        }
-                                      }}
+                                      defaultValue={getDefaultTime('morningCheckoutTime')}
                                       className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
+                                      id="morning-checkout-time"
                                     />
                                     <Button
                                       size="sm"
@@ -1508,26 +1462,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   <div className="flex gap-3 justify-center">
                                     <Input
                                       type="time"
-                                      value={getDefaultTime('eveningCheckinTime')}
-                                      onChange={(e) => {
-                                        if (existingAttendance) {
-                                          handleAttendanceUpdate(existingAttendance.id, 'eveningCheckinTime', e.target.value);
-                                        } else {
-                                          // For new record, create it with default times
-                                          const attendanceData = {
-                                            employeeId: selectedEmployeeForDialog.employeeId,
-                                            employeeName: selectedEmployeeForDialog.employeeName,
-                                            date: dateStr,
-                                            scheduleType: selectedEmployeeForDialog.scheduleType,
-                                            morningCheckinTime: selectedEmployeeForDialog.morningStartTime || currentTime,
-                                            morningCheckoutTime: selectedEmployeeForDialog.morningEndTime || currentTime,
-                                            eveningCheckinTime: e.target.value,
-                                            eveningCheckoutTime: selectedEmployeeForDialog.eveningEndTime || currentTime
-                                          };
-                                          createAttendanceMutation.mutate(attendanceData);
-                                        }
-                                      }}
+                                      defaultValue={getDefaultTime('eveningCheckinTime')}
                                       className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
+                                      id="evening-checkin-time"
                                     />
                                     <Button
                                       size="sm"
@@ -1553,26 +1490,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   <div className="flex gap-3 justify-center">
                                     <Input
                                       type="time"
-                                      value={getDefaultTime('eveningCheckoutTime')}
-                                      onChange={(e) => {
-                                        if (existingAttendance) {
-                                          handleAttendanceUpdate(existingAttendance.id, 'eveningCheckoutTime', e.target.value);
-                                        } else {
-                                          // For new record, create it with default times
-                                          const attendanceData = {
-                                            employeeId: selectedEmployeeForDialog.employeeId,
-                                            employeeName: selectedEmployeeForDialog.employeeName,
-                                            date: dateStr,
-                                            scheduleType: selectedEmployeeForDialog.scheduleType,
-                                            morningCheckinTime: selectedEmployeeForDialog.morningStartTime || currentTime,
-                                            morningCheckoutTime: selectedEmployeeForDialog.morningEndTime || currentTime,
-                                            eveningCheckinTime: selectedEmployeeForDialog.eveningStartTime || currentTime,
-                                            eveningCheckoutTime: e.target.value
-                                          };
-                                          createAttendanceMutation.mutate(attendanceData);
-                                        }
-                                      }}
+                                      defaultValue={getDefaultTime('eveningCheckoutTime')}
                                       className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
+                                      id="evening-checkout-time"
                                     />
                                     <Button
                                       size="sm"
@@ -1611,9 +1531,14 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                           
                           <Button
                             onClick={() => {
-                              // Save attendance data with current form values
+                              // Get values from time inputs
+                              const getInputValue = (id: string) => {
+                                const input = document.getElementById(id) as HTMLInputElement;
+                                return input?.value || currentTime;
+                              };
+
                               if (!existingAttendance) {
-                                // Create new attendance record
+                                // Create new attendance record with values from time inputs
                                 const attendanceData = {
                                   employeeId: selectedEmployeeForDialog.employeeId,
                                   employeeName: selectedEmployeeForDialog.employeeName,
@@ -1621,29 +1546,43 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   scheduleType: selectedEmployeeForDialog.scheduleType,
                                   ...(selectedEmployeeForDialog.scheduleType === "متصل" 
                                     ? {
-                                        continuousCheckinTime: currentTime,
-                                        continuousCheckoutTime: currentTime
+                                        continuousCheckinTime: getInputValue('continuous-checkin-time'),
+                                        continuousCheckoutTime: getInputValue('continuous-checkout-time')
                                       }
                                     : {
-                                        morningCheckinTime: currentTime,
-                                        morningCheckoutTime: currentTime,
-                                        eveningCheckinTime: currentTime,
-                                        eveningCheckoutTime: currentTime
+                                        morningCheckinTime: getInputValue('morning-checkin-time'),
+                                        morningCheckoutTime: getInputValue('morning-checkout-time'),
+                                        eveningCheckinTime: getInputValue('evening-checkin-time'),
+                                        eveningCheckoutTime: getInputValue('evening-checkout-time')
                                       }
                                   )
                                 };
                                 createAttendanceMutation.mutate(attendanceData);
                               } else {
-                                // Update existing attendance with current form values
-                                toast({ title: "تم حفظ بيانات الحضور بنجاح" });
-                                setIsAttendanceDialogOpen(false);
+                                // Update existing attendance with values from time inputs
+                                if (selectedEmployeeForDialog.scheduleType === "متصل") {
+                                  const checkinTime = getInputValue('continuous-checkin-time');
+                                  const checkoutTime = getInputValue('continuous-checkout-time');
+                                  handleAttendanceUpdate(existingAttendance.id, 'continuousCheckinTime', checkinTime);
+                                  setTimeout(() => handleAttendanceUpdate(existingAttendance.id, 'continuousCheckoutTime', checkoutTime), 100);
+                                } else {
+                                  const morningCheckin = getInputValue('morning-checkin-time');
+                                  const morningCheckout = getInputValue('morning-checkout-time');
+                                  const eveningCheckin = getInputValue('evening-checkin-time');
+                                  const eveningCheckout = getInputValue('evening-checkout-time');
+                                  
+                                  handleAttendanceUpdate(existingAttendance.id, 'morningCheckinTime', morningCheckin);
+                                  setTimeout(() => handleAttendanceUpdate(existingAttendance.id, 'morningCheckoutTime', morningCheckout), 100);
+                                  setTimeout(() => handleAttendanceUpdate(existingAttendance.id, 'eveningCheckinTime', eveningCheckin), 200);
+                                  setTimeout(() => handleAttendanceUpdate(existingAttendance.id, 'eveningCheckoutTime', eveningCheckout), 300);
+                                }
                               }
                             }}
                             className="bg-green-600 hover:bg-green-700 text-white px-12"
                             disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
                           >
                             <Check className="w-4 h-4 mr-2" />
-                            حفظ
+                            حفظ الأوقات
                           </Button>
                           
                           <Button
