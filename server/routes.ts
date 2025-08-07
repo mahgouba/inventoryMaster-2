@@ -2920,7 +2920,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Leave Requests API - restored for attendance request approval workflow
+  app.get("/api/leave-requests", async (req, res) => {
+    try {
+      const requests = await getStorage().getAllLeaveRequests();
+      res.json(requests);
+    } catch (error) {
+      console.error("Error fetching leave requests:", error);
+      res.status(500).json({ message: "Failed to fetch leave requests" });
+    }
+  });
 
+  app.post("/api/leave-requests", async (req, res) => {
+    try {
+      const validation = insertLeaveRequestSchema.safeParse(req.body);
+      if (!validation.success) {
+        console.error("Validation error:", validation.error.errors);
+        return res.status(400).json({ 
+          message: "Invalid data", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const leaveRequest = await getStorage().createLeaveRequest(validation.data);
+      res.status(201).json(leaveRequest);
+    } catch (error) {
+      console.error("Error creating leave request:", error);
+      res.status(500).json({ message: "Failed to create leave request" });
+    }
+  });
+
+  app.put("/api/leave-requests/:id/status", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid request ID" });
+      }
+
+      const { status, approvedBy, approvedByName, rejectionReason } = req.body;
+      const request = await getStorage().updateLeaveRequestStatus(
+        id, 
+        status, 
+        approvedBy, 
+        approvedByName, 
+        rejectionReason
+      );
+      
+      if (!request) {
+        return res.status(404).json({ message: "Leave request not found" });
+      }
+
+      res.json(request);
+    } catch (error) {
+      console.error("Error updating leave request:", error);
+      res.status(500).json({ message: "Failed to update leave request" });
+    }
+  });
 
   // Employee Work Schedules API Routes
   app.get("/api/employee-work-schedules", async (req, res) => {

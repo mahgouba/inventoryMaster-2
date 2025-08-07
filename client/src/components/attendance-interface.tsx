@@ -116,20 +116,36 @@ export function AttendanceInterface({ open, onOpenChange }: AttendanceInterfaceP
     queryKey: ['/api/attendance/monthly', format(monthStart, 'yyyy-MM-dd'), format(monthEnd, 'yyyy-MM-dd')],
   });
 
-  // Submit attendance request mutation
+  // Submit attendance request mutation - sends to leave requests for approval workflow
   const createAttendanceRequestMutation = useMutation({
-    mutationFn: (data: AttendanceRequestFormData) => 
-      apiRequest('/api/attendance-requests', 'POST', data),
+    mutationFn: async (data: AttendanceRequestFormData) => {
+      // Convert attendance request to leave request format for approval workflow
+      return await apiRequest("/api/leave-requests", "POST", {
+        requestType: data.requestType,
+        startDate: data.date,
+        endDate: data.requestType === "إجازة" ? data.date : undefined,
+        duration: data.duration,
+        durationType: data.durationType,
+        reason: data.reason,
+        userName: "اسم الموظف", // Replace with actual user name
+        userId: 1, // Replace with actual user ID
+        requestedBy: 1, // Replace with actual user ID
+        requestedByName: "اسم الموظف", // Replace with actual user name
+        status: "pending"
+      });
+    },
     onSuccess: () => {
       toast({
         title: "تم إرسال الطلب بنجاح",
-        description: "سيتم مراجعة طلبك من قبل المدير",
+        description: "سيتم عرض طلبك في طلبات الإجازة المعلقة للمراجعة والموافقة",
       });
+      queryClient.invalidateQueries({ queryKey: ['/api/leave-requests'] });
       queryClient.invalidateQueries({ queryKey: ['/api/attendance-requests'] });
       form.reset();
       onOpenChange(false);
     },
     onError: (error: any) => {
+      console.error("Error submitting attendance request:", error);
       toast({
         title: "خطأ في إرسال الطلب",
         description: error.message || "حدث خطأ غير متوقع",
