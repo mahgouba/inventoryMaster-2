@@ -89,7 +89,7 @@ export function AttendanceInterface({ open, onOpenChange }: AttendanceInterfaceP
   const form = useForm<AttendanceRequestFormData>({
     resolver: zodResolver(attendanceRequestSchema),
     defaultValues: {
-      requestType: "إجازة",
+      requestType: "استئذان",
       date: format(new Date(), "yyyy-MM-dd"),
       timeFrom: "",
       timeTo: "",
@@ -259,7 +259,6 @@ export function AttendanceInterface({ open, onOpenChange }: AttendanceInterfaceP
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="إجازة">إجازة</SelectItem>
                                 <SelectItem value="استئذان">استئذان</SelectItem>
                                 <SelectItem value="تأخير">تأخير في الحضور</SelectItem>
                                 <SelectItem value="انصراف مبكر">انصراف مبكر</SelectItem>
