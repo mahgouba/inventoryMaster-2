@@ -29,7 +29,11 @@ import {
   ChevronRight,
   ChevronLeft,
   Calendar as CalendarIcon,
-  Coffee
+  Coffee,
+  CheckSquare,
+  Printer,
+  Search,
+  Filter
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay, parseISO, isBefore } from "date-fns";
@@ -196,6 +200,12 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   const { data: pendingLeaveRequests = [] } = useQuery<LeaveRequest[]>({
     queryKey: ["/api/leave-requests"],
     select: (data) => data.filter(request => request.status === "pending"),
+  });
+
+  // Fetch approved leave requests
+  const { data: approvedLeaveRequests = [] } = useQuery<LeaveRequest[]>({
+    queryKey: ["/api/leave-requests"],
+    select: (data) => data.filter(request => request.status === "approved"),
   });
 
   // Fetch employee work schedules
@@ -640,6 +650,268 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     // Dialog will be closed by the mutation success handler
   };
 
+  // Handle printing approved requests
+  const handlePrintRequest = (request: LeaveRequest) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    
+    const printContent = `
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>طلب إجازة/استئذان معتمد - ${request.userName}</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+          
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            font-family: 'Noto Sans Arabic', Arial, sans-serif;
+            background: white;
+            color: #333;
+            line-height: 1.6;
+            padding: 40px;
+            direction: rtl;
+          }
+          
+          .header {
+            text-align: center;
+            border-bottom: 3px solid #0891b2;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+          }
+          
+          .header h1 {
+            color: #0891b2;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+          }
+          
+          .header p {
+            color: #64748b;
+            font-size: 16px;
+          }
+          
+          .request-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            background: #f8fafc;
+          }
+          
+          .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+          }
+          
+          .request-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1e293b;
+          }
+          
+          .status-badge {
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 14px;
+          }
+          
+          .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+          }
+          
+          .detail-item {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+          }
+          
+          .detail-label {
+            font-weight: 600;
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 5px;
+          }
+          
+          .detail-value {
+            font-size: 16px;
+            color: #1e293b;
+            font-weight: 500;
+          }
+          
+          .reason-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+          }
+          
+          .reason-title {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-size: 16px;
+          }
+          
+          .reason-text {
+            color: #475569;
+            line-height: 1.7;
+            font-size: 15px;
+          }
+          
+          .approval-section {
+            background: #dcfdf7;
+            border: 1px solid #6ee7b7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+          }
+          
+          .approval-title {
+            color: #059669;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+          
+          .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+          }
+          
+          @media print {
+            body {
+              padding: 20px;
+            }
+            
+            .no-print {
+              display: none;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>طلب إجازة/استئذان معتمد</h1>
+          <p>نظام إدارة الموارد البشرية</p>
+        </div>
+        
+        <div class="request-card">
+          <div class="request-header">
+            <div class="request-title">${request.requestType} - ${request.userName}</div>
+            <div class="status-badge">معتمد ✓</div>
+          </div>
+          
+          <div class="details-grid">
+            <div class="detail-item">
+              <div class="detail-label">اسم الموظف</div>
+              <div class="detail-value">${request.userName}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">نوع الطلب</div>
+              <div class="detail-value">${request.requestType}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">تاريخ البداية</div>
+              <div class="detail-value">${new Date(request.startDate).toLocaleDateString('ar-SA', {
+                weekday: 'long',
+                year: 'numeric', 
+                month: 'long',
+                day: 'numeric'
+              })}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">المدة</div>
+              <div class="detail-value">${request.duration} ${request.durationType}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">رقم الطلب</div>
+              <div class="detail-value">#${request.id}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">تاريخ تقديم الطلب</div>
+              <div class="detail-value">${new Date(request.createdAt).toLocaleDateString('ar-SA')}</div>
+            </div>
+          </div>
+          
+          ${request.reason ? `
+            <div class="reason-section">
+              <div class="reason-title">سبب الطلب:</div>
+              <div class="reason-text">${request.reason}</div>
+            </div>
+          ` : ''}
+          
+          <div class="approval-section">
+            <div class="approval-title">
+              ✓ تم اعتماد الطلب
+            </div>
+            <div class="details-grid">
+              <div class="detail-item">
+                <div class="detail-label">المسؤول المعتمد</div>
+                <div class="detail-value">${request.approvedByName || 'غير محدد'}</div>
+              </div>
+              
+              <div class="detail-item">
+                <div class="detail-label">تاريخ الاعتماد</div>
+                <div class="detail-value">${request.approvedAt ? new Date(request.approvedAt).toLocaleDateString('ar-SA') : 'غير محدد'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="footer">
+          <p>تم إنشاء هذا التقرير في: ${new Date().toLocaleString('ar-SA')}</p>
+          <p>نظام إدارة الموارد البشرية - ${new Date().getFullYear()}</p>
+        </div>
+        
+        <script>
+          window.onload = function() {
+            window.print();
+            window.onafterprint = function() {
+              window.close();
+            }
+          }
+        </script>
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+  };
+
   // Handle both checkin and checkout in one operation
   const handleConfirmBothAttendance = (checkinTime: string, checkoutTime: string, period?: 'morning' | 'evening') => {
     if (!selectedDayForAttendance || !selectedEmployeeForDialog) return;
@@ -801,7 +1073,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 glass-container backdrop-blur-md bg-white/10 border border-white/20">
+          <TabsList className="grid w-full grid-cols-4 glass-container backdrop-blur-md bg-white/10 border border-white/20">
             <TabsTrigger 
               value="pending-requests" 
               className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-gray-300"
@@ -825,6 +1097,14 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
             >
               <UserCheck className="w-4 h-4 mr-2" />
               الحضور اليومي
+            </TabsTrigger>
+            <TabsTrigger 
+              value="approved-requests" 
+              className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-gray-300"
+              data-testid="tab-approved-requests"
+            >
+              <CheckSquare className="w-4 h-4 mr-2" />
+              الطلبات المعتمدة ({approvedLeaveRequests.length})
             </TabsTrigger>
           </TabsList>
 
@@ -1733,6 +2013,117 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   })()}
                 </DialogContent>
               </Dialog>
+            </GlassContainer>
+          </TabsContent>
+
+          {/* Approved Requests Tab */}
+          <TabsContent value="approved-requests" className="mt-6">
+            <GlassContainer className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold text-white">الطلبات المعتمدة</h2>
+                <div className="flex gap-3 items-center">
+                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                    <CheckSquare className="w-4 h-4" />
+                    <span>إجمالي الطلبات المعتمدة: {approvedLeaveRequests.length}</span>
+                  </div>
+                </div>
+              </div>
+
+              {approvedLeaveRequests.length > 0 ? (
+                <div className="space-y-4">
+                  {approvedLeaveRequests.map((request) => (
+                    <GlassCard key={request.id} className="p-6 transition-all duration-300 hover:bg-white/15">
+                      <div className="space-y-4">
+                        {/* Header with employee info and status */}
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
+                              <CheckSquare className="w-6 h-6 text-green-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-3">
+                                <h3 className="text-lg font-semibold text-white">{request.userName}</h3>
+                                <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                                  {request.requestType}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-gray-400">رقم الطلب: #{request.id}</p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePrintRequest(request)}
+                            className="bg-blue-500/20 border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors"
+                          >
+                            <Printer className="w-4 h-4 mr-2" />
+                            طباعة
+                          </Button>
+                        </div>
+
+                        {/* Request details */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                          <div className="space-y-1">
+                            <span className="text-gray-400">تاريخ البداية:</span>
+                            <div className="text-white font-medium">
+                              {new Date(request.startDate).toLocaleDateString('ar-SA', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-gray-400">المدة:</span>
+                            <div className="text-white font-medium">
+                              {request.duration} {request.durationType}
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-gray-400">وافق عليه:</span>
+                            <div className="text-green-400 font-medium">
+                              {request.approvedByName || 'غير محدد'}
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-gray-400">تاريخ الموافقة:</span>
+                            <div className="text-white font-medium">
+                              {request.approvedAt ? new Date(request.approvedAt).toLocaleDateString('ar-SA') : 'غير محدد'}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Reason */}
+                        {request.reason && (
+                          <div className="space-y-2">
+                            <span className="text-gray-400 text-sm">سبب الطلب:</span>
+                            <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                              <p className="text-white text-sm leading-relaxed">{request.reason}</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Timeline */}
+                        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                          <div className="text-xs text-gray-400 space-y-1">
+                            <div>تم إنشاء الطلب: {new Date(request.createdAt).toLocaleString('ar-SA')}</div>
+                            {request.approvedAt && (
+                              <div>تمت الموافقة: {new Date(request.approvedAt).toLocaleString('ar-SA')}</div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </GlassCard>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <CheckSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-white text-lg mb-2">لا توجد طلبات معتمدة</p>
+                  <p className="text-gray-400">لم يتم العثور على أي طلبات إجازة أو استئذان معتمدة</p>
+                </div>
+              )}
             </GlassContainer>
           </TabsContent>
 
