@@ -1216,18 +1216,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 <div className="w-6 h-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></div>
                                 <span className="text-green-200 font-medium">100%+ (مكتمل)</span>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-6 h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></div>
-                                <span className="text-blue-200 font-medium">75-99% (جيد)</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-6 h-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full"></div>
-                                <span className="text-yellow-200 font-medium">50-74% (مقبول)</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-6 h-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-full"></div>
-                                <span className="text-orange-200 font-medium">25-49% (ضعيف)</span>
-                              </div>
+
                               <div className="flex items-center gap-2">
                                 <div className="w-6 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full"></div>
                                 <span className="text-red-200 font-medium">تأخير</span>

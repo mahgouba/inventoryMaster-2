@@ -1237,11 +1237,14 @@ export class MemStorage implements IStorage {
   }
 
   async getDailyAttendanceByEmployeeAndDateRange(employeeId: number, startDate: Date, endDate: Date): Promise<DailyAttendance[]> {
-    return Array.from(this.dailyAttendance.values()).filter(attendance => 
-      attendance.employeeId === employeeId && 
-      attendance.date >= startDate && 
-      attendance.date <= endDate
-    );
+    const startStr = startDate.toISOString().split('T')[0];
+    const endStr = endDate.toISOString().split('T')[0];
+    return Array.from(this.dailyAttendance.values()).filter(attendance => {
+      const attendanceDateStr = typeof attendance.date === 'string' ? attendance.date : attendance.date.toISOString().split('T')[0];
+      return attendance.employeeId === employeeId && 
+             attendanceDateStr >= startStr && 
+             attendanceDateStr <= endStr;
+    });
   }
 
   async getDailyAttendanceByDate(date: Date): Promise<DailyAttendance[]> {
