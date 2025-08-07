@@ -125,11 +125,11 @@ export interface IStorage {
   createTrimLevel(trimLevel: InsertTrimLevel): Promise<TrimLevel>;
   updateTrimLevel(id: number, trimLevel: Partial<InsertTrimLevel>): Promise<TrimLevel | undefined>;
   deleteTrimLevel(id: number): Promise<boolean>;
-  getTrimLevelsByCategory(manufacturer: string, category: string): Promise<TrimLevel[]>;
+  getTrimLevelsByCategory(manufacturer: string, category: string): Promise<VehicleTrimLevel[]>;
   
   // Categories and engine capacities methods
   getAllCategories(): Promise<{ category: string }[]>;
-  getCategoriesByManufacturer(manufacturer: string): Promise<{ category: string }[]>;
+  getCategoriesByManufacturer(manufacturer: string): Promise<VehicleCategory[]>;
   getAllEngineCapacities(): Promise<{ engineCapacity: string }[]>;
   
   // Quotations methods
@@ -284,6 +284,7 @@ export interface IStorage {
   createExteriorColor(colorData: any): Promise<any>;
   createInteriorColor(colorData: any): Promise<any>;
   getColorAssociations(): Promise<ColorAssociation[]>;
+  getColorAssociationsByFilters(filters: { manufacturer?: string; category?: string; trimLevel?: string; colorType?: string }): Promise<ColorAssociation[]>;
   createCategory(categoryData: any): Promise<any>;
   getAllImportTypes(): Promise<any[]>;
   createImportType(typeData: any): Promise<any>;
@@ -977,14 +978,56 @@ export class MemStorage implements IStorage {
     return this.trimLevels.delete(id); 
   }
   
-  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<TrimLevel[]> { 
-    return Array.from(this.trimLevels.values()).filter(t => 
-      t.manufacturer === manufacturer && t.category === category
-    ); 
+  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<VehicleTrimLevel[]> {
+    // Find the manufacturer first
+    const manufacturerObj = Array.from(this.manufacturers.values()).find(
+      m => m.nameAr === manufacturer || m.nameEn === manufacturer
+    );
+    
+    if (!manufacturerObj) {
+      console.log(`❌ Manufacturer "${manufacturer}" not found for trim levels`);
+      return [];
+    }
+    
+    // Find the category for this manufacturer
+    const categoryObj = Array.from(this.vehicleCategories.values()).find(
+      c => c.manufacturerId === manufacturerObj.id && (c.nameAr === category || c.nameEn === category) && c.isActive
+    );
+    
+    if (!categoryObj) {
+      console.log(`❌ Category "${category}" not found for manufacturer "${manufacturer}"`);
+      return [];
+    }
+    
+    // Find trim levels for this category
+    const trimLevels = Array.from(this.vehicleTrimLevels.values()).filter(
+      t => t.categoryId === categoryObj.id && t.isActive
+    );
+    
+    console.log(`🎚️ Found ${trimLevels.length} trim levels for "${manufacturer}" -> "${category}":`, trimLevels.map(t => t.nameAr));
+    return trimLevels;
   }
   
   async getAllCategories(): Promise<{ category: string }[]> { return []; }
-  async getCategoriesByManufacturer(manufacturer: string): Promise<{ category: string }[]> { return []; }
+  async getCategoriesByManufacturer(manufacturer: string): Promise<VehicleCategory[]> {
+    // Find the manufacturer first
+    const manufacturerObj = Array.from(this.manufacturers.values()).find(
+      m => m.nameAr === manufacturer || m.nameEn === manufacturer
+    );
+    
+    if (!manufacturerObj) {
+      console.log(`❌ Manufacturer "${manufacturer}" not found`);
+      return [];
+    }
+    
+    // Find categories for this manufacturer
+    const categories = Array.from(this.vehicleCategories.values()).filter(
+      c => c.manufacturerId === manufacturerObj.id && c.isActive
+    );
+    
+    console.log(`📋 Found ${categories.length} categories for manufacturer "${manufacturer}":`, categories.map(c => c.nameAr));
+    return categories;
+  }
   async getAllEngineCapacities(): Promise<{ engineCapacity: string }[]> { return []; }
   
   async getAllQuotations(): Promise<Quotation[]> { return []; }
@@ -1337,6 +1380,33 @@ export class MemStorage implements IStorage {
 
   async deleteColorAssociation(id: number): Promise<boolean> {
     return this.colorAssociations.delete(id);
+  }
+
+  async getColorAssociationsByFilters(filters: { manufacturer?: string; category?: string; trimLevel?: string; colorType?: string }): Promise<ColorAssociation[]> {
+    let colors = Array.from(this.colorAssociations.values());
+    
+    // Filter by manufacturer
+    if (filters.manufacturer) {
+      colors = colors.filter(color => color.manufacturer === filters.manufacturer);
+    }
+    
+    // Filter by category  
+    if (filters.category) {
+      colors = colors.filter(color => color.category === filters.category);
+    }
+    
+    // Filter by trim level
+    if (filters.trimLevel) {
+      colors = colors.filter(color => color.trimLevel === filters.trimLevel);
+    }
+    
+    // Filter by color type
+    if (filters.colorType) {
+      colors = colors.filter(color => color.colorType === filters.colorType);
+    }
+    
+    console.log(`🎨 Found ${colors.length} colors for filters:`, filters, 'Colors:', colors.map(c => c.colorName));
+    return colors;
   }
 
   async getColorAssociationsByManufacturer(manufacturer: string): Promise<ColorAssociation[]> {
