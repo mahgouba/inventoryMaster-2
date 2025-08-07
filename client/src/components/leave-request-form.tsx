@@ -57,7 +57,7 @@ export function LeaveRequestForm({ open, onOpenChange, username }: LeaveRequestF
         requestedByName: username,
         userId: 1, // Will be replaced with actual user ID from auth
         requestedBy: 1, // Will be replaced with actual user ID from auth
-        status: "قيد الموافقة", // Default status
+        status: "pending", // Default status
       });
     },
     onSuccess: () => {
