@@ -127,12 +127,56 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
     enabled: open && !!selectedManufacturerName && !!selectedCategoryName,
   });
 
+  // Get current trim level for colors query
+  const selectedTrimLevelName = form.watch("trimLevel");
+
+  // Fetch exterior colors based on manufacturer, category, and trim level
+  const { data: hierarchicalExteriorColors = [] } = useQuery({
+    queryKey: ["/api/hierarchical/colors", selectedManufacturerName, selectedCategoryName, selectedTrimLevelName, "exterior"],
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (selectedManufacturerName) params.append('manufacturer', selectedManufacturerName);
+      if (selectedCategoryName) params.append('category', selectedCategoryName);
+      if (selectedTrimLevelName) params.append('trimLevel', selectedTrimLevelName);
+      params.append('colorType', 'exterior');
+      
+      return fetch(`/api/hierarchical/colors?${params}`).then(res => res.json());
+    },
+    enabled: open && !!selectedManufacturerName,
+  });
+
+  // Fetch interior colors based on manufacturer, category, and trim level
+  const { data: hierarchicalInteriorColors = [] } = useQuery({
+    queryKey: ["/api/hierarchical/colors", selectedManufacturerName, selectedCategoryName, selectedTrimLevelName, "interior"],
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (selectedManufacturerName) params.append('manufacturer', selectedManufacturerName);
+      if (selectedCategoryName) params.append('category', selectedCategoryName);
+      if (selectedTrimLevelName) params.append('trimLevel', selectedTrimLevelName);
+      params.append('colorType', 'interior');
+      
+      return fetch(`/api/hierarchical/colors?${params}`).then(res => res.json());
+    },
+    enabled: open && !!selectedManufacturerName,
+  });
+
+  // Combine hierarchical colors with fallback colors
+  const availableExteriorColors = hierarchicalExteriorColors.length > 0 
+    ? hierarchicalExteriorColors.map((color: any) => color.colorName)
+    : editableExteriorColors;
+
+  const availableInteriorColors = hierarchicalInteriorColors.length > 0 
+    ? hierarchicalInteriorColors.map((color: any) => color.colorName)
+    : editableInteriorColors;
+
   // Handle manufacturer change
   const handleManufacturerChange = (manufacturerName: string) => {
     // Update form values and reset dependent fields
     form.setValue("manufacturer", manufacturerName);
     form.setValue("category", "");
     form.setValue("trimLevel", "");
+    form.setValue("exteriorColor", "");
+    form.setValue("interiorColor", "");
   };
 
   // Handle category change
@@ -140,6 +184,16 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
     // Update form values and reset dependent fields
     form.setValue("category", categoryName);
     form.setValue("trimLevel", "");
+    form.setValue("exteriorColor", "");
+    form.setValue("interiorColor", "");
+  };
+
+  // Handle trim level change
+  const handleTrimLevelChange = (trimLevelName: string) => {
+    // Update form values and reset color fields
+    form.setValue("trimLevel", trimLevelName);
+    form.setValue("exteriorColor", "");
+    form.setValue("interiorColor", "");
   };
 
   // Update form when editItem changes
@@ -352,7 +406,10 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value || undefined}>
+                      <Select onValueChange={(value) => {
+                        handleTrimLevelChange(value);
+                        field.onChange(value);
+                      }} value={field.value || undefined}>
                         <SelectTrigger className="glass-input border-white/20 text-white">
                           <SelectValue placeholder="درجة التجهيز" />
                         </SelectTrigger>
@@ -447,7 +504,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                           <SelectValue placeholder="اللون الخارجي" />
                         </SelectTrigger>
                         <SelectContent>
-                          {editableExteriorColors.filter(color => color && color.trim()).map((color) => (
+                          {availableExteriorColors.filter(color => color && color.trim()).map((color) => (
                             <SelectItem key={color} value={color}>
                               {color}
                             </SelectItem>
@@ -472,7 +529,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                           <SelectValue placeholder="اللون الداخلي" />
                         </SelectTrigger>
                         <SelectContent>
-                          {editableInteriorColors.filter(color => color && color.trim()).map((color) => (
+                          {availableInteriorColors.filter(color => color && color.trim()).map((color) => (
                             <SelectItem key={color} value={color}>
                               {color}
                             </SelectItem>

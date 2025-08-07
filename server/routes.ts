@@ -1633,6 +1633,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Hierarchical API Routes for frontend form
+  app.get("/api/hierarchical/manufacturers", async (req, res) => {
+    try {
+      const manufacturers = await getStorage().getAllManufacturers();
+      res.json(manufacturers);
+    } catch (error) {
+      console.error("Error fetching hierarchical manufacturers:", error);
+      res.status(500).json({ message: "Failed to fetch manufacturers" });
+    }
+  });
+
+  app.get("/api/hierarchical/categories", async (req, res) => {
+    try {
+      const { manufacturer } = req.query;
+      if (!manufacturer) {
+        return res.json([]);
+      }
+      const categories = await getStorage().getCategoriesByManufacturer(manufacturer as string);
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching hierarchical categories:", error);
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  app.get("/api/hierarchical/trimLevels", async (req, res) => {
+    try {
+      const { manufacturer, category } = req.query;
+      if (!manufacturer || !category) {
+        return res.json([]);
+      }
+      const trimLevels = await getStorage().getTrimLevelsByCategory(manufacturer as string, category as string);
+      res.json(trimLevels);
+    } catch (error) {
+      console.error("Error fetching hierarchical trim levels:", error);
+      res.status(500).json({ message: "Failed to fetch trim levels" });
+    }
+  });
+
+  // Colors filtered by manufacturer, category, and trim level
+  app.get("/api/hierarchical/colors", async (req, res) => {
+    try {
+      const { manufacturer, category, trimLevel, colorType } = req.query;
+      
+      const filters: any = {};
+      if (manufacturer) filters.manufacturer = manufacturer;
+      if (category) filters.category = category;
+      if (trimLevel) filters.trimLevel = trimLevel;
+      if (colorType) filters.colorType = colorType;
+      
+      const colors = await getStorage().getColorAssociations(filters);
+      res.json(colors);
+    } catch (error) {
+      console.error("Error fetching hierarchical colors:", error);
+      res.status(500).json({ message: "Failed to fetch colors" });
+    }
+  });
+
   // Categories API Routes
   app.get("/api/categories", async (req, res) => {
     try {
