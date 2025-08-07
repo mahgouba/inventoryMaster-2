@@ -398,8 +398,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/daily-attendance"] });
+      queryClient.refetchQueries({ queryKey: ["/api/daily-attendance"] });
       toast({ title: "تم تسجيل الحضور بنجاح" });
-      setIsAttendanceDialogOpen(false); // إغلاق الـ Dialog بعد النجاح
+      setIsAttendanceDialogOpen(false);
     },
     onError: (error) => {
       console.error("Attendance creation error:", error);
@@ -418,13 +419,27 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       if (!response.ok) throw new Error("فشل في تحديث حالة الإجازة");
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Force refresh both queries to ensure data consistency
       queryClient.invalidateQueries({ queryKey: ["/api/daily-attendance"] });
-      toast({ title: "تم تحديث حالة الإجازة بنجاح" });
-      setIsAttendanceDialogOpen(false); // إغلاق الـ Dialog بعد النجاح
+      
+      // Also refresh other related queries
+      queryClient.invalidateQueries({ queryKey: ["/api/employee-work-schedules"] });
+      
+      toast({ 
+        title: "تم تحديد اليوم كإجازة بنجاح", 
+        description: `تم تحديث حالة يوم ${format(selectedDayForAttendance!, "dd/MM/yyyy", { locale: ar })} بنجاح` 
+      });
+      setIsAttendanceDialogOpen(false);
+      
+      // Small delay to allow data to propagate
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/daily-attendance"] });
+      }, 100);
     },
-    onError: () => {
-      toast({ title: "خطأ في تحديث حالة الإجازة", variant: "destructive" });
+    onError: (error) => {
+      console.error("Holiday marking error:", error);
+      toast({ title: "خطأ في تحديد الإجازة", description: "يرجى المحاولة مرة أخرى", variant: "destructive" });
     },
   });
 
@@ -624,12 +639,19 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     if (!selectedDayForAttendance || !selectedEmployeeForDialog) return;
     
     const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
+    const existingAttendance = dailyAttendance.find(a => 
+      a.employeeId === selectedEmployeeForDialog.employeeId && 
+      a.date === dateStr
+    );
+    
+    // Toggle holiday status if record exists
+    const isCurrentlyHoliday = existingAttendance?.notes === 'إجازة';
+    
     markHolidayMutation.mutate({
       employeeId: selectedEmployeeForDialog.employeeId,
       date: dateStr,
-      isHoliday: true
+      isHoliday: !isCurrentlyHoliday
     });
-    setIsAttendanceDialogOpen(false);
   };
 
   const calculateHoursWorked = (schedule: EmployeeWorkSchedule, attendance: DailyAttendance): string => {
@@ -1434,10 +1456,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                             onClick={handleMarkHoliday}
                             variant="outline"
                             className="bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-300 border-yellow-400/50 px-8"
-                            disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending}
+                            disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending || markHolidayMutation.isPending}
                           >
                             <Calendar className="w-4 h-4 mr-2" />
-                            تحديد كإجازة
+                            {existingAttendance?.notes === 'إجازة' ? 'إلغاء الإجازة' : 'تحديد كإجازة'}
                           </Button>
                           
                           <Button
