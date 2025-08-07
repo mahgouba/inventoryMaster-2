@@ -1258,10 +1258,14 @@ export class MemStorage implements IStorage {
     const newAttendance: DailyAttendance = {
       id: this.currentDailyAttendanceId++,
       ...attendance,
+      // Convert date to string format for consistency
+      date: typeof attendance.date === 'string' ? attendance.date : attendance.date.toISOString().split('T')[0],
       createdAt: new Date(),
       updatedAt: new Date()
     };
+    console.log("💾 Creating attendance record:", newAttendance);
     this.dailyAttendance.set(newAttendance.id, newAttendance);
+    console.log("📊 Total attendance records after creation:", this.dailyAttendance.size);
     return newAttendance;
   }
 

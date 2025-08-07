@@ -3092,20 +3092,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/daily-attendance", async (req, res) => {
     try {
       const rawData = req.body;
+      console.log("📋 Raw attendance data received:", rawData);
       
       // Ensure required fields are provided with defaults if missing
       const attendanceData = {
         ...rawData,
         employeeName: rawData.employeeName || "موظف",
         scheduleType: rawData.scheduleType || "متصل",
+        // Keep date as received from frontend 
+        date: rawData.date,
       };
+      
+      console.log("📋 Processed attendance data:", attendanceData);
       
       // Validate with schema
       const validatedData = insertDailyAttendanceSchema.parse(attendanceData);
+      console.log("✅ Validated attendance data:", validatedData);
+      
       const attendance = await getStorage().createDailyAttendance(validatedData);
+      console.log("💾 Created attendance record:", attendance);
+      
       res.status(201).json(attendance);
     } catch (error) {
-      console.error("Error creating daily attendance:", error);
+      console.error("❌ Error creating daily attendance:", error);
       res.status(500).json({ message: "Failed to create daily attendance" });
     }
   });
