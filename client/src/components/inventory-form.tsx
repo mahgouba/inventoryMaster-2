@@ -110,20 +110,28 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   // Fetch categories based on selected manufacturer
   const { data: categories = [], isLoading: isLoadingCategories } = useQuery<Category[]>({
     queryKey: ["/api/hierarchical/categories", selectedManufacturerName],
-    queryFn: () => 
-      selectedManufacturerName 
-        ? fetch(`/api/hierarchical/categories?manufacturer=${encodeURIComponent(selectedManufacturerName)}`).then(res => res.json())
-        : Promise.resolve([]),
+    queryFn: async () => {
+      if (!selectedManufacturerName) return [];
+      console.log('Fetching categories for manufacturer:', selectedManufacturerName);
+      const response = await fetch(`/api/hierarchical/categories?manufacturer=${encodeURIComponent(selectedManufacturerName)}`);
+      const data = await response.json();
+      console.log('Categories received:', data);
+      return data;
+    },
     enabled: open && !!selectedManufacturerName,
   });
   
   // Fetch trim levels based on selected category
   const { data: trimLevels = [], isLoading: isLoadingTrimLevels } = useQuery<TrimLevel[]>({
     queryKey: ["/api/hierarchical/trimLevels", selectedManufacturerName, selectedCategoryName],
-    queryFn: () => 
-      selectedManufacturerName && selectedCategoryName
-        ? fetch(`/api/hierarchical/trimLevels?manufacturer=${encodeURIComponent(selectedManufacturerName)}&category=${encodeURIComponent(selectedCategoryName)}`).then(res => res.json())
-        : Promise.resolve([]),
+    queryFn: async () => {
+      if (!selectedManufacturerName || !selectedCategoryName) return [];
+      console.log('Fetching trim levels for:', selectedManufacturerName, selectedCategoryName);
+      const response = await fetch(`/api/hierarchical/trimLevels?manufacturer=${encodeURIComponent(selectedManufacturerName)}&category=${encodeURIComponent(selectedCategoryName)}`);
+      const data = await response.json();
+      console.log('Trim levels received:', data);
+      return data;
+    },
     enabled: open && !!selectedManufacturerName && !!selectedCategoryName,
   });
 
@@ -133,31 +141,39 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   // Fetch exterior colors based on manufacturer, category, and trim level
   const { data: hierarchicalExteriorColors = [] } = useQuery({
     queryKey: ["/api/hierarchical/colors", selectedManufacturerName, selectedCategoryName, selectedTrimLevelName, "exterior"],
-    queryFn: () => {
+    queryFn: async () => {
       const params = new URLSearchParams();
       if (selectedManufacturerName) params.append('manufacturer', selectedManufacturerName);
       if (selectedCategoryName) params.append('category', selectedCategoryName);
       if (selectedTrimLevelName) params.append('trimLevel', selectedTrimLevelName);
       params.append('colorType', 'exterior');
       
-      return fetch(`/api/hierarchical/colors?${params}`).then(res => res.json());
+      console.log('Fetching exterior colors with params:', params.toString());
+      const response = await fetch(`/api/hierarchical/colors?${params}`);
+      const data = await response.json();
+      console.log('Exterior colors received:', data);
+      return data;
     },
-    enabled: open && !!selectedManufacturerName,
+    enabled: open && !!selectedManufacturerName && !!selectedTrimLevelName,
   });
 
   // Fetch interior colors based on manufacturer, category, and trim level
   const { data: hierarchicalInteriorColors = [] } = useQuery({
     queryKey: ["/api/hierarchical/colors", selectedManufacturerName, selectedCategoryName, selectedTrimLevelName, "interior"],
-    queryFn: () => {
+    queryFn: async () => {
       const params = new URLSearchParams();
       if (selectedManufacturerName) params.append('manufacturer', selectedManufacturerName);
       if (selectedCategoryName) params.append('category', selectedCategoryName);
       if (selectedTrimLevelName) params.append('trimLevel', selectedTrimLevelName);
       params.append('colorType', 'interior');
       
-      return fetch(`/api/hierarchical/colors?${params}`).then(res => res.json());
+      console.log('Fetching interior colors with params:', params.toString());
+      const response = await fetch(`/api/hierarchical/colors?${params}`);
+      const data = await response.json();
+      console.log('Interior colors received:', data);
+      return data;
     },
-    enabled: open && !!selectedManufacturerName,
+    enabled: open && !!selectedManufacturerName && !!selectedTrimLevelName,
   });
 
   // Combine hierarchical colors with fallback colors
@@ -504,11 +520,21 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                           <SelectValue placeholder="اللون الخارجي" />
                         </SelectTrigger>
                         <SelectContent>
-                          {availableExteriorColors.filter(color => color && color.trim()).map((color) => (
-                            <SelectItem key={color} value={color}>
-                              {color}
+                          {!selectedTrimLevelName ? (
+                            <SelectItem key="no-trim" disabled value="no-trim">
+                              اختر درجة التجهيز أولاً
                             </SelectItem>
-                          ))}
+                          ) : availableExteriorColors.length > 0 ? (
+                            availableExteriorColors.filter(color => color && color.trim()).map((color) => (
+                              <SelectItem key={color} value={color}>
+                                {color}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem key="no-colors" disabled value="no-colors">
+                              لا توجد ألوان خارجية لدرجة التجهيز هذه
+                            </SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -529,11 +555,21 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                           <SelectValue placeholder="اللون الداخلي" />
                         </SelectTrigger>
                         <SelectContent>
-                          {availableInteriorColors.filter(color => color && color.trim()).map((color) => (
-                            <SelectItem key={color} value={color}>
-                              {color}
+                          {!selectedTrimLevelName ? (
+                            <SelectItem key="no-trim" disabled value="no-trim">
+                              اختر درجة التجهيز أولاً
                             </SelectItem>
-                          ))}
+                          ) : availableInteriorColors.length > 0 ? (
+                            availableInteriorColors.filter(color => color && color.trim()).map((color) => (
+                              <SelectItem key={color} value={color}>
+                                {color}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem key="no-colors" disabled value="no-colors">
+                              لا توجد ألوان داخلية لدرجة التجهيز هذه
+                            </SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                     </FormControl>
