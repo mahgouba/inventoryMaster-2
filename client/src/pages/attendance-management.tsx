@@ -1065,7 +1065,12 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   };
 
   // حساب الساعات المتوقعة بناءً على جدول العمل الفعلي
-  const calculateExpectedHours = (schedule: EmployeeWorkSchedule): number => {
+  const calculateExpectedHours = (schedule: EmployeeWorkSchedule, day?: Date): number => {
+    // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
+    if (day && format(day, "EEEE", { locale: ar }) === "الجمعة") {
+      return 5; // 5 ساعات في يوم الجمعة (4:00 PM - 9:00 PM)
+    }
+    
     if (schedule.scheduleType === "متصل") {
       if (schedule.continuousStartTime && schedule.continuousEndTime) {
         const startTime = new Date(`2024-01-01T${schedule.continuousStartTime}`);
@@ -1087,6 +1092,138 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       return totalExpectedHours;
     }
     return 8; // Default fallback
+  };
+
+  // دالة طباعة تقرير الحضور الشهري
+  const handlePrintMonthlyReport = (schedule: EmployeeWorkSchedule) => {
+    const monthAttendance = getEmployeeMonthAttendance(schedule.employeeId);
+    const monthDays = getMonthDays();
+    const monthName = format(currentMonth, "MMMM yyyy", { locale: ar });
+    
+    // إنشاء محتوى التقرير
+    const reportContent = `
+      <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px;">
+          <h1 style="color: #333; font-size: 24px; margin-bottom: 10px;">تقرير الحضور والإنصراف الشهري</h1>
+          <h2 style="color: #666; font-size: 18px; margin-bottom: 5px;">الموظف: ${schedule.employeeName}</h2>
+          <h3 style="color: #666; font-size: 16px; margin-bottom: 5px;">شهر: ${monthName}</h3>
+          <p style="color: #888; font-size: 14px;">نوع الدوام: ${schedule.scheduleType}</p>
+        </div>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+          <thead>
+            <tr style="background-color: #f0f0f0;">
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">التاريخ</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">اليوم</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">الحضور</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">الانصراف</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">ساعات العمل</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">الحالة</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${monthDays.map(day => {
+              const dateStr = format(day, "yyyy-MM-dd");
+              const dayAttendance = monthAttendance.find(a => a.date === dateStr);
+              const dayName = format(day, "EEEE", { locale: ar });
+              const isHoliday = dayAttendance?.notes === 'إجازة';
+              const hasApprovedLeaveForDay = hasApprovedLeave(schedule.employeeId, day);
+              
+              let checkinTime = '-';
+              let checkoutTime = '-';
+              let workHours = '0.00';
+              let status = 'غائب';
+              
+              if (isHoliday) {
+                status = 'إجازة';
+              } else if (hasApprovedLeaveForDay) {
+                status = 'إجازة معتمدة';
+              } else if (dayAttendance) {
+                if (schedule.scheduleType === "متصل") {
+                  checkinTime = dayAttendance.continuousCheckinTime || '-';
+                  checkoutTime = dayAttendance.continuousCheckoutTime || '-';
+                } else {
+                  const morningIn = dayAttendance.morningCheckinTime;
+                  const morningOut = dayAttendance.morningCheckoutTime;
+                  const eveningIn = dayAttendance.eveningCheckinTime;
+                  const eveningOut = dayAttendance.eveningCheckoutTime;
+                  checkinTime = [morningIn, eveningIn].filter(t => t).join(', ') || '-';
+                  checkoutTime = [morningOut, eveningOut].filter(t => t).join(', ') || '-';
+                }
+                workHours = calculateHoursWorked(schedule, dayAttendance);
+                status = 'حاضر';
+              }
+              
+              return `
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">${format(day, "dd/MM/yyyy", { locale: ar })}</td>
+                  <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">${dayName}</td>
+                  <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">${checkinTime}</td>
+                  <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">${checkoutTime}</td>
+                  <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">${workHours}</td>
+                  <td style="border: 1px solid #ddd; padding: 6px; text-align: center; font-weight: bold;
+                    color: ${status === 'حاضر' ? '#22c55e' : status === 'إجازة' || status === 'إجازة معتمدة' ? '#3b82f6' : '#ef4444'};">
+                    ${status}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+        
+        <div style="margin-top: 30px; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
+          <h3 style="color: #333; margin-bottom: 10px;">ملخص الشهر:</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <div>
+              <strong>إجمالي أيام العمل:</strong> ${monthDays.length} يوم
+            </div>
+            <div>
+              <strong>أيام الحضور:</strong> ${monthAttendance.filter(a => a.notes !== 'إجازة').length} يوم
+            </div>
+            <div>
+              <strong>أيام الإجازة:</strong> ${monthAttendance.filter(a => a.notes === 'إجازة').length} يوم
+            </div>
+            <div>
+              <strong>إجمالي ساعات العمل:</strong> ${monthAttendance
+                .filter(a => a.notes !== 'إجازة')
+                .reduce((total, a) => total + parseFloat(calculateHoursWorked(schedule, a)), 0)
+                .toFixed(2)} ساعة
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center; font-size: 12px; color: #888;">
+          <p>تم إنشاء التقرير في: ${new Date().toLocaleString('ar-SA')}</p>
+        </div>
+      </div>
+    `;
+    
+    // فتح نافذة جديدة للطباعة
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>تقرير الحضور - ${schedule.employeeName} - ${monthName}</title>
+            <meta charset="utf-8">
+            <style>
+              @media print {
+                body { margin: 0; }
+                @page { size: A4; margin: 1cm; }
+              }
+            </style>
+          </head>
+          <body>
+            ${reportContent}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+      }, 500);
+    }
   };
 
   return (
@@ -1501,6 +1638,15 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                           >
                             {monthAttendance.length} يوم حضور هذا الشهر
                           </Badge>
+                          <Button
+                            onClick={() => handlePrintMonthlyReport(schedule)}
+                            size="sm"
+                            variant="outline"
+                            className="bg-green-500/20 border-green-500/30 text-green-400 hover:bg-green-500/30 transition-colors"
+                          >
+                            <Printer className="w-4 h-4 mr-2" />
+                            طباعة التقرير
+                          </Button>
                           <ChevronLeft 
                             className={`w-5 h-5 text-gray-300 transition-transform ${
                               isExpanded ? 'rotate-90' : ''
@@ -1526,7 +1672,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               
                               // Calculate hours worked
                               const hoursWorked = hasAttendance && !isHoliday ? parseFloat(calculateHoursWorked(schedule, dayAttendance)) : 0;
-                              const expectedHours = calculateExpectedHours(schedule);
+                              const expectedHours = calculateExpectedHours(schedule, day);
                               const workPercentage = Math.min((hoursWorked / expectedHours) * 100, 100);
                               
                               // Get day name in Arabic
