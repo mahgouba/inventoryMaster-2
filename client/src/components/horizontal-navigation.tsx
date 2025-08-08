@@ -272,13 +272,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       internal: true,
       permission: "financingCalculator"
     },
-    { 
-      title: "واجهة الدوام", 
-      href: "/monthly-attendance", 
-      icon: Calendar,
-      internal: true,
-      permission: "monthlyAttendance"
-    },
+
     { 
       title: "إدارة الحضور والإنصراف", 
       href: "/attendance-management", 

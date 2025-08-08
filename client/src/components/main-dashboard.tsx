@@ -10,7 +10,7 @@ import SoldVehiclesPage from "@/pages/sold-vehicles";
 import FinancingCalculatorPage from "@/pages/financing-calculator";
 import LeaveRequestsPage from "@/pages/leave-requests";
 import AttendanceManagementPage from "@/pages/attendance-management";
-import MonthlyAttendancePage from "@/pages/monthly-attendance";
+
 
 import ManufacturerLogosPage from "@/pages/manufacturer-logos";
 import UserManagementPage from "@/pages/user-management";
@@ -65,8 +65,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return <LeaveRequestsPage userRole={user.role} username={user.username} userId={user.id} />;
       case "/attendance-management":
         return <AttendanceManagementPage userRole={user.role} username={user.username} userId={user.id} />;
-      case "/monthly-attendance":
-        return <MonthlyAttendancePage userRole={user.role} username={user.username} userId={user.id} />;
+
       case "/detailed-specifications":
         return <DetailedSpecificationsPage />;
       case "/images-management":
