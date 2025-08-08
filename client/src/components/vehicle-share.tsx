@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Share2, Copy, Edit2, Save, X, Image, Link, Calculator } from "lucide-react";
+import { Plus, Share2, Copy, Edit2, Save, X, Image, Link, Calculator, MessageCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { InventoryItem } from "@shared/schema";
 
@@ -60,6 +60,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
   const [isEditingPrice, setIsEditingPrice] = useState(false);
   const [taxRate, setTaxRate] = useState("15"); // Default VAT rate 15%
   const [linkedImageUrl, setLinkedImageUrl] = useState<string>("");
+  const [whatsappPhoneNumber, setWhatsappPhoneNumber] = useState("");
   
   // Checkbox states for what to include in sharing
   const [includeFields, setIncludeFields] = useState({
@@ -294,6 +295,26 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     } else {
       await handleCopyText();
     }
+  };
+
+  const handleWhatsAppShare = () => {
+    if (!whatsappPhoneNumber.trim()) {
+      toast({
+        title: "خطأ",
+        description: "يرجى إدخال رقم الهاتف",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const shareText = generateShareText();
+    const formattedPhone = whatsappPhoneNumber.startsWith('+966') 
+      ? whatsappPhoneNumber 
+      : `+966${whatsappPhoneNumber.replace(/^0/, '')}`;
+    const whatsappUrl = `https://wa.me/${formattedPhone.replace(/\+/g, '')}?text=${encodeURIComponent(shareText)}`;
+    
+    window.open(whatsappUrl, '_blank');
+    setWhatsappPhoneNumber("");
   };
 
   return (
@@ -679,6 +700,41 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                 نسخ النص
               </Button>
             </div>
+
+            {/* WhatsApp Share Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5 text-green-600" />
+                  مشاركة عبر الواتساب
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Input
+                      type="tel"
+                      placeholder="5xxxxxxxx"
+                      value={whatsappPhoneNumber}
+                      onChange={(e) => setWhatsappPhoneNumber(e.target.value)}
+                      className="flex-1"
+                      dir="ltr"
+                      disabled={!generateShareText()}
+                    />
+                    <Button
+                      onClick={handleWhatsAppShare}
+                      className="bg-green-600 hover:bg-green-700 px-4"
+                      disabled={!generateShareText() || !whatsappPhoneNumber.trim()}
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    أدخل رقم الهاتف بدون +966 (مثال: 512345678)
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
             
             {/* Image sharing buttons */}
             <div className="space-y-2">

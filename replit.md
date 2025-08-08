@@ -6,6 +6,9 @@ This is a full-stack inventory management system designed for comprehensive inve
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 Migration Status: Successfully completed migration from Replit Agent to Replit environment (August 8, 2025). Enhanced monthly attendance report with comprehensive statistics including tardiness, early departure, and absence tracking. Added detailed calculations for approved requests with status indicators: "حضور متأخر بإذن" (late arrival with permission), "انصراف مبكر بإذن" (early departure with permission), "استئذان معتمد" (approved permission), and "إجازة بإذن" (approved leave). System now provides complete statistical analysis of attendance patterns and approval statuses.
+WhatsApp Integration: Enhanced WhatsApp sharing functionality across the application:
+- Bank Management: Long-press bank icons in card view opens sharing dialog with copy link, share button, and WhatsApp phone number input for both company and personal banks
+- Vehicle Sharing: Added WhatsApp phone number input section to vehicle share dialog with Saudi Arabia country code integration (+966) for direct WhatsApp sharing of vehicle details
 Attendance Management: Successfully created integrated attendance system:
 - Integrated attendance requests with leave request approval workflow system
 - Attendance requests are sent through leave request API and appear in pending approvals
