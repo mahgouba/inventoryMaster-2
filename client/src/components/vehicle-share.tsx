@@ -173,7 +173,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     }
     
     if (includeFields.trimLevel && vehicle.trimLevel) {
-      shareText += `\n🔧 درجة التجهيز: ${vehicle.trimLevel}`;
+      shareText += `\n⚙️ درجة التجهيز: ${vehicle.trimLevel}`;
     }
     
     if (includeFields.year) {
@@ -181,7 +181,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     }
     
     if (includeFields.engineCapacity) {
-      shareText += `\n⚙️ سعة المحرك: ${vehicle.engineCapacity}`;
+      shareText += `\n🔧 سعة المحرك: ${vehicle.engineCapacity}`;
     }
 
     if (includeFields.exteriorColor && vehicle.exteriorColor) {
@@ -193,19 +193,25 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     }
 
     if (includeFields.status) {
-      shareText += `\n📊 الحالة: ${vehicle.status}`;
+      shareText += `\n✅ الحالة: ${vehicle.status}`;
     }
 
-    // Add detailed price breakdown if price is included
+    // Add price - with or without tax breakdown based on import type
     if (includeFields.price && sharePrice) {
-      const priceBreakdown = calculatePriceBreakdown();
-      if (priceBreakdown) {
-        shareText += `\n💰 تفاصيل السعر:`;
-        shareText += `\n   📊 السعر الأساسي: ${Number(priceBreakdown.basePrice).toLocaleString()} ريال`;
-        shareText += `\n   📈 الضريبة (${taxRate}%): ${Number(priceBreakdown.taxAmount).toLocaleString()} ريال`;
-        shareText += `\n   💳 السعر الإجمالي: ${Number(priceBreakdown.totalPrice).toLocaleString()} ريال`;
-      } else {
+      // For used cars, show simple price without tax breakdown
+      if (vehicle.importType === "مستعمل" || vehicle.importType === "مستعمل شخصي") {
         shareText += `\n💰 السعر: ${sharePrice}`;
+      } else {
+        // For new cars, show detailed price breakdown
+        const priceBreakdown = calculatePriceBreakdown();
+        if (priceBreakdown) {
+          shareText += `\n💰 تفاصيل السعر:`;
+          shareText += `\n   📊 السعر الأساسي: ${Number(priceBreakdown.basePrice).toLocaleString()} ريال`;
+          shareText += `\n   📈 الضريبة (${taxRate}%): ${Number(priceBreakdown.taxAmount).toLocaleString()} ريال`;
+          shareText += `\n   💳 السعر الإجمالي: ${Number(priceBreakdown.totalPrice).toLocaleString()} ريال`;
+        } else {
+          shareText += `\n💰 السعر: ${sharePrice}`;
+        }
       }
     }
 
