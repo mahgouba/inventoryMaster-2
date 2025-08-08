@@ -5,7 +5,7 @@ This is a full-stack inventory management system designed for comprehensive inve
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
-Migration Status: Successfully migrated from Replit Agent to Replit environment (August 7, 2025). Fixed attendance tracking issues with date handling and holiday marking. System now properly saves attendance records for any selected date and correctly handles holiday marking for both current and past dates. Enhanced time input behavior to prevent automatic saving - time inputs now show default/scheduled times but only save when the user clicks the save button.
+Migration Status: Successfully completed migration from Replit Agent to Replit environment (August 8, 2025). Enhanced monthly attendance report with comprehensive statistics including tardiness, early departure, and absence tracking. Added detailed calculations for approved requests with status indicators: "حضور متأخر بإذن" (late arrival with permission), "انصراف مبكر بإذن" (early departure with permission), "استئذان معتمد" (approved permission), and "إجازة بإذن" (approved leave). System now provides complete statistical analysis of attendance patterns and approval statuses.
 Attendance Management: Successfully created integrated attendance system:
 - Created monthly attendance interface (/monthly-attendance) that shows only confirmed attendance days for employees
 - Integrated attendance requests with leave request approval workflow system

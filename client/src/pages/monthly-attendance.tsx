@@ -130,21 +130,38 @@ export default function MonthlyAttendancePage({ userRole, username, userId }: Mo
     return getApprovedRequests().some(request => request.date === dayStr);
   };
 
+  // Get approved request details for a specific day
+  const getApprovedRequestForDay = (day: Date) => {
+    const dayStr = format(day, "yyyy-MM-dd");
+    return getApprovedRequests().find(request => request.date === dayStr);
+  };
+
   // Calculate day status
   const getDayStatus = (day: Date) => {
     const dayStr = format(day, "yyyy-MM-dd");
     const dayAttendance = getUserMonthAttendance().find(a => a.date === dayStr);
-    const hasApprovedRequest = hasApprovedRequestForDay(day);
+    const approvedRequest = getApprovedRequestForDay(day);
     
     if (dayAttendance) {
       if (dayAttendance.notes === 'إجازة') return 'holiday';
-      if (dayAttendance.totalHours && dayAttendance.totalHours >= 7) return 'full';
+      if (dayAttendance.totalHours && dayAttendance.totalHours >= 7) {
+        // Check if there's an approved late arrival or early departure
+        if (approvedRequest) {
+          if (approvedRequest.requestType === 'تأخير') return 'late-approved';
+          if (approvedRequest.requestType === 'انصراف مبكر') return 'early-departure-approved';
+        }
+        return 'full';
+      }
       if (dayAttendance.totalHours && dayAttendance.totalHours >= 4) return 'partial';
       return 'present';
     }
     
-    if (hasApprovedRequest) return 'approved-request';
-    return 'no-record';
+    if (approvedRequest) {
+      if (approvedRequest.requestType === 'استئذان') return 'permission-approved';
+      if (approvedRequest.requestType === 'إجازة') return 'leave-approved';
+      return 'approved-request';
+    }
+    return 'absent';
   };
 
   // Get status color and icon
@@ -158,8 +175,18 @@ export default function MonthlyAttendancePage({ userRole, username, userId }: Mo
         return { color: 'bg-blue-500/20 text-blue-300', icon: CheckCircle, text: 'حاضر' };
       case 'holiday':
         return { color: 'bg-purple-500/20 text-purple-300', icon: Coffee, text: 'إجازة' };
+      case 'late-approved':
+        return { color: 'bg-orange-500/20 text-orange-300', icon: Clock, text: 'حضور متأخر بإذن' };
+      case 'early-departure-approved':
+        return { color: 'bg-amber-500/20 text-amber-300', icon: Clock, text: 'انصراف مبكر بإذن' };
+      case 'permission-approved':
+        return { color: 'bg-cyan-500/20 text-cyan-300', icon: CheckCircle, text: 'استئذان معتمد' };
+      case 'leave-approved':
+        return { color: 'bg-teal-500/20 text-teal-300', icon: Coffee, text: 'إجازة بإذن' };
       case 'approved-request':
         return { color: 'bg-indigo-500/20 text-indigo-300', icon: CheckCircle, text: 'طلب معتمد' };
+      case 'absent':
+        return { color: 'bg-red-500/20 text-red-300', icon: XCircle, text: 'غائب' };
       default:
         return { color: 'bg-gray-500/20 text-gray-400', icon: XCircle, text: 'لا يوجد سجل' };
     }
@@ -169,13 +196,83 @@ export default function MonthlyAttendancePage({ userRole, username, userId }: Mo
   const userAttendance = getUserMonthAttendance();
   const approvedRequests = getApprovedRequests();
 
-  // Calculate statistics
-  const stats = {
-    totalDays: monthDays.length,
-    presentDays: userAttendance.filter(a => a.totalHours && a.totalHours > 0).length,
-    approvedRequests: approvedRequests.length,
-    totalHours: userAttendance.reduce((sum, a) => sum + (a.totalHours || 0), 0)
+  // Enhanced statistics calculation
+  const calculateDetailedStats = () => {
+    const workingDays = monthDays.filter(day => {
+      const dayOfWeek = day.getDay();
+      return dayOfWeek !== 5 && dayOfWeek !== 6; // Exclude Fridays and Saturdays
+    });
+
+    const stats = {
+      totalWorkingDays: workingDays.length,
+      presentDays: 0,
+      fullPresenceDays: 0,
+      partialPresenceDays: 0,
+      absentDays: 0,
+      holidayDays: 0,
+      lateArrivalWithPermission: 0,
+      earlyDepartureWithPermission: 0,
+      permissionRequests: 0,
+      leaveWithPermission: 0,
+      totalApprovedRequests: 0,
+      totalHours: userAttendance.reduce((sum, a) => sum + (a.totalHours || 0), 0),
+      averageHoursPerDay: 0
+    };
+
+    workingDays.forEach(day => {
+      const status = getDayStatus(day);
+      const dayStr = format(day, "yyyy-MM-dd");
+      const dayAttendance = userAttendance.find(a => a.date === dayStr);
+      
+      switch (status) {
+        case 'full':
+          stats.presentDays++;
+          stats.fullPresenceDays++;
+          break;
+        case 'partial':
+          stats.presentDays++;
+          stats.partialPresenceDays++;
+          break;
+        case 'present':
+          stats.presentDays++;
+          break;
+        case 'holiday':
+          stats.holidayDays++;
+          break;
+        case 'late-approved':
+          stats.presentDays++;
+          stats.fullPresenceDays++;
+          stats.lateArrivalWithPermission++;
+          stats.totalApprovedRequests++;
+          break;
+        case 'early-departure-approved':
+          stats.presentDays++;
+          stats.fullPresenceDays++;
+          stats.earlyDepartureWithPermission++;
+          stats.totalApprovedRequests++;
+          break;
+        case 'permission-approved':
+          stats.permissionRequests++;
+          stats.totalApprovedRequests++;
+          break;
+        case 'leave-approved':
+          stats.leaveWithPermission++;
+          stats.totalApprovedRequests++;
+          break;
+        case 'absent':
+          stats.absentDays++;
+          break;
+      }
+    });
+
+    // Calculate average hours per working day (excluding absences and leaves)
+    const workingPresenceDays = stats.fullPresenceDays + stats.partialPresenceDays;
+    stats.averageHoursPerDay = workingPresenceDays > 0 ? stats.totalHours / workingPresenceDays : 0;
+
+    return stats;
   };
+
+  const detailedStats = calculateDetailedStats();
 
   return (
     <GlassBackground>
@@ -191,33 +288,69 @@ export default function MonthlyAttendancePage({ userRole, username, userId }: Mo
         </div>
 
         <div className="grid lg:grid-cols-4 gap-6">
-          {/* Statistics Cards */}
+          {/* Enhanced Statistics Cards */}
           <div className="lg:col-span-1 space-y-4">
+            {/* Main Statistics */}
             <GlassContainer className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">{stats.presentDays}</div>
-                <div className="text-gray-300 text-sm">أيام الحضور</div>
+              <h3 className="text-white font-medium mb-3 text-center">إحصائيات الطلبات المعتمدة</h3>
+              <div className="space-y-3">
+                <div className="text-center">
+                  <div className="text-xl font-bold text-green-300">{detailedStats.presentDays}</div>
+                  <div className="text-gray-300 text-xs">أيام الحضور</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-red-300">{detailedStats.absentDays}</div>
+                  <div className="text-gray-300 text-xs">أيام الغياب</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-blue-300">{detailedStats.totalApprovedRequests}</div>
+                  <div className="text-gray-300 text-xs">طلبات معتمدة</div>
+                </div>
               </div>
             </GlassContainer>
 
+            {/* Tardiness and Early Departure */}
             <GlassContainer className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">{stats.approvedRequests}</div>
-                <div className="text-gray-300 text-sm">طلبات معتمدة</div>
+              <h3 className="text-white font-medium mb-3 text-center text-sm">التأخير والانصراف المبكر</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300 text-xs">حضور متأخر بإذن</span>
+                  <span className="text-orange-300 font-bold">{detailedStats.lateArrivalWithPermission}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300 text-xs">انصراف مبكر بإذن</span>
+                  <span className="text-amber-300 font-bold">{detailedStats.earlyDepartureWithPermission}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300 text-xs">استئذان معتمد</span>
+                  <span className="text-cyan-300 font-bold">{detailedStats.permissionRequests}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300 text-xs">إجازة بإذن</span>
+                  <span className="text-teal-300 font-bold">{detailedStats.leaveWithPermission}</span>
+                </div>
               </div>
             </GlassContainer>
 
+            {/* Work Hours Statistics */}
             <GlassContainer className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">{Math.round(stats.totalHours)}</div>
-                <div className="text-gray-300 text-sm">إجمالي الساعات</div>
+              <h3 className="text-white font-medium mb-3 text-center text-sm">إحصائيات الساعات</h3>
+              <div className="space-y-2">
+                <div className="text-center">
+                  <div className="text-xl font-bold text-white">{Math.round(detailedStats.totalHours)}</div>
+                  <div className="text-gray-300 text-xs">إجمالي الساعات</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-blue-300">{detailedStats.averageHoursPerDay.toFixed(1)}</div>
+                  <div className="text-gray-300 text-xs">متوسط الساعات/يوم</div>
+                </div>
               </div>
             </GlassContainer>
 
-            {/* Legend */}
+            {/* Enhanced Legend */}
             <GlassContainer className="p-4">
-              <h3 className="text-white font-medium mb-3">دليل الألوان</h3>
-              <div className="space-y-2 text-xs">
+              <h3 className="text-white font-medium mb-3 text-sm">دليل الألوان</h3>
+              <div className="space-y-1 text-xs">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-green-500/20 rounded"></div>
                   <span className="text-gray-300">حضور كامل</span>
@@ -227,12 +360,28 @@ export default function MonthlyAttendancePage({ userRole, username, userId }: Mo
                   <span className="text-gray-300">حضور جزئي</span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-orange-500/20 rounded"></div>
+                  <span className="text-gray-300">متأخر بإذن</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-amber-500/20 rounded"></div>
+                  <span className="text-gray-300">انصراف مبكر بإذن</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-cyan-500/20 rounded"></div>
+                  <span className="text-gray-300">استئذان معتمد</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-teal-500/20 rounded"></div>
+                  <span className="text-gray-300">إجازة بإذن</span>
+                </div>
+                <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-purple-500/20 rounded"></div>
                   <span className="text-gray-300">إجازة</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-indigo-500/20 rounded"></div>
-                  <span className="text-gray-300">طلب معتمد</span>
+                  <div className="w-3 h-3 bg-red-500/20 rounded"></div>
+                  <span className="text-gray-300">غائب</span>
                 </div>
               </div>
             </GlassContainer>
