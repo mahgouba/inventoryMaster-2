@@ -2203,7 +2203,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                 {isInvoiceMode ? (
                   // Authorization number field for invoice mode
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <Label htmlFor="invoiceNumber" className="text-white/90">رقم الفاتورة</Label>
                         <Input
@@ -2215,12 +2215,22 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                         />
                       </div>
                       <div>
-                        <Label htmlFor="authorizationNumber" className="text-white/90">رقم التخويل</Label>
+                        <Label htmlFor="quoteReference" className="text-white/90">رقم عرض السعر المرجعي</Label>
+                        <Input
+                          id="quoteReference"
+                          value={quoteNumber}
+                          readOnly
+                          className="glass-input bg-white/10 border-white/20 text-white/70 placeholder-white/50"
+                          placeholder="QT-123456"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="authorizationNumber" className="text-white/90">رقم التعميد</Label>
                         <Input
                           id="authorizationNumber"
                           value={authorizationNumber}
                           onChange={(e) => setAuthorizationNumber(e.target.value)}
-                          placeholder="أدخل رقم التخويل"
+                          placeholder="أدخل رقم التعميد"
                           className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50 font-medium"
                         />
                       </div>
@@ -2231,13 +2241,13 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   <div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="quoteNumber">رقم التعميد</Label>
+                        <Label htmlFor="quoteNumber">رقم العرض</Label>
                         <Input
                           id="quoteNumber"
                           value={quoteNumber}
                           readOnly
                           className="bg-slate-50 dark:bg-slate-800"
-                          placeholder="Q-123456"
+                          placeholder="QT-123456"
                         />
                       </div>
                       <div>
