@@ -1378,13 +1378,13 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             </div>
                           )}
 
-                          {/* Action Buttons - Only Share, Sell, and Reservation */}
+                          {/* Action Buttons - First Row */}
                           <div className="pt-3 mt-3 border-t border-slate-200">
-                            <div className="flex justify-center gap-2">
+                            <div className="flex justify-center gap-1 mb-2">
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="px-3 h-8 hover:bg-yellow-50 border-yellow-300"
+                                className="px-2 h-8 hover:bg-yellow-50 border-yellow-300"
                                 style={{color: '#BF9231'}}
                                 onClick={() => handleShareItem(item)}
                                 title="مشاركة"
@@ -1395,19 +1395,42 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="px-3 h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
-                                onClick={() => sellItemMutation.mutate(item.id)}
+                                className="px-2 h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
+                                onClick={() => handleSellItem(item)}
                                 disabled={sellingItemId === item.id || item.isSold}
                                 title="بيع"
                               >
                                 <ShoppingCart size={14} />
                               </Button>
 
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="px-2 h-8 text-purple-600 hover:text-purple-700 hover:bg-purple-50 border-purple-300"
+                                onClick={() => handleCreateQuote(item)}
+                                title="إنشاء عرض سعر"
+                              >
+                                <FileText size={14} />
+                              </Button>
+
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="px-2 h-8 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 border-indigo-300"
+                                onClick={() => {
+                                  localStorage.setItem('selectedVehicleForPriceCard', JSON.stringify(item));
+                                  window.location.href = '/price-cards';
+                                }}
+                                title="إنشاء بطاقة سعر"
+                              >
+                                <Receipt size={14} />
+                              </Button>
+
                               {item.status === "محجوز" ? (
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="px-3 h-8 text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
+                                  className="px-2 h-8 text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
                                   onClick={() => handleCancelReservation(item)}
                                   disabled={cancelingReservationId === item.id}
                                   title="إلغاء الحجز"
@@ -1418,7 +1441,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="px-3 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
+                                  className="px-2 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
                                   onClick={() => handleReserveItem(item)}
                                   disabled={item.status === "محجوز" || item.isSold}
                                   title="حجز"
