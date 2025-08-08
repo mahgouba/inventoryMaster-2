@@ -277,7 +277,9 @@ export default function QuotationA4Preview({
             </span>
             
             <div className="flex items-center gap-1">
-              <span className="font-semibold text-black/80">رقم العرض:</span>
+              <span className="font-semibold text-black/80">
+                {isInvoiceMode ? 'رقم الفاتورة:' : 'رقم العرض:'}
+              </span>
               <span className="font-bold text-[#C79C45]">
                 {isInvoiceMode ? invoiceNumber : quoteNumber}
               </span>
@@ -290,19 +292,25 @@ export default function QuotationA4Preview({
               </span>
             </div>
             
-            <div className="flex items-center gap-1">
-              <span className="font-semibold text-black/80">الإنتهاء:</span>
-              <span className="text-red-600 font-medium">
-                {validUntil.toLocaleDateString('en-GB')}
-              </span>
-            </div>
+            {/* Hide expiry date in invoice mode */}
+            {!isInvoiceMode && (
+              <div className="flex items-center gap-1">
+                <span className="font-semibold text-black/80">الإنتهاء:</span>
+                <span className="text-red-600 font-medium">
+                  {validUntil.toLocaleDateString('en-GB')}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Second Row: Customer Information */}
           <div className="mb-3 mt-[2px]">
             <div className="flex items-center gap-2">
               <span className="text-lg font-bold text-black/80">
-                {customerTitle} / {customerName || "غير محدد"}
+                {isInvoiceMode && authorizationNumber ? 
+                  `بناءً علي تعميدكم رقم : ${authorizationNumber}` : 
+                  `${customerTitle} / ${customerName || "غير محدد"}`
+                }
               </span>
             </div>
           </div>

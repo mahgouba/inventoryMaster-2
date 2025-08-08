@@ -2215,7 +2215,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                         />
                       </div>
                       <div>
-                        <Label htmlFor="authorizationNumber" className="text-white/90">رقم عرض السعر</Label>
+                        <Label htmlFor="authorizationNumber" className="text-white/90">رقم التخويل</Label>
                         <Input
                           id="authorizationNumber"
                           value={authorizationNumber}
