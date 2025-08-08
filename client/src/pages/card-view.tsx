@@ -36,11 +36,14 @@ import {
   CreditCard,
   Plus,
   Receipt,
-  UserCheck
+  UserCheck,
+  Copy,
+  MessageCircle
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
 import { useTheme } from "@/hooks/useTheme";
 import { useToast } from "@/hooks/use-toast";
@@ -95,6 +98,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [showSoldCars, setShowSoldCars] = useState<boolean>(false);
   const [shareVehicle, setShareVehicle] = useState<InventoryItem | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  
+  // Bank sharing states
+  const [bankShareDialogOpen, setBankShareDialogOpen] = useState(false);
+  const [selectedBankType, setSelectedBankType] = useState<'company' | 'personal' | null>(null);
+  const [bankPhoneNumber, setBankPhoneNumber] = useState("");
 
   const [quotationManagementOpen, setQuotationManagementOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -620,6 +628,74 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     setShareDialogOpen(true);
   };
 
+  // Bank sharing functionality
+  const handleBankLongPress = (bankType: 'company' | 'personal') => {
+    setSelectedBankType(bankType);
+    setBankShareDialogOpen(true);
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      return new Promise<void>((resolve, reject) => {
+        if (document.execCommand('copy')) {
+          resolve();
+        } else {
+          reject(new Error('Copy failed'));
+        }
+        document.body.removeChild(textArea);
+      });
+    } catch (error) {
+      console.error('Failed to copy text to clipboard:', error);
+      throw error;
+    }
+  };
+
+  const getBankShareText = () => {
+    const bankPageName = selectedBankType === 'company' ? 'بنوك الشركة' : 'البنوك الشخصية';
+    const bankUrl = `${window.location.origin}/${selectedBankType === 'company' ? 'banks-company' : 'banks-personal'}`;
+    return `${bankPageName}\n${bankUrl}`;
+  };
+
+  const handleBankCopy = async () => {
+    try {
+      await copyToClipboard(getBankShareText());
+      toast({
+        title: "تم نسخ الرابط",
+        description: `تم نسخ رابط صفحة ${selectedBankType === 'company' ? 'بنوك الشركة' : 'البنوك الشخصية'}`
+      });
+    } catch (error) {
+      toast({
+        title: "خطأ في النسخ",
+        description: "حدث خطأ أثناء نسخ الرابط",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleBankWhatsAppShare = () => {
+    if (!bankPhoneNumber.trim()) {
+      toast({
+        title: "رقم الجوال مطلوب",
+        description: "يرجى إدخال رقم الجوال للمشاركة عبر الواتساب",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const shareText = encodeURIComponent(getBankShareText());
+    const phoneNumber = bankPhoneNumber.replace(/\D/g, '');
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${shareText}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   const handleCreateQuote = (item: InventoryItem) => {
     // Store vehicle data in localStorage for the quotation creation page
     localStorage.setItem('selectedVehicleForQuote', JSON.stringify(item));
@@ -764,26 +840,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     title="بنوك الشركة"
                     onMouseDown={(e) => {
                       const longPressTimer = setTimeout(() => {
-                        const currentUrl = window.location.origin + "/banks-company";
-                        if (navigator.share) {
-                          navigator.share({
-                            title: "بنوك الشركة",
-                            text: "صفحة بنوك الشركة",
-                            url: currentUrl
-                          }).catch(() => {
-                            navigator.clipboard.writeText(currentUrl);
-                            toast({
-                              title: "تم نسخ الرابط",
-                              description: "تم نسخ رابط صفحة بنوك الشركة"
-                            });
-                          });
-                        } else {
-                          navigator.clipboard.writeText(currentUrl);
-                          toast({
-                            title: "تم نسخ الرابط",
-                            description: "تم نسخ رابط صفحة بنوك الشركة"
-                          });
-                        }
+                        handleBankLongPress('company');
                       }, 800);
                       
                       const clearTimer = () => {
@@ -807,26 +864,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     title="البنوك الشخصية"
                     onMouseDown={(e) => {
                       const longPressTimer = setTimeout(() => {
-                        const currentUrl = window.location.origin + "/banks-personal";
-                        if (navigator.share) {
-                          navigator.share({
-                            title: "البنوك الشخصية",
-                            text: "صفحة البنوك الشخصية",
-                            url: currentUrl
-                          }).catch(() => {
-                            navigator.clipboard.writeText(currentUrl);
-                            toast({
-                              title: "تم نسخ الرابط",
-                              description: "تم نسخ رابط صفحة البنوك الشخصية"
-                            });
-                          });
-                        } else {
-                          navigator.clipboard.writeText(currentUrl);
-                          toast({
-                            title: "تم نسخ الرابط",
-                            description: "تم نسخ رابط صفحة البنوك الشخصية"
-                          });
-                        }
+                        handleBankLongPress('personal');
                       }, 800);
                       
                       const clearTimer = () => {
@@ -1620,6 +1658,66 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         open={attendanceInterfaceOpen}
         onOpenChange={setAttendanceInterfaceOpen}
       />
+
+      {/* Vehicle Share Dialog */}
+      {shareVehicle && (
+        <VehicleShare 
+          vehicle={shareVehicle} 
+          open={shareDialogOpen} 
+          onOpenChange={(open) => {
+            setShareDialogOpen(open);
+            if (!open) setShareVehicle(null);
+          }} 
+        />
+      )}
+
+      {/* Bank Share Dialog */}
+      <Dialog open={bankShareDialogOpen} onOpenChange={setBankShareDialogOpen}>
+        <DialogContent className="glass-morphism max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-right text-slate-200">
+              مشاركة صفحة {selectedBankType === 'company' ? 'بنوك الشركة' : 'البنوك الشخصية'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Copy Link Button */}
+            <Button
+              onClick={handleBankCopy}
+              className="w-full glass-button glass-text-primary"
+              variant="outline"
+            >
+              <Copy size={18} className="ml-2" />
+              نسخ الرابط
+            </Button>
+            
+            {/* WhatsApp Share Section */}
+            <div className="space-y-3">
+              <Label className="text-slate-300">مشاركة عبر الواتساب</Label>
+              <div className="flex gap-2">
+                <span className="flex items-center justify-center px-3 py-2 bg-slate-700 rounded-lg text-slate-300 text-sm">
+                  +966
+                </span>
+                <Input
+                  placeholder="أدخل رقم الجوال"
+                  value={bankPhoneNumber}
+                  onChange={(e) => setBankPhoneNumber(e.target.value)}
+                  className="glass-input flex-1"
+                  dir="ltr"
+                />
+              </div>
+              <Button
+                onClick={handleBankWhatsAppShare}
+                className="w-full glass-button glass-text-primary"
+                variant="outline"
+              >
+                <MessageCircle size={18} className="ml-2" />
+                إرسال عبر الواتساب
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       </div>
     </div>
   );
