@@ -1885,6 +1885,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                       a.date === dateStr
                     );
                     
+                    // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
+                    const isFriday = format(selectedDayForAttendance, "EEEE", { locale: ar }) === "الجمعة";
+                    
                     const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
                     
                     // Get default times - show scheduled times for new records
@@ -2007,76 +2010,84 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                         ) : (
                           /* Split Schedule - 4 Fields */
                           <div className="space-y-6">
-                            <h3 className="font-semibold text-lg text-center text-blue-300">الدوام المنفصل</h3>
+                            <h3 className="font-semibold text-lg text-center text-blue-300">
+                              {isFriday ? "دوام الجمعة (4:00 مساءً - 9:00 مساءً)" : "الدوام المنفصل"}
+                            </h3>
                             
-                            {/* Morning Period */}
-                            <div className="bg-white/5 rounded-lg p-6">
-                              <h4 className="font-medium mb-4 text-center text-orange-400">الفترة الصباحية</h4>
-                              <div className="grid grid-cols-2 gap-8">
-                                <div className="space-y-3">
-                                  <label className="block text-sm font-medium text-gray-300 text-center">وقت الحضور الصباحي</label>
-                                  <div className="flex gap-3 justify-center">
-                                    <Input
-                                      type="time"
-                                      defaultValue={getDefaultTime('morningCheckinTime')}
-                                      className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
-                                      id="morning-checkin-time"
-                                    />
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => {
-                                        const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-                                        if (existingAttendance) {
-                                          handleAttendanceUpdate(existingAttendance.id, 'morningCheckinTime', time);
-                                        }
-                                      }}
-                                      className="h-12 px-3 border-white/20 hover:bg-white/10"
-                                    >
-                                      <Clock className="w-4 h-4" />
-                                    </Button>
+                            {/* Morning Period - إخفاء في يوم الجمعة */}
+                            {!isFriday && (
+                              <div className="bg-white/5 rounded-lg p-6">
+                                <h4 className="font-medium mb-4 text-center text-orange-400">الفترة الصباحية</h4>
+                                <div className="grid grid-cols-2 gap-8">
+                                  <div className="space-y-3">
+                                    <label className="block text-sm font-medium text-gray-300 text-center">وقت الحضور الصباحي</label>
+                                    <div className="flex gap-3 justify-center">
+                                      <Input
+                                        type="time"
+                                        defaultValue={getDefaultTime('morningCheckinTime')}
+                                        className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
+                                        id="morning-checkin-time"
+                                      />
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => {
+                                          const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                                          if (existingAttendance) {
+                                            handleAttendanceUpdate(existingAttendance.id, 'morningCheckinTime', time);
+                                          }
+                                        }}
+                                        className="h-12 px-3 border-white/20 hover:bg-white/10"
+                                      >
+                                        <Clock className="w-4 h-4" />
+                                      </Button>
+                                    </div>
+                                    <div className="text-xs text-gray-400 text-center">
+                                      الوقت المحدد: {selectedEmployeeForDialog.morningStartTime}
+                                    </div>
                                   </div>
-                                  <div className="text-xs text-gray-400 text-center">
-                                    الوقت المحدد: {selectedEmployeeForDialog.morningStartTime}
-                                  </div>
-                                </div>
 
-                                <div className="space-y-3">
-                                  <label className="block text-sm font-medium text-gray-300 text-center">وقت الانصراف الصباحي</label>
-                                  <div className="flex gap-3 justify-center">
-                                    <Input
-                                      type="time"
-                                      defaultValue={getDefaultTime('morningCheckoutTime')}
-                                      className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
-                                      id="morning-checkout-time"
-                                    />
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => {
-                                        const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-                                        if (existingAttendance) {
-                                          handleAttendanceUpdate(existingAttendance.id, 'morningCheckoutTime', time);
-                                        }
-                                      }}
-                                      className="h-12 px-3 border-white/20 hover:bg-white/10"
-                                    >
-                                      <Clock className="w-4 h-4" />
-                                    </Button>
-                                  </div>
-                                  <div className="text-xs text-gray-400 text-center">
-                                    الوقت المحدد: {selectedEmployeeForDialog.morningEndTime}
+                                  <div className="space-y-3">
+                                    <label className="block text-sm font-medium text-gray-300 text-center">وقت الانصراف الصباحي</label>
+                                    <div className="flex gap-3 justify-center">
+                                      <Input
+                                        type="time"
+                                        defaultValue={getDefaultTime('morningCheckoutTime')}
+                                        className="text-lg h-12 text-center font-mono bg-white/10 border-white/20 text-white"
+                                        id="morning-checkout-time"
+                                      />
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => {
+                                          const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                                          if (existingAttendance) {
+                                            handleAttendanceUpdate(existingAttendance.id, 'morningCheckoutTime', time);
+                                          }
+                                        }}
+                                        className="h-12 px-3 border-white/20 hover:bg-white/10"
+                                      >
+                                        <Clock className="w-4 h-4" />
+                                      </Button>
+                                    </div>
+                                    <div className="text-xs text-gray-400 text-center">
+                                      الوقت المحدد: {selectedEmployeeForDialog.morningEndTime}
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
+                            )}
 
                             {/* Evening Period */}
                             <div className="bg-white/5 rounded-lg p-6">
-                              <h4 className="font-medium mb-4 text-center text-purple-400">الفترة المسائية</h4>
+                              <h4 className="font-medium mb-4 text-center text-purple-400">
+                                {isFriday ? "دوام الجمعة" : "الفترة المسائية"}
+                              </h4>
                               <div className="grid grid-cols-2 gap-8">
                                 <div className="space-y-3">
-                                  <label className="block text-sm font-medium text-gray-300 text-center">وقت الحضور المسائي</label>
+                                  <label className="block text-sm font-medium text-gray-300 text-center">
+                                    {isFriday ? "وقت الحضور" : "وقت الحضور المسائي"}
+                                  </label>
                                   <div className="flex gap-3 justify-center">
                                     <Input
                                       type="time"
@@ -2104,7 +2115,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 </div>
 
                                 <div className="space-y-3">
-                                  <label className="block text-sm font-medium text-gray-300 text-center">وقت الانصراف المسائي</label>
+                                  <label className="block text-sm font-medium text-gray-300 text-center">
+                                    {isFriday ? "وقت الانصراف" : "وقت الانصراف المسائي"}
+                                  </label>
                                   <div className="flex gap-3 justify-center">
                                     <Input
                                       type="time"
