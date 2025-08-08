@@ -1060,6 +1060,17 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     );
   };
 
+  // Get approved leave request details for a specific day
+  const getApprovedLeaveForDay = (employeeId: number, day: Date): LeaveRequest | null => {
+    const dateStr = format(day, "yyyy-MM-dd");
+    return allLeaveRequests.find(request => 
+      request.userId === employeeId &&
+      request.status === "approved" &&
+      format(new Date(request.startDate), "yyyy-MM-dd") <= dateStr &&
+      (request.endDate ? format(new Date(request.endDate), "yyyy-MM-dd") >= dateStr : format(new Date(request.startDate), "yyyy-MM-dd") === dateStr)
+    ) || null;
+  };
+
   // Mark day as holiday
   const handleMarkHoliday = () => {
     if (!selectedDayForAttendance || !selectedEmployeeForDialog) return;
@@ -1168,7 +1179,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               const dayAttendance = monthAttendance.find(a => a.date === dateStr);
               const dayName = format(day, "EEEE", { locale: ar });
               const isHoliday = dayAttendance?.notes === 'إجازة';
-              const hasApprovedLeaveForDay = hasApprovedLeave(schedule.employeeId, day);
+              const approvedLeave = getApprovedLeaveForDay(schedule.employeeId, day);
               
               let checkinTime = '-';
               let checkoutTime = '-';
@@ -1177,8 +1188,14 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               
               if (isHoliday) {
                 status = 'إجازة';
-              } else if (hasApprovedLeaveForDay) {
-                status = 'إجازة معتمدة';
+              } else if (approvedLeave) {
+                switch (approvedLeave.requestType) {
+                  case 'استئذان': status = `استئذان (${approvedLeave.duration} ${approvedLeave.durationType})`; break;
+                  case 'إجازة': status = 'إجازة معتمدة'; break;
+                  case 'تأخير في الحضور': status = `تأخير (${approvedLeave.duration} ${approvedLeave.durationType})`; break;
+                  case 'انصراف مبكر': status = `انصراف مبكر (${approvedLeave.duration} ${approvedLeave.durationType})`; break;
+                  default: status = 'إجازة معتمدة'; break;
+                }
               } else if (dayAttendance) {
                 if (schedule.scheduleType === "متصل") {
                   checkinTime = dayAttendance.continuousCheckinTime || '-';
@@ -1203,7 +1220,13 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">${checkoutTime}</td>
                   <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">${workHours}</td>
                   <td style="border: 1px solid #ddd; padding: 6px; text-align: center; font-weight: bold;
-                    color: ${status === 'حاضر' ? '#22c55e' : status === 'إجازة' || status === 'إجازة معتمدة' ? '#3b82f6' : '#ef4444'};">
+                    color: ${status === 'حاضر' ? '#22c55e' : 
+                             status === 'إجازة' ? '#f59e0b' : 
+                             status === 'إجازة معتمدة' ? '#10b981' : 
+                             status.includes('استئذان') ? '#3b82f6' : 
+                             status.includes('تأخير') ? '#f97316' : 
+                             status.includes('انصراف مبكر') ? '#8b5cf6' : 
+                             '#ef4444'};">
                     ${status}
                   </td>
                 </tr>
@@ -1214,7 +1237,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         
         <div style="margin-top: 30px; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
           <h3 style="color: #333; margin-bottom: 10px;">ملخص الشهر:</h3>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
             <div>
               <strong>إجمالي أيام العمل:</strong> ${monthDays.length} يوم
             </div>
@@ -1229,6 +1252,38 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                 .filter(a => a.notes !== 'إجازة')
                 .reduce((total, a) => total + parseFloat(calculateHoursWorked(schedule, a)), 0)
                 .toFixed(2)} ساعة
+            </div>
+          </div>
+          
+          <h4 style="color: #333; margin: 15px 0 10px 0; border-top: 1px solid #ddd; padding-top: 15px;">إحصائيات الطلبات المعتمدة:</h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <div>
+              <strong style="color: #3b82f6;">طلبات الاستئذان:</strong> 
+              ${monthDays.filter(day => {
+                const leave = getApprovedLeaveForDay(schedule.employeeId, day);
+                return leave && leave.requestType === 'استئذان';
+              }).length} طلب
+            </div>
+            <div>
+              <strong style="color: #f97316;">طلبات التأخير:</strong> 
+              ${monthDays.filter(day => {
+                const leave = getApprovedLeaveForDay(schedule.employeeId, day);
+                return leave && leave.requestType === 'تأخير في الحضور';
+              }).length} طلب
+            </div>
+            <div>
+              <strong style="color: #8b5cf6;">الانصراف المبكر:</strong> 
+              ${monthDays.filter(day => {
+                const leave = getApprovedLeaveForDay(schedule.employeeId, day);
+                return leave && leave.requestType === 'انصراف مبكر';
+              }).length} طلب
+            </div>
+            <div>
+              <strong style="color: #10b981;">الإجازات المعتمدة:</strong> 
+              ${monthDays.filter(day => {
+                const leave = getApprovedLeaveForDay(schedule.employeeId, day);
+                return leave && leave.requestType === 'إجازة';
+              }).length} يوم
             </div>
           </div>
         </div>
@@ -1743,8 +1798,21 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                     <div className="flex-1 space-y-1">
                                       <div className="flex justify-between items-center">
                                         <div className="text-sm text-gray-300">
-                                          {isHoliday ? 'إجازة' : hasApprovedLeaveForDay ? 'إجازة معتمدة' : hasAttendance ? `${hoursWorked.toFixed(1)} ساعة` : 'لا يوجد سجل'}
-                                        </div>
+                                          {(() => {
+                                            if (isHoliday) return 'إجازة';
+                                            const approvedLeave = getApprovedLeaveForDay(schedule.employeeId, day);
+                                            if (approvedLeave) {
+                                              switch (approvedLeave.requestType) {
+                                                case 'استئذان': return `استئذان (${approvedLeave.duration} ${approvedLeave.durationType})`;
+                                                case 'إجازة': return 'إجازة معتمدة';
+                                                case 'تأخير في الحضور': return `تأخير (${approvedLeave.duration} ${approvedLeave.durationType})`;
+                                                case 'انصراف مبكر': return `انصراف مبكر (${approvedLeave.duration} ${approvedLeave.durationType})`;
+                                                default: return 'إجازة معتمدة';
+                                              }
+                                            }
+                                            return hasAttendance ? `${hoursWorked.toFixed(1)} ساعة` : 'لا يوجد سجل';
+                                          })()
+                                        }</div>
                                         <div className="text-xs text-gray-400">
                                           {hasAttendance && !isHoliday && !hasApprovedLeaveForDay ? `${workPercentage.toFixed(0)}%` : ''}
                                         </div>
@@ -1756,35 +1824,82 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                         <div className="absolute inset-0 bg-gradient-to-r from-gray-600/30 to-gray-600/50"></div>
                                         
                                         {/* Progress fill */}
-                                        {isHoliday || hasApprovedLeaveForDay ? (
-                                          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-500 flex items-center justify-center">
-                                            <Coffee className="w-4 h-4 text-white" />
-                                          </div>
-                                        ) : hasAttendance ? (
-                                          <div 
-                                            className={`
-                                              h-full transition-all duration-500 flex items-center justify-center
-                                              ${isLate ? 'bg-gradient-to-r from-red-500 to-red-600' : ''}
-                                              ${workPercentage >= 100 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : ''}
-                                              ${workPercentage >= 75 && workPercentage < 100 ? 'bg-gradient-to-r from-blue-500 to-cyan-500' : ''}
-                                              ${workPercentage >= 50 && workPercentage < 75 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : ''}
-                                              ${workPercentage < 50 && workPercentage > 0 ? 'bg-gradient-to-r from-orange-500 to-red-500' : ''}
-                                            `}
-                                            style={{ width: `${Math.max(workPercentage, 10)}%` }}
-                                          >
-                                            {isLate ? (
-                                              <XCircle className="w-3 h-3 text-white" />
-                                            ) : workPercentage >= 100 ? (
-                                              <CheckCircle className="w-3 h-3 text-white" />
-                                            ) : workPercentage > 0 ? (
-                                              <Clock className="w-3 h-3 text-white" />
-                                            ) : null}
-                                          </div>
-                                        ) : (
-                                          <div className="h-full bg-gradient-to-r from-gray-600/20 to-gray-600/30 flex items-center justify-center">
-                                            <div className="w-2 h-2 bg-gray-500 rounded-full opacity-50"></div>
-                                          </div>
-                                        )}
+                                        {(() => {
+                                          if (isHoliday) {
+                                            return (
+                                              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-500 flex items-center justify-center">
+                                                <Coffee className="w-4 h-4 text-white" />
+                                              </div>
+                                            );
+                                          }
+                                          
+                                          const approvedLeave = getApprovedLeaveForDay(schedule.employeeId, day);
+                                          if (approvedLeave) {
+                                            // Show different colors and icons based on request type
+                                            switch (approvedLeave.requestType) {
+                                              case 'استئذان':
+                                                return (
+                                                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
+                                                    <Clock className="w-4 h-4 text-white" />
+                                                  </div>
+                                                );
+                                              case 'إجازة':
+                                                return (
+                                                  <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center">
+                                                    <Coffee className="w-4 h-4 text-white" />
+                                                  </div>
+                                                );
+                                              case 'تأخير في الحضور':
+                                                return (
+                                                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
+                                                    <AlertCircle className="w-4 h-4 text-white" />
+                                                  </div>
+                                                );
+                                              case 'انصراف مبكر':
+                                                return (
+                                                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center">
+                                                    <UserClock className="w-4 h-4 text-white" />
+                                                  </div>
+                                                );
+                                              default:
+                                                return (
+                                                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-500 flex items-center justify-center">
+                                                    <Coffee className="w-4 h-4 text-white" />
+                                                  </div>
+                                                );
+                                            }
+                                          }
+                                          
+                                          if (hasAttendance) {
+                                            return (
+                                              <div 
+                                                className={`
+                                                  h-full transition-all duration-500 flex items-center justify-center
+                                                  ${isLate ? 'bg-gradient-to-r from-red-500 to-red-600' : ''}
+                                                  ${workPercentage >= 100 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : ''}
+                                                  ${workPercentage >= 75 && workPercentage < 100 ? 'bg-gradient-to-r from-blue-500 to-cyan-500' : ''}
+                                                  ${workPercentage >= 50 && workPercentage < 75 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : ''}
+                                                  ${workPercentage < 50 && workPercentage > 0 ? 'bg-gradient-to-r from-orange-500 to-red-500' : ''}
+                                                `}
+                                                style={{ width: `${Math.max(workPercentage, 10)}%` }}
+                                              >
+                                                {isLate ? (
+                                                  <XCircle className="w-3 h-3 text-white" />
+                                                ) : workPercentage >= 100 ? (
+                                                  <CheckCircle className="w-3 h-3 text-white" />
+                                                ) : workPercentage > 0 ? (
+                                                  <Clock className="w-3 h-3 text-white" />
+                                                ) : null}
+                                              </div>
+                                            );
+                                          } else {
+                                            return (
+                                              <div className="h-full bg-gradient-to-r from-gray-600/20 to-gray-600/30 flex items-center justify-center">
+                                                <div className="w-2 h-2 bg-gray-500 rounded-full opacity-50"></div>
+                                              </div>
+                                            );
+                                          }
+                                        })()}
                                         
                                         {/* Glow effect for today */}
                                         {isToday && (
