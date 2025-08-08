@@ -229,15 +229,32 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       
       if (!existingAttendance) {
         setTimeout(() => {
-          // Default scheduled times
-          const defaultTimes = {
-            'continuous-checkin-time': '12:00',    // 12:00 PM
-            'continuous-checkout-time': '22:00',   // 10:00 PM
-            'morning-checkin-time': '09:30',       // 09:30 AM
-            'morning-checkout-time': '13:00',      // 01:00 PM
-            'evening-checkin-time': '16:00',       // 04:00 PM
-            'evening-checkout-time': '21:00'       // 09:00 PM
-          };
+          // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
+          const isFriday = selectedDayForAttendance && format(selectedDayForAttendance, "EEEE", { locale: ar }) === "الجمعة";
+          
+          let defaultTimes;
+          
+          if (isFriday) {
+            // أوقات الجمعة الخاصة لجميع أنواع الدوام
+            defaultTimes = {
+              'continuous-checkin-time': '16:00',    // 4:00 PM
+              'continuous-checkout-time': '21:00',   // 9:00 PM
+              'morning-checkin-time': '16:00',       // 4:00 PM
+              'morning-checkout-time': '21:00',      // 9:00 PM
+              'evening-checkin-time': '16:00',       // 4:00 PM
+              'evening-checkout-time': '21:00'       // 9:00 PM
+            };
+          } else {
+            // الأوقات الافتراضية للأيام العادية
+            defaultTimes = {
+              'continuous-checkin-time': '12:00',    // 12:00 PM
+              'continuous-checkout-time': '22:00',   // 10:00 PM
+              'morning-checkin-time': '09:30',       // 09:30 AM
+              'morning-checkout-time': '13:00',      // 01:00 PM
+              'evening-checkin-time': '16:00',       // 04:00 PM
+              'evening-checkout-time': '21:00'       // 09:00 PM
+            };
+          }
           
           Object.entries(defaultTimes).forEach(([inputId, defaultTime]) => {
             const input = document.getElementById(inputId) as HTMLInputElement;
