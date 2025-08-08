@@ -996,6 +996,30 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
 
     if (!attendance) return false;
 
+    // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
+    const isFriday = format(day, "EEEE", { locale: ar }) === "الجمعة";
+    
+    if (isFriday) {
+      // يوم الجمعة: التحقق من وقت الحضور الخاص (4:00 PM)
+      const fridayStartTime = "16:00"; // 4:00 PM
+      if (employee.scheduleType === "متصل") {
+        if (attendance.continuousCheckinTime) {
+          return attendance.continuousCheckinTime > fridayStartTime;
+        }
+      } else {
+        // للدوام المنفصل، نتحقق من الفترة المسائية في يوم الجمعة
+        if (attendance.eveningCheckinTime) {
+          return attendance.eveningCheckinTime > fridayStartTime;
+        }
+        // إذا سجل في الفترة الصباحية بدلاً من المسائية، نتحقق أيضاً
+        if (attendance.morningCheckinTime) {
+          return attendance.morningCheckinTime > fridayStartTime;
+        }
+      }
+      return false;
+    }
+
+    // الأيام العادية: استخدام الجدول المعتاد
     if (employee.scheduleType === "متصل") {
       if (attendance.continuousCheckinTime && employee.continuousStartTime) {
         return attendance.continuousCheckinTime > employee.continuousStartTime;
