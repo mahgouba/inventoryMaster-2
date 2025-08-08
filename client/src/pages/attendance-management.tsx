@@ -1064,6 +1064,31 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     return "0.00";
   };
 
+  // حساب الساعات المتوقعة بناءً على جدول العمل الفعلي
+  const calculateExpectedHours = (schedule: EmployeeWorkSchedule): number => {
+    if (schedule.scheduleType === "متصل") {
+      if (schedule.continuousStartTime && schedule.continuousEndTime) {
+        const startTime = new Date(`2024-01-01T${schedule.continuousStartTime}`);
+        const endTime = new Date(`2024-01-01T${schedule.continuousEndTime}`);
+        return (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+      }
+    } else {
+      let totalExpectedHours = 0;
+      if (schedule.morningStartTime && schedule.morningEndTime) {
+        const morningStart = new Date(`2024-01-01T${schedule.morningStartTime}`);
+        const morningEnd = new Date(`2024-01-01T${schedule.morningEndTime}`);
+        totalExpectedHours += (morningEnd.getTime() - morningStart.getTime()) / (1000 * 60 * 60);
+      }
+      if (schedule.eveningStartTime && schedule.eveningEndTime) {
+        const eveningStart = new Date(`2024-01-01T${schedule.eveningStartTime}`);
+        const eveningEnd = new Date(`2024-01-01T${schedule.eveningEndTime}`);
+        totalExpectedHours += (eveningEnd.getTime() - eveningStart.getTime()) / (1000 * 60 * 60);
+      }
+      return totalExpectedHours;
+    }
+    return 8; // Default fallback
+  };
+
   return (
     <GlassBackground>
       <div className="container mx-auto px-4 py-8">
@@ -1501,7 +1526,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               
                               // Calculate hours worked
                               const hoursWorked = hasAttendance && !isHoliday ? parseFloat(calculateHoursWorked(schedule, dayAttendance)) : 0;
-                              const expectedHours = schedule.scheduleType === "متصل" ? 8 : 8; // Default 8 hours
+                              const expectedHours = calculateExpectedHours(schedule);
                               const workPercentage = Math.min((hoursWorked / expectedHours) * 100, 100);
                               
                               // Get day name in Arabic
