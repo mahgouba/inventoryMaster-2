@@ -1114,14 +1114,6 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-white">طلبات الإجازة والاستئذان المعلقة</h2>
                 <div className="flex gap-3 items-center">
-                  <Button
-                    onClick={() => setIsCreateRequestDialogOpen(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                    data-testid="create-request-button"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    إنشاء طلب جديد
-                  </Button>
                   <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300">
                     {pendingLeaveRequests.length} طلب معلق
                   </Badge>
@@ -2022,6 +2014,14 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-white">الطلبات المعتمدة</h2>
                 <div className="flex gap-3 items-center">
+                  <Button
+                    onClick={() => setIsCreateRequestDialogOpen(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    data-testid="create-request-button"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    إنشاء طلب جديد
+                  </Button>
                   <div className="flex items-center gap-2 text-sm text-gray-300">
                     <CheckSquare className="w-4 h-4" />
                     <span>إجمالي الطلبات المعتمدة: {approvedLeaveRequests.length}</span>
