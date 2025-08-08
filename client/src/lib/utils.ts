@@ -297,14 +297,7 @@ export function printTableWithSettings(settings: PrintSettings) {
           .status-available { background: #dcfce7 !important; color: #166534 !important; }
         ` : ''}
         
-        /* Hide columns based on settings */
-        ${settings.visibleColumns.length > 0 ? 
-          Array.from({length: 20}, (_, i) => i).map(i => 
-            !settings.visibleColumns.includes(['manufacturer', 'category', 'trimLevel', 'engineCapacity', 'year', 'exteriorColor', 'interiorColor', 'status', 'importType', 'location', 'chassisNumber', 'price', 'ownershipType', 'engineer', 'entryDate', 'notes'][i] || '') 
-              ? `table th:nth-child(${i+1}), table td:nth-child(${i+1}) { display: none !important; }`
-              : ''
-          ).join('\n')
-        : ''}
+        /* Column visibility will be handled by rebuilding the table structure instead of CSS hiding */
         
         /* Hide unnecessary elements for simple table */
         .print-footer,
@@ -342,30 +335,86 @@ export function printTableWithSettings(settings: PrintSettings) {
         </div>
         ` : ''}
         
-        <!-- Simple Table Only -->
+        <!-- Rebuilt Table with Proper Column Alignment -->
         ${(() => {
-          let tableHTML = tableElement.outerHTML;
-          
-          // Remove all SVG icons
-          tableHTML = tableHTML.replace(/<svg[^>]*>.*?<\/svg>/gs, '');
-          
-          // Remove all buttons
-          tableHTML = tableHTML.replace(/<button[^>]*>.*?<\/button>/gs, '');
-          
-          // Remove the actions column header
-          tableHTML = tableHTML.replace(/<th[^>]*>\s*الإجراءات\s*<\/th>/g, '');
-          
-          // Remove actions column cells (multiple patterns to catch all variations)
-          tableHTML = tableHTML.replace(/<td[^>]*data-actions[^>]*>.*?<\/td>/gs, '');
-          tableHTML = tableHTML.replace(/<td[^>]*>\s*<div[^>]*space-x-2[^>]*>.*?<\/div>\s*<\/td>/gs, '');
-          tableHTML = tableHTML.replace(/<td[^>]*>\s*<div[^>]*flex[^>]*gap[^>]*>.*?<\/div>\s*<\/td>/gs, '');
-          
-          // Remove all remaining class attributes for clean printing
-          tableHTML = tableHTML.replace(/class="[^"]*"/g, '');
-          
-          // Ensure table headers have golden background
-          tableHTML = tableHTML.replace(/<th([^>]*)>/g, '<th$1 style="background-color: #C49632 !important; color: white !important;">');
-          
+          // Column configuration with Arabic headers
+          const columnConfig = {
+            'manufacturer': 'الصانع',
+            'category': 'الفئة', 
+            'trimLevel': 'درجة التجهيز',
+            'engineCapacity': 'سعة المحرك',
+            'year': 'السنة',
+            'exteriorColor': 'اللون الخارجي',
+            'interiorColor': 'اللون الداخلي',
+            'status': 'الحالة',
+            'importType': 'نوع الاستيراد',
+            'location': 'الموقع',
+            'chassisNumber': 'رقم الهيكل',
+            'price': 'السعر',
+            'ownershipType': 'نوع الملكية',
+            'engineer': 'المهندس',
+            'entryDate': 'تاريخ الدخول',
+            'notes': 'ملاحظات'
+          };
+
+          // Determine visible columns - use all columns if none specified
+          const visibleColumns = settings.visibleColumns.length > 0 
+            ? settings.visibleColumns 
+            : Object.keys(columnConfig);
+
+          // Build table header
+          let tableHTML = '<table><thead><tr>';
+          visibleColumns.forEach(column => {
+            if (columnConfig[column]) {
+              tableHTML += `<th style="background-color: #C49632 !important; color: white !important; border: 1px solid #000; padding: 4pt 8pt; text-align: center; font-weight: 700;">${columnConfig[column]}</th>`;
+            }
+          });
+          tableHTML += '</tr></thead><tbody>';
+
+          // Extract data rows from the original table
+          const tableRows = tableElement.querySelectorAll('tbody tr');
+          tableRows.forEach((row, rowIndex) => {
+            if (row.querySelector('td')) { // Skip empty rows
+              tableHTML += '<tr>';
+              visibleColumns.forEach((column, colIndex) => {
+                // Find the cell for this column from the original table
+                let cellContent = '';
+                const cells = row.querySelectorAll('td');
+                
+                // Map column names to cell indices based on actual table structure
+                const columnIndexMap = {
+                  'manufacturer': 0,      // الصانع
+                  'category': 1,          // الفئة 
+                  'trimLevel': 2,         // درجة التجهيز
+                  'engineCapacity': 3,    // سعة المحرك
+                  'year': 4,              // السنة
+                  'exteriorColor': 5,     // اللون الخارجي
+                  'interiorColor': 6,     // اللون الداخلي
+                  'status': 7,            // الحالة
+                  'location': 8,          // الموقع
+                  'importType': 9,        // الاستيراد
+                  'chassisNumber': 10,    // رقم الهيكل
+                  'ownershipType': 11,    // نوع الملكية
+                  'entryDate': 12,        // تاريخ الدخول
+                  'price': 13,            // السعر
+                  'notes': 14             // الملاحظات
+                  // Skip index 15 which is الإجراءات (Actions)
+                };
+
+                const cellIndex = columnIndexMap[column];
+                if (cellIndex !== undefined && cells[cellIndex]) {
+                  cellContent = cells[cellIndex].textContent?.trim() || '';
+                  // Clean up content - remove extra spaces and line breaks
+                  cellContent = cellContent.replace(/\\s+/g, ' ').trim();
+                }
+
+                tableHTML += `<td style="border: 1px solid #000; padding: 2pt 4pt; text-align: right; vertical-align: middle; background: white !important; color: #000 !important;">${cellContent || '-'}</td>`;
+              });
+              tableHTML += '</tr>';
+            }
+          });
+
+          tableHTML += '</tbody></table>';
           return tableHTML;
         })()}
     </body>
