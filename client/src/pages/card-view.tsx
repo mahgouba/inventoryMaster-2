@@ -696,6 +696,34 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     window.open(whatsappUrl, '_blank');
   };
 
+  const handleBankShare = async () => {
+    const bankPageName = selectedBankType === 'company' ? 'بنوك الشركة' : 'البنوك الشخصية';
+    const bankUrl = `${window.location.origin}/${selectedBankType === 'company' ? 'banks-company' : 'banks-personal'}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: bankPageName,
+          text: `صفحة ${bankPageName}`,
+          url: bankUrl
+        });
+        toast({
+          title: "تم المشاركة بنجاح",
+          description: `تم مشاركة صفحة ${bankPageName}`
+        });
+      } catch (error: any) {
+        // If user cancels sharing, don't show error
+        if (error.name !== 'AbortError') {
+          // Fallback to copy
+          await handleBankCopy();
+        }
+      }
+    } else {
+      // Fallback to copy functionality
+      await handleBankCopy();
+    }
+  };
+
   const handleCreateQuote = (item: InventoryItem) => {
     // Store vehicle data in localStorage for the quotation creation page
     localStorage.setItem('selectedVehicleForQuote', JSON.stringify(item));
@@ -1681,6 +1709,16 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           </DialogHeader>
           
           <div className="space-y-4">
+            {/* Share Button */}
+            <Button
+              onClick={handleBankShare}
+              className="w-full glass-button glass-text-primary"
+              variant="outline"
+            >
+              <Share2 size={18} className="ml-2" />
+              مشاركة
+            </Button>
+
             {/* Copy Link Button */}
             <Button
               onClick={handleBankCopy}
