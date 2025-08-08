@@ -49,15 +49,25 @@ interface DailyAttendance {
   employeeId: number;
   employeeName: string;
   date: string;
-  checkinTime?: string;
-  checkoutTime?: string;
+  scheduleType: string;
+  continuousCheckinTime?: string;
+  continuousCheckoutTime?: string;
+  continuousCheckinStatus?: string;
+  continuousCheckoutStatus?: string;
   morningCheckinTime?: string;
   morningCheckoutTime?: string;
+  morningCheckinStatus?: string;
+  morningCheckoutStatus?: string;
   eveningCheckinTime?: string;
   eveningCheckoutTime?: string;
+  eveningCheckinStatus?: string;
+  eveningCheckoutStatus?: string;
+  totalHoursWorked?: string;
   notes?: string;
-  isConfirmed: boolean;
-  totalHours?: number;
+  createdBy?: number;
+  createdByName?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface AttendanceRequest {
@@ -144,7 +154,9 @@ export default function MonthlyAttendancePage({ userRole, username, userId }: Mo
     
     if (dayAttendance) {
       if (dayAttendance.notes === 'إجازة') return 'holiday';
-      if (dayAttendance.totalHours && dayAttendance.totalHours >= 7) {
+      const totalHours = dayAttendance.totalHoursWorked ? parseFloat(dayAttendance.totalHoursWorked) : 0;
+      
+      if (totalHours >= 7) {
         // Check if there's an approved late arrival or early departure
         if (approvedRequest) {
           if (approvedRequest.requestType === 'تأخير') return 'late-approved';
@@ -152,7 +164,7 @@ export default function MonthlyAttendancePage({ userRole, username, userId }: Mo
         }
         return 'full';
       }
-      if (dayAttendance.totalHours && dayAttendance.totalHours >= 4) return 'partial';
+      if (totalHours >= 4) return 'partial';
       return 'present';
     }
     
@@ -215,7 +227,7 @@ export default function MonthlyAttendancePage({ userRole, username, userId }: Mo
       permissionRequests: 0,
       leaveWithPermission: 0,
       totalApprovedRequests: 0,
-      totalHours: userAttendance.reduce((sum, a) => sum + (a.totalHours || 0), 0),
+      totalHours: userAttendance.reduce((sum, a) => sum + (a.totalHoursWorked ? parseFloat(a.totalHoursWorked) : 0), 0),
       averageHoursPerDay: 0
     };
 
@@ -442,18 +454,24 @@ export default function MonthlyAttendancePage({ userRole, username, userId }: Mo
                         p-3 text-center rounded-lg transition-all duration-200 min-h-[80px] flex flex-col justify-between
                         ${isToday ? 'ring-2 ring-blue-400' : ''}
                         ${statusDisplay.color}
-                        ${status !== 'no-record' ? 'cursor-pointer hover:scale-105' : ''}
+                        ${status !== 'absent' ? 'cursor-pointer hover:scale-105' : ''}
                       `}
                     >
                       <div className="text-sm font-medium">
                         {format(day, "d")}
                       </div>
                       
-                      {status !== 'no-record' && (
+                      {status !== 'absent' && (
                         <div className="flex flex-col items-center gap-1">
                           <StatusIcon className="w-4 h-4" />
-                          {dayAttendance && dayAttendance.totalHours && (
-                            <div className="text-xs">{Math.round(dayAttendance.totalHours)}س</div>
+                          {dayAttendance && dayAttendance.totalHoursWorked && (
+                            <div className="text-xs">{parseFloat(dayAttendance.totalHoursWorked).toFixed(1)}س</div>
+                          )}
+                          {status === 'late-approved' && (
+                            <div className="text-xs text-orange-300">متأخر بإذن</div>
+                          )}
+                          {status === 'early-departure-approved' && (
+                            <div className="text-xs text-amber-300">انصراف بإذن</div>
                           )}
                         </div>
                       )}
@@ -479,14 +497,36 @@ export default function MonthlyAttendancePage({ userRole, username, userId }: Mo
                         {format(new Date(attendance.date), "EEEE، dd MMMM", { locale: ar })}
                       </div>
                       <div className="text-gray-300 text-sm">
-                        {attendance.checkinTime && `دخول: ${attendance.checkinTime}`}
-                        {attendance.checkoutTime && ` | خروج: ${attendance.checkoutTime}`}
+                        {attendance.scheduleType === 'متصل' ? (
+                          <>
+                            {attendance.continuousCheckinTime && `دخول: ${attendance.continuousCheckinTime}`}
+                            {attendance.continuousCheckoutTime && ` | خروج: ${attendance.continuousCheckoutTime}`}
+                          </>
+                        ) : (
+                          <>
+                            {attendance.morningCheckinTime && `ص دخول: ${attendance.morningCheckinTime}`}
+                            {attendance.morningCheckoutTime && ` | ص خروج: ${attendance.morningCheckoutTime}`}
+                            {attendance.eveningCheckinTime && ` | م دخول: ${attendance.eveningCheckinTime}`}
+                            {attendance.eveningCheckoutTime && ` | م خروج: ${attendance.eveningCheckoutTime}`}
+                          </>
+                        )}
+                        {/* Show approved request status */}
+                        {(() => {
+                          const approvedRequest = getApprovedRequestForDay(new Date(attendance.date));
+                          if (approvedRequest) {
+                            if (approvedRequest.requestType === 'تأخير') return ' (حضور متأخر بإذن)';
+                            if (approvedRequest.requestType === 'انصراف مبكر') return ' (انصراف مبكر بإذن)';
+                            if (approvedRequest.requestType === 'استئذان') return ' (استئذان معتمد)';
+                            if (approvedRequest.requestType === 'إجازة') return ' (إجازة بإذن)';
+                          }
+                          return '';
+                        })()}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
                     <Badge variant="outline" className="border-green-400 text-green-300 bg-green-400/10">
-                      {attendance.totalHours ? `${Math.round(attendance.totalHours)} ساعات` : 'مؤكد'}
+                      {attendance.totalHoursWorked ? `${parseFloat(attendance.totalHoursWorked).toFixed(1)} ساعات` : 'مؤكد'}
                     </Badge>
                   </div>
                 </div>
