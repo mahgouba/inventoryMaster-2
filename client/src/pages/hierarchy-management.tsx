@@ -200,42 +200,280 @@ export default function HierarchyManagementPage() {
     "أزرق / Blue"
   ];
 
-  // Sample specifications
-  const sampleSpecs: VehicleSpecification[] = [
+  // Comprehensive default specifications data
+  const defaultSpecs: VehicleSpecification[] = [
+    // Toyota Specifications
     {
       id: 1,
-      manufacturer: "تويوتا",
-      category: "كامري",
-      trimLevel: "GLE",
+      manufacturer: "تويوتا / Toyota",
+      category: "كامري / Camry",
+      trimLevel: "فل كامل / Full Option",
       model: "2024",
       specifications: {
-        engine: "محرك 2.5 لتر 4 سلندر",
-        power: "203 حصان",
-        transmission: "ناقل حركة أوتوماتيكي 8 سرعات",
-        fuelType: "بنزين",
-        drivetrain: "دفع أمامي",
-        features: ["نظام الملاحة", "كاميرا خلفية", "حساسات وقوف", "مقاعد جلدية"]
+        engine: "محرك 2.5 لتر 4 سلندر / 2.5L 4-Cylinder Engine",
+        power: "203 حصان / 203 HP",
+        transmission: "ناقل حركة أوتوماتيكي 8 سرعات / 8-Speed Automatic",
+        fuelType: "بنزين / Gasoline",
+        drivetrain: "دفع أمامي / Front-Wheel Drive",
+        features: ["نظام الملاحة / Navigation", "كاميرا خلفية / Backup Camera", "حساسات وقوف / Parking Sensors", "مقاعد جلدية / Leather Seats"]
+      },
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    {
+      id: 2,
+      manufacturer: "تويوتا / Toyota",
+      category: "لاند كروزر / Land Cruiser",
+      trimLevel: "فل كامل / Full Option",
+      model: "2024",
+      specifications: {
+        engine: "محرك 3.5 لتر V6 توين تيربو / 3.5L V6 Twin Turbo",
+        power: "409 حصان / 409 HP",
+        transmission: "ناقل حركة أوتوماتيكي 10 سرعات / 10-Speed Automatic",
+        fuelType: "بنزين / Gasoline",
+        drivetrain: "دفع رباعي / All-Wheel Drive",
+        features: ["نظام الملاحة المتقدم / Advanced Navigation", "كاميرا 360 / 360 Camera", "مقاعد جلدية مدفأة / Heated Leather Seats", "سقف بانوراما / Panoramic Sunroof"]
+      },
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    // Mercedes Specifications
+    {
+      id: 3,
+      manufacturer: "مرسيدس / Mercedes-Benz",
+      category: "E-Class",
+      trimLevel: "AMG",
+      model: "2024",
+      specifications: {
+        engine: "محرك 3.0 لتر V6 توربو / 3.0L V6 Turbo",
+        power: "429 حصان / 429 HP",
+        transmission: "ناقل حركة أوتوماتيكي 9 سرعات / 9G-TRONIC",
+        fuelType: "بنزين / Gasoline",
+        drivetrain: "دفع رباعي / All-Wheel Drive",
+        features: ["نظام MBUX المتطور / Advanced MBUX", "مقاعد AMG الرياضية / AMG Sport Seats", "نظام صوت Burmester / Burmester Sound", "إضاءة محيطية / Ambient Lighting"]
+      },
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    // BMW Specifications
+    {
+      id: 4,
+      manufacturer: "بي ام دبليو / BMW",
+      category: "الفئة الخامسة / 5 Series",
+      trimLevel: "M Sport",
+      model: "2024",
+      specifications: {
+        engine: "محرك 3.0 لتر 6 سلندر توربو / 3.0L I6 Turbo",
+        power: "382 حصان / 382 HP",
+        transmission: "ناقل حركة أوتوماتيكي 8 سرعات / 8-Speed Automatic",
+        fuelType: "بنزين / Gasoline",
+        drivetrain: "دفع خلفي / Rear-Wheel Drive",
+        features: ["نظام iDrive 8 / iDrive 8", "مقاعد جلدية رياضية / Sport Leather Seats", "نظام صوت Harman Kardon / Harman Kardon Audio", "إضاءة ليزر / Laser Headlights"]
+      },
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    // Land Rover Specifications
+    {
+      id: 5,
+      manufacturer: "لاند روفر / Land Rover",
+      category: "رينج روفر / Range Rover",
+      trimLevel: "Autobiography",
+      model: "2024",
+      specifications: {
+        engine: "محرك 4.4 لتر V8 توين تيربو / 4.4L V8 Twin Turbo",
+        power: "523 حصان / 523 HP",
+        transmission: "ناقل حركة أوتوماتيكي 8 سرعات / 8-Speed Automatic",
+        fuelType: "بنزين / Gasoline",
+        drivetrain: "دفع رباعي / All-Wheel Drive",
+        features: ["نظام التعليق الهوائي / Air Suspension", "مقاعد جلدية فاخرة / Luxury Leather Seats", "نظام الترفيه الخلفي / Rear Entertainment", "إضاءة محيطية / Ambient Lighting"]
+      },
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    // Rolls-Royce Specifications
+    {
+      id: 6,
+      manufacturer: "رولز رويس / Rolls-Royce",
+      category: "فانتوم / Phantom",
+      trimLevel: "First Edition",
+      model: "2024",
+      specifications: {
+        engine: "محرك 6.75 لتر V12 توين تيربو / 6.75L V12 Twin Turbo",
+        power: "563 حصان / 563 HP",
+        transmission: "ناقل حركة أوتوماتيكي 8 سرعات / 8-Speed Automatic",
+        fuelType: "بنزين / Gasoline",
+        drivetrain: "دفع خلفي / Rear-Wheel Drive",
+        features: ["نظام العزل الصوتي المتقدم / Advanced Sound Isolation", "مقاعد جلدية مخصصة / Bespoke Leather Seats", "نظام النجوم في السقف / Starlight Headliner", "أبواب بإغلاق ناعم / Soft Close Doors"]
+      },
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    // Ferrari Specifications
+    {
+      id: 7,
+      manufacturer: "فيراري / Ferrari",
+      category: "F8",
+      trimLevel: "فل كامل / Full Option",
+      model: "2024",
+      specifications: {
+        engine: "محرك 3.9 لتر V8 توين تيربو / 3.9L V8 Twin Turbo",
+        power: "710 حصان / 710 HP",
+        transmission: "ناقل حركة أوتوماتيكي 7 سرعات / 7-Speed Dual Clutch",
+        fuelType: "بنزين / Gasoline",
+        drivetrain: "دفع خلفي / Rear-Wheel Drive",
+        features: ["نظام التحكم في الجر المتقدم / Advanced Traction Control", "مقاعد رياضية من الكربون / Carbon Sport Seats", "نظام العادم الرياضي / Sport Exhaust System", "شاشة قيادة رقمية / Digital Driver Display"]
+      },
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    // Tesla Specifications
+    {
+      id: 8,
+      manufacturer: "تسلا / Tesla",
+      category: "Model S",
+      trimLevel: "فل كامل / Full Option",
+      model: "2024",
+      specifications: {
+        engine: "محرك كهربائي مزدوج / Dual Electric Motor",
+        power: "1020 حصان / 1020 HP",
+        transmission: "ناقل حركة أحادي السرعة / Single Speed",
+        fuelType: "كهربائي / Electric",
+        drivetrain: "دفع رباعي / All-Wheel Drive",
+        features: ["نظام القيادة الذاتية الكاملة / Full Self-Driving", "شاشة لمس 17 بوصة / 17-inch Touchscreen", "نظام صوت عالي الجودة / Premium Audio System", "تحديثات البرمجيات عبر الإنترنت / Over-the-Air Updates"]
       },
       createdAt: "2024-01-15T10:30:00Z",
       updatedAt: "2024-01-15T10:30:00Z"
     }
   ];
 
-  // Sample image links
-  const sampleImages: VehicleImageLink[] = [
+  // Comprehensive default image links
+  const defaultImages: VehicleImageLink[] = [
     {
       id: 1,
-      manufacturer: "تويوتا",
-      category: "كامري",
-      trimLevel: "GLE",
-      exteriorColor: "أبيض",
-      interiorColor: "بيج",
+      manufacturer: "تويوتا / Toyota",
+      category: "كامري / Camry",
+      trimLevel: "فل كامل / Full Option",
+      exteriorColor: "أبيض لؤلؤي / Pearl White",
+      interiorColor: "بيج / Beige",
       imageUrls: [
-        "https://example.com/toyota-camry-white-exterior-1.jpg",
-        "https://example.com/toyota-camry-white-exterior-2.jpg",
-        "https://example.com/toyota-camry-beige-interior.jpg"
+        "https://cdn.toyota.com/camry-2024-pearl-white-exterior-front.jpg",
+        "https://cdn.toyota.com/camry-2024-pearl-white-exterior-side.jpg",
+        "https://cdn.toyota.com/camry-2024-beige-interior.jpg"
       ],
-      description: "صور تويوتا كامري 2024 GLE باللون الأبيض والداخلية البيج",
+      description: "صور تويوتا كامري 2024 فل كامل باللون الأبيض اللؤلؤي والداخلية البيج / Toyota Camry 2024 Full Option Pearl White with Beige Interior",
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    {
+      id: 2,
+      manufacturer: "تويوتا / Toyota",
+      category: "لاند كروزر / Land Cruiser",
+      trimLevel: "فل كامل / Full Option",
+      exteriorColor: "أسود معدني / Metallic Black",
+      interiorColor: "بني / Brown",
+      imageUrls: [
+        "https://cdn.toyota.com/landcruiser-2024-black-exterior-front.jpg",
+        "https://cdn.toyota.com/landcruiser-2024-black-exterior-side.jpg",
+        "https://cdn.toyota.com/landcruiser-2024-brown-interior.jpg"
+      ],
+      description: "صور تويوتا لاند كروزر 2024 فل كامل باللون الأسود المعدني والداخلية البنية / Toyota Land Cruiser 2024 Full Option Metallic Black with Brown Interior",
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    {
+      id: 3,
+      manufacturer: "مرسيدس / Mercedes-Benz",
+      category: "E-Class",
+      trimLevel: "AMG",
+      exteriorColor: "فضي / Silver",
+      interiorColor: "أسود / Black",
+      imageUrls: [
+        "https://cdn.mercedes.com/e-class-2024-silver-amg-exterior.jpg",
+        "https://cdn.mercedes.com/e-class-2024-silver-amg-side.jpg",
+        "https://cdn.mercedes.com/e-class-2024-black-amg-interior.jpg"
+      ],
+      description: "صور مرسيدس E-Class 2024 AMG باللون الفضي والداخلية السوداء / Mercedes E-Class 2024 AMG Silver with Black Interior",
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    {
+      id: 4,
+      manufacturer: "بي ام دبليو / BMW",
+      category: "الفئة الخامسة / 5 Series",
+      trimLevel: "M Sport",
+      exteriorColor: "أزرق معدني / Metallic Blue",
+      interiorColor: "رمادي / Gray",
+      imageUrls: [
+        "https://cdn.bmw.com/5series-2024-blue-msport-exterior.jpg",
+        "https://cdn.bmw.com/5series-2024-blue-msport-side.jpg",
+        "https://cdn.bmw.com/5series-2024-gray-msport-interior.jpg"
+      ],
+      description: "صور بي ام دبليو الفئة الخامسة 2024 M Sport باللون الأزرق المعدني والداخلية الرمادية / BMW 5 Series 2024 M Sport Metallic Blue with Gray Interior",
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    {
+      id: 5,
+      manufacturer: "لاند روفر / Land Rover",
+      category: "رينج روفر / Range Rover",
+      trimLevel: "Autobiography",
+      exteriorColor: "أبيض لؤلؤي / Pearl White",
+      interiorColor: "بني / Brown",
+      imageUrls: [
+        "https://cdn.landrover.com/range-rover-2024-white-autobiography-exterior.jpg",
+        "https://cdn.landrover.com/range-rover-2024-white-autobiography-side.jpg",
+        "https://cdn.landrover.com/range-rover-2024-brown-autobiography-interior.jpg"
+      ],
+      description: "صور لاند روفر رينج روفر 2024 Autobiography باللون الأبيض اللؤلؤي والداخلية البنية / Land Rover Range Rover 2024 Autobiography Pearl White with Brown Interior",
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    {
+      id: 6,
+      manufacturer: "فيراري / Ferrari",
+      category: "F8",
+      trimLevel: "فل كامل / Full Option",
+      exteriorColor: "أحمر / Red",
+      interiorColor: "أسود / Black",
+      imageUrls: [
+        "https://cdn.ferrari.com/f8-2024-red-exterior-front.jpg",
+        "https://cdn.ferrari.com/f8-2024-red-exterior-side.jpg",
+        "https://cdn.ferrari.com/f8-2024-black-interior.jpg"
+      ],
+      description: "صور فيراري F8 2024 فل كامل باللون الأحمر والداخلية السوداء / Ferrari F8 2024 Full Option Red with Black Interior",
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    {
+      id: 7,
+      manufacturer: "تسلا / Tesla",
+      category: "Model S",
+      trimLevel: "فل كامل / Full Option",
+      exteriorColor: "أبيض / White",
+      interiorColor: "أبيض / White",
+      imageUrls: [
+        "https://cdn.tesla.com/model-s-2024-white-exterior-front.jpg",
+        "https://cdn.tesla.com/model-s-2024-white-exterior-side.jpg",
+        "https://cdn.tesla.com/model-s-2024-white-interior.jpg"
+      ],
+      description: "صور تسلا Model S 2024 فل كامل باللون الأبيض والداخلية البيضاء / Tesla Model S 2024 Full Option White with White Interior",
+      createdAt: "2024-01-15T10:30:00Z",
+      updatedAt: "2024-01-15T10:30:00Z"
+    },
+    {
+      id: 8,
+      manufacturer: "بورش / Porsche",
+      category: "911",
+      trimLevel: "فل كامل / Full Option",
+      exteriorColor: "رمادي معدني / Metallic Gray",
+      interiorColor: "أسود / Black",
+      imageUrls: [
+        "https://cdn.porsche.com/911-2024-gray-exterior-front.jpg",
+        "https://cdn.porsche.com/911-2024-gray-exterior-side.jpg",
+        "https://cdn.porsche.com/911-2024-black-interior.jpg"
+      ],
+      description: "صور بورش 911 2024 فل كامل باللون الرمادي المعدني والداخلية السوداء / Porsche 911 2024 Full Option Metallic Gray with Black Interior",
       createdAt: "2024-01-15T10:30:00Z",
       updatedAt: "2024-01-15T10:30:00Z"
     }
@@ -402,7 +640,7 @@ export default function HierarchyManagementPage() {
 
             {/* Specifications List */}
             <div className="grid gap-4">
-              {sampleSpecs.map((spec) => (
+              {defaultSpecs.map((spec: VehicleSpecification) => (
                 <Card key={spec.id} className="glass-container">
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
@@ -474,7 +712,7 @@ export default function HierarchyManagementPage() {
 
             {/* Image Links List */}
             <div className="grid gap-4">
-              {sampleImages.map((imageLink) => (
+              {defaultImages.map((imageLink: VehicleImageLink) => (
                 <Card key={imageLink.id} className="glass-container">
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
