@@ -1372,6 +1372,106 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-white">طلبات الإجازة والاستئذان المعلقة</h2>
                 <div className="flex gap-3 items-center">
+                  <Dialog open={isCreateRequestDialogOpen} onOpenChange={setIsCreateRequestDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-green-600 hover:bg-green-700 text-white" data-testid="create-request-button">
+                        <Plus className="w-4 h-4 mr-2" />
+                        إنشاء طلب جديد
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent 
+                      className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-md"
+                      aria-describedby="request-dialog-description"
+                    >
+                      <DialogHeader>
+                        <DialogTitle>إنشاء طلب إجازة/استئذان جديد</DialogTitle>
+                      </DialogHeader>
+                      
+                      <div id="request-dialog-description" className="sr-only">
+                        إنشاء طلب جديد للإجازة أو الاستئذان مع تحديد النوع والتاريخ والمدة والسبب
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <Label>نوع الطلب</Label>
+                          <Select value={requestType} onValueChange={setRequestType}>
+                            <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="استئذان">استئذان</SelectItem>
+                              <SelectItem value="إجازة">إجازة</SelectItem>
+                              <SelectItem value="تأخير في الحضور">تأخير في الحضور</SelectItem>
+                              <SelectItem value="انصراف مبكر">انصراف مبكر</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label>التاريخ</Label>
+                          <Input
+                            type="date"
+                            value={requestDate}
+                            onChange={(e) => setRequestDate(e.target.value)}
+                            className="bg-white/10 border-white/20 text-white"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label>المدة</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              type="number"
+                              value={duration}
+                              onChange={(e) => setDuration(e.target.value)}
+                              placeholder="المدة"
+                              className="bg-white/10 border-white/20 text-white flex-1"
+                            />
+                            {requestType !== "إجازة" && (
+                              <Select value={durationType} onValueChange={setDurationType}>
+                                <SelectTrigger className="bg-white/10 border-white/20 text-white w-24">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="ساعة">ساعة</SelectItem>
+                                  <SelectItem value="دقيقة">دقيقة</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <Label>السبب</Label>
+                          <textarea
+                            value={reason}
+                            onChange={(e) => setReason(e.target.value)}
+                            placeholder="اكتب سبب الطلب..."
+                            className="w-full p-3 bg-white/10 border border-white/20 text-white placeholder-gray-400 rounded-md resize-none"
+                            rows={3}
+                          />
+                        </div>
+                        
+                        <div className="flex gap-2 pt-4">
+                          <Button
+                            onClick={handleCreateRequest}
+                            disabled={createLeaveRequestMutation.isPending || !duration || !reason}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                            data-testid="submit-request-button"
+                          >
+                            إرسال الطلب
+                          </Button>
+                          <Button
+                            onClick={() => setIsCreateRequestDialogOpen(false)}
+                            variant="outline"
+                            className="border-white/20 text-white hover:bg-white/10"
+                          >
+                            إلغاء
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                   <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300">
                     {pendingLeaveRequests.length} طلب معلق
                   </Badge>
