@@ -49,7 +49,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           <Route path="/leave-requests" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/attendance-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
 
-          <Route path="/detailed-specifications" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+
           <Route path="/images-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
 
           <Route path="/database-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />

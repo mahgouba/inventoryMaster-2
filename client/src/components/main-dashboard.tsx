@@ -26,7 +26,7 @@ import HierarchicalView from "@/pages/HierarchicalView";
 import HierarchyManagementPage from "@/pages/hierarchy-management";
 
 import PriceCardsPage from "@/pages/price-cards";
-import DetailedSpecificationsPage from "@/pages/detailed-specifications";
+
 import ImagesManagementPage from "@/pages/images-management";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
@@ -66,8 +66,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
       case "/attendance-management":
         return <AttendanceManagementPage userRole={user.role} username={user.username} userId={user.id} />;
 
-      case "/detailed-specifications":
-        return <DetailedSpecificationsPage />;
+
       case "/images-management":
         return <ImagesManagementPage />;
 

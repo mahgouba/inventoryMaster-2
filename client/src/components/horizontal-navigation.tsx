@@ -280,13 +280,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       internal: true,
       permission: "attendanceManagement"
     },
-    { 
-      title: "المواصفات", 
-      href: "/detailed-specifications", 
-      icon: Settings,
-      internal: true,
-      permission: "inventory"
-    },
+
     { 
       title: "الصور", 
       href: "/images-management", 
