@@ -66,12 +66,139 @@ export default function HierarchyManagementPage() {
     description: ""
   });
 
-  // Sample data for dropdowns
-  const manufacturers = ["تويوتا", "مرسيدس", "بي ام دبليو", "اودي", "لكزس"];
-  const categories = ["كامري", "كورولا", "افالون", "هايلاندر", "برادو", "لاند كروزر"];
-  const trimLevels = ["GLE", "GLX", "Limited", "Premium", "Standard"];
-  const models = ["2024", "2023", "2022", "2025"];
-  const colors = ["أبيض", "أسود", "فضي", "رمادي", "أزرق", "أحمر", "بني", "بيج"];
+  // Comprehensive data for dropdowns
+  const manufacturers = [
+    "تويوتا / Toyota",
+    "مرسيدس / Mercedes-Benz", 
+    "بي ام دبليو / BMW",
+    "اودي / Audi",
+    "لكزس / Lexus",
+    "لاند روفر / Land Rover",
+    "رولز رويس / Rolls-Royce",
+    "بنتلي / Bentley", 
+    "فراري / Ferrari",
+    "بورش / Porsche",
+    "لامبورجيني / Lamborghini",
+    "تسلا / Tesla",
+    "فورد / Ford",
+    "جي ام سي / GMC", 
+    "شيفروليت / Chevrolet",
+    "دودج / Dodge",
+    "لينكولن / Lincoln",
+    "نيسان / Nissan",
+    "انفينيتي / Infiniti"
+  ];
+
+  const categoriesByManufacturer: Record<string, string[]> = {
+    "تويوتا / Toyota": [
+      "كامري / Camry", "كورولا / Corolla", "افالون / Avalon", "RAV4", 
+      "هايلاندر / Highlander", "برادو / Prado", "لاند كروزر / Land Cruiser",
+      "سيكويا / Sequoia", "تاكوما / Tacoma", "تندرا / Tundra", "سيينا / Sienna"
+    ],
+    "مرسيدس / Mercedes-Benz": [
+      "E-Class", "C-Class", "S-Class", "A-Class", "CLS", "GLE", "GLS", 
+      "GLC", "GLA", "G-Class", "AMG GT", "EQS", "EQE", "Sprinter", "V-Class"
+    ],
+    "بي ام دبليو / BMW": [
+      "الفئة الثالثة / 3 Series", "الفئة الخامسة / 5 Series", "الفئة السابعة / 7 Series",
+      "X1", "X3", "X5", "X7", "Z4", "i3", "i4", "iX", "M3", "M5", "X6"
+    ],
+    "لكزس / Lexus": [
+      "ES", "IS", "GS", "LS", "RX", "GX", "LX", "NX", "UX", "LC", "RC"
+    ],
+    "لاند روفر / Land Rover": [
+      "رينج روفر / Range Rover", "رينج روفر سبورت / Range Rover Sport",
+      "رينج روفر إيفوك / Range Rover Evoque", "ديسكفري / Discovery",
+      "ديفندر / Defender"
+    ],
+    "رولز رويس / Rolls-Royce": [
+      "فانتوم / Phantom", "غوست / Ghost", "ريث / Wraith", "داون / Dawn", "كولينان / Cullinan"
+    ],
+    "بنتلي / Bentley": [
+      "كونتيننتال / Continental", "فلاينج سبير / Flying Spur", "بنتايجا / Bentayga"
+    ],
+    "فراري / Ferrari": [
+      "488", "F8", "SF90", "Roma", "Portofino", "812", "LaFerrari"
+    ],
+    "بورش / Porsche": [
+      "911", "Cayenne", "Macan", "Panamera", "Taycan", "718"
+    ],
+    "لامبورجيني / Lamborghini": [
+      "أفينتادور / Aventador", "هوراكان / Huracan", "أوروس / Urus"
+    ],
+    "تسلا / Tesla": [
+      "Model S", "Model 3", "Model X", "Model Y", "Cybertruck"
+    ],
+    "فورد / Ford": [
+      "فيوجن / Fusion", "إكسبلورر / Explorer", "F-150", "موستانج / Mustang", "إسكيب / Escape"
+    ],
+    "جي ام سي / GMC": [
+      "سييرا / Sierra", "أكاديا / Acadia", "تيرين / Terrain", "يوكون / Yukon"
+    ],
+    "شيفروليت / Chevrolet": [
+      "تاهو / Tahoe", "سوبربان / Suburban", "إكوينوكس / Equinox", "كامارو / Camaro"
+    ],
+    "دودج / Dodge": [
+      "تشالنجر / Challenger", "تشارجر / Charger", "دورانجو / Durango", "رام / RAM"
+    ],
+    "لينكولن / Lincoln": [
+      "نافيجيتور / Navigator", "أفياتور / Aviator", "كورسير / Corsair", "MKZ"
+    ],
+    "نيسان / Nissan": [
+      "ألتيما / Altima", "سنترا / Sentra", "باترول / Patrol", "أرمادا / Armada", "370Z"
+    ],
+    "انفينيتي / Infiniti": [
+      "Q50", "Q60", "Q70", "QX50", "QX60", "QX80"
+    ]
+  };
+
+  const trimLevels = [
+    "فل كامل / Full Option",
+    "فل / Full", 
+    "ستاندرد / Standard",
+    "بريميوم / Premium",
+    "لوكس / Luxury",
+    "سبورت / Sport",
+    "AMG",
+    "M Sport",
+    "S-Line",
+    "F Sport",
+    "HSE",
+    "Autobiography",
+    "First Edition",
+    "Black Edition"
+  ];
+
+  const models = ["2025", "2024", "2023", "2022", "2021", "2020"];
+
+  const exteriorColors = [
+    "أبيض / White",
+    "أبيض لؤلؤي / Pearl White", 
+    "أسود / Black",
+    "أسود معدني / Metallic Black",
+    "فضي / Silver",
+    "رمادي / Gray",
+    "رمادي معدني / Metallic Gray",
+    "أزرق / Blue",
+    "أزرق معدني / Metallic Blue",
+    "أحمر / Red",
+    "بني / Brown",
+    "بيج / Beige",
+    "ذهبي / Gold",
+    "برونزي / Bronze",
+    "أخضر / Green"
+  ];
+
+  const interiorColors = [
+    "بيج / Beige",
+    "أسود / Black", 
+    "بني / Brown",
+    "رمادي / Gray",
+    "كريمي / Cream",
+    "أبيض / White",
+    "أحمر / Red",
+    "أزرق / Blue"
+  ];
 
   // Sample specifications
   const sampleSpecs: VehicleSpecification[] = [
@@ -451,7 +578,7 @@ export default function HierarchyManagementPage() {
                       <SelectValue placeholder="اختر الفئة" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((category) => (
+                      {(specForm.manufacturer && categoriesByManufacturer[specForm.manufacturer] || []).map((category: string) => (
                         <SelectItem key={category} value={category}>
                           {category}
                         </SelectItem>
@@ -579,7 +706,7 @@ export default function HierarchyManagementPage() {
                       <SelectValue placeholder="اختر الفئة" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((category) => (
+                      {(imageForm.manufacturer && categoriesByManufacturer[imageForm.manufacturer] || []).map((category: string) => (
                         <SelectItem key={category} value={category}>
                           {category}
                         </SelectItem>
@@ -617,7 +744,7 @@ export default function HierarchyManagementPage() {
                       <SelectValue placeholder="اختر اللون الخارجي" />
                     </SelectTrigger>
                     <SelectContent>
-                      {colors.map((color) => (
+                      {exteriorColors.map((color: string) => (
                         <SelectItem key={color} value={color}>
                           {color}
                         </SelectItem>
@@ -635,7 +762,7 @@ export default function HierarchyManagementPage() {
                       <SelectValue placeholder="اختر اللون الداخلي" />
                     </SelectTrigger>
                     <SelectContent>
-                      {colors.map((color) => (
+                      {interiorColors.map((color: string) => (
                         <SelectItem key={color} value={color}>
                           {color}
                         </SelectItem>
