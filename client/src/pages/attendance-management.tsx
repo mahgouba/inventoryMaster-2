@@ -1871,16 +1871,28 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               const expectedHours = calculateExpectedHours(schedule, day);
                               const approvedLeave = getApprovedLeaveForDay(schedule.employeeId, day);
                               
-                              // Debug logging to understand the issue
-                              if (format(day, "d") === "9") {
-                                console.log(`Day 9 Debug:`, {
+                              // Debug logging to understand the issue  
+                              const dayNumber = format(day, "d");
+                              if (dayNumber === "8" || dayNumber === "9") {
+                                console.log(`Day ${dayNumber} Debug - Enhanced:`, {
                                   employeeId: schedule.employeeId,
                                   dayDate: format(day, "yyyy-MM-dd"),
                                   approvedLeave,
                                   hasAttendance,
                                   hoursWorked,
                                   expectedHours,
-                                  allLeaveRequests: allLeaveRequests.filter(r => r.userId === schedule.employeeId && r.status === "approved")
+                                  workPercentage: 0, // Will be calculated below
+                                  allLeaveRequests: allLeaveRequests.filter(r => r.userId === schedule.employeeId && r.status === "approved"),
+                                  allLeaveRequestsRaw: allLeaveRequests.map(r => ({
+                                    id: r.id,
+                                    userId: r.userId,
+                                    requestType: r.requestType,
+                                    startDate: r.startDate,
+                                    endDate: r.endDate,
+                                    status: r.status,
+                                    duration: r.duration,
+                                    durationType: r.durationType
+                                  }))
                                 });
                               }
                               
