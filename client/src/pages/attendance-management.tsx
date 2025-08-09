@@ -1866,10 +1866,33 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               const hasApprovedLeaveForDay = hasApprovedLeave(schedule.employeeId, day);
                               const isLate = hasAttendance && !isHoliday && !hasApprovedLeaveForDay && isEmployeeLate(schedule, day);
                               
-                              // Calculate hours worked
+                              // Calculate hours worked and percentage with special handling for approved leave
                               const hoursWorked = hasAttendance && !isHoliday ? parseFloat(calculateHoursWorked(schedule, dayAttendance)) : 0;
                               const expectedHours = calculateExpectedHours(schedule, day);
-                              const workPercentage = Math.min((hoursWorked / expectedHours) * 100, 100);
+                              const approvedLeave = getApprovedLeaveForDay(schedule.employeeId, day);
+                              
+                              // Calculate work percentage considering approved leave
+                              let workPercentage = 0;
+                              if (approvedLeave) {
+                                // For approved leave, calculate actual percentage based on work done vs expected
+                                if (hasAttendance && hoursWorked > 0) {
+                                  const leaveHours = parseFloat(String(approvedLeave.duration)) || 0;
+                                  const adjustedLeaveHours = approvedLeave.durationType === 'دقيقة' ? leaveHours / 60 : leaveHours;
+                                  
+                                  // For early departure and permission, calculate actual work percentage
+                                  if (approvedLeave.requestType === 'انصراف مبكر' || approvedLeave.requestType === 'استئذان') {
+                                    workPercentage = (hoursWorked / expectedHours) * 100;
+                                  } else if (approvedLeave.requestType === 'تأخير في الحضور') {
+                                    workPercentage = (hoursWorked / expectedHours) * 100;
+                                  } else {
+                                    workPercentage = 100; // Full leave approved
+                                  }
+                                } else {
+                                  workPercentage = approvedLeave.requestType === 'إجازة' ? 100 : 0;
+                                }
+                              } else {
+                                workPercentage = hoursWorked > 0 ? Math.min((hoursWorked / expectedHours) * 100, 100) : 0;
+                              }
                               
                               // Get day name in Arabic
                               const dayName = format(day, "EEEE", { locale: ar });
@@ -1914,7 +1937,14 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                           })()
                                         }</div>
                                         <div className="text-xs text-gray-400">
-                                          {hasAttendance && !isHoliday && !hasApprovedLeaveForDay ? `${workPercentage.toFixed(0)}%` : ''}
+                                          {(() => {
+                                            if (isHoliday) return '';
+                                            if (approvedLeave) {
+                                              if (approvedLeave.requestType === 'إجازة') return '';
+                                              return `${workPercentage.toFixed(0)}%`;
+                                            }
+                                            return hasAttendance ? `${workPercentage.toFixed(0)}%` : '';
+                                          })()}
                                         </div>
                                       </div>
                                       
@@ -1971,25 +2001,58 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                           }
                                           
                                           if (hasAttendance) {
+                                            // Determine the appropriate color and icon based on status
+                                            let bgColor = '';
+                                            let icon = null;
+                                            let barWidth = Math.max(workPercentage, 10);
+                                            
+                                            if (approvedLeave) {
+                                              // Show actual percentage for approved leave that affects work
+                                              switch (approvedLeave.requestType) {
+                                                case 'انصراف مبكر':
+                                                  bgColor = 'bg-gradient-to-r from-purple-500 to-purple-600';
+                                                  icon = <UserClock className="w-3 h-3 text-white" />;
+                                                  barWidth = workPercentage; // Show actual work percentage
+                                                  break;
+                                                case 'استئذان':
+                                                  bgColor = 'bg-gradient-to-r from-blue-500 to-blue-600';
+                                                  icon = <Clock className="w-3 h-3 text-white" />;
+                                                  barWidth = workPercentage;
+                                                  break;
+                                                case 'تأخير في الحضور':
+                                                  bgColor = 'bg-gradient-to-r from-orange-500 to-red-500';
+                                                  icon = <AlertCircle className="w-3 h-3 text-white" />;
+                                                  barWidth = workPercentage;
+                                                  break;
+                                                default:
+                                                  bgColor = 'bg-gradient-to-r from-green-500 to-green-600';
+                                                  icon = <Coffee className="w-3 h-3 text-white" />;
+                                                  barWidth = 100;
+                                                  break;
+                                              }
+                                            } else if (isLate) {
+                                              bgColor = 'bg-gradient-to-r from-red-500 to-red-600';
+                                              icon = <XCircle className="w-3 h-3 text-white" />;
+                                            } else if (workPercentage >= 100) {
+                                              bgColor = 'bg-gradient-to-r from-green-500 to-emerald-500';
+                                              icon = <CheckCircle className="w-3 h-3 text-white" />;
+                                            } else if (workPercentage >= 75) {
+                                              bgColor = 'bg-gradient-to-r from-blue-500 to-cyan-500';
+                                              icon = <Clock className="w-3 h-3 text-white" />;
+                                            } else if (workPercentage >= 50) {
+                                              bgColor = 'bg-gradient-to-r from-yellow-500 to-orange-500';
+                                              icon = <Clock className="w-3 h-3 text-white" />;
+                                            } else if (workPercentage > 0) {
+                                              bgColor = 'bg-gradient-to-r from-orange-500 to-red-500';
+                                              icon = <Clock className="w-3 h-3 text-white" />;
+                                            }
+                                            
                                             return (
                                               <div 
-                                                className={`
-                                                  h-full transition-all duration-500 flex items-center justify-center
-                                                  ${isLate ? 'bg-gradient-to-r from-red-500 to-red-600' : ''}
-                                                  ${workPercentage >= 100 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : ''}
-                                                  ${workPercentage >= 75 && workPercentage < 100 ? 'bg-gradient-to-r from-blue-500 to-cyan-500' : ''}
-                                                  ${workPercentage >= 50 && workPercentage < 75 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : ''}
-                                                  ${workPercentage < 50 && workPercentage > 0 ? 'bg-gradient-to-r from-orange-500 to-red-500' : ''}
-                                                `}
-                                                style={{ width: `${Math.max(workPercentage, 10)}%` }}
+                                                className={`h-full transition-all duration-500 flex items-center justify-center ${bgColor}`}
+                                                style={{ width: `${Math.max(barWidth, 10)}%` }}
                                               >
-                                                {isLate ? (
-                                                  <XCircle className="w-3 h-3 text-white" />
-                                                ) : workPercentage >= 100 ? (
-                                                  <CheckCircle className="w-3 h-3 text-white" />
-                                                ) : workPercentage > 0 ? (
-                                                  <Clock className="w-3 h-3 text-white" />
-                                                ) : null}
+                                                {icon}
                                               </div>
                                             );
                                           } else {
@@ -2042,6 +2105,16 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               <div className="flex items-center gap-2">
                                 <div className="w-6 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full"></div>
                                 <span className="text-red-200 font-medium">تأخير</span>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full"></div>
+                                <span className="text-purple-200 font-medium">انصراف مبكر</span>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
+                                <span className="text-blue-200 font-medium">استئذان</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <div className="w-6 h-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
