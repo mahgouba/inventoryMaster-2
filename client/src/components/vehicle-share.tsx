@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useState, useEffect } from "react";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,9 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Share2, Copy, Edit2, Save, X, Image, Link, Calculator, MessageCircle } from "lucide-react";
+import { Plus, Share2, Copy, Edit2, Save, X, Image, Link, Calculator, MessageCircle, Settings } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { InventoryItem } from "@shared/schema";
+import type { InventoryItem, VehicleSpecification, VehicleImageLink } from "@shared/schema";
 
 interface VehicleShareProps {
   vehicle: InventoryItem;
@@ -61,6 +61,10 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
   const [taxRate, setTaxRate] = useState("15"); // Default VAT rate 15%
   const [linkedImageUrl, setLinkedImageUrl] = useState<string>("");
   const [whatsappPhoneNumber, setWhatsappPhoneNumber] = useState("");
+  const [hierarchySpecifications, setHierarchySpecifications] = useState<VehicleSpecification[]>([]);
+  const [hierarchyImageLinks, setHierarchyImageLinks] = useState<VehicleImageLink[]>([]);
+  const [selectedHierarchySpec, setSelectedHierarchySpec] = useState<VehicleSpecification | null>(null);
+  const [selectedHierarchyImages, setSelectedHierarchyImages] = useState<VehicleImageLink[]>([]);
   
   // Checkbox states for what to include in sharing
   const [includeFields, setIncludeFields] = useState({
@@ -80,37 +84,55 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     mileage: false // Include mileage only when shown (for used cars)
   });
 
-  // Fetch linked image for this vehicle
-  const fetchLinkedImage = async () => {
+  // Fetch hierarchy management data for this vehicle
+  const fetchHierarchyData = async () => {
     try {
-      const response = await fetch('/api/image-links');
-      if (response.ok) {
-        const imageLinks = await response.json();
+      // Fetch specifications from hierarchy management
+      const specsResponse = await fetch(`/api/specifications/vehicle/${vehicle.manufacturer}/${vehicle.category}?trimLevel=${vehicle.trimLevel || ''}`);
+      if (specsResponse.ok) {
+        const specifications = await specsResponse.json();
+        setHierarchySpecifications(specifications);
         
-        // Find matching image link based on vehicle specifications
-        const matchingImage = imageLinks.find((link: any) => 
+        // Auto-select the first matching specification
+        if (specifications.length > 0) {
+          const exactMatch = specifications.find((spec: VehicleSpecification) => 
+            spec.model === vehicle.year.toString() && spec.trimLevel === vehicle.trimLevel
+          );
+          setSelectedHierarchySpec(exactMatch || specifications[0]);
+        }
+      }
+
+      // Fetch image links from hierarchy management
+      const imageResponse = await fetch('/api/image-links');
+      if (imageResponse.ok) {
+        const imageLinks = await imageResponse.json();
+        setHierarchyImageLinks(imageLinks);
+        
+        // Find matching image links based on vehicle specifications
+        const matchingImages = imageLinks.filter((link: VehicleImageLink) => 
           link.manufacturer === vehicle.manufacturer &&
           link.category === vehicle.category &&
           (link.trimLevel === vehicle.trimLevel || !link.trimLevel) &&
-          link.year === vehicle.year &&
           (link.exteriorColor === vehicle.exteriorColor || !link.exteriorColor) &&
-          (link.interiorColor === vehicle.interiorColor || !link.interiorColor) &&
-          (link.engineCapacity === vehicle.engineCapacity || !link.engineCapacity)
+          (link.interiorColor === vehicle.interiorColor || !link.interiorColor)
         );
         
-        if (matchingImage) {
-          setLinkedImageUrl(matchingImage.imageUrl);
+        setSelectedHierarchyImages(matchingImages);
+        
+        // Set the first linked image URL if available
+        if (matchingImages.length > 0 && matchingImages[0].imageUrls.length > 0) {
+          setLinkedImageUrl(matchingImages[0].imageUrls[0]);
         }
       }
     } catch (error) {
-      console.error('Error fetching linked image:', error);
+      console.error('Error fetching hierarchy data:', error);
     }
   };
 
-  // Fetch linked image when dialog opens and set mileage checkbox for used cars
-  React.useEffect(() => {
+  // Fetch hierarchy data when dialog opens and set mileage checkbox for used cars
+  useEffect(() => {
     if (open) {
-      fetchLinkedImage();
+      fetchHierarchyData();
       // Enable mileage checkbox by default for used cars when dialog opens
       if (vehicle.importType === "شخصي مستعمل" || vehicle.importType === "مستعمل") {
         setIncludeFields(prev => ({ ...prev, mileage: true }));
@@ -239,9 +261,40 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
       });
     }
 
-    // Add specifications if available and selected
-    if (includeFields.specifications && vehicle.detailedSpecifications) {
-      shareText += `\n\n📋 المواصفات التفصيلية:\n${vehicle.detailedSpecifications}`;
+    // Add hierarchy specifications if available and selected
+    if (includeFields.specifications) {
+      if (selectedHierarchySpec && selectedHierarchySpec.specifications) {
+        shareText += `\n\n📋 المواصفات من إدارة التسلسل الهرمي:`;
+        const specs = selectedHierarchySpec.specifications as any;
+        
+        if (specs.engine) shareText += `\n🔧 المحرك: ${specs.engine}`;
+        if (specs.power) shareText += `\n⚡ القوة: ${specs.power}`;
+        if (specs.transmission) shareText += `\n⚙️ ناقل الحركة: ${specs.transmission}`;
+        if (specs.fuelType) shareText += `\n⛽ نوع الوقود: ${specs.fuelType}`;
+        if (specs.drivetrain) shareText += `\n🚗 نوع الدفع: ${specs.drivetrain}`;
+        
+        if (specs.features && Array.isArray(specs.features) && specs.features.length > 0) {
+          shareText += `\n✨ المميزات:`;
+          specs.features.forEach((feature: string) => {
+            shareText += `\n   • ${feature}`;
+          });
+        }
+      } else if (vehicle.detailedSpecifications) {
+        shareText += `\n\n📋 المواصفات التفصيلية:\n${vehicle.detailedSpecifications}`;
+      }
+    }
+
+    // Add hierarchy image links if available and selected
+    if (includeFields.linkedImage && selectedHierarchyImages.length > 0) {
+      shareText += `\n\n🖼️ روابط الصور من إدارة التسلسل الهرمي:`;
+      selectedHierarchyImages.forEach((imageLink, index) => {
+        if (imageLink.imageUrls && imageLink.imageUrls.length > 0) {
+          shareText += `\n📸 مجموعة ${index + 1} (${imageLink.exteriorColor} - ${imageLink.interiorColor}):`;
+          imageLink.imageUrls.forEach((url, urlIndex) => {
+            shareText += `\n   🔗 صورة ${urlIndex + 1}: ${url}`;
+          });
+        }
+      });
     }
     
     return shareText;
@@ -587,11 +640,74 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
             </CardContent>
           </Card>
 
+          {/* Hierarchy Management Section */}
+          {(hierarchySpecifications.length > 0 || selectedHierarchyImages.length > 0) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  إدارة التسلسل الهرمي
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {hierarchySpecifications.length > 0 && (
+                  <div>
+                    <Label className="text-sm font-medium">المواصفات المتاحة ({hierarchySpecifications.length})</Label>
+                    <div className="mt-2 space-y-2">
+                      {hierarchySpecifications.map((spec) => (
+                        <div 
+                          key={spec.id} 
+                          className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                            selectedHierarchySpec?.id === spec.id 
+                              ? 'border-[#C49632] bg-yellow-50' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                          onClick={() => setSelectedHierarchySpec(spec)}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium text-sm">{spec.model} - {spec.trimLevel}</p>
+                              {spec.specifications && typeof spec.specifications === 'object' && (spec.specifications as any).engine && (
+                                <p className="text-xs text-gray-600">المحرك: {(spec.specifications as any).engine}</p>
+                              )}
+                            </div>
+                            {selectedHierarchySpec?.id === spec.id && (
+                              <div className="w-2 h-2 bg-[#C49632] rounded-full"></div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {selectedHierarchyImages.length > 0 && (
+                  <div>
+                    <Label className="text-sm font-medium">روابط الصور المطابقة ({selectedHierarchyImages.length})</Label>
+                    <div className="mt-2 space-y-2">
+                      {selectedHierarchyImages.map((imageLink) => (
+                        <div key={imageLink.id} className="p-3 border rounded-lg bg-blue-50 border-blue-200">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="text-sm font-medium">{imageLink.exteriorColor} - {imageLink.interiorColor}</p>
+                              <p className="text-xs text-gray-600">{imageLink.imageUrls.length} صورة متاحة</p>
+                            </div>
+                            <Image className="h-4 w-4 text-blue-600" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Specifications Section */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">المواصفات التفصيلية</CardTitle>
+                <CardTitle className="text-lg">المواصفات المخصصة</CardTitle>
                 {!showSpecificationForm && (
                   <Button
                     variant="outline"
