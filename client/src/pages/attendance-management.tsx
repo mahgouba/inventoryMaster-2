@@ -2041,9 +2041,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                               // Show actual percentage for approved leave that affects work
                                               switch (approvedLeave.requestType) {
                                                 case 'انصراف مبكر':
+                                                  // Force purple color for early departure
                                                   bgColor = 'bg-gradient-to-r from-purple-500 to-purple-600';
                                                   icon = <UserClock className="w-3 h-3 text-white" />;
-                                                  barWidth = workPercentage; // Show actual work percentage
+                                                  barWidth = workPercentage;
                                                   break;
                                                 case 'استئذان':
                                                   bgColor = 'bg-gradient-to-r from-blue-500 to-blue-600';
