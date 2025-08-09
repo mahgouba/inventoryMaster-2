@@ -75,14 +75,14 @@ export default function HierarchyManagementPage() {
     "لكزس / Lexus",
     "لاند روفر / Land Rover",
     "رولز رويس / Rolls-Royce",
-    "بنتلي / Bentley", 
-    "فراري / Ferrari",
+    "بنتلي / Bentley",
+    "فيراري / Ferrari",
     "بورش / Porsche",
     "لامبورجيني / Lamborghini",
     "تسلا / Tesla",
     "فورد / Ford",
-    "جي ام سي / GMC", 
-    "شيفروليت / Chevrolet",
+    "جي إم سي / GMC",
+    "شيفروليه / Chevrolet",
     "دودج / Dodge",
     "لينكولن / Lincoln",
     "نيسان / Nissan",
@@ -117,7 +117,7 @@ export default function HierarchyManagementPage() {
     "بنتلي / Bentley": [
       "كونتيننتال / Continental", "فلاينج سبير / Flying Spur", "بنتايجا / Bentayga"
     ],
-    "فراري / Ferrari": [
+    "فيراري / Ferrari": [
       "488", "F8", "SF90", "Roma", "Portofino", "812", "LaFerrari"
     ],
     "بورش / Porsche": [
@@ -132,10 +132,10 @@ export default function HierarchyManagementPage() {
     "فورد / Ford": [
       "فيوجن / Fusion", "إكسبلورر / Explorer", "F-150", "موستانج / Mustang", "إسكيب / Escape"
     ],
-    "جي ام سي / GMC": [
+    "جي إم سي / GMC": [
       "سييرا / Sierra", "أكاديا / Acadia", "تيرين / Terrain", "يوكون / Yukon"
     ],
-    "شيفروليت / Chevrolet": [
+    "شيفروليه / Chevrolet": [
       "تاهو / Tahoe", "سوبربان / Suburban", "إكوينوكس / Equinox", "كامارو / Camaro"
     ],
     "دودج / Dodge": [
