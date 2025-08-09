@@ -1871,65 +1871,53 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               const expectedHours = calculateExpectedHours(schedule, day);
                               const approvedLeave = getApprovedLeaveForDay(schedule.employeeId, day);
                               
-                              // Debug logging to understand the issue  
-                              const dayNumber = format(day, "d");
-                              if (dayNumber === "8" || dayNumber === "9") {
-                                console.log(`Day ${dayNumber} Debug - Enhanced:`, {
-                                  employeeId: schedule.employeeId,
-                                  dayDate: format(day, "yyyy-MM-dd"),
-                                  approvedLeave,
-                                  hasAttendance,
-                                  hoursWorked,
-                                  expectedHours,
-                                  workPercentage: 0, // Will be calculated below
-                                  allLeaveRequests: allLeaveRequests.filter(r => r.userId === schedule.employeeId && r.status === "approved"),
-                                  allLeaveRequestsRaw: allLeaveRequests.map(r => ({
-                                    id: r.id,
-                                    userId: r.userId,
-                                    requestType: r.requestType,
-                                    startDate: r.startDate,
-                                    endDate: r.endDate,
-                                    status: r.status,
-                                    duration: r.duration,
-                                    durationType: r.durationType
-                                  }))
-                                });
-                              }
-                              
-                              // Calculate work percentage considering approved leave
+                              // Calculate work percentage properly for approved leave requests
                               let workPercentage = 0;
-                              if (approvedLeave) {
-                                // For approved leave, calculate actual percentage based on work done vs expected
-                                if (hasAttendance && hoursWorked > 0) {
-                                  const leaveHours = parseFloat(String(approvedLeave.duration)) || 0;
-                                  const adjustedLeaveHours = approvedLeave.durationType === 'دقيقة' ? leaveHours / 60 : leaveHours;
+                              
+                              if (isHoliday) {
+                                workPercentage = 100;
+                              } else if (approvedLeave) {
+                                // Handle different types of approved leave
+                                const leaveHours = parseFloat(String(approvedLeave.duration)) || 0;
+                                
+                                if (approvedLeave.requestType === "انصراف مبكر") {
+                                  // For early departure: calculate based on actual work vs adjusted expected
+                                  const actualWorkHours = hasAttendance ? hoursWorked : 0;
+                                  const effectiveWorkHours = Math.max(0, expectedHours - leaveHours);
                                   
-                                  // For early departure, calculate based on actual work vs full expected hours
-                                  if (approvedLeave.requestType === 'انصراف مبكر') {
-                                    // Calculate the percentage based on actual hours worked out of full expected hours
-                                    // Don't give full credit just for having worked - show the impact of early departure
-                                    workPercentage = Math.max(0, (hoursWorked / expectedHours) * 100);
-                                  } else if (approvedLeave.requestType === 'استئذان') {
-                                    // For permission, show actual work percentage
-                                    workPercentage = (hoursWorked / expectedHours) * 100;
-                                  } else if (approvedLeave.requestType === 'تأخير في الحضور') {
-                                    workPercentage = (hoursWorked / expectedHours) * 100;
+                                  if (effectiveWorkHours === 0 || actualWorkHours >= effectiveWorkHours) {
+                                    workPercentage = 100;
                                   } else {
-                                    workPercentage = 100; // Full leave approved
+                                    workPercentage = Math.min(100, (actualWorkHours / effectiveWorkHours) * 100);
+                                  }
+                                } else if (approvedLeave.requestType === "تأخير") {
+                                  // For late arrival: similar logic
+                                  const adjustedExpectedHours = Math.max(0, expectedHours - leaveHours);
+                                  
+                                  if (hasAttendance && adjustedExpectedHours > 0) {
+                                    workPercentage = Math.min(100, (hoursWorked / adjustedExpectedHours) * 100);
+                                  } else {
+                                    workPercentage = 100;
+                                  }
+                                } else if (approvedLeave.requestType === "استئذان") {
+                                  // For permission: calculate based on remaining work hours
+                                  const remainingExpectedHours = Math.max(0, expectedHours - leaveHours);
+                                  
+                                  if (remainingExpectedHours === 0) {
+                                    workPercentage = 100;
+                                  } else if (hasAttendance) {
+                                    workPercentage = Math.min(100, (hoursWorked / remainingExpectedHours) * 100);
                                   }
                                 } else {
-                                  // No attendance recorded
-                                  if (approvedLeave.requestType === 'إجازة') {
-                                    workPercentage = 100; // Full leave approved
-                                  } else if (approvedLeave.requestType === 'انصراف مبكر') {
-                                    // No attendance but approved early departure - this should be 0%
-                                    workPercentage = 0;
-                                  } else {
-                                    workPercentage = 0;
-                                  }
+                                  // Full day leave types
+                                  workPercentage = 100;
                                 }
+                              } else if (hasAttendance && expectedHours > 0) {
+                                // Regular attendance without approved leave
+                                workPercentage = Math.min(100, (hoursWorked / expectedHours) * 100);
                               } else {
-                                workPercentage = hoursWorked > 0 ? Math.min((hoursWorked / expectedHours) * 100, 100) : 0;
+                                // No attendance record and no approved leave
+                                workPercentage = 0;
                               }
                               
                               // Get day name in Arabic
@@ -2025,8 +2013,13 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                                 );
                                               case 'انصراف مبكر':
                                                 return (
-                                                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center">
-                                                    <UserClock className="w-4 h-4 text-white" />
+                                                  <div className="absolute inset-0 flex items-center">
+                                                    <div 
+                                                      className="h-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center transition-all duration-500" 
+                                                      style={{ width: `${Math.max(workPercentage, 10)}%` }}
+                                                    >
+                                                      <UserClock className="w-4 h-4 text-white" />
+                                                    </div>
                                                   </div>
                                                 );
                                               default:
