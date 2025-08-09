@@ -60,6 +60,7 @@ import { ReservationDialog } from "@/components/reservation-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
 import { AttendanceInterface } from "@/components/attendance-interface";
+import { EnhancedSaleDialog } from "@/components/enhanced-sale-dialog";
 
 import type { InventoryItem } from "@shared/schema";
 
@@ -103,6 +104,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [bankShareDialogOpen, setBankShareDialogOpen] = useState(false);
   const [selectedBankType, setSelectedBankType] = useState<'company' | 'personal' | null>(null);
   const [bankPhoneNumber, setBankPhoneNumber] = useState("");
+  
+  // Sell dialog states
+  const [sellDialogOpen, setSellDialogOpen] = useState(false);
+  const [selectedVehicleForSale, setSelectedVehicleForSale] = useState<InventoryItem | null>(null);
 
   const [quotationManagementOpen, setQuotationManagementOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -600,9 +605,44 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
   // Handle sell item
   const handleSellItem = (item: InventoryItem) => {
-    // Prevent multiple calls by checking if already processing
-    if (sellingItemId !== null) return;
-    sellItemMutation.mutate(item.id);
+    setSelectedVehicleForSale(item);
+    setSellDialogOpen(true);
+  };
+
+  // Enhanced sell mutation for dialog
+  const enhancedSellMutation = useMutation({
+    mutationFn: async (data: { vehicleId: number; saleData: any }) => {
+      return apiRequest("POST", `/api/inventory/${data.vehicleId}/sell`, { 
+        body: JSON.stringify(data.saleData),
+        headers: { 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "تم البيع بنجاح",
+        description: "تم تسجيل بيع المركبة",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory/manufacturer-stats"] });
+      setSellDialogOpen(false);
+      setSelectedVehicleForSale(null);
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "فشل في تسجيل بيع المركبة",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleConfirmSale = (saleData: any) => {
+    if (!selectedVehicleForSale) return;
+    
+    enhancedSellMutation.mutate({
+      vehicleId: selectedVehicleForSale.id,
+      saleData
+    });
   };
 
   // Handle reserve item
@@ -1687,6 +1727,76 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               </div>
                             )}
                           </div>
+                          
+                          {/* Action Buttons for Today's Arrivals */}
+                          <div className="mt-4 pt-4 border-t border-white/20">
+                            <h5 className="font-bold text-white mb-3 text-sm">إجراءات سريعة</h5>
+                            <div className="flex gap-2 flex-wrap">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="px-3 h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
+                                onClick={() => handleSellItem(vehicle)}
+                                disabled={sellingItemId === vehicle.id || vehicle.status === "مباع"}
+                                title="بيع"
+                              >
+                                <ShoppingCart size={14} className="ml-1" />
+                                بيع
+                              </Button>
+                              
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="px-3 h-8 hover:bg-yellow-50 border-yellow-300"
+                                style={{color: '#BF9231'}}
+                                onClick={() => handleShareItem(vehicle)}
+                                title="مشاركة"
+                              >
+                                <Share2 size={14} className="ml-1" />
+                                مشاركة
+                              </Button>
+
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="px-3 h-8 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 border-indigo-300"
+                                onClick={() => {
+                                  localStorage.setItem('selectedVehicleForPriceCard', JSON.stringify(vehicle));
+                                  window.location.href = '/price-cards';
+                                }}
+                                title="إنشاء بطاقة سعر"
+                              >
+                                <Receipt size={14} className="ml-1" />
+                                بطاقة سعر
+                              </Button>
+
+                              {vehicle.status === "محجوز" ? (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="px-3 h-8 text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
+                                  onClick={() => handleCancelReservation(vehicle)}
+                                  disabled={cancelingReservationId === vehicle.id}
+                                  title="إلغاء الحجز"
+                                >
+                                  <X size={14} className="ml-1" />
+                                  إلغاء الحجز
+                                </Button>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="px-3 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
+                                  onClick={() => handleReserveItem(vehicle)}
+                                  disabled={vehicle.status === "محجوز" || vehicle.status === "مباع"}
+                                  title="حجز"
+                                >
+                                  <Calendar size={14} className="ml-1" />
+                                  حجز
+                                </Button>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -1779,6 +1889,31 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Enhanced Sell Dialog */}
+      {selectedVehicleForSale && (
+        <EnhancedSaleDialog
+          isOpen={sellDialogOpen}
+          onClose={() => {
+            setSellDialogOpen(false);
+            setSelectedVehicleForSale(null);
+          }}
+          onConfirm={handleConfirmSale}
+          vehicleData={{
+            id: selectedVehicleForSale.id,
+            manufacturer: selectedVehicleForSale.manufacturer,
+            category: selectedVehicleForSale.category,
+            year: selectedVehicleForSale.year,
+            chassisNumber: selectedVehicleForSale.chassisNumber || '',
+            customerName: selectedVehicleForSale.customerName || undefined,
+            customerPhone: selectedVehicleForSale.customerPhone || undefined,
+            salesRepresentative: selectedVehicleForSale.salesRepresentative || undefined,
+            reservationDate: selectedVehicleForSale.reservationDate ? selectedVehicleForSale.reservationDate.toISOString() : undefined,
+            reservationNote: selectedVehicleForSale.reservationNote || undefined
+          }}
+          isLoading={enhancedSellMutation.isPending}
+        />
+      )}
       </div>
     </div>
   );
