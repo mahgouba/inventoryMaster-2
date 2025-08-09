@@ -1871,6 +1871,19 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               const expectedHours = calculateExpectedHours(schedule, day);
                               const approvedLeave = getApprovedLeaveForDay(schedule.employeeId, day);
                               
+                              // Debug logging to understand the issue
+                              if (format(day, "d") === "9") {
+                                console.log(`Day 9 Debug:`, {
+                                  employeeId: schedule.employeeId,
+                                  dayDate: format(day, "yyyy-MM-dd"),
+                                  approvedLeave,
+                                  hasAttendance,
+                                  hoursWorked,
+                                  expectedHours,
+                                  allLeaveRequests: allLeaveRequests.filter(r => r.userId === schedule.employeeId && r.status === "approved")
+                                });
+                              }
+                              
                               // Calculate work percentage considering approved leave
                               let workPercentage = 0;
                               if (approvedLeave) {
