@@ -116,6 +116,23 @@ export function AttendanceInterface({ open, onOpenChange }: AttendanceInterfaceP
     queryKey: ['/api/attendance/monthly', format(monthStart, 'yyyy-MM-dd'), format(monthEnd, 'yyyy-MM-dd')],
   });
 
+  // Get pending leave requests for approval
+  const { data: pendingLeaveRequests = [] } = useQuery({
+    queryKey: ['/api/leave-requests'],
+    select: (data: any[]) => data.filter((request: any) => request.status === 'pending'),
+  });
+
+  // Get daily attendance records for management
+  const { data: dailyAttendance = [] } = useQuery({
+    queryKey: ['/api/daily-attendance'],
+    refetchInterval: 2000,
+  });
+
+  // Get users list
+  const { data: users = [] } = useQuery({
+    queryKey: ['/api/users'],
+  });
+
   // Submit attendance request mutation - sends to leave requests for approval workflow
   const createAttendanceRequestMutation = useMutation({
     mutationFn: async (data: AttendanceRequestFormData) => {
@@ -149,6 +166,45 @@ export function AttendanceInterface({ open, onOpenChange }: AttendanceInterfaceP
       toast({
         title: "خطأ في إرسال الطلب",
         description: error.message || "حدث خطأ غير متوقع",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Approve/Reject leave request mutation
+  const updateRequestStatusMutation = useMutation({
+    mutationFn: async ({ id, status, rejectionReason }: { id: number; status: string; rejectionReason?: string }) => {
+      const response = await fetch(`/api/leave-requests/${id}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          status, 
+          rejectionReason,
+          approvedBy: 1, // Replace with actual user ID
+          approvedByName: "المدير" // Replace with actual user name
+        }),
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      return await response.json();
+    },
+    onSuccess: (_, variables) => {
+      toast({
+        title: variables.status === "approved" ? "تم الموافقة على الطلب" : "تم رفض الطلب",
+        description: variables.status === "approved" ? "تم الموافقة على طلب الإجازة/الاستئذان" : "تم رفض الطلب",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/leave-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/daily-attendance"] });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ في تحديث الطلب",
+        description: "حدث خطأ أثناء تحديث حالة الطلب",
         variant: "destructive",
       });
     },
@@ -237,18 +293,26 @@ export function AttendanceInterface({ open, onOpenChange }: AttendanceInterfaceP
         </DialogHeader>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 glass-card">
-            <TabsTrigger value="submit-request" className="text-white">
-              <Plus className="w-4 h-4 ml-2" />
+          <TabsList className="grid w-full grid-cols-5 glass-card">
+            <TabsTrigger value="submit-request" className="text-white text-xs">
+              <Plus className="w-3 h-3 ml-1" />
               إرسال طلب
             </TabsTrigger>
-            <TabsTrigger value="request-status" className="text-white">
-              <FileText className="w-4 h-4 ml-2" />
+            <TabsTrigger value="request-status" className="text-white text-xs">
+              <FileText className="w-3 h-3 ml-1" />
               حالة الطلبات
             </TabsTrigger>
-            <TabsTrigger value="monthly-attendance" className="text-white">
-              <Calendar className="w-4 h-4 ml-2" />
+            <TabsTrigger value="monthly-attendance" className="text-white text-xs">
+              <Calendar className="w-3 h-3 ml-1" />
               دوام الشهر
+            </TabsTrigger>
+            <TabsTrigger value="pending-requests" className="text-white text-xs">
+              <AlertCircle className="w-3 h-3 ml-1" />
+              الطلبات المعلقة
+            </TabsTrigger>
+            <TabsTrigger value="daily-attendance" className="text-white text-xs">
+              <Users className="w-3 h-3 ml-1" />
+              الدوام اليومي
             </TabsTrigger>
           </TabsList>
 
@@ -585,6 +649,167 @@ export function AttendanceInterface({ open, onOpenChange }: AttendanceInterfaceP
                     <div className="w-4 h-4 bg-red-500 rounded-full" />
                     <span className="text-white text-sm">أقل من 4 ساعات</span>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          {/* Pending Requests Tab */}
+          <TabsContent value="pending-requests" className="space-y-4">
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="text-white">الطلبات المعلقة للمراجعة</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {pendingLeaveRequests.length === 0 ? (
+                    <div className="text-center text-white/70 py-8">
+                      <CheckCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>لا توجد طلبات معلقة</p>
+                    </div>
+                  ) : (
+                    pendingLeaveRequests.map((request: any) => (
+                      <div key={request.id} className="glass-card p-4 rounded-lg border border-yellow-500/30">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Badge className="bg-yellow-500 text-white">
+                              قيد المراجعة
+                            </Badge>
+                            <span className="text-white font-medium">{request.requestType}</span>
+                          </div>
+                          <span className="text-white/70 text-sm">
+                            {request.requestedByName || 'غير محدد'}
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <span className="text-white/70">التاريخ:</span>
+                            <p className="text-white font-medium">
+                              {format(parseISO(request.startDate), "dd/MM/yyyy")}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-white/70">المدة:</span>
+                            <p className="text-white font-medium">
+                              {request.duration} {request.durationType}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-white/70">السبب:</span>
+                            <p className="text-white font-medium">
+                              {request.reason}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                            onClick={() => updateRequestStatusMutation.mutate({ id: request.id, status: "approved" })}
+                            disabled={updateRequestStatusMutation.isPending}
+                          >
+                            <Check className="w-4 h-4 ml-1" />
+                            موافقة
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => updateRequestStatusMutation.mutate({ id: request.id, status: "rejected", rejectionReason: "تم الرفض من قبل المدير" })}
+                            disabled={updateRequestStatusMutation.isPending}
+                          >
+                            <X className="w-4 h-4 ml-1" />
+                            رفض
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Daily Attendance Tab */}
+          <TabsContent value="daily-attendance" className="space-y-4">
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="text-white">الدوام اليومي للموظفين</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {users.length === 0 ? (
+                    <div className="text-center text-white/70 py-8">
+                      <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>لا توجد بيانات موظفين</p>
+                    </div>
+                  ) : (
+                    users.map((user: any) => {
+                      const todayAttendance = dailyAttendance.find((att: any) => 
+                        att.employeeId === user.id && 
+                        att.date === format(new Date(), 'yyyy-MM-dd')
+                      );
+                      
+                      return (
+                        <div key={user.id} className="glass-card p-4 rounded-lg">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                                <UserCheck className="w-5 h-5 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="text-white font-medium">{user.name}</h3>
+                                <p className="text-white/70 text-sm">{user.jobTitle}</p>
+                              </div>
+                            </div>
+                            
+                            <div className="text-left">
+                              {todayAttendance ? (
+                                <div>
+                                  <Badge className="bg-green-500 text-white mb-1">
+                                    حاضر
+                                  </Badge>
+                                  <div className="text-white/70 text-sm">
+                                    {todayAttendance.checkInTime && `دخول: ${todayAttendance.checkInTime}`}
+                                  </div>
+                                  {todayAttendance.checkOutTime && (
+                                    <div className="text-white/70 text-sm">
+                                      خروج: {todayAttendance.checkOutTime}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <Badge className="bg-red-500 text-white">
+                                  غائب
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <span className="text-white/70">إجمالي الساعات:</span>
+                              <p className="text-white font-medium">
+                                {todayAttendance?.totalHours || 0} ساعة
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-white/70">نوع الدوام:</span>
+                              <p className="text-white font-medium">
+                                {todayAttendance?.scheduleType || 'غير محدد'}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-white/70">الحالة:</span>
+                              <p className="text-white font-medium">
+                                {todayAttendance?.status || 'غير محدد'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </CardContent>
             </Card>
