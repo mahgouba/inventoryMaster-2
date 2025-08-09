@@ -75,7 +75,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     engineCapacity: true,
     exteriorColor: true,
     interiorColor: true,
-    status: true, // Show status by default
+    status: false, // Hide status by default as requested
     price: true,
     specifications: true,
     images: true,
