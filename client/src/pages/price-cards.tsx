@@ -1529,27 +1529,103 @@ export default function PriceCardsPage() {
                 )}
               />
 
-              <div className="flex gap-2 pt-4">
-                <Button
-                  type="submit"
-                  disabled={createPriceCardMutation.isPending || updatePriceCardMutation.isPending}
-                  className="flex-1"
-                >
-                  {createPriceCardMutation.isPending || updatePriceCardMutation.isPending ? (
-                    <RefreshCw className="w-4 h-4 ml-2 animate-spin" />
-                  ) : (
-                    <Save className="w-4 h-4 ml-2" />
-                  )}
-                  {editingCard ? 'تحديث' : 'إنشاء'}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsEditDialogOpen(false)}
-                  className="flex-1"
-                >
-                  إلغاء
-                </Button>
+              <div className="space-y-4 pt-4">
+                {/* Action Buttons - Show only if editing existing card */}
+                {editingCard && (
+                  <div className="border-t pt-4">
+                    <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      الإجراءات المتاحة
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => generatePDF(editingCard, `price-card-${editingCard.id}`)}
+                        disabled={isGeneratingPDF}
+                        className="flex-1 min-w-0"
+                      >
+                        {isGeneratingPDF ? (
+                          <RefreshCw className="w-4 h-4 ml-1 animate-spin" />
+                        ) : (
+                          <Download className="w-4 h-4 ml-1" />
+                        )}
+                        PDF
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => generateJPG(editingCard, `price-card-${editingCard.id}`)}
+                        disabled={isGeneratingPDF}
+                        className="flex-1 min-w-0"
+                      >
+                        {isGeneratingPDF ? (
+                          <RefreshCw className="w-4 h-4 ml-1 animate-spin" />
+                        ) : (
+                          <Download className="w-4 h-4 ml-1" />
+                        )}
+                        JPG
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => printCard(editingCard, `price-card-${editingCard.id}`)}
+                        className="flex-1 min-w-0"
+                      >
+                        <Printer className="w-4 h-4 ml-1" />
+                        طباعة
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (window.confirm('هل أنت متأكد من حذف هذه البطاقة؟')) {
+                            deletePriceCardMutation.mutate(editingCard.id);
+                          }
+                        }}
+                        disabled={deletePriceCardMutation.isPending}
+                        className="flex-1 min-w-0 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+                      >
+                        {deletePriceCardMutation.isPending ? (
+                          <RefreshCw className="w-4 h-4 ml-1 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4 ml-1" />
+                        )}
+                        حذف
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Form Submit Buttons */}
+                <div className="flex gap-2 border-t pt-4">
+                  <Button
+                    type="submit"
+                    disabled={createPriceCardMutation.isPending || updatePriceCardMutation.isPending}
+                    className="flex-1"
+                  >
+                    {createPriceCardMutation.isPending || updatePriceCardMutation.isPending ? (
+                      <RefreshCw className="w-4 h-4 ml-2 animate-spin" />
+                    ) : (
+                      <Save className="w-4 h-4 ml-2" />
+                    )}
+                    {editingCard ? 'تحديث' : 'إنشاء'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsEditDialogOpen(false)}
+                    className="flex-1"
+                  >
+                    إلغاء
+                  </Button>
+                </div>
               </div>
             </form>
           </Form>
