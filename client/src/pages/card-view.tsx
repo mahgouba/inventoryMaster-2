@@ -53,6 +53,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay } from "date-fns";
 import { ar } from "date-fns/locale";
+import { Clock, AlertTriangle, Calendar as CalendarIcon, UserX } from "lucide-react";
 
 import { CardViewFAB } from "@/components/animated-fab";
 import InventoryForm from "@/components/inventory-form";
@@ -1944,6 +1945,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 function AttendanceManagementContent() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   
+  // Get current user info to check role - fallback to admin for now
+  const currentUser = { id: 1, role: 'admin', name: 'مدير النظام' };
+  
   // Fetch daily attendance data
   const { data: dailyAttendance = [] } = useQuery<any[]>({
     queryKey: ["/api/daily-attendance"],
@@ -1962,7 +1966,7 @@ function AttendanceManagementContent() {
   });
 
   // Fetch employee work schedules
-  const { data: employeeSchedules = [] } = useQuery({
+  const { data: employeeSchedules = [] } = useQuery<any[]>({
     queryKey: ["/api/employee-work-schedules"]
   });
 
@@ -2142,7 +2146,11 @@ function AttendanceManagementContent() {
 
             {/* Employee Monthly Calendars */}
             <div className="space-y-6">
-              {employeeSchedules.map((schedule: any) => {
+              {employeeSchedules.filter((schedule: any) => {
+                // Show all employees for admin, only current user for others
+                if (!currentUser) return true; // Show all if user info not loaded
+                return currentUser.role === 'admin' || schedule.employeeId === currentUser.id;
+              }).map((schedule: any) => {
                 const monthAttendance = dailyAttendance.filter(a => 
                   a.employeeId === schedule.employeeId &&
                   format(new Date(a.date), "yyyy-MM") === format(currentMonth, "yyyy-MM")
@@ -2254,40 +2262,53 @@ function AttendanceManagementContent() {
                                 </div>
                               </div>
                               
-                              {/* Status Indicator */}
+                              {/* Status Indicator with Icons */}
                               <div className="flex items-center justify-center w-8 h-8">
                                 {(() => {
                                   if (isHoliday) {
                                     return <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
-                                      <span className="text-xs text-black font-bold">إ</span>
+                                      <CalendarIcon className="w-3 h-3 text-black" />
                                     </div>;
                                   }
                                   
                                   if (approvedLeave) {
                                     let bgColor = 'bg-green-500';
-                                    let icon = '✓';
-                                    if (approvedLeave.requestType === 'استئذان') { bgColor = 'bg-blue-500'; icon = 'س'; }
-                                    else if (approvedLeave.requestType === 'تأخير في الحضور') { bgColor = 'bg-orange-500'; icon = 'ت'; }
-                                    else if (approvedLeave.requestType === 'انصراف مبكر') { bgColor = 'bg-purple-500'; icon = 'م'; }
+                                    let IconComponent = CheckCircle;
+                                    if (approvedLeave.requestType === 'استئذان') { 
+                                      bgColor = 'bg-blue-500'; 
+                                      IconComponent = UserX; 
+                                    }
+                                    else if (approvedLeave.requestType === 'تأخير في الحضور') { 
+                                      bgColor = 'bg-orange-500'; 
+                                      IconComponent = Clock; 
+                                    }
+                                    else if (approvedLeave.requestType === 'انصراف مبكر') { 
+                                      bgColor = 'bg-purple-500'; 
+                                      IconComponent = AlertTriangle; 
+                                    }
                                     
                                     return <div className={`w-6 h-6 ${bgColor} rounded-full flex items-center justify-center`}>
-                                      <span className="text-xs text-white font-bold">{icon}</span>
+                                      <IconComponent className="w-3 h-3 text-white" />
                                     </div>;
                                   }
                                   
                                   if (hasAttendance) {
                                     if (workPercentage >= 80) {
                                       return <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                                        <span className="text-xs text-white font-bold">✓</span>
+                                        <CheckCircle className="w-3 h-3 text-white" />
+                                      </div>;
+                                    } else if (workPercentage >= 50) {
+                                      return <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
+                                        <AlertTriangle className="w-3 h-3 text-black" />
                                       </div>;
                                     } else {
-                                      return <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
-                                        <span className="text-xs text-black font-bold">!</span>
+                                      return <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                        <Clock className="w-3 h-3 text-white" />
                                       </div>;
                                     }
                                   } else {
                                     return <div className="w-6 h-6 border-2 border-gray-500 rounded-full opacity-50 flex items-center justify-center">
-                                      <span className="text-xs text-gray-500">○</span>
+                                      <UserX className="w-3 h-3 text-gray-500" />
                                     </div>;
                                   }
                                 })()}
@@ -2301,11 +2322,18 @@ function AttendanceManagementContent() {
                 );
               })}
               
-              {employeeSchedules.length === 0 && (
+              {employeeSchedules.filter((schedule: any) => {
+                if (!currentUser) return true;
+                return currentUser.role === 'admin' || schedule.employeeId === currentUser.id;
+              }).length === 0 && (
                 <div className="text-center py-12">
                   <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-white text-lg mb-2">لا توجد جداول عمل</p>
-                  <p className="text-gray-400">يجب إنشاء جداول عمل للموظفين أولاً</p>
+                  <p className="text-white text-lg mb-2">
+                    {currentUser?.role === 'admin' ? 'لا توجد جداول عمل' : 'لا يوجد جدول عمل لك'}
+                  </p>
+                  <p className="text-gray-400">
+                    {currentUser?.role === 'admin' ? 'يجب إنشاء جداول عمل للموظفين أولاً' : 'يجب على المدير إنشاء جدول عمل لك'}
+                  </p>
                 </div>
               )}
             </div>
