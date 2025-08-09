@@ -51,7 +51,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay } from "date-fns";
 import { ar } from "date-fns/locale";
 
 import { CardViewFAB } from "@/components/animated-fab";
@@ -1942,6 +1942,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
 // Attendance Management Content Component
 function AttendanceManagementContent() {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  
   // Fetch daily attendance data
   const { data: dailyAttendance = [] } = useQuery<any[]>({
     queryKey: ["/api/daily-attendance"],
@@ -1958,6 +1960,83 @@ function AttendanceManagementContent() {
   const { data: users = [] } = useQuery({
     queryKey: ["/api/users"]
   });
+
+  // Fetch employee work schedules
+  const { data: employeeSchedules = [] } = useQuery({
+    queryKey: ["/api/employee-work-schedules"]
+  });
+
+  // Fetch approved leave requests
+  const { data: approvedLeaveRequests = [] } = useQuery<any[]>({
+    queryKey: ["/api/leave-requests"],
+    select: (data: any[]) => data.filter(request => request.status === "approved")
+  });
+
+  // Get month days
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+  // Calculate expected hours for a given day and schedule
+  const calculateExpectedHours = (schedule: any, day: Date): number => {
+    const isFriday = format(day, "EEEE", { locale: ar }) === "الجمعة";
+    
+    if (isFriday) {
+      return 5.0; // Friday special hours (4:00 PM to 9:00 PM)
+    }
+    
+    if (schedule.scheduleType === "متصل") {
+      // Continuous schedule: 8 hours
+      return 8.0;
+    } else {
+      // Split schedule: 4 hours morning + 4 hours evening = 8 hours
+      return 8.0;
+    }
+  };
+
+  // Calculate hours worked
+  const calculateHoursWorked = (schedule: any, attendance: any): string => {
+    if (!attendance) return "0.00";
+    
+    let totalMinutes = 0;
+    
+    if (schedule.scheduleType === "متصل") {
+      // Continuous schedule
+      if (attendance.continuousCheckinTime && attendance.continuousCheckoutTime) {
+        const checkin = new Date(`2000-01-01T${attendance.continuousCheckinTime}:00`);
+        const checkout = new Date(`2000-01-01T${attendance.continuousCheckoutTime}:00`);
+        totalMinutes = (checkout.getTime() - checkin.getTime()) / (1000 * 60);
+      }
+    } else {
+      // Split schedule
+      // Morning period
+      if (attendance.morningCheckinTime && attendance.morningCheckoutTime) {
+        const morningCheckin = new Date(`2000-01-01T${attendance.morningCheckinTime}:00`);
+        const morningCheckout = new Date(`2000-01-01T${attendance.morningCheckoutTime}:00`);
+        totalMinutes += (morningCheckout.getTime() - morningCheckin.getTime()) / (1000 * 60);
+      }
+      
+      // Evening period
+      if (attendance.eveningCheckinTime && attendance.eveningCheckoutTime) {
+        const eveningCheckin = new Date(`2000-01-01T${attendance.eveningCheckinTime}:00`);
+        const eveningCheckout = new Date(`2000-01-01T${attendance.eveningCheckoutTime}:00`);
+        totalMinutes += (eveningCheckout.getTime() - eveningCheckin.getTime()) / (1000 * 60);
+      }
+    }
+    
+    const hours = Math.max(0, totalMinutes / 60);
+    return hours.toFixed(2);
+  };
+
+  // Check if there's approved leave for a specific day
+  const getApprovedLeaveForDay = (employeeId: number, day: Date) => {
+    const dayStr = format(day, "yyyy-MM-dd");
+    return approvedLeaveRequests.find(request => {
+      const startDate = format(new Date(request.startDate), "yyyy-MM-dd");
+      const endDate = request.endDate ? format(new Date(request.endDate), "yyyy-MM-dd") : startDate;
+      return request.userId === employeeId && dayStr >= startDate && dayStr <= endDate;
+    });
+  };
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -2033,99 +2112,197 @@ function AttendanceManagementContent() {
 
         <TabsContent value="daily-attendance" className="mt-6">
           <div className="glass-container backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6">
+            {/* Month Navigation */}
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-white">الحضور اليومي</h2>
-              <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
-                {dailyAttendance.length} سجل حضور
-              </Badge>
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="glass-button"
+                  onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+                <h3 className="text-lg font-medium text-white min-w-[140px] text-center">
+                  {format(currentMonth, "MMMM yyyy", { locale: ar })}
+                </h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="glass-button"
+                  onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
 
-            {dailyAttendance.length === 0 ? (
-              <div className="text-center py-12">
-                <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-white text-lg mb-2">لا توجد سجلات حضور</p>
-                <p className="text-gray-400">لم يتم تسجيل أي حضور لهذا اليوم</p>
-              </div>
-            ) : (
-              <div className="grid gap-4">
-                {dailyAttendance.map((attendance: any) => (
-                  <div key={attendance.id} className="glass-container backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-4">
+            {/* Employee Monthly Calendars */}
+            <div className="space-y-6">
+              {employeeSchedules.map((schedule: any) => {
+                const monthAttendance = dailyAttendance.filter(a => 
+                  a.employeeId === schedule.employeeId &&
+                  format(new Date(a.date), "yyyy-MM") === format(currentMonth, "yyyy-MM")
+                );
+
+                return (
+                  <div key={schedule.id} className="glass-container backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-4">
                       <div>
-                        <h3 className="font-semibold text-white text-lg">{attendance.employeeName}</h3>
-                        <p className="text-gray-300">{format(new Date(attendance.date), "dd/MM/yyyy", { locale: ar })}</p>
+                        <h3 className="font-semibold text-white text-lg">{schedule.employeeName}</h3>
+                        <p className="text-gray-300 text-sm">{schedule.scheduleType} • {monthAttendance.length} يوم حضور</p>
                       </div>
-                      <Badge 
-                        variant="outline" 
-                        className={`
-                          ${attendance.isConfirmed ? 'border-green-400 text-green-300 bg-green-400/10' : 'border-yellow-400 text-yellow-300 bg-yellow-400/10'}
-                        `}
-                      >
-                        {attendance.isConfirmed ? 'مؤكد' : 'غير مؤكد'}
+                      <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
+                        {format(currentMonth, "MMMM", { locale: ar })}
                       </Badge>
                     </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-gray-300 text-sm">نوع الدوام</Label>
-                        <p className="text-white">{attendance.scheduleType}</p>
-                      </div>
-                      {attendance.notes && (
-                        <div>
-                          <Label className="text-gray-300 text-sm">ملاحظات</Label>
-                          <p className="text-white">{attendance.notes}</p>
-                        </div>
-                      )}
-                    </div>
 
-                    {/* Display timing information based on schedule type */}
-                    {attendance.scheduleType === "متصل" ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                        {attendance.continuousCheckinTime && (
-                          <div>
-                            <Label className="text-gray-300 text-sm">وقت الحضور</Label>
-                            <p className="text-white">{attendance.continuousCheckinTime}</p>
+                    {/* Monthly Progress Bars */}
+                    <div className="space-y-3">
+                      {monthDays.map((day) => {
+                        const dayStr = format(day, "yyyy-MM-dd");
+                        const dayAttendance = monthAttendance.find(a => a.date === dayStr);
+                        const isToday = isSameDay(day, new Date());
+                        const hasAttendance = !!dayAttendance;
+                        const isHoliday = dayAttendance?.notes === 'إجازة';
+                        const approvedLeave = getApprovedLeaveForDay(schedule.employeeId, day);
+                        
+                        // Calculate hours worked
+                        const hoursWorked = hasAttendance && !isHoliday ? parseFloat(calculateHoursWorked(schedule, dayAttendance)) : 0;
+                        const expectedHours = calculateExpectedHours(schedule, day);
+                        const workPercentage = Math.min((hoursWorked / expectedHours) * 100, 100);
+                        
+                        // Get day name in Arabic
+                        const dayName = format(day, "EEEE", { locale: ar });
+                        
+                        return (
+                          <div
+                            key={day.toISOString()}
+                            className={`
+                              group cursor-pointer transition-all duration-300 hover:scale-[1.02]
+                              ${isToday ? 'ring-2 ring-blue-400 rounded-lg p-1' : ''}
+                            `}
+                          >
+                            <div className="flex items-center gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10">
+                              {/* Date Info */}
+                              <div className="flex flex-col items-center min-w-[80px]">
+                                <div className={`text-2xl font-bold ${isToday ? 'text-blue-400' : 'text-white'}`}>
+                                  {format(day, "d")}
+                                </div>
+                                <div className="text-xs text-gray-400 truncate">
+                                  {dayName}
+                                </div>
+                              </div>
+                              
+                              {/* Progress Bar Container */}
+                              <div className="flex-1 space-y-1">
+                                <div className="flex justify-between items-center">
+                                  <div className="text-sm text-gray-300">
+                                    {(() => {
+                                      if (isHoliday) return 'إجازة';
+                                      if (approvedLeave) {
+                                        switch (approvedLeave.requestType) {
+                                          case 'استئذان': return `استئذان (${approvedLeave.duration} ${approvedLeave.durationType})`;
+                                          case 'إجازة': return 'إجازة معتمدة';
+                                          case 'تأخير في الحضور': return `تأخير (${approvedLeave.duration} ${approvedLeave.durationType})`;
+                                          case 'انصراف مبكر': return `انصراف مبكر (${approvedLeave.duration} ${approvedLeave.durationType})`;
+                                          default: return 'إجازة معتمدة';
+                                        }
+                                      }
+                                      if (!hasAttendance) return 'لا يوجد سجل';
+                                      return `${hoursWorked.toFixed(1)} ساعة`;
+                                    })()}
+                                  </div>
+                                  <div className="text-xs text-gray-400">
+                                    {hasAttendance && !isHoliday && !approvedLeave ? `${workPercentage.toFixed(0)}%` : ''}
+                                  </div>
+                                </div>
+                                
+                                {/* Progress Bar */}
+                                <div className="w-full bg-gray-600 rounded-full h-3 overflow-hidden">
+                                  {(() => {
+                                    if (isHoliday) {
+                                      return <div className="h-full bg-yellow-500 rounded-full flex items-center justify-center">
+                                        <span className="text-xs text-black font-medium">إجازة</span>
+                                      </div>;
+                                    }
+                                    
+                                    if (approvedLeave) {
+                                      let bgColor = 'bg-green-500';
+                                      if (approvedLeave.requestType === 'استئذان') bgColor = 'bg-blue-500';
+                                      else if (approvedLeave.requestType === 'تأخير في الحضور') bgColor = 'bg-orange-500';
+                                      else if (approvedLeave.requestType === 'انصراف مبكر') bgColor = 'bg-purple-500';
+                                      
+                                      return <div className={`h-full ${bgColor} rounded-full`} style={{ width: '100%' }}></div>;
+                                    }
+                                    
+                                    if (!hasAttendance) {
+                                      return <div className="w-5 h-5 border-2 border-gray-500 rounded-full opacity-30"></div>;
+                                    }
+                                    
+                                    let barColor = 'bg-green-500';
+                                    if (workPercentage < 50) barColor = 'bg-red-500';
+                                    else if (workPercentage < 80) barColor = 'bg-yellow-500';
+                                    
+                                    return <div className={`h-full ${barColor} rounded-full transition-all duration-500`} style={{ width: `${workPercentage}%` }}></div>;
+                                  })()}
+                                </div>
+                              </div>
+                              
+                              {/* Status Indicator */}
+                              <div className="flex items-center justify-center w-8 h-8">
+                                {(() => {
+                                  if (isHoliday) {
+                                    return <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
+                                      <span className="text-xs text-black">إ</span>
+                                    </div>;
+                                  }
+                                  
+                                  if (approvedLeave) {
+                                    let bgColor = 'bg-green-500';
+                                    let icon = '✓';
+                                    if (approvedLeave.requestType === 'استئذان') { bgColor = 'bg-blue-500'; icon = 'س'; }
+                                    else if (approvedLeave.requestType === 'تأخير في الحضور') { bgColor = 'bg-orange-500'; icon = 'ت'; }
+                                    else if (approvedLeave.requestType === 'انصراف مبكر') { bgColor = 'bg-purple-500'; icon = 'م'; }
+                                    
+                                    return <div className={`w-5 h-5 ${bgColor} rounded-full flex items-center justify-center`}>
+                                      <span className="text-xs text-white font-bold">{icon}</span>
+                                    </div>;
+                                  }
+                                  
+                                  if (hasAttendance) {
+                                    if (workPercentage >= 80) {
+                                      return <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                        <span className="text-xs text-white">✓</span>
+                                      </div>;
+                                    } else {
+                                      return <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
+                                        <span className="text-xs text-black">!</span>
+                                      </div>;
+                                    }
+                                  } else {
+                                    return <div className="w-5 h-5 border-2 border-gray-500 rounded-full opacity-30"></div>;
+                                  }
+                                })()}
+                              </div>
+                            </div>
                           </div>
-                        )}
-                        {attendance.continuousCheckoutTime && (
-                          <div>
-                            <Label className="text-gray-300 text-sm">وقت الانصراف</Label>
-                            <p className="text-white">{attendance.continuousCheckoutTime}</p>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-                        {attendance.morningCheckinTime && (
-                          <div>
-                            <Label className="text-gray-300 text-sm">حضور صباحي</Label>
-                            <p className="text-white">{attendance.morningCheckinTime}</p>
-                          </div>
-                        )}
-                        {attendance.morningCheckoutTime && (
-                          <div>
-                            <Label className="text-gray-300 text-sm">انصراف صباحي</Label>
-                            <p className="text-white">{attendance.morningCheckoutTime}</p>
-                          </div>
-                        )}
-                        {attendance.eveningCheckinTime && (
-                          <div>
-                            <Label className="text-gray-300 text-sm">حضور مسائي</Label>
-                            <p className="text-white">{attendance.eveningCheckinTime}</p>
-                          </div>
-                        )}
-                        {attendance.eveningCheckoutTime && (
-                          <div>
-                            <Label className="text-gray-300 text-sm">انصراف مسائي</Label>
-                            <p className="text-white">{attendance.eveningCheckoutTime}</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                        );
+                      })}
+                    </div>
                   </div>
-                ))}
-              </div>
-            )}
+                );
+              })}
+              
+              {employeeSchedules.length === 0 && (
+                <div className="text-center py-12">
+                  <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-white text-lg mb-2">لا توجد جداول عمل</p>
+                  <p className="text-gray-400">يجب إنشاء جداول عمل للموظفين أولاً</p>
+                </div>
+              )}
+            </div>
           </div>
         </TabsContent>
 
