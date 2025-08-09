@@ -59,7 +59,7 @@ import ScrollableFilter from "@/components/scrollable-filter";
 import { ReservationDialog } from "@/components/reservation-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
-import { AttendanceInterface } from "@/components/attendance-interface";
+
 import { EnhancedSaleDialog } from "@/components/enhanced-sale-dialog";
 
 import type { InventoryItem } from "@shared/schema";
@@ -113,7 +113,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [arrivedTodayOpen, setArrivedTodayOpen] = useState(false);
-  const [attendanceInterfaceOpen, setAttendanceInterfaceOpen] = useState(false);
+
   
   // Toggle states for individual filters - default to false (closed)
   const [showManufacturerFilter, setShowManufacturerFilter] = useState(false);
@@ -882,21 +882,6 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   )}
                 </Button>
               </div>
-
-              {/* Attendance Interface Button */}
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="glass-button glass-text-primary"
-                onClick={() => setAttendanceInterfaceOpen(true)}
-              >
-                <Calendar size={16} className="ml-1" />
-                <span className="hidden sm:inline">واجهة الدوام</span>
-              </Button>
-
-
-
-
 
               {/* Bank Header Icons */}
               <div className="flex items-center space-x-1 space-x-reverse">
@@ -1814,11 +1799,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         </DialogContent>
       </Dialog>
 
-      {/* Attendance Interface Dialog */}
-      <AttendanceInterface
-        open={attendanceInterfaceOpen}
-        onOpenChange={setAttendanceInterfaceOpen}
-      />
+
 
       {/* Vehicle Share Dialog */}
       {shareVehicle && (
