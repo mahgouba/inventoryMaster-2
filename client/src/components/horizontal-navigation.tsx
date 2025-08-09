@@ -365,13 +365,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       internal: true,
       permission: "admin"
     },
-    { 
-      title: "إدارة الثيمات", 
-      href: "/theme-management", 
-      icon: Palette,
-      internal: true,
-      permission: "admin"
-    },
+
 
   ];
 
