@@ -1892,8 +1892,13 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   const leaveHours = parseFloat(String(approvedLeave.duration)) || 0;
                                   const adjustedLeaveHours = approvedLeave.durationType === 'دقيقة' ? leaveHours / 60 : leaveHours;
                                   
-                                  // For early departure and permission, calculate actual work percentage
-                                  if (approvedLeave.requestType === 'انصراف مبكر' || approvedLeave.requestType === 'استئذان') {
+                                  // For early departure, calculate based on actual work vs full expected hours
+                                  if (approvedLeave.requestType === 'انصراف مبكر') {
+                                    // Calculate the percentage based on actual hours worked out of full expected hours
+                                    // Don't give full credit just for having worked - show the impact of early departure
+                                    workPercentage = Math.max(0, (hoursWorked / expectedHours) * 100);
+                                  } else if (approvedLeave.requestType === 'استئذان') {
+                                    // For permission, show actual work percentage
                                     workPercentage = (hoursWorked / expectedHours) * 100;
                                   } else if (approvedLeave.requestType === 'تأخير في الحضور') {
                                     workPercentage = (hoursWorked / expectedHours) * 100;
@@ -1901,7 +1906,15 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                     workPercentage = 100; // Full leave approved
                                   }
                                 } else {
-                                  workPercentage = approvedLeave.requestType === 'إجازة' ? 100 : 0;
+                                  // No attendance recorded
+                                  if (approvedLeave.requestType === 'إجازة') {
+                                    workPercentage = 100; // Full leave approved
+                                  } else if (approvedLeave.requestType === 'انصراف مبكر') {
+                                    // No attendance but approved early departure - this should be 0%
+                                    workPercentage = 0;
+                                  } else {
+                                    workPercentage = 0;
+                                  }
                                 }
                               } else {
                                 workPercentage = hoursWorked > 0 ? Math.min((hoursWorked / expectedHours) * 100, 100) : 0;
