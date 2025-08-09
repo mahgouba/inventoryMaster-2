@@ -2148,13 +2148,13 @@ function AttendanceManagementContent() {
             الحضور اليومي
           </TabsTrigger>
           <TabsTrigger 
-            value="pending-requests"
-            className="data-[state=active]:bg-yellow-600 data-[state=active]:text-white"
+            value="approved-requests"
+            className="data-[state=active]:bg-green-600 data-[state=active]:text-white"
           >
-            الطلبات المعلقة
-            {pendingLeaveRequests.length > 0 && (
-              <Badge className="ml-2 bg-yellow-500 text-black">
-                {pendingLeaveRequests.length}
+            الطلبات المعتمدة
+            {approvedLeaveRequests.length > 0 && (
+              <Badge className="ml-2 bg-green-500 text-black">
+                {approvedLeaveRequests.length}
               </Badge>
             )}
           </TabsTrigger>
@@ -2384,26 +2384,26 @@ function AttendanceManagementContent() {
           </div>
         </TabsContent>
 
-        <TabsContent value="pending-requests" className="mt-6">
+        <TabsContent value="approved-requests" className="mt-6">
           <div className="glass-container backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-white">طلبات الإجازة والاستئذان المعلقة</h2>
+              <h2 className="text-xl font-semibold text-white">الطلبات المعتمدة</h2>
               <div className="flex gap-3 items-center">
-                <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300">
-                  {pendingLeaveRequests.length} طلب معلق
+                <Badge variant="secondary" className="bg-green-500/20 text-green-300">
+                  {approvedLeaveRequests.length} طلب معتمد
                 </Badge>
               </div>
             </div>
 
-            {pendingLeaveRequests.length === 0 ? (
+            {approvedLeaveRequests.length === 0 ? (
               <div className="text-center py-12">
                 <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-                <p className="text-white text-lg mb-2">لا توجد طلبات معلقة</p>
-                <p className="text-gray-400">جميع طلبات الإجازة والاستئذان تم التعامل معها</p>
+                <p className="text-white text-lg mb-2">لا توجد طلبات معتمدة</p>
+                <p className="text-gray-400">لم يتم العثور على أي طلبات إجازة أو استئذان معتمدة</p>
               </div>
             ) : (
               <div className="grid gap-4">
-                {pendingLeaveRequests.map((request: any) => (
+                {approvedLeaveRequests.map((request: any) => (
                   <div key={request.id} className="glass-container backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-4">
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -2412,9 +2412,9 @@ function AttendanceManagementContent() {
                       </div>
                       <Badge 
                         variant="outline" 
-                        className="border-yellow-400 text-yellow-300 bg-yellow-400/10"
+                        className="border-green-400 text-green-300 bg-green-400/10"
                       >
-                        معلق
+                        معتمد
                       </Badge>
                     </div>
                     
@@ -2434,8 +2434,12 @@ function AttendanceManagementContent() {
                         <p className="text-white">{request.duration} {request.durationType}</p>
                       </div>
                       <div>
-                        <Label className="text-gray-300 text-sm">تاريخ الطلب</Label>
-                        <p className="text-white">{format(new Date(request.createdAt), "dd/MM/yyyy", { locale: ar })}</p>
+                        <Label className="text-gray-300 text-sm">وافق عليه</Label>
+                        <p className="text-white">{request.approvedByName || 'غير محدد'}</p>
+                      </div>
+                      <div>
+                        <Label className="text-gray-300 text-sm">تاريخ الموافقة</Label>
+                        <p className="text-white">{request.approvedAt ? format(new Date(request.approvedAt), "dd/MM/yyyy", { locale: ar }) : 'غير محدد'}</p>
                       </div>
                     </div>
                     
@@ -2446,35 +2450,14 @@ function AttendanceManagementContent() {
                       </div>
                     )}
                     
-                    <div className="flex gap-3 justify-end">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="border-red-400 text-red-300 hover:bg-red-400/10"
-                        onClick={() => {
-                          const reason = prompt("سبب الرفض (اختياري):");
-                          if (reason !== null) { // User didn't cancel
-                            rejectRequestMutation.mutate({ 
-                              requestId: request.id, 
-                              reason: reason || "لم يتم تحديد سبب" 
-                            });
-                          }
-                        }}
-                        disabled={rejectRequestMutation.isPending}
-                      >
-                        <X size={16} className="ml-1" />
-                        رفض
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="border-green-400 text-green-300 hover:bg-green-400/10"
-                        onClick={() => approveRequestMutation.mutate(request.id)}
-                        disabled={approveRequestMutation.isPending}
-                      >
-                        <Check size={16} className="ml-1" />
-                        اعتماد
-                      </Button>
+                    {/* Timeline */}
+                    <div className="bg-white/5 rounded-lg p-3 border border-white/10 mt-4">
+                      <div className="text-xs text-gray-400 space-y-1">
+                        <div>تم إنشاء الطلب: {format(new Date(request.createdAt), "dd/MM/yyyy HH:mm", { locale: ar })}</div>
+                        {request.approvedAt && (
+                          <div>تمت الموافقة: {format(new Date(request.approvedAt), "dd/MM/yyyy HH:mm", { locale: ar })}</div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}

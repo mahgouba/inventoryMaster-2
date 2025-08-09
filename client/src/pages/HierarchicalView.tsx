@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Save, X, Eye, EyeOff, Edit2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Trash2, Save, X, Eye, EyeOff, Edit2 } from "lucide-react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 // import { FreshImportButton } from "@/components/FreshImportButton"; // Removed per user request
 
