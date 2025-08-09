@@ -768,6 +768,59 @@ export default function HierarchicalView() {
 
       {/* Action Buttons */}
       <div className="flex gap-4 justify-center">
+        {/* Clean Duplicates Button */}
+        <Button
+          onClick={async () => {
+            try {
+              const allManufacturers = manufacturers || [];
+              
+              // Group by Arabic name to find duplicates
+              const manufacturerGroups: { [key: string]: any[] } = {};
+              allManufacturers.forEach((m: any) => {
+                if (!manufacturerGroups[m.nameAr]) {
+                  manufacturerGroups[m.nameAr] = [];
+                }
+                manufacturerGroups[m.nameAr].push(m);
+              });
+              
+              let deletedCount = 0;
+              
+              // Delete duplicates, keep the first one (oldest)
+              for (const [nameAr, duplicateManufacturers] of Object.entries(manufacturerGroups)) {
+                if (duplicateManufacturers.length > 1) {
+                  // Sort by ID to keep the first one created
+                  duplicateManufacturers.sort((a, b) => a.id - b.id);
+                  
+                  // Delete all but the first one
+                  for (let i = 1; i < duplicateManufacturers.length; i++) {
+                    await deleteManufacturerMutation.mutateAsync(duplicateManufacturers[i].id.toString());
+                    deletedCount++;
+                  }
+                }
+              }
+              
+              toast({
+                title: "تم تنظيف البيانات",
+                description: `تم حذف ${deletedCount} شركة مكررة`,
+              });
+              
+              // Refresh data
+              queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
+              queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+            } catch (error) {
+              toast({
+                title: "خطأ",
+                description: "فشل في تنظيف البيانات المكررة",
+                variant: "destructive",
+              });
+            }
+          }}
+          className="glass-button"
+        >
+          <Trash2 className="h-4 w-4 ml-2" />
+          تنظيف البيانات المكررة
+        </Button>
+
         {/* Add Category Button */}
         <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
           <DialogTrigger asChild>

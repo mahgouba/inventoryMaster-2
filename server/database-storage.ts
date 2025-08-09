@@ -354,6 +354,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async addManufacturer(manufacturer: any): Promise<any> {
+    // Check if manufacturer already exists
+    const existing = await db.select().from(manufacturers).where(eq(manufacturers.nameAr, manufacturer.nameAr));
+    if (existing.length > 0) {
+      return existing[0]; // Return existing manufacturer
+    }
+    
     const [newManufacturer] = await db.insert(manufacturers).values(manufacturer).returning();
     return newManufacturer;
   }
@@ -395,6 +401,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async addCategory(category: any): Promise<any> {
+    // Check if category already exists for this manufacturer
+    const existing = await db.select().from(vehicleCategories)
+      .where(and(
+        eq(vehicleCategories.nameAr, category.name_ar),
+        eq(vehicleCategories.manufacturerId, category.manufacturer_id)
+      ));
+    if (existing.length > 0) {
+      return existing[0]; // Return existing category
+    }
+    
     const [newCategory] = await db.insert(vehicleCategories).values(category).returning();
     return newCategory;
   }
@@ -436,6 +452,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async addTrimLevel(trimLevel: any): Promise<any> {
+    // Check if trim level already exists for this category
+    const existing = await db.select().from(vehicleTrimLevels)
+      .where(and(
+        eq(vehicleTrimLevels.nameAr, trimLevel.name_ar),
+        eq(vehicleTrimLevels.categoryId, trimLevel.category_id)
+      ));
+    if (existing.length > 0) {
+      return existing[0]; // Return existing trim level
+    }
+    
     const [newTrimLevel] = await db.insert(vehicleTrimLevels).values(trimLevel).returning();
     return newTrimLevel;
   }
