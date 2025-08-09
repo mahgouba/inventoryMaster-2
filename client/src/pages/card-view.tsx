@@ -867,17 +867,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   )}
                 </div>
                 
-                {/* Neumorphism Toggle Switch */}
-                <div className="flex flex-col items-center mt-2 space-y-1">
-                  <div className="flex items-center space-x-2 space-x-reverse">
-                    <Switch
-                      checked={neumorphismMode}
-                      onCheckedChange={setNeumorphismMode}
-                      className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-600 scale-75"
-                    />
-                    <span className="text-xs text-gray-300">نيومورفيزم</span>
-                  </div>
-                </div>
+
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg hover:text-amber-400 transition-colors duration-300">{companyName}</h1>
