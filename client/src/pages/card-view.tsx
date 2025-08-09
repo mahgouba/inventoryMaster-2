@@ -1972,10 +1972,12 @@ function AttendanceManagementContent() {
     select: (data: any[]) => data.filter(request => request.status === "approved")
   });
 
-  // Get month days
+  // Get month days - only show days up to today
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
-  const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  const today = new Date();
+  const endDate = monthEnd > today ? today : monthEnd;
+  const monthDays = eachDayOfInterval({ start: monthStart, end: endDate });
 
   // Calculate expected hours for a given day and schedule
   const calculateExpectedHours = (schedule: any, day: Date): number => {
@@ -2220,11 +2222,11 @@ function AttendanceManagementContent() {
                                 </div>
                                 
                                 {/* Progress Bar */}
-                                <div className="w-full bg-gray-600 rounded-full h-3 overflow-hidden">
+                                <div className="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
                                   {(() => {
                                     if (isHoliday) {
                                       return <div className="h-full bg-yellow-500 rounded-full flex items-center justify-center">
-                                        <span className="text-xs text-black font-medium">إجازة</span>
+                                        <span className="text-xs text-black font-medium px-2">إجازة</span>
                                       </div>;
                                     }
                                     
@@ -2238,7 +2240,9 @@ function AttendanceManagementContent() {
                                     }
                                     
                                     if (!hasAttendance) {
-                                      return <div className="w-5 h-5 border-2 border-gray-500 rounded-full opacity-30"></div>;
+                                      return <div className="h-full bg-gray-600 rounded-full flex items-center justify-center">
+                                        <span className="text-xs text-gray-400 px-2">لا يوجد سجل</span>
+                                      </div>;
                                     }
                                     
                                     let barColor = 'bg-green-500';
@@ -2254,8 +2258,8 @@ function AttendanceManagementContent() {
                               <div className="flex items-center justify-center w-8 h-8">
                                 {(() => {
                                   if (isHoliday) {
-                                    return <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
-                                      <span className="text-xs text-black">إ</span>
+                                    return <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
+                                      <span className="text-xs text-black font-bold">إ</span>
                                     </div>;
                                   }
                                   
@@ -2266,23 +2270,25 @@ function AttendanceManagementContent() {
                                     else if (approvedLeave.requestType === 'تأخير في الحضور') { bgColor = 'bg-orange-500'; icon = 'ت'; }
                                     else if (approvedLeave.requestType === 'انصراف مبكر') { bgColor = 'bg-purple-500'; icon = 'م'; }
                                     
-                                    return <div className={`w-5 h-5 ${bgColor} rounded-full flex items-center justify-center`}>
+                                    return <div className={`w-6 h-6 ${bgColor} rounded-full flex items-center justify-center`}>
                                       <span className="text-xs text-white font-bold">{icon}</span>
                                     </div>;
                                   }
                                   
                                   if (hasAttendance) {
                                     if (workPercentage >= 80) {
-                                      return <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                        <span className="text-xs text-white">✓</span>
+                                      return <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                        <span className="text-xs text-white font-bold">✓</span>
                                       </div>;
                                     } else {
-                                      return <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
-                                        <span className="text-xs text-black">!</span>
+                                      return <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
+                                        <span className="text-xs text-black font-bold">!</span>
                                       </div>;
                                     }
                                   } else {
-                                    return <div className="w-5 h-5 border-2 border-gray-500 rounded-full opacity-30"></div>;
+                                    return <div className="w-6 h-6 border-2 border-gray-500 rounded-full opacity-50 flex items-center justify-center">
+                                      <span className="text-xs text-gray-500">○</span>
+                                    </div>;
                                   }
                                 })()}
                               </div>
