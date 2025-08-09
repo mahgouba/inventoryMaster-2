@@ -1189,12 +1189,42 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               if (isHoliday) {
                 status = 'إجازة';
               } else if (approvedLeave) {
+                // حساب ساعات العمل الفعلية وساعات الإذن بناءً على نوع الطلب
+                const expectedHours = calculateExpectedHours(schedule, day);
+                let actualWorkHours = 0;
+                let permissionHours = 0;
+                
+                if (dayAttendance) {
+                  actualWorkHours = parseFloat(calculateHoursWorked(schedule, dayAttendance));
+                }
+                
                 switch (approvedLeave.requestType) {
-                  case 'استئذان': status = `استئذان (${approvedLeave.duration} ${approvedLeave.durationType})`; break;
-                  case 'إجازة': status = 'إجازة معتمدة'; break;
-                  case 'تأخير في الحضور': status = `تأخير (${approvedLeave.duration} ${approvedLeave.durationType})`; break;
-                  case 'انصراف مبكر': status = `انصراف مبكر (${approvedLeave.duration} ${approvedLeave.durationType})`; break;
-                  default: status = 'إجازة معتمدة'; break;
+                  case 'استئذان': 
+                    permissionHours = parseFloat(String(approvedLeave.duration)) || 0;
+                    if (approvedLeave.durationType === 'دقيقة') permissionHours = permissionHours / 60;
+                    status = `ساعات العمل: ${actualWorkHours.toFixed(2)} | ساعات الإذن: ${permissionHours.toFixed(2)}`;
+                    workHours = actualWorkHours.toFixed(2);
+                    break;
+                  case 'إجازة': 
+                    status = 'إجازة معتمدة'; 
+                    workHours = '0.00';
+                    break;
+                  case 'تأخير في الحضور': 
+                    permissionHours = parseFloat(String(approvedLeave.duration)) || 0;
+                    if (approvedLeave.durationType === 'دقيقة') permissionHours = permissionHours / 60;
+                    status = `ساعات العمل: ${actualWorkHours.toFixed(2)} | ساعات التأخير: ${permissionHours.toFixed(2)}`;
+                    workHours = actualWorkHours.toFixed(2);
+                    break;
+                  case 'انصراف مبكر': 
+                    permissionHours = parseFloat(String(approvedLeave.duration)) || 0;
+                    if (approvedLeave.durationType === 'دقيقة') permissionHours = permissionHours / 60;
+                    status = `ساعات العمل: ${actualWorkHours.toFixed(2)} | ساعات الانصراف المبكر: ${permissionHours.toFixed(2)}`;
+                    workHours = actualWorkHours.toFixed(2);
+                    break;
+                  default: 
+                    status = 'إجازة معتمدة'; 
+                    workHours = '0.00';
+                    break;
                 }
               } else if (dayAttendance) {
                 if (schedule.scheduleType === "متصل") {
@@ -1255,37 +1285,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
             </div>
           </div>
           
-          <h4 style="color: #333; margin: 15px 0 10px 0; border-top: 1px solid #ddd; padding-top: 15px;">إحصائيات الطلبات المعتمدة:</h4>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-            <div>
-              <strong style="color: #3b82f6;">طلبات الاستئذان:</strong> 
-              ${monthDays.filter(day => {
-                const leave = getApprovedLeaveForDay(schedule.employeeId, day);
-                return leave && leave.requestType === 'استئذان';
-              }).length} طلب
-            </div>
-            <div>
-              <strong style="color: #f97316;">طلبات التأخير:</strong> 
-              ${monthDays.filter(day => {
-                const leave = getApprovedLeaveForDay(schedule.employeeId, day);
-                return leave && leave.requestType === 'تأخير في الحضور';
-              }).length} طلب
-            </div>
-            <div>
-              <strong style="color: #8b5cf6;">الانصراف المبكر:</strong> 
-              ${monthDays.filter(day => {
-                const leave = getApprovedLeaveForDay(schedule.employeeId, day);
-                return leave && leave.requestType === 'انصراف مبكر';
-              }).length} طلب
-            </div>
-            <div>
-              <strong style="color: #10b981;">الإجازات المعتمدة:</strong> 
-              ${monthDays.filter(day => {
-                const leave = getApprovedLeaveForDay(schedule.employeeId, day);
-                return leave && leave.requestType === 'إجازة';
-              }).length} يوم
-            </div>
-          </div>
+
         </div>
         
         <div style="margin-top: 20px; text-align: center; font-size: 12px; color: #888;">
