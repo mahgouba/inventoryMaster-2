@@ -9,9 +9,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Trash2, Save, X, Eye, EyeOff, Edit2, Layers } from "lucide-react";
+import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Save, X, Eye, EyeOff, Edit2 } from "lucide-react";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { FreshImportButton } from "@/components/FreshImportButton";
+// import { FreshImportButton } from "@/components/FreshImportButton"; // Removed per user request
 
 interface Manufacturer {
   id: number;
@@ -352,89 +352,7 @@ export default function HierarchicalView() {
     ]
   };
 
-  // Auto-populate data mutation
-  const autoPopulateDataMutation = useMutation({
-    mutationFn: async () => {
-      const results: any[] = [];
-      
-      for (const vehicleData of defaultVehicleData) {
-        try {
-          // Add manufacturer
-          const manufacturerResult: any = await apiRequest('POST', '/api/hierarchical/manufacturers', vehicleData.manufacturer);
-          const manufacturerId = manufacturerResult.id;
-
-          // Add categories
-          for (const category of vehicleData.categories) {
-            try {
-              const categoryResult: any = await apiRequest('POST', '/api/hierarchical/categories', {
-                ...category,
-                manufacturer_id: manufacturerId
-              });
-              const categoryId = categoryResult.id;
-
-              // Add trim levels for each category
-              for (const trimLevel of trimLevelsData) {
-                try {
-                  const trimLevelResult: any = await apiRequest('POST', '/api/hierarchical/trimLevels', {
-                    ...trimLevel,
-                    category_id: categoryId
-                  });
-                  const trimLevelId = trimLevelResult.id;
-
-                  // Add exterior colors for each trim level
-                  for (const color of colorsData.exterior) {
-                    try {
-                      await apiRequest('POST', '/api/hierarchical/colors', {
-                        name: color.name,
-                        code: color.code,
-                        type: 'exterior',
-                        trimLevelId: trimLevelId
-                      });
-                    } catch (error) {
-                      // Continue if color already exists
-                    }
-                  }
-
-                  // Add interior colors for each trim level
-                  for (const color of colorsData.interior) {
-                    try {
-                      await apiRequest('POST', '/api/hierarchical/colors', {
-                        name: color.name,
-                        code: color.code,
-                        type: 'interior',
-                        trimLevelId: trimLevelId
-                      });
-                    } catch (error) {
-                      // Continue if color already exists
-                    }
-                  }
-                } catch (error) {
-                  // Continue if trim level already exists
-                }
-              }
-            } catch (error) {
-              // Continue if category already exists
-            }
-          }
-        } catch (error) {
-          // Continue if manufacturer already exists
-        }
-      }
-
-      return results;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
-      toast({
-        title: "تم تحميل البيانات بنجاح",
-        description: "تم إضافة جميع الشركات والفئات ودرجات التجهيز والألوان",
-      });
-    },
-    onError: (error) => {
-      console.log("البيانات موجودة مسبقاً أو حدث خطأ:", error);
-    }
-  });
+  // Auto-populate data mutation removed per user request
 
   // Fetch manufacturers
   const { data: manufacturers = [] } = useQuery({
@@ -446,14 +364,7 @@ export default function HierarchicalView() {
     queryKey: ['/api/hierarchy/full'],
   });
 
-  // Auto-populate disabled to prevent duplicates
-  // useEffect(() => {
-  //   if (manufacturers && Array.isArray(manufacturers) && manufacturers.length === 0 && !autoPopulateDataMutation.isPending) {
-  //     setTimeout(() => {
-  //       autoPopulateDataMutation.mutate();
-  //     }, 1000);
-  //   }
-  // }, [manufacturers]);
+  // Auto-populate functionality removed per user request
 
   // Add color mutation for trim levels
   const addColorMutation = useMutation({
@@ -641,19 +552,6 @@ export default function HierarchicalView() {
           </h1>
           
           <div className="flex gap-2">
-            {/* Auto-populate Button */}
-            <Button 
-              onClick={() => autoPopulateDataMutation.mutate()}
-              disabled={autoPopulateDataMutation.isPending}
-              className="glass-button flex items-center gap-2 bg-green-600 hover:bg-green-700"
-            >
-              <Layers className="h-4 w-4" />
-              {autoPopulateDataMutation.isPending ? "جاري التحميل..." : "تحميل البيانات الكاملة"}
-            </Button>
-
-            {/* Fresh Import Button */}
-            <FreshImportButton />
-            
             {/* Add Manufacturer Button */}
             <Dialog open={isAddManufacturerOpen} onOpenChange={setIsAddManufacturerOpen}>
             <DialogTrigger asChild>
@@ -768,59 +666,6 @@ export default function HierarchicalView() {
 
       {/* Action Buttons */}
       <div className="flex gap-4 justify-center">
-        {/* Clean Duplicates Button */}
-        <Button
-          onClick={async () => {
-            try {
-              const allManufacturers = manufacturers || [];
-              
-              // Group by Arabic name to find duplicates
-              const manufacturerGroups: { [key: string]: any[] } = {};
-              allManufacturers.forEach((m: any) => {
-                if (!manufacturerGroups[m.nameAr]) {
-                  manufacturerGroups[m.nameAr] = [];
-                }
-                manufacturerGroups[m.nameAr].push(m);
-              });
-              
-              let deletedCount = 0;
-              
-              // Delete duplicates, keep the first one (oldest)
-              for (const [nameAr, duplicateManufacturers] of Object.entries(manufacturerGroups)) {
-                if (duplicateManufacturers.length > 1) {
-                  // Sort by ID to keep the first one created
-                  duplicateManufacturers.sort((a, b) => a.id - b.id);
-                  
-                  // Delete all but the first one
-                  for (let i = 1; i < duplicateManufacturers.length; i++) {
-                    await deleteManufacturerMutation.mutateAsync(duplicateManufacturers[i].id.toString());
-                    deletedCount++;
-                  }
-                }
-              }
-              
-              toast({
-                title: "تم تنظيف البيانات",
-                description: `تم حذف ${deletedCount} شركة مكررة`,
-              });
-              
-              // Refresh data
-              queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
-              queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
-            } catch (error) {
-              toast({
-                title: "خطأ",
-                description: "فشل في تنظيف البيانات المكررة",
-                variant: "destructive",
-              });
-            }
-          }}
-          className="glass-button"
-        >
-          <Trash2 className="h-4 w-4 ml-2" />
-          تنظيف البيانات المكررة
-        </Button>
-
         {/* Add Category Button */}
         <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
           <DialogTrigger asChild>
