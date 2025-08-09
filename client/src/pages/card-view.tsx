@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -38,7 +37,9 @@ import {
   Receipt,
   UserCheck,
   Copy,
-  MessageCircle
+  MessageCircle,
+  CheckCircle,
+  Check
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,10 @@ import { Link } from "wouter";
 import { useTheme } from "@/hooks/useTheme";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
 
 import { CardViewFAB } from "@/components/animated-fab";
 import InventoryForm from "@/components/inventory-form";
@@ -113,6 +118,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [arrivedTodayOpen, setArrivedTodayOpen] = useState(false);
+  const [attendanceDialogOpen, setAttendanceDialogOpen] = useState(false);
 
   
   // Toggle states for individual filters - default to false (closed)
@@ -882,6 +888,17 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   )}
                 </Button>
               </div>
+
+              {/* Attendance Button */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="glass-button glass-text-primary"
+                onClick={() => setAttendanceDialogOpen(true)}
+              >
+                <UserCheck size={16} className="ml-1" />
+                <span className="hidden sm:inline">الدوام</span>
+              </Button>
 
               {/* Bank Header Icons */}
               <div className="flex items-center space-x-1 space-x-reverse">
@@ -1895,7 +1912,322 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           isLoading={enhancedSellMutation.isPending}
         />
       )}
+
+      {/* Attendance Management Dialog */}
+      <Dialog open={attendanceDialogOpen} onOpenChange={setAttendanceDialogOpen}>
+        <DialogContent 
+          className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-6xl max-h-[90vh] overflow-y-auto"
+          aria-describedby="attendance-management-description"
+        >
+          <DialogHeader>
+            <DialogTitle className="text-xl text-center">
+              إدارة الدوام
+            </DialogTitle>
+            <p className="text-gray-300 text-center">
+              الحضور اليومي والطلبات المعلقة
+            </p>
+          </DialogHeader>
+          
+          <div id="attendance-management-description" className="sr-only">
+            إدارة شاملة للحضور اليومي والطلبات المعلقة للموظفين
+          </div>
+          
+          <AttendanceManagementContent />
+        </DialogContent>
+      </Dialog>
       </div>
+    </div>
+  );
+}
+
+// Attendance Management Content Component
+function AttendanceManagementContent() {
+  // Fetch daily attendance data
+  const { data: dailyAttendance = [] } = useQuery<any[]>({
+    queryKey: ["/api/daily-attendance"],
+    refetchInterval: 3000
+  });
+
+  // Fetch pending leave requests
+  const { data: pendingLeaveRequests = [] } = useQuery<any[]>({
+    queryKey: ["/api/leave-requests"],
+    select: (data: any[]) => data.filter(request => request.status === "pending")
+  });
+
+  // Fetch users data
+  const { data: users = [] } = useQuery({
+    queryKey: ["/api/users"]
+  });
+
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Mutation for approving leave requests
+  const approveRequestMutation = useMutation({
+    mutationFn: async (requestId: number) => {
+      return apiRequest("POST", `/api/leave-requests/${requestId}/approve`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "تم اعتماد الطلب",
+        description: "تم اعتماد طلب الإجازة بنجاح",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/leave-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/daily-attendance"] });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "فشل في اعتماد الطلب",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Mutation for rejecting leave requests
+  const rejectRequestMutation = useMutation({
+    mutationFn: async ({ requestId, reason }: { requestId: number; reason: string }) => {
+      return apiRequest("POST", `/api/leave-requests/${requestId}/reject`, {
+        body: JSON.stringify({ rejectionReason: reason }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "تم رفض الطلب",
+        description: "تم رفض طلب الإجازة",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/leave-requests"] });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "فشل في رفض الطلب",
+        variant: "destructive",
+      });
+    }
+  });
+
+  return (
+    <div className="space-y-6">
+      <Tabs defaultValue="daily-attendance" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
+          <TabsTrigger 
+            value="daily-attendance" 
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+          >
+            الحضور اليومي
+          </TabsTrigger>
+          <TabsTrigger 
+            value="pending-requests"
+            className="data-[state=active]:bg-yellow-600 data-[state=active]:text-white"
+          >
+            الطلبات المعلقة
+            {pendingLeaveRequests.length > 0 && (
+              <Badge className="ml-2 bg-yellow-500 text-black">
+                {pendingLeaveRequests.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="daily-attendance" className="mt-6">
+          <div className="glass-container backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-white">الحضور اليومي</h2>
+              <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
+                {dailyAttendance.length} سجل حضور
+              </Badge>
+            </div>
+
+            {dailyAttendance.length === 0 ? (
+              <div className="text-center py-12">
+                <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-white text-lg mb-2">لا توجد سجلات حضور</p>
+                <p className="text-gray-400">لم يتم تسجيل أي حضور لهذا اليوم</p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {dailyAttendance.map((attendance: any) => (
+                  <div key={attendance.id} className="glass-container backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="font-semibold text-white text-lg">{attendance.employeeName}</h3>
+                        <p className="text-gray-300">{format(new Date(attendance.date), "dd/MM/yyyy", { locale: ar })}</p>
+                      </div>
+                      <Badge 
+                        variant="outline" 
+                        className={`
+                          ${attendance.isConfirmed ? 'border-green-400 text-green-300 bg-green-400/10' : 'border-yellow-400 text-yellow-300 bg-yellow-400/10'}
+                        `}
+                      >
+                        {attendance.isConfirmed ? 'مؤكد' : 'غير مؤكد'}
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-gray-300 text-sm">نوع الدوام</Label>
+                        <p className="text-white">{attendance.scheduleType}</p>
+                      </div>
+                      {attendance.notes && (
+                        <div>
+                          <Label className="text-gray-300 text-sm">ملاحظات</Label>
+                          <p className="text-white">{attendance.notes}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Display timing information based on schedule type */}
+                    {attendance.scheduleType === "متصل" ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        {attendance.continuousCheckinTime && (
+                          <div>
+                            <Label className="text-gray-300 text-sm">وقت الحضور</Label>
+                            <p className="text-white">{attendance.continuousCheckinTime}</p>
+                          </div>
+                        )}
+                        {attendance.continuousCheckoutTime && (
+                          <div>
+                            <Label className="text-gray-300 text-sm">وقت الانصراف</Label>
+                            <p className="text-white">{attendance.continuousCheckoutTime}</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                        {attendance.morningCheckinTime && (
+                          <div>
+                            <Label className="text-gray-300 text-sm">حضور صباحي</Label>
+                            <p className="text-white">{attendance.morningCheckinTime}</p>
+                          </div>
+                        )}
+                        {attendance.morningCheckoutTime && (
+                          <div>
+                            <Label className="text-gray-300 text-sm">انصراف صباحي</Label>
+                            <p className="text-white">{attendance.morningCheckoutTime}</p>
+                          </div>
+                        )}
+                        {attendance.eveningCheckinTime && (
+                          <div>
+                            <Label className="text-gray-300 text-sm">حضور مسائي</Label>
+                            <p className="text-white">{attendance.eveningCheckinTime}</p>
+                          </div>
+                        )}
+                        {attendance.eveningCheckoutTime && (
+                          <div>
+                            <Label className="text-gray-300 text-sm">انصراف مسائي</Label>
+                            <p className="text-white">{attendance.eveningCheckoutTime}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="pending-requests" className="mt-6">
+          <div className="glass-container backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-white">طلبات الإجازة والاستئذان المعلقة</h2>
+              <div className="flex gap-3 items-center">
+                <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300">
+                  {pendingLeaveRequests.length} طلب معلق
+                </Badge>
+              </div>
+            </div>
+
+            {pendingLeaveRequests.length === 0 ? (
+              <div className="text-center py-12">
+                <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+                <p className="text-white text-lg mb-2">لا توجد طلبات معلقة</p>
+                <p className="text-gray-400">جميع طلبات الإجازة والاستئذان تم التعامل معها</p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {pendingLeaveRequests.map((request: any) => (
+                  <div key={request.id} className="glass-container backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="font-semibold text-white text-lg">{request.userName}</h3>
+                        <p className="text-gray-300">{request.requestType}</p>
+                      </div>
+                      <Badge 
+                        variant="outline" 
+                        className="border-yellow-400 text-yellow-300 bg-yellow-400/10"
+                      >
+                        معلق
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <Label className="text-gray-300 text-sm">تاريخ البداية</Label>
+                        <p className="text-white">{format(new Date(request.startDate), "dd/MM/yyyy", { locale: ar })}</p>
+                      </div>
+                      {request.endDate && (
+                        <div>
+                          <Label className="text-gray-300 text-sm">تاريخ النهاية</Label>
+                          <p className="text-white">{format(new Date(request.endDate), "dd/MM/yyyy", { locale: ar })}</p>
+                        </div>
+                      )}
+                      <div>
+                        <Label className="text-gray-300 text-sm">المدة</Label>
+                        <p className="text-white">{request.duration} {request.durationType}</p>
+                      </div>
+                      <div>
+                        <Label className="text-gray-300 text-sm">تاريخ الطلب</Label>
+                        <p className="text-white">{format(new Date(request.createdAt), "dd/MM/yyyy", { locale: ar })}</p>
+                      </div>
+                    </div>
+                    
+                    {request.reason && (
+                      <div className="mb-4">
+                        <Label className="text-gray-300 text-sm">السبب</Label>
+                        <p className="text-white bg-slate-800/30 p-3 rounded-lg mt-1">{request.reason}</p>
+                      </div>
+                    )}
+                    
+                    <div className="flex gap-3 justify-end">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="border-red-400 text-red-300 hover:bg-red-400/10"
+                        onClick={() => {
+                          const reason = prompt("سبب الرفض (اختياري):");
+                          if (reason !== null) { // User didn't cancel
+                            rejectRequestMutation.mutate({ 
+                              requestId: request.id, 
+                              reason: reason || "لم يتم تحديد سبب" 
+                            });
+                          }
+                        }}
+                        disabled={rejectRequestMutation.isPending}
+                      >
+                        <X size={16} className="ml-1" />
+                        رفض
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="border-green-400 text-green-300 hover:bg-green-400/10"
+                        onClick={() => approveRequestMutation.mutate(request.id)}
+                        disabled={approveRequestMutation.isPending}
+                      >
+                        <Check size={16} className="ml-1" />
+                        اعتماد
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
