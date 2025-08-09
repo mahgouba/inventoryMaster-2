@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -93,6 +93,316 @@ export default function HierarchicalView() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Comprehensive vehicle data to be added automatically
+  const defaultVehicleData = [
+    // Toyota
+    {
+      manufacturer: { nameAr: "تويوتا", nameEn: "Toyota" },
+      categories: [
+        { name_ar: "كامري", name_en: "Camry" },
+        { name_ar: "كورولا", name_en: "Corolla" },
+        { name_ar: "افالون", name_en: "Avalon" },
+        { name_ar: "راف فور", name_en: "RAV4" },
+        { name_ar: "هايلاندر", name_en: "Highlander" },
+        { name_ar: "برادو", name_en: "Prado" },
+        { name_ar: "لاند كروزر", name_en: "Land Cruiser" },
+        { name_ar: "سيكويا", name_en: "Sequoia" },
+        { name_ar: "تاكوما", name_en: "Tacoma" },
+        { name_ar: "سيينا", name_en: "Sienna" }
+      ]
+    },
+    // Mercedes-Benz
+    {
+      manufacturer: { nameAr: "مرسيدس", nameEn: "Mercedes-Benz" },
+      categories: [
+        { name_ar: "الفئة إي", name_en: "E-Class" },
+        { name_ar: "الفئة سي", name_en: "C-Class" },
+        { name_ar: "الفئة إس", name_en: "S-Class" },
+        { name_ar: "الفئة إيه", name_en: "A-Class" },
+        { name_ar: "سي إل إس", name_en: "CLS" },
+        { name_ar: "جي إل إي", name_en: "GLE" },
+        { name_ar: "جي إل إس", name_en: "GLS" },
+        { name_ar: "جي إل سي", name_en: "GLC" },
+        { name_ar: "جي إل إيه", name_en: "GLA" },
+        { name_ar: "جي كلاس", name_en: "G-Class" }
+      ]
+    },
+    // BMW
+    {
+      manufacturer: { nameAr: "بي ام دبليو", nameEn: "BMW" },
+      categories: [
+        { name_ar: "الفئة الثالثة", name_en: "3 Series" },
+        { name_ar: "الفئة الخامسة", name_en: "5 Series" },
+        { name_ar: "الفئة السابعة", name_en: "7 Series" },
+        { name_ar: "إكس ون", name_en: "X1" },
+        { name_ar: "إكس ثري", name_en: "X3" },
+        { name_ar: "إكس فايف", name_en: "X5" },
+        { name_ar: "إكس سفن", name_en: "X7" },
+        { name_ar: "زي فور", name_en: "Z4" }
+      ]
+    },
+    // Land Rover
+    {
+      manufacturer: { nameAr: "لاند روفر", nameEn: "Land Rover" },
+      categories: [
+        { name_ar: "رينج روفر", name_en: "Range Rover" },
+        { name_ar: "رينج روفر سبورت", name_en: "Range Rover Sport" },
+        { name_ar: "رينج روفر إيفوك", name_en: "Range Rover Evoque" },
+        { name_ar: "ديسكفري", name_en: "Discovery" },
+        { name_ar: "ديفندر", name_en: "Defender" }
+      ]
+    },
+    // Rolls-Royce
+    {
+      manufacturer: { nameAr: "رولز رويس", nameEn: "Rolls-Royce" },
+      categories: [
+        { name_ar: "فانتوم", name_en: "Phantom" },
+        { name_ar: "غوست", name_en: "Ghost" },
+        { name_ar: "ريث", name_en: "Wraith" },
+        { name_ar: "داون", name_en: "Dawn" },
+        { name_ar: "كولينان", name_en: "Cullinan" }
+      ]
+    },
+    // Bentley
+    {
+      manufacturer: { nameAr: "بنتلي", nameEn: "Bentley" },
+      categories: [
+        { name_ar: "كونتيننتال", name_en: "Continental" },
+        { name_ar: "فلاينج سبير", name_en: "Flying Spur" },
+        { name_ar: "بنتايجا", name_en: "Bentayga" }
+      ]
+    },
+    // Lexus
+    {
+      manufacturer: { nameAr: "لكزس", nameEn: "Lexus" },
+      categories: [
+        { name_ar: "إي إس", name_en: "ES" },
+        { name_ar: "آي إس", name_en: "IS" },
+        { name_ar: "جي إس", name_en: "GS" },
+        { name_ar: "إل إس", name_en: "LS" },
+        { name_ar: "آر إكس", name_en: "RX" },
+        { name_ar: "جي إكس", name_en: "GX" },
+        { name_ar: "إل إكس", name_en: "LX" },
+        { name_ar: "إن إكس", name_en: "NX" }
+      ]
+    },
+    // Ferrari
+    {
+      manufacturer: { nameAr: "فيراري", nameEn: "Ferrari" },
+      categories: [
+        { name_ar: "488", name_en: "488" },
+        { name_ar: "إف 8", name_en: "F8" },
+        { name_ar: "إس إف 90", name_en: "SF90" },
+        { name_ar: "روما", name_en: "Roma" },
+        { name_ar: "بورتوفينو", name_en: "Portofino" },
+        { name_ar: "812", name_en: "812" }
+      ]
+    },
+    // Porsche
+    {
+      manufacturer: { nameAr: "بورش", nameEn: "Porsche" },
+      categories: [
+        { name_ar: "911", name_en: "911" },
+        { name_ar: "كايين", name_en: "Cayenne" },
+        { name_ar: "ماكان", name_en: "Macan" },
+        { name_ar: "باناميرا", name_en: "Panamera" },
+        { name_ar: "تايكان", name_en: "Taycan" },
+        { name_ar: "718", name_en: "718" }
+      ]
+    },
+    // Lamborghini
+    {
+      manufacturer: { nameAr: "لامبورجيني", nameEn: "Lamborghini" },
+      categories: [
+        { name_ar: "أفينتادور", name_en: "Aventador" },
+        { name_ar: "هوراكان", name_en: "Huracan" },
+        { name_ar: "أوروس", name_en: "Urus" }
+      ]
+    },
+    // Tesla
+    {
+      manufacturer: { nameAr: "تسلا", nameEn: "Tesla" },
+      categories: [
+        { name_ar: "موديل إس", name_en: "Model S" },
+        { name_ar: "موديل 3", name_en: "Model 3" },
+        { name_ar: "موديل إكس", name_en: "Model X" },
+        { name_ar: "موديل واي", name_en: "Model Y" }
+      ]
+    },
+    // Ford
+    {
+      manufacturer: { nameAr: "فورد", nameEn: "Ford" },
+      categories: [
+        { name_ar: "فيوجن", name_en: "Fusion" },
+        { name_ar: "إكسبلورر", name_en: "Explorer" },
+        { name_ar: "إف 150", name_en: "F-150" },
+        { name_ar: "موستانج", name_en: "Mustang" },
+        { name_ar: "إسكيب", name_en: "Escape" }
+      ]
+    },
+    // GMC
+    {
+      manufacturer: { nameAr: "جي إم سي", nameEn: "GMC" },
+      categories: [
+        { name_ar: "سييرا", name_en: "Sierra" },
+        { name_ar: "أكاديا", name_en: "Acadia" },
+        { name_ar: "تيرين", name_en: "Terrain" },
+        { name_ar: "يوكون", name_en: "Yukon" }
+      ]
+    },
+    // Chevrolet
+    {
+      manufacturer: { nameAr: "شيفروليه", nameEn: "Chevrolet" },
+      categories: [
+        { name_ar: "تاهو", name_en: "Tahoe" },
+        { name_ar: "سوبربان", name_en: "Suburban" },
+        { name_ar: "إكوينوكس", name_en: "Equinox" },
+        { name_ar: "كامارو", name_en: "Camaro" }
+      ]
+    },
+    // Dodge
+    {
+      manufacturer: { nameAr: "دودج", nameEn: "Dodge" },
+      categories: [
+        { name_ar: "تشالنجر", name_en: "Challenger" },
+        { name_ar: "تشارجر", name_en: "Charger" },
+        { name_ar: "دورانجو", name_en: "Durango" },
+        { name_ar: "رام", name_en: "RAM" }
+      ]
+    },
+    // Lincoln
+    {
+      manufacturer: { nameAr: "لينكولن", nameEn: "Lincoln" },
+      categories: [
+        { name_ar: "نافيجيتور", name_en: "Navigator" },
+        { name_ar: "أفياتور", name_en: "Aviator" },
+        { name_ar: "كورسير", name_en: "Corsair" },
+        { name_ar: "إم كي زد", name_en: "MKZ" }
+      ]
+    },
+    // Nissan
+    {
+      manufacturer: { nameAr: "نيسان", nameEn: "Nissan" },
+      categories: [
+        { name_ar: "ألتيما", name_en: "Altima" },
+        { name_ar: "سنترا", name_en: "Sentra" },
+        { name_ar: "باترول", name_en: "Patrol" },
+        { name_ar: "أرمادا", name_en: "Armada" },
+        { name_ar: "370 زد", name_en: "370Z" }
+      ]
+    },
+    // Infiniti
+    {
+      manufacturer: { nameAr: "انفينيتي", nameEn: "Infiniti" },
+      categories: [
+        { name_ar: "كيو 50", name_en: "Q50" },
+        { name_ar: "كيو 60", name_en: "Q60" },
+        { name_ar: "كيو 70", name_en: "Q70" },
+        { name_ar: "كيو إكس 50", name_en: "QX50" },
+        { name_ar: "كيو إكس 60", name_en: "QX60" },
+        { name_ar: "كيو إكس 80", name_en: "QX80" }
+      ]
+    }
+  ];
+
+  // Trim levels data
+  const trimLevelsData = [
+    { name_ar: "فل كامل", name_en: "Full Option" },
+    { name_ar: "فل", name_en: "Full" },
+    { name_ar: "ستاندرد", name_en: "Standard" },
+    { name_ar: "بريميوم", name_en: "Premium" },
+    { name_ar: "لوكس", name_en: "Luxury" },
+    { name_ar: "سبورت", name_en: "Sport" },
+    { name_ar: "إيه إم جي", name_en: "AMG" },
+    { name_ar: "إم سبورت", name_en: "M Sport" },
+    { name_ar: "إس لاين", name_en: "S-Line" },
+    { name_ar: "إف سبورت", name_en: "F Sport" },
+    { name_ar: "إتش إس إي", name_en: "HSE" },
+    { name_ar: "أوتوبايوجرافي", name_en: "Autobiography" }
+  ];
+
+  // Colors data
+  const colorsData = {
+    exterior: [
+      { name: "أبيض / White", code: "#FFFFFF" },
+      { name: "أبيض لؤلؤي / Pearl White", code: "#F8F8FF" },
+      { name: "أسود / Black", code: "#000000" },
+      { name: "أسود معدني / Metallic Black", code: "#1C1C1C" },
+      { name: "فضي / Silver", code: "#C0C0C0" },
+      { name: "رمادي / Gray", code: "#808080" },
+      { name: "رمادي معدني / Metallic Gray", code: "#696969" },
+      { name: "أزرق / Blue", code: "#0066CC" },
+      { name: "أزرق معدني / Metallic Blue", code: "#003366" },
+      { name: "أحمر / Red", code: "#CC0000" },
+      { name: "بني / Brown", code: "#8B4513" },
+      { name: "بيج / Beige", code: "#F5F5DC" },
+      { name: "ذهبي / Gold", code: "#FFD700" },
+      { name: "برونزي / Bronze", code: "#CD7F32" },
+      { name: "أخضر / Green", code: "#006600" }
+    ],
+    interior: [
+      { name: "بيج / Beige", code: "#F5F5DC" },
+      { name: "أسود / Black", code: "#000000" },
+      { name: "بني / Brown", code: "#8B4513" },
+      { name: "رمادي / Gray", code: "#808080" },
+      { name: "كريمي / Cream", code: "#FFFDD0" },
+      { name: "أبيض / White", code: "#FFFFFF" },
+      { name: "أحمر / Red", code: "#8B0000" },
+      { name: "أزرق / Blue", code: "#000080" }
+    ]
+  };
+
+  // Auto-populate data mutation
+  const autoPopulateDataMutation = useMutation({
+    mutationFn: async () => {
+      const results = [];
+      
+      for (const vehicleData of defaultVehicleData) {
+        try {
+          // Add manufacturer
+          const manufacturerResult = await apiRequest('POST', '/api/hierarchical/manufacturers', vehicleData.manufacturer);
+          const manufacturerId = manufacturerResult.id;
+
+          // Add categories
+          for (const category of vehicleData.categories) {
+            const categoryResult = await apiRequest('POST', '/api/hierarchical/categories', {
+              ...category,
+              manufacturer_id: manufacturerId
+            });
+            const categoryId = categoryResult.id;
+
+            // Add trim levels for each category
+            for (const trimLevel of trimLevelsData) {
+              try {
+                await apiRequest('POST', '/api/hierarchical/trimLevels', {
+                  ...trimLevel,
+                  category_id: categoryId
+                });
+              } catch (error) {
+                // Continue if trim level already exists
+              }
+            }
+          }
+        } catch (error) {
+          // Continue if manufacturer already exists
+        }
+      }
+
+      return results;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تم تحميل البيانات بنجاح",
+        description: "تم إضافة جميع الشركات والفئات ودرجات التجهيز والألوان",
+      });
+    },
+    onError: (error) => {
+      console.log("البيانات موجودة مسبقاً أو حدث خطأ:", error);
+    }
+  });
+
   // Fetch manufacturers
   const { data: manufacturers = [] } = useQuery({
     queryKey: ['/api/hierarchical/manufacturers'],
@@ -102,6 +412,15 @@ export default function HierarchicalView() {
   const { data: hierarchyData = [], isLoading, error } = useQuery({
     queryKey: ['/api/hierarchy/full'],
   });
+
+  // Auto-populate data when there are no manufacturers
+  useEffect(() => {
+    if (manufacturers && Array.isArray(manufacturers) && manufacturers.length === 0 && !autoPopulateDataMutation.isPending) {
+      setTimeout(() => {
+        autoPopulateDataMutation.mutate();
+      }, 1000);
+    }
+  }, [manufacturers]);
 
   // Add manufacturer mutation
   const addManufacturerMutation = useMutation({
@@ -275,6 +594,16 @@ export default function HierarchicalView() {
           </h1>
           
           <div className="flex gap-2">
+            {/* Auto-populate Button */}
+            <Button 
+              onClick={() => autoPopulateDataMutation.mutate()}
+              disabled={autoPopulateDataMutation.isPending}
+              className="glass-button flex items-center gap-2 bg-green-600 hover:bg-green-700"
+            >
+              <Layers className="h-4 w-4" />
+              {autoPopulateDataMutation.isPending ? "جاري التحميل..." : "تحميل البيانات الكاملة"}
+            </Button>
+
             {/* Fresh Import Button */}
             <FreshImportButton />
             
@@ -384,6 +713,71 @@ export default function HierarchicalView() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Colors Section */}
+      <Card className="glass-container">
+        <CardHeader className="glass-header">
+          <CardTitle className="text-white text-right flex items-center gap-2">
+            <Palette className="h-5 w-5" />
+            الألوان المتوفرة
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Exterior Colors */}
+            <div>
+              <h3 className="text-lg font-semibold text-white text-right mb-3">الألوان الخارجية</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {colorsData.exterior.map((color, index) => (
+                  <div key={index} className="flex items-center gap-2 p-2 glass-container rounded">
+                    <div 
+                      className="w-6 h-6 rounded-full border border-gray-300"
+                      style={{ backgroundColor: color.code }}
+                    ></div>
+                    <span className="text-white text-sm">{color.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Interior Colors */}
+            <div>
+              <h3 className="text-lg font-semibold text-white text-right mb-3">الألوان الداخلية</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {colorsData.interior.map((color, index) => (
+                  <div key={index} className="flex items-center gap-2 p-2 glass-container rounded">
+                    <div 
+                      className="w-6 h-6 rounded-full border border-gray-300"
+                      style={{ backgroundColor: color.code }}
+                    ></div>
+                    <span className="text-white text-sm">{color.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Trim Levels Section */}
+      <Card className="glass-container">
+        <CardHeader className="glass-header">
+          <CardTitle className="text-white text-right flex items-center gap-2">
+            <Settings className="h-5 w-5" />
+            درجات التجهيز المتوفرة
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {trimLevelsData.map((trim, index) => (
+              <div key={index} className="p-3 glass-container rounded text-center">
+                <div className="text-white font-medium">{trim.name_ar}</div>
+                <div className="text-gray-300 text-sm">{trim.name_en}</div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
