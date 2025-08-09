@@ -355,32 +355,65 @@ export default function HierarchicalView() {
   // Auto-populate data mutation
   const autoPopulateDataMutation = useMutation({
     mutationFn: async () => {
-      const results = [];
+      const results: any[] = [];
       
       for (const vehicleData of defaultVehicleData) {
         try {
           // Add manufacturer
-          const manufacturerResult = await apiRequest('POST', '/api/hierarchical/manufacturers', vehicleData.manufacturer);
+          const manufacturerResult: any = await apiRequest('POST', '/api/hierarchical/manufacturers', vehicleData.manufacturer);
           const manufacturerId = manufacturerResult.id;
 
           // Add categories
           for (const category of vehicleData.categories) {
-            const categoryResult = await apiRequest('POST', '/api/hierarchical/categories', {
-              ...category,
-              manufacturer_id: manufacturerId
-            });
-            const categoryId = categoryResult.id;
+            try {
+              const categoryResult: any = await apiRequest('POST', '/api/hierarchical/categories', {
+                ...category,
+                manufacturer_id: manufacturerId
+              });
+              const categoryId = categoryResult.id;
 
-            // Add trim levels for each category
-            for (const trimLevel of trimLevelsData) {
-              try {
-                await apiRequest('POST', '/api/hierarchical/trimLevels', {
-                  ...trimLevel,
-                  category_id: categoryId
-                });
-              } catch (error) {
-                // Continue if trim level already exists
+              // Add trim levels for each category
+              for (const trimLevel of trimLevelsData) {
+                try {
+                  const trimLevelResult: any = await apiRequest('POST', '/api/hierarchical/trimLevels', {
+                    ...trimLevel,
+                    category_id: categoryId
+                  });
+                  const trimLevelId = trimLevelResult.id;
+
+                  // Add exterior colors for each trim level
+                  for (const color of colorsData.exterior) {
+                    try {
+                      await apiRequest('POST', '/api/hierarchical/colors', {
+                        name: color.name,
+                        code: color.code,
+                        type: 'exterior',
+                        trimLevelId: trimLevelId
+                      });
+                    } catch (error) {
+                      // Continue if color already exists
+                    }
+                  }
+
+                  // Add interior colors for each trim level
+                  for (const color of colorsData.interior) {
+                    try {
+                      await apiRequest('POST', '/api/hierarchical/colors', {
+                        name: color.name,
+                        code: color.code,
+                        type: 'interior',
+                        trimLevelId: trimLevelId
+                      });
+                    } catch (error) {
+                      // Continue if color already exists
+                    }
+                  }
+                } catch (error) {
+                  // Continue if trim level already exists
+                }
               }
+            } catch (error) {
+              // Continue if category already exists
             }
           }
         } catch (error) {
@@ -421,6 +454,20 @@ export default function HierarchicalView() {
       }, 1000);
     }
   }, [manufacturers]);
+
+  // Add color mutation for trim levels
+  const addColorMutation = useMutation({
+    mutationFn: async (data: { name: string; code: string; type: 'exterior' | 'interior'; trimLevelId: number }) => {
+      return apiRequest('POST', '/api/hierarchical/colors', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تم إضافة اللون",
+        description: "تم إضافة اللون بنجاح",
+      });
+    }
+  });
 
   // Add manufacturer mutation
   const addManufacturerMutation = useMutation({
@@ -717,70 +764,7 @@ export default function HierarchicalView() {
         </CardContent>
       </Card>
 
-      {/* Colors Section */}
-      <Card className="glass-container">
-        <CardHeader className="glass-header">
-          <CardTitle className="text-white text-right flex items-center gap-2">
-            <Palette className="h-5 w-5" />
-            الألوان المتوفرة
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Exterior Colors */}
-            <div>
-              <h3 className="text-lg font-semibold text-white text-right mb-3">الألوان الخارجية</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {colorsData.exterior.map((color, index) => (
-                  <div key={index} className="flex items-center gap-2 p-2 glass-container rounded">
-                    <div 
-                      className="w-6 h-6 rounded-full border border-gray-300"
-                      style={{ backgroundColor: color.code }}
-                    ></div>
-                    <span className="text-white text-sm">{color.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
 
-            {/* Interior Colors */}
-            <div>
-              <h3 className="text-lg font-semibold text-white text-right mb-3">الألوان الداخلية</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {colorsData.interior.map((color, index) => (
-                  <div key={index} className="flex items-center gap-2 p-2 glass-container rounded">
-                    <div 
-                      className="w-6 h-6 rounded-full border border-gray-300"
-                      style={{ backgroundColor: color.code }}
-                    ></div>
-                    <span className="text-white text-sm">{color.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Trim Levels Section */}
-      <Card className="glass-container">
-        <CardHeader className="glass-header">
-          <CardTitle className="text-white text-right flex items-center gap-2">
-            <Settings className="h-5 w-5" />
-            درجات التجهيز المتوفرة
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {trimLevelsData.map((trim, index) => (
-              <div key={index} className="p-3 glass-container rounded text-center">
-                <div className="text-white font-medium">{trim.name_ar}</div>
-                <div className="text-gray-300 text-sm">{trim.name_en}</div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Action Buttons */}
       <div className="flex gap-4 justify-center">
@@ -1325,6 +1309,52 @@ export default function HierarchicalView() {
                                       </div>
                                     </div>
                                   </div>
+                                  
+                                  {/* Colors under Trim Level */}
+                                  <Collapsible.Root open={expandedItems.has(`trim-${trimLevel.id}`)}>
+                                    <Collapsible.Content>
+                                      <div className="space-y-2 mr-6 mt-2">
+                                        <div className="p-2 bg-black/20 rounded">
+                                          <div className="grid grid-cols-2 gap-2">
+                                            <div>
+                                              <h6 className="text-xs font-medium text-gray-300 mb-2">الألوان الخارجية</h6>
+                                              <div className="space-y-1">
+                                                {colorsData.exterior.slice(0, 5).map((color, index) => (
+                                                  <div key={`ext-${index}`} className="flex items-center gap-2">
+                                                    <div 
+                                                      className="w-3 h-3 rounded-full border border-gray-400"
+                                                      style={{ backgroundColor: color.code }}
+                                                    ></div>
+                                                    <span className="text-xs text-white">{color.name.split(' / ')[0]}</span>
+                                                  </div>
+                                                ))}
+                                                {colorsData.exterior.length > 5 && (
+                                                  <span className="text-xs text-gray-400">+{colorsData.exterior.length - 5} لون آخر</span>
+                                                )}
+                                              </div>
+                                            </div>
+                                            <div>
+                                              <h6 className="text-xs font-medium text-gray-300 mb-2">الألوان الداخلية</h6>
+                                              <div className="space-y-1">
+                                                {colorsData.interior.slice(0, 4).map((color, index) => (
+                                                  <div key={`int-${index}`} className="flex items-center gap-2">
+                                                    <div 
+                                                      className="w-3 h-3 rounded-full border border-gray-400"
+                                                      style={{ backgroundColor: color.code }}
+                                                    ></div>
+                                                    <span className="text-xs text-white">{color.name.split(' / ')[0]}</span>
+                                                  </div>
+                                                ))}
+                                                {colorsData.interior.length > 4 && (
+                                                  <span className="text-xs text-gray-400">+{colorsData.interior.length - 4} لون آخر</span>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </Collapsible.Content>
+                                  </Collapsible.Root>
                                   
                                   {/* Colors under Trim Level */}
                                   <Collapsible.Root open={expandedItems.has(`trim-${trimLevel.id}`)}>
