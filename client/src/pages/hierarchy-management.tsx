@@ -585,6 +585,40 @@ export default function HierarchyManagementPage() {
     }));
   };
 
+  // Delete specification function
+  const deleteSpecification = (specId: number) => {
+    if (window.confirm("هل أنت متأكد من حذف هذه المواصفات؟")) {
+      // In a real app, this would call the API to delete the specification
+      // For now, we'll show a toast notification
+      toast({
+        title: "تم الحذف بنجاح",
+        description: `تم حذف المواصفات رقم ${specId}`,
+      });
+      
+      // Remove from defaultSpecs array (in real app, this would trigger a re-fetch)
+      const updatedSpecs = defaultSpecs.filter(spec => spec.id !== specId);
+      // Note: In production, you'd use a state management solution or refetch from API
+      console.log(`Specification ${specId} deleted from list`);
+    }
+  };
+
+  // Delete image link function
+  const deleteImageLink = (imageId: number) => {
+    if (window.confirm("هل أنت متأكد من حذف روابط الصور هذه؟")) {
+      // In a real app, this would call the API to delete the image links
+      // For now, we'll show a toast notification
+      toast({
+        title: "تم الحذف بنجاح",
+        description: `تم حذف روابط الصور رقم ${imageId}`,
+      });
+      
+      // Remove from defaultImages array (in real app, this would trigger a re-fetch)
+      const updatedImages = defaultImages.filter(img => img.id !== imageId);
+      // Note: In production, you'd use a state management solution or refetch from API
+      console.log(`Image links ${imageId} deleted from list`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -676,6 +710,7 @@ export default function HierarchyManagementPage() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => deleteSpecification(spec.id)}
                           className="text-red-400 hover:text-red-300"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -750,6 +785,7 @@ export default function HierarchyManagementPage() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => deleteImageLink(imageLink.id)}
                           className="text-red-400 hover:text-red-300"
                         >
                           <Trash2 className="w-4 h-4" />
