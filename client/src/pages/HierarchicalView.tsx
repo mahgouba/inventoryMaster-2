@@ -446,14 +446,14 @@ export default function HierarchicalView() {
     queryKey: ['/api/hierarchy/full'],
   });
 
-  // Auto-populate data when there are no manufacturers
-  useEffect(() => {
-    if (manufacturers && Array.isArray(manufacturers) && manufacturers.length === 0 && !autoPopulateDataMutation.isPending) {
-      setTimeout(() => {
-        autoPopulateDataMutation.mutate();
-      }, 1000);
-    }
-  }, [manufacturers]);
+  // Auto-populate disabled to prevent duplicates
+  // useEffect(() => {
+  //   if (manufacturers && Array.isArray(manufacturers) && manufacturers.length === 0 && !autoPopulateDataMutation.isPending) {
+  //     setTimeout(() => {
+  //       autoPopulateDataMutation.mutate();
+  //     }, 1000);
+  //   }
+  // }, [manufacturers]);
 
   // Add color mutation for trim levels
   const addColorMutation = useMutation({
