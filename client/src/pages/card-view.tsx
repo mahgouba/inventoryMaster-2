@@ -54,6 +54,7 @@ import { Badge } from "@/components/ui/badge";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Clock, AlertTriangle, Calendar as CalendarIcon, UserX } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 import { CardViewFAB } from "@/components/animated-fab";
 import InventoryForm from "@/components/inventory-form";
@@ -120,6 +121,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
   const [arrivedTodayOpen, setArrivedTodayOpen] = useState(false);
   const [attendanceDialogOpen, setAttendanceDialogOpen] = useState(false);
+  
+  // Neumorphism design toggle
+  const [neumorphismMode, setNeumorphismMode] = useState(false);
 
   
   // Toggle states for individual filters - default to false (closed)
@@ -817,7 +821,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-purple-950 relative overflow-hidden" dir="rtl">
+    <div className={`min-h-screen relative overflow-hidden ${
+      neumorphismMode 
+        ? 'bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400' 
+        : 'bg-gradient-to-br from-gray-900 via-black to-purple-950'
+    }`} dir="rtl">
       {/* Company Logo Background */}
       <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
         <img 
@@ -833,7 +841,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
       {/* Background Animation Removed */}
       <div className="relative z-10" dir="rtl">
       {/* Header */}
-      <header className="glass-container sticky top-0 z-50 border-b border-white/20 dark:border-slate-700/30">
+      <header className={`sticky top-0 z-50 border-b ${
+        neumorphismMode 
+          ? 'neuro-container border-gray-300' 
+          : 'glass-container border-white/20 dark:border-slate-700/30'
+      }`}>
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
           <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Logo and Company Name */}
@@ -854,6 +866,18 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     />
                   )}
                 </div>
+                
+                {/* Neumorphism Toggle Switch */}
+                <div className="flex flex-col items-center mt-2 space-y-1">
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <Switch
+                      checked={neumorphismMode}
+                      onCheckedChange={setNeumorphismMode}
+                      className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-600 scale-75"
+                    />
+                    <span className="text-xs text-gray-300">نيومورفيزم</span>
+                  </div>
+                </div>
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg hover:text-amber-400 transition-colors duration-300">{companyName}</h1>
@@ -866,7 +890,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
               {/* Home Button */}
               <Link href="/">
-                <Button variant="outline" size="sm" className="glass-button glass-text-primary">
+                <Button variant="outline" size="sm" className={
+                  neumorphismMode 
+                    ? "neuro-button" 
+                    : "glass-button glass-text-primary"
+                }>
                   <Home size={16} className="ml-1" />
                   <span className="hidden sm:inline">الرئيسية</span>
                 </Button>
@@ -877,7 +905,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="glass-button glass-text-primary"
+                  className={
+                    neumorphismMode 
+                      ? "neuro-button" 
+                      : "glass-button glass-text-primary"
+                  }
                   onClick={() => setArrivedTodayOpen(true)}
                 >
                   <Bell size={16} className="ml-1" />
@@ -894,7 +926,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="glass-button glass-text-primary"
+                className={
+                  neumorphismMode 
+                    ? "neuro-button" 
+                    : "glass-button glass-text-primary"
+                }
                 onClick={() => setAttendanceDialogOpen(true)}
               >
                 <UserCheck size={16} className="ml-1" />
@@ -1311,7 +1347,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-in slide-in-from-top-2 fade-in duration-300"
                   >
                   {data.items.map((item) => (
-                    <Card key={item.id} className="glass-card dark:glass-card-dark rounded-2xl overflow-hidden border-0 relative">
+                    <Card key={item.id} className={`rounded-2xl overflow-hidden border-0 relative ${
+                      neumorphismMode 
+                        ? 'neuro-card' 
+                        : 'glass-card dark:glass-card-dark'
+                    }`}>
                       <CardHeader className="pb-3 relative z-10">
                         <div className="flex items-center justify-between">
                           {/* Category and Trim Level Row */}
@@ -1427,8 +1467,12 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="px-2 h-8 hover:bg-yellow-50 border-yellow-300"
-                                style={{color: '#BF9231'}}
+                                className={`px-2 h-8 ${
+                                  neumorphismMode 
+                                    ? 'neuro-button' 
+                                    : 'hover:bg-yellow-50 border-yellow-300'
+                                }`}
+                                style={{color: neumorphismMode ? '#333' : '#BF9231'}}
                                 onClick={() => handleShareItem(item)}
                                 title="مشاركة"
                               >
