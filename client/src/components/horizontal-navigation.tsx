@@ -281,13 +281,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       permission: "attendanceManagement"
     },
 
-    { 
-      title: "الصور", 
-      href: "/images-management", 
-      icon: Image,
-      internal: true,
-      permission: "inventory"
-    },
+
     { 
       title: "التسلسل الهرمي", 
       href: "/hierarchy-management", 

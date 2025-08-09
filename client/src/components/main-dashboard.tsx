@@ -27,7 +27,7 @@ import HierarchyManagementPage from "@/pages/hierarchy-management";
 
 import PriceCardsPage from "@/pages/price-cards";
 
-import ImagesManagementPage from "@/pages/images-management";
+
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
 
@@ -67,8 +67,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return <AttendanceManagementPage userRole={user.role} username={user.username} userId={user.id} />;
 
 
-      case "/images-management":
-        return <ImagesManagementPage />;
+
 
       case "/manufacturer-logos":
         return user.role === "admin" ? <ManufacturerLogosPage userRole={user.role} onLogout={onLogout} /> : null;
