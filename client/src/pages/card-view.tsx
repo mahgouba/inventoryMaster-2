@@ -934,7 +934,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
               {/* QR Scanner Button */}
               <QRScannerButton 
-                onVehicleFound={handleScannedVehicle}
+                onVehicleFound={(vehicleId: number) => {
+                  // Navigate to vehicle detail page
+                  window.location.href = `/vehicles/${vehicleId}`;
+                }}
                 className={
                   neumorphismMode 
                     ? "neuro-button" 
@@ -2222,31 +2225,7 @@ function AttendanceManagementContent() {
     createLeaveRequestMutation.mutate(requestData);
   };
 
-  // Handle scanned QR code result
-  const handleScannedVehicle = async (vehicleId: number) => {
-    try {
-      // Fetch the vehicle details
-      const response = await fetch(`/api/inventory/${vehicleId}`);
-      if (response.ok) {
-        const vehicle = await response.json();
-        setScannedVehicle(vehicle);
-        setScannedVehicleDialogOpen(true);
-      } else {
-        toast({
-          title: "خطأ",
-          description: "لم يتم العثور على المركبة",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching scanned vehicle:', error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ في جلب بيانات المركبة",
-        variant: "destructive",
-      });
-    }
-  };
+
 
   return (
     <div className="space-y-6">
@@ -2710,145 +2689,7 @@ function AttendanceManagementContent() {
         </DialogContent>
       </Dialog>
 
-      {/* Scanned Vehicle Detail Dialog */}
-      {scannedVehicle && (
-        <Dialog open={scannedVehicleDialogOpen} onOpenChange={setScannedVehicleDialogOpen}>
-          <DialogContent className="max-w-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                <ManufacturerLogo
-                  manufacturer={scannedVehicle.manufacturer}
-                  size="sm"
-                  className="w-8 h-8"
-                />
-                {scannedVehicle.manufacturer} {scannedVehicle.category} {scannedVehicle.year}
-              </DialogTitle>
-            </DialogHeader>
 
-            <div className="space-y-6">
-              {/* Vehicle Image */}
-              {scannedVehicle.images && scannedVehicle.images.length > 0 && (
-                <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden">
-                  <img
-                    src={scannedVehicle.images[0]}
-                    alt={`${scannedVehicle.manufacturer} ${scannedVehicle.category}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-
-              {/* Vehicle Details */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">الصانع:</span>
-                    <span className="font-medium">{scannedVehicle.manufacturer}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">الفئة:</span>
-                    <span className="font-medium">{scannedVehicle.category}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">السنة:</span>
-                    <span className="font-medium">{scannedVehicle.year}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">اللون الخارجي:</span>
-                    <span className="font-medium">{scannedVehicle.exteriorColor}</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">درجة التجهيز:</span>
-                    <span className="font-medium">{scannedVehicle.trimLevel}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">اللون الداخلي:</span>
-                    <span className="font-medium">{scannedVehicle.interiorColor}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">الحالة:</span>
-                    <Badge variant={scannedVehicle.status === 'متوفر' ? 'default' : scannedVehicle.status === 'محجوز' ? 'secondary' : 'destructive'}>
-                      {scannedVehicle.status}
-                    </Badge>
-                  </div>
-                  {scannedVehicle.price && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">السعر:</span>
-                      <span className="font-bold text-green-600">{scannedVehicle.price.toLocaleString()} ر.س</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3">
-                {/* Reserve/Cancel Reservation Button */}
-                {scannedVehicle.status === "محجوز" ? (
-                  <Button
-                    onClick={() => {
-                      handleCancelReservation(scannedVehicle);
-                      setScannedVehicleDialogOpen(false);
-                    }}
-                    disabled={cancelingReservationId === scannedVehicle.id}
-                    className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
-                  >
-                    <X size={16} className="ml-1" />
-                    إلغاء الحجز
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => {
-                      handleReserveItem(scannedVehicle);
-                      setScannedVehicleDialogOpen(false);
-                    }}
-                    disabled={scannedVehicle.status === "محجوز" || scannedVehicle.status === "مباع"}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <Calendar size={16} className="ml-1" />
-                    حجز
-                  </Button>
-                )}
-
-                {/* Sell Button */}
-                <Button
-                  onClick={() => {
-                    handleSellItem(scannedVehicle);
-                    setScannedVehicleDialogOpen(false);
-                  }}
-                  disabled={sellingItemId === scannedVehicle.id || scannedVehicle.status === "مباع"}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                >
-                  <ShoppingCart size={16} className="ml-1" />
-                  بيع
-                </Button>
-
-                {/* Share Button */}
-                <Button
-                  onClick={() => {
-                    handleShareItem(scannedVehicle);
-                    setScannedVehicleDialogOpen(false);
-                  }}
-                  className="flex-1"
-                  style={{backgroundColor: '#BF9231', color: 'white'}}
-                >
-                  <Share2 size={16} className="ml-1" />
-                  مشاركة
-                </Button>
-              </div>
-
-              {/* Close Button */}
-              <Button
-                onClick={() => setScannedVehicleDialogOpen(false)}
-                variant="outline"
-                className="w-full"
-              >
-                إغلاق
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 }

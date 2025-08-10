@@ -346,17 +346,25 @@ export default function VehicleDetailPage({ userRole, username, onLogout }: Vehi
           open={reserveDialogOpen}
           onOpenChange={setReserveDialogOpen}
           item={vehicle}
-          onConfirm={handleReserve}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: [`/api/inventory/${vehicleId}`] });
+          }}
         />
       )}
 
       {/* Sell Dialog */}
       {vehicle && (
         <EnhancedSaleDialog
-          item={vehicle}
           isOpen={sellDialogOpen}
           onClose={() => setSellDialogOpen(false)}
-          onSale={handleSell}
+          onConfirm={handleSell}
+          vehicleData={{
+            id: vehicle.id,
+            manufacturer: vehicle.manufacturer,
+            category: vehicle.category,
+            year: vehicle.year,
+            chassisNumber: vehicle.chassisNumber || '',
+          }}
         />
       )}
 

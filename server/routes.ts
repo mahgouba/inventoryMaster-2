@@ -174,6 +174,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get single inventory item by ID
+  app.get("/api/inventory/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid item ID" });
+      }
+      
+      const items = await getStorage().getAllInventoryItems();
+      const item = items.find(item => item.id === id);
+      
+      if (!item) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+      
+      res.json(item);
+    } catch (error) {
+      console.error("Error fetching inventory item:", error);
+      res.status(500).json({ message: "Failed to fetch inventory item" });
+    }
+  });
+
   // Get inventory stats
   app.get("/api/inventory/stats", async (req, res) => {
     try {
