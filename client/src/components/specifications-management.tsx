@@ -369,11 +369,21 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                   <Label htmlFor="description">الوصف التفصيلي</Label>
                   <Textarea
                     id="description"
-                    placeholder="اكتب الوصف التفصيلي للسيارة..."
+                    placeholder="اكتب الوصف التفصيلي للسيارة بالعربية والإنجليزية...
+
+مثال:
+محرك 2.5L هجين مع نظام التحكم الذكي في الوقود
+Hybrid 2.5L engine with intelligent fuel control system
+
+نظام الفرامل المانعة للانزلاق ABS
+Anti-lock Braking System (ABS)
+
+مقاعد جلدية فاخرة مع التدفئة والتهوية
+Premium leather seats with heating and ventilation"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     className="mt-2"
-                    rows={4}
+                    rows={6}
                   />
                 </div>
 
@@ -449,8 +459,42 @@ export default function SpecificationsManagement({ open, onOpenChange }: Specifi
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="bg-slate-50 p-4 rounded-lg">
-                        <p className="text-sm whitespace-pre-wrap">{spec.detailedDescription}</p>
+                      <div className="bg-slate-50 p-4 rounded-lg space-y-3">
+                        {/* Display basic specs in bilingual format */}
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="font-semibold text-slate-700">المحرك / Engine:</span>
+                            <br />
+                            <span className="text-slate-600">{spec.engineCapacity || 'غير محدد / Not specified'}</span>
+                          </div>
+                          <div>
+                            <span className="font-semibold text-slate-700">السنة / Year:</span>
+                            <br />
+                            <span className="text-slate-600">{spec.year}</span>
+                          </div>
+                          <div>
+                            <span className="font-semibold text-slate-700">درجة التجهيز / Trim:</span>
+                            <br />
+                            <span className="text-slate-600">{spec.trimLevel}</span>
+                          </div>
+                          {spec.chassisNumber && (
+                            <div>
+                              <span className="font-semibold text-slate-700">رقم الهيكل / Chassis:</span>
+                              <br />
+                              <span className="text-slate-600 font-mono">{spec.chassisNumber}</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Detailed description in readable format */}
+                        {spec.detailedDescription && (
+                          <div className="border-t pt-3">
+                            <span className="font-semibold text-slate-700 block mb-2">الوصف التفصيلي / Detailed Description:</span>
+                            <p className="text-sm whitespace-pre-wrap text-slate-600 leading-relaxed">
+                              {spec.detailedDescription}
+                            </p>
+                          </div>
+                        )}
                       </div>
                       <div className="flex justify-between text-xs text-slate-500 mt-2">
                         <span>تم الإنشاء: {new Date(spec.createdAt).toLocaleDateString('en-GB')}</span>
