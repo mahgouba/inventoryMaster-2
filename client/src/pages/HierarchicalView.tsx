@@ -780,33 +780,67 @@ export default function HierarchicalView() {
 
                     <div>
                       <Label className="text-right block mb-2">الفئة</Label>
-                      <Input
-                        value={specCategory}
-                        onChange={(e) => setSpecCategory(e.target.value)}
-                        placeholder="اسم الفئة"
-                        dir="rtl"
-                      />
+                      <Select value={specCategory} onValueChange={setSpecCategory}>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر الفئة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {/* Get categories for selected manufacturer */}
+                          {specManufacturer && hierarchyData
+                            .filter((data: HierarchyData) => data.manufacturer.nameAr === specManufacturer)
+                            .flatMap((data: HierarchyData) => data.categories)
+                            .map(category => (
+                              <SelectItem key={category.category.id} value={category.category.nameAr || category.category.name_ar || ""}>
+                                {category.category.nameAr || category.category.name_ar}
+                              </SelectItem>
+                            ))
+                          }
+                          {/* Common categories if no manufacturer selected */}
+                          {!specManufacturer && [
+                            "كامري", "كورولا", "افالون", "راف فور", "هايلاندر", "برادو", "لاند كروزر", "سيكويا",
+                            "الفئة إي", "الفئة سي", "الفئة إس", "جي إل إي", "جي إل إس", "جي كلاس",
+                            "الفئة الثالثة", "الفئة الخامسة", "الفئة السابعة", "إكس ثري", "إكس فايف", "إكس سفن",
+                            "رينج روفر", "رينج روفر سبورت", "ديسكفري", "ديفندر"
+                          ].map(category => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
                       <Label className="text-right block mb-2">درجة التجهيز</Label>
-                      <Input
-                        value={specTrimLevel}
-                        onChange={(e) => setSpecTrimLevel(e.target.value)}
-                        placeholder="درجة التجهيز"
-                        dir="rtl"
-                      />
+                      <Select value={specTrimLevel} onValueChange={setSpecTrimLevel}>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر درجة التجهيز" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {trimLevelsData.map(trim => (
+                            <SelectItem key={trim.name_en} value={trim.name_ar}>
+                              {trim.name_ar}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
                       <Label className="text-right block mb-2">السنة</Label>
-                      <Input
-                        value={specYear}
-                        onChange={(e) => setSpecYear(e.target.value)}
-                        placeholder="2024"
-                        type="number"
-                        dir="rtl"
-                      />
+                      <Select value={specYear} onValueChange={setSpecYear}>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر السنة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {/* Generate years from 2020 to 2026 */}
+                          {Array.from({ length: 7 }, (_, i) => 2026 - i).map(year => (
+                            <SelectItem key={year} value={year.toString()}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </>
                 )}
@@ -1013,53 +1047,105 @@ export default function HierarchicalView() {
 
                     <div>
                       <Label className="text-right block mb-2">الفئة</Label>
-                      <Input
-                        value={imageCategory}
-                        onChange={(e) => setImageCategory(e.target.value)}
-                        placeholder="اسم الفئة"
-                        dir="rtl"
-                      />
+                      <Select value={imageCategory} onValueChange={setImageCategory}>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر الفئة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {/* Get categories for selected manufacturer */}
+                          {imageManufacturer && hierarchyData
+                            .filter((data: HierarchyData) => data.manufacturer.nameAr === imageManufacturer)
+                            .flatMap((data: HierarchyData) => data.categories)
+                            .map(category => (
+                              <SelectItem key={category.category.id} value={category.category.nameAr || category.category.name_ar || ""}>
+                                {category.category.nameAr || category.category.name_ar}
+                              </SelectItem>
+                            ))
+                          }
+                          {/* Common categories if no manufacturer selected */}
+                          {!imageManufacturer && [
+                            "كامري", "كورولا", "افالون", "راف فور", "هايلاندر", "برادو", "لاند كروزر", "سيكويا",
+                            "الفئة إي", "الفئة سي", "الفئة إس", "جي إل إي", "جي إل إس", "جي كلاس",
+                            "الفئة الثالثة", "الفئة الخامسة", "الفئة السابعة", "إكس ثري", "إكس فايف", "إكس سفن",
+                            "رينج روفر", "رينج روفر سبورت", "ديسكفري", "ديفندر"
+                          ].map(category => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
                       <Label className="text-right block mb-2">درجة التجهيز</Label>
-                      <Input
-                        value={imageTrimLevel}
-                        onChange={(e) => setImageTrimLevel(e.target.value)}
-                        placeholder="درجة التجهيز"
-                        dir="rtl"
-                      />
+                      <Select value={imageTrimLevel} onValueChange={setImageTrimLevel}>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر درجة التجهيز" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {trimLevelsData.map(trim => (
+                            <SelectItem key={trim.name_en} value={trim.name_ar}>
+                              {trim.name_ar}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
                       <Label className="text-right block mb-2">السنة</Label>
-                      <Input
-                        value={imageYear}
-                        onChange={(e) => setImageYear(e.target.value)}
-                        placeholder="2024"
-                        type="number"
-                        dir="rtl"
-                      />
+                      <Select value={imageYear} onValueChange={setImageYear}>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر السنة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {/* Generate years from 2020 to 2026 */}
+                          {Array.from({ length: 7 }, (_, i) => 2026 - i).map(year => (
+                            <SelectItem key={year} value={year.toString()}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
                       <Label className="text-right block mb-2">اللون الخارجي</Label>
-                      <Input
-                        value={imageExteriorColor}
-                        onChange={(e) => setImageExteriorColor(e.target.value)}
-                        placeholder="الأبيض اللؤلؤي"
-                        dir="rtl"
-                      />
+                      <Select value={imageExteriorColor} onValueChange={setImageExteriorColor}>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر اللون الخارجي" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {colorsData.exterior.map(color => (
+                            <SelectItem key={color.name} value={color.name.split(' / ')[0]}>
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 rounded border" style={{backgroundColor: color.code}}></div>
+                                {color.name}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
                       <Label className="text-right block mb-2">اللون الداخلي</Label>
-                      <Input
-                        value={imageInteriorColor}
-                        onChange={(e) => setImageInteriorColor(e.target.value)}
-                        placeholder="أسود جلد"
-                        dir="rtl"
-                      />
+                      <Select value={imageInteriorColor} onValueChange={setImageInteriorColor}>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر اللون الداخلي" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {colorsData.interior.map(color => (
+                            <SelectItem key={color.name} value={color.name.split(' / ')[0]}>
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 rounded border" style={{backgroundColor: color.code}}></div>
+                                {color.name}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </>
                 )}
