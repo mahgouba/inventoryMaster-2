@@ -232,13 +232,18 @@ export default function HierarchicalView() {
     try {
       const data: any = await processExcelFile(importFile);
       
+      let successCount = 0;
+      let skippedCount = 0;
+      
       // Import manufacturers
       if (data.manufacturers?.length > 0) {
         for (const manufacturer of data.manufacturers) {
           try {
             await apiRequest('/api/manufacturers', 'POST', manufacturer);
+            successCount++;
           } catch (error) {
             console.log(`Manufacturer ${manufacturer.nameAr} might already exist`);
+            skippedCount++;
           }
         }
       }
@@ -259,9 +264,11 @@ export default function HierarchicalView() {
                 ...category,
                 manufacturer_id: manufacturer.id
               });
+              successCount++;
             }
           } catch (error) {
             console.log(`Category ${category.nameAr} might already exist`);
+            skippedCount++;
           }
         }
       }
@@ -283,9 +290,11 @@ export default function HierarchicalView() {
                 ...trimLevel,
                 category_id: category.id
               });
+              successCount++;
             }
           } catch (error) {
             console.log(`Trim level ${trimLevel.nameAr} might already exist`);
+            skippedCount++;
           }
         }
       }
@@ -295,8 +304,10 @@ export default function HierarchicalView() {
         for (const color of data.colors) {
           try {
             await apiRequest('/api/colors', 'POST', color);
+            successCount++;
           } catch (error) {
             console.log(`Color ${color.name} might already exist`);
+            skippedCount++;
           }
         }
       }
@@ -309,8 +320,8 @@ export default function HierarchicalView() {
       queryClient.invalidateQueries({ queryKey: ['/api/colors'] });
 
       toast({
-        title: "نجح الاستيراد",
-        description: "تم استيراد البيانات من ملف الإكسل بنجاح"
+        title: "اكتمل الاستيراد الشامل",
+        description: `تم إضافة ${successCount} عنصر جديد، تم تخطي ${skippedCount} عنصر موجود مسبقاً`
       });
 
       setIsImportDialogOpen(false);
@@ -334,9 +345,12 @@ export default function HierarchicalView() {
     // Manufacturers sheet
     const manufacturersData = [
       ['الاسم بالعربية', 'الاسم بالإنجليزية', 'اللوجو'],
-      ['تويوتا', 'Toyota', ''],
-      ['مرسيدس', 'Mercedes-Benz', ''],
-      ['بي ام دبليو', 'BMW', '']
+      ['تويوتا', 'Toyota', 'https://example.com/toyota-logo.png'],
+      ['مرسيدس', 'Mercedes-Benz', 'https://example.com/mercedes-logo.png'],
+      ['بي ام دبليو', 'BMW', 'https://example.com/bmw-logo.png'],
+      ['أودي', 'Audi', 'https://example.com/audi-logo.png'],
+      ['لكزس', 'Lexus', 'https://example.com/lexus-logo.png'],
+      ['نيسان', 'Nissan', 'https://example.com/nissan-logo.png']
     ];
     const manufacturersSheet = XLSX.utils.aoa_to_sheet(manufacturersData);
     XLSX.utils.book_append_sheet(workbook, manufacturersSheet, 'الصناع');
@@ -346,7 +360,14 @@ export default function HierarchicalView() {
       ['الصانع', 'الاسم بالعربية', 'الاسم بالإنجليزية'],
       ['تويوتا', 'كامري', 'Camry'],
       ['تويوتا', 'كورولا', 'Corolla'],
-      ['مرسيدس', 'الفئة إي', 'E-Class']
+      ['تويوتا', 'راف فور', 'RAV4'],
+      ['تويوتا', 'برادو', 'Prado'],
+      ['مرسيدس', 'الفئة إي', 'E-Class'],
+      ['مرسيدس', 'الفئة سي', 'C-Class'],
+      ['مرسيدس', 'جي إل إي', 'GLE'],
+      ['بي ام دبليو', 'الفئة الثالثة', '3 Series'],
+      ['بي ام دبليو', 'الفئة الخامسة', '5 Series'],
+      ['بي ام دبليو', 'إكس ثري', 'X3']
     ];
     const categoriesSheet = XLSX.utils.aoa_to_sheet(categoriesData);
     XLSX.utils.book_append_sheet(workbook, categoriesSheet, 'الفئات');
@@ -356,7 +377,15 @@ export default function HierarchicalView() {
       ['الفئة', 'الصانع', 'الاسم بالعربية', 'الاسم بالإنجليزية'],
       ['كامري', 'تويوتا', 'جي إل إي', 'GLE'],
       ['كامري', 'تويوتا', 'إس إي', 'SE'],
-      ['الفئة إي', 'مرسيدس', 'إي 200', 'E 200']
+      ['كامري', 'تويوتا', 'إل إي', 'LE'],
+      ['كورولا', 'تويوتا', 'إل', 'L'],
+      ['كورولا', 'تويوتا', 'إل إي', 'LE'],
+      ['كورولا', 'تويوتا', 'إكس إل إي', 'XLE'],
+      ['الفئة إي', 'مرسيدس', 'إي 200', 'E 200'],
+      ['الفئة إي', 'مرسيدس', 'إي 300', 'E 300'],
+      ['الفئة إي', 'مرسيدس', 'إي 450', 'E 450'],
+      ['الفئة الثالثة', 'بي ام دبليو', '320i', '320i'],
+      ['الفئة الثالثة', 'بي ام دبليو', '330i', '330i']
     ];
     const trimLevelsSheet = XLSX.utils.aoa_to_sheet(trimLevelsData);
     XLSX.utils.book_append_sheet(workbook, trimLevelsSheet, 'درجات التجهيز');
@@ -364,11 +393,18 @@ export default function HierarchicalView() {
     // Colors sheet
     const colorsData = [
       ['الاسم', 'الرمز', 'النوع'],
-      ['أبيض', '#FFFFFF', 'exterior'],
-      ['أسود', '#000000', 'exterior'],
-      ['أحمر', '#FF0000', 'exterior'],
-      ['بيج', '#F5F5DC', 'interior'],
-      ['أسود', '#000000', 'interior']
+      ['أبيض لؤلؤي', '#FFFFFF', 'exterior'],
+      ['أسود معدني', '#000000', 'exterior'],
+      ['أحمر كرزي', '#8B0000', 'exterior'],
+      ['فضي معدني', '#C0C0C0', 'exterior'],
+      ['أزرق داكن', '#003366', 'exterior'],
+      ['ذهبي', '#FFD700', 'exterior'],
+      ['رمادي جرافيت', '#36454F', 'exterior'],
+      ['بيج فاتح', '#F5F5DC', 'interior'],
+      ['أسود جلد', '#2F2F2F', 'interior'],
+      ['بني جلد', '#8B4513', 'interior'],
+      ['رمادي فاتح', '#D3D3D3', 'interior'],
+      ['كريمي', '#FFFDD0', 'interior']
     ];
     const colorsSheet = XLSX.utils.aoa_to_sheet(colorsData);
     XLSX.utils.book_append_sheet(workbook, colorsSheet, 'الألوان');
@@ -848,24 +884,40 @@ export default function HierarchicalView() {
                 <DialogHeader>
                   <DialogTitle className="text-right">استيراد البيانات من ملف إكسل</DialogTitle>
                   <DialogDescription className="text-right">
-                    يمكنك استيراد الصناع والفئات ودرجات التجهيز والألوان من ملف إكسل
+                    استيراد شامل للصناع والفئات ودرجات التجهيز والألوان الداخلية والخارجية من ملف إكسل واحد
                   </DialogDescription>
                 </DialogHeader>
                 
                 <div className="space-y-4">
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h4 className="font-semibold text-blue-800 text-right mb-2">تنسيق الملف المطلوب:</h4>
+                    <ul className="text-sm text-blue-700 text-right space-y-1">
+                      <li>• ورقة "الصناع": الاسم العربي، الاسم الإنجليزي، رابط الشعار</li>
+                      <li>• ورقة "الفئات": الصانع، الاسم العربي، الاسم الإنجليزي</li>
+                      <li>• ورقة "درجات التجهيز": الفئة، الصانع، الاسم العربي، الاسم الإنجليزي</li>
+                      <li>• ورقة "الألوان": الاسم، الرمز اللوني، النوع (exterior/interior)</li>
+                    </ul>
+                  </div>
+
                   <div>
-                    <Label className="text-right block mb-2">اختر ملف الإكسل</Label>
+                    <Label className="text-right block mb-2">اختر ملف الإكسل (.xlsx أو .xls)</Label>
                     <Input
                       type="file"
                       accept=".xlsx,.xls"
                       onChange={handleFileSelect}
                       className="mt-2"
+                      dir="rtl"
                     />
                   </div>
                   
                   {importFile && (
-                    <div className="text-sm text-gray-600 text-right">
-                      ملف محدد: {importFile.name}
+                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                      <div className="text-sm text-green-800 text-right">
+                        ✓ ملف محدد: {importFile.name}
+                      </div>
+                      <div className="text-xs text-green-600 text-right mt-1">
+                        الحجم: {(importFile.size / 1024).toFixed(1)} KB
+                      </div>
                     </div>
                   )}
                   
@@ -876,7 +928,7 @@ export default function HierarchicalView() {
                       className="glass-button flex items-center gap-2 flex-1"
                     >
                       <Download size={16} />
-                      تحميل النموذج
+                      تحميل النموذج الشامل
                     </Button>
                     
                     <Button
@@ -885,7 +937,7 @@ export default function HierarchicalView() {
                       className="glass-button flex items-center gap-2 flex-1"
                     >
                       <Upload size={16} />
-                      {isImporting ? 'جاري الاستيراد...' : 'استيراد البيانات'}
+                      {isImporting ? 'جاري الاستيراد الشامل...' : 'استيراد جميع البيانات'}
                     </Button>
                   </div>
                 </div>
