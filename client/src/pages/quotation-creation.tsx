@@ -386,13 +386,10 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
   const [selectedRepresentative, setSelectedRepresentative] = useState<string>("");
   const [selectedCompany, setSelectedCompany] = useState<string>("");
   
-  // Available representatives
-  const representatives = [
-    { id: "1", name: "أحمد محمد", phone: "01234567890", email: "ahmed@company.com", position: "مندوب مبيعات أول" },
-    { id: "2", name: "محمد عبدالله", phone: "01234567891", email: "mohammed@company.com", position: "مندوب مبيعات" },
-    { id: "3", name: "سارة أحمد", phone: "01234567892", email: "sarah@company.com", position: "مديرة مبيعات" },
-    { id: "4", name: "عمر حسن", phone: "01234567893", email: "omar@company.com", position: "مستشار مبيعات" },
-  ];
+  // Fetch users from API for sales representatives
+  const { data: users = [] } = useQuery({
+    queryKey: ["/api/users"]
+  });
   
   // Fetch companies from API
   const { data: companies = [] } = useQuery<Company[]>({
@@ -836,7 +833,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
         validityDays: validityDays || 30,
         createdBy: "system", // Should be current user
         companyData: JSON.stringify(selectedCompanyData || {}),
-        representativeData: JSON.stringify(representatives.find(r => r.id === selectedRepresentative) || {}),
+        representativeData: JSON.stringify(users.find((user: any) => user.id.toString() === selectedRepresentative) || {}),
         pricingDetails: JSON.stringify(pricingDetails),
         qrCodeData: JSON.stringify({ quoteNumber: quoteNumber || generateQuoteNumber(), customerName: customerName || "عميل غير محدد", finalPrice: totals.finalTotal })
       };
@@ -897,7 +894,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     
     if (selectedEmployee && sendToWorkNumber) {
       // Use employee's work number
-      const selectedRep = representatives.find(r => r.id === selectedEmployee);
+      const selectedRep = users.find((user: any) => user.id.toString() === selectedEmployee);
       if (selectedRep) {
         targetNumber = selectedRep.phone.startsWith('+') ? selectedRep.phone : `+966${selectedRep.phone.replace(/^0/, '')}`;
       }
@@ -984,7 +981,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
 💰 السعر النهائي: ${calculateTotals().finalTotal.toLocaleString()} ريال
 
 📱 للاستفسار:
-${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567890"}
+${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phoneNumber || "01234567890"}
 
 🏢 ${selectedCompanyData?.name || "شركة السيارات"}
 
@@ -1696,7 +1693,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
     const totals = calculateTotals();
     
     // Get selected representative and company data (use defaults if not selected)
-    const selectedRepData = representatives.find(rep => rep.id === selectedRepresentative) || {
+    const selectedRepData = users.find((user: any) => user.id.toString() === selectedRepresentative) || {
       id: "",
       name: "",
       phone: "",
@@ -2312,9 +2309,9 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                             <SelectValue placeholder="اختر المندوب" />
                           </SelectTrigger>
                           <SelectContent>
-                            {representatives.map((rep) => (
-                              <SelectItem key={rep.id} value={rep.id}>
-                                {rep.name} - {rep.position}
+                            {users.map((user: any) => (
+                              <SelectItem key={user.id} value={user.id.toString()}>
+                                {user.name} - {user.jobTitle}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -2619,10 +2616,10 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
           licensePlateSubjectToTax={pricingDetails.licensePlateSubjectToTax}
           taxRate={pricingDetails.taxRate}
           isVATInclusive={pricingDetails.isVATInclusive}
-          representativeName={representatives.find(r => r.id === selectedRepresentative)?.name || "غير محدد"}
-          representativePhone={representatives.find(r => r.id === selectedRepresentative)?.phone || "غير محدد"}
-          representativeEmail={representatives.find(r => r.id === selectedRepresentative)?.email || "غير محدد"}
-          representativePosition={representatives.find(r => r.id === selectedRepresentative)?.position || "غير محدد"}
+          representativeName={users.find((user: any) => user.id.toString() === selectedRepresentative)?.name || ""}
+          representativePhone={users.find((user: any) => user.id.toString() === selectedRepresentative)?.phoneNumber || ""}
+          representativeEmail={users.find((user: any) => user.id.toString() === selectedRepresentative)?.email || ""}
+          representativePosition={users.find((user: any) => user.id.toString() === selectedRepresentative)?.jobTitle || ""}
           notes={notes}
           termsRefreshTrigger={termsRefreshTrigger}
           companyStamp={showStamp ? companyStamp : null}
@@ -3412,7 +3409,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
 
         {/* Representative Information - Hidden if no representative selected */}
         {(() => {
-          const rep = representatives.find(r => r.id === selectedRepresentative);
+          const rep = users.find((user: any) => user.id.toString() === selectedRepresentative);
           return rep ? (
             <div className="print-section">
               <h3>بيانات المندوب</h3>
@@ -3554,9 +3551,9 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   <SelectValue placeholder="اختر موظف لإرسال الرسالة إليه" />
                 </SelectTrigger>
                 <SelectContent>
-                  {representatives.map((rep) => (
-                    <SelectItem key={rep.id} value={rep.id}>
-                      {rep.name} - {rep.position}
+                  {users.map((user: any) => (
+                    <SelectItem key={user.id} value={user.id.toString()}>
+                      {user.name} - {user.jobTitle}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -3572,7 +3569,7 @@ ${representatives.find(r => r.id === selectedRepresentative)?.phone || "01234567
                   onCheckedChange={setSendToWorkNumber}
                 />
                 <Label htmlFor="send-to-work" className="text-sm">
-                  إرسال على رقم العمل: {representatives.find(r => r.id === selectedEmployee)?.phone}
+                  إرسال على رقم العمل: {users.find((user: any) => user.id.toString() === selectedEmployee)?.phoneNumber}
                 </Label>
               </div>
             )}
