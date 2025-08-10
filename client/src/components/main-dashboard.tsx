@@ -86,8 +86,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
       case "/cars-migration":
         return user.role === "admin" ? <CarsMigrationPage /> : null;
 
-      case "/hierarchy":
-        return user.role === "admin" ? <HierarchicalView /> : null;
+
       case "/hierarchy-management":
         return user.role === "admin" ? <HierarchicalView /> : null;
 
