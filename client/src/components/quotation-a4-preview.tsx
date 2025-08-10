@@ -494,48 +494,49 @@ export default function QuotationA4Preview({
             </div>
           </div>
 
-          {/* Bottom Row: Sales Representative and Company Stamp */}
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            {/* Sales Representative */}
-            <div className="rounded-lg p-3 bg-white/50">
-              <div className="flex items-center gap-2 mb-2">
-                <User className="text-[#C79C45] w-5 h-5" />
-                <span className="text-lg font-bold text-black/80">مندوب المبيعات</span>
-              </div>
-              
-              <div className="space-y-1 text-sm text-black/80">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">الاسم:</span>
-                  <span>{representativeName || "غير محدد"}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">الجوال:</span>
-                  <span>{representativePhone || "غير محدد"}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Company Stamp - removed border, icon, and text */}
-            <div className="rounded-lg p-3 bg-white/50">
-              <div className="flex items-center justify-center h-20">
-                {companyStamp ? (
-                  <img 
-                    src={companyStamp} 
-                    alt="ختم الشركة" 
-                    className="object-contain"
-                    style={{ height: '4cm', width: '6cm' }}
-                  />
-                ) : (
-                  <div className="text-center text-black/60 text-sm">
-                    <div className="border-2 border-dashed border-black/20 rounded-lg flex items-center justify-center"
-                         style={{ height: '4cm', width: '6cm' }}>
-                      <span className="text-xs">ختم الشركة</span>
-                    </div>
+          {/* Bottom Row: Sales Representative and Company Stamp - Show only if data exists */}
+          {(representativeName || companyStamp) && (
+            <div className={`${
+              representativeName && companyStamp ? 'grid grid-cols-2' : 'flex justify-center'
+            } gap-3 mb-3`}>
+              {/* Sales Representative - Only show if representative name exists */}
+              {representativeName && (
+                <div className="rounded-lg p-3 bg-white/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <User className="text-[#C79C45] w-5 h-5" />
+                    <span className="text-lg font-bold text-black/80">مندوب المبيعات</span>
                   </div>
-                )}
-              </div>
+                  
+                  <div className="space-y-1 text-sm text-black/80">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">الاسم:</span>
+                      <span>{representativeName}</span>
+                    </div>
+                    {representativePhone && (
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold">الجوال:</span>
+                        <span>{representativePhone}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Company Stamp - Only show if stamp exists */}
+              {companyStamp && (
+                <div className="rounded-lg p-3 bg-white/50">
+                  <div className="flex items-center justify-center h-20">
+                    <img 
+                      src={companyStamp} 
+                      alt="ختم الشركة" 
+                      className="object-contain"
+                      style={{ height: '4cm', width: '6cm' }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
         </div>
       </div>
