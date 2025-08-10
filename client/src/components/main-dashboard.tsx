@@ -23,7 +23,7 @@ import DatabaseManagement from "@/pages/database-management";
 import CarsMigrationPage from "@/pages/cars-migration";
 
 import HierarchicalView from "@/pages/HierarchicalView";
-import HierarchyManagementPage from "@/pages/hierarchy-management";
+
 
 import PriceCardsPage from "@/pages/price-cards";
 
@@ -89,7 +89,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
       case "/hierarchy":
         return user.role === "admin" ? <HierarchicalView /> : null;
       case "/hierarchy-management":
-        return user.role === "admin" ? <HierarchyManagementPage /> : null;
+        return user.role === "admin" ? <HierarchicalView /> : null;
 
       case "/price-cards":
         return <PriceCardsPage />;
