@@ -9,7 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Trash2, Save, X, Eye, EyeOff, Edit2, FileText, Image, Link } from "lucide-react";
+import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Trash2, Save, X, Eye, EyeOff, Edit2, FileText, Image, Link, Upload, Download } from "lucide-react";
+import * as XLSX from 'xlsx';
 import * as Collapsible from "@radix-ui/react-collapsible";
 // import { FreshImportButton } from "@/components/FreshImportButton"; // Removed per user request
 
@@ -129,6 +130,11 @@ export default function HierarchicalView() {
   const [specSpecifications, setSpecSpecifications] = useState("");
   const [specSpecificationsEn, setSpecSpecificationsEn] = useState("");
 
+  // Excel import state
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+
   // Image link form states
   const [imageManufacturer, setImageManufacturer] = useState("");
   const [imageCategory, setImageCategory] = useState("");
@@ -143,6 +149,233 @@ export default function HierarchicalView() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Excel import functions
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImportFile(file);
+    }
+  };
+
+  const processExcelFile = async (file: File) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          
+          const result: any = {};
+          
+          // Process each sheet
+          workbook.SheetNames.forEach(sheetName => {
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            
+            if (sheetName.toLowerCase().includes('manufacturer') || sheetName.toLowerCase().includes('صناع')) {
+              result.manufacturers = jsonData.slice(1).map((row: any) => ({
+                nameAr: row[0],
+                nameEn: row[1],
+                logo: row[2] || ''
+              })).filter((item: any) => item.nameAr);
+            }
+            
+            if (sheetName.toLowerCase().includes('categor') || sheetName.toLowerCase().includes('فئات')) {
+              result.categories = jsonData.slice(1).map((row: any) => ({
+                manufacturer: row[0],
+                nameAr: row[1],
+                nameEn: row[2]
+              })).filter((item: any) => item.nameAr && item.manufacturer);
+            }
+            
+            if (sheetName.toLowerCase().includes('trim') || sheetName.toLowerCase().includes('تجهيز')) {
+              result.trimLevels = jsonData.slice(1).map((row: any) => ({
+                category: row[0],
+                manufacturer: row[1],
+                nameAr: row[2],
+                nameEn: row[3]
+              })).filter((item: any) => item.nameAr && item.category);
+            }
+            
+            if (sheetName.toLowerCase().includes('color') || sheetName.toLowerCase().includes('لون')) {
+              result.colors = jsonData.slice(1).map((row: any) => ({
+                name: row[0],
+                code: row[1] || '',
+                type: row[2] === 'interior' || row[2] === 'داخلي' ? 'interior' : 'exterior'
+              })).filter((item: any) => item.name);
+            }
+          });
+          
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
+  const importExcelData = async () => {
+    if (!importFile) {
+      toast({
+        title: "خطأ",
+        description: "يرجى اختيار ملف إكسل",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsImporting(true);
+    
+    try {
+      const data: any = await processExcelFile(importFile);
+      
+      // Import manufacturers
+      if (data.manufacturers?.length > 0) {
+        for (const manufacturer of data.manufacturers) {
+          try {
+            await apiRequest('/api/manufacturers', 'POST', manufacturer);
+          } catch (error) {
+            console.log(`Manufacturer ${manufacturer.nameAr} might already exist`);
+          }
+        }
+      }
+
+      // Import categories
+      if (data.categories?.length > 0) {
+        for (const category of data.categories) {
+          try {
+            // Find manufacturer by name
+            const manufacturerResponse = await fetch('/api/manufacturers');
+            const manufacturers = await manufacturerResponse.json();
+            const manufacturer = manufacturers.find((m: any) => 
+              m.nameAr === category.manufacturer || m.nameEn === category.manufacturer
+            );
+            
+            if (manufacturer) {
+              await apiRequest('/api/categories', 'POST', {
+                ...category,
+                manufacturer_id: manufacturer.id
+              });
+            }
+          } catch (error) {
+            console.log(`Category ${category.nameAr} might already exist`);
+          }
+        }
+      }
+
+      // Import trim levels
+      if (data.trimLevels?.length > 0) {
+        for (const trimLevel of data.trimLevels) {
+          try {
+            // Find category by name and manufacturer
+            const categoriesResponse = await fetch('/api/categories');
+            const categories = await categoriesResponse.json();
+            const category = categories.find((c: any) => 
+              (c.nameAr === trimLevel.category || c.name_ar === trimLevel.category) &&
+              (c.manufacturer?.nameAr === trimLevel.manufacturer || c.manufacturer?.nameEn === trimLevel.manufacturer)
+            );
+            
+            if (category) {
+              await apiRequest('/api/trim-levels', 'POST', {
+                ...trimLevel,
+                category_id: category.id
+              });
+            }
+          } catch (error) {
+            console.log(`Trim level ${trimLevel.nameAr} might already exist`);
+          }
+        }
+      }
+
+      // Import colors
+      if (data.colors?.length > 0) {
+        for (const color of data.colors) {
+          try {
+            await apiRequest('/api/colors', 'POST', color);
+          } catch (error) {
+            console.log(`Color ${color.name} might already exist`);
+          }
+        }
+      }
+
+      // Refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/categories'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/colors'] });
+
+      toast({
+        title: "نجح الاستيراد",
+        description: "تم استيراد البيانات من ملف الإكسل بنجاح"
+      });
+
+      setIsImportDialogOpen(false);
+      setImportFile(null);
+      
+    } catch (error) {
+      console.error('Import error:', error);
+      toast({
+        title: "خطأ في الاستيراد",
+        description: "حدث خطأ أثناء استيراد البيانات",
+        variant: "destructive"
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const downloadExcelTemplate = () => {
+    const workbook = XLSX.utils.book_new();
+
+    // Manufacturers sheet
+    const manufacturersData = [
+      ['الاسم بالعربية', 'الاسم بالإنجليزية', 'اللوجو'],
+      ['تويوتا', 'Toyota', ''],
+      ['مرسيدس', 'Mercedes-Benz', ''],
+      ['بي ام دبليو', 'BMW', '']
+    ];
+    const manufacturersSheet = XLSX.utils.aoa_to_sheet(manufacturersData);
+    XLSX.utils.book_append_sheet(workbook, manufacturersSheet, 'الصناع');
+
+    // Categories sheet
+    const categoriesData = [
+      ['الصانع', 'الاسم بالعربية', 'الاسم بالإنجليزية'],
+      ['تويوتا', 'كامري', 'Camry'],
+      ['تويوتا', 'كورولا', 'Corolla'],
+      ['مرسيدس', 'الفئة إي', 'E-Class']
+    ];
+    const categoriesSheet = XLSX.utils.aoa_to_sheet(categoriesData);
+    XLSX.utils.book_append_sheet(workbook, categoriesSheet, 'الفئات');
+
+    // Trim levels sheet
+    const trimLevelsData = [
+      ['الفئة', 'الصانع', 'الاسم بالعربية', 'الاسم بالإنجليزية'],
+      ['كامري', 'تويوتا', 'جي إل إي', 'GLE'],
+      ['كامري', 'تويوتا', 'إس إي', 'SE'],
+      ['الفئة إي', 'مرسيدس', 'إي 200', 'E 200']
+    ];
+    const trimLevelsSheet = XLSX.utils.aoa_to_sheet(trimLevelsData);
+    XLSX.utils.book_append_sheet(workbook, trimLevelsSheet, 'درجات التجهيز');
+
+    // Colors sheet
+    const colorsData = [
+      ['الاسم', 'الرمز', 'النوع'],
+      ['أبيض', '#FFFFFF', 'exterior'],
+      ['أسود', '#000000', 'exterior'],
+      ['أحمر', '#FF0000', 'exterior'],
+      ['بيج', '#F5F5DC', 'interior'],
+      ['أسود', '#000000', 'interior']
+    ];
+    const colorsSheet = XLSX.utils.aoa_to_sheet(colorsData);
+    XLSX.utils.book_append_sheet(workbook, colorsSheet, 'الألوان');
+
+    // Download the file
+    XLSX.writeFile(workbook, 'hierarchy_template.xlsx');
+  };
 
   // Comprehensive vehicle data to be added automatically
   const defaultVehicleData = [
@@ -603,6 +836,62 @@ export default function HierarchicalView() {
           </h1>
           
           <div className="flex gap-2">
+            {/* Excel Import Button */}
+            <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="glass-button flex items-center gap-2">
+                  <Upload size={16} />
+                  استيراد من إكسل
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="glass-modal max-w-lg" dir="rtl">
+                <DialogHeader>
+                  <DialogTitle className="text-right">استيراد البيانات من ملف إكسل</DialogTitle>
+                  <DialogDescription className="text-right">
+                    يمكنك استيراد الصناع والفئات ودرجات التجهيز والألوان من ملف إكسل
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-right block mb-2">اختر ملف الإكسل</Label>
+                    <Input
+                      type="file"
+                      accept=".xlsx,.xls"
+                      onChange={handleFileSelect}
+                      className="mt-2"
+                    />
+                  </div>
+                  
+                  {importFile && (
+                    <div className="text-sm text-gray-600 text-right">
+                      ملف محدد: {importFile.name}
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={downloadExcelTemplate}
+                      variant="outline"
+                      className="glass-button flex items-center gap-2 flex-1"
+                    >
+                      <Download size={16} />
+                      تحميل النموذج
+                    </Button>
+                    
+                    <Button
+                      onClick={importExcelData}
+                      disabled={!importFile || isImporting}
+                      className="glass-button flex items-center gap-2 flex-1"
+                    >
+                      <Upload size={16} />
+                      {isImporting ? 'جاري الاستيراد...' : 'استيراد البيانات'}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
             {/* Add Manufacturer Button */}
             <Dialog open={isAddManufacturerOpen} onOpenChange={setIsAddManufacturerOpen}>
             <DialogTrigger asChild>
