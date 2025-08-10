@@ -934,13 +934,69 @@ export class MemStorage implements IStorage {
     return appearance;
   }
   
-  async getAllSpecifications(): Promise<Specification[]> { return []; }
-  async getSpecification(id: number): Promise<Specification | undefined> { return undefined; }
-  async createSpecification(specification: InsertSpecification): Promise<Specification> { throw new Error("Not implemented"); }
-  async updateSpecification(id: number, specification: Partial<InsertSpecification>): Promise<Specification | undefined> { return undefined; }
-  async deleteSpecification(id: number): Promise<boolean> { return false; }
-  async getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<Specification[]> { return []; }
-  async getSpecificationByVehicleParams(manufacturer: string, category: string, trimLevel: string | null, year: number, engineCapacity: string): Promise<Specification | undefined> { return undefined; }
+  async getAllSpecifications(): Promise<Specification[]> { 
+    return Array.from(this.specifications.values()); 
+  }
+  
+  async getSpecification(id: number): Promise<Specification | undefined> { 
+    return this.specifications.get(id); 
+  }
+  
+  async createSpecification(specification: InsertSpecification): Promise<Specification> { 
+    const id = this.currentSpecificationId++;
+    const newSpec: Specification = {
+      id,
+      ...specification,
+      chassisNumber: specification.chassisNumber || null,
+      detailedDescription: specification.detailedDescription || null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.specifications.set(id, newSpec);
+    console.log(`✅ Created specification ${id} for ${specification.manufacturer} ${specification.category}`);
+    return newSpec;
+  }
+  
+  async updateSpecification(id: number, specification: Partial<InsertSpecification>): Promise<Specification | undefined> { 
+    const existing = this.specifications.get(id);
+    if (!existing) return undefined;
+
+    const updated: Specification = {
+      ...existing,
+      ...specification,
+      updatedAt: new Date()
+    };
+    this.specifications.set(id, updated);
+    console.log(`✅ Updated specification ${id}`);
+    return updated;
+  }
+  
+  async deleteSpecification(id: number): Promise<boolean> { 
+    const deleted = this.specifications.delete(id);
+    if (deleted) {
+      console.log(`✅ Deleted specification ${id}`);
+    }
+    return deleted;
+  }
+  
+  async getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<Specification[]> { 
+    return Array.from(this.specifications.values()).filter(spec => {
+      const manufacturerMatch = spec.manufacturer === manufacturer;
+      const categoryMatch = spec.category === category;
+      const trimLevelMatch = trimLevel ? spec.trimLevel === trimLevel : true;
+      return manufacturerMatch && categoryMatch && trimLevelMatch;
+    });
+  }
+  
+  async getSpecificationByVehicleParams(manufacturer: string, category: string, trimLevel: string | null, year: number, engineCapacity: string): Promise<Specification | undefined> { 
+    return Array.from(this.specifications.values()).find(spec => 
+      spec.manufacturer === manufacturer &&
+      spec.category === category &&
+      spec.trimLevel === trimLevel &&
+      spec.year === year &&
+      spec.engineCapacity === engineCapacity
+    );
+  }
   
   async getAllTrimLevels(): Promise<TrimLevel[]> { 
     return Array.from(this.trimLevels.values()); 
