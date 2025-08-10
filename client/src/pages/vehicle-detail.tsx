@@ -13,7 +13,8 @@ import {
   X, 
   ArrowLeft,
   Receipt,
-  Home
+  Home,
+  FileText
 } from "lucide-react";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import { ReservationDialog } from "@/components/reservation-dialog";
@@ -347,11 +348,11 @@ export default function VehicleDetailPage({ userRole, username, onLogout }: Vehi
                   {vehicle.status === 'مباع' && (
                     <div className="bg-red-600/20 p-3 rounded-lg border border-red-500/30 mt-4">
                       <div className="text-red-300 text-sm font-medium mb-2">معلومات البيع</div>
-                      {vehicle.saleDate && (
-                        <div className="text-white text-sm">تاريخ البيع: {new Date(vehicle.saleDate).toLocaleDateString('ar-SA')}</div>
+                      {(vehicle as any).saleDate && (
+                        <div className="text-white text-sm">تاريخ البيع: {new Date((vehicle as any).saleDate).toLocaleDateString('ar-SA')}</div>
                       )}
-                      {vehicle.salePrice && (
-                        <div className="text-white text-sm">سعر البيع: {vehicle.salePrice.toLocaleString()} ر.س</div>
+                      {(vehicle as any).salePrice && (
+                        <div className="text-white text-sm">سعر البيع: {(vehicle as any).salePrice.toLocaleString()} ر.س</div>
                       )}
                     </div>
                   )}
@@ -376,10 +377,10 @@ export default function VehicleDetailPage({ userRole, username, onLogout }: Vehi
                       <span className="text-white">{vehicle.reservationNote}</span>
                     </div>
                   )}
-                  {vehicle.saleNotes && (
+                  {(vehicle as any).saleNotes && (
                     <div>
                       <span className="text-gray-400 text-sm">ملاحظات البيع: </span>
-                      <span className="text-white">{vehicle.saleNotes}</span>
+                      <span className="text-white">{(vehicle as any).saleNotes}</span>
                     </div>
                   )}
                 </div>
