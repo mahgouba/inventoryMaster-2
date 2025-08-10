@@ -932,18 +932,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                 <span className="hidden sm:inline">الدوام</span>
               </Button>
 
-              {/* QR Scanner Button */}
-              <QRScannerButton 
-                onVehicleFound={(vehicleId: number) => {
-                  // Navigate to vehicle detail page
-                  window.location.href = `/vehicles/${vehicleId}`;
-                }}
-                className={
-                  neumorphismMode 
-                    ? "neuro-button" 
-                    : "glass-button glass-text-primary"
-                }
-              />
+
 
               {/* Bank Header Icons */}
               <div className="flex items-center space-x-1 space-x-reverse">
@@ -1017,14 +1006,29 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           <div className="mt-6">
             {/* Search Input and Filter Toggle */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-              <div className="relative max-w-md">
-                <Search size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
-                <Input
-                  type="text"
-                  placeholder="البحث في رقم الهيكل، الفئة، درجة التجهيز، اللون، الموقع..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="glass-search pr-10 pl-4 py-2 w-full text-right"
+              <div className="flex items-center gap-2">
+                <div className="relative max-w-md">
+                  <Search size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                  <Input
+                    type="text"
+                    placeholder="البحث في رقم الهيكل، الفئة، درجة التجهيز، اللون، الموقع..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="glass-search pr-10 pl-4 py-2 w-full text-right"
+                  />
+                </div>
+                
+                {/* QR Scanner Button */}
+                <QRScannerButton 
+                  onVehicleFound={(vehicleId: number) => {
+                    // Navigate to vehicle detail page
+                    window.location.href = `/vehicles/${vehicleId}`;
+                  }}
+                  className={
+                    neumorphismMode 
+                      ? "neuro-button h-10" 
+                      : "glass-button glass-text-primary h-10"
+                  }
                 />
               </div>
               

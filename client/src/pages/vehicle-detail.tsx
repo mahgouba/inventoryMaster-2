@@ -180,7 +180,7 @@ export default function VehicleDetailPage({ userRole, username, onLogout }: Vehi
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Link href="/">
+          <Link href="/card-view">
             <Button variant="outline" className="glass-button glass-text-primary">
               <ArrowLeft className="w-4 h-4 ml-2" />
               العودة
