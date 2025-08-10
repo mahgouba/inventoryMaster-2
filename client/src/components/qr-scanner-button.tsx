@@ -30,20 +30,15 @@ export default function QRScannerButton({ onVehicleFound, className }: QRScanner
         }
       } catch {
         // If not JSON, try to extract ID from URL or direct ID
-        const idMatch = result.match(/vehicleId=(\d+)|id=(\d+)|\/(\d+)/) || result.match(/^\d+$/);
+        const idMatch = result.match(/vehicles\/(\d+)|vehicleId=(\d+)|id=(\d+)|\/(\d+)/) || result.match(/^\d+$/);
         if (idMatch) {
-          vehicleId = parseInt(idMatch[1] || idMatch[2] || idMatch[3] || result);
+          vehicleId = parseInt(idMatch[1] || idMatch[2] || idMatch[3] || idMatch[4] || result);
         }
       }
 
       if (vehicleId) {
-        // Verify the vehicle exists
-        const response = await fetch(`/api/inventory/${vehicleId}`);
-        if (response.ok) {
-          onVehicleFound(vehicleId);
-        } else {
-          throw new Error('المركبة غير موجودة');
-        }
+        // Instead of verifying, just navigate to the vehicle detail page
+        window.location.href = `/vehicles/${vehicleId}`;
       } else {
         throw new Error('كود QR غير صالح');
       }

@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import MainDashboard from "@/components/main-dashboard";
 import CardViewPage from "@/pages/card-view";
+import VehicleDetailPage from "@/pages/vehicle-detail";
 
 import LoginPage from "@/pages/login";
 import NotFound from "@/pages/not-found";
@@ -86,6 +87,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           
           {/* Special Routes */}
           <Route path="/quotation-edit/:id" component={QuotationEditPage} />
+          <Route path="/vehicles/:id" component={() => <VehicleDetailPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
           
           <Route component={NotFound} />
         </Switch>
