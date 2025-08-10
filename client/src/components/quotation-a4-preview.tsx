@@ -233,12 +233,7 @@ export default function QuotationA4Preview({
           <span className="text-sm text-yellow-700 font-medium">خلفية 2</span>
         </div>
         
-        <Button 
-          onClick={handlePrint}
-          className="bg-[#2B4C8C] hover:bg-[#1e3a6f] text-white px-6 py-2 text-sm font-medium shadow-lg"
-        >
-          🖨️ طباعة الكوتيشن
-        </Button>
+
       </div>
 
       <div 
