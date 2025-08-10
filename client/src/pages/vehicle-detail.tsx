@@ -12,9 +12,7 @@ import {
   Share2, 
   X, 
   ArrowLeft,
-  Receipt,
-  Home,
-  FileText
+  Home
 } from "lucide-react";
 import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import { ReservationDialog } from "@/components/reservation-dialog";
@@ -435,35 +433,7 @@ export default function VehicleDetailPage({ userRole, username, onLogout }: Vehi
                 </Button>
               </div>
 
-              {/* Secondary Actions Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Create Quote Button */}
-                <Button
-                  onClick={() => {
-                    // Navigate to quotation page with vehicle data
-                    localStorage.setItem('selectedVehicleForQuote', JSON.stringify(vehicle));
-                    window.location.href = '/quotations';
-                  }}
-                  variant="outline"
-                  className="glass-button glass-text-primary text-lg py-3 rounded-xl border-2 hover:bg-white/10"
-                >
-                  <FileText className="w-5 h-5 ml-2" />
-                  إنشاء عرض سعر
-                </Button>
 
-                {/* Create Price Card Button */}
-                <Button
-                  onClick={() => {
-                    localStorage.setItem('selectedVehicleForPriceCard', JSON.stringify(vehicle));
-                    window.location.href = '/price-cards';
-                  }}
-                  variant="outline"
-                  className="glass-button glass-text-primary text-lg py-3 rounded-xl border-2 hover:bg-white/10"
-                >
-                  <Receipt className="w-5 h-5 ml-2" />
-                  إنشاء بطاقة سعر
-                </Button>
-              </div>
             </div>
 
             {/* Price Card Button */}
