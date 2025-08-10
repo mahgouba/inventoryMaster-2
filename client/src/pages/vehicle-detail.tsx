@@ -21,7 +21,7 @@ import { EnhancedSaleDialog } from "@/components/enhanced-sale-dialog";
 import VehicleShare from "@/components/vehicle-share";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import type { InventoryItem } from "@shared/schema";
 
 interface VehicleDetailPageProps {
@@ -32,6 +32,7 @@ interface VehicleDetailPageProps {
 
 export default function VehicleDetailPage({ userRole, username, onLogout }: VehicleDetailPageProps) {
   const [match, params] = useRoute("/vehicles/:id");
+  const [location, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -180,14 +181,18 @@ export default function VehicleDetailPage({ userRole, username, onLogout }: Vehi
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Link href="/card-view">
-            <Button variant="outline" className="glass-button glass-text-primary">
-              <ArrowLeft className="w-4 h-4 ml-2" />
-              العودة
-            </Button>
-          </Link>
+          <Button 
+            variant="outline" 
+            className="glass-button glass-text-primary"
+            onClick={() => navigate("/card-view")}
+          >
+            <ArrowLeft className="w-4 h-4 ml-2" />
+            العودة للبطاقات
+          </Button>
           <h1 className="text-2xl font-bold text-white">تفاصيل المركبة</h1>
-          <div></div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-white/60">ID: {vehicle?.id}</span>
+          </div>
         </div>
 
         {/* Vehicle Card */}
@@ -221,10 +226,11 @@ export default function VehicleDetailPage({ userRole, username, onLogout }: Vehi
               </div>
             )}
 
-            {/* Vehicle Specifications */}
-            <div className="grid md:grid-cols-2 gap-6">
+            {/* Vehicle Specifications - Complete Details */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Column 1: Basic Info */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-white">المواصفات الأساسية</h3>
+                <h3 className="text-lg font-semibold text-white border-b border-white/20 pb-2">المواصفات الأساسية</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-gray-300">الصانع:</span>
@@ -240,13 +246,20 @@ export default function VehicleDetailPage({ userRole, username, onLogout }: Vehi
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-300">درجة التجهيز:</span>
-                    <span className="text-white font-medium">{vehicle.trimLevel}</span>
+                    <span className="text-white font-medium">{vehicle.trimLevel || 'غير محدد'}</span>
                   </div>
+                  {vehicle.engineCapacity && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">سعة المحرك:</span>
+                      <span className="text-white font-medium">{vehicle.engineCapacity}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
+              {/* Column 2: Colors and Details */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-white">التفاصيل الإضافية</h3>
+                <h3 className="text-lg font-semibold text-white border-b border-white/20 pb-2">الألوان والتفاصيل</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-gray-300">اللون الخارجي:</span>
@@ -256,9 +269,35 @@ export default function VehicleDetailPage({ userRole, username, onLogout }: Vehi
                     <span className="text-gray-300">اللون الداخلي:</span>
                     <span className="text-white font-medium">{vehicle.interiorColor}</span>
                   </div>
-                  <div className="flex justify-between">
+                  {vehicle.chassisNumber && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">رقم الهيكل:</span>
+                      <span className="text-white font-medium font-mono text-sm">{vehicle.chassisNumber}</span>
+                    </div>
+                  )}
+                  {vehicle.importType && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">نوع الاستيراد:</span>
+                      <span className="text-white font-medium">{vehicle.importType}</span>
+                    </div>
+                  )}
+                  {vehicle.location && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">الموقع:</span>
+                      <span className="text-white font-medium">{vehicle.location}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Column 3: Status and Pricing */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-white border-b border-white/20 pb-2">الحالة والسعر</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-300">الحالة:</span>
                     <Badge 
+                      className="text-sm px-3 py-1"
                       variant={
                         vehicle.status === 'متوفر' ? 'default' : 
                         vehicle.status === 'محجوز' ? 'secondary' : 
@@ -268,60 +307,162 @@ export default function VehicleDetailPage({ userRole, username, onLogout }: Vehi
                       {vehicle.status}
                     </Badge>
                   </div>
+                  
                   {vehicle.price && (
+                    <div className="bg-gradient-to-r from-green-600/20 to-green-500/20 p-4 rounded-lg border border-green-500/30">
+                      <div className="text-center">
+                        <span className="text-gray-300 text-sm block mb-1">السعر</span>
+                        <span className="text-3xl font-bold text-green-400">
+                          {vehicle.price.toLocaleString()}
+                        </span>
+                        <span className="text-green-300 text-lg mr-2">ر.س</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {vehicle.mileage && (
                     <div className="flex justify-between">
-                      <span className="text-gray-300">السعر:</span>
-                      <span className="text-2xl font-bold text-green-400">
-                        {vehicle.price.toLocaleString()} ر.س
-                      </span>
+                      <span className="text-gray-300">الكيلومترات:</span>
+                      <span className="text-white font-medium">{vehicle.mileage.toLocaleString()} كم</span>
+                    </div>
+                  )}
+
+                  {/* Customer Info if Reserved */}
+                  {vehicle.status === 'محجوز' && (
+                    <div className="bg-orange-600/20 p-3 rounded-lg border border-orange-500/30 mt-4">
+                      <div className="text-orange-300 text-sm font-medium mb-2">معلومات الحجز</div>
+                      {vehicle.customerName && (
+                        <div className="text-white text-sm">العميل: {vehicle.customerName}</div>
+                      )}
+                      {vehicle.customerPhone && (
+                        <div className="text-white text-sm">الجوال: {vehicle.customerPhone}</div>
+                      )}
+                      {vehicle.reservationDate && (
+                        <div className="text-white text-sm">تاريخ الحجز: {new Date(vehicle.reservationDate).toLocaleDateString('ar-SA')}</div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Sold Info if Sold */}
+                  {vehicle.status === 'مباع' && (
+                    <div className="bg-red-600/20 p-3 rounded-lg border border-red-500/30 mt-4">
+                      <div className="text-red-300 text-sm font-medium mb-2">معلومات البيع</div>
+                      {vehicle.saleDate && (
+                        <div className="text-white text-sm">تاريخ البيع: {new Date(vehicle.saleDate).toLocaleDateString('ar-SA')}</div>
+                      )}
+                      {vehicle.salePrice && (
+                        <div className="text-white text-sm">سعر البيع: {vehicle.salePrice.toLocaleString()} ر.س</div>
+                      )}
                     </div>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/10">
-              {/* Reserve/Cancel Reservation Button */}
-              {vehicle.status === "محجوز" ? (
-                <Button
-                  onClick={handleCancelReservation}
-                  disabled={cancelingReservationId === vehicle.id}
-                  className="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-lg py-3"
-                >
-                  <X className="w-5 h-5 ml-2" />
-                  {cancelingReservationId === vehicle.id ? "جاري الإلغاء..." : "إلغاء الحجز"}
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => setReserveDialogOpen(true)}
-                  disabled={vehicle.status === "محجوز" || vehicle.status === "مباع"}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-lg py-3"
-                >
-                  <Calendar className="w-5 h-5 ml-2" />
-                  حجز
-                </Button>
-              )}
+            {/* Additional Notes Section */}
+            {(vehicle.notes || vehicle.reservationNote || vehicle.saleNotes) && (
+              <div className="mt-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                <h3 className="text-lg font-semibold text-white mb-3">الملاحظات</h3>
+                <div className="space-y-2">
+                  {vehicle.notes && (
+                    <div>
+                      <span className="text-gray-400 text-sm">ملاحظات عامة: </span>
+                      <span className="text-white">{vehicle.notes}</span>
+                    </div>
+                  )}
+                  {vehicle.reservationNote && (
+                    <div>
+                      <span className="text-gray-400 text-sm">ملاحظة الحجز: </span>
+                      <span className="text-white">{vehicle.reservationNote}</span>
+                    </div>
+                  )}
+                  {vehicle.saleNotes && (
+                    <div>
+                      <span className="text-gray-400 text-sm">ملاحظات البيع: </span>
+                      <span className="text-white">{vehicle.saleNotes}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
-              {/* Sell Button */}
-              <Button
-                onClick={() => setSellDialogOpen(true)}
-                disabled={sellingItemId === vehicle.id || vehicle.status === "مباع"}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white text-lg py-3"
-              >
-                <ShoppingCart className="w-5 h-5 ml-2" />
-                {sellingItemId === vehicle.id ? "جاري البيع..." : "بيع"}
-              </Button>
+            {/* Action Buttons - Enhanced Layout */}
+            <div className="pt-6 border-t border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-4">الإجراءات المتاحة</h3>
+              
+              {/* Primary Actions Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                {/* Reserve/Cancel Reservation Button */}
+                {vehicle.status === "محجوز" ? (
+                  <Button
+                    onClick={handleCancelReservation}
+                    disabled={cancelingReservationId === vehicle.id}
+                    className="bg-orange-600 hover:bg-orange-700 text-white text-lg py-4 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                  >
+                    <X className="w-5 h-5 ml-2" />
+                    {cancelingReservationId === vehicle.id ? "جاري الإلغاء..." : "إلغاء الحجز"}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setReserveDialogOpen(true)}
+                    disabled={vehicle.status === "محجوز" || vehicle.status === "مباع"}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-lg py-4 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                  >
+                    <Calendar className="w-5 h-5 ml-2" />
+                    حجز
+                  </Button>
+                )}
 
-              {/* Share Button */}
-              <Button
-                onClick={() => setShareDialogOpen(true)}
-                className="flex-1 text-lg py-3"
-                style={{backgroundColor: '#BF9231', color: 'white'}}
-              >
-                <Share2 className="w-5 h-5 ml-2" />
-                مشاركة
-              </Button>
+                {/* Sell Button */}
+                <Button
+                  onClick={() => setSellDialogOpen(true)}
+                  disabled={sellingItemId === vehicle.id || vehicle.status === "مباع"}
+                  className="bg-green-600 hover:bg-green-700 text-white text-lg py-4 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                >
+                  <ShoppingCart className="w-5 h-5 ml-2" />
+                  {sellingItemId === vehicle.id ? "جاري البيع..." : "بيع"}
+                </Button>
+
+                {/* Share Button */}
+                <Button
+                  onClick={() => setShareDialogOpen(true)}
+                  className="text-lg py-4 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                  style={{backgroundColor: '#BF9231', color: 'white'}}
+                >
+                  <Share2 className="w-5 h-5 ml-2" />
+                  مشاركة
+                </Button>
+              </div>
+
+              {/* Secondary Actions Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Create Quote Button */}
+                <Button
+                  onClick={() => {
+                    // Navigate to quotation page with vehicle data
+                    localStorage.setItem('selectedVehicleForQuote', JSON.stringify(vehicle));
+                    window.location.href = '/quotations';
+                  }}
+                  variant="outline"
+                  className="glass-button glass-text-primary text-lg py-3 rounded-xl border-2 hover:bg-white/10"
+                >
+                  <FileText className="w-5 h-5 ml-2" />
+                  إنشاء عرض سعر
+                </Button>
+
+                {/* Create Price Card Button */}
+                <Button
+                  onClick={() => {
+                    localStorage.setItem('selectedVehicleForPriceCard', JSON.stringify(vehicle));
+                    window.location.href = '/price-cards';
+                  }}
+                  variant="outline"
+                  className="glass-button glass-text-primary text-lg py-3 rounded-xl border-2 hover:bg-white/10"
+                >
+                  <Receipt className="w-5 h-5 ml-2" />
+                  إنشاء بطاقة سعر
+                </Button>
+              </div>
             </div>
 
             {/* Price Card Button */}
