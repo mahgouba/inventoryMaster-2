@@ -64,9 +64,6 @@ interface VehicleSpecification {
   year?: number;
   chassisNumber?: string;
   engine?: string;
-  transmission?: string;
-  drivetrain?: string;
-  fuelType?: string;
   specifications?: string;
   specificationsEn?: string;
 }
@@ -128,9 +125,7 @@ export default function HierarchicalView() {
   const [specYear, setSpecYear] = useState("");
   const [specChassisNumber, setSpecChassisNumber] = useState("");
   const [specEngine, setSpecEngine] = useState("");
-  const [specTransmission, setSpecTransmission] = useState("");
-  const [specDrivetrain, setSpecDrivetrain] = useState("");
-  const [specFuelType, setSpecFuelType] = useState("");
+
   const [specSpecifications, setSpecSpecifications] = useState("");
   const [specSpecificationsEn, setSpecSpecificationsEn] = useState("");
 
@@ -786,10 +781,10 @@ export default function HierarchicalView() {
                         </SelectTrigger>
                         <SelectContent>
                           {/* Get categories for selected manufacturer */}
-                          {specManufacturer && hierarchyData
+                          {specManufacturer && Array.isArray(hierarchyData) && hierarchyData
                             .filter((data: HierarchyData) => data.manufacturer.nameAr === specManufacturer)
                             .flatMap((data: HierarchyData) => data.categories)
-                            .map(category => (
+                            .map((category: any) => (
                               <SelectItem key={category.category.id} value={category.category.nameAr || category.category.name_ar || ""}>
                                 {category.category.nameAr || category.category.name_ar}
                               </SelectItem>
@@ -847,57 +842,24 @@ export default function HierarchicalView() {
 
                 {/* Technical Specifications */}
                 <div>
-                  <Label className="text-right block mb-2">المحرك</Label>
-                  <Input
-                    value={specEngine}
-                    onChange={(e) => setSpecEngine(e.target.value)}
-                    placeholder="2.5L V6 Twin Turbo"
-                    dir="rtl"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-right block mb-2">ناقل الحركة</Label>
-                  <Select value={specTransmission} onValueChange={setSpecTransmission}>
+                  <Label className="text-right block mb-2">سعة المحرك</Label>
+                  <Select value={specEngine} onValueChange={setSpecEngine}>
                     <SelectTrigger dir="rtl">
-                      <SelectValue placeholder="نوع ناقل الحركة" />
+                      <SelectValue placeholder="اختر سعة المحرك" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="manual">يدوي</SelectItem>
-                      <SelectItem value="automatic">أوتوماتيك</SelectItem>
-                      <SelectItem value="cvt">CVT</SelectItem>
-                      <SelectItem value="dsg">DSG</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label className="text-right block mb-2">نظام الدفع</Label>
-                  <Select value={specDrivetrain} onValueChange={setSpecDrivetrain}>
-                    <SelectTrigger dir="rtl">
-                      <SelectValue placeholder="نظام الدفع" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="fwd">دفع أمامي</SelectItem>
-                      <SelectItem value="rwd">دفع خلفي</SelectItem>
-                      <SelectItem value="awd">دفع رباعي</SelectItem>
-                      <SelectItem value="4wd">دفع رباعي 4WD</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label className="text-right block mb-2">نوع الوقود</Label>
-                  <Select value={specFuelType} onValueChange={setSpecFuelType}>
-                    <SelectTrigger dir="rtl">
-                      <SelectValue placeholder="نوع الوقود" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="gasoline">بنزين</SelectItem>
-                      <SelectItem value="diesel">ديزل</SelectItem>
-                      <SelectItem value="hybrid">هجين</SelectItem>
-                      <SelectItem value="electric">كهربائي</SelectItem>
-                      <SelectItem value="plugin_hybrid">هجين قابل للشحن</SelectItem>
+                      <SelectItem value="1.6L">1.6 لتر</SelectItem>
+                      <SelectItem value="1.8L">1.8 لتر</SelectItem>
+                      <SelectItem value="2.0L">2.0 لتر</SelectItem>
+                      <SelectItem value="2.4L">2.4 لتر</SelectItem>
+                      <SelectItem value="2.5L">2.5 لتر</SelectItem>
+                      <SelectItem value="3.0L">3.0 لتر</SelectItem>
+                      <SelectItem value="3.5L">3.5 لتر</SelectItem>
+                      <SelectItem value="4.0L">4.0 لتر</SelectItem>
+                      <SelectItem value="4.6L">4.6 لتر</SelectItem>
+                      <SelectItem value="5.0L">5.0 لتر</SelectItem>
+                      <SelectItem value="5.7L">5.7 لتر</SelectItem>
+                      <SelectItem value="6.2L">6.2 لتر</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -936,9 +898,6 @@ export default function HierarchicalView() {
                         trimLevel: specTrimLevel || undefined,
                         year: specYear ? parseInt(specYear) : undefined,
                         engine: specEngine || undefined,
-                        transmission: specTransmission || undefined,
-                        drivetrain: specDrivetrain || undefined,
-                        fuelType: specFuelType || undefined,
                         specifications: specSpecifications || undefined,
                         specificationsEn: specSpecificationsEn || undefined
                       };
@@ -954,9 +913,6 @@ export default function HierarchicalView() {
                       setSpecYear("");
                       setSpecChassisNumber("");
                       setSpecEngine("");
-                      setSpecTransmission("");
-                      setSpecDrivetrain("");
-                      setSpecFuelType("");
                       setSpecSpecifications("");
                       setSpecSpecificationsEn("");
                       setIsAddSpecificationOpen(false);
@@ -1053,10 +1009,10 @@ export default function HierarchicalView() {
                         </SelectTrigger>
                         <SelectContent>
                           {/* Get categories for selected manufacturer */}
-                          {imageManufacturer && hierarchyData
+                          {imageManufacturer && Array.isArray(hierarchyData) && hierarchyData
                             .filter((data: HierarchyData) => data.manufacturer.nameAr === imageManufacturer)
                             .flatMap((data: HierarchyData) => data.categories)
-                            .map(category => (
+                            .map((category: any) => (
                               <SelectItem key={category.category.id} value={category.category.nameAr || category.category.name_ar || ""}>
                                 {category.category.nameAr || category.category.name_ar}
                               </SelectItem>
