@@ -1461,7 +1461,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid specification ID" });
       }
 
-      const specificationData = insertSpecificationSchema.parse(req.body);
+      // Use partial schema for updates
+      const specificationData = insertSpecificationSchema.partial().parse(req.body);
       const specification = await getStorage().updateSpecification(id, specificationData);
       
       if (!specification) {
