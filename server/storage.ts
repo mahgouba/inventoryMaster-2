@@ -319,6 +319,13 @@ export interface IStorage {
   updateVehicleSpecification(id: number, spec: Partial<InsertVehicleSpecification>): Promise<VehicleSpecification | undefined>;
   deleteVehicleSpecification(id: number): Promise<boolean>;
   getSpecificationsByHierarchy(manufacturer: string, category: string, trimLevel: string, model: string): Promise<VehicleSpecification[]>;
+  getVehicleSpecificationsByFilters(filters: { 
+    manufacturer?: string; 
+    category?: string; 
+    trimLevel?: string; 
+    year?: number; 
+    chassisNumber?: string; 
+  }): Promise<VehicleSpecification[]>;
   
   // Vehicle Image Links methods
   getAllVehicleImageLinks(): Promise<VehicleImageLink[]>;
@@ -327,6 +334,15 @@ export interface IStorage {
   updateVehicleImageLink(id: number, link: Partial<InsertVehicleImageLink>): Promise<VehicleImageLink | undefined>;
   deleteVehicleImageLink(id: number): Promise<boolean>;
   getImageLinksByHierarchy(manufacturer: string, category: string, trimLevel: string, exteriorColor: string, interiorColor: string): Promise<VehicleImageLink[]>;
+  getVehicleImageLinksByFilters(filters: { 
+    manufacturer?: string; 
+    category?: string; 
+    trimLevel?: string; 
+    year?: number; 
+    exteriorColor?: string; 
+    interiorColor?: string; 
+    chassisNumber?: string; 
+  }): Promise<VehicleImageLink[]>;
 
   saveImageLink(linkData: any): Promise<any>;
   getLeaveRequest(id: number): Promise<LeaveRequest | undefined>;
@@ -2068,6 +2084,54 @@ export class MemStorage implements IStorage {
       link.exteriorColor === exteriorColor &&
       link.interiorColor === interiorColor
     );
+  }
+
+  async getVehicleImageLinksByFilters(filters: { 
+    manufacturer?: string; 
+    category?: string; 
+    trimLevel?: string; 
+    year?: number; 
+    exteriorColor?: string; 
+    interiorColor?: string; 
+    chassisNumber?: string; 
+  }): Promise<VehicleImageLink[]> {
+    const allLinks = Array.from(this.vehicleImageLinks.values());
+    return allLinks.filter(link => {
+      // If chassis number is provided, use it as primary identifier
+      if (filters.chassisNumber) {
+        return link.chassisNumber === filters.chassisNumber;
+      }
+      
+      // Otherwise filter by other criteria
+      return (!filters.manufacturer || link.manufacturer === filters.manufacturer) &&
+             (!filters.category || link.category === filters.category) &&
+             (!filters.trimLevel || link.trimLevel === filters.trimLevel) &&
+             (!filters.year || link.year === filters.year) &&
+             (!filters.exteriorColor || link.exteriorColor === filters.exteriorColor) &&
+             (!filters.interiorColor || link.interiorColor === filters.interiorColor);
+    });
+  }
+
+  async getVehicleSpecificationsByFilters(filters: { 
+    manufacturer?: string; 
+    category?: string; 
+    trimLevel?: string; 
+    year?: number; 
+    chassisNumber?: string; 
+  }): Promise<VehicleSpecification[]> {
+    const allSpecs = Array.from(this.vehicleSpecifications.values());
+    return allSpecs.filter(spec => {
+      // If chassis number is provided, use it as primary identifier
+      if (filters.chassisNumber) {
+        return spec.chassisNumber === filters.chassisNumber;
+      }
+      
+      // Otherwise filter by other criteria
+      return (!filters.manufacturer || spec.manufacturer === filters.manufacturer) &&
+             (!filters.category || spec.category === filters.category) &&
+             (!filters.trimLevel || spec.trimLevel === filters.trimLevel) &&
+             (!filters.year || spec.year === filters.year);
+    });
   }
 }
 

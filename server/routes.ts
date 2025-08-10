@@ -27,7 +27,9 @@ import {
   insertVehicleSpecificationSchema,
   insertVehicleImageLinkSchema,
   insertEmployeeWorkScheduleSchema,
-  insertDailyAttendanceSchema
+  insertDailyAttendanceSchema,
+  type VehicleSpecification,
+  type VehicleImageLink
 } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -5265,6 +5267,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Railway import routes
   app.use("/api/railway", railwayImportRoutes);
+
+  // Vehicle Specifications API Routes
+  app.get("/api/vehicle-specifications", async (req, res) => {
+    try {
+      const specifications = await getStorage().getAllVehicleSpecifications();
+      res.json(specifications);
+    } catch (error) {
+      console.error("Error fetching vehicle specifications:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle specifications" });
+    }
+  });
+
+  app.post("/api/vehicle-specifications", async (req, res) => {
+    try {
+      const validatedData = insertVehicleSpecificationSchema.parse(req.body);
+      const specification = await getStorage().createVehicleSpecification(validatedData);
+      res.status(201).json(specification);
+    } catch (error) {
+      console.error("Error creating vehicle specification:", error);
+      res.status(500).json({ message: "Failed to create vehicle specification" });
+    }
+  });
+
+  app.get("/api/vehicle-specifications/search", async (req, res) => {
+    try {
+      const { manufacturer, category, trimLevel, year, chassisNumber } = req.query;
+      const filters = {
+        manufacturer: manufacturer as string,
+        category: category as string,
+        trimLevel: trimLevel as string,
+        year: year ? parseInt(year as string) : undefined,
+        chassisNumber: chassisNumber as string
+      };
+      
+      const specifications = await getStorage().getVehicleSpecificationsByFilters(filters);
+      res.json(specifications);
+    } catch (error) {
+      console.error("Error searching vehicle specifications:", error);
+      res.status(500).json({ message: "Failed to search vehicle specifications" });
+    }
+  });
+
+  // Vehicle Image Links API Routes
+  app.get("/api/vehicle-image-links", async (req, res) => {
+    try {
+      const imageLinks = await getStorage().getAllVehicleImageLinks();
+      res.json(imageLinks);
+    } catch (error) {
+      console.error("Error fetching vehicle image links:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle image links" });
+    }
+  });
+
+  app.post("/api/vehicle-image-links", async (req, res) => {
+    try {
+      const validatedData = insertVehicleImageLinkSchema.parse(req.body);
+      const imageLink = await getStorage().createVehicleImageLink(validatedData);
+      res.status(201).json(imageLink);
+    } catch (error) {
+      console.error("Error creating vehicle image link:", error);
+      res.status(500).json({ message: "Failed to create vehicle image link" });
+    }
+  });
+
+  app.get("/api/vehicle-image-links/search", async (req, res) => {
+    try {
+      const { manufacturer, category, trimLevel, year, exteriorColor, interiorColor, chassisNumber } = req.query;
+      const filters = {
+        manufacturer: manufacturer as string,
+        category: category as string,
+        trimLevel: trimLevel as string,
+        year: year ? parseInt(year as string) : undefined,
+        exteriorColor: exteriorColor as string,
+        interiorColor: interiorColor as string,
+        chassisNumber: chassisNumber as string
+      };
+      
+      const imageLinks = await getStorage().getVehicleImageLinksByFilters(filters);
+      res.json(imageLinks);
+    } catch (error) {
+      console.error("Error searching vehicle image links:", error);
+      res.status(500).json({ message: "Failed to search vehicle image links" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

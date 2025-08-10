@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Trash2, Save, X, Eye, EyeOff, Edit2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Trash2, Save, X, Eye, EyeOff, Edit2, FileText, Image, Link } from "lucide-react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 // import { FreshImportButton } from "@/components/FreshImportButton"; // Removed per user request
 
@@ -56,6 +56,35 @@ interface HierarchyData {
   totalVehicles: number;
 }
 
+interface VehicleSpecification {
+  id?: number;
+  manufacturer?: string;
+  category?: string;
+  trimLevel?: string;
+  year?: number;
+  chassisNumber?: string;
+  engine?: string;
+  transmission?: string;
+  drivetrain?: string;
+  fuelType?: string;
+  specifications?: string;
+  specificationsEn?: string;
+}
+
+interface VehicleImageLink {
+  id?: number;
+  manufacturer?: string;
+  category?: string;
+  trimLevel?: string;
+  year?: number;
+  exteriorColor?: string;
+  interiorColor?: string;
+  chassisNumber?: string;
+  imageUrl: string;
+  description?: string;
+  descriptionEn?: string;
+}
+
 export default function HierarchicalView() {
   const [selectedManufacturer, setSelectedManufacturer] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -66,6 +95,8 @@ export default function HierarchicalView() {
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isAddTrimLevelOpen, setIsAddTrimLevelOpen] = useState(false);
   const [isAddColorOpen, setIsAddColorOpen] = useState(false);
+  const [isAddSpecificationOpen, setIsAddSpecificationOpen] = useState(false);
+  const [isAddImageLinkOpen, setIsAddImageLinkOpen] = useState(false);
   
   // Color form states
   const [colorType, setColorType] = useState("");
@@ -89,6 +120,31 @@ export default function HierarchicalView() {
   const [newTrimLevelNameAr, setNewTrimLevelNameAr] = useState("");
   const [newTrimLevelNameEn, setNewTrimLevelNameEn] = useState("");
   const [selectedCategoryForTrimLevel, setSelectedCategoryForTrimLevel] = useState<number | null>(null);
+
+  // Specification form states
+  const [specManufacturer, setSpecManufacturer] = useState("");
+  const [specCategory, setSpecCategory] = useState("");
+  const [specTrimLevel, setSpecTrimLevel] = useState("");
+  const [specYear, setSpecYear] = useState("");
+  const [specChassisNumber, setSpecChassisNumber] = useState("");
+  const [specEngine, setSpecEngine] = useState("");
+  const [specTransmission, setSpecTransmission] = useState("");
+  const [specDrivetrain, setSpecDrivetrain] = useState("");
+  const [specFuelType, setSpecFuelType] = useState("");
+  const [specSpecifications, setSpecSpecifications] = useState("");
+  const [specSpecificationsEn, setSpecSpecificationsEn] = useState("");
+
+  // Image link form states
+  const [imageManufacturer, setImageManufacturer] = useState("");
+  const [imageCategory, setImageCategory] = useState("");
+  const [imageTrimLevel, setImageTrimLevel] = useState("");
+  const [imageYear, setImageYear] = useState("");
+  const [imageExteriorColor, setImageExteriorColor] = useState("");
+  const [imageInteriorColor, setImageInteriorColor] = useState("");
+  const [imageChassisNumber, setImageChassisNumber] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageDescription, setImageDescription] = useState("");
+  const [imageDescriptionEn, setImageDescriptionEn] = useState("");
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -665,7 +721,441 @@ export default function HierarchicalView() {
 
 
       {/* Action Buttons */}
-      <div className="flex gap-4 justify-center">
+      <div className="flex gap-4 justify-center flex-wrap">
+        {/* Add Specification Button */}
+        <Dialog open={isAddSpecificationOpen} onOpenChange={setIsAddSpecificationOpen}>
+          <DialogTrigger asChild>
+            <Button className="glass-button flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              إضافة مواصفات تفصيلية
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="glass-modal max-w-2xl" dir="rtl">
+            <DialogHeader>
+              <DialogTitle className="text-right">إضافة مواصفات تفصيلية للسيارة</DialogTitle>
+              <DialogDescription className="text-right text-gray-400">
+                إما كتابة رقم الهيكل مباشرة أو تحديد الصانع والفئة ودرجة التجهيز والسنة
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Chassis Number */}
+                <div className="md:col-span-2">
+                  <Label className="text-right block mb-2">رقم الهيكل (اختياري - للربط المباشر)</Label>
+                  <Input
+                    value={specChassisNumber}
+                    onChange={(e) => {
+                      setSpecChassisNumber(e.target.value);
+                      if (e.target.value.trim()) {
+                        // Reset other fields when chassis number is entered
+                        setSpecManufacturer("");
+                        setSpecCategory("");
+                        setSpecTrimLevel("");
+                        setSpecYear("");
+                      }
+                    }}
+                    placeholder="VIN أو رقم الهيكل"
+                    dir="rtl"
+                  />
+                </div>
+
+                {/* Show other fields only if chassis number is empty */}
+                {!specChassisNumber && (
+                  <>
+                    <div>
+                      <Label className="text-right block mb-2">الصانع</Label>
+                      <Select value={specManufacturer} onValueChange={setSpecManufacturer}>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر الصانع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.isArray(manufacturers) && manufacturers.map((manufacturer: Manufacturer) => (
+                            <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                              {manufacturer.nameAr}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label className="text-right block mb-2">الفئة</Label>
+                      <Input
+                        value={specCategory}
+                        onChange={(e) => setSpecCategory(e.target.value)}
+                        placeholder="اسم الفئة"
+                        dir="rtl"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-right block mb-2">درجة التجهيز</Label>
+                      <Input
+                        value={specTrimLevel}
+                        onChange={(e) => setSpecTrimLevel(e.target.value)}
+                        placeholder="درجة التجهيز"
+                        dir="rtl"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-right block mb-2">السنة</Label>
+                      <Input
+                        value={specYear}
+                        onChange={(e) => setSpecYear(e.target.value)}
+                        placeholder="2024"
+                        type="number"
+                        dir="rtl"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Technical Specifications */}
+                <div>
+                  <Label className="text-right block mb-2">المحرك</Label>
+                  <Input
+                    value={specEngine}
+                    onChange={(e) => setSpecEngine(e.target.value)}
+                    placeholder="2.5L V6 Twin Turbo"
+                    dir="rtl"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-right block mb-2">ناقل الحركة</Label>
+                  <Select value={specTransmission} onValueChange={setSpecTransmission}>
+                    <SelectTrigger dir="rtl">
+                      <SelectValue placeholder="نوع ناقل الحركة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="manual">يدوي</SelectItem>
+                      <SelectItem value="automatic">أوتوماتيك</SelectItem>
+                      <SelectItem value="cvt">CVT</SelectItem>
+                      <SelectItem value="dsg">DSG</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-right block mb-2">نظام الدفع</Label>
+                  <Select value={specDrivetrain} onValueChange={setSpecDrivetrain}>
+                    <SelectTrigger dir="rtl">
+                      <SelectValue placeholder="نظام الدفع" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fwd">دفع أمامي</SelectItem>
+                      <SelectItem value="rwd">دفع خلفي</SelectItem>
+                      <SelectItem value="awd">دفع رباعي</SelectItem>
+                      <SelectItem value="4wd">دفع رباعي 4WD</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-right block mb-2">نوع الوقود</Label>
+                  <Select value={specFuelType} onValueChange={setSpecFuelType}>
+                    <SelectTrigger dir="rtl">
+                      <SelectValue placeholder="نوع الوقود" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gasoline">بنزين</SelectItem>
+                      <SelectItem value="diesel">ديزل</SelectItem>
+                      <SelectItem value="hybrid">هجين</SelectItem>
+                      <SelectItem value="electric">كهربائي</SelectItem>
+                      <SelectItem value="plugin_hybrid">هجين قابل للشحن</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Detailed Specifications */}
+                <div className="md:col-span-2">
+                  <Label className="text-right block mb-2">المواصفات التفصيلية (عربي)</Label>
+                  <textarea
+                    value={specSpecifications}
+                    onChange={(e) => setSpecSpecifications(e.target.value)}
+                    placeholder="اكتب المواصفات التفصيلية بالعربية..."
+                    className="w-full h-24 p-3 border border-gray-600 rounded-lg bg-gray-800 text-white resize-none"
+                    dir="rtl"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label className="text-right block mb-2">المواصفات التفصيلية (إنجليزي)</Label>
+                  <textarea
+                    value={specSpecificationsEn}
+                    onChange={(e) => setSpecSpecificationsEn(e.target.value)}
+                    placeholder="Enter detailed specifications in English..."
+                    className="w-full h-24 p-3 border border-gray-600 rounded-lg bg-gray-800 text-white resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={async () => {
+                    try {
+                      const specData: VehicleSpecification = {
+                        chassisNumber: specChassisNumber || undefined,
+                        manufacturer: specManufacturer || undefined,
+                        category: specCategory || undefined,
+                        trimLevel: specTrimLevel || undefined,
+                        year: specYear ? parseInt(specYear) : undefined,
+                        engine: specEngine || undefined,
+                        transmission: specTransmission || undefined,
+                        drivetrain: specDrivetrain || undefined,
+                        fuelType: specFuelType || undefined,
+                        specifications: specSpecifications || undefined,
+                        specificationsEn: specSpecificationsEn || undefined
+                      };
+
+                      await apiRequest('POST', '/api/vehicle-specifications', specData);
+                      
+                      toast({ title: "تم إضافة المواصفات بنجاح" });
+                      
+                      // Reset form
+                      setSpecManufacturer("");
+                      setSpecCategory("");
+                      setSpecTrimLevel("");
+                      setSpecYear("");
+                      setSpecChassisNumber("");
+                      setSpecEngine("");
+                      setSpecTransmission("");
+                      setSpecDrivetrain("");
+                      setSpecFuelType("");
+                      setSpecSpecifications("");
+                      setSpecSpecificationsEn("");
+                      setIsAddSpecificationOpen(false);
+                    } catch (error) {
+                      toast({
+                        title: "خطأ",
+                        description: "فشل في إضافة المواصفات",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  disabled={!specChassisNumber && (!specManufacturer || !specCategory)}
+                  className="glass-button flex-1"
+                >
+                  <Save className="h-4 w-4 ml-2" />
+                  حفظ المواصفات
+                </Button>
+                <Button
+                  onClick={() => setIsAddSpecificationOpen(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <X className="h-4 w-4 ml-2" />
+                  إلغاء
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Image Link Button */}
+        <Dialog open={isAddImageLinkOpen} onOpenChange={setIsAddImageLinkOpen}>
+          <DialogTrigger asChild>
+            <Button className="glass-button flex items-center gap-2">
+              <Image className="h-4 w-4" />
+              إضافة روابط الصور
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="glass-modal max-w-2xl" dir="rtl">
+            <DialogHeader>
+              <DialogTitle className="text-right">إضافة رابط صورة للسيارة</DialogTitle>
+              <DialogDescription className="text-right text-gray-400">
+                إما كتابة رقم الهيكل مباشرة أو تحديد الصانع والفئة ودرجة التجهيز والألوان
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Chassis Number */}
+                <div className="md:col-span-2">
+                  <Label className="text-right block mb-2">رقم الهيكل (اختياري - للربط المباشر)</Label>
+                  <Input
+                    value={imageChassisNumber}
+                    onChange={(e) => {
+                      setImageChassisNumber(e.target.value);
+                      if (e.target.value.trim()) {
+                        // Reset other fields when chassis number is entered
+                        setImageManufacturer("");
+                        setImageCategory("");
+                        setImageTrimLevel("");
+                        setImageYear("");
+                        setImageExteriorColor("");
+                        setImageInteriorColor("");
+                      }
+                    }}
+                    placeholder="VIN أو رقم الهيكل"
+                    dir="rtl"
+                  />
+                </div>
+
+                {/* Show other fields only if chassis number is empty */}
+                {!imageChassisNumber && (
+                  <>
+                    <div>
+                      <Label className="text-right block mb-2">الصانع</Label>
+                      <Select value={imageManufacturer} onValueChange={setImageManufacturer}>
+                        <SelectTrigger dir="rtl">
+                          <SelectValue placeholder="اختر الصانع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.isArray(manufacturers) && manufacturers.map((manufacturer: Manufacturer) => (
+                            <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                              {manufacturer.nameAr}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label className="text-right block mb-2">الفئة</Label>
+                      <Input
+                        value={imageCategory}
+                        onChange={(e) => setImageCategory(e.target.value)}
+                        placeholder="اسم الفئة"
+                        dir="rtl"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-right block mb-2">درجة التجهيز</Label>
+                      <Input
+                        value={imageTrimLevel}
+                        onChange={(e) => setImageTrimLevel(e.target.value)}
+                        placeholder="درجة التجهيز"
+                        dir="rtl"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-right block mb-2">السنة</Label>
+                      <Input
+                        value={imageYear}
+                        onChange={(e) => setImageYear(e.target.value)}
+                        placeholder="2024"
+                        type="number"
+                        dir="rtl"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-right block mb-2">اللون الخارجي</Label>
+                      <Input
+                        value={imageExteriorColor}
+                        onChange={(e) => setImageExteriorColor(e.target.value)}
+                        placeholder="الأبيض اللؤلؤي"
+                        dir="rtl"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-right block mb-2">اللون الداخلي</Label>
+                      <Input
+                        value={imageInteriorColor}
+                        onChange={(e) => setImageInteriorColor(e.target.value)}
+                        placeholder="أسود جلد"
+                        dir="rtl"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Image URL */}
+                <div className="md:col-span-2">
+                  <Label className="text-right block mb-2">رابط الصورة *</Label>
+                  <Input
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="https://example.com/image.jpg"
+                    type="url"
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <Label className="text-right block mb-2">وصف الصورة (عربي)</Label>
+                  <Input
+                    value={imageDescription}
+                    onChange={(e) => setImageDescription(e.target.value)}
+                    placeholder="صورة جانبية للسيارة"
+                    dir="rtl"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-right block mb-2">وصف الصورة (إنجليزي)</Label>
+                  <Input
+                    value={imageDescriptionEn}
+                    onChange={(e) => setImageDescriptionEn(e.target.value)}
+                    placeholder="Side view of the vehicle"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={async () => {
+                    try {
+                      const imageData: VehicleImageLink = {
+                        chassisNumber: imageChassisNumber || undefined,
+                        manufacturer: imageManufacturer || undefined,
+                        category: imageCategory || undefined,
+                        trimLevel: imageTrimLevel || undefined,
+                        year: imageYear ? parseInt(imageYear) : undefined,
+                        exteriorColor: imageExteriorColor || undefined,
+                        interiorColor: imageInteriorColor || undefined,
+                        imageUrl: imageUrl,
+                        description: imageDescription || undefined,
+                        descriptionEn: imageDescriptionEn || undefined
+                      };
+
+                      await apiRequest('POST', '/api/vehicle-image-links', imageData);
+                      
+                      toast({ title: "تم إضافة رابط الصورة بنجاح" });
+                      
+                      // Reset form
+                      setImageManufacturer("");
+                      setImageCategory("");
+                      setImageTrimLevel("");
+                      setImageYear("");
+                      setImageExteriorColor("");
+                      setImageInteriorColor("");
+                      setImageChassisNumber("");
+                      setImageUrl("");
+                      setImageDescription("");
+                      setImageDescriptionEn("");
+                      setIsAddImageLinkOpen(false);
+                    } catch (error) {
+                      toast({
+                        title: "خطأ",
+                        description: "فشل في إضافة رابط الصورة",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  disabled={!imageUrl || (!imageChassisNumber && (!imageManufacturer || !imageCategory))}
+                  className="glass-button flex-1"
+                >
+                  <Save className="h-4 w-4 ml-2" />
+                  حفظ رابط الصورة
+                </Button>
+                <Button
+                  onClick={() => setIsAddImageLinkOpen(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <X className="h-4 w-4 ml-2" />
+                  إلغاء
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {/* Add Category Button */}
         <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
           <DialogTrigger asChild>
