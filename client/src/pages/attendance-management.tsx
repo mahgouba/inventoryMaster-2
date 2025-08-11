@@ -1255,7 +1255,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                              status === 'إجازة معتمدة' ? '#10b981' : 
                              status.includes('استئذان') ? '#3b82f6' : 
                              status.includes('تأخير') ? '#f97316' : 
-                             status.includes('انصراف مبكر') ? '#8b5cf6' : 
+                             status.includes('انصراف مبكر') ? '#10b981' : 
                              '#ef4444'};">
                     ${status}
                   </td>

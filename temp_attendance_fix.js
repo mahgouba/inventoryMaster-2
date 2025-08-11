@@ -3,7 +3,7 @@ function getAttendanceColor(workPercentage, approvedLeave) {
   // Priority 1: Approved leave types (override everything)
   if (approvedLeave && approvedLeave.requestType === 'انصراف مبكر') {
     return {
-      color: 'bg-gradient-to-r from-purple-500 to-purple-600',
+      color: 'bg-gradient-to-r from-green-500 to-emerald-500',
       icon: 'UserClock',
       width: workPercentage
     };

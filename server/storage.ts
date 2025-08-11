@@ -1231,7 +1231,7 @@ export class MemStorage implements IStorage {
     const request = this.leaveRequests.get(id);
     if (!request) return undefined;
     
-    const updatedRequest = {
+    let updatedRequest = {
       ...request,
       status,
       approvedBy,
@@ -1240,6 +1240,12 @@ export class MemStorage implements IStorage {
       rejectionReason,
       updatedAt: new Date()
     };
+    
+    // When approving early departure or late arrival requests, change duration to 1 hour
+    if (status === 'approved' && (request.requestType === 'انصراف مبكر' || request.requestType === 'تأخير')) {
+      updatedRequest.duration = 1;
+      updatedRequest.durationType = 'ساعة';
+    }
     
     this.leaveRequests.set(id, updatedRequest);
     return updatedRequest;
