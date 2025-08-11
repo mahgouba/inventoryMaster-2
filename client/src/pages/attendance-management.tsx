@@ -1155,11 +1155,25 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     // إنشاء محتوى التقرير
     const reportContent = `
       <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto;">
-        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px;">
-          <h1 style="color: #333; font-size: 24px; margin-bottom: 10px;">تقرير الحضور والإنصراف الشهري</h1>
-          <h2 style="color: #666; font-size: 18px; margin-bottom: 5px;">الموظف: ${schedule.employeeName}</h2>
-          <h3 style="color: #666; font-size: 16px; margin-bottom: 5px;">شهر: ${monthName}</h3>
-          <p style="color: #888; font-size: 14px;">نوع الدوام: ${schedule.scheduleType}</p>
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1e40af; padding-bottom: 20px;">
+          <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+            <svg width="80" height="80" viewBox="0 0 100 100" style="margin-left: 20px;">
+              <defs>
+                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <circle cx="50" cy="50" r="45" fill="url(#logoGradient)" stroke="#1e40af" stroke-width="3"/>
+              <text x="50" y="35" text-anchor="middle" fill="white" font-size="12" font-weight="bold">شركة</text>
+              <text x="50" y="50" text-anchor="middle" fill="white" font-size="14" font-weight="bold">النجاح</text>
+              <text x="50" y="65" text-anchor="middle" fill="white" font-size="10">للسيارات</text>
+            </svg>
+          </div>
+          <h1 style="color: #1e40af; font-size: 24px; margin-bottom: 10px;">تقرير الحضور والإنصراف الشهري</h1>
+          <h2 style="color: #d97706; font-size: 18px; margin-bottom: 5px;">الموظف: ${schedule.employeeName}</h2>
+          <h3 style="color: #1e40af; font-size: 16px; margin-bottom: 5px;">شهر: ${monthName}</h3>
+          <p style="color: #d97706; font-size: 14px;">نوع الدوام: ${schedule.scheduleType}</p>
         </div>
         
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
@@ -1202,7 +1216,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   case 'استئذان': 
                     permissionHours = parseFloat(String(approvedLeave.duration)) || 0;
                     if (approvedLeave.durationType === 'دقيقة') permissionHours = permissionHours / 60;
-                    status = `ساعات العمل: ${actualWorkHours.toFixed(2)} | ساعات الإذن: ${permissionHours.toFixed(2)}`;
+                    status = `ساعات العمل: ${actualWorkHours.toFixed(2)} | استئذان: ${permissionHours.toFixed(2)}`;
                     workHours = actualWorkHours.toFixed(2);
                     break;
                   case 'إجازة': 
@@ -1212,13 +1226,13 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   case 'تأخير في الحضور': 
                     permissionHours = parseFloat(String(approvedLeave.duration)) || 0;
                     if (approvedLeave.durationType === 'دقيقة') permissionHours = permissionHours / 60;
-                    status = `ساعات العمل: ${actualWorkHours.toFixed(2)} | ساعات التأخير: ${permissionHours.toFixed(2)}`;
+                    status = `ساعات العمل: ${actualWorkHours.toFixed(2)} | إحصاء التاخير: ${permissionHours.toFixed(2)}`;
                     workHours = actualWorkHours.toFixed(2);
                     break;
                   case 'انصراف مبكر': 
                     permissionHours = parseFloat(String(approvedLeave.duration)) || 0;
                     if (approvedLeave.durationType === 'دقيقة') permissionHours = permissionHours / 60;
-                    status = `ساعات العمل: ${actualWorkHours.toFixed(2)} | ساعات الانصراف المبكر: ${permissionHours.toFixed(2)}`;
+                    status = `ساعات العمل: ${actualWorkHours.toFixed(2)} | استئذان: ${permissionHours.toFixed(2)}`;
                     workHours = actualWorkHours.toFixed(2);
                     break;
                   default: 
@@ -1254,8 +1268,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                              status === 'إجازة' ? '#f59e0b' : 
                              status === 'إجازة معتمدة' ? '#10b981' : 
                              status.includes('استئذان') ? '#3b82f6' : 
-                             status.includes('تأخير') ? '#f97316' : 
-                             status.includes('انصراف مبكر') ? '#10b981' : 
+                             status.includes('تأخير') ? '#3b82f6' : 
+                             status.includes('انصراف مبكر') ? '#3b82f6' : 
                              '#ef4444'};">
                     ${status}
                   </td>

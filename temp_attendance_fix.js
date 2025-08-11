@@ -19,8 +19,8 @@ function getAttendanceColor(workPercentage, approvedLeave) {
   
   if (approvedLeave && approvedLeave.requestType === 'تأخير') {
     return {
-      color: 'bg-gradient-to-r from-orange-500 to-red-500',
-      icon: 'AlertCircle', 
+      color: 'bg-gradient-to-r from-blue-500 to-blue-600',
+      icon: 'Clock', 
       width: workPercentage
     };
   }
