@@ -885,8 +885,19 @@ export default function FinancingCalculatorPage() {
                 <div>
                   <Label>نسبة التمويل (هامش الربح %)</Label>
                   <div className="grid grid-cols-4 gap-2 mt-2">
-                    {selectedBank && Object.entries(selectedBank.rates).length > 0 ? (
-                      Object.entries(selectedBank.rates).map(([year, rate]) => (
+                    {(() => {
+                      // Get unique rates from selected bank or use default rates
+                      let availableRates;
+                      if (selectedBank && Object.keys(selectedBank.rates).length > 0) {
+                        // Get unique rates from the selected bank
+                        const uniqueRates = [...new Set(Object.values(selectedBank.rates))];
+                        availableRates = uniqueRates.sort((a, b) => a - b);
+                      } else {
+                        // Default rates if no bank selected
+                        availableRates = [4.99, 5.49, 5.99, 6.49, 6.99, 7.49, 7.99];
+                      }
+                      
+                      return availableRates.map((rate) => (
                         <Button
                           key={`rate-${rate}`}
                           type="button"
@@ -900,25 +911,8 @@ export default function FinancingCalculatorPage() {
                         >
                           <span className="font-bold">{rate}%</span>
                         </Button>
-                      ))
-                    ) : (
-                      // Default rates if no bank selected
-                      ["4.99", "5.49", "5.99", "6.49", "6.99", "7.49", "7.99"].map((rate) => (
-                        <Button
-                          key={`default-rate-${rate}`}
-                          type="button"
-                          variant={formData.financingRate === rate ? "default" : "outline"}
-                          className={`h-12 flex items-center justify-center text-sm ${
-                            formData.financingRate === rate
-                              ? "bg-[#C79C45] hover:bg-[#B8862F] text-white" 
-                              : "hover:bg-[#C79C45]/10 border-[#C79C45]/30"
-                          }`}
-                          onClick={() => handleInputChange("financingRate", rate)}
-                        >
-                          <span className="font-bold">{rate}%</span>
-                        </Button>
-                      ))
-                    )}
+                      ));
+                    })()}
                   </div>
                   <p className="text-sm text-gray-500 mt-2">
                     {selectedBank ? "اختر نسبة التمويل المناسبة من البنك المحدد" : "اختر البنك أولاً لعرض نسب التمويل المتاحة"}
