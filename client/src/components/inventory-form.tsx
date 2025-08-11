@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertInventoryItemSchema, type InsertInventoryItem, type InventoryItem } from "@shared/schema";
-import { CloudUpload } from "lucide-react";
+import { CloudUpload, Settings } from "lucide-react";
 
 interface InventoryFormProps {
   open: boolean;
@@ -55,6 +55,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   const [isEditingOptions, setIsEditingOptions] = useState(false);
   
   // Local state for editable lists (keeping the same structure for other dropdowns)
+  const [editableYears, setEditableYears] = useState<number[]>(initialYears);
   const [editableEngineCapacities, setEditableEngineCapacities] = useState<string[]>(initialEngineCapacities);
   const [editableStatuses, setEditableStatuses] = useState<string[]>(initialStatuses);
   const [editableImportTypes, setEditableImportTypes] = useState<string[]>(initialImportTypes);
@@ -65,6 +66,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   
   // Options editor state
   const [editingOptionType, setEditingOptionType] = useState<string | null>(null);
+  const [dropdownSettingsOpen, setDropdownSettingsOpen] = useState(false);
 
   const form = useForm<InsertInventoryItem>({
     resolver: zodResolver(insertInventoryItemSchema),
@@ -327,9 +329,21 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full glass-container border-0">
         <DialogHeader className="pb-4">
-          <DialogTitle className="text-xl font-bold text-white text-center">
-            {editItem ? "تحرير المركبة" : "إضافة مركبة جديدة"}
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setDropdownSettingsOpen(true)}
+              className="text-white hover:bg-white/10"
+            >
+              <Settings size={20} />
+            </Button>
+            <DialogTitle className="text-xl font-bold text-white flex-1 text-center">
+              {editItem ? "تحرير المركبة" : "إضافة مركبة جديدة"}
+            </DialogTitle>
+            <div className="w-10" /> {/* Spacer for centering */}
+          </div>
         </DialogHeader>
 
         <Form {...form}>
@@ -495,7 +509,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                           <SelectValue placeholder="السنة" />
                         </SelectTrigger>
                         <SelectContent>
-                          {initialYears.map((year) => (
+                          {editableYears.map((year) => (
                             <SelectItem key={year} value={year.toString()}>
                               {year}
                             </SelectItem>
@@ -754,7 +768,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                           <SelectValue placeholder="حالة البيع" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="false">متوفر</SelectItem>
+                          <SelectItem value="false">متاح للبيع</SelectItem>
                           <SelectItem value="true">مباع</SelectItem>
                         </SelectContent>
                       </Select>
@@ -853,25 +867,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 />
               )}
 
-              {/* المواصفات التفصيلية */}
-              <FormField
-                control={form.control}
-                name="detailedSpecifications"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="المواصفات التفصيلية"
-                        className="glass-input border-white/20 text-white placeholder:text-white/60 min-h-[100px]"
-                        value={field.value || ""}
-                        onChange={field.onChange}
-                        dir="rtl"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
 
               {/* الملاحظات العامة */}
               <FormField
@@ -916,6 +912,204 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
           </form>
         </Form>
       </DialogContent>
+
+      {/* Dropdown Settings Dialog */}
+      <Dialog open={dropdownSettingsOpen} onOpenChange={setDropdownSettingsOpen}>
+        <DialogContent className="max-w-2xl glass-container border-0">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-white text-center">
+              إعدادات القوائم المنسدلة
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Years Settings */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-white">السنوات</h3>
+              <div className="flex flex-wrap gap-2">
+                {editableYears.map((year) => (
+                  <div key={year} className="flex items-center gap-1 bg-white/10 rounded px-2 py-1">
+                    <span className="text-white text-sm">{year}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditableYears(prev => prev.filter(y => y !== year))}
+                      className="h-auto p-0 text-red-400 hover:text-red-300"
+                    >
+                      ×
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newYear = prompt("أدخل السنة الجديدة:");
+                    if (newYear && !isNaN(Number(newYear))) {
+                      setEditableYears(prev => [...prev, Number(newYear)].sort((a, b) => b - a));
+                    }
+                  }}
+                  className="glass-button text-white border-white/20"
+                >
+                  + إضافة سنة
+                </Button>
+              </div>
+            </div>
+
+            {/* Import Types Settings */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-white">أنواع الاستيراد</h3>
+              <div className="flex flex-wrap gap-2">
+                {editableImportTypes.map((type) => (
+                  <div key={type} className="flex items-center gap-1 bg-white/10 rounded px-2 py-1">
+                    <span className="text-white text-sm">{type}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditableImportTypes(prev => prev.filter(t => t !== type))}
+                      className="h-auto p-0 text-red-400 hover:text-red-300"
+                    >
+                      ×
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newType = prompt("أدخل نوع الاستيراد الجديد:");
+                    if (newType && newType.trim()) {
+                      setEditableImportTypes(prev => [...prev, newType.trim()]);
+                    }
+                  }}
+                  className="glass-button text-white border-white/20"
+                >
+                  + إضافة نوع
+                </Button>
+              </div>
+            </div>
+
+            {/* Status Settings */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-white">الحالات</h3>
+              <div className="flex flex-wrap gap-2">
+                {editableStatuses.map((status) => (
+                  <div key={status} className="flex items-center gap-1 bg-white/10 rounded px-2 py-1">
+                    <span className="text-white text-sm">{status}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditableStatuses(prev => prev.filter(s => s !== status))}
+                      className="h-auto p-0 text-red-400 hover:text-red-300"
+                    >
+                      ×
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newStatus = prompt("أدخل الحالة الجديدة:");
+                    if (newStatus && newStatus.trim()) {
+                      setEditableStatuses(prev => [...prev, newStatus.trim()]);
+                    }
+                  }}
+                  className="glass-button text-white border-white/20"
+                >
+                  + إضافة حالة
+                </Button>
+              </div>
+            </div>
+
+            {/* Locations Settings */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-white">المواقع</h3>
+              <div className="flex flex-wrap gap-2">
+                {editableLocations.map((location) => (
+                  <div key={location} className="flex items-center gap-1 bg-white/10 rounded px-2 py-1">
+                    <span className="text-white text-sm">{location}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditableLocations(prev => prev.filter(l => l !== location))}
+                      className="h-auto p-0 text-red-400 hover:text-red-300"
+                    >
+                      ×
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newLocation = prompt("أدخل الموقع الجديد:");
+                    if (newLocation && newLocation.trim()) {
+                      setEditableLocations(prev => [...prev, newLocation.trim()]);
+                    }
+                  }}
+                  className="glass-button text-white border-white/20"
+                >
+                  + إضافة موقع
+                </Button>
+              </div>
+            </div>
+
+            {/* Ownership Types Settings */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-white">أنواع الملكية</h3>
+              <div className="flex flex-wrap gap-2">
+                {editableOwnershipTypes.map((type) => (
+                  <div key={type} className="flex items-center gap-1 bg-white/10 rounded px-2 py-1">
+                    <span className="text-white text-sm">{type}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditableOwnershipTypes(prev => prev.filter(t => t !== type))}
+                      className="h-auto p-0 text-red-400 hover:text-red-300"
+                    >
+                      ×
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newType = prompt("أدخل نوع الملكية الجديد:");
+                    if (newType && newType.trim()) {
+                      setEditableOwnershipTypes(prev => [...prev, newType.trim()]);
+                    }
+                  }}
+                  className="glass-button text-white border-white/20"
+                >
+                  + إضافة نوع
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-center pt-4">
+            <Button
+              type="button"
+              onClick={() => setDropdownSettingsOpen(false)}
+              className="bg-custom-gold hover:bg-custom-gold-dark text-white px-8"
+            >
+              إغلاق
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

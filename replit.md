@@ -13,6 +13,9 @@ Removed duplicate price card component (/components/price-card.tsx) to eliminate
 Single horizontal navigation system at the top - removed duplicate sidebar navigation component to eliminate confusion and maintain clean architecture.
 Removed print button from quotation preview component per user request.
 Disabled text selection on long press to prevent unwanted text highlighting when interacting with UI elements, while maintaining text selection for input fields and text areas.
+Removed detailed specifications box and "متوفر" availability checkbox from vehicle addition dialog per user request.
+Added gear (Settings) button in vehicle form header for controlling dropdown data (Year, Import Type, Status, Location, Ownership Type) with add/remove functionality.
+Updated sale status from "متوفر" to "متاح للبيع" for clearer terminology.
 
 ## System Architecture
 
