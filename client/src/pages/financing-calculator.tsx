@@ -89,6 +89,7 @@ interface FormData {
   finalPayment: string;
   bankName: string;
   financingYears: string;
+  financingRate: string; // Profit margin percentage
   administrativeFees: string;
   insuranceRate: string;
   vehicleManufacturer: string;
@@ -108,6 +109,7 @@ export default function FinancingCalculatorPage() {
     finalPayment: "",
     bankName: "",
     financingYears: "",
+    financingRate: "", // Profit margin percentage
     administrativeFees: "",
     insuranceRate: "5.0", // Default comprehensive insurance rate
     vehicleManufacturer: "",
@@ -596,33 +598,16 @@ export default function FinancingCalculatorPage() {
                           )}
                         </div>
                         
-                        {/* Interest Rates as Selectable Buttons */}
+                        {/* Interest Rates Display */}
                         {selectedBank?.name === bank.name && (
                           <div className="mt-3 pt-3 border-t border-white/20">
-                            <h4 className="text-sm font-medium text-white mb-2">اختر نسبة التأمين الشامل (%):</h4>
-                            <div className="grid grid-cols-2 gap-2">
+                            <h4 className="text-sm font-medium text-white mb-2">نسب الفائدة المتاحة:</h4>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
                               {Object.entries(bank.rates).map(([years, rate]) => (
-                                <Button
-                                  key={years}
-                                  type="button"
-                                  variant={formData.financingYears === years ? "default" : "outline"}
-                                  className={`h-12 flex flex-col items-center justify-center text-xs transition-all duration-200 ${
-                                    formData.financingYears === years 
-                                      ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600" 
-                                      : "bg-white/10 hover:bg-white/20 border-white/20 text-white"
-                                  }`}
-                                  onClick={() => {
-                                    handleInputChange("financingYears", years);
-                                    // Also set the interest rate based on selected years
-                                    const selectedRate = bank.rates[years];
-                                    if (selectedRate) {
-                                      handleInputChange("insuranceRate", selectedRate.toString());
-                                    }
-                                  }}
-                                >
-                                  <span className="font-bold text-sm">{years} {parseInt(years) === 1 ? "سنة" : "سنوات"}</span>
-                                  <span className="text-xs opacity-90">{rate}%</span>
-                                </Button>
+                                <div key={years} className="flex justify-between p-2 bg-white/10 rounded">
+                                  <span className="text-white/80">{years} سنة:</span>
+                                  <span className="text-blue-400 font-bold">{rate}%</span>
+                                </div>
                               ))}
                             </div>
                           </div>
@@ -874,7 +859,6 @@ export default function FinancingCalculatorPage() {
                   <Label>عدد سنوات التمويل</Label>
                   <div className="grid grid-cols-4 gap-2 mt-2">
                     {(availableRates.length > 0 ? availableRates : ["1", "2", "3", "4", "5", "6", "7"]).map((year) => {
-                      const rate = selectedBank?.rates[year];
                       return (
                         <Button
                           key={year}
@@ -888,7 +872,6 @@ export default function FinancingCalculatorPage() {
                           onClick={() => handleInputChange("financingYears", year)}
                         >
                           <span className="font-bold">{year} {parseInt(year) === 1 ? "سنة" : "سنوات"}</span>
-                          {rate && <span className="text-xs opacity-75">{rate}%</span>}
                         </Button>
                       );
                     })}
@@ -896,6 +879,50 @@ export default function FinancingCalculatorPage() {
                   {!selectedBank && (
                     <p className="text-sm text-gray-500 mt-2">اختر البنك لعرض النسب المحددة</p>
                   )}
+                </div>
+
+                {/* Financing Rate (Profit Margin) - Button Selection */}
+                <div>
+                  <Label>نسبة التمويل (هامش الربح %)</Label>
+                  <div className="grid grid-cols-4 gap-2 mt-2">
+                    {selectedBank && Object.entries(selectedBank.rates).length > 0 ? (
+                      Object.entries(selectedBank.rates).map(([year, rate]) => (
+                        <Button
+                          key={`rate-${rate}`}
+                          type="button"
+                          variant={formData.financingRate === rate.toString() ? "default" : "outline"}
+                          className={`h-12 flex items-center justify-center text-sm ${
+                            formData.financingRate === rate.toString()
+                              ? "bg-[#C79C45] hover:bg-[#B8862F] text-white" 
+                              : "hover:bg-[#C79C45]/10 border-[#C79C45]/30"
+                          }`}
+                          onClick={() => handleInputChange("financingRate", rate.toString())}
+                        >
+                          <span className="font-bold">{rate}%</span>
+                        </Button>
+                      ))
+                    ) : (
+                      // Default rates if no bank selected
+                      ["4.99", "5.49", "5.99", "6.49", "6.99", "7.49", "7.99"].map((rate) => (
+                        <Button
+                          key={`default-rate-${rate}`}
+                          type="button"
+                          variant={formData.financingRate === rate ? "default" : "outline"}
+                          className={`h-12 flex items-center justify-center text-sm ${
+                            formData.financingRate === rate
+                              ? "bg-[#C79C45] hover:bg-[#B8862F] text-white" 
+                              : "hover:bg-[#C79C45]/10 border-[#C79C45]/30"
+                          }`}
+                          onClick={() => handleInputChange("financingRate", rate)}
+                        >
+                          <span className="font-bold">{rate}%</span>
+                        </Button>
+                      ))
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">
+                    {selectedBank ? "اختر نسبة التمويل المناسبة من البنك المحدد" : "اختر البنك أولاً لعرض نسب التمويل المتاحة"}
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
