@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Calculator, Printer, Save, ArrowRight, TrendingUp, Plus, Upload, Trash2 } from "lucide-react";
+import { Calculator, Printer, Save, ArrowRight, TrendingUp, Plus, Upload, Trash2, Car } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
@@ -89,7 +89,9 @@ interface FormData {
   finalPayment: string;
   bankName: string;
   financingYears: string;
+  financingMonths: string;
   financingRate: string; // Profit margin percentage
+  financingType: string; // "installments" or "50-50"
   administrativeFees: string;
   insuranceRate: string;
   vehicleManufacturer: string;
@@ -109,7 +111,9 @@ export default function FinancingCalculatorPage() {
     finalPayment: "",
     bankName: "",
     financingYears: "",
+    financingMonths: "",
     financingRate: "", // Profit margin percentage
+    financingType: "installments", // Default to installments
     administrativeFees: "",
     insuranceRate: "5.0", // Default comprehensive insurance rate
     vehicleManufacturer: "",
@@ -558,235 +562,147 @@ export default function FinancingCalculatorPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Banks Section */}
-          <Card className="glass-container h-fit">
+        <div className="space-y-6">
+          {/* Vehicle Information Section */}
+          <Card className="glass-container">
             <CardHeader className="pb-3 border-b border-white/10">
               <CardTitle className="text-lg font-semibold text-white drop-shadow-lg flex items-center">
-                <TrendingUp className="h-5 w-5 ml-2 text-blue-400" />
-                البنوك ونسب التمويل
+                <Car className="h-5 w-5 ml-2 text-blue-400" />
+                بيانات المركبة
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4">
-              {isLoadingRates ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
-                  <p className="text-white/60">جاري تحميل البنوك...</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Manufacturer */}
+                <div>
+                  <Label>الصانع</Label>
+                  <Select 
+                    value={formData.vehicleManufacturer} 
+                    onValueChange={(value) => handleInputChange("vehicleManufacturer", value)}
+                  >
+                    <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                      <SelectValue placeholder="اختر الصانع" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {hierarchicalManufacturers.map((manufacturer: any) => (
+                        <SelectItem key={manufacturer.id} value={manufacturer.name}>
+                          {manufacturer.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  {allBanks.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-white/60 mb-4">لا توجد بنوك متاحة</p>
-                      <Link href="/financing-rates">
-                        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                          إدارة النسب
-                        </Button>
-                      </Link>
-                    </div>
-                  ) : (
-                    allBanks.map((bank) => (
-                      <div
-                        key={bank.id || bank.name}
-                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                          selectedBank?.name === bank.name
-                            ? 'border-blue-400 bg-blue-500/20'
-                            : 'border-white/20 bg-white/5 hover:bg-white/10'
-                        }`}
-                        onClick={() => {
-                          setSelectedBank(bank);
-                          handleInputChange("bankName", bank.name);
-                          // Reset financing rate when bank changes
-                          handleInputChange("financingRate", "");
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            {bank.logo && (
-                              <img src={bank.logo} alt={bank.name} className="w-8 h-8 object-contain" />
-                            )}
-                            <div>
-                              <h3 className="font-semibold text-white">{bank.name}</h3>
-                              <p className="text-xs text-white/60">
-                                {bank.id ? "(مُدار)" : "(مخصص)"}
-                              </p>
-                            </div>
-                          </div>
-                          {selectedBank?.name === bank.name && (
-                            <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
-                          )}
-                        </div>
-                        
-                        {/* Interest Rates Display */}
-                        {selectedBank?.name === bank.name && (
-                          <div className="mt-3 pt-3 border-t border-white/20">
-                            <h4 className="text-sm font-medium text-white mb-2">نسب الفائدة المتاحة:</h4>
-                            <div className="grid grid-cols-2 gap-2 text-xs">
-                              {Object.entries(bank.rates).map(([years, rate]) => (
-                                <div key={years} className="flex justify-between p-2 bg-white/10 rounded">
-                                  <span className="text-white/80">{years} سنة:</span>
-                                  <span className="text-blue-400 font-bold">{rate}%</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
+
+                {/* Category */}
+                <div>
+                  <Label>الفئة</Label>
+                  <Select 
+                    value={formData.vehicleCategory} 
+                    onValueChange={(value) => handleInputChange("vehicleCategory", value)}
+                    disabled={!formData.vehicleManufacturer}
+                  >
+                    <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                      <SelectValue placeholder="اختر الفئة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {hierarchicalCategories.map((category: any) => (
+                        <SelectItem key={category.id} value={category.name}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-              )}
+
+                {/* Trim Level */}
+                <div>
+                  <Label>درجة التجهيز</Label>
+                  <Select 
+                    value={formData.vehicleTrimLevel} 
+                    onValueChange={(value) => handleInputChange("vehicleTrimLevel", value)}
+                    disabled={!formData.vehicleCategory}
+                  >
+                    <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                      <SelectValue placeholder="اختر درجة التجهيز" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {hierarchicalTrimLevels.map((trim: any) => (
+                        <SelectItem key={trim.id} value={trim.name}>
+                          {trim.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Exterior Color */}
+                <div>
+                  <Label>اللون الخارجي</Label>
+                  <Select 
+                    value={formData.vehicleExteriorColor} 
+                    onValueChange={(value) => handleInputChange("vehicleExteriorColor", value)}
+                    disabled={!formData.vehicleCategory}
+                  >
+                    <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                      <SelectValue placeholder="اختر اللون الخارجي" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {hierarchicalExteriorColors.map((color: any) => (
+                        <SelectItem key={color.id} value={color.name}>
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="w-4 h-4 rounded-full border border-gray-300" 
+                              style={{ backgroundColor: color.hexCode || '#000' }}
+                            ></div>
+                            {color.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Interior Color */}
+                <div>
+                  <Label>اللون الداخلي</Label>
+                  <Select 
+                    value={formData.vehicleInteriorColor} 
+                    onValueChange={(value) => handleInputChange("vehicleInteriorColor", value)}
+                    disabled={!formData.vehicleCategory}
+                  >
+                    <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                      <SelectValue placeholder="اختر اللون الداخلي" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {hierarchicalInteriorColors.map((color: any) => (
+                        <SelectItem key={color.id} value={color.name}>
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="w-4 h-4 rounded-full border border-gray-300" 
+                              style={{ backgroundColor: color.hexCode || '#000' }}
+                            ></div>
+                            {color.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Input Form */}
-          <Card className="glass-container h-fit">
+          {/* Financing Information Section */}
+          <Card className="glass-container">
             <CardHeader className="pb-3 border-b border-white/10">
               <CardTitle className="text-lg font-semibold text-white drop-shadow-lg flex items-center">
-                <TrendingUp className="h-5 w-5 ml-2 text-blue-400" />
+                <Calculator className="h-5 w-5 ml-2 text-blue-400" />
                 بيانات التمويل
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6 p-4">
-              {/* Customer Info */}
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="customerName">اسم العميل</Label>
-                  <Input
-                    id="customerName"
-                    value={formData.customerName}
-                    onChange={(e) => handleInputChange("customerName", e.target.value)}
-                    placeholder="أدخل اسم العميل"
-                  />
-                </div>
-
-                {/* Vehicle Details - Hierarchical Dropdowns */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="vehicleManufacturer">الصانع</Label>
-                    <Select value={formData.vehicleManufacturer} onValueChange={(value) => handleInputChange("vehicleManufacturer", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر الصانع" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {hierarchicalManufacturers.map((manufacturer: any) => (
-                          <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
-                            <div className="flex items-center gap-2">
-                              {manufacturer.logo && (
-                                <img src={manufacturer.logo} alt={manufacturer.nameAr} className="w-4 h-4 object-contain" />
-                              )}
-                              {manufacturer.nameAr}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="vehicleCategory">الفئة</Label>
-                    <Select 
-                      value={formData.vehicleCategory} 
-                      onValueChange={(value) => handleInputChange("vehicleCategory", value)}
-                      disabled={!formData.vehicleManufacturer}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={!formData.vehicleManufacturer ? "اختر الصانع أولاً" : "اختر الفئة"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {hierarchicalCategories.map((category: any) => (
-                          <SelectItem key={category.id || category.nameAr} value={category.nameAr}>
-                            {category.nameAr}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="vehicleTrimLevel">درجة التجهيز</Label>
-                    <Select 
-                      value={formData.vehicleTrimLevel} 
-                      onValueChange={(value) => handleInputChange("vehicleTrimLevel", value)}
-                      disabled={!formData.vehicleCategory}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={!formData.vehicleCategory ? "اختر الفئة أولاً" : "اختر درجة التجهيز"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {hierarchicalTrimLevels.map((trimLevel: any) => (
-                          <SelectItem key={trimLevel.id || trimLevel.nameAr} value={trimLevel.nameAr}>
-                            {trimLevel.nameAr}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="vehicleExteriorColor">اللون الخارجي</Label>
-                    <Select 
-                      value={formData.vehicleExteriorColor} 
-                      onValueChange={(value) => handleInputChange("vehicleExteriorColor", value)}
-                      disabled={!formData.vehicleCategory}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر اللون الخارجي" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {hierarchicalExteriorColors.map((color: any) => (
-                          <SelectItem key={color.id} value={color.colorName}>
-                            <div className="flex items-center gap-2">
-                              {color.colorCode && (
-                                <div 
-                                  className="w-4 h-4 rounded border border-gray-300" 
-                                  style={{ backgroundColor: color.colorCode }}
-                                />
-                              )}
-                              {color.colorName}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="vehicleInteriorColor">اللون الداخلي</Label>
-                    <Select 
-                      value={formData.vehicleInteriorColor} 
-                      onValueChange={(value) => handleInputChange("vehicleInteriorColor", value)}
-                      disabled={!formData.vehicleCategory}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر اللون الداخلي" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {hierarchicalInteriorColors.map((color: any) => (
-                          <SelectItem key={color.id} value={color.colorName}>
-                            <div className="flex items-center gap-2">
-                              {color.colorCode && (
-                                <div 
-                                  className="w-4 h-4 rounded border border-gray-300" 
-                                  style={{ backgroundColor: color.colorCode }}
-                                />
-                              )}
-                              {color.colorName}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Financial Details */}
-              <div className="space-y-4">
+            <CardContent className="p-4 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Vehicle Price */}
                 <div>
                   <Label htmlFor="vehiclePrice">سعر السيارة (ريال)</Label>
                   <Input
@@ -794,150 +710,204 @@ export default function FinancingCalculatorPage() {
                     type="number"
                     value={formData.vehiclePrice}
                     onChange={(e) => handleInputChange("vehiclePrice", e.target.value)}
-                    placeholder="150000"
+                    placeholder="0"
+                    className="bg-white/5 border-white/20 text-white"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="downPayment">الدفعة الأولى (ريال)</Label>
-                    <Input
-                      id="downPayment"
-                      type="number"
-                      value={formData.downPayment}
-                      onChange={(e) => handleInputChange("downPayment", e.target.value)}
-                      placeholder="30000"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="finalPayment">الدفعة الأخيرة (ريال)</Label>
-                    <Input
-                      id="finalPayment"
-                      type="number"
-                      value={formData.finalPayment}
-                      onChange={(e) => handleInputChange("finalPayment", e.target.value)}
-                      placeholder="0"
-                    />
+                {/* Financing Type */}
+                <div>
+                  <Label>نوع التمويل</Label>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <Button
+                      type="button"
+                      variant={formData.financingType === "installments" ? "default" : "outline"}
+                      className={`h-12 ${
+                        formData.financingType === "installments"
+                          ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                          : "hover:bg-blue-50 border-blue-200"
+                      }`}
+                      onClick={() => handleInputChange("financingType", "installments")}
+                    >
+                      أقساط
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={formData.financingType === "50-50" ? "default" : "outline"}
+                      className={`h-12 ${
+                        formData.financingType === "50-50"
+                          ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                          : "hover:bg-blue-50 border-blue-200"
+                      }`}
+                      onClick={() => handleInputChange("financingType", "50-50")}
+                    >
+                      50% / 50%
+                    </Button>
                   </div>
                 </div>
 
+                {/* Down Payment */}
                 <div>
-                  <Label htmlFor="bankName">البنك</Label>
+                  <Label htmlFor="downPayment">الدفعة الأولى (ريال)</Label>
+                  <Input
+                    id="downPayment"
+                    type="number"
+                    value={formData.downPayment}
+                    onChange={(e) => handleInputChange("downPayment", e.target.value)}
+                    placeholder="0"
+                    className="bg-white/5 border-white/20 text-white"
+                  />
+                </div>
+
+                {/* Final Payment */}
+                <div>
+                  <Label htmlFor="finalPayment">الدفعة الأخيرة (ريال)</Label>
+                  <Input
+                    id="finalPayment"
+                    type="number"
+                    value={formData.finalPayment}
+                    onChange={(e) => handleInputChange("finalPayment", e.target.value)}
+                    placeholder="0"
+                    className="bg-white/5 border-white/20 text-white"
+                  />
+                </div>
+
+                {/* Financing Years */}
+                <div>
+                  <Label>عدد سنوات التمويل (أقصى 5 سنوات)</Label>
+                  <div className="grid grid-cols-5 gap-2 mt-2">
+                    {["1", "2", "3", "4", "5"].map((year) => (
+                      <Button
+                        key={year}
+                        type="button"
+                        variant={formData.financingYears === year ? "default" : "outline"}
+                        className={`h-12 text-sm ${
+                          formData.financingYears === year 
+                            ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                            : "hover:bg-blue-50 border-blue-200"
+                        }`}
+                        onClick={() => handleInputChange("financingYears", year)}
+                      >
+                        {year} {parseInt(year) === 1 ? "سنة" : "سنوات"}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Financing Months */}
+                <div>
+                  <Label htmlFor="financingMonths">الأشهر الإضافية</Label>
                   <Select 
-                    value={formData.bankName} 
-                    onValueChange={(value) => handleInputChange("bankName", value)}
-                    disabled={isLoadingRates}
+                    value={formData.financingMonths} 
+                    onValueChange={(value) => handleInputChange("financingMonths", value)}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder={isLoadingRates ? "جاري تحميل البنوك..." : "اختر البنك"} />
+                    <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                      <SelectValue placeholder="اختر الأشهر" />
                     </SelectTrigger>
                     <SelectContent>
-                      {managedBanks.length > 0 && (
-                        <div className="px-2 py-1 text-xs text-muted-foreground border-b">
-                          البنوك من إدارة النسب ({managedBanks.length})
-                        </div>
-                      )}
-                      {managedBanks.map((bank) => (
-                        <SelectItem key={`managed-${bank.name}`} value={bank.name}>
-                          <div className="flex items-center gap-2">
-                            {bank.logo && (
-                              <img src={bank.logo} alt={bank.name} className="w-4 h-4 object-contain" />
-                            )}
-                            {bank.name}
-                            <span className="text-xs text-blue-600">(مُدار)</span>
-                          </div>
+                      {Array.from({length: 12}, (_, i) => (
+                        <SelectItem key={i.toString()} value={i.toString()}>
+                          {i === 0 ? "بدون أشهر إضافية" : `${i} شهر`}
                         </SelectItem>
                       ))}
-                      {customBanks.length > 0 && managedBanks.length > 0 && (
-                        <div className="px-2 py-1 text-xs text-muted-foreground border-b border-t">
-                          البنوك المخصصة ({customBanks.length})
-                        </div>
-                      )}
-                      {customBanks.map((bank) => (
-                        <SelectItem key={`custom-${bank.id}`} value={bank.name}>
-                          <div className="flex items-center gap-2">
-                            {bank.logo && (
-                              <img src={bank.logo} alt={bank.name} className="w-4 h-4 object-contain" />
-                            )}
-                            {bank.name}
-                            <span className="text-xs text-gray-500">(مخصص)</span>
-                          </div>
-                        </SelectItem>
-                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Banks Section */}
+          <Card className="glass-container">
+            <CardHeader className="pb-3 border-b border-white/10">
+              <CardTitle className="text-lg font-semibold text-white drop-shadow-lg flex items-center">
+                <TrendingUp className="h-5 w-5 ml-2 text-blue-400" />
+                البنوك ونسب التمويل
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="space-y-4">
+                {/* Customer Name */}
+                <div>
+                  <Label htmlFor="customerName">اسم العميل</Label>
+                  <Input
+                    id="customerName"
+                    value={formData.customerName}
+                    onChange={(e) => handleInputChange("customerName", e.target.value)}
+                    placeholder="أدخل اسم العميل"
+                    className="bg-white/5 border-white/20 text-white"
+                  />
+                </div>
+
+                {/* Bank Selection */}
+                <div>
+                  <Label>اختيار البنك</Label>
+                  <Select 
+                    value={formData.bankName} 
+                    onValueChange={(value) => {
+                      handleInputChange("bankName", value);
+                      const bank = allBanks.find(b => b.name === value);
+                      setSelectedBank(bank || null);
+                      handleInputChange("financingRate", "");
+                    }}
+                  >
+                    <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                      <SelectValue placeholder="اختر البنك" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {managedBanks.length === 0 && customBanks.length === 0 && !isLoadingRates && (
                         <div className="px-2 py-2 text-sm text-muted-foreground text-center">
-                          لا توجد بنوك متاحة. يرجى إضافة بنوك من صفحة إدارة النسب أو إضافة بنك مخصص.
+                          لا توجد بنوك متاحة
                         </div>
                       )}
+                      {allBanks.map((bank) => (
+                        <SelectItem key={bank.id || bank.name} value={bank.name}>
+                          <div className="flex items-center gap-2">
+                            {bank.logo && (
+                              <img src={bank.logo} alt={bank.name} className="w-4 h-4 object-contain" />
+                            )}
+                            {bank.name}
+                            <span className="text-xs text-muted-foreground ml-2">
+                              {bank.id ? "(مُدار)" : "(مخصص)"}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
 
-                {/* Financing Years - Button Selection */}
-                <div>
-                  <Label>عدد سنوات التمويل</Label>
-                  <div className="grid grid-cols-4 gap-2 mt-2">
-                    {(availableRates.length > 0 ? availableRates : ["1", "2", "3", "4", "5", "6", "7"]).map((year) => {
-                      return (
-                        <Button
-                          key={year}
-                          type="button"
-                          variant={formData.financingYears === year ? "default" : "outline"}
-                          className={`h-16 flex flex-col items-center justify-center text-sm ${
-                            formData.financingYears === year 
-                              ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                              : "hover:bg-blue-50 border-blue-200"
-                          }`}
-                          onClick={() => handleInputChange("financingYears", year)}
-                        >
-                          <span className="font-bold">{year} {parseInt(year) === 1 ? "سنة" : "سنوات"}</span>
-                        </Button>
-                      );
-                    })}
-                  </div>
-                  {!selectedBank && (
-                    <p className="text-sm text-gray-500 mt-2">اختر البنك لعرض النسب المحددة</p>
-                  )}
-                </div>
-
-                {/* Financing Rate (Profit Margin) - Button Selection */}
-                <div>
-                  <Label>نسبة التمويل (هامش الربح %)</Label>
-                  <div className="grid grid-cols-4 gap-2 mt-2">
-                    {(() => {
-                      // Get unique rates from selected bank or use default rates
-                      let availableRates;
-                      if (selectedBank && Object.keys(selectedBank.rates).length > 0) {
-                        // Get unique rates from the selected bank
+                {/* Financing Rate Selection - Only show when bank is selected */}
+                {selectedBank && (
+                  <div>
+                    <Label>نسب التمويل المتاحة</Label>
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {(() => {
                         const uniqueRates = [...new Set(Object.values(selectedBank.rates))];
-                        availableRates = uniqueRates.sort((a, b) => a - b);
-                      } else {
-                        // Default rates if no bank selected
-                        availableRates = [4.99, 5.49, 5.99, 6.49, 6.99, 7.49, 7.99];
-                      }
-                      
-                      return availableRates.map((rate) => (
-                        <Button
-                          key={`rate-${rate}`}
-                          type="button"
-                          variant={formData.financingRate === rate.toString() ? "default" : "outline"}
-                          className={`h-12 flex items-center justify-center text-sm ${
-                            formData.financingRate === rate.toString()
-                              ? "bg-[#C79C45] hover:bg-[#B8862F] text-white" 
-                              : "hover:bg-[#C79C45]/10 border-[#C79C45]/30"
-                          }`}
-                          onClick={() => handleInputChange("financingRate", rate.toString())}
-                        >
-                          <span className="font-bold">{rate}%</span>
-                        </Button>
-                      ));
-                    })()}
+                        return uniqueRates.sort((a, b) => a - b).map((rate) => (
+                          <Button
+                            key={`rate-${rate}`}
+                            type="button"
+                            variant={formData.financingRate === rate.toString() ? "default" : "outline"}
+                            className={`h-12 flex items-center justify-center text-sm ${
+                              formData.financingRate === rate.toString()
+                                ? "bg-[#C79C45] hover:bg-[#B8862F] text-white" 
+                                : "hover:bg-[#C79C45]/10 border-[#C79C45]/30"
+                            }`}
+                            onClick={() => handleInputChange("financingRate", rate.toString())}
+                          >
+                            <span className="font-bold">{rate}%</span>
+                          </Button>
+                        ));
+                      })()}
+                    </div>
+                    <p className="text-sm text-gray-500 mt-2">
+                      اختر نسبة التمويل المناسبة من البنك المحدد
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-500 mt-2">
-                    {selectedBank ? "اختر نسبة التمويل المناسبة من البنك المحدد" : "اختر البنك أولاً لعرض نسب التمويل المتاحة"}
-                  </p>
-                </div>
+                )}
 
+                {/* Administrative Fees and Insurance */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="administrativeFees">الرسوم الإدارية (ريال)</Label>
@@ -947,9 +917,10 @@ export default function FinancingCalculatorPage() {
                       value={formData.administrativeFees}
                       onChange={(e) => handleInputChange("administrativeFees", e.target.value)}
                       placeholder="0"
+                      className="bg-white/5 border-white/20 text-white"
                     />
                   </div>
-                  {/* Insurance Rate - Button Selection */}
+                  
                   <div>
                     <Label>نسبة التأمين الشامل (%)</Label>
                     <div className="grid grid-cols-3 gap-2 mt-2">
@@ -971,24 +942,40 @@ export default function FinancingCalculatorPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
 
-                <div>
-                  <Label htmlFor="notes">ملاحظات</Label>
-                  <Input
-                    id="notes"
-                    value={formData.notes}
-                    onChange={(e) => handleInputChange("notes", e.target.value)}
-                    placeholder="ملاحظات إضافية..."
-                  />
-                </div>
+          {/* Insurance Section */}
+          <Card className="glass-container">
+            <CardHeader className="pb-3 border-b border-white/10">
+              <CardTitle className="text-lg font-semibold text-white drop-shadow-lg flex items-center">
+                <Save className="h-5 w-5 ml-2 text-blue-400" />
+                قسم التأمين
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div>
+                <Label htmlFor="notes">ملاحظات إضافية</Label>
+                <Input
+                  id="notes"
+                  value={formData.notes}
+                  onChange={(e) => handleInputChange("notes", e.target.value)}
+                  placeholder="ملاحظات إضافية..."
+                  className="bg-white/5 border-white/20 text-white"
+                />
               </div>
 
-              <Button onClick={calculateFinancing} className="w-full" size="lg">
+              <Button onClick={calculateFinancing} className="w-full mt-4" size="lg">
                 <Calculator className="h-4 w-4 ml-2" />
                 احسب التمويل
               </Button>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Results Column */}
+        <div className="space-y-6">
 
           {/* Results */}
           {result && (
