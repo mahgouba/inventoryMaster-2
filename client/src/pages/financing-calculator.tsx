@@ -596,16 +596,33 @@ export default function FinancingCalculatorPage() {
                           )}
                         </div>
                         
-                        {/* Interest Rates Display */}
+                        {/* Interest Rates as Selectable Buttons */}
                         {selectedBank?.name === bank.name && (
                           <div className="mt-3 pt-3 border-t border-white/20">
-                            <h4 className="text-sm font-medium text-white mb-2">نسب الفائدة:</h4>
-                            <div className="grid grid-cols-2 gap-2 text-xs">
+                            <h4 className="text-sm font-medium text-white mb-2">اختر نسبة التأمين الشامل (%):</h4>
+                            <div className="grid grid-cols-2 gap-2">
                               {Object.entries(bank.rates).map(([years, rate]) => (
-                                <div key={years} className="flex justify-between p-2 bg-white/10 rounded">
-                                  <span className="text-white/80">{years} سنة:</span>
-                                  <span className="text-blue-400 font-bold">{rate}%</span>
-                                </div>
+                                <Button
+                                  key={years}
+                                  type="button"
+                                  variant={formData.financingYears === years ? "default" : "outline"}
+                                  className={`h-12 flex flex-col items-center justify-center text-xs transition-all duration-200 ${
+                                    formData.financingYears === years 
+                                      ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600" 
+                                      : "bg-white/10 hover:bg-white/20 border-white/20 text-white"
+                                  }`}
+                                  onClick={() => {
+                                    handleInputChange("financingYears", years);
+                                    // Also set the interest rate based on selected years
+                                    const selectedRate = bank.rates[years];
+                                    if (selectedRate) {
+                                      handleInputChange("insuranceRate", selectedRate.toString());
+                                    }
+                                  }}
+                                >
+                                  <span className="font-bold text-sm">{years} {parseInt(years) === 1 ? "سنة" : "سنوات"}</span>
+                                  <span className="text-xs opacity-90">{rate}%</span>
+                                </Button>
                               ))}
                             </div>
                           </div>
@@ -801,32 +818,7 @@ export default function FinancingCalculatorPage() {
                 </div>
 
                 <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <Label htmlFor="bankName">البنك</Label>
-                    <div className="flex gap-2">
-                      <Link href="/financing-rates">
-                        <Button 
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className="text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white"
-                        >
-                          <TrendingUp className="h-4 w-4 ml-1" />
-                          إدارة النسب
-                        </Button>
-                      </Link>
-                      <Button 
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setShowAddBankDialog(true)}
-                        className="text-[#C79C45] border-[#C79C45] hover:bg-[#C79C45] hover:text-white"
-                      >
-                        <Plus className="h-4 w-4 ml-1" />
-                        إضافة بنك
-                      </Button>
-                    </div>
-                  </div>
+                  <Label htmlFor="bankName">البنك</Label>
                   <Select 
                     value={formData.bankName} 
                     onValueChange={(value) => handleInputChange("bankName", value)}
