@@ -184,6 +184,23 @@ export default function FinancingCalculatorPage() {
   // Get all available banks (managed + custom)
   const allBanks = [...managedBanks, ...customBanks];
 
+  // Update financing rate when selected bank changes
+  useEffect(() => {
+    if (selectedBank && Object.keys(selectedBank.rates).length > 0) {
+      // Get the first available rate from the selected bank as default
+      const uniqueRates = [...new Set(Object.values(selectedBank.rates))];
+      const sortedRates = uniqueRates.sort((a, b) => a - b);
+      if (sortedRates.length > 0 && !formData.financingRate) {
+        handleInputChange("financingRate", sortedRates[0].toString());
+      }
+    } else {
+      // Reset financing rate if no bank selected
+      if (formData.financingRate) {
+        handleInputChange("financingRate", "");
+      }
+    }
+  }, [selectedBank]);
+
   // Update bank rates when bank selection changes
   useEffect(() => {
     if (formData.bankName) {
@@ -579,6 +596,8 @@ export default function FinancingCalculatorPage() {
                         onClick={() => {
                           setSelectedBank(bank);
                           handleInputChange("bankName", bank.name);
+                          // Reset financing rate when bank changes
+                          handleInputChange("financingRate", "");
                         }}
                       >
                         <div className="flex items-center justify-between">
