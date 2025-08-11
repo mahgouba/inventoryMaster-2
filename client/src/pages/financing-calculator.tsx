@@ -91,13 +91,16 @@ interface FormData {
   financingYears: string;
   administrativeFees: string;
   insuranceRate: string;
-  chassisNumber: string;
   vehicleManufacturer: string;
   vehicleCategory: string;
+  vehicleTrimLevel: string;
+  vehicleExteriorColor: string;
+  vehicleInteriorColor: string;
   notes: string;
 }
 
 export default function FinancingCalculatorPage() {
+  // State definitions first
   const [formData, setFormData] = useState<FormData>({
     customerName: "",
     vehiclePrice: "",
@@ -107,10 +110,45 @@ export default function FinancingCalculatorPage() {
     financingYears: "",
     administrativeFees: "",
     insuranceRate: "5.0", // Default comprehensive insurance rate
-    chassisNumber: "",
     vehicleManufacturer: "",
     vehicleCategory: "",
+    vehicleTrimLevel: "",
+    vehicleExteriorColor: "",
+    vehicleInteriorColor: "",
     notes: ""
+  });
+
+  // Additional state for hierarchical data
+  const [manufacturers, setManufacturers] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [trimLevels, setTrimLevels] = useState<any[]>([]);
+  const [exteriorColors, setExteriorColors] = useState<any[]>([]);
+  const [interiorColors, setInteriorColors] = useState<any[]>([]);
+  const [availableRates, setAvailableRates] = useState<string[]>([]);
+
+  // Fetch hierarchical data
+  const { data: hierarchicalManufacturers = [] } = useQuery({
+    queryKey: ["/api/hierarchical/manufacturers"],
+  });
+
+  const { data: hierarchicalCategories = [] } = useQuery({
+    queryKey: ["/api/hierarchical/categories", formData.vehicleManufacturer],
+    enabled: !!formData.vehicleManufacturer
+  });
+
+  const { data: hierarchicalTrimLevels = [] } = useQuery({
+    queryKey: ["/api/hierarchical/trimLevels", formData.vehicleManufacturer, formData.vehicleCategory],
+    enabled: !!formData.vehicleManufacturer && !!formData.vehicleCategory
+  });
+
+  const { data: hierarchicalExteriorColors = [] } = useQuery({
+    queryKey: ["/api/hierarchical/colors", formData.vehicleManufacturer, formData.vehicleCategory, formData.vehicleTrimLevel, "exterior"],
+    enabled: !!formData.vehicleManufacturer && !!formData.vehicleCategory
+  });
+
+  const { data: hierarchicalInteriorColors = [] } = useQuery({
+    queryKey: ["/api/hierarchical/colors", formData.vehicleManufacturer, formData.vehicleCategory, formData.vehicleTrimLevel, "interior"],
+    enabled: !!formData.vehicleManufacturer && !!formData.vehicleCategory
   });
 
   const [result, setResult] = useState<CalculationResult | null>(null);
@@ -149,8 +187,46 @@ export default function FinancingCalculatorPage() {
     if (formData.bankName) {
       const bank = allBanks.find(b => b.name === formData.bankName);
       setSelectedBank(bank || null);
+      // Update available rates when bank changes
+      if (bank) {
+        setAvailableRates(Object.keys(bank.rates));
+      }
     }
   }, [formData.bankName, customBanks, managedBanks]);
+
+  // Reset dependent fields when parent fields change
+  useEffect(() => {
+    if (formData.vehicleManufacturer) {
+      setFormData(prev => ({
+        ...prev,
+        vehicleCategory: "",
+        vehicleTrimLevel: "",
+        vehicleExteriorColor: "",
+        vehicleInteriorColor: ""
+      }));
+    }
+  }, [formData.vehicleManufacturer]);
+
+  useEffect(() => {
+    if (formData.vehicleCategory) {
+      setFormData(prev => ({
+        ...prev,
+        vehicleTrimLevel: "",
+        vehicleExteriorColor: "",
+        vehicleInteriorColor: ""
+      }));
+    }
+  }, [formData.vehicleCategory]);
+
+  useEffect(() => {
+    if (formData.vehicleTrimLevel) {
+      setFormData(prev => ({
+        ...prev,
+        vehicleExteriorColor: "",
+        vehicleInteriorColor: ""
+      }));
+    }
+  }, [formData.vehicleTrimLevel]);
 
   // Auto-update interest rate when bank and years change
   useEffect(() => {
@@ -339,9 +415,12 @@ export default function FinancingCalculatorPage() {
       totalAmount: result.totalAmount.toString(),
       totalInterest: result.totalInterest.toString(),
       totalInsurance: result.totalInsurance.toString(),
-      chassisNumber: formData.chassisNumber,
+
       vehicleManufacturer: formData.vehicleManufacturer,
       vehicleCategory: formData.vehicleCategory,
+      vehicleTrimLevel: formData.vehicleTrimLevel,
+      vehicleExteriorColor: formData.vehicleExteriorColor,
+      vehicleInteriorColor: formData.vehicleInteriorColor,
       notes: formData.notes
     };
 
@@ -560,35 +639,126 @@ export default function FinancingCalculatorPage() {
                   />
                 </div>
 
+                {/* Vehicle Details - Hierarchical Dropdowns */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="vehicleManufacturer">الصانع</Label>
-                    <Input
-                      id="vehicleManufacturer"
-                      value={formData.vehicleManufacturer}
-                      onChange={(e) => handleInputChange("vehicleManufacturer", e.target.value)}
-                      placeholder="مرسيدس، بي ام دبليو..."
-                    />
+                    <Select value={formData.vehicleManufacturer} onValueChange={(value) => handleInputChange("vehicleManufacturer", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الصانع" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {hierarchicalManufacturers.map((manufacturer: any) => (
+                          <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                            <div className="flex items-center gap-2">
+                              {manufacturer.logo && (
+                                <img src={manufacturer.logo} alt={manufacturer.nameAr} className="w-4 h-4 object-contain" />
+                              )}
+                              {manufacturer.nameAr}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
+                  
                   <div>
                     <Label htmlFor="vehicleCategory">الفئة</Label>
-                    <Input
-                      id="vehicleCategory"
-                      value={formData.vehicleCategory}
-                      onChange={(e) => handleInputChange("vehicleCategory", e.target.value)}
-                      placeholder="C200، X5..."
-                    />
+                    <Select 
+                      value={formData.vehicleCategory} 
+                      onValueChange={(value) => handleInputChange("vehicleCategory", value)}
+                      disabled={!formData.vehicleManufacturer}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={!formData.vehicleManufacturer ? "اختر الصانع أولاً" : "اختر الفئة"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {hierarchicalCategories.map((category: any) => (
+                          <SelectItem key={category.id || category.nameAr} value={category.nameAr}>
+                            {category.nameAr}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="chassisNumber">رقم الهيكل (اختياري)</Label>
-                  <Input
-                    id="chassisNumber"
-                    value={formData.chassisNumber}
-                    onChange={(e) => handleInputChange("chassisNumber", e.target.value)}
-                    placeholder="رقم الهيكل"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="vehicleTrimLevel">درجة التجهيز</Label>
+                    <Select 
+                      value={formData.vehicleTrimLevel} 
+                      onValueChange={(value) => handleInputChange("vehicleTrimLevel", value)}
+                      disabled={!formData.vehicleCategory}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={!formData.vehicleCategory ? "اختر الفئة أولاً" : "اختر درجة التجهيز"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {hierarchicalTrimLevels.map((trimLevel: any) => (
+                          <SelectItem key={trimLevel.id || trimLevel.nameAr} value={trimLevel.nameAr}>
+                            {trimLevel.nameAr}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="vehicleExteriorColor">اللون الخارجي</Label>
+                    <Select 
+                      value={formData.vehicleExteriorColor} 
+                      onValueChange={(value) => handleInputChange("vehicleExteriorColor", value)}
+                      disabled={!formData.vehicleCategory}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر اللون الخارجي" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {hierarchicalExteriorColors.map((color: any) => (
+                          <SelectItem key={color.id} value={color.colorName}>
+                            <div className="flex items-center gap-2">
+                              {color.colorCode && (
+                                <div 
+                                  className="w-4 h-4 rounded border border-gray-300" 
+                                  style={{ backgroundColor: color.colorCode }}
+                                />
+                              )}
+                              {color.colorName}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="vehicleInteriorColor">اللون الداخلي</Label>
+                    <Select 
+                      value={formData.vehicleInteriorColor} 
+                      onValueChange={(value) => handleInputChange("vehicleInteriorColor", value)}
+                      disabled={!formData.vehicleCategory}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر اللون الداخلي" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {hierarchicalInteriorColors.map((color: any) => (
+                          <SelectItem key={color.id} value={color.colorName}>
+                            <div className="flex items-center gap-2">
+                              {color.colorCode && (
+                                <div 
+                                  className="w-4 h-4 rounded border border-gray-300" 
+                                  style={{ backgroundColor: color.colorCode }}
+                                />
+                              )}
+                              {color.colorName}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 
@@ -707,23 +877,33 @@ export default function FinancingCalculatorPage() {
                   </Select>
                 </div>
 
+                {/* Financing Years - Button Selection */}
                 <div>
-                  <Label htmlFor="financingYears">عدد سنوات التمويل</Label>
-                  <Select value={formData.financingYears} onValueChange={(value) => handleInputChange("financingYears", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر عدد السنوات" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[1, 2, 3, 4, 5, 6, 7].map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                          {year} {year === 1 ? "سنة" : "سنوات"}
-                          {selectedBank && selectedBank.rates[year.toString()] && 
-                            ` (${selectedBank.rates[year.toString()]}%)`
-                          }
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label>عدد سنوات التمويل</Label>
+                  <div className="grid grid-cols-4 gap-2 mt-2">
+                    {(availableRates.length > 0 ? availableRates : ["1", "2", "3", "4", "5", "6", "7"]).map((year) => {
+                      const rate = selectedBank?.rates[year];
+                      return (
+                        <Button
+                          key={year}
+                          type="button"
+                          variant={formData.financingYears === year ? "default" : "outline"}
+                          className={`h-16 flex flex-col items-center justify-center text-sm ${
+                            formData.financingYears === year 
+                              ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                              : "hover:bg-blue-50 border-blue-200"
+                          }`}
+                          onClick={() => handleInputChange("financingYears", year)}
+                        >
+                          <span className="font-bold">{year} {parseInt(year) === 1 ? "سنة" : "سنوات"}</span>
+                          {rate && <span className="text-xs opacity-75">{rate}%</span>}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  {!selectedBank && (
+                    <p className="text-sm text-gray-500 mt-2">اختر البنك لعرض النسب المحددة</p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -737,16 +917,26 @@ export default function FinancingCalculatorPage() {
                       placeholder="0"
                     />
                   </div>
+                  {/* Insurance Rate - Button Selection */}
                   <div>
-                    <Label htmlFor="insuranceRate">نسبة التأمين الشامل (%)</Label>
-                    <Input
-                      id="insuranceRate"
-                      type="number"
-                      step="0.1"
-                      value={formData.insuranceRate}
-                      onChange={(e) => handleInputChange("insuranceRate", e.target.value)}
-                      placeholder="5.0"
-                    />
+                    <Label>نسبة التأمين الشامل (%)</Label>
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {["3.5", "4.0", "4.5", "5.0", "5.5", "6.0"].map((rate) => (
+                        <Button
+                          key={rate}
+                          type="button"
+                          variant={formData.insuranceRate === rate ? "default" : "outline"}
+                          className={`h-12 ${
+                            formData.insuranceRate === rate 
+                              ? "bg-green-600 hover:bg-green-700 text-white" 
+                              : "hover:bg-green-50 border-green-200"
+                          }`}
+                          onClick={() => handleInputChange("insuranceRate", rate)}
+                        >
+                          {rate}%
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -796,10 +986,7 @@ export default function FinancingCalculatorPage() {
                         <span className="label">اسم العميل:</span>
                         <span className="value">{formData.customerName || "غير محدد"}</span>
                       </div>
-                      <div className="field">
-                        <span className="label">رقم الهيكل:</span>
-                        <span className="value">{formData.chassisNumber || "غير محدد"}</span>
-                      </div>
+
                       <div className="field">
                         <span className="label">الصانع:</span>
                         <span className="value">{formData.vehicleManufacturer || "غير محدد"}</span>
@@ -807,6 +994,21 @@ export default function FinancingCalculatorPage() {
                       <div className="field">
                         <span className="label">الفئة:</span>
                         <span className="value">{formData.vehicleCategory || "غير محدد"}</span>
+                      </div>
+
+                      <div className="field">
+                        <span className="label">درجة التجهيز:</span>
+                        <span className="value">{formData.vehicleTrimLevel || "غير محدد"}</span>
+                      </div>
+
+                      <div className="field">
+                        <span className="label">اللون الخارجي:</span>
+                        <span className="value">{formData.vehicleExteriorColor || "غير محدد"}</span>
+                      </div>
+
+                      <div className="field">
+                        <span className="label">اللون الداخلي:</span>
+                        <span className="value">{formData.vehicleInteriorColor || "غير محدد"}</span>
                       </div>
                     </div>
                   </div>
