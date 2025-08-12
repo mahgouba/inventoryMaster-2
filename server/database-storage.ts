@@ -390,6 +390,33 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Categories
+  async getCategoriesByManufacturer(manufacturer: string): Promise<VehicleCategory[]> {
+    try {
+      // First, find the manufacturer by name
+      const [manufacturerObj] = await db.select().from(manufacturers)
+        .where(or(
+          eq(manufacturers.nameAr, manufacturer),
+          eq(manufacturers.nameEn, manufacturer)
+        ));
+      
+      if (!manufacturerObj) {
+        console.log(`❌ Manufacturer "${manufacturer}" not found in database`);
+        return [];
+      }
+      
+      // Then get categories for this manufacturer
+      const categories = await db.select().from(vehicleCategories)
+        .where(eq(vehicleCategories.manufacturerId, manufacturerObj.id))
+        .orderBy(vehicleCategories.nameAr);
+      
+      console.log(`✅ Found ${categories.length} categories for manufacturer "${manufacturer}"`);
+      return categories;
+    } catch (error) {
+      console.error('Error in getCategoriesByManufacturer:', error);
+      return [];
+    }
+  }
+
   async getCategories(manufacturer?: string): Promise<any[]> {
     try {
       // Use raw SQL to avoid Drizzle issues
@@ -441,6 +468,48 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Trim Levels
+  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<VehicleTrimLevel[]> {
+    try {
+      // First, find the manufacturer
+      const [manufacturerObj] = await db.select().from(manufacturers)
+        .where(or(
+          eq(manufacturers.nameAr, manufacturer),
+          eq(manufacturers.nameEn, manufacturer)
+        ));
+      
+      if (!manufacturerObj) {
+        console.log(`❌ Manufacturer "${manufacturer}" not found`);
+        return [];
+      }
+      
+      // Then find the category for this manufacturer
+      const [categoryObj] = await db.select().from(vehicleCategories)
+        .where(and(
+          eq(vehicleCategories.manufacturerId, manufacturerObj.id),
+          or(
+            eq(vehicleCategories.nameAr, category),
+            eq(vehicleCategories.nameEn, category)
+          )
+        ));
+      
+      if (!categoryObj) {
+        console.log(`❌ Category "${category}" not found for manufacturer "${manufacturer}"`);
+        return [];
+      }
+      
+      // Finally get trim levels for this category
+      const trimLevels = await db.select().from(vehicleTrimLevels)
+        .where(eq(vehicleTrimLevels.categoryId, categoryObj.id))
+        .orderBy(vehicleTrimLevels.nameAr);
+      
+      console.log(`✅ Found ${trimLevels.length} trim levels for category "${category}"`);
+      return trimLevels;
+    } catch (error) {
+      console.error('Error in getTrimLevelsByCategory:', error);
+      return [];
+    }
+  }
+
   async getTrimLevels(manufacturer?: string, category?: string): Promise<any[]> {
     try {
       // Use raw SQL to avoid Drizzle issues
@@ -534,8 +603,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Stub implementations for remaining interface methods
-  async getAllCategories(): Promise<{ category: string }[]> { return []; }
-  async getCategoriesByManufacturer(manufacturer: string): Promise<{ category: string }[]> { return []; }
+  async getAllCategories(): Promise<{ category: string }[]> { 
+    const categories = await db.select().from(vehicleCategories);
+    return categories.map(c => ({ category: c.nameAr }));
+  }
+
   async getAllEngineCapacities(): Promise<{ engineCapacity: string }[]> { return []; }
   async getAppearanceSettings(): Promise<any> { return null; }
   async updateAppearanceSettings(settings: any): Promise<any> { return settings; }
@@ -546,12 +618,14 @@ export class DatabaseStorage implements IStorage {
   async deleteSpecification(id: number): Promise<boolean> { return false; }
   async getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<any[]> { return []; }
   async getSpecificationByVehicleParams(manufacturer: string, category: string, trimLevel: string | null, year: number, engineCapacity: string): Promise<any> { return null; }
-  async getAllTrimLevels(): Promise<any[]> { return []; }
+  async getAllTrimLevels(): Promise<any[]> { 
+    const trimLevels = await db.select().from(vehicleTrimLevels);
+    return trimLevels;
+  }
   async getTrimLevel(id: number): Promise<any> { return null; }
   async createTrimLevel(trimLevel: any): Promise<any> { return trimLevel; }
   async updateTrimLevel(id: number, trimLevel: any): Promise<any> { return null; }
   async deleteTrimLevel(id: number): Promise<boolean> { return false; }
-  async getTrimLevelsByCategory(manufacturer: string, category: string): Promise<any[]> { return []; }
   async getAllQuotations(): Promise<any[]> { return []; }
   async getQuotation(id: number): Promise<any> { return null; }
   async createQuotation(quotation: any): Promise<any> { return quotation; }
@@ -695,27 +769,87 @@ export class DatabaseStorage implements IStorage {
 
   async getColorAssociations(filters: any = {}): Promise<ColorAssociation[]> {
     try {
-      let query = sql`SELECT * FROM color_associations WHERE is_active = true`;
+      // If filters include manufacturer/category/trimLevel, we need to find the actual trim level ID
+      if (filters.manufacturer || filters.category || filters.trimLevel) {
+        // First find the manufacturer
+        let manufacturerId = null;
+        if (filters.manufacturer) {
+          const [manufacturerObj] = await db.select().from(manufacturers)
+            .where(or(
+              eq(manufacturers.nameAr, filters.manufacturer),
+              eq(manufacturers.nameEn, filters.manufacturer)
+            ));
+          manufacturerId = manufacturerObj?.id;
+          
+          if (!manufacturerId) {
+            console.log(`❌ Color: Manufacturer "${filters.manufacturer}" not found`);
+            return [];
+          }
+        }
+        
+        // Then find the category
+        let categoryId = null;
+        if (filters.category && manufacturerId) {
+          const [categoryObj] = await db.select().from(vehicleCategories)
+            .where(and(
+              eq(vehicleCategories.manufacturerId, manufacturerId),
+              or(
+                eq(vehicleCategories.nameAr, filters.category),
+                eq(vehicleCategories.nameEn, filters.category)
+              )
+            ));
+          categoryId = categoryObj?.id;
+          
+          if (!categoryId) {
+            console.log(`❌ Color: Category "${filters.category}" not found for manufacturer`);
+            return [];
+          }
+        }
+        
+        // Then find the trim level
+        let trimLevelId = null;
+        if (filters.trimLevel && categoryId) {
+          const [trimLevelObj] = await db.select().from(vehicleTrimLevels)
+            .where(and(
+              eq(vehicleTrimLevels.categoryId, categoryId),
+              or(
+                eq(vehicleTrimLevels.nameAr, filters.trimLevel),
+                eq(vehicleTrimLevels.nameEn, filters.trimLevel)
+              )
+            ));
+          trimLevelId = trimLevelObj?.id;
+          
+          if (!trimLevelId) {
+            console.log(`❌ Color: Trim level "${filters.trimLevel}" not found for category`);
+            return [];
+          }
+          
+          // Fetch colors for this trim level
+          const conditions = [
+            eq(colorAssociations.trimLevelId, trimLevelId),
+            eq(colorAssociations.isActive, true)
+          ];
+          
+          if (filters.colorType) {
+            conditions.push(eq(colorAssociations.colorType, filters.colorType));
+          }
+          
+          const colors = await db.select().from(colorAssociations)
+            .where(and(...conditions))
+            .orderBy(colorAssociations.colorNameAr);
+          
+          console.log(`✅ Found ${colors.length} colors for trim level ID ${trimLevelId}`);
+          return colors;
+        }
+      }
       
-      if (filters.manufacturer) {
-        query = sql`${query} AND manufacturer = ${filters.manufacturer}`;
-      }
-      if (filters.category) {
-        query = sql`${query} AND category = ${filters.category}`;
-      }
-      if (filters.trimLevel) {
-        query = sql`${query} AND trim_level = ${filters.trimLevel}`;
-      }
-      if (filters.colorType) {
-        query = sql`${query} AND color_type = ${filters.colorType}`;
-      }
-      
-      query = sql`${query} ORDER BY created_at DESC`;
-      
-      const result = await db.execute(query);
-      return result.rows as ColorAssociation[];
+      // Default: return all active colors
+      const results = await db.select().from(colorAssociations)
+        .where(eq(colorAssociations.isActive, true))
+        .orderBy(colorAssociations.colorNameAr);
+      return results;
     } catch (error) {
-      console.error('Error fetching color associations:', error);
+      console.error('Error in getColorAssociations:', error);
       return [];
     }
   }
