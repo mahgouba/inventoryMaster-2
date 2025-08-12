@@ -681,86 +681,376 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                   {/* Master Filter Controls */}
 
                                   
-                                  {/* Grid Layout for Desktop - Responsive Filters */}
-                                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-                                    <ScrollableFilter
-                                      title="الصانع"
-                                      items={manufacturers}
-                                      selectedItems={manufacturerFilter}
-                                      onItemToggle={(item) => toggleFilter(manufacturerFilter, setManufacturerFilter, item)}
-                                      onClearSelection={() => setManufacturerFilter([])}
-                                    />
-                                    
-                                    <ScrollableFilter
-                                      title="الفئة"
-                                      items={categories}
-                                      selectedItems={categoryFilter}
-                                      onItemToggle={(item) => toggleFilter(categoryFilter, setCategoryFilter, item)}
-                                      onClearSelection={() => setCategoryFilter([])}
-                                    />
-                                    
-                                    <ScrollableFilter
-                                      title="درجة التجهيز"
-                                      items={availableTrimLevels}
-                                      selectedItems={trimLevelFilter}
-                                      onItemToggle={(item) => toggleFilter(trimLevelFilter, setTrimLevelFilter, item)}
-                                      onClearSelection={() => setTrimLevelFilter([])}
-                                    />
-                                    
-                                    <ScrollableFilter
-                                      title="السنة"
-                                      items={availableYears}
-                                      selectedItems={yearFilter}
-                                      onItemToggle={(item) => toggleFilter(yearFilter, setYearFilter, item)}
-                                      onClearSelection={() => setYearFilter([])}
-                                    />
-                                    
-                                    <ScrollableFilter
-                                      title="سعة المحرك"
-                                      items={availableEngineCapacities}
-                                      selectedItems={engineCapacityFilter}
-                                      onItemToggle={(item) => toggleFilter(engineCapacityFilter, setEngineCapacityFilter, item)}
-                                      onClearSelection={() => setEngineCapacityFilter([])}
-                                    />
-                                    
-                                    <ScrollableFilter
-                                      title="اللون الخارجي"
-                                      items={availableExteriorColors}
-                                      selectedItems={exteriorColorFilter}
-                                      onItemToggle={(item) => toggleFilter(exteriorColorFilter, setExteriorColorFilter, item)}
-                                      onClearSelection={() => setExteriorColorFilter([])}
-                                    />
-                                    
-                                    <ScrollableFilter
-                                      title="اللون الداخلي"
-                                      items={availableInteriorColors}
-                                      selectedItems={interiorColorFilter}
-                                      onItemToggle={(item) => toggleFilter(interiorColorFilter, setInteriorColorFilter, item)}
-                                      onClearSelection={() => setInteriorColorFilter([])}
-                                    />
-                                    
-                                    <ScrollableFilter
-                                      title="الحالة"
-                                      items={availableStatuses}
-                                      selectedItems={statusFilter}
-                                      onItemToggle={(item) => toggleFilter(statusFilter, setStatusFilter, item)}
-                                      onClearSelection={() => setStatusFilter([])}
-                                    />
-                                    <ScrollableFilter
-                                      title="نوع الاستيراد"
-                                      items={availableImportTypes}
-                                      selectedItems={importTypeFilter}
-                                      onItemToggle={(item) => toggleFilter(importTypeFilter, setImportTypeFilter, item)}
-                                      onClearSelection={() => setImportTypeFilter([])}
-                                    />
-                                    
-                                    <ScrollableFilter
-                                      title="نوع الملكية"
-                                      items={availableOwnershipTypes}
-                                      selectedItems={ownershipTypeFilter}
-                                      onItemToggle={(item) => toggleFilter(ownershipTypeFilter, setOwnershipTypeFilter, item)}
-                                      onClearSelection={() => setOwnershipTypeFilter([])}
-                                    />
+                                  {/* Single Row Filters Layout */}
+                                  <div className="flex flex-wrap gap-3 items-center">
+                                    {/* Manufacturer Filter */}
+                                    <div className="min-w-[150px]">
+                                      <Select
+                                        value={manufacturerFilter.length > 0 ? `${manufacturerFilter.length} محدد` : ""}
+                                        onValueChange={() => {}}
+                                      >
+                                        <SelectTrigger className="glass-button border-white/20 text-white">
+                                          <SelectValue placeholder="الصانع" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          {manufacturers.map((manufacturer) => (
+                                            <SelectItem
+                                              key={manufacturer}
+                                              value={manufacturer}
+                                              className="text-white hover:bg-white/20 cursor-pointer"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleFilter(manufacturerFilter, setManufacturerFilter, manufacturer);
+                                              }}
+                                            >
+                                              <div className="flex items-center justify-between w-full">
+                                                <span>{manufacturer}</span>
+                                                <div className="flex items-center gap-2">
+                                                  {manufacturerFilter.includes(manufacturer) && (
+                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                                  )}
+                                                  <span className="text-xs text-white/60">({getFilterCount(manufacturer, "manufacturer")})</span>
+                                                </div>
+                                              </div>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+
+                                    {/* Category Filter */}
+                                    <div className="min-w-[150px]">
+                                      <Select
+                                        value={categoryFilter.length > 0 ? `${categoryFilter.length} محدد` : ""}
+                                        onValueChange={() => {}}
+                                      >
+                                        <SelectTrigger className="glass-button border-white/20 text-white">
+                                          <SelectValue placeholder="الفئة" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          {categories.map((category) => (
+                                            <SelectItem
+                                              key={category}
+                                              value={category}
+                                              className="text-white hover:bg-white/20 cursor-pointer"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleFilter(categoryFilter, setCategoryFilter, category);
+                                              }}
+                                            >
+                                              <div className="flex items-center justify-between w-full">
+                                                <span>{category}</span>
+                                                <div className="flex items-center gap-2">
+                                                  {categoryFilter.includes(category) && (
+                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                                  )}
+                                                  <span className="text-xs text-white/60">({getFilterCount(category, "category")})</span>
+                                                </div>
+                                              </div>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+
+                                    {/* Trim Level Filter */}
+                                    <div className="min-w-[150px]">
+                                      <Select
+                                        value={trimLevelFilter.length > 0 ? `${trimLevelFilter.length} محدد` : ""}
+                                        onValueChange={() => {}}
+                                      >
+                                        <SelectTrigger className="glass-button border-white/20 text-white">
+                                          <SelectValue placeholder="درجة التجهيز" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          {availableTrimLevels.map((trimLevel) => (
+                                            <SelectItem
+                                              key={trimLevel}
+                                              value={trimLevel}
+                                              className="text-white hover:bg-white/20 cursor-pointer"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleFilter(trimLevelFilter, setTrimLevelFilter, trimLevel);
+                                              }}
+                                            >
+                                              <div className="flex items-center justify-between w-full">
+                                                <span>{trimLevel}</span>
+                                                <div className="flex items-center gap-2">
+                                                  {trimLevelFilter.includes(trimLevel) && (
+                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                                  )}
+                                                  <span className="text-xs text-white/60">({getFilterCount(trimLevel, "trimLevel")})</span>
+                                                </div>
+                                              </div>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+
+                                    {/* Year Filter */}
+                                    <div className="min-w-[120px]">
+                                      <Select
+                                        value={yearFilter.length > 0 ? `${yearFilter.length} محدد` : ""}
+                                        onValueChange={() => {}}
+                                      >
+                                        <SelectTrigger className="glass-button border-white/20 text-white">
+                                          <SelectValue placeholder="السنة" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          {availableYears.map((year) => (
+                                            <SelectItem
+                                              key={year}
+                                              value={year}
+                                              className="text-white hover:bg-white/20 cursor-pointer"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleFilter(yearFilter, setYearFilter, year);
+                                              }}
+                                            >
+                                              <div className="flex items-center justify-between w-full">
+                                                <span>{year}</span>
+                                                <div className="flex items-center gap-2">
+                                                  {yearFilter.includes(year) && (
+                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                                  )}
+                                                  <span className="text-xs text-white/60">({getFilterCount(year, "year")})</span>
+                                                </div>
+                                              </div>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+
+                                    {/* Engine Capacity Filter */}
+                                    <div className="min-w-[150px]">
+                                      <Select
+                                        value={engineCapacityFilter.length > 0 ? `${engineCapacityFilter.length} محدد` : ""}
+                                        onValueChange={() => {}}
+                                      >
+                                        <SelectTrigger className="glass-button border-white/20 text-white">
+                                          <SelectValue placeholder="سعة المحرك" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          {availableEngineCapacities.map((capacity) => (
+                                            <SelectItem
+                                              key={capacity}
+                                              value={capacity}
+                                              className="text-white hover:bg-white/20 cursor-pointer"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleFilter(engineCapacityFilter, setEngineCapacityFilter, capacity);
+                                              }}
+                                            >
+                                              <div className="flex items-center justify-between w-full">
+                                                <span>{capacity}</span>
+                                                <div className="flex items-center gap-2">
+                                                  {engineCapacityFilter.includes(capacity) && (
+                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                                  )}
+                                                  <span className="text-xs text-white/60">({getFilterCount(capacity, "engineCapacity")})</span>
+                                                </div>
+                                              </div>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    {/* Exterior Color Filter */}
+                                    <div className="min-w-[150px]">
+                                      <Select
+                                        value={exteriorColorFilter.length > 0 ? `${exteriorColorFilter.length} محدد` : ""}
+                                        onValueChange={() => {}}
+                                      >
+                                        <SelectTrigger className="glass-button border-white/20 text-white">
+                                          <SelectValue placeholder="اللون الخارجي" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          {availableExteriorColors.map((color) => (
+                                            <SelectItem
+                                              key={color}
+                                              value={color}
+                                              className="text-white hover:bg-white/20 cursor-pointer"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleFilter(exteriorColorFilter, setExteriorColorFilter, color);
+                                              }}
+                                            >
+                                              <div className="flex items-center justify-between w-full">
+                                                <span>{color}</span>
+                                                <div className="flex items-center gap-2">
+                                                  {exteriorColorFilter.includes(color) && (
+                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                                  )}
+                                                  <span className="text-xs text-white/60">({getFilterCount(color, "exteriorColor")})</span>
+                                                </div>
+                                              </div>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+
+                                    {/* Interior Color Filter */}
+                                    <div className="min-w-[150px]">
+                                      <Select
+                                        value={interiorColorFilter.length > 0 ? `${interiorColorFilter.length} محدد` : ""}
+                                        onValueChange={() => {}}
+                                      >
+                                        <SelectTrigger className="glass-button border-white/20 text-white">
+                                          <SelectValue placeholder="اللون الداخلي" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          {availableInteriorColors.map((color) => (
+                                            <SelectItem
+                                              key={color}
+                                              value={color}
+                                              className="text-white hover:bg-white/20 cursor-pointer"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleFilter(interiorColorFilter, setInteriorColorFilter, color);
+                                              }}
+                                            >
+                                              <div className="flex items-center justify-between w-full">
+                                                <span>{color}</span>
+                                                <div className="flex items-center gap-2">
+                                                  {interiorColorFilter.includes(color) && (
+                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                                  )}
+                                                  <span className="text-xs text-white/60">({getFilterCount(color, "interiorColor")})</span>
+                                                </div>
+                                              </div>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    {/* Status Filter */}
+                                    <div className="min-w-[120px]">
+                                      <Select
+                                        value={statusFilter.length > 0 ? `${statusFilter.length} محدد` : ""}
+                                        onValueChange={() => {}}
+                                      >
+                                        <SelectTrigger className="glass-button border-white/20 text-white">
+                                          <SelectValue placeholder="الحالة" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          {availableStatuses.map((status) => (
+                                            <SelectItem
+                                              key={status}
+                                              value={status}
+                                              className="text-white hover:bg-white/20 cursor-pointer"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleFilter(statusFilter, setStatusFilter, status);
+                                              }}
+                                            >
+                                              <div className="flex items-center justify-between w-full">
+                                                <span>{status}</span>
+                                                <div className="flex items-center gap-2">
+                                                  {statusFilter.includes(status) && (
+                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                                  )}
+                                                  <span className="text-xs text-white/60">({getFilterCount(status, "status")})</span>
+                                                </div>
+                                              </div>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+
+                                    {/* Import Type Filter */}
+                                    <div className="min-w-[150px]">
+                                      <Select
+                                        value={importTypeFilter.length > 0 ? `${importTypeFilter.length} محدد` : ""}
+                                        onValueChange={() => {}}
+                                      >
+                                        <SelectTrigger className="glass-button border-white/20 text-white">
+                                          <SelectValue placeholder="نوع الاستيراد" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          {availableImportTypes.map((importType) => (
+                                            <SelectItem
+                                              key={importType}
+                                              value={importType}
+                                              className="text-white hover:bg-white/20 cursor-pointer"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleFilter(importTypeFilter, setImportTypeFilter, importType);
+                                              }}
+                                            >
+                                              <div className="flex items-center justify-between w-full">
+                                                <span>{importType}</span>
+                                                <div className="flex items-center gap-2">
+                                                  {importTypeFilter.includes(importType) && (
+                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                                  )}
+                                                  <span className="text-xs text-white/60">({getFilterCount(importType, "importType")})</span>
+                                                </div>
+                                              </div>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+
+                                    {/* Ownership Type Filter */}
+                                    <div className="min-w-[150px]">
+                                      <Select
+                                        value={ownershipTypeFilter.length > 0 ? `${ownershipTypeFilter.length} محدد` : ""}
+                                        onValueChange={() => {}}
+                                      >
+                                        <SelectTrigger className="glass-button border-white/20 text-white">
+                                          <SelectValue placeholder="نوع الملكية" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          {availableOwnershipTypes.map((ownershipType) => (
+                                            <SelectItem
+                                              key={ownershipType}
+                                              value={ownershipType}
+                                              className="text-white hover:bg-white/20 cursor-pointer"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleFilter(ownershipTypeFilter, setOwnershipTypeFilter, ownershipType);
+                                              }}
+                                            >
+                                              <div className="flex items-center justify-between w-full">
+                                                <span>{ownershipType}</span>
+                                                <div className="flex items-center gap-2">
+                                                  {ownershipTypeFilter.includes(ownershipType) && (
+                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                                  )}
+                                                  <span className="text-xs text-white/60">({getFilterCount(ownershipType, "ownershipType")})</span>
+                                                </div>
+                                              </div>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+
+                                    {/* Clear All Filters Button */}
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setManufacturerFilter([]);
+                                        setCategoryFilter([]);
+                                        setTrimLevelFilter([]);
+                                        setYearFilter([]);
+                                        setEngineCapacityFilter([]);
+                                        setExteriorColorFilter([]);
+                                        setInteriorColorFilter([]);
+                                        setStatusFilter([]);
+                                        setImportTypeFilter([]);
+                                        setOwnershipTypeFilter([]);
+                                      }}
+                                      className="glass-button border-red-400/30 text-red-300 hover:bg-red-500/20 min-w-[100px]"
+                                    >
+                                      مسح الكل
+                                    </Button>
                                   </div>
                                 </div>
                               );
