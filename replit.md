@@ -26,6 +26,15 @@ Added gear (Settings) button in vehicle form header for controlling dropdown dat
 Updated sale status from "متوفر" to "متاح للبيع" for clearer terminology.
 Excel Import: Requested removal of specific fields from Excel import template (Serial Number, Payment System, Transmission, Fuel Type) to streamline data entry process. These fields are either auto-generated or use default values.
 
+## Recent Changes
+**August 12, 2025 - Migration to Replit Completed:**
+- Successfully migrated project from Replit Agent to standard Replit environment
+- Fixed critical JavaScript error in card view page (missing Car icon import)
+- Resolved API routing conflicts that caused statistics endpoints to fail
+- Reordered Express.js routes to ensure specific endpoints (/stats, /manufacturer-stats) come before parameterized routes (/:id)
+- Statistics dashboard now displays correct data for inventory counts and manufacturer breakdowns
+- All systems operational with proper client/server separation and security practices
+
 ## System Architecture
 
 ### Core Design Principles

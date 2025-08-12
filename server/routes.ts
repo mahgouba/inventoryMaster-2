@@ -174,7 +174,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get single inventory item by ID
+  // Get inventory stats - MUST come BEFORE :id routes
+  app.get("/api/inventory/stats", async (req, res) => {
+    try {
+      const stats = await getStorage().getInventoryStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch inventory stats" });
+    }
+  });
+
+  // Get manufacturer statistics - MUST come BEFORE :id routes
+  app.get("/api/inventory/manufacturer-stats", async (req, res) => {
+    try {
+      const stats = await getStorage().getManufacturerStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch manufacturer stats" });
+    }
+  });
+
+  // Get location statistics - MUST come BEFORE :id routes
+  app.get("/api/inventory/location-stats", async (req, res) => {
+    try {
+      const stats = await getStorage().getLocationStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch location stats" });
+    }
+  });
+
+  // Search inventory items - MUST come BEFORE :id routes
+  app.get("/api/inventory/search", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      if (!query) {
+        return res.status(400).json({ message: "Search query is required" });
+      }
+      const items = await getStorage().searchInventoryItems(query);
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to search inventory items" });
+    }
+  });
+
+  // Filter inventory items - MUST come BEFORE :id routes
+  app.get("/api/inventory/filter", async (req, res) => {
+    try {
+      const { category, status, year, manufacturer, importType, location } = req.query;
+      const filters: { 
+        category?: string; 
+        status?: string; 
+        year?: number; 
+        manufacturer?: string;
+        importType?: string;
+        location?: string;
+      } = {};
+      
+      if (category) filters.category = category as string;
+      if (status) filters.status = status as string;
+      if (year) filters.year = parseInt(year as string);
+      if (manufacturer) filters.manufacturer = manufacturer as string;
+      if (importType) filters.importType = importType as string;
+      if (location) filters.location = location as string;
+      
+      const items = await getStorage().filterInventoryItems(filters);
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to filter inventory items" });
+    }
+  });
+
+  // Get single inventory item by ID - MUST come AFTER all specific routes
   app.get("/api/inventory/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -193,16 +264,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching inventory item:", error);
       res.status(500).json({ message: "Failed to fetch inventory item" });
-    }
-  });
-
-  // Get inventory stats
-  app.get("/api/inventory/stats", async (req, res) => {
-    try {
-      const stats = await getStorage().getInventoryStats();
-      res.json(stats);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch inventory stats" });
     }
   });
 
@@ -340,66 +401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Search inventory items
-  app.get("/api/inventory/search", async (req, res) => {
-    try {
-      const query = req.query.q as string;
-      if (!query) {
-        return res.status(400).json({ message: "Search query is required" });
-      }
-      const items = await getStorage().searchInventoryItems(query);
-      res.json(items);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to search inventory items" });
-    }
-  });
 
-  // Filter inventory items  
-  app.get("/api/inventory/filter", async (req, res) => {
-    try {
-      const { category, status, year, manufacturer, importType, location } = req.query;
-      const filters: { 
-        category?: string; 
-        status?: string; 
-        year?: number; 
-        manufacturer?: string;
-        importType?: string;
-        location?: string;
-      } = {};
-      
-      if (category) filters.category = category as string;
-      if (status) filters.status = status as string;
-      if (year) filters.year = parseInt(year as string);
-      if (manufacturer) filters.manufacturer = manufacturer as string;
-      if (importType) filters.importType = importType as string;
-      if (location) filters.location = location as string;
-      
-      const items = await getStorage().filterInventoryItems(filters);
-      res.json(items);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to filter inventory items" });
-    }
-  });
-
-  // Get manufacturer statistics
-  app.get("/api/inventory/manufacturer-stats", async (req, res) => {
-    try {
-      const stats = await getStorage().getManufacturerStats();
-      res.json(stats);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch manufacturer stats" });
-    }
-  });
-
-  // Get location statistics
-  app.get("/api/inventory/location-stats", async (req, res) => {
-    try {
-      const stats = await getStorage().getLocationStats();
-      res.json(stats);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch location stats" });
-    }
-  });
 
   // Transfer item to different location
   app.patch("/api/inventory/:id/transfer", async (req, res) => {
