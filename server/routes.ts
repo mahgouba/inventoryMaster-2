@@ -723,6 +723,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       for (const item of items) {
         try {
+          console.log("Processing item:", item);
+          
           // Check for duplicate chassis number
           const existingItems = await getStorage().getAllInventoryItems();
           const isDuplicate = existingItems.some((existing: any) => 
@@ -730,18 +732,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
           );
 
           if (isDuplicate) {
+            console.log("Duplicate chassis number:", item.chassisNumber);
             duplicateCount++;
             continue;
           }
 
-          // Validate and create the item (with auto-generated serial number)
-          const validatedItem = insertInventoryItemSchema.parse({
-            ...item,
-            serialNumber: `SN${Date.now()}${Math.random().toString(36).substr(2, 5)}`,
-            fuelType: item.fuelType || 'بنزين',
-            transmission: item.transmission || 'أوتوماتيك',
-            drivetrain: item.drivetrain || 'دفع خلفي',
-          });
+          // Prepare the item with required fields and defaults (removing non-existent fields)
+          const itemToValidate = {
+            // Only include fields that exist in the actual database schema
+            manufacturer: item.manufacturer || '',
+            category: item.category || '',
+            trimLevel: item.trimLevel || '',
+            engineCapacity: item.engineCapacity || '',
+            year: item.year || new Date().getFullYear(),
+            exteriorColor: item.exteriorColor || '',
+            interiorColor: item.interiorColor || '',
+            status: item.status || 'متاح للبيع',
+            importType: item.importType || 'وكالة',
+            ownershipType: item.ownershipType || 'ملكية شخصية',
+            location: item.location || 'الرياض',
+            chassisNumber: item.chassisNumber || `CH${Date.now()}${Math.random().toString(36).substr(2, 5)}`,
+            price: item.price ? String(item.price) : '0',
+            mileage: item.mileage || 0,
+            notes: item.notes || '',
+            images: item.images || [],
+          };
+
+          console.log("Validating item:", itemToValidate);
+          
+          // Validate and create the item
+          const validation = insertInventoryItemSchema.safeParse(itemToValidate);
+          if (!validation.success) {
+            console.error("Validation failed for item:", itemToValidate, "Errors:", validation.error.errors);
+            throw new Error(`Validation failed: ${validation.error.errors.map(e => `${e.path}: ${e.message}`).join(', ')}`);
+          }
+
+          const validatedItem = validation.data;
 
           const createdItem = await getStorage().createInventoryItem(validatedItem);
           
@@ -768,6 +794,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           successCount++;
         } catch (error) {
           failedCount++;
+          console.error("Failed to import item:", item, "Error:", error);
           failedItems.push({ item, error: error instanceof Error ? error.message : String(error) });
         }
       }
