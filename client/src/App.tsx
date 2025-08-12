@@ -134,20 +134,44 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-
         <TooltipProvider>
           <div dir="rtl" className="font-arabic">
             <Toaster />
-            {!user ? (
-              <LoginPage onLogin={handleLogin} />
-            ) : (
-              <Router user={user} onLogout={handleLogout} />
-            )}
+            <PublicRouter onLogin={handleLogin} user={user} onLogout={handleLogout} />
           </div>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
+}
+
+function PublicRouter({ onLogin, user, onLogout }: { onLogin: (user: User) => void; user: User | null; onLogout: () => void }) {
+  const [location] = useLocation();
+  
+  // Public routes that don't require authentication
+  const publicRoutes = ['/banks-personal', '/banks-company'];
+  const isPublicRoute = publicRoutes.includes(location);
+  
+  if (!user && !isPublicRoute) {
+    return <LoginPage onLogin={onLogin} />;
+  }
+  
+  if (!user && isPublicRoute) {
+    return (
+      <div className="min-h-screen">
+        <SystemGlassWrapper>
+          <Switch>
+            <Route path="/banks-personal" component={PersonalBanks} />
+            <Route path="/banks-company" component={CompanyBanks} />
+            <Route component={() => <LoginPage onLogin={onLogin} />} />
+          </Switch>
+        </SystemGlassWrapper>
+      </div>
+    );
+  }
+  
+  // User is logged in, show the full app
+  return <Router user={user!} onLogout={onLogout} />;
 }
 
 export default App;

@@ -149,49 +149,42 @@ export default function CompanyBanks() {
   }
 
   return (
-    <div className="min-h-screen relative" style={{ background: 'var(--dark-bg-primary)' }} dir="rtl">
-      {/* Company Logo Background */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-        <img 
-          src={appearance?.companyLogo || "/company-logo.svg"} 
-          alt="شعار الشركة" 
-          className="w-96 h-96 object-contain"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = "/copmany logo.svg";
-          }}
-        />
+    <div className="min-h-screen relative bg-gradient-to-br from-slate-900 via-green-900 to-slate-800" dir="rtl">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-10 right-10 w-72 h-72 bg-green-400/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-10 left-10 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] opacity-5">
+          <img 
+            src={appearance?.companyLogo || "/copmany logo.svg"} 
+            alt="شعار الشركة" 
+            className="w-full h-full object-contain"
+          />
+        </div>
       </div>
       <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="glass-container mb-6 p-4">
-          <div className="flex items-center justify-center gap-4">
-            {appearance?.companyLogo ? (
-              <img 
-                src={appearance.companyLogo} 
-                alt="شعار الشركة" 
-                className="w-16 h-16 object-contain drop-shadow-xl"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                }}
-              />
-            ) : (
-              <img 
-                src="/copmany logo.svg" 
-                alt="شعار شركة البريمي للسيارات" 
-                className="w-16 h-16 object-contain drop-shadow-xl"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                }}
-              />
-            )}
-            
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2 drop-shadow-lg">
-              <Building2 className="w-6 h-6" />
-              بنوك شركة البريمي للسيارات
-            </h1>
+        {/* Enhanced Header */}
+        <div className="text-center mb-8">
+          <div className="mb-6">
+            <img 
+              src={appearance?.companyLogo || "/copmany logo.svg"} 
+              alt="شعار الشركة" 
+              className="w-24 h-24 mx-auto object-contain drop-shadow-2xl"
+            />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+            حسابات الشركة
+          </h1>
+          <p className="text-xl text-green-100/80 max-w-2xl mx-auto leading-relaxed">
+            بيانات الحسابات البنكية الرسمية للشركة
+          </p>
+          <div className="mt-6 flex items-center justify-center gap-4 text-sm text-green-200/70">
+            <span className="flex items-center gap-2">
+              <Building2 size={16} />
+              حسابات الشركة
+            </span>
+            <span>•</span>
+            <span>{banks.length} حساب متاح</span>
           </div>
         </div>
 
