@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Trash2, Save, X, Eye, EyeOff, Edit2, FileText, Image, Link, Upload, Download } from "lucide-react";
+import { ChevronDown, ChevronRight, Building2, Car, Settings, Search, Filter, Plus, Palette, Tag, Edit, Trash2, Save, X, Eye, EyeOff, Edit2, FileText, Image, Link, Upload, Download, GripVertical } from "lucide-react";
 import * as XLSX from 'xlsx';
 import * as Collapsible from "@radix-ui/react-collapsible";
 // import { FreshImportButton } from "@/components/FreshImportButton"; // Removed per user request
@@ -87,6 +87,9 @@ export default function HierarchicalView() {
   const [selectedManufacturer, setSelectedManufacturer] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [hiddenManufacturers, setHiddenManufacturers] = useState<Set<string>>(new Set());
+  const [manufacturerOrder, setManufacturerOrder] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState<string | null>(null);
   
   // Dialog states
   const [isAddManufacturerOpen, setIsAddManufacturerOpen] = useState(false);
@@ -818,20 +821,93 @@ export default function HierarchicalView() {
     setExpandedItems(newExpanded);
   };
 
-  const filteredData = Array.isArray(hierarchyData) ? hierarchyData.filter((item: HierarchyData) => {
-    if (!searchTerm) return true;
+  const toggleManufacturerVisibility = (manufacturerId: string) => {
+    setHiddenManufacturers(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(manufacturerId)) {
+        newSet.delete(manufacturerId);
+      } else {
+        newSet.add(manufacturerId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleDragStart = (e: React.DragEvent, manufacturerId: string) => {
+    setIsDragging(manufacturerId);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', manufacturerId);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetManufacturerId: string) => {
+    e.preventDefault();
+    const draggedManufacturerId = e.dataTransfer.getData('text/plain');
     
-    const searchLower = searchTerm.toLowerCase();
-    const manufacturerMatch = item.manufacturer?.nameAr?.toLowerCase().includes(searchLower) || false;
-    const categoryMatch = item.categories?.some(cat => 
-      cat.category?.name_ar?.toLowerCase().includes(searchLower)
-    ) || false;
-    const trimMatch = item.categories?.some(cat =>
-      cat.trimLevels?.some(trim => trim.name_ar?.toLowerCase().includes(searchLower))
-    ) || false;
-    
-    return manufacturerMatch || categoryMatch || trimMatch;
-  }) : [];
+    if (draggedManufacturerId !== targetManufacturerId) {
+      // Update manufacturer order
+      setManufacturerOrder(prev => {
+        const newOrder = [...prev];
+        const draggedIndex = newOrder.indexOf(draggedManufacturerId);
+        const targetIndex = newOrder.indexOf(targetManufacturerId);
+        
+        if (draggedIndex > -1) {
+          newOrder.splice(draggedIndex, 1);
+        }
+        if (targetIndex > -1) {
+          newOrder.splice(targetIndex, 0, draggedManufacturerId);
+        } else {
+          newOrder.push(draggedManufacturerId);
+        }
+        
+        return newOrder;
+      });
+    }
+    setIsDragging(null);
+  };
+
+  // Sort and filter data with visibility and custom ordering
+  const filteredData = Array.isArray(hierarchyData) ? hierarchyData
+    .filter((item: HierarchyData) => {
+      // Filter hidden manufacturers
+      if (hiddenManufacturers.has(item.manufacturer?.id?.toString())) return false;
+      
+      // Apply search filter
+      if (!searchTerm) return true;
+      
+      const searchLower = searchTerm.toLowerCase();
+      const manufacturerMatch = item.manufacturer?.nameAr?.toLowerCase().includes(searchLower) || false;
+      const categoryMatch = item.categories?.some(cat => 
+        cat.category?.name_ar?.toLowerCase().includes(searchLower)
+      ) || false;
+      const trimMatch = item.categories?.some(cat =>
+        cat.trimLevels?.some(trim => trim.name_ar?.toLowerCase().includes(searchLower))
+      ) || false;
+      
+      return manufacturerMatch || categoryMatch || trimMatch;
+    })
+    .sort((a, b) => {
+      // First, apply custom order if available
+      const aOrder = manufacturerOrder.indexOf(a.manufacturer?.id?.toString());
+      const bOrder = manufacturerOrder.indexOf(b.manufacturer?.id?.toString());
+      
+      if (aOrder !== -1 && bOrder !== -1) {
+        return aOrder - bOrder;
+      }
+      if (aOrder !== -1) return -1;
+      if (bOrder !== -1) return 1;
+      
+      // Then sort by vehicle count (highest first)
+      return (b.totalVehicles || 0) - (a.totalVehicles || 0);
+    }) : [];
 
   if (isLoading) {
     return (
@@ -1023,7 +1099,7 @@ export default function HierarchicalView() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="relative">
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -1050,6 +1126,27 @@ export default function HierarchicalView() {
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Show Hidden Manufacturers */}
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (hiddenManufacturers.size > 0) {
+                  setHiddenManufacturers(new Set());
+                }
+              }}
+              disabled={hiddenManufacturers.size === 0}
+              className="glass-button flex items-center gap-2"
+            >
+              <EyeOff className="h-4 w-4" />
+              إظهار المخفيين ({hiddenManufacturers.size})
+            </Button>
+          </div>
+          
+          {/* Sort Information */}
+          <div className="text-sm text-gray-400 text-right border-t border-white/10 pt-2">
+            <p>🔹 الترتيب: حسب عدد المركبات (الأعلى أولاً) أو الترتيب المخصص</p>
+            <p>🔹 اسحب الصناع بواسطة المقبض لإعادة الترتيب</p>
           </div>
         </CardContent>
       </Card>
@@ -1906,10 +2003,25 @@ export default function HierarchicalView() {
           }
           
           return (
-          <Card key={`manufacturer-${item.manufacturer.id}`} className="glass-container">
+          <Card 
+            key={`manufacturer-${item.manufacturer.id}`} 
+            className={`glass-container transition-all duration-200 ${
+              isDragging === item.manufacturer.id?.toString() ? 'opacity-50 scale-95' : 'hover:shadow-lg'
+            }`}
+            draggable
+            onDragStart={(e) => handleDragStart(e, item.manufacturer.id?.toString())}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, item.manufacturer.id?.toString())}
+            onDragEnd={handleDragEnd}
+          >
             <CardHeader className="glass-header">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
+                  {/* Drag Handle */}
+                  <div className="cursor-grab active:cursor-grabbing">
+                    <GripVertical className="h-4 w-4 text-gray-400" />
+                  </div>
+                  
                   <Button
                     variant="ghost"
                     size="sm"
@@ -1941,6 +2053,17 @@ export default function HierarchicalView() {
                   
                   {/* Manufacturer Actions */}
                   <div className="flex gap-1">
+                    {/* Visibility Toggle */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleManufacturerVisibility(item.manufacturer.id?.toString())}
+                      className="text-gray-400 hover:bg-gray-700/50"
+                      title="إخفاء/إظهار الصانع"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    
                     <Button
                       variant="ghost"
                       size="sm"
