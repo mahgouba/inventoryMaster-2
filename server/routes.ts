@@ -3618,6 +3618,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Also support kebab-case endpoint for backward compatibility
+  app.post("/api/hierarchical/trim-levels", async (req, res) => {
+    try {
+      const { category_id, name_ar, name_en } = req.body;
+      
+      if (!category_id || !name_ar) {
+        return res.status(400).json({ message: "Category ID and Arabic name are required" });
+      }
+
+      const trimLevelData = {
+        categoryId: parseInt(category_id),
+        nameAr: name_ar,
+        nameEn: name_en || name_ar
+      };
+
+      const trimLevel = await getStorage().addTrimLevel(trimLevelData);
+      res.json(trimLevel);
+    } catch (error) {
+      console.error("Error adding trim level:", error);
+      res.status(500).json({ message: "Failed to add trim level" });
+    }
+  });
+
   app.post("/api/hierarchical/colors", async (req, res) => {
     try {
       const color = await getStorage().addColor(req.body);
