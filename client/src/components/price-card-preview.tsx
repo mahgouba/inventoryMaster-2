@@ -11,7 +11,7 @@ export function PriceCardPreview({ vehicle }: PriceCardPreviewProps) {
   };
 
   const calculatePricing = () => {
-    const basePrice = vehicle.price || 0;
+    const basePrice = typeof vehicle.price === 'number' ? vehicle.price : (typeof vehicle.price === 'string' ? parseFloat(vehicle.price) || 0 : 0);
     
     // تحديد نوع السعر والضريبة بناءً على نوع الاستيراد
     let showBreakdown = false;
@@ -190,15 +190,14 @@ export function PriceCardPreview({ vehicle }: PriceCardPreviewProps) {
                   alignItems: 'center', 
                   gap: '6px' 
                 }}>
-                  <img 
-                    src="/Saudi_Riyal_Symbol.svg" 
-                    alt="ريال سعودي" 
-                    style={{ 
-                      width: '20px', 
-                      height: '20px', 
-                      filter: 'brightness(0) saturate(100%) invert(100%)'
-                    }} 
-                  />
+                  <span style={{ 
+                    fontSize: '20px', 
+                    fontWeight: 'bold',
+                    color: 'white',
+                    marginRight: '4px'
+                  }}>
+                    ر.س
+                  </span>
                   <span style={{ fontSize: '24px', fontWeight: 'bold', color: 'white' }}>
                     {formatPrice(pricing.totalPrice)}
                   </span>
@@ -247,7 +246,7 @@ export function PriceCardPreview({ vehicle }: PriceCardPreviewProps) {
                 fontWeight: 'bold',
                 color: '#FFD700'
               }}>
-                {vehicle.mileage ? `${new Intl.NumberFormat('en-US').format(vehicle.mileage)} كم` : "85,000 كم"}
+                {vehicle.mileage ? `${new Intl.NumberFormat('en-US').format(typeof vehicle.mileage === 'number' ? vehicle.mileage : parseInt(String(vehicle.mileage)) || 0)} كم` : "85,000 كم"}
               </div>
             </div>
           )}
