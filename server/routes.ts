@@ -725,14 +725,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           console.log("Processing item:", item);
           
+          // Generate unique chassis number if missing or "000" (common placeholder)
+          let chassisNumber = item.chassisNumber;
+          if (!chassisNumber || chassisNumber === '000' || chassisNumber.trim() === '') {
+            chassisNumber = `CH${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+          }
+          
           // Check for duplicate chassis number
           const existingItems = await getStorage().getAllInventoryItems();
-          const isDuplicate = existingItems.some((existing: any) => 
-            existing.chassisNumber === item.chassisNumber
+          let isDuplicate = existingItems.some((existing: any) => 
+            existing.chassisNumber === chassisNumber
           );
 
+          // If still duplicate, generate new one
+          let attempts = 0;
+          while (isDuplicate && attempts < 10) {
+            chassisNumber = `CH${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+            isDuplicate = existingItems.some((existing: any) => 
+              existing.chassisNumber === chassisNumber
+            );
+            attempts++;
+          }
+
           if (isDuplicate) {
-            console.log("Duplicate chassis number:", item.chassisNumber);
+            console.log("Could not generate unique chassis number after 10 attempts");
             duplicateCount++;
             continue;
           }
@@ -751,7 +767,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             importType: item.importType || 'وكالة',
             ownershipType: item.ownershipType || 'ملكية شخصية',
             location: item.location || 'الرياض',
-            chassisNumber: item.chassisNumber || `CH${Date.now()}${Math.random().toString(36).substr(2, 5)}`,
+            chassisNumber: chassisNumber,
             price: item.price ? String(item.price) : '0',
             mileage: item.mileage || 0,
             notes: item.notes || '',

@@ -111,7 +111,7 @@ export function ExcelImportDialog({ open, onOpenChange }: ExcelImportDialogProps
             importType: row[12] || 'وكالة',
             ownershipType: row[13] || 'ملكية شخصية',
             notes: row[14] || '',
-            chassisNumber: row[15] || `CH${Date.now()}${index}`,
+            chassisNumber: row[15] || '000', // Server will generate unique chassis number if needed
             // Note: serialNumber, fuelType, transmission, drivetrain fields removed from template as requested
           };
         });
