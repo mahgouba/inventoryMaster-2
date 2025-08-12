@@ -734,10 +734,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             continue;
           }
 
-          // Validate and create the item
+          // Validate and create the item (with auto-generated serial number)
           const validatedItem = insertInventoryItemSchema.parse({
             ...item,
-            serialNumber: item.serialNumber || `SN${Date.now()}${Math.random().toString(36).substr(2, 5)}`,
+            serialNumber: `SN${Date.now()}${Math.random().toString(36).substr(2, 5)}`,
             fuelType: item.fuelType || 'بنزين',
             transmission: item.transmission || 'أوتوماتيك',
             drivetrain: item.drivetrain || 'دفع خلفي',
