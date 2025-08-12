@@ -35,7 +35,7 @@ Excel Import: Requested removal of specific fields from Excel import template (S
 - Statistics dashboard now displays correct data for inventory counts and manufacturer breakdowns
 - All systems operational with proper client/server separation and security practices
 - Fixed notification badge disappearing issue when opening "وصل اليوم" (arrival notifications) interface
-- Set card view page (/card-view) as default landing page per user request
+- Changed default landing page from CardViewPage to MainDashboard (inventory page) per user request - main page button now redirects to inventory
 - Implemented manufacturer sorting by count (highest count displayed first) in card view interface
 
 ## System Architecture

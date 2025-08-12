@@ -37,8 +37,8 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
     <div className="min-h-screen">
       <SystemGlassWrapper>
         <Switch>
-          {/* Default landing page - Card View */}
-          <Route path="/" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+          {/* Default landing page - Redirect to Inventory */}
+          <Route path="/" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/inventory" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/quotation-creation" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/quotation-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
