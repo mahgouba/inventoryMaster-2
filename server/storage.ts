@@ -1623,6 +1623,12 @@ export class MemStorage implements IStorage {
     return this.vehicleTrimLevels.get(id);
   }
 
+  async getVehicleCategoriesByManufacturer(manufacturerId: number): Promise<VehicleCategory[]> {
+    return Array.from(this.vehicleCategories.values()).filter(
+      category => category.manufacturerId === manufacturerId
+    );
+  }
+
   async getVehicleTrimLevelsByCategory(categoryId: number): Promise<VehicleTrimLevel[]> {
     return Array.from(this.vehicleTrimLevels.values()).filter(
       trimLevel => trimLevel.categoryId === categoryId

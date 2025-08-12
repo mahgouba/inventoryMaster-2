@@ -291,6 +291,12 @@ export class DatabaseStorage implements IStorage {
     return result.rowCount > 0;
   }
 
+  async getVehicleCategoriesByManufacturer(manufacturerId: number): Promise<VehicleCategory[]> {
+    return await db.select().from(vehicleCategories)
+      .where(eq(vehicleCategories.manufacturerId, manufacturerId))
+      .orderBy(vehicleCategories.nameAr);
+  }
+
   // Vehicle Trim Levels
   async getAllVehicleTrimLevels(): Promise<VehicleTrimLevel[]> {
     return await db.select().from(vehicleTrimLevels).orderBy(desc(vehicleTrimLevels.createdAt));
@@ -317,6 +323,12 @@ export class DatabaseStorage implements IStorage {
   async deleteVehicleTrimLevel(id: number): Promise<boolean> {
     const result = await db.delete(vehicleTrimLevels).where(eq(vehicleTrimLevels.id, id));
     return result.rowCount > 0;
+  }
+
+  async getVehicleTrimLevelsByCategory(categoryId: number): Promise<VehicleTrimLevel[]> {
+    return await db.select().from(vehicleTrimLevels)
+      .where(eq(vehicleTrimLevels.categoryId, categoryId))
+      .orderBy(vehicleTrimLevels.nameAr);
   }
 
   // Placeholder methods for remaining IStorage interface requirements
