@@ -34,6 +34,7 @@ Excel Import: Requested removal of specific fields from Excel import template (S
 - Reordered Express.js routes to ensure specific endpoints (/stats, /manufacturer-stats) come before parameterized routes (/:id)
 - Statistics dashboard now displays correct data for inventory counts and manufacturer breakdowns
 - All systems operational with proper client/server separation and security practices
+- Fixed notification badge disappearing issue when opening "وصل اليوم" (arrival notifications) interface
 
 ## System Architecture
 

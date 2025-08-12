@@ -181,11 +181,19 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     const now = new Date();
     const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     
-    return inventoryData.filter(item => {
+    const arrivedVehicles = inventoryData.filter(item => {
       if (!item.entryDate) return false;
       const entryDate = new Date(item.entryDate);
-      return entryDate >= twentyFourHoursAgo && entryDate <= now;
+      const isArrived = entryDate >= twentyFourHoursAgo && entryDate <= now;
+      // Debug logging for troubleshooting
+      if (isArrived) {
+        console.log('Vehicle arrived today:', item.manufacturer, item.category, 'Entry date:', entryDate);
+      }
+      return isArrived;
     });
+    
+    console.log('Total vehicles arrived today:', arrivedVehicles.length);
+    return arrivedVehicles;
   };
   
   const arrivedTodayVehicles = getVehiclesArrivedToday();
