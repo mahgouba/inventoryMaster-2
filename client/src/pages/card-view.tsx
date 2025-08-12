@@ -67,7 +67,6 @@ import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import ScrollableFilter from "@/components/scrollable-filter";
 import { ReservationDialog } from "@/components/reservation-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
-import { PriceCardPreview } from "@/components/price-card-preview";
 
 import { EnhancedSaleDialog } from "@/components/enhanced-sale-dialog";
 
@@ -124,10 +123,6 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
   const [arrivedTodayOpen, setArrivedTodayOpen] = useState(false);
   const [attendanceDialogOpen, setAttendanceDialogOpen] = useState(false);
-  
-  // Price card preview states
-  const [priceCardPreviewOpen, setPriceCardPreviewOpen] = useState(false);
-  const [selectedVehicleForPriceCard, setSelectedVehicleForPriceCard] = useState<InventoryItem | null>(null);
   
   // QR Scanner states
   const [scannedVehicleDialogOpen, setScannedVehicleDialogOpen] = useState(false);
@@ -1594,10 +1589,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 variant="outline"
                                 className="px-2 h-8 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 border-indigo-300"
                                 onClick={() => {
-                                  setSelectedVehicleForPriceCard(item);
-                                  setPriceCardPreviewOpen(true);
+                                  localStorage.setItem('selectedVehicleForPriceCard', JSON.stringify(item));
+                                  window.location.href = '/price-cards';
                                 }}
-                                title="معاينة بطاقة السعر"
+                                title="إنشاء بطاقة سعر"
                               >
                                 <Receipt size={14} />
                               </Button>
@@ -2072,39 +2067,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         </DialogContent>
       </Dialog>
 
-      {/* Price Card Preview Dialog */}
-      {selectedVehicleForPriceCard && (
-        <Dialog open={priceCardPreviewOpen} onOpenChange={setPriceCardPreviewOpen}>
-          <DialogContent 
-            className="max-w-6xl max-h-[90vh] p-6 glass-container backdrop-blur-md bg-slate-900/90 border border-white/20"
-            aria-describedby="price-card-preview-description"
-          >
-            <DialogHeader>
-              <DialogTitle className="text-xl text-center text-white mb-4">
-                معاينة بطاقة السعر
-              </DialogTitle>
-            </DialogHeader>
-            
-            <div id="price-card-preview-description" className="sr-only">
-              معاينة بطاقة السعر للمركبة المحددة مع جميع التفاصيل والأسعار
-            </div>
 
-            <div className="flex justify-center">
-              <PriceCardPreview vehicle={selectedVehicleForPriceCard} />
-            </div>
-
-            <div className="flex justify-center mt-6">
-              <Button
-                onClick={() => setPriceCardPreviewOpen(false)}
-                className="px-6 glass-button glass-text-primary"
-                variant="outline"
-              >
-                إغلاق
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
       </div>
     </div>
   );
