@@ -440,7 +440,7 @@ export const insertInventoryItemSchema = createInsertSchema(inventoryItems).omit
   reservationDate: z.date().nullable().optional(),
   reservedBy: z.string().optional(),
   reservationNote: z.string().optional(),
-  mileage: z.number().positive("يجب أن يكون الممشي رقم موجب").optional(),
+  mileage: z.number().min(0, "يجب أن يكون الممشي رقم غير سالب").optional(),
   price: z.string().optional(),
   notes: z.string().optional(),
   images: z.array(z.string()).optional().default([]),
