@@ -707,6 +707,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Excel import endpoint for inventory
+  app.post("/api/inventory/import-excel", async (req, res) => {
+    try {
+      const { items } = req.body;
+      
+      if (!Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ message: "No items provided for import" });
+      }
+
+      let successCount = 0;
+      let failedCount = 0;
+      let duplicateCount = 0;
+      const failedItems: any[] = [];
+
+      for (const item of items) {
+        try {
+          // Check for duplicate chassis number
+          const existingItems = await getStorage().getAllInventoryItems();
+          const isDuplicate = existingItems.some((existing: any) => 
+            existing.chassisNumber === item.chassisNumber
+          );
+
+          if (isDuplicate) {
+            duplicateCount++;
+            continue;
+          }
+
+          // Validate and create the item
+          const validatedItem = insertInventoryItemSchema.parse({
+            ...item,
+            serialNumber: item.serialNumber || `SN${Date.now()}${Math.random().toString(36).substr(2, 5)}`,
+            fuelType: item.fuelType || 'بنزين',
+            transmission: item.transmission || 'أوتوماتيك',
+            drivetrain: item.drivetrain || 'دفع خلفي',
+          });
+
+          const createdItem = await getStorage().createInventoryItem(validatedItem);
+          
+          // Also create price card data for each imported item
+          try {
+            await getStorage().createPriceCard({
+              inventoryItemId: createdItem.id,
+              manufacturer: createdItem.manufacturer,
+              category: createdItem.category,
+              model: createdItem.trimLevel || createdItem.category,
+              year: createdItem.year.toString(),
+              price: parseFloat(createdItem.price || "0"),
+              chassisNumber: createdItem.chassisNumber,
+              exteriorColor: createdItem.exteriorColor,
+              interiorColor: createdItem.interiorColor,
+              status: createdItem.status,
+              engineCapacity: createdItem.engineCapacity,
+              createdAt: new Date()
+            });
+          } catch (priceCardError) {
+            console.error("Failed to create price card for imported item:", priceCardError);
+          }
+          
+          successCount++;
+        } catch (error) {
+          failedCount++;
+          failedItems.push({ item, error: error instanceof Error ? error.message : String(error) });
+        }
+      }
+
+      const stats = {
+        total: items.length,
+        success: successCount,
+        failed: failedCount,
+        duplicates: duplicateCount,
+        failedItems: failedItems.slice(0, 10) // Return first 10 failed items for debugging
+      };
+
+      res.json(stats);
+    } catch (error) {
+      console.error("Error importing Excel data:", error);
+      res.status(500).json({ message: "Failed to import Excel data" });
+    }
+  });
+
   // Update inventory item
   app.patch("/api/inventory/:id", async (req, res) => {
     try {

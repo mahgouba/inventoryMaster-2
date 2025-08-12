@@ -16,6 +16,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import InventoryStats from "@/components/inventory-stats";
 import InventoryTable from "@/components/inventory-table";
 import InventoryForm from "@/components/inventory-form";
+import { ExcelImportDialog } from "@/components/excel-import-dialog";
 
 import ScrollableFilter from "@/components/scrollable-filter";
 
@@ -71,6 +72,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [showImportTypeFilter, setShowImportTypeFilter] = useState(false);
   const [showOwnershipTypeFilter, setShowOwnershipTypeFilter] = useState(false);
   const [printDialogOpen, setPrintDialogOpen] = useState(false);
+  const [excelImportDialogOpen, setExcelImportDialogOpen] = useState(false);
 
   // Get theme settings and hooks
   const { companyName, companyLogo, darkMode, toggleDarkMode, isUpdatingDarkMode } = useTheme();
@@ -475,6 +477,19 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     >
                       <Plus className="w-4 h-4 ml-2" />
                       إضافة عنصر
+                    </Button>
+                  )}
+                  
+                  {/* Excel Import Button */}
+                  {canCreateItem(userRole as UserRole, "inventory") && (
+                    <Button 
+                      onClick={() => setExcelImportDialogOpen(true)}
+                      variant="outline"
+                      size="sm"
+                      className="glass-button glass-text-primary"
+                    >
+                      <FileSpreadsheet className="w-4 h-4 ml-2" />
+                      استيراد من Excel
                     </Button>
                   )}
                   
@@ -918,6 +933,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
       <AdvancedPrintDialog
         open={printDialogOpen}
         onOpenChange={setPrintDialogOpen}
+      />
+
+      {/* Excel Import Dialog */}
+      <ExcelImportDialog
+        open={excelImportDialogOpen}
+        onOpenChange={setExcelImportDialogOpen}
       />
       </div>
     </SystemGlassWrapper>
