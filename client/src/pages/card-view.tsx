@@ -1360,6 +1360,16 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           
           {Object.entries(groupedData)
             .filter(([manufacturer]) => selectedManufacturer.length === 0 || selectedManufacturer.includes(manufacturer))
+            .sort(([, a], [, b]) => {
+              // Sort by count of available items (highest first)
+              const aCount = showSoldCars 
+                ? allGroupedData[a.items[0]?.manufacturer]?.items.length || 0
+                : allGroupedData[a.items[0]?.manufacturer]?.items.filter(item => item.status !== "مباع").length || 0;
+              const bCount = showSoldCars 
+                ? allGroupedData[b.items[0]?.manufacturer]?.items.length || 0
+                : allGroupedData[b.items[0]?.manufacturer]?.items.filter(item => item.status !== "مباع").length || 0;
+              return bCount - aCount; // Descending order (highest first)
+            })
             .map(([manufacturer, data]) => {
             const logo = getManufacturerLogo(manufacturer);
             
