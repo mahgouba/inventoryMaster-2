@@ -116,7 +116,7 @@ export function ExcelImportDialog({ open, onOpenChange }: ExcelImportDialogProps
           };
         });
 
-        setPreviewData(mappedData.slice(0, 5)); // Show first 5 rows as preview
+        setPreviewData(mappedData); // Show all data for preview
         setProgress(100);
         setIsProcessing(false);
 
@@ -150,6 +150,7 @@ export function ExcelImportDialog({ open, onOpenChange }: ExcelImportDialogProps
     }
 
     console.log("Importing data:", previewData);
+    console.log("Total rows to import:", previewData.length);
     importMutation.mutate(previewData);
   };
 
