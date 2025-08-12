@@ -1571,15 +1571,14 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         )}
       </div>
 
-      {/* Simple Add Item Button */}
+      {/* Floating Action Button */}
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           onClick={() => setShowEditDialog(true)}
-          className="bg-custom-primary hover:bg-custom-primary-dark text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-3 flex items-center gap-2"
+          className="bg-custom-primary hover:bg-custom-primary-dark text-white shadow-2xl hover:shadow-custom-primary/40 transition-all duration-300 rounded-full w-16 h-16 flex items-center justify-center group hover:scale-110 animate-pulse hover:animate-none"
           size="lg"
         >
-          <Plus size={20} />
-          إضافة عنصر
+          <Plus size={24} className="group-hover:rotate-90 transition-transform duration-300" />
         </Button>
       </div>
 

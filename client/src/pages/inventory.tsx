@@ -537,27 +537,58 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     </Button>
                   )}
 
-                  {/* Filter Toggle Button */}
+                  {/* Enhanced Filter Toggle Button */}
                   <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
                     <CollapsibleTrigger asChild>
                       <Button 
-                        variant="outline" 
+                        variant={filtersOpen ? "default" : "outline"}
                         size="sm" 
-                        className="glass-toggle-button flex items-center gap-2"
+                        className={`glass-toggle-button flex items-center gap-2 transition-all duration-300 hover:scale-105 ${
+                          filtersOpen 
+                            ? "glass-button-primary shadow-lg" 
+                            : "glass-button hover:shadow-md"
+                        }`}
                       >
-                        <Filter size={16} />
+                        <Filter size={16} className={filtersOpen ? "text-white" : ""} />
                         الفلاتر
-                        {filtersOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        <div className={`transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`}>
+                          <ChevronDown size={16} className={filtersOpen ? "text-white" : ""} />
+                        </div>
+                        {/* Active Filters Indicator */}
+                        {((manufacturerFilter?.length || 0) + (categoryFilter?.length || 0) + (trimLevelFilter?.length || 0) + 
+                          (yearFilter?.length || 0) + (engineCapacityFilter?.length || 0) + (exteriorColorFilter?.length || 0) + 
+                          (interiorColorFilter?.length || 0) + (statusFilter?.length || 0) + (importTypeFilter?.length || 0) + (ownershipTypeFilter?.length || 0)) > 0 && (
+                          <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-1 animate-pulse">
+                            {(manufacturerFilter?.length || 0) + (categoryFilter?.length || 0) + (trimLevelFilter?.length || 0) + 
+                             (yearFilter?.length || 0) + (engineCapacityFilter?.length || 0) + (exteriorColorFilter?.length || 0) + 
+                             (interiorColorFilter?.length || 0) + (statusFilter?.length || 0) + (importTypeFilter?.length || 0) + (ownershipTypeFilter?.length || 0)}
+                          </span>
+                        )}
                       </Button>
                     </CollapsibleTrigger>
                     
                     <CollapsibleContent className="mt-4 w-full">
-                      <Card className="glass-collapsible w-full">
-                        <CardContent className="p-6">
+                      <Card className="glass-collapsible w-full border-0 shadow-xl backdrop-blur-xl bg-gradient-to-br from-white/10 to-white/5 dark:from-slate-800/20 dark:to-slate-900/10">
+                        <CardContent className="p-6 relative overflow-hidden">
+                          {/* Decorative Elements */}
+                          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-custom-primary/10 to-transparent rounded-full blur-3xl"></div>
+                          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-400/10 to-transparent rounded-full blur-2xl"></div>
                           {/* Enhanced Filter Controls with Desktop-Optimized Layout */}
-                          <div className="space-y-6 animate-in fade-in duration-300"
+                          <div className="space-y-6 animate-in fade-in duration-500 slide-in-from-top-5 relative z-10"
                             style={{ minHeight: "400px" }} // Ensure adequate space for desktop viewing
                           >
+                            
+                            {/* Filter Header */}
+                            <div className="flex items-center justify-between border-b border-white/20 dark:border-slate-700/50 pb-3">
+                              <h2 className="text-lg font-semibold glass-text-primary flex items-center gap-2">
+                                <Filter size={20} className="text-custom-primary" />
+                                فلاتر البحث المتقدم
+                              </h2>
+                              <div className="flex items-center gap-2 text-sm glass-text-secondary">
+                                <span className="animate-pulse">🔍</span>
+                                <span>اختر الفلاتر المطلوبة</span>
+                              </div>
+                            </div>
                             
                             {/* Multi-Select Filter Component */}
                             {(() => {
