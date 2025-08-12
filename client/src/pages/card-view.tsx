@@ -56,7 +56,7 @@ import { ar } from "date-fns/locale";
 import { Clock, AlertTriangle, Calendar as CalendarIcon, UserX } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
-import { CardViewFAB } from "@/components/animated-fab";
+
 import InventoryForm from "@/components/inventory-form";
 import VehicleShare from "@/components/vehicle-share";
 import QRScannerButton from "@/components/qr-scanner-button";
@@ -1571,14 +1571,17 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         )}
       </div>
 
-      {/* Animated Floating Action Button */}
-      <CardViewFAB
-        onVoiceChat={() => {}}
-        onSettings={() => {
-          // Could add settings dialog for card view preferences
-          console.log("Card view settings clicked");
-        }}
-      />
+      {/* Simple Add Item Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <Button
+          onClick={() => setShowEditDialog(true)}
+          className="bg-custom-primary hover:bg-custom-primary-dark text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-3 flex items-center gap-2"
+          size="lg"
+        >
+          <Plus size={20} />
+          إضافة عنصر
+        </Button>
+      </div>
 
 
 
