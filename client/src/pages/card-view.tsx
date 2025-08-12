@@ -1571,15 +1571,36 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         )}
       </div>
 
-      {/* Floating Action Button */}
+      {/* Enhanced Floating Action Button */}
       <div className="fixed bottom-6 right-6 z-50">
+        {/* Glow Effect Ring */}
+        <div className="absolute inset-0 rounded-full animate-ping bg-custom-primary/30 scale-110"></div>
+        <div className="absolute inset-0 rounded-full animate-pulse bg-custom-primary/20 scale-125"></div>
+        
+        {/* Main Button */}
         <Button
           onClick={() => setShowEditDialog(true)}
-          className="bg-custom-primary hover:bg-custom-primary-dark text-white shadow-2xl hover:shadow-custom-primary/40 transition-all duration-300 rounded-full w-16 h-16 flex items-center justify-center group hover:scale-110 animate-pulse hover:animate-none"
+          className="relative bg-gradient-to-r from-custom-primary to-custom-primary-dark hover:from-custom-primary-dark hover:to-custom-primary text-white shadow-2xl hover:shadow-custom-primary/60 transition-all duration-500 rounded-full w-16 h-16 flex items-center justify-center group hover:scale-125 active:scale-95 animate-bounce hover:animate-none"
           size="lg"
         >
-          <Plus size={24} className="group-hover:rotate-90 transition-transform duration-300" />
+          {/* Background Shimmer Effect */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 group-hover:translate-x-full transition-transform duration-700"></div>
+          
+          {/* Icon with Enhanced Animation */}
+          <Plus size={28} className="relative z-10 group-hover:rotate-180 group-hover:scale-110 transition-all duration-500 drop-shadow-lg" />
+          
+          {/* Floating Particles Effect */}
+          <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute top-1 left-1 w-1 h-1 bg-white rounded-full animate-ping"></div>
+            <div className="absolute bottom-2 right-2 w-1 h-1 bg-white rounded-full animate-ping animation-delay-200"></div>
+            <div className="absolute top-3 right-1 w-1 h-1 bg-white rounded-full animate-ping animation-delay-500"></div>
+          </div>
         </Button>
+        
+        {/* Ripple Effect on Click */}
+        <div className="absolute inset-0 rounded-full pointer-events-none">
+          <div className="absolute inset-0 rounded-full bg-custom-primary/40 scale-0 group-active:scale-150 group-active:opacity-0 transition-all duration-300"></div>
+        </div>
       </div>
 
 
