@@ -554,8 +554,10 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                     <CollapsibleContent className="mt-4 w-full">
                       <Card className="glass-collapsible w-full">
                         <CardContent className="p-6">
-                          {/* Enhanced Filter Controls with Button Design */}
-                          <div className="space-y-6 animate-in fade-in duration-300">
+                          {/* Enhanced Filter Controls with Desktop-Optimized Layout */}
+                          <div className="space-y-6 animate-in fade-in duration-300"
+                            style={{ minHeight: "400px" }} // Ensure adequate space for desktop viewing
+                          >
                             
                             {/* Multi-Select Filter Component */}
                             {(() => {
@@ -644,12 +646,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               );
                               
                               return (
-                                <div className="space-y-4">
+                                <div className="space-y-6">
                                   {/* Master Filter Controls */}
 
                                   
-                                  {/* Individual Multiple Selection Filters */}
-                                  <div className="space-y-3">
+                                  {/* Grid Layout for Desktop - Responsive Filters */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
                                     <ScrollableFilter
                                       title="الصانع"
                                       items={manufacturers}
@@ -733,31 +735,36 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                               );
                             })()}
 
-                {/* Reset Filters Button */}
-                <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setManufacturerFilter([]);
-                      setCategoryFilter([]);
-                      setTrimLevelFilter([]);
-                      setYearFilter([]);
-                      setEngineCapacityFilter([]);
-                      setInteriorColorFilter([]);
-                      setExteriorColorFilter([]);
-                      setStatusFilter([]);
-                      setImportTypeFilter([]);
-                      setOwnershipTypeFilter([]);
-                    }}
-                    className="hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20"
-                  >
-                    إعادة تعيين جميع الفلاتر ({
-                      (manufacturerFilter?.length || 0) + (categoryFilter?.length || 0) + (trimLevelFilter?.length || 0) + 
-                      (yearFilter?.length || 0) + (engineCapacityFilter?.length || 0) + (exteriorColorFilter?.length || 0) + 
-                      (interiorColorFilter?.length || 0) + (statusFilter?.length || 0) + (importTypeFilter?.length || 0) + (ownershipTypeFilter?.length || 0)
-                    } نشط)
-                  </Button>
+                {/* Reset Filters Button - Enhanced for Desktop */}
+                <div className="pt-4 mt-4 border-t border-slate-200/50 dark:border-slate-700/50">
+                  <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+                    <div className="text-sm text-slate-600 dark:text-slate-400">
+                      إجمالي الفلاتر النشطة: {
+                        (manufacturerFilter?.length || 0) + (categoryFilter?.length || 0) + (trimLevelFilter?.length || 0) + 
+                        (yearFilter?.length || 0) + (engineCapacityFilter?.length || 0) + (exteriorColorFilter?.length || 0) + 
+                        (interiorColorFilter?.length || 0) + (statusFilter?.length || 0) + (importTypeFilter?.length || 0) + (ownershipTypeFilter?.length || 0)
+                      } فلتر
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setManufacturerFilter([]);
+                        setCategoryFilter([]);
+                        setTrimLevelFilter([]);
+                        setYearFilter([]);
+                        setEngineCapacityFilter([]);
+                        setInteriorColorFilter([]);
+                        setExteriorColorFilter([]);
+                        setStatusFilter([]);
+                        setImportTypeFilter([]);
+                        setOwnershipTypeFilter([]);
+                      }}
+                      className="glass-button hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20 min-w-[140px]"
+                    >
+                      إعادة تعيين الفلاتر
+                    </Button>
+                  </div>
                 </div>
                           </div>
                         </CardContent>
