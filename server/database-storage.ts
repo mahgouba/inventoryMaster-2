@@ -602,6 +602,18 @@ export class DatabaseStorage implements IStorage {
   async deleteColorAssociation(id: number): Promise<boolean> { return false; }
   async getColorAssociationsByVehicle(manufacturer: string, category?: string, trimLevel?: string): Promise<any[]> { return []; }
   async searchColorAssociations(query: string): Promise<any[]> { return []; }
+  
+  async getColorAssociationsByManufacturer(manufacturer: string): Promise<ColorAssociation[]> {
+    return [];
+  }
+  
+  async getColorAssociationsByCategory(manufacturer: string, category: string): Promise<ColorAssociation[]> {
+    return [];
+  }
+  
+  async getColorAssociationsByTrimLevel(manufacturer: string, category: string, trimLevel: string): Promise<ColorAssociation[]> {
+    return [];
+  }
   async getAllCompanies(): Promise<any[]> { return []; }
   async getCompany(id: number): Promise<any> { return null; }
   async createCompany(company: any): Promise<any> { return company; }
