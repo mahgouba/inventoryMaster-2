@@ -22,7 +22,7 @@ import ScrollableFilter from "@/components/scrollable-filter";
 
 
 
-import { InventoryFAB } from "@/components/animated-fab";
+
 
 import { AdvancedPrintDialog } from "@/components/advanced-print-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
@@ -900,21 +900,19 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
         </div>
       </main>
 
-      {/* Animated Floating Action Button */}
-      <InventoryFAB
-        onAddItem={canCreateItem(userRole as UserRole, "inventory") ? () => setFormOpen(true) : () => {}}
-        onSearch={() => {
-          // Focus on search input if visible, or scroll to search area
-          const searchInput = document.querySelector('input[placeholder*="البحث"]') as HTMLInputElement;
-          if (searchInput) {
-            searchInput.focus();
-            searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }}
-        onExport={handleExport}
-        onPrint={handlePrint}
-        onVoiceChat={() => {}}
-      />
+      {/* Simple Add Item Button */}
+      {canCreateItem(userRole as UserRole, "inventory") && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
+            onClick={() => setFormOpen(true)}
+            className="bg-custom-primary hover:bg-custom-primary-dark text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-3 flex items-center gap-2"
+            size="lg"
+          >
+            <Plus size={20} />
+            إضافة عنصر
+          </Button>
+        </div>
+      )}
 
       {/* Add/Edit Form */}
       <InventoryForm 
