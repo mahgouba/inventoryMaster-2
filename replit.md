@@ -16,6 +16,7 @@ Disabled text selection on long press to prevent unwanted text highlighting when
 Removed detailed specifications box and "متوفر" availability checkbox from vehicle addition dialog per user request.
 Added gear (Settings) button in vehicle form header for controlling dropdown data (Year, Import Type, Status, Location, Ownership Type) with add/remove functionality.
 Updated sale status from "متوفر" to "متاح للبيع" for clearer terminology.
+Excel Import: Requested removal of specific fields from Excel import template (Serial Number, Payment System, Transmission, Fuel Type) to streamline data entry process. These fields are either auto-generated or use default values.
 
 ## System Architecture
 
@@ -48,7 +49,7 @@ The system follows a clear separation of concerns, with distinct layers for fron
 - **Quotation System**: Full-page quotation creation with QR code generation, dynamic pricing, company branding, and PDF/JPG export. Supports quotation and invoice modes.
 - **Vehicle Sharing**: Share vehicle details with linked images and editable pricing, integrated with hierarchy data and enhanced WhatsApp sharing.
 - **Manufacturer Management**: Comprehensive system for managing manufacturers, categories, and trim levels with logo integration. Includes extensive vehicle hierarchy data with bilingual support for major brands, trim levels, and colors.
-- **Data Management**: Import/export functionality for various data types via Excel and JSON, with enhanced Excel import for hierarchy data.
+- **Data Management**: Import/export functionality for various data types via Excel and JSON, with enhanced Excel import for hierarchy data. Excel import system with custom template excluding Serial Number, Payment System, Transmission, and Fuel Type fields - these are auto-generated or use defaults. Automatic unique chassis number generation when duplicates or placeholder values ("000") are detected.
 - **Bank Management**: Management of company and personal bank accounts, including visibility toggles and share functionality.
 - **Financing Calculator**: APR-based calculation with integration to managed financing rates from Saudi banks.
 - **Integrated Attendance System**: Monthly attendance interface showing only confirmed attendance days, with attendance requests integrated into the leave request approval workflow. Includes daily attendance view with calendar format and progress bars.
