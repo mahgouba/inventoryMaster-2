@@ -67,7 +67,7 @@ import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import ScrollableFilter from "@/components/scrollable-filter";
 import { ReservationDialog } from "@/components/reservation-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
-
+import { PriceCardPreview } from "@/components/price-card-preview";
 
 import { EnhancedSaleDialog } from "@/components/enhanced-sale-dialog";
 
@@ -124,6 +124,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
   const [arrivedTodayOpen, setArrivedTodayOpen] = useState(false);
   const [attendanceDialogOpen, setAttendanceDialogOpen] = useState(false);
+  
+  // Price card preview states
+  const [priceCardPreviewOpen, setPriceCardPreviewOpen] = useState(false);
+  const [selectedVehicleForPriceCard, setSelectedVehicleForPriceCard] = useState<InventoryItem | null>(null);
   
   // QR Scanner states
   const [scannedVehicleDialogOpen, setScannedVehicleDialogOpen] = useState(false);
@@ -1895,10 +1899,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 variant="outline"
                                 className="px-3 h-8 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 border-indigo-300"
                                 onClick={() => {
-                                  localStorage.setItem('selectedVehicleForPriceCard', JSON.stringify(vehicle));
-                                  window.location.href = '/price-cards';
+                                  setSelectedVehicleForPriceCard(vehicle);
+                                  setPriceCardPreviewOpen(true);
                                 }}
-                                title="إنشاء بطاقة سعر"
+                                title="معاينة بطاقة السعر"
                               >
                                 <Receipt size={14} className="ml-1" />
                                 بطاقة سعر
@@ -2767,6 +2771,8 @@ function AttendanceManagementContent() {
           </div>
         </DialogContent>
       </Dialog>
+
+
 
 
     </div>
