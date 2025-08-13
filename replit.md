@@ -37,6 +37,7 @@ Excel Import: Requested removal of specific fields from Excel import template (S
 - **Hidden "متاح للبيع" field** from vehicle addition dialog per user request to simplify interface
 - **Updated import type options**: Changed "مستعمل شخصي" to just "مستعمل" in dropdown selections
 - **Moved card view icon (البطاقات) to position below inventory icon (المخزون)** in horizontal navigation per user request
+- **Hidden engine capacity field when chassis number is entered** in vehicle form per user request to simplify data entry
 - Statistics dashboard now displays correct data for inventory counts and manufacturer breakdowns
 - All systems operational with proper client/server separation and security practices
 - Fixed notification badge disappearing issue when opening "وصل اليوم" (arrival notifications) interface
