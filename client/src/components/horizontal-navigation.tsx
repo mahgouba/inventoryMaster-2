@@ -357,7 +357,13 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       internal: true,
       permission: "admin"
     },
-
+    { 
+      title: "المواصفات والصور", 
+      href: "/specifications-management", 
+      icon: Settings,
+      internal: true,
+      permission: "admin"
+    },
     { 
       title: "التسلسل الهرمي", 
       href: "/hierarchy", 

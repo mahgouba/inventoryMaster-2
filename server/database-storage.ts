@@ -2,13 +2,16 @@ import "dotenv/config";
 import { db } from "./db";
 import { 
   users, inventoryItems, banks, manufacturers, vehicleCategories, vehicleTrimLevels, colorAssociations,
+  vehicleSpecifications, vehicleImageLinks,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Bank, type InsertBank,
   type Manufacturer, type InsertManufacturer,
   type VehicleCategory, type InsertVehicleCategory,
   type VehicleTrimLevel, type InsertVehicleTrimLevel,
-  type ColorAssociation, type InsertColorAssociation
+  type ColorAssociation, type InsertColorAssociation,
+  type VehicleSpecification, type InsertVehicleSpecification,
+  type VehicleImageLink, type InsertVehicleImageLink
 } from "@shared/schema";
 import { eq, sql, and, or, ilike, desc, asc } from "drizzle-orm";
 import type { IStorage } from "./storage";
@@ -893,4 +896,89 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+
+  // Vehicle Specifications methods
+  async getVehicleSpecifications(): Promise<VehicleSpecification[]> {
+    return await db.select().from(vehicleSpecifications).orderBy(desc(vehicleSpecifications.createdAt));
+  }
+
+  async getVehicleSpecification(id: number): Promise<VehicleSpecification | undefined> {
+    const [spec] = await db.select().from(vehicleSpecifications).where(eq(vehicleSpecifications.id, id));
+    return spec || undefined;
+  }
+
+  async createVehicleSpecification(spec: InsertVehicleSpecification): Promise<VehicleSpecification> {
+    const [newSpec] = await db.insert(vehicleSpecifications).values(spec).returning();
+    return newSpec;
+  }
+
+  async updateVehicleSpecification(id: number, spec: Partial<InsertVehicleSpecification>): Promise<VehicleSpecification | undefined> {
+    const [updated] = await db.update(vehicleSpecifications).set(spec).where(eq(vehicleSpecifications.id, id)).returning();
+    return updated || undefined;
+  }
+
+  async deleteVehicleSpecification(id: number): Promise<boolean> {
+    const result = await db.delete(vehicleSpecifications).where(eq(vehicleSpecifications.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getVehicleSpecificationsByChassisNumber(chassisNumber: string): Promise<VehicleSpecification[]> {
+    return await db.select().from(vehicleSpecifications).where(eq(vehicleSpecifications.chassisNumber, chassisNumber));
+  }
+
+  // Vehicle Image Links methods
+  async getVehicleImageLinks(): Promise<VehicleImageLink[]> {
+    return await db.select().from(vehicleImageLinks).orderBy(desc(vehicleImageLinks.createdAt));
+  }
+
+  async getVehicleImageLink(id: number): Promise<VehicleImageLink | undefined> {
+    const [link] = await db.select().from(vehicleImageLinks).where(eq(vehicleImageLinks.id, id));
+    return link || undefined;
+  }
+
+  async createVehicleImageLink(link: InsertVehicleImageLink): Promise<VehicleImageLink> {
+    const [newLink] = await db.insert(vehicleImageLinks).values(link).returning();
+    return newLink;
+  }
+
+  async updateVehicleImageLink(id: number, link: Partial<InsertVehicleImageLink>): Promise<VehicleImageLink | undefined> {
+    const [updated] = await db.update(vehicleImageLinks).set(link).where(eq(vehicleImageLinks.id, id)).returning();
+    return updated || undefined;
+  }
+
+  async deleteVehicleImageLink(id: number): Promise<boolean> {
+    const result = await db.delete(vehicleImageLinks).where(eq(vehicleImageLinks.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getVehicleImageLinksByChassisNumber(chassisNumber: string): Promise<VehicleImageLink[]> {
+    return await db.select().from(vehicleImageLinks).where(eq(vehicleImageLinks.chassisNumber, chassisNumber));
+  }
+
+  // Add missing methods from IStorage interface (stubs)
+  async getAllImportTypes(): Promise<any[]> { return []; }
+  async createImportType(typeData: any): Promise<any> { throw new Error("Not implemented"); }
+  async updateImportType(id: number, typeData: any): Promise<any> { throw new Error("Not implemented"); }
+  async deleteImportType(id: number): Promise<boolean> { return false; }
+  async getAllVehicleStatuses(): Promise<any[]> { return []; }
+  async createVehicleStatus(statusData: any): Promise<any> { throw new Error("Not implemented"); }
+  async updateVehicleStatus(id: number, statusData: any): Promise<any> { throw new Error("Not implemented"); }
+  async deleteVehicleStatus(id: number): Promise<boolean> { return false; }
+  async getAllOwnershipTypes(): Promise<any[]> { return []; }
+  async createOwnershipType(typeData: any): Promise<any> { throw new Error("Not implemented"); }
+  async updateOwnershipType(id: number, typeData: any): Promise<any> { throw new Error("Not implemented"); }
+  async deleteOwnershipType(id: number): Promise<boolean> { return false; }
+  async getCategories(): Promise<any[]> { return []; }
+  async getTrimLevels(): Promise<any[]> { return []; }
+  async getColors(): Promise<any[]> { return []; }
+  async getLocations(): Promise<any[]> { return []; }
+  async addManufacturer(manufacturerData: any): Promise<any> { throw new Error("Not implemented"); }
+  async addCategory(categoryData: any): Promise<any> { throw new Error("Not implemented"); }
+  async addTrimLevel(trimData: any): Promise<any> { throw new Error("Not implemented"); }
+  async addColor(colorData: any): Promise<any> { throw new Error("Not implemented"); }
+  async addLocation(locationData: any): Promise<any> { throw new Error("Not implemented"); }
+  async updateCategory(id: number, categoryData: any): Promise<any> { throw new Error("Not implemented"); }
+  async updateColor(id: number, colorData: any): Promise<any> { throw new Error("Not implemented"); }
+  async deleteCategory(id: number): Promise<boolean> { return false; }
+  async deleteColor(id: number): Promise<boolean> { return false; }
 }

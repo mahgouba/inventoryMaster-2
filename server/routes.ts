@@ -5413,5 +5413,138 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+  // Vehicle Specifications endpoints
+  app.get("/api/vehicle-specifications", async (req, res) => {
+    try {
+      const storage = getStorage();
+      const specifications = await storage.getVehicleSpecifications();
+      res.json(specifications);
+    } catch (error) {
+      console.error("Error fetching vehicle specifications:", error);
+      res.status(500).json({ error: "فشل في جلب المواصفات" });
+    }
+  });
+
+  app.post("/api/vehicle-specifications", async (req, res) => {
+    try {
+      const validatedData = insertVehicleSpecificationSchema.parse(req.body);
+      const storage = getStorage();
+      const specification = await storage.createVehicleSpecification(validatedData);
+      res.json(specification);
+    } catch (error) {
+      console.error("Error creating vehicle specification:", error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "بيانات غير صحيحة", details: error.errors });
+      } else {
+        res.status(500).json({ error: "فشل في إنشاء المواصفات" });
+      }
+    }
+  });
+
+  app.put("/api/vehicle-specifications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertVehicleSpecificationSchema.parse(req.body);
+      const storage = getStorage();
+      const specification = await storage.updateVehicleSpecification(id, validatedData);
+      res.json(specification);
+    } catch (error) {
+      console.error("Error updating vehicle specification:", error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "بيانات غير صحيحة", details: error.errors });
+      } else {
+        res.status(500).json({ error: "فشل في تحديث المواصفات" });
+      }
+    }
+  });
+
+  app.delete("/api/vehicle-specifications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const storage = getStorage();
+      await storage.deleteVehicleSpecification(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting vehicle specification:", error);
+      res.status(500).json({ error: "فشل في حذف المواصفات" });
+    }
+  });
+
+  // Vehicle Image Links endpoints
+  app.get("/api/vehicle-image-links", async (req, res) => {
+    try {
+      const storage = getStorage();
+      const imageLinks = await storage.getVehicleImageLinks();
+      res.json(imageLinks);
+    } catch (error) {
+      console.error("Error fetching vehicle image links:", error);
+      res.status(500).json({ error: "فشل في جلب روابط الصور" });
+    }
+  });
+
+  app.post("/api/vehicle-image-links", async (req, res) => {
+    try {
+      const validatedData = insertVehicleImageLinkSchema.parse(req.body);
+      const storage = getStorage();
+      const imageLink = await storage.createVehicleImageLink(validatedData);
+      res.json(imageLink);
+    } catch (error) {
+      console.error("Error creating vehicle image link:", error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "بيانات غير صحيحة", details: error.errors });
+      } else {
+        res.status(500).json({ error: "فشل في إنشاء رابط الصورة" });
+      }
+    }
+  });
+
+  app.put("/api/vehicle-image-links/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertVehicleImageLinkSchema.parse(req.body);
+      const storage = getStorage();
+      const imageLink = await storage.updateVehicleImageLink(id, validatedData);
+      res.json(imageLink);
+    } catch (error) {
+      console.error("Error updating vehicle image link:", error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "بيانات غير صحيحة", details: error.errors });
+      } else {
+        res.status(500).json({ error: "فشل في تحديث رابط الصورة" });
+      }
+    }
+  });
+
+  app.delete("/api/vehicle-image-links/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const storage = getStorage();
+      await storage.deleteVehicleImageLink(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting vehicle image link:", error);
+      res.status(500).json({ error: "فشل في حذف رابط الصورة" });
+    }
+  });
+
+  // Get specifications and images for a specific vehicle (by chassis number)
+  app.get("/api/vehicle-data/:chassisNumber", async (req, res) => {
+    try {
+      const chassisNumber = req.params.chassisNumber;
+      const storage = getStorage();
+      
+      const specifications = await storage.getVehicleSpecificationsByChassisNumber(chassisNumber);
+      const imageLinks = await storage.getVehicleImageLinksByChassisNumber(chassisNumber);
+      
+      res.json({
+        specifications,
+        imageLinks
+      });
+    } catch (error) {
+      console.error("Error fetching vehicle data:", error);
+      res.status(500).json({ error: "فشل في جلب بيانات المركبة" });
+    }
+  });
+
   return httpServer;
 }

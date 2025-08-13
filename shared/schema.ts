@@ -135,7 +135,7 @@ export const vehicleSpecifications = pgTable("vehicle_specifications", {
   category: text("category"), // الفئة
   trimLevel: text("trim_level"), // درجة التجهيز
   year: integer("year"), // السنة
-  engine: text("engine"), // سعة المحرك
+  engineCapacity: text("engine_capacity"), // سعة المحرك
   chassisNumber: text("chassis_number"), // رقم الهيكل (اختياري لربط مواصفة بسيارة محددة)
   specifications: text("specifications"), // المواصفات التفصيلية (عربي)
   specificationsEn: text("specifications_en"), // المواصفات التفصيلية (إنجليزي)
@@ -150,6 +150,7 @@ export const vehicleImageLinks = pgTable("vehicle_image_links", {
   category: text("category"), // الفئة
   trimLevel: text("trim_level"), // درجة التجهيز
   year: integer("year"), // السنة
+  engineCapacity: text("engine_capacity"), // سعة المحرك
   exteriorColor: text("exterior_color"), // اللون الخارجي
   interiorColor: text("interior_color"), // اللون الداخلي
   chassisNumber: text("chassis_number"), // رقم الهيكل (اختياري لربط رابط بسيارة محددة)

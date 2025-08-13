@@ -26,7 +26,7 @@ import HierarchicalView from "@/pages/HierarchicalView";
 
 
 import PriceCardsPage from "@/pages/price-cards";
-
+import SpecificationsManagement from "@/pages/specifications-management";
 
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
@@ -89,6 +89,8 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
 
       case "/hierarchy-management":
         return user.role === "admin" ? <HierarchicalView /> : null;
+      case "/specifications-management":
+        return user.role === "admin" ? <SpecificationsManagement /> : null;
 
       case "/price-cards":
         return <PriceCardsPage />;
