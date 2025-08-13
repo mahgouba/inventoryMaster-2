@@ -821,15 +821,34 @@ export default function HierarchicalView() {
     setExpandedItems(newExpanded);
   };
 
-  const toggleManufacturerVisibility = (manufacturerId: string) => {
-    setHiddenManufacturers(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(manufacturerId)) {
-        newSet.delete(manufacturerId);
-      } else {
-        newSet.add(manufacturerId);
-      }
-      return newSet;
+  // Toggle manufacturer visibility mutation
+  const toggleManufacturerVisibilityMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
+      return apiRequest('PUT', `/api/manufacturers/${id}`, {
+        isActive: !isActive
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تم التحديث",
+        description: "تم تحديث إعدادات الرؤية بنجاح",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ",
+        description: "فشل في تحديث إعدادات الرؤية",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const toggleManufacturerVisibility = (manufacturer: Manufacturer) => {
+    toggleManufacturerVisibilityMutation.mutate({
+      id: manufacturer.id,
+      isActive: manufacturer.isActive ?? true
     });
   };
 
@@ -2057,11 +2076,12 @@ export default function HierarchicalView() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => toggleManufacturerVisibility(item.manufacturer.id?.toString())}
-                      className="text-gray-400 hover:bg-gray-700/50"
-                      title="إخفاء/إظهار الصانع"
+                      onClick={() => toggleManufacturerVisibility(item.manufacturer)}
+                      className={`hover:bg-gray-700/50 ${(item.manufacturer.isActive === false) ? 'text-red-400' : 'text-green-400'}`}
+                      title={(item.manufacturer.isActive === false) ? "إظهار الصانع في القوائم المنسدلة" : "إخفاء الصانع من القوائم المنسدلة"}
+                      disabled={toggleManufacturerVisibilityMutation.isPending}
                     >
-                      <Eye className="h-4 w-4" />
+                      {(item.manufacturer.isActive === false) ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                     
                     <Button

@@ -369,7 +369,9 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                               جاري التحميل...
                             </SelectItem>
                           ) : manufacturers.length > 0 ? (
-                            manufacturers.map((manufacturer) => (
+                            manufacturers
+                              .filter((manufacturer) => manufacturer.isActive !== false)
+                              .map((manufacturer) => (
                               <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
                                 {manufacturer.nameAr}
                               </SelectItem>
