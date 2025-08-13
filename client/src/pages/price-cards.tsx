@@ -35,6 +35,8 @@ interface InventoryItem {
   interiorColor?: string;
   chassisNumber?: string;
   mileage?: number;
+  entryDate?: string;
+  createdAt?: string;
 }
 
 interface PriceCard {
@@ -122,6 +124,7 @@ export default function PriceCardsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedTrimLevel, setSelectedTrimLevel] = useState<string>("all");
   const [selectedModel, setSelectedModel] = useState<string>("all");
+  const [expandedManufacturers, setExpandedManufacturers] = useState<Set<string>>(new Set());
 
   // Fetch inventory data
   const { data: inventoryData = [] } = useQuery<InventoryItem[]>({
@@ -170,6 +173,40 @@ export default function PriceCardsPage() {
   const categories = ["all", ...new Set(priceCards.map(card => card.category).filter(Boolean))];
   const trimLevels = ["all", ...new Set(priceCards.map(card => card.trimLevel).filter(Boolean))];
   const models = ["all", ...new Set(priceCards.map(card => card.model).filter(Boolean))];
+
+  // Group cards by manufacturer
+  const groupedByManufacturer = filteredCards.reduce((acc, card) => {
+    const manufacturer = card.manufacturer || "غير محدد";
+    if (!acc[manufacturer]) {
+      acc[manufacturer] = [];
+    }
+    acc[manufacturer].push(card);
+    return acc;
+  }, {} as Record<string, typeof filteredCards>);
+
+  // Get vehicles that arrived today (within 24 hours)
+  const getVehiclesArrivedToday = () => {
+    const now = new Date();
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    
+    return inventoryData.filter(vehicle => {
+      const entryDate = new Date(vehicle.entryDate || vehicle.createdAt || '');
+      return entryDate >= twentyFourHoursAgo && entryDate <= now;
+    });
+  };
+
+  const vehiclesArrivedToday = getVehiclesArrivedToday();
+
+  // Toggle manufacturer expansion
+  const toggleManufacturerExpansion = (manufacturer: string) => {
+    const newExpanded = new Set(expandedManufacturers);
+    if (newExpanded.has(manufacturer)) {
+      newExpanded.delete(manufacturer);
+    } else {
+      newExpanded.add(manufacturer);
+    }
+    setExpandedManufacturers(newExpanded);
+  };
 
   // Toggle card expansion
   const toggleCardExpansion = (cardId: number) => {
@@ -802,6 +839,60 @@ export default function PriceCardsPage() {
         </Badge>
       </div>
 
+      {/* Vehicles Arrived Today Section */}
+      {vehiclesArrivedToday.length > 0 && (
+        <Card className="mb-6 border-green-500 bg-green-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-green-700">
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              السيارات الواصلة اليوم ({vehiclesArrivedToday.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {vehiclesArrivedToday.map((vehicle) => (
+                <Card key={`today-${vehicle.id}`} className="border-green-200 hover:border-green-400 transition-colors">
+                  <CardContent className="p-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-semibold text-gray-900">{vehicle.manufacturer} {vehicle.category}</h4>
+                          {vehicle.trimLevel && <p className="text-sm text-gray-600">{vehicle.trimLevel}</p>}
+                        </div>
+                        <Badge variant="secondary" className="bg-green-100 text-green-800">
+                          {vehicle.year}
+                        </Badge>
+                      </div>
+                      
+                      {vehicle.chassisNumber && (
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <span>رقم الهيكل:</span>
+                          <span className="font-mono">{vehicle.chassisNumber}</span>
+                        </div>
+                      )}
+                      
+                      {vehicle.price && (
+                        <div className="text-lg font-bold text-green-700">
+                          {formatPrice(vehicle.price)} ريال
+                        </div>
+                      )}
+                      
+                      <Button 
+                        onClick={() => createPriceCardFromInventory(vehicle)}
+                        size="sm"
+                        className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        إنشاء بطاقة سعر
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Enhanced Filters */}
       <Card className="mb-6">
         <CardHeader>
@@ -923,38 +1014,79 @@ export default function PriceCardsPage() {
         </div>
       )}
 
-      {/* Price Cards Grid - Collapsible Cards */}
-      {filteredCards.map((card) => {
-        const isExpanded = expandedCards.has(card.id);
-        
-        return (
-          <Card key={card.id} className="mb-6 border-2 hover:border-blue-300 transition-colors text-[#ffffff]">
-            {/* Card Header - Always Visible */}
-            <CardHeader 
-              className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-              onClick={() => toggleCardExpansion(card.id)}
-            >
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+      {/* Price Cards Grouped by Manufacturer */}
+      {Object.entries(groupedByManufacturer)
+        .sort(([,a], [,b]) => b.length - a.length) // Sort by count (highest first)
+        .map(([manufacturer, cards]) => {
+          const isManufacturerExpanded = expandedManufacturers.has(manufacturer);
+          
+          return (
+            <Card key={manufacturer} className="mb-6 border-l-4 border-l-blue-500">
+              {/* Manufacturer Header */}
+              <CardHeader 
+                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                onClick={() => toggleManufacturerExpansion(manufacturer)}
+              >
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <ManufacturerLogo manufacturer={manufacturer} size={32} />
+                    <div>
+                      <span className="text-xl font-bold">{manufacturer}</span>
+                      <Badge variant="secondary" className="mr-2">
+                        {cards.length} مركبة
+                      </Badge>
+                    </div>
+                  </div>
                   <div className="flex items-center gap-2">
-                    {isExpanded ? (
+                    {isManufacturerExpanded ? (
                       <EyeOff className="w-5 h-5 text-blue-600" />
                     ) : (
                       <Eye className="w-5 h-5 text-gray-400" />
                     )}
-                    <span>بطاقة سعر {card.manufacturer} {card.category}</span>
                   </div>
-                  <div className="flex gap-2">
-                    {card.trimLevel && (
-                      <Badge variant="secondary">{card.trimLevel}</Badge>
-                    )}
-                    {card.model && (
-                      <Badge variant="default">{card.model}</Badge>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex gap-2 no-print">
+                </CardTitle>
+              </CardHeader>
+
+              {/* Manufacturer's Vehicles */}
+              {isManufacturerExpanded && (
+                <CardContent className="pt-0 space-y-4">
+                  {cards.map((card) => {
+                    const isExpanded = expandedCards.has(card.id);
+                    const inventoryItem = inventoryData.find(item => item.id === card.inventoryItemId);
+                    
+                    return (
+                      <Card key={card.id} className="border-2 hover:border-blue-300 transition-colors text-[#ffffff]">
+                        {/* Card Header - Always Visible */}
+                        <CardHeader 
+                          className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                          onClick={() => toggleCardExpansion(card.id)}
+                        >
+                          <CardTitle className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                {isExpanded ? (
+                                  <EyeOff className="w-5 h-5 text-blue-600" />
+                                ) : (
+                                  <Eye className="w-5 h-5 text-gray-400" />
+                                )}
+                                <span>{card.category}</span>
+                                {inventoryItem?.chassisNumber && (
+                                  <Badge variant="outline" className="text-xs font-mono">
+                                    {inventoryItem.chassisNumber}
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex gap-2">
+                                {card.trimLevel && (
+                                  <Badge variant="secondary">{card.trimLevel}</Badge>
+                                )}
+                                {card.model && (
+                                  <Badge variant="default">{card.model}</Badge>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <div className="flex gap-2 no-print">
                   {/* عناصر التحكم في إخفاء البيانات */}
                   <div className="flex gap-1 ml-4 border-l pl-2">
                     <Button
@@ -1396,9 +1528,14 @@ export default function PriceCardsPage() {
                 </div>
               </CardContent>
             )}
-          </Card>
-        );
-      })}
+                          </Card>
+                        );
+                      })}
+                    </CardContent>
+                  )}
+                </Card>
+              );
+            })}
 
       {/* Edit Price Card Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
