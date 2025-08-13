@@ -430,14 +430,23 @@ export class MemStorage implements IStorage {
     
     return {
       total: availableItems.length,
-      available: availableItems.filter(item => item.status === "متوفر").length,
+      available: availableItems.filter(item => item.status === "متوفر" || item.status?.trim() === "متوفر").length,
       inTransit: availableItems.filter(item => item.status === "في الطريق").length,
       maintenance: availableItems.filter(item => item.status === "في الصيانة").length,
       reserved: availableItems.filter(item => item.status === "محجوز").length,
       sold: items.filter(item => item.isSold || item.status === "مباع").length,
-      personal: availableItems.filter(item => item.importType === "شخصي").length,
-      company: availableItems.filter(item => item.importType === "شركة").length,
-      usedPersonal: availableItems.filter(item => item.importType === "شخصي مستعمل").length
+      personal: availableItems.filter(item => {
+        const importType = item.importType?.trim() || "";
+        return importType === "شخصي" || importType === "شخصيي" || importType === "سخصي";
+      }).length,
+      company: availableItems.filter(item => {
+        const importType = item.importType?.trim() || "";
+        return importType === "شركة" || importType === "شركه";
+      }).length,
+      usedPersonal: availableItems.filter(item => {
+        const importType = item.importType?.trim() || "";
+        return importType === "مستعمل" || importType.includes("مستعمل");
+      }).length
     };
   }
 
@@ -450,9 +459,18 @@ export class MemStorage implements IStorage {
       return {
         manufacturer,
         total: manufacturerItems.length,
-        personal: manufacturerItems.filter(item => item.importType === "شخصي").length,
-        company: manufacturerItems.filter(item => item.importType === "شركة").length,
-        usedPersonal: manufacturerItems.filter(item => item.importType === "شخصي مستعمل").length,
+        personal: manufacturerItems.filter(item => {
+          const importType = item.importType?.trim() || "";
+          return importType === "شخصي" || importType === "شخصيي" || importType === "سخصي";
+        }).length,
+        company: manufacturerItems.filter(item => {
+          const importType = item.importType?.trim() || "";
+          return importType === "شركة" || importType === "شركه";
+        }).length,
+        usedPersonal: manufacturerItems.filter(item => {
+          const importType = item.importType?.trim() || "";
+          return importType === "مستعمل" || importType.includes("مستعمل");
+        }).length,
         logo: null
       };
     });
