@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Share2, Copy, Edit2, Save, X, Image, Link, Calculator, MessageCircle, Settings } from "lucide-react";
+import { Plus, Share2, Copy, Edit2, Save, X, Image, Link, Calculator, MessageCircle, Settings, Car, Gauge, Fuel, Palette, FileText, ExternalLink } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { InventoryItem, VehicleSpecification, VehicleImageLink } from "@shared/schema";
 
@@ -381,7 +381,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
       <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Share2 className="h-5 w-5" />
+            <Car className="h-5 w-5" style={{color: '#C49632'}} />
             مشاركة السيارة
           </DialogTitle>
           <DialogDescription>
@@ -396,6 +396,8 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
+                <Settings className="h-5 w-5" style={{color: '#C49632'}} />
+                اختيار البيانات للمشاركة
                 <Checkbox 
                   checked={Object.values(includeFields).every(Boolean)}
                   onCheckedChange={(checked) => {
@@ -562,14 +564,15 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, price: !!checked }))}
                     className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
-                  <Calculator className="h-5 w-5" />
+                  <Calculator className="h-5 w-5" style={{color: '#C49632'}} />
                   تفاصيل السعر
                 </CardTitle>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsEditingPrice(!isEditingPrice)}
-                  className="text-blue-600 hover:bg-blue-50"
+                  className="hover:bg-orange-50"
+                  style={{color: '#C49632'}}
                 >
                   <Edit2 className="h-4 w-4" />
                 </Button>
@@ -601,7 +604,8 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                       <Button
                         size="sm"
                         onClick={() => setIsEditingPrice(false)}
-                        className="bg-green-600 hover:bg-green-700"
+                        style={{backgroundColor: '#C49632', borderColor: '#C49632'}}
+                        className="hover:opacity-90"
                       >
                         <Save className="h-4 w-4 ml-1" />
                         حفظ
@@ -786,10 +790,13 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
           {/* Share Preview */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">معاينة المشاركة</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <FileText className="h-5 w-5" style={{color: '#C49632'}} />
+                معاينة المشاركة
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="bg-slate-50 p-4 rounded-lg border-r-4 border-blue-500 min-h-[100px]">
+              <div className="bg-slate-50 p-4 rounded-lg border-r-4 min-h-[100px]" style={{borderRightColor: '#C49632'}}>
                 {generateShareText() ? (
                   <pre className="text-sm whitespace-pre-wrap font-sans">{generateShareText()}</pre>
                 ) : (
@@ -808,8 +815,9 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                 onClick={handleShare}
                 className="flex-1"
                 disabled={!generateShareText()}
+                style={{backgroundColor: '#C49632', borderColor: '#C49632'}}
               >
-                <Share2 className="h-4 w-4 ml-1" />
+                <Car className="h-4 w-4 ml-1" />
                 مشاركة
               </Button>
               <Button
@@ -817,6 +825,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                 onClick={handleCopyText}
                 className="flex-1"
                 disabled={!generateShareText()}
+                style={{borderColor: '#C49632', color: '#C49632'}}
               >
                 <Copy className="h-4 w-4 ml-1" />
                 نسخ النص
@@ -827,7 +836,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5 text-green-600" />
+                  <MessageCircle className="h-5 w-5" style={{color: '#C49632'}} />
                   مشاركة عبر الواتساب
                 </CardTitle>
               </CardHeader>
@@ -845,8 +854,9 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     />
                     <Button
                       onClick={handleWhatsAppShare}
-                      className="bg-green-600 hover:bg-green-700 px-4"
+                      className="px-4"
                       disabled={!generateShareText() || !whatsappPhoneNumber.trim()}
+                      style={{backgroundColor: '#C49632', borderColor: '#C49632'}}
                     >
                       <MessageCircle className="h-4 w-4" />
                     </Button>
@@ -880,8 +890,9 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     }
                   }}
                   className="w-full"
+                  style={{backgroundColor: '#C49632', borderColor: '#C49632', color: 'white'}}
                 >
-                  <Link className="h-4 w-4 ml-1" />
+                  <ExternalLink className="h-4 w-4 ml-1" />
                   نسخ رابط الصورة المرتبط
                 </Button>
               )}
@@ -893,8 +904,9 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     variant="secondary"
                     onClick={handleCopyImageLinks}
                     className="flex-1"
+                    style={{backgroundColor: '#C49632', borderColor: '#C49632', color: 'white'}}
                   >
-                    <Link className="h-4 w-4 ml-1" />
+                    <ExternalLink className="h-4 w-4 ml-1" />
                     نسخ روابط الصور المرفقة ({vehicle.images.length})
                   </Button>
                   <Button
