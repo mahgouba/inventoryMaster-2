@@ -100,7 +100,7 @@ export default function InventoryStats() {
       color: "bg-purple-100 text-purple-600",
     },
     {
-      title: "مستعمل شخصي",
+      title: "مستعمل",
       value: stats?.usedPersonal || 0,
       icon: Users,
       color: "bg-orange-100 text-orange-600",
