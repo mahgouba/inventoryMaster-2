@@ -5293,7 +5293,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle Specifications API Routes
   app.get("/api/vehicle-specifications", async (req, res) => {
     try {
-      const specifications = await getStorage().getAllVehicleSpecifications();
+      const specifications = await getStorage().getVehicleSpecifications();
       res.json(specifications);
     } catch (error) {
       console.error("Error fetching vehicle specifications:", error);
@@ -5353,7 +5353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle Image Links API Routes
   app.get("/api/vehicle-image-links", async (req, res) => {
     try {
-      const imageLinks = await getStorage().getAllVehicleImageLinks();
+      const imageLinks = await getStorage().getVehicleImageLinks();
       res.json(imageLinks);
     } catch (error) {
       console.error("Error fetching vehicle image links:", error);

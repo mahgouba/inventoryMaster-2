@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Search, Car, Image, Settings } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Car, Image, Settings, FileText, Link, Palette } from "lucide-react";
 import type { VehicleSpecification, InsertVehicleSpecification, VehicleImageLink, InsertVehicleImageLink } from "@shared/schema";
 
 // Schemas for form validation
@@ -46,6 +46,29 @@ const imageLinkFormSchema = z.object({
 type SpecificationFormData = z.infer<typeof specificationFormSchema>;
 type ImageLinkFormData = z.infer<typeof imageLinkFormSchema>;
 
+// Sample data for dropdowns
+const manufacturerOptions = [
+  "تويوتا", "نيسان", "هيونداي", "كيا", "مازدا", "هوندا", "فولكسفاغن", "شيفروليه", "فورد", "بي إم دبليو", "مرسيدس", "أودي", "جيب", "لكزس", "انفينيتي", "أكورا"
+];
+
+const categoryOptions = [
+  "سيدان", "SUV", "هاتشباك", "كوبيه", "كروس أوفر", "بيك آب", "فان", "كابريو"
+];
+
+const trimLevelOptions = [
+  "Base", "GL", "GLS", "GLX", "SE", "SEL", "Limited", "Premium", "Sport", "Luxury"
+];
+
+const yearOptions = Array.from({ length: 30 }, (_, i) => (new Date().getFullYear() - i).toString());
+
+const engineCapacityOptions = [
+  "1.0L", "1.2L", "1.4L", "1.5L", "1.6L", "1.8L", "2.0L", "2.2L", "2.4L", "2.5L", "2.7L", "3.0L", "3.5L", "4.0L", "4.5L", "5.0L"
+];
+
+const colorOptions = [
+  "أبيض", "أسود", "فضي", "رمادي", "أحمر", "أزرق", "أخضر", "بني", "ذهبي", "برتقالي", "أصفر", "بنفسجي", "وردي", "بيج"
+];
+
 export default function SpecificationsManagement() {
   const [activeTab, setActiveTab] = useState("specifications");
   const [searchTerm, setSearchTerm] = useState("");
@@ -67,94 +90,12 @@ export default function SpecificationsManagement() {
     queryKey: ['/api/vehicle-image-links'],
   });
 
-  // Fetch manufacturers for dropdowns
-  const { data: manufacturers = [] } = useQuery({
-    queryKey: ['/api/manufacturers'],
-  });
-
   // Fetch inventory items for chassis numbers
   const { data: inventoryItems = [] } = useQuery({
     queryKey: ['/api/inventory'],
   });
 
-  // Create/Update specification mutation
-  const specMutation = useMutation({
-    mutationFn: async (data: SpecificationFormData) => {
-      const url = editingSpec ? `/api/vehicle-specifications/${editingSpec.id}` : '/api/vehicle-specifications';
-      const method = editingSpec ? 'PUT' : 'POST';
-      return apiRequest(url, { method, body: data });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specifications'] });
-      setIsSpecDialogOpen(false);
-      setEditingSpec(null);
-      toast({
-        title: "تم بنجاح",
-        description: editingSpec ? "تم تحديث المواصفات" : "تم إضافة المواصفات",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء حفظ المواصفات",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Create/Update image link mutation
-  const imageMutation = useMutation({
-    mutationFn: async (data: ImageLinkFormData) => {
-      const url = editingImage ? `/api/vehicle-image-links/${editingImage.id}` : '/api/vehicle-image-links';
-      const method = editingImage ? 'PUT' : 'POST';
-      return apiRequest(url, { method, body: data });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/vehicle-image-links'] });
-      setIsImageDialogOpen(false);
-      setEditingImage(null);
-      toast({
-        title: "تم بنجاح",
-        description: editingImage ? "تم تحديث رابط الصورة" : "تم إضافة رابط الصورة",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء حفظ رابط الصورة",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Delete mutations
-  const deleteSpecMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return apiRequest(`/api/vehicle-specifications/${id}`, { method: 'DELETE' });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specifications'] });
-      toast({
-        title: "تم بنجاح",
-        description: "تم حذف المواصفات",
-      });
-    },
-  });
-
-  const deleteImageMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return apiRequest(`/api/vehicle-image-links/${id}`, { method: 'DELETE' });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/vehicle-image-links'] });
-      toast({
-        title: "تم بنجاح",
-        description: "تم حذف رابط الصورة",
-      });
-    },
-  });
-
-  // Form configurations
+  // Forms
   const specForm = useForm<SpecificationFormData>({
     resolver: zodResolver(specificationFormSchema),
     defaultValues: {
@@ -186,298 +127,402 @@ export default function SpecificationsManagement() {
     },
   });
 
-  // Filter functions
+  // Create/Update specification mutation
+  const specMutation = useMutation({
+    mutationFn: async (data: SpecificationFormData) => {
+      const url = editingSpec ? `/api/vehicle-specifications/${editingSpec.id}` : '/api/vehicle-specifications';
+      const method = editingSpec ? 'PUT' : 'POST';
+      return apiRequest(url, { method, body: data });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specifications'] });
+      setIsSpecDialogOpen(false);
+      setEditingSpec(null);
+      specForm.reset();
+      toast({
+        title: "تم بنجاح",
+        description: editingSpec ? "تم تحديث المواصفات" : "تم إضافة المواصفات",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء حفظ المواصفات",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Create/Update image link mutation
+  const imageMutation = useMutation({
+    mutationFn: async (data: ImageLinkFormData) => {
+      const url = editingImage ? `/api/vehicle-image-links/${editingImage.id}` : '/api/vehicle-image-links';
+      const method = editingImage ? 'PUT' : 'POST';
+      return apiRequest(url, { method, body: data });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/vehicle-image-links'] });
+      setIsImageDialogOpen(false);
+      setEditingImage(null);
+      imageForm.reset();
+      toast({
+        title: "تم بنجاح",
+        description: editingImage ? "تم تحديث رابط الصورة" : "تم إضافة رابط الصورة",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء حفظ رابط الصورة",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete specification mutation
+  const deleteSpecMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest(`/api/vehicle-specifications/${id}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specifications'] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف المواصفات بنجاح",
+      });
+    },
+  });
+
+  // Delete image link mutation
+  const deleteImageMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest(`/api/vehicle-image-links/${id}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/vehicle-image-links'] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف رابط الصورة بنجاح",
+      });
+    },
+  });
+
+  const onSubmitSpec = (data: SpecificationFormData) => {
+    specMutation.mutate(data);
+  };
+
+  const onSubmitImage = (data: ImageLinkFormData) => {
+    imageMutation.mutate(data);
+  };
+
+  const handleEditSpec = (spec: VehicleSpecification) => {
+    setEditingSpec(spec);
+    specForm.reset({
+      manufacturer: spec.manufacturer || "",
+      category: spec.category || "",
+      trimLevel: spec.trimLevel || "",
+      year: spec.year || undefined,
+      engineCapacity: spec.engine || "",
+      chassisNumber: spec.chassisNumber || "",
+      specifications: spec.specifications || "",
+      specificationsEn: spec.specificationsEn || "",
+    });
+    setIsSpecDialogOpen(true);
+  };
+
+  const handleEditImage = (image: VehicleImageLink) => {
+    setEditingImage(image);
+    imageForm.reset({
+      manufacturer: image.manufacturer || "",
+      category: image.category || "",
+      trimLevel: image.trimLevel || "",
+      year: image.year || undefined,
+      engineCapacity: "",
+      exteriorColor: image.exteriorColor || "",
+      interiorColor: image.interiorColor || "",
+      chassisNumber: image.chassisNumber || "",
+      imageUrl: image.imageUrl || "",
+      description: image.description || "",
+      descriptionEn: image.descriptionEn || "",
+    });
+    setIsImageDialogOpen(true);
+  };
+
   const filteredSpecs = specifications.filter((spec: VehicleSpecification) =>
+    !searchTerm ||
     spec.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     spec.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    spec.chassisNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    spec.specifications?.toLowerCase().includes(searchTerm.toLowerCase())
+    spec.trimLevel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    spec.chassisNumber?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredImages = imageLinks.filter((image: VehicleImageLink) =>
+    !searchTerm ||
     image.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     image.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    image.chassisNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    image.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    image.trimLevel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    image.chassisNumber?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Reset forms when editing changes
-  useEffect(() => {
-    if (editingSpec) {
-      specForm.reset({
-        manufacturer: editingSpec.manufacturer || "",
-        category: editingSpec.category || "",
-        trimLevel: editingSpec.trimLevel || "",
-        year: editingSpec.year || undefined,
-        engineCapacity: editingSpec.engineCapacity || "",
-        chassisNumber: editingSpec.chassisNumber || "",
-        specifications: editingSpec.specifications || "",
-        specificationsEn: editingSpec.specificationsEn || "",
-      });
-    } else {
-      specForm.reset();
-    }
-  }, [editingSpec, specForm]);
-
-  useEffect(() => {
-    if (editingImage) {
-      imageForm.reset({
-        manufacturer: editingImage.manufacturer || "",
-        category: editingImage.category || "",
-        trimLevel: editingImage.trimLevel || "",
-        year: editingImage.year || undefined,
-        engineCapacity: editingImage.engineCapacity || "",
-        exteriorColor: editingImage.exteriorColor || "",
-        interiorColor: editingImage.interiorColor || "",
-        chassisNumber: editingImage.chassisNumber || "",
-        imageUrl: editingImage.imageUrl,
-        description: editingImage.description || "",
-        descriptionEn: editingImage.descriptionEn || "",
-      });
-    } else {
-      imageForm.reset();
-    }
-  }, [editingImage, imageForm]);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-900 dark:via-slate-800 dark:to-amber-900/20 p-6" dir="rtl">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
-              <Settings className="h-6 w-6 text-white" />
+        <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl border border-amber-200/50 dark:border-amber-700/30 p-6 shadow-lg shadow-amber-100/50 dark:shadow-slate-900/50">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-gradient-to-br from-amber-100 to-yellow-100 dark:bg-gradient-to-br dark:from-amber-900/50 dark:to-yellow-900/50 rounded-xl border border-amber-200 dark:border-amber-700/50">
+                <Settings className="w-7 h-7 text-amber-700 dark:text-amber-300" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-700 to-yellow-600 dark:from-amber-300 dark:to-yellow-200 bg-clip-text text-transparent">إدارة المواصفات والصور</h1>
+                <p className="text-amber-600/80 dark:text-amber-300/80 text-lg">إدارة مواصفات المركبات وروابط الصور التفصيلية</p>
+              </div>
             </div>
-            إدارة المواصفات والصور
-          </h1>
-          <p className="text-slate-600 dark:text-slate-300">
-            إدارة المواصفات التفصيلية وروابط الصور للمركبات
-          </p>
-        </div>
+          </div>
 
-        {/* Search Bar */}
-        <div className="mb-6">
+          {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-500 dark:text-amber-400 w-5 h-5" />
             <Input
-              type="text"
               placeholder="البحث في المواصفات والصور..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+              className="pr-10 border-amber-200 dark:border-amber-700/50 focus:border-amber-400 dark:focus:border-amber-500 bg-white/50 dark:bg-slate-700/50"
             />
           </div>
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="specifications" className="flex items-center gap-2">
-              <Car className="h-4 w-4" />
-              المواصفات التفصيلية
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 bg-white/80 dark:bg-slate-800/80 border border-amber-200/50 dark:border-amber-700/30 rounded-xl p-1">
+            <TabsTrigger 
+              value="specifications" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-500 data-[state=active]:text-white data-[state=active]:shadow-lg"
+            >
+              <FileText className="w-4 h-4 ml-2" />
+              مواصفات المركبات
             </TabsTrigger>
-            <TabsTrigger value="images" className="flex items-center gap-2">
-              <Image className="h-4 w-4" />
+            <TabsTrigger 
+              value="images" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-500 data-[state=active]:text-white data-[state=active]:shadow-lg"
+            >
+              <Image className="w-4 h-4 ml-2" />
               روابط الصور
             </TabsTrigger>
           </TabsList>
 
           {/* Specifications Tab */}
-          <TabsContent value="specifications">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-                المواصفات التفصيلية ({filteredSpecs.length})
-              </h2>
+          <TabsContent value="specifications" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-amber-800 dark:text-amber-200">مواصفات المركبات</h2>
               <Dialog open={isSpecDialogOpen} onOpenChange={setIsSpecDialogOpen}>
                 <DialogTrigger asChild>
                   <Button 
-                    onClick={() => setEditingSpec(null)}
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                    className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-lg"
+                    onClick={() => {
+                      setEditingSpec(null);
+                      specForm.reset();
+                    }}
                   >
-                    <Plus className="h-4 w-4 mr-2" />
-                    إضافة مواصفات
+                    <Plus className="w-4 h-4 ml-2" />
+                    إضافة مواصفات جديدة
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-2xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-amber-200 dark:border-amber-700/50">
                   <DialogHeader>
-                    <DialogTitle>
+                    <DialogTitle className="text-amber-800 dark:text-amber-200">
                       {editingSpec ? "تعديل المواصفات" : "إضافة مواصفات جديدة"}
                     </DialogTitle>
                   </DialogHeader>
                   <Form {...specForm}>
-                    <form onSubmit={specForm.handleSubmit((data) => specMutation.mutate(data))} className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Manufacturer */}
+                    <form onSubmit={specForm.handleSubmit(onSubmitSpec)} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={specForm.control}
                           name="manufacturer"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>الصانع</FormLabel>
-                              <FormControl>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="اختر الصانع" />
+                              <FormLabel className="text-amber-700 dark:text-amber-300">الشركة المصنعة</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                    <SelectValue placeholder="اختر الشركة المصنعة" />
                                   </SelectTrigger>
-                                  <SelectContent>
-                                    {manufacturers.map((manufacturer: any) => (
-                                      <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
-                                        {manufacturer.nameAr}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
+                                </FormControl>
+                                <SelectContent>
+                                  {manufacturerOptions.map((manufacturer) => (
+                                    <SelectItem key={manufacturer} value={manufacturer}>
+                                      {manufacturer}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        {/* Category */}
                         <FormField
                           control={specForm.control}
                           name="category"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>الفئة</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="مثال: C300, X5, A4" />
-                              </FormControl>
+                              <FormLabel className="text-amber-700 dark:text-amber-300">الفئة</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                    <SelectValue placeholder="اختر الفئة" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {categoryOptions.map((category) => (
+                                    <SelectItem key={category} value={category}>
+                                      {category}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        {/* Trim Level */}
                         <FormField
                           control={specForm.control}
                           name="trimLevel"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>درجة التجهيز</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="مثال: فل كامل، ستاندرد" />
-                              </FormControl>
+                              <FormLabel className="text-amber-700 dark:text-amber-300">درجة التجهيز</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                    <SelectValue placeholder="اختر درجة التجهيز" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {trimLevelOptions.map((trim) => (
+                                    <SelectItem key={trim} value={trim}>
+                                      {trim}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        {/* Year */}
                         <FormField
                           control={specForm.control}
                           name="year"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>السنة</FormLabel>
+                              <FormLabel className="text-amber-700 dark:text-amber-300">السنة</FormLabel>
+                              <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                                <FormControl>
+                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                    <SelectValue placeholder="اختر السنة" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {yearOptions.map((year) => (
+                                    <SelectItem key={year} value={year}>
+                                      {year}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={specForm.control}
+                          name="engineCapacity"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-amber-700 dark:text-amber-300">سعة المحرك</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                    <SelectValue placeholder="اختر سعة المحرك" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {engineCapacityOptions.map((capacity) => (
+                                    <SelectItem key={capacity} value={capacity}>
+                                      {capacity}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={specForm.control}
+                          name="chassisNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-amber-700 dark:text-amber-300">رقم الهيكل (اختياري)</FormLabel>
                               <FormControl>
-                                <Input 
-                                  type="number" 
-                                  {...field} 
-                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                                  placeholder="مثال: 2023" 
+                                <Input
+                                  placeholder="رقم الهيكل"
+                                  {...field}
+                                  className="border-amber-200 dark:border-amber-700/50"
                                 />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        {/* Engine Capacity */}
-                        <FormField
-                          control={specForm.control}
-                          name="engineCapacity"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>سعة المحرك</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="مثال: 2.0L Turbo" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Chassis Number */}
-                        <FormField
-                          control={specForm.control}
-                          name="chassisNumber"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>رقم الهيكل (اختياري)</FormLabel>
-                              <FormControl>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="اختر رقم الهيكل" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {inventoryItems.map((item: any) => (
-                                      <SelectItem key={item.id} value={item.chassisNumber}>
-                                        {item.chassisNumber} - {item.manufacturer} {item.category}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
                       </div>
-
-                      {/* Specifications (Arabic) */}
                       <FormField
                         control={specForm.control}
                         name="specifications"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>المواصفات التفصيلية (عربي) *</FormLabel>
+                            <FormLabel className="text-amber-700 dark:text-amber-300">المواصفات (عربي)</FormLabel>
                             <FormControl>
-                              <Textarea 
-                                {...field} 
-                                placeholder="اكتب المواصفات التفصيلية باللغة العربية..."
-                                rows={6}
+                              <Textarea
+                                placeholder="اكتب المواصفات التفصيلية..."
+                                className="h-32 border-amber-200 dark:border-amber-700/50"
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-
-                      {/* Specifications (English) */}
                       <FormField
                         control={specForm.control}
                         name="specificationsEn"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>المواصفات التفصيلية (إنجليزي)</FormLabel>
+                            <FormLabel className="text-amber-700 dark:text-amber-300">المواصفات (إنجليزي)</FormLabel>
                             <FormControl>
-                              <Textarea 
-                                {...field} 
-                                placeholder="Enter detailed specifications in English..."
-                                rows={6}
+                              <Textarea
+                                placeholder="Write detailed specifications..."
+                                className="h-32 border-amber-200 dark:border-amber-700/50"
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-
-                      <div className="flex justify-end gap-2 pt-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            setIsSpecDialogOpen(false);
-                            setEditingSpec(null);
-                          }}
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => setIsSpecDialogOpen(false)}
+                          className="border-amber-200 dark:border-amber-700/50"
                         >
                           إلغاء
                         </Button>
                         <Button 
                           type="submit" 
                           disabled={specMutation.isPending}
-                          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                          className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white"
                         >
                           {specMutation.isPending ? "جاري الحفظ..." : "حفظ"}
                         </Button>
@@ -488,82 +533,67 @@ export default function SpecificationsManagement() {
               </Dialog>
             </div>
 
-            {/* Specifications Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Specifications List */}
+            <div className="grid gap-4">
               {specsLoading ? (
-                // Loading skeletons
-                Array.from({ length: 6 }).map((_, i) => (
-                  <Card key={i} className="animate-pulse">
-                    <CardHeader>
-                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                <div className="text-center py-8 text-amber-600 dark:text-amber-400">جاري التحميل...</div>
+              ) : filteredSpecs.length === 0 ? (
+                <div className="text-center py-8 text-amber-600 dark:text-amber-400">لا توجد مواصفات</div>
+              ) : (
+                filteredSpecs.map((spec: VehicleSpecification) => (
+                  <Card key={spec.id} className="bg-white/80 dark:bg-slate-800/80 border-amber-200/50 dark:border-amber-700/30 shadow-md hover:shadow-lg transition-shadow">
+                    <CardHeader className="pb-3">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <CardTitle className="text-amber-800 dark:text-amber-200 flex items-center gap-2">
+                            <Car className="w-5 h-5" />
+                            {spec.manufacturer} {spec.category} {spec.trimLevel}
+                          </CardTitle>
+                          <div className="flex gap-2 text-sm text-amber-600/80 dark:text-amber-300/80">
+                            {spec.year && <span>السنة: {spec.year}</span>}
+                            {spec.engine && <span>المحرك: {spec.engine}</span>}
+                            {spec.chassisNumber && <span>رقم الهيكل: {spec.chassisNumber}</span>}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditSpec(spec)}
+                            className="border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/20"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => deleteSpecMutation.mutate(spec.id)}
+                            className="border-red-300 text-red-700 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded"></div>
-                        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-2/3"></div>
+                        {spec.specifications && (
+                          <div>
+                            <h4 className="font-medium text-amber-700 dark:text-amber-300">المواصفات:</h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 bg-amber-50/50 dark:bg-amber-900/10 p-2 rounded">
+                              {spec.specifications}
+                            </p>
+                          </div>
+                        )}
+                        {spec.specificationsEn && (
+                          <div>
+                            <h4 className="font-medium text-amber-700 dark:text-amber-300">Specifications:</h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 bg-amber-50/50 dark:bg-amber-900/10 p-2 rounded">
+                              {spec.specificationsEn}
+                            </p>
+                          </div>
+                        )}
                       </div>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : filteredSpecs.length === 0 ? (
-                <div className="col-span-full text-center py-8">
-                  <Car className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                  <p className="text-slate-500 dark:text-slate-400">
-                    {searchTerm ? "لا توجد مواصفات تطابق البحث" : "لا توجد مواصفات مضافة"}
-                  </p>
-                </div>
-              ) : (
-                filteredSpecs.map((spec: VehicleSpecification) => (
-                  <Card key={spec.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center justify-between">
-                        <span>{spec.manufacturer} {spec.category}</span>
-                        <div className="flex gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              setEditingSpec(spec);
-                              setIsSpecDialogOpen(true);
-                            }}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => deleteSpecMutation.mutate(spec.id)}
-                            disabled={deleteSpecMutation.isPending}
-                          >
-                            <Trash2 className="h-4 w-4 text-red-500" />
-                          </Button>
-                        </div>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      {spec.trimLevel && (
-                        <p className="text-sm text-slate-600 dark:text-slate-300">
-                          <strong>درجة التجهيز:</strong> {spec.trimLevel}
-                        </p>
-                      )}
-                      {spec.year && (
-                        <p className="text-sm text-slate-600 dark:text-slate-300">
-                          <strong>السنة:</strong> {spec.year}
-                        </p>
-                      )}
-                      {spec.engineCapacity && (
-                        <p className="text-sm text-slate-600 dark:text-slate-300">
-                          <strong>سعة المحرك:</strong> {spec.engineCapacity}
-                        </p>
-                      )}
-                      {spec.chassisNumber && (
-                        <p className="text-sm text-slate-600 dark:text-slate-300">
-                          <strong>رقم الهيكل:</strong> {spec.chassisNumber}
-                        </p>
-                      )}
-                      <p className="text-sm text-slate-700 dark:text-slate-200 line-clamp-3">
-                        {spec.specifications}
-                      </p>
                     </CardContent>
                   </Card>
                 ))
@@ -572,246 +602,263 @@ export default function SpecificationsManagement() {
           </TabsContent>
 
           {/* Images Tab */}
-          <TabsContent value="images">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-                روابط الصور ({filteredImages.length})
-              </h2>
+          <TabsContent value="images" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-amber-800 dark:text-amber-200">روابط الصور</h2>
               <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
                 <DialogTrigger asChild>
                   <Button 
-                    onClick={() => setEditingImage(null)}
-                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                    className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-lg"
+                    onClick={() => {
+                      setEditingImage(null);
+                      imageForm.reset();
+                    }}
                   >
-                    <Plus className="h-4 w-4 mr-2" />
-                    إضافة رابط صورة
+                    <Plus className="w-4 h-4 ml-2" />
+                    إضافة رابط صورة جديد
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-2xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-amber-200 dark:border-amber-700/50">
                   <DialogHeader>
-                    <DialogTitle>
+                    <DialogTitle className="text-amber-800 dark:text-amber-200">
                       {editingImage ? "تعديل رابط الصورة" : "إضافة رابط صورة جديد"}
                     </DialogTitle>
                   </DialogHeader>
                   <Form {...imageForm}>
-                    <form onSubmit={imageForm.handleSubmit((data) => imageMutation.mutate(data))} className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Manufacturer */}
+                    <form onSubmit={imageForm.handleSubmit(onSubmitImage)} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={imageForm.control}
                           name="manufacturer"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>الصانع</FormLabel>
-                              <FormControl>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="اختر الصانع" />
+                              <FormLabel className="text-amber-700 dark:text-amber-300">الشركة المصنعة</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                    <SelectValue placeholder="اختر الشركة المصنعة" />
                                   </SelectTrigger>
-                                  <SelectContent>
-                                    {manufacturers.map((manufacturer: any) => (
-                                      <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
-                                        {manufacturer.nameAr}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
+                                </FormControl>
+                                <SelectContent>
+                                  {manufacturerOptions.map((manufacturer) => (
+                                    <SelectItem key={manufacturer} value={manufacturer}>
+                                      {manufacturer}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        {/* Category */}
                         <FormField
                           control={imageForm.control}
                           name="category"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>الفئة</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="مثال: C300, X5, A4" />
-                              </FormControl>
+                              <FormLabel className="text-amber-700 dark:text-amber-300">الفئة</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                    <SelectValue placeholder="اختر الفئة" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {categoryOptions.map((category) => (
+                                    <SelectItem key={category} value={category}>
+                                      {category}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        {/* Trim Level */}
                         <FormField
                           control={imageForm.control}
                           name="trimLevel"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>درجة التجهيز</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="مثال: فل كامل، ستاندرد" />
-                              </FormControl>
+                              <FormLabel className="text-amber-700 dark:text-amber-300">درجة التجهيز</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                    <SelectValue placeholder="اختر درجة التجهيز" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {trimLevelOptions.map((trim) => (
+                                    <SelectItem key={trim} value={trim}>
+                                      {trim}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        {/* Year */}
                         <FormField
                           control={imageForm.control}
                           name="year"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>السنة</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  {...field} 
-                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                                  placeholder="مثال: 2023" 
-                                />
-                              </FormControl>
+                              <FormLabel className="text-amber-700 dark:text-amber-300">السنة</FormLabel>
+                              <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                                <FormControl>
+                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                    <SelectValue placeholder="اختر السنة" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {yearOptions.map((year) => (
+                                    <SelectItem key={year} value={year}>
+                                      {year}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        {/* Engine Capacity */}
-                        <FormField
-                          control={imageForm.control}
-                          name="engineCapacity"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>سعة المحرك</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="مثال: 2.0L Turbo" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Exterior Color */}
                         <FormField
                           control={imageForm.control}
                           name="exteriorColor"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>اللون الخارجي</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="مثال: أبيض، أسود، أزرق" />
-                              </FormControl>
+                              <FormLabel className="text-amber-700 dark:text-amber-300">اللون الخارجي</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                    <SelectValue placeholder="اختر اللون الخارجي" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {colorOptions.map((color) => (
+                                    <SelectItem key={color} value={color}>
+                                      <div className="flex items-center gap-2">
+                                        <Palette className="w-4 h-4" />
+                                        {color}
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        {/* Interior Color */}
                         <FormField
                           control={imageForm.control}
                           name="interiorColor"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>اللون الداخلي</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="مثال: بيج، أسود، بني" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Chassis Number */}
-                        <FormField
-                          control={imageForm.control}
-                          name="chassisNumber"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>رقم الهيكل (اختياري)</FormLabel>
-                              <FormControl>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="اختر رقم الهيكل" />
+                              <FormLabel className="text-amber-700 dark:text-amber-300">اللون الداخلي</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                    <SelectValue placeholder="اختر اللون الداخلي" />
                                   </SelectTrigger>
-                                  <SelectContent>
-                                    {inventoryItems.map((item: any) => (
-                                      <SelectItem key={item.id} value={item.chassisNumber}>
-                                        {item.chassisNumber} - {item.manufacturer} {item.category}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
+                                </FormControl>
+                                <SelectContent>
+                                  {colorOptions.map((color) => (
+                                    <SelectItem key={color} value={color}>
+                                      <div className="flex items-center gap-2">
+                                        <Palette className="w-4 h-4" />
+                                        {color}
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
                       </div>
-
-                      {/* Image URL */}
+                      <FormField
+                        control={imageForm.control}
+                        name="chassisNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-amber-700 dark:text-amber-300">رقم الهيكل (اختياري)</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="رقم الهيكل"
+                                {...field}
+                                className="border-amber-200 dark:border-amber-700/50"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       <FormField
                         control={imageForm.control}
                         name="imageUrl"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>رابط الصورة *</FormLabel>
+                            <FormLabel className="text-amber-700 dark:text-amber-300">رابط الصورة *</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="https://example.com/image.jpg" />
+                              <Input
+                                placeholder="https://example.com/image.jpg"
+                                {...field}
+                                className="border-amber-200 dark:border-amber-700/50"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-
-                      {/* Description (Arabic) */}
                       <FormField
                         control={imageForm.control}
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>وصف الصورة (عربي)</FormLabel>
+                            <FormLabel className="text-amber-700 dark:text-amber-300">وصف الصورة (عربي)</FormLabel>
                             <FormControl>
-                              <Textarea 
-                                {...field} 
-                                placeholder="وصف الصورة باللغة العربية..."
-                                rows={3}
+                              <Textarea
+                                placeholder="وصف الصورة..."
+                                className="h-20 border-amber-200 dark:border-amber-700/50"
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-
-                      {/* Description (English) */}
                       <FormField
                         control={imageForm.control}
                         name="descriptionEn"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>وصف الصورة (إنجليزي)</FormLabel>
+                            <FormLabel className="text-amber-700 dark:text-amber-300">وصف الصورة (إنجليزي)</FormLabel>
                             <FormControl>
-                              <Textarea 
-                                {...field} 
-                                placeholder="Image description in English..."
-                                rows={3}
+                              <Textarea
+                                placeholder="Image description..."
+                                className="h-20 border-amber-200 dark:border-amber-700/50"
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-
-                      <div className="flex justify-end gap-2 pt-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            setIsImageDialogOpen(false);
-                            setEditingImage(null);
-                          }}
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => setIsImageDialogOpen(false)}
+                          className="border-amber-200 dark:border-amber-700/50"
                         >
                           إلغاء
                         </Button>
                         <Button 
                           type="submit" 
                           disabled={imageMutation.isPending}
-                          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                          className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white"
                         >
                           {imageMutation.isPending ? "جاري الحفظ..." : "حفظ"}
                         </Button>
@@ -822,102 +869,72 @@ export default function SpecificationsManagement() {
               </Dialog>
             </div>
 
-            {/* Images Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Images List */}
+            <div className="grid gap-4">
               {imagesLoading ? (
-                // Loading skeletons
-                Array.from({ length: 6 }).map((_, i) => (
-                  <Card key={i} className="animate-pulse">
-                    <CardHeader>
-                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="h-32 bg-slate-200 dark:bg-slate-700 rounded"></div>
-                        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded"></div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
+                <div className="text-center py-8 text-amber-600 dark:text-amber-400">جاري التحميل...</div>
               ) : filteredImages.length === 0 ? (
-                <div className="col-span-full text-center py-8">
-                  <Image className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                  <p className="text-slate-500 dark:text-slate-400">
-                    {searchTerm ? "لا توجد صور تطابق البحث" : "لا توجد صور مضافة"}
-                  </p>
-                </div>
+                <div className="text-center py-8 text-amber-600 dark:text-amber-400">لا توجد روابط صور</div>
               ) : (
                 filteredImages.map((image: VehicleImageLink) => (
-                  <Card key={image.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center justify-between">
-                        <span>{image.manufacturer} {image.category}</span>
-                        <div className="flex gap-1">
+                  <Card key={image.id} className="bg-white/80 dark:bg-slate-800/80 border-amber-200/50 dark:border-amber-700/30 shadow-md hover:shadow-lg transition-shadow">
+                    <CardHeader className="pb-3">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <CardTitle className="text-amber-800 dark:text-amber-200 flex items-center gap-2">
+                            <Image className="w-5 h-5" />
+                            {image.manufacturer} {image.category} {image.trimLevel}
+                          </CardTitle>
+                          <div className="flex gap-2 text-sm text-amber-600/80 dark:text-amber-300/80">
+                            {image.year && <span>السنة: {image.year}</span>}
+                            {image.exteriorColor && <span>خارجي: {image.exteriorColor}</span>}
+                            {image.interiorColor && <span>داخلي: {image.interiorColor}</span>}
+                            {image.chassisNumber && <span>رقم الهيكل: {image.chassisNumber}</span>}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
                           <Button
+                            variant="outline"
                             size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              setEditingImage(image);
-                              setIsImageDialogOpen(true);
-                            }}
+                            onClick={() => handleEditImage(image)}
+                            className="border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/20"
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="w-4 h-4" />
                           </Button>
                           <Button
+                            variant="outline"
                             size="sm"
-                            variant="ghost"
                             onClick={() => deleteImageMutation.mutate(image.id)}
-                            disabled={deleteImageMutation.isPending}
+                            className="border-red-300 text-red-700 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
                           >
-                            <Trash2 className="h-4 w-4 text-red-500" />
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {/* Image Preview */}
-                      <div className="aspect-video bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden">
-                        <img 
-                          src={image.imageUrl} 
-                          alt={image.description || "صورة المركبة"}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/placeholder-car.jpg';
-                          }}
-                        />
                       </div>
-                      
-                      {/* Details */}
-                      <div className="space-y-1 text-sm">
-                        {image.trimLevel && (
-                          <p className="text-slate-600 dark:text-slate-300">
-                            <strong>درجة التجهيز:</strong> {image.trimLevel}
-                          </p>
-                        )}
-                        {image.year && (
-                          <p className="text-slate-600 dark:text-slate-300">
-                            <strong>السنة:</strong> {image.year}
-                          </p>
-                        )}
-                        {image.exteriorColor && (
-                          <p className="text-slate-600 dark:text-slate-300">
-                            <strong>اللون الخارجي:</strong> {image.exteriorColor}
-                          </p>
-                        )}
-                        {image.interiorColor && (
-                          <p className="text-slate-600 dark:text-slate-300">
-                            <strong>اللون الداخلي:</strong> {image.interiorColor}
-                          </p>
-                        )}
-                        {image.chassisNumber && (
-                          <p className="text-slate-600 dark:text-slate-300">
-                            <strong>رقم الهيكل:</strong> {image.chassisNumber}
-                          </p>
-                        )}
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300">
+                          <Link className="w-4 h-4" />
+                          <a href={image.imageUrl} target="_blank" rel="noopener noreferrer" className="hover:underline break-all">
+                            {image.imageUrl}
+                          </a>
+                        </div>
                         {image.description && (
-                          <p className="text-slate-700 dark:text-slate-200 line-clamp-2">
-                            {image.description}
-                          </p>
+                          <div>
+                            <h4 className="font-medium text-amber-700 dark:text-amber-300">الوصف:</h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 bg-amber-50/50 dark:bg-amber-900/10 p-2 rounded">
+                              {image.description}
+                            </p>
+                          </div>
+                        )}
+                        {image.descriptionEn && (
+                          <div>
+                            <h4 className="font-medium text-amber-700 dark:text-amber-300">Description:</h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 bg-amber-50/50 dark:bg-amber-900/10 p-2 rounded">
+                              {image.descriptionEn}
+                            </p>
+                          </div>
                         )}
                       </div>
                     </CardContent>

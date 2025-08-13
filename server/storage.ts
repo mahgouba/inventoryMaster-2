@@ -2010,6 +2010,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.vehicleSpecifications.values());
   }
 
+  async getVehicleSpecifications(): Promise<VehicleSpecification[]> {
+    return Array.from(this.vehicleSpecifications.values());
+  }
+
   async getVehicleSpecification(id: number): Promise<VehicleSpecification | undefined> {
     return this.vehicleSpecifications.get(id);
   }
@@ -2068,6 +2072,10 @@ export class MemStorage implements IStorage {
 
   // Vehicle Image Links methods implementation
   async getAllVehicleImageLinks(): Promise<VehicleImageLink[]> {
+    return Array.from(this.vehicleImageLinks.values());
+  }
+
+  async getVehicleImageLinks(): Promise<VehicleImageLink[]> {
     return Array.from(this.vehicleImageLinks.values());
   }
 
