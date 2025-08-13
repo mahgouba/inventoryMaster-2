@@ -430,7 +430,10 @@ export class MemStorage implements IStorage {
     
     return {
       total: availableItems.length,
-      available: availableItems.filter(item => item.status === "متوفر" || item.status?.trim() === "متوفر").length,
+      available: availableItems.filter(item => {
+        const status = item.status?.trim() || "";
+        return status === "متوفر";
+      }).length,
       inTransit: availableItems.filter(item => item.status === "في الطريق").length,
       maintenance: availableItems.filter(item => item.status === "في الصيانة").length,
       reserved: availableItems.filter(item => item.status === "محجوز").length,
