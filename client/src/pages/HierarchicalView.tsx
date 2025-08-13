@@ -828,7 +828,7 @@ export default function HierarchicalView() {
         nameAr: manufacturer.nameAr,
         nameEn: manufacturer.nameEn,
         logo: manufacturer.logo || null,
-        isActive: !(manufacturer.isActive ?? true)
+        isActive: !((manufacturer as any).isActive ?? true)
       });
     },
     onSuccess: () => {
@@ -1297,29 +1297,31 @@ export default function HierarchicalView() {
                   </>
                 )}
 
-                {/* Technical Specifications */}
-                <div>
-                  <Label className="text-right block mb-2">سعة المحرك</Label>
-                  <Select value={specEngine} onValueChange={setSpecEngine}>
-                    <SelectTrigger dir="rtl">
-                      <SelectValue placeholder="اختر سعة المحرك" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1.6L">1.6 لتر</SelectItem>
-                      <SelectItem value="1.8L">1.8 لتر</SelectItem>
-                      <SelectItem value="2.0L">2.0 لتر</SelectItem>
-                      <SelectItem value="2.4L">2.4 لتر</SelectItem>
-                      <SelectItem value="2.5L">2.5 لتر</SelectItem>
-                      <SelectItem value="3.0L">3.0 لتر</SelectItem>
-                      <SelectItem value="3.5L">3.5 لتر</SelectItem>
-                      <SelectItem value="4.0L">4.0 لتر</SelectItem>
-                      <SelectItem value="4.6L">4.6 لتر</SelectItem>
-                      <SelectItem value="5.0L">5.0 لتر</SelectItem>
-                      <SelectItem value="5.7L">5.7 لتر</SelectItem>
-                      <SelectItem value="6.2L">6.2 لتر</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {/* Technical Specifications - إخفاء سعة المحرك عند إدخال رقم الهيكل */}
+                {!specChassisNumber && (
+                  <div>
+                    <Label className="text-right block mb-2">سعة المحرك</Label>
+                    <Select value={specEngine} onValueChange={setSpecEngine}>
+                      <SelectTrigger dir="rtl">
+                        <SelectValue placeholder="اختر سعة المحرك" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1.6L">1.6 لتر</SelectItem>
+                        <SelectItem value="1.8L">1.8 لتر</SelectItem>
+                        <SelectItem value="2.0L">2.0 لتر</SelectItem>
+                        <SelectItem value="2.4L">2.4 لتر</SelectItem>
+                        <SelectItem value="2.5L">2.5 لتر</SelectItem>
+                        <SelectItem value="3.0L">3.0 لتر</SelectItem>
+                        <SelectItem value="3.5L">3.5 لتر</SelectItem>
+                        <SelectItem value="4.0L">4.0 لتر</SelectItem>
+                        <SelectItem value="4.6L">4.6 لتر</SelectItem>
+                        <SelectItem value="5.0L">5.0 لتر</SelectItem>
+                        <SelectItem value="5.7L">5.7 لتر</SelectItem>
+                        <SelectItem value="6.2L">6.2 لتر</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
                 {/* Detailed Specifications */}
                 <div className="md:col-span-2">
@@ -2077,11 +2079,11 @@ export default function HierarchicalView() {
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleManufacturerVisibility(item.manufacturer)}
-                      className={`hover:bg-gray-700/50 ${(item.manufacturer.isActive === false) ? 'text-red-400' : 'text-green-400'}`}
-                      title={(item.manufacturer.isActive === false) ? "إظهار الصانع في القوائم المنسدلة" : "إخفاء الصانع من القوائم المنسدلة"}
+                      className={`hover:bg-gray-700/50 ${((item.manufacturer as any).isActive === false) ? 'text-red-400' : 'text-green-400'}`}
+                      title={((item.manufacturer as any).isActive === false) ? "إظهار الصانع في القوائم المنسدلة" : "إخفاء الصانع من القوائم المنسدلة"}
                       disabled={toggleManufacturerVisibilityMutation.isPending}
                     >
-                      {(item.manufacturer.isActive === false) ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {((item.manufacturer as any).isActive === false) ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                     
                     <Button
