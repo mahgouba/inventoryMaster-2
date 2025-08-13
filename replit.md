@@ -44,6 +44,15 @@ Excel Import: Requested removal of specific fields from Excel import template (S
 - Changed default landing page from CardViewPage to MainDashboard (inventory page) per user request - main page button now redirects to inventory
 - Implemented manufacturer sorting by count (highest count displayed first) in card view interface
 
+**August 13, 2025 - Hierarchy Management Page Fixes Completed:**
+- **Fixed engine capacity field hiding**: Updated the vehicle specifications form to properly hide the engine capacity field when chassis number is entered
+- **Resolved vehicle specifications API errors**: Fixed schema validation issues in vehicleSpecifications table by making fields optional and updating storage methods
+- **Resolved vehicle image links API errors**: Fixed schema validation issues in vehicleImageLinks table by updating field structure and storage implementation
+- **Updated database schema**: Modified vehicleSpecifications and vehicleImageLinks tables to support flexible field requirements
+- **Fixed TypeScript errors**: Resolved all compilation errors in HierarchicalView component and storage layer
+- **Tested API endpoints**: Confirmed that both /api/vehicle-specifications and /api/vehicle-image-links endpoints work correctly for creating new entries
+- All hierarchy management functionality now operational with proper error handling and data validation
+
 ## System Architecture
 
 ### Core Design Principles

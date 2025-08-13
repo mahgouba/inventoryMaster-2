@@ -318,7 +318,7 @@ export interface IStorage {
   createVehicleSpecification(spec: InsertVehicleSpecification): Promise<VehicleSpecification>;
   updateVehicleSpecification(id: number, spec: Partial<InsertVehicleSpecification>): Promise<VehicleSpecification | undefined>;
   deleteVehicleSpecification(id: number): Promise<boolean>;
-  getSpecificationsByHierarchy(manufacturer: string, category: string, trimLevel: string, model: string): Promise<VehicleSpecification[]>;
+  // getSpecificationsByHierarchy(manufacturer: string, category: string, trimLevel: string, model: string): Promise<VehicleSpecification[]>;
   getVehicleSpecificationsByFilters(filters: { 
     manufacturer?: string; 
     category?: string; 
@@ -333,7 +333,7 @@ export interface IStorage {
   createVehicleImageLink(link: InsertVehicleImageLink): Promise<VehicleImageLink>;
   updateVehicleImageLink(id: number, link: Partial<InsertVehicleImageLink>): Promise<VehicleImageLink | undefined>;
   deleteVehicleImageLink(id: number): Promise<boolean>;
-  getImageLinksByHierarchy(manufacturer: string, category: string, trimLevel: string, exteriorColor: string, interiorColor: string): Promise<VehicleImageLink[]>;
+  // getImageLinksByHierarchy(manufacturer: string, category: string, trimLevel: string, exteriorColor: string, interiorColor: string): Promise<VehicleImageLink[]>;
   getVehicleImageLinksByFilters(filters: { 
     manufacturer?: string; 
     category?: string; 
@@ -2017,7 +2017,14 @@ export class MemStorage implements IStorage {
   async createVehicleSpecification(spec: InsertVehicleSpecification): Promise<VehicleSpecification> {
     const newSpec: VehicleSpecification = {
       id: this.currentVehicleSpecificationId++,
-      ...spec,
+      manufacturer: spec.manufacturer || null,
+      category: spec.category || null,
+      trimLevel: spec.trimLevel || null,
+      year: spec.year || null,
+      engine: spec.engine || null,
+      chassisNumber: spec.chassisNumber || null,
+      specifications: spec.specifications || null,
+      specificationsEn: spec.specificationsEn || null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -2042,13 +2049,21 @@ export class MemStorage implements IStorage {
     return this.vehicleSpecifications.delete(id);
   }
 
-  async getSpecificationsByHierarchy(manufacturer: string, category: string, trimLevel: string, model: string): Promise<VehicleSpecification[]> {
-    return Array.from(this.vehicleSpecifications.values()).filter(spec => 
-      spec.manufacturer === manufacturer &&
-      spec.category === category &&
-      spec.trimLevel === trimLevel &&
-      spec.model === model
-    );
+  async getVehicleSpecificationsByFilters(filters: { 
+    manufacturer?: string; 
+    category?: string; 
+    trimLevel?: string; 
+    year?: number; 
+    chassisNumber?: string; 
+  }): Promise<VehicleSpecification[]> {
+    return Array.from(this.vehicleSpecifications.values()).filter(spec => {
+      if (filters.chassisNumber && spec.chassisNumber !== filters.chassisNumber) return false;
+      if (filters.manufacturer && spec.manufacturer !== filters.manufacturer) return false;
+      if (filters.category && spec.category !== filters.category) return false;
+      if (filters.trimLevel && spec.trimLevel !== filters.trimLevel) return false;
+      if (filters.year && spec.year !== filters.year) return false;
+      return true;
+    });
   }
 
   // Vehicle Image Links methods implementation
@@ -2063,7 +2078,16 @@ export class MemStorage implements IStorage {
   async createVehicleImageLink(link: InsertVehicleImageLink): Promise<VehicleImageLink> {
     const newLink: VehicleImageLink = {
       id: this.currentVehicleImageLinkId++,
-      ...link,
+      manufacturer: link.manufacturer || null,
+      category: link.category || null,
+      trimLevel: link.trimLevel || null,
+      year: link.year || null,
+      exteriorColor: link.exteriorColor || null,
+      interiorColor: link.interiorColor || null,
+      chassisNumber: link.chassisNumber || null,
+      imageUrl: link.imageUrl,
+      description: link.description || null,
+      descriptionEn: link.descriptionEn || null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -2088,61 +2112,24 @@ export class MemStorage implements IStorage {
     return this.vehicleImageLinks.delete(id);
   }
 
-  async getImageLinksByHierarchy(manufacturer: string, category: string, trimLevel: string, exteriorColor: string, interiorColor: string): Promise<VehicleImageLink[]> {
-    return Array.from(this.vehicleImageLinks.values()).filter(link => 
-      link.manufacturer === manufacturer &&
-      link.category === category &&
-      link.trimLevel === trimLevel &&
-      link.exteriorColor === exteriorColor &&
-      link.interiorColor === interiorColor
-    );
-  }
-
-  async getVehicleImageLinksByFilters(filters: { 
-    manufacturer?: string; 
-    category?: string; 
-    trimLevel?: string; 
-    year?: number; 
-    exteriorColor?: string; 
-    interiorColor?: string; 
-    chassisNumber?: string; 
+  async getVehicleImageLinksByFilters(filters: {
+    manufacturer?: string;
+    category?: string;
+    trimLevel?: string;
+    year?: number;
+    exteriorColor?: string;
+    interiorColor?: string;
+    chassisNumber?: string;
   }): Promise<VehicleImageLink[]> {
-    const allLinks = Array.from(this.vehicleImageLinks.values());
-    return allLinks.filter(link => {
-      // If chassis number is provided, use it as primary identifier
-      if (filters.chassisNumber) {
-        return link.chassisNumber === filters.chassisNumber;
-      }
-      
-      // Otherwise filter by other criteria
-      return (!filters.manufacturer || link.manufacturer === filters.manufacturer) &&
-             (!filters.category || link.category === filters.category) &&
-             (!filters.trimLevel || link.trimLevel === filters.trimLevel) &&
-             (!filters.year || link.year === filters.year) &&
-             (!filters.exteriorColor || link.exteriorColor === filters.exteriorColor) &&
-             (!filters.interiorColor || link.interiorColor === filters.interiorColor);
-    });
-  }
-
-  async getVehicleSpecificationsByFilters(filters: { 
-    manufacturer?: string; 
-    category?: string; 
-    trimLevel?: string; 
-    year?: number; 
-    chassisNumber?: string; 
-  }): Promise<VehicleSpecification[]> {
-    const allSpecs = Array.from(this.vehicleSpecifications.values());
-    return allSpecs.filter(spec => {
-      // If chassis number is provided, use it as primary identifier
-      if (filters.chassisNumber) {
-        return spec.chassisNumber === filters.chassisNumber;
-      }
-      
-      // Otherwise filter by other criteria
-      return (!filters.manufacturer || spec.manufacturer === filters.manufacturer) &&
-             (!filters.category || spec.category === filters.category) &&
-             (!filters.trimLevel || spec.trimLevel === filters.trimLevel) &&
-             (!filters.year || spec.year === filters.year);
+    return Array.from(this.vehicleImageLinks.values()).filter(link => {
+      if (filters.chassisNumber && link.chassisNumber !== filters.chassisNumber) return false;
+      if (filters.manufacturer && link.manufacturer !== filters.manufacturer) return false;
+      if (filters.category && link.category !== filters.category) return false;
+      if (filters.trimLevel && link.trimLevel !== filters.trimLevel) return false;
+      if (filters.year && link.year !== filters.year) return false;
+      if (filters.exteriorColor && link.exteriorColor !== filters.exteriorColor) return false;
+      if (filters.interiorColor && link.interiorColor !== filters.interiorColor) return false;
+      return true;
     });
   }
 }

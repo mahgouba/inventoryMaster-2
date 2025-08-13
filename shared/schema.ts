@@ -131,12 +131,14 @@ export const colorAssociations = pgTable("color_associations", {
 // Vehicle Specifications table for detailed specifications
 export const vehicleSpecifications = pgTable("vehicle_specifications", {
   id: serial("id").primaryKey(),
-  manufacturer: text("manufacturer").notNull(), // الصانع
-  category: text("category").notNull(), // الفئة
-  trimLevel: text("trim_level").notNull(), // درجة التجهيز
-  model: text("model").notNull(), // الموديل
+  manufacturer: text("manufacturer"), // الصانع
+  category: text("category"), // الفئة
+  trimLevel: text("trim_level"), // درجة التجهيز
+  year: integer("year"), // السنة
+  engine: text("engine"), // سعة المحرك
   chassisNumber: text("chassis_number"), // رقم الهيكل (اختياري لربط مواصفة بسيارة محددة)
-  specifications: jsonb("specifications").notNull(), // المواصفات التفصيلية كـ JSON
+  specifications: text("specifications"), // المواصفات التفصيلية (عربي)
+  specificationsEn: text("specifications_en"), // المواصفات التفصيلية (إنجليزي)
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -144,14 +146,16 @@ export const vehicleSpecifications = pgTable("vehicle_specifications", {
 // Vehicle Image Links table for linking images to vehicle hierarchy
 export const vehicleImageLinks = pgTable("vehicle_image_links", {
   id: serial("id").primaryKey(),
-  manufacturer: text("manufacturer").notNull(), // الصانع
-  category: text("category").notNull(), // الفئة
-  trimLevel: text("trim_level").notNull(), // درجة التجهيز
-  exteriorColor: text("exterior_color").notNull(), // اللون الخارجي
-  interiorColor: text("interior_color").notNull(), // اللون الداخلي
+  manufacturer: text("manufacturer"), // الصانع
+  category: text("category"), // الفئة
+  trimLevel: text("trim_level"), // درجة التجهيز
+  year: integer("year"), // السنة
+  exteriorColor: text("exterior_color"), // اللون الخارجي
+  interiorColor: text("interior_color"), // اللون الداخلي
   chassisNumber: text("chassis_number"), // رقم الهيكل (اختياري لربط رابط بسيارة محددة)
-  imageUrls: text("image_urls").array().notNull(), // روابط الصور
-  description: text("description"), // وصف الصور
+  imageUrl: text("image_url").notNull(), // رابط الصورة (واحد)
+  description: text("description"), // وصف الصورة (عربي)
+  descriptionEn: text("description_en"), // وصف الصورة (إنجليزي)
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
