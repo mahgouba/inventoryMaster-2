@@ -150,8 +150,24 @@ export default function HierarchicalView() {
   const [imageDescription, setImageDescription] = useState("");
   const [imageDescriptionEn, setImageDescriptionEn] = useState("");
 
+  // State for manage dialogs
+  const [isManageSpecificationsOpen, setIsManageSpecificationsOpen] = useState(false);
+  const [isManageImageLinksOpen, setIsManageImageLinksOpen] = useState(false);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Query for saved vehicle specifications
+  const { data: savedSpecifications = [] } = useQuery({
+    queryKey: ['/api/vehicle-specifications'],
+    enabled: isManageSpecificationsOpen
+  });
+
+  // Query for saved vehicle image links
+  const { data: savedImageLinks = [] } = useQuery({
+    queryKey: ['/api/vehicle-image-links'],
+    enabled: isManageImageLinksOpen
+  });
 
   // Excel import functions
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1183,11 +1199,93 @@ export default function HierarchicalView() {
             </Button>
           </DialogTrigger>
           <DialogContent className="glass-modal max-w-2xl" dir="rtl">
-            <DialogHeader>
-              <DialogTitle className="text-right">إضافة مواصفات تفصيلية للسيارة</DialogTitle>
-              <DialogDescription className="text-right text-gray-400">
-                إما كتابة رقم الهيكل مباشرة أو تحديد الصانع والفئة ودرجة التجهيز والسنة
-              </DialogDescription>
+            <DialogHeader className="flex flex-row items-center justify-between">
+              <div className="flex-1">
+                <DialogTitle className="text-right">إضافة مواصفات تفصيلية للسيارة</DialogTitle>
+                <DialogDescription className="text-right text-gray-400">
+                  إما كتابة رقم الهيكل مباشرة أو تحديد الصانع والفئة ودرجة التجهيز والسنة
+                </DialogDescription>
+              </div>
+              <div className="flex gap-2">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="glass-button"
+                      onClick={() => setIsManageSpecificationsOpen(true)}
+                    >
+                      <Settings className="h-4 w-4 ml-1" />
+                      إدارة البيانات المحفوظة
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="glass-modal max-w-4xl max-h-[80vh] overflow-hidden" dir="rtl">
+                    <DialogHeader>
+                      <DialogTitle className="text-right">إدارة المواصفات التفصيلية المحفوظة</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 overflow-y-auto max-h-[60vh]">
+                      {/* قائمة المواصفات المحفوظة */}
+                      <div className="space-y-2">
+                        <Label className="text-right block">المواصفات المحفوظة ({savedSpecifications.length}):</Label>
+                        <div className="grid gap-3">
+                          {savedSpecifications.length === 0 ? (
+                            <div className="glass-card p-6 border rounded-lg text-center text-gray-400">
+                              لا توجد مواصفات محفوظة حتى الآن
+                            </div>
+                          ) : (
+                            savedSpecifications.map((spec: any) => (
+                              <div key={spec.id} className="glass-card p-4 border rounded-lg">
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    {spec.chassisNumber && (
+                                      <div className="text-sm text-gray-400 mb-1">رقم الهيكل: {spec.chassisNumber}</div>
+                                    )}
+                                    {spec.manufacturer && (
+                                      <div className="text-sm text-gray-400 mb-1">
+                                        {spec.manufacturer} - {spec.category} - {spec.trimLevel} ({spec.year})
+                                      </div>
+                                    )}
+                                    {spec.specifications && (
+                                      <div className="text-sm font-medium mb-1">{spec.specifications}</div>
+                                    )}
+                                    {spec.specificationsEn && (
+                                      <div className="text-xs text-gray-500">{spec.specificationsEn}</div>
+                                    )}
+                                    <div className="text-xs text-gray-600 mt-2">
+                                      تاريخ الإنشاء: {new Date(spec.createdAt).toLocaleDateString('ar-SA')}
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={async () => {
+                                        try {
+                                          await apiRequest('DELETE', `/api/vehicle-specifications/${spec.id}`);
+                                          queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specifications'] });
+                                          toast({ title: "تم حذف المواصفة بنجاح" });
+                                        } catch (error) {
+                                          toast({
+                                            title: "خطأ",
+                                            description: "فشل في حذف المواصفة",
+                                            variant: "destructive",
+                                          });
+                                        }
+                                      }}
+                                    >
+                                      <Trash2 className="h-4 w-4 text-red-400" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </DialogHeader>
             <div className="space-y-4 max-h-[60vh] overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1411,11 +1509,99 @@ export default function HierarchicalView() {
             </Button>
           </DialogTrigger>
           <DialogContent className="glass-modal max-w-2xl" dir="rtl">
-            <DialogHeader>
-              <DialogTitle className="text-right">إضافة رابط صورة للسيارة</DialogTitle>
-              <DialogDescription className="text-right text-gray-400">
-                إما كتابة رقم الهيكل مباشرة أو تحديد الصانع والفئة ودرجة التجهيز والألوان
-              </DialogDescription>
+            <DialogHeader className="flex flex-row items-center justify-between">
+              <div className="flex-1">
+                <DialogTitle className="text-right">إضافة رابط صورة للسيارة</DialogTitle>
+                <DialogDescription className="text-right text-gray-400">
+                  إما كتابة رقم الهيكل مباشرة أو تحديد الصانع والفئة ودرجة التجهيز والألوان
+                </DialogDescription>
+              </div>
+              <div className="flex gap-2">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="glass-button"
+                      onClick={() => setIsManageImageLinksOpen(true)}
+                    >
+                      <Settings className="h-4 w-4 ml-1" />
+                      إدارة البيانات المحفوظة
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="glass-modal max-w-4xl max-h-[80vh] overflow-hidden" dir="rtl">
+                    <DialogHeader>
+                      <DialogTitle className="text-right">إدارة روابط الصور المحفوظة</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 overflow-y-auto max-h-[60vh]">
+                      {/* قائمة روابط الصور المحفوظة */}
+                      <div className="space-y-2">
+                        <Label className="text-right block">روابط الصور المحفوظة ({savedImageLinks.length}):</Label>
+                        <div className="grid gap-3">
+                          {savedImageLinks.length === 0 ? (
+                            <div className="glass-card p-6 border rounded-lg text-center text-gray-400">
+                              لا توجد روابط صور محفوظة حتى الآن
+                            </div>
+                          ) : (
+                            savedImageLinks.map((link: any) => (
+                              <div key={link.id} className="glass-card p-4 border rounded-lg">
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    {link.chassisNumber && (
+                                      <div className="text-sm text-gray-400 mb-1">رقم الهيكل: {link.chassisNumber}</div>
+                                    )}
+                                    {link.manufacturer && (
+                                      <div className="text-sm text-gray-400 mb-1">
+                                        {link.manufacturer} - {link.category} - {link.trimLevel} ({link.year})
+                                      </div>
+                                    )}
+                                    {(link.exteriorColor || link.interiorColor) && (
+                                      <div className="text-sm text-gray-400 mb-1">
+                                        اللون الخارجي: {link.exteriorColor || 'غير محدد'} | اللون الداخلي: {link.interiorColor || 'غير محدد'}
+                                      </div>
+                                    )}
+                                    <div className="text-sm font-medium mb-1 break-all">{link.imageUrl}</div>
+                                    {link.description && (
+                                      <div className="text-sm text-gray-300 mb-1">{link.description}</div>
+                                    )}
+                                    {link.descriptionEn && (
+                                      <div className="text-xs text-gray-500 mb-1">{link.descriptionEn}</div>
+                                    )}
+                                    <div className="text-xs text-gray-600">
+                                      تاريخ الإنشاء: {new Date(link.createdAt).toLocaleDateString('ar-SA')}
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={async () => {
+                                        try {
+                                          await apiRequest('DELETE', `/api/vehicle-image-links/${link.id}`);
+                                          queryClient.invalidateQueries({ queryKey: ['/api/vehicle-image-links'] });
+                                          toast({ title: "تم حذف رابط الصورة بنجاح" });
+                                        } catch (error) {
+                                          toast({
+                                            title: "خطأ",
+                                            description: "فشل في حذف رابط الصورة",
+                                            variant: "destructive",
+                                          });
+                                        }
+                                      }}
+                                    >
+                                      <Trash2 className="h-4 w-4 text-red-400" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </DialogHeader>
             <div className="space-y-4 max-h-[60vh] overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

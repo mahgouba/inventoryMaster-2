@@ -5312,6 +5312,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/vehicle-specifications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid specification ID" });
+      }
+      
+      const success = await getStorage().deleteVehicleSpecification(id);
+      if (success) {
+        res.json({ message: "Vehicle specification deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Vehicle specification not found" });
+      }
+    } catch (error) {
+      console.error("Error deleting vehicle specification:", error);
+      res.status(500).json({ message: "Failed to delete vehicle specification" });
+    }
+  });
+
   app.get("/api/vehicle-specifications/search", async (req, res) => {
     try {
       const { manufacturer, category, trimLevel, year, chassisNumber } = req.query;
@@ -5350,6 +5369,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating vehicle image link:", error);
       res.status(500).json({ message: "Failed to create vehicle image link" });
+    }
+  });
+
+  app.delete("/api/vehicle-image-links/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid image link ID" });
+      }
+      
+      const success = await getStorage().deleteVehicleImageLink(id);
+      if (success) {
+        res.json({ message: "Vehicle image link deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Vehicle image link not found" });
+      }
+    } catch (error) {
+      console.error("Error deleting vehicle image link:", error);
+      res.status(500).json({ message: "Failed to delete vehicle image link" });
     }
   });
 
