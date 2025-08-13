@@ -1146,6 +1146,70 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     return 8; // Default fallback
   };
 
+  // حساب ساعات التأخير والإنصراف المبكر
+  const calculateDelayHours = (schedule: EmployeeWorkSchedule, attendance: DailyAttendance, day: Date): number => {
+    let totalDelayHours = 0;
+    
+    // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
+    const isFriday = format(day, "EEEE", { locale: ar }) === "الجمعة";
+    
+    if (schedule.scheduleType === "متصل") {
+      const expectedStart = isFriday ? "16:00" : schedule.continuousStartTime;
+      const expectedEnd = isFriday ? "21:00" : schedule.continuousEndTime;
+      
+      if (expectedStart && expectedEnd && attendance.continuousCheckinTime && attendance.continuousCheckoutTime) {
+        // حساب التأخير في الحضور
+        const expectedStartTime = new Date(`2024-01-01T${expectedStart}`);
+        const actualStartTime = new Date(`2024-01-01T${attendance.continuousCheckinTime}`);
+        if (actualStartTime > expectedStartTime) {
+          totalDelayHours += (actualStartTime.getTime() - expectedStartTime.getTime()) / (1000 * 60 * 60);
+        }
+        
+        // حساب الإنصراف المبكر
+        const expectedEndTime = new Date(`2024-01-01T${expectedEnd}`);
+        const actualEndTime = new Date(`2024-01-01T${attendance.continuousCheckoutTime}`);
+        if (actualEndTime < expectedEndTime) {
+          totalDelayHours += (expectedEndTime.getTime() - actualEndTime.getTime()) / (1000 * 60 * 60);
+        }
+      }
+    } else {
+      // للدوام المنفصل - فقط للأيام العادية (ليس الجمعة)
+      if (!isFriday) {
+        // الفترة الصباحية
+        if (schedule.morningStartTime && schedule.morningEndTime && attendance.morningCheckinTime && attendance.morningCheckoutTime) {
+          const expectedMorningStart = new Date(`2024-01-01T${schedule.morningStartTime}`);
+          const actualMorningStart = new Date(`2024-01-01T${attendance.morningCheckinTime}`);
+          if (actualMorningStart > expectedMorningStart) {
+            totalDelayHours += (actualMorningStart.getTime() - expectedMorningStart.getTime()) / (1000 * 60 * 60);
+          }
+          
+          const expectedMorningEnd = new Date(`2024-01-01T${schedule.morningEndTime}`);
+          const actualMorningEnd = new Date(`2024-01-01T${attendance.morningCheckoutTime}`);
+          if (actualMorningEnd < expectedMorningEnd) {
+            totalDelayHours += (expectedMorningEnd.getTime() - actualMorningEnd.getTime()) / (1000 * 60 * 60);
+          }
+        }
+        
+        // الفترة المسائية
+        if (schedule.eveningStartTime && schedule.eveningEndTime && attendance.eveningCheckinTime && attendance.eveningCheckoutTime) {
+          const expectedEveningStart = new Date(`2024-01-01T${schedule.eveningStartTime}`);
+          const actualEveningStart = new Date(`2024-01-01T${attendance.eveningCheckinTime}`);
+          if (actualEveningStart > expectedEveningStart) {
+            totalDelayHours += (actualEveningStart.getTime() - expectedEveningStart.getTime()) / (1000 * 60 * 60);
+          }
+          
+          const expectedEveningEnd = new Date(`2024-01-01T${schedule.eveningEndTime}`);
+          const actualEveningEnd = new Date(`2024-01-01T${attendance.eveningCheckoutTime}`);
+          if (actualEveningEnd < expectedEveningEnd) {
+            totalDelayHours += (expectedEveningEnd.getTime() - actualEveningEnd.getTime()) / (1000 * 60 * 60);
+          }
+        }
+      }
+    }
+    
+    return totalDelayHours;
+  };
+
   // دالة طباعة تقرير الحضور الشهري
   const handlePrintMonthlyReport = (schedule: EmployeeWorkSchedule) => {
     const monthAttendance = getEmployeeMonthAttendance(schedule.employeeId);
@@ -1155,36 +1219,28 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     // إنشاء محتوى التقرير
     const reportContent = `
       <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto;">
-        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1e40af; padding-bottom: 20px;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #00627F; padding-bottom: 20px;">
           <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-            <svg width="80" height="80" viewBox="0 0 100 100" style="margin-left: 20px;">
-              <defs>
-                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
-                </linearGradient>
-              </defs>
-              <circle cx="50" cy="50" r="45" fill="url(#logoGradient)" stroke="#1e40af" stroke-width="3"/>
-              <text x="50" y="35" text-anchor="middle" fill="white" font-size="12" font-weight="bold">شركة</text>
-              <text x="50" y="50" text-anchor="middle" fill="white" font-size="14" font-weight="bold">النجاح</text>
-              <text x="50" y="65" text-anchor="middle" fill="white" font-size="10">للسيارات</text>
+            <svg width="80" height="75" viewBox="0 0 84 75" style="margin-left: 20px;">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M81.3532 31.451C57.5788 19.9162 28.5104 43.3473 12.4635 59.3186C27.787 25.6343 60.3739 5.85084 60.7356 5.6208L60.5712 5.3579C61.8207 4.47061 62.1824 2.76174 61.3933 1.41437C60.6041 0.0998539 58.927 -0.360228 57.546 0.297027L57.4144 0.0341249C55.6387 1.08574 14.3708 26.0944 1.71086 69.6376C1.18473 71.3793 1.97392 73.2196 3.58518 74.1069C4.17708 74.4355 4.80185 74.5998 5.42662 74.5998C6.51176 74.5998 7.56401 74.1398 8.32031 73.2525C14.864 65.7926 46.1356 31.7139 71.2581 35.1316C65.0104 38.2207 57.0856 42.3943 54.0275 45.0891L58.368 49.9527C61.6892 47.028 74.3491 40.7512 81.2874 37.5306C82.4712 36.9719 83.2275 35.7889 83.2275 34.5072C83.2604 33.2256 82.5041 32.0097 81.3532 31.451ZM17.2964 33.6861L13.3176 38.8455C12.7586 38.4183 -0.0655127 28.2967 0.00025207 4.70156C0.00025207 3.15703 0.920959 1.77681 2.30202 1.11957C3.71596 0.495177 5.36008 0.758087 6.51096 1.74395C8.02355 3.05845 11.0158 5.58884 14.2054 8.25068C19.5324 12.72 25.5827 17.8136 28.2462 20.2455L23.84 25.0434C21.308 22.7101 15.3234 17.6822 10.0294 13.2458C8.87849 12.2928 7.79337 11.3726 6.8069 10.5182C8.45102 26.555 16.9018 33.3904 17.2964 33.6861ZM43.4722 46.3056L49.0293 42.9208C50.4761 45.2212 54.981 51.0707 69.2191 63.9855C70.3042 64.9714 70.6988 66.4831 70.2384 67.8633C69.811 69.2435 68.5943 70.2622 67.1475 70.4265C65.4376 70.6018 63.7825 70.6894 62.1822 70.6894C41.8938 70.6894 30.3192 56.23 29.7931 55.5728L34.9228 51.5636C35.3502 52.0894 44.1956 63.0325 59.7161 64.117C51.3311 56.1972 45.8726 50.2162 43.4722 46.3056Z" fill="#C49632"/>
             </svg>
           </div>
-          <h1 style="color: #1e40af; font-size: 24px; margin-bottom: 10px;">تقرير الحضور والإنصراف الشهري</h1>
-          <h2 style="color: #d97706; font-size: 18px; margin-bottom: 5px;">الموظف: ${schedule.employeeName}</h2>
-          <h3 style="color: #1e40af; font-size: 16px; margin-bottom: 5px;">شهر: ${monthName}</h3>
-          <p style="color: #d97706; font-size: 14px;">نوع الدوام: ${schedule.scheduleType}</p>
+          <h1 style="color: #00627F; font-size: 24px; margin-bottom: 10px;">تقرير الحضور والإنصراف الشهري</h1>
+          <h2 style="color: #C49632; font-size: 18px; margin-bottom: 5px;">الموظف: ${schedule.employeeName}</h2>
+          <h3 style="color: #00627F; font-size: 16px; margin-bottom: 5px;">شهر: ${monthName}</h3>
+          <p style="color: #C49632; font-size: 14px;">نوع الدوام: ${schedule.scheduleType}</p>
         </div>
         
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
           <thead>
-            <tr style="background-color: #f0f0f0;">
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">التاريخ</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">اليوم</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">الحضور</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">الانصراف</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">ساعات العمل</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">الحالة</th>
+            <tr style="background-color: #C49632; color: white;">
+              <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">التاريخ</th>
+              <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">اليوم</th>
+              <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">الحضور</th>
+              <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">الانصراف</th>
+              <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">ساعات العمل</th>
+              <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">ساعات التأخير</th>
+              <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">الحالة</th>
             </tr>
           </thead>
           <tbody>
@@ -1198,6 +1254,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               let checkinTime = '-';
               let checkoutTime = '-';
               let workHours = '0.00';
+              let delayHours = '0.00';
               let status = 'غائب';
               
               if (isHoliday) {
@@ -1253,23 +1310,25 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   checkoutTime = [morningOut, eveningOut].filter(t => t).join(', ') || '-';
                 }
                 workHours = calculateHoursWorked(schedule, dayAttendance);
+                delayHours = calculateDelayHours(schedule, dayAttendance, day).toFixed(2);
                 status = 'حاضر';
               }
               
               return `
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">${format(day, "dd/MM/yyyy", { locale: ar })}</td>
-                  <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">${dayName}</td>
-                  <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">${checkinTime}</td>
-                  <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">${checkoutTime}</td>
-                  <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">${workHours}</td>
-                  <td style="border: 1px solid #ddd; padding: 6px; text-align: center; font-weight: bold;
-                    color: ${status === 'حاضر' ? '#22c55e' : 
-                             status === 'إجازة' ? '#f59e0b' : 
-                             status === 'إجازة معتمدة' ? '#10b981' : 
-                             status.includes('استئذان') ? '#3b82f6' : 
-                             status.includes('تأخير') ? '#3b82f6' : 
-                             status.includes('انصراف مبكر') ? '#3b82f6' : 
+                <tr style="background-color: ${status === 'حاضر' ? '#f0f8ff' : status === 'إجازة' ? '#fff8dc' : '#ffffff'};">
+                  <td style="border: 1px solid #00627F; padding: 6px; text-align: center;">${format(day, "dd/MM/yyyy", { locale: ar })}</td>
+                  <td style="border: 1px solid #00627F; padding: 6px; text-align: center;">${dayName}</td>
+                  <td style="border: 1px solid #00627F; padding: 6px; text-align: center;">${checkinTime}</td>
+                  <td style="border: 1px solid #00627F; padding: 6px; text-align: center;">${checkoutTime}</td>
+                  <td style="border: 1px solid #00627F; padding: 6px; text-align: center;">${workHours}</td>
+                  <td style="border: 1px solid #00627F; padding: 6px; text-align: center; font-weight: bold; color: ${parseFloat(delayHours) > 0 ? '#C49632' : '#00627F'};">${delayHours}</td>
+                  <td style="border: 1px solid #00627F; padding: 6px; text-align: center; font-weight: bold;
+                    color: ${status === 'حاضر' ? '#00627F' : 
+                             status === 'إجازة' ? '#C49632' : 
+                             status === 'إجازة معتمدة' ? '#00627F' : 
+                             status.includes('استئذان') ? '#C49632' : 
+                             status.includes('تأخير') ? '#C49632' : 
+                             status.includes('انصراف مبكر') ? '#C49632' : 
                              '#ef4444'};">
                     ${status}
                   </td>
@@ -1279,22 +1338,31 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
           </tbody>
         </table>
         
-        <div style="margin-top: 30px; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
-          <h3 style="color: #333; margin-bottom: 10px;">ملخص الشهر:</h3>
+        <div style="margin-top: 30px; padding: 15px; background-color: #f9f9f9; border: 2px solid #00627F; border-radius: 8px;">
+          <h3 style="color: #00627F; margin-bottom: 10px;">ملخص الشهر:</h3>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
-            <div>
+            <div style="color: #00627F;">
               <strong>إجمالي أيام العمل:</strong> ${monthDays.length} يوم
             </div>
-            <div>
+            <div style="color: #00627F;">
               <strong>أيام الحضور:</strong> ${monthAttendance.filter(a => a.notes !== 'إجازة').length} يوم
             </div>
-            <div>
+            <div style="color: #C49632;">
               <strong>أيام الإجازة:</strong> ${monthAttendance.filter(a => a.notes === 'إجازة').length} يوم
             </div>
-            <div>
+            <div style="color: #00627F;">
               <strong>إجمالي ساعات العمل:</strong> ${monthAttendance
                 .filter(a => a.notes !== 'إجازة')
                 .reduce((total, a) => total + parseFloat(calculateHoursWorked(schedule, a)), 0)
+                .toFixed(2)} ساعة
+            </div>
+            <div style="color: #C49632;">
+              <strong>إجمالي ساعات التأخير:</strong> ${monthAttendance
+                .filter(a => a.notes !== 'إجازة')
+                .reduce((total, a) => {
+                  const dayDate = new Date(a.date);
+                  return total + calculateDelayHours(schedule, a, dayDate);
+                }, 0)
                 .toFixed(2)} ساعة
             </div>
           </div>
@@ -1302,7 +1370,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
 
         </div>
         
-        <div style="margin-top: 20px; text-align: center; font-size: 12px; color: #888;">
+        <div style="margin-top: 20px; text-align: center; font-size: 12px; color: #00627F; border-top: 1px solid #C49632; padding-top: 10px;">
           <p>تم إنشاء التقرير في: ${new Date().toLocaleString('ar-SA')}</p>
         </div>
       </div>
