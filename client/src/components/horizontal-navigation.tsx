@@ -245,6 +245,13 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       permission: "inventory"
     },
     { 
+      title: "البطاقات", 
+      href: "/card-view", 
+      icon: Package,
+      internal: false,
+      permission: "cardView"
+    },
+    { 
       title: "عرض سعر", 
       href: "/quotation-creation", 
       icon: MessageSquare,
@@ -290,13 +297,6 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       permission: "admin"
     },
     // External pages (will navigate away)
-    { 
-      title: "البطاقات", 
-      href: "/card-view", 
-      icon: Package,
-      internal: false,
-      permission: "cardView"
-    },
     { 
       title: "بطاقات الأسعار", 
       href: "/price-cards", 
