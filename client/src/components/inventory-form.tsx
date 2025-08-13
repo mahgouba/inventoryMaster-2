@@ -43,7 +43,7 @@ interface TrimLevel {
 const initialEngineCapacities = ["2.0L", "1.5L", "3.0L", "4.0L", "5.0L", "V6", "V8"];
 const initialYears = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018];
 const initialStatuses = ["متوفر", "في الطريق", "قيد الصيانة"];
-const initialImportTypes = ["شخصي", "شركة", "مستعمل شخصي"];
+const initialImportTypes = ["شخصي", "شركة", "مستعمل"];
 const initialOwnershipTypes = ["ملك الشركة", "عرض (وسيط)"];
 const initialLocations = ["المستودع الرئيسي", "المعرض", "الورشة", "الميناء", "مستودع فرعي"];
 const initialColors = ["أسود", "أبيض", "رمادي", "أزرق", "أحمر", "بني", "فضي", "ذهبي", "بيج"];
@@ -620,7 +620,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
               />
 
               {/* المسافة المقطوعة - للمركبات المستعملة فقط */}
-              {(form.watch("importType") === "مستعمل" || form.watch("importType") === "مستعمل شخصي") && (
+              {form.watch("importType") === "مستعمل" && (
                 <FormField
                   control={form.control}
                   name="mileage"
@@ -751,29 +751,6 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                         className="glass-input border-white/20 text-white placeholder:text-white/60"
                         dir="rtl"
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* حالة البيع */}
-              <FormField
-                control={form.control}
-                name="isSold"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Select onValueChange={(value) => field.onChange(value === "true")} 
-                              value={field.value ? "true" : "false"}>
-                        <SelectTrigger className="glass-input border-white/20 text-white">
-                          <SelectValue placeholder="حالة البيع" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="false">متاح للبيع</SelectItem>
-                          <SelectItem value="true">مباع</SelectItem>
-                        </SelectContent>
-                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
