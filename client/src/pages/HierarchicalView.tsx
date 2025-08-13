@@ -823,9 +823,12 @@ export default function HierarchicalView() {
 
   // Toggle manufacturer visibility mutation
   const toggleManufacturerVisibilityMutation = useMutation({
-    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
-      return apiRequest('PUT', `/api/manufacturers/${id}`, {
-        isActive: !isActive
+    mutationFn: async (manufacturer: Manufacturer) => {
+      return apiRequest('PUT', `/api/manufacturers/${manufacturer.id}`, {
+        nameAr: manufacturer.nameAr,
+        nameEn: manufacturer.nameEn,
+        logo: manufacturer.logo || null,
+        isActive: !(manufacturer.isActive ?? true)
       });
     },
     onSuccess: () => {
@@ -846,10 +849,7 @@ export default function HierarchicalView() {
   });
 
   const toggleManufacturerVisibility = (manufacturer: Manufacturer) => {
-    toggleManufacturerVisibilityMutation.mutate({
-      id: manufacturer.id,
-      isActive: manufacturer.isActive ?? true
-    });
+    toggleManufacturerVisibilityMutation.mutate(manufacturer);
   };
 
   const handleDragStart = (e: React.DragEvent, manufacturerId: string) => {
