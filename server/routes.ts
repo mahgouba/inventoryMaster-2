@@ -10,7 +10,7 @@ import {
   insertLocationSchema,
   insertLocationTransferSchema,
   insertUserSchema,
-  insertSpecificationSchema,
+
   insertTrimLevelSchema,
   insertQuotationSchema,
   insertPriceCardSchema,
@@ -1562,133 +1562,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Specifications API Routes
-  app.get("/api/specifications", async (req, res) => {
-    try {
-      const specifications = await getStorage().getAllSpecifications();
-      res.json(specifications);
-    } catch (error) {
-      console.error("Error fetching specifications:", error);
-      res.status(500).json({ message: "Failed to fetch specifications" });
-    }
-  });
-
-  app.get("/api/specifications/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid specification ID" });
-      }
-
-      const specification = await getStorage().getSpecification(id);
-      if (!specification) {
-        return res.status(404).json({ message: "Specification not found" });
-      }
-
-      res.json(specification);
-    } catch (error) {
-      console.error("Error fetching specification:", error);
-      res.status(500).json({ message: "Failed to fetch specification" });
-    }
-  });
-
-  app.post("/api/specifications", async (req, res) => {
-    try {
-      const specificationData = insertSpecificationSchema.parse(req.body);
-      const specification = await getStorage().createSpecification(specificationData);
-      res.status(201).json(specification);
-    } catch (error) {
-      console.error("Error creating specification:", error);
-      res.status(400).json({ message: "Invalid specification data" });
-    }
-  });
-
-  app.put("/api/specifications/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid specification ID" });
-      }
-
-      // Use partial schema for updates
-      const specificationData = insertSpecificationSchema.partial().parse(req.body);
-      const specification = await getStorage().updateSpecification(id, specificationData);
-      
-      if (!specification) {
-        return res.status(404).json({ message: "Specification not found" });
-      }
-
-      res.json(specification);
-    } catch (error) {
-      console.error("Error updating specification:", error);
-      res.status(400).json({ message: "Invalid specification data" });
-    }
-  });
-
-  app.delete("/api/specifications/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid specification ID" });
-      }
-
-      const deleted = await getStorage().deleteSpecification(id);
-      if (!deleted) {
-        return res.status(404).json({ message: "Specification not found" });
-      }
-
-      res.json({ message: "Specification deleted successfully" });
-    } catch (error) {
-      console.error("Error deleting specification:", error);
-      res.status(500).json({ message: "Failed to delete specification" });
-    }
-  });
-
-  app.get("/api/specifications/vehicle/:manufacturer/:category", async (req, res) => {
-    try {
-      const { manufacturer, category } = req.params;
-      const { trimLevel } = req.query;
-      
-      const specifications = await getStorage().getSpecificationsByVehicle(
-        manufacturer, 
-        category, 
-        trimLevel as string
-      );
-      
-      res.json(specifications);
-    } catch (error) {
-      console.error("Error fetching specifications by vehicle:", error);
-      res.status(500).json({ message: "Failed to fetch specifications" });
-    }
-  });
-
-  // Get specification by vehicle parameters
-  app.get("/api/specifications/:manufacturer/:category/:trimLevel/:year/:engineCapacity", async (req, res) => {
-    try {
-      const { manufacturer, category, trimLevel, year, engineCapacity } = req.params;
-      
-      if (!manufacturer || !category || !year || !engineCapacity) {
-        return res.status(400).json({ message: "Invalid specification parameters" });
-      }
-      
-      const specification = await getStorage().getSpecificationByVehicleParams(
-        manufacturer, 
-        category, 
-        trimLevel === "null" ? null : trimLevel, 
-        parseInt(year), 
-        engineCapacity
-      );
-      
-      if (!specification) {
-        return res.status(404).json({ message: "Specification not found" });
-      }
-      
-      res.json(specification);
-    } catch (error) {
-      console.error("Error fetching specification by vehicle params:", error);
-      res.status(500).json({ message: "Failed to fetch specification" });
-    }
-  });
 
   // Trim Levels API Routes
   app.get("/api/trim-levels", async (req, res) => {
@@ -2640,28 +2513,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Import categories and trim levels
       for (const brand of carsData) {
         for (const model of brand.models) {
-          // Add categories to specifications
-          try {
-            const existingSpecs = await getStorage().getAllSpecifications();
-            const categoryExists = existingSpecs.some(s => 
-              s.manufacturer === brand.brand_ar && 
-              s.category === model.model_ar && 
-              s.type === "category"
-            );
-            
-            if (!categoryExists) {
-              await getStorage().createSpecification({
-                type: "category",
-                manufacturer: brand.brand_ar,
-                category: model.model_ar,
-                value: model.model_ar,
-                valueEn: model.model_en,
-                description: `${model.model_ar} (${model.model_en})`
-              });
-            }
-          } catch (error) {
-            console.log(`Category ${model.model_ar} already exists or error occurred`);
-          }
+
 
           // Import trim levels
           for (const trim of model.trims) {
@@ -4703,7 +4555,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           leaveRequests,
           financingRates,
           imageLinks,
-          specifications,
+
           trimLevels,
           categories,
           engineCapacities,
@@ -4718,7 +4570,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           getStorage().getAllLeaveRequests(),
           getStorage().getAllFinancingRates(),
           getStorage().getAllImageLinks(),
-          getStorage().getAllSpecifications(),
+
           getStorage().getAllTrimLevels(),
           getStorage().getAllCategories(),
           getStorage().getAllEngineCapacities(),
@@ -4734,7 +4586,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         data.leaveRequests = leaveRequests;
         data.financingRates = financingRates;
         data.imageLinks = imageLinks;
-        data.specifications = specifications;
+
         data.trimLevels = trimLevels;
         data.categories = categories;
         data.engineCapacities = engineCapacities;

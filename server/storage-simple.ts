@@ -8,7 +8,7 @@ import {
   type LowStockAlert, type InsertLowStockAlert,
   type StockSettings, type InsertStockSettings,
   type AppearanceSettings, type InsertAppearanceSettings,
-  type Specification, type InsertSpecification,
+
   type TrimLevel, type InsertTrimLevel,
   type Quotation, type InsertQuotation,
   type FinancingCalculation, type InsertFinancingCalculation,
@@ -98,14 +98,7 @@ export interface IStorage {
   getAppearanceSettings(): Promise<AppearanceSettings | undefined>;
   updateAppearanceSettings(settings: InsertAppearanceSettings): Promise<AppearanceSettings>;
   
-  // Specifications methods
-  getAllSpecifications(): Promise<Specification[]>;
-  getSpecification(id: number): Promise<Specification | undefined>;
-  createSpecification(specification: InsertSpecification): Promise<Specification>;
-  updateSpecification(id: number, specification: Partial<InsertSpecification>): Promise<Specification | undefined>;
-  deleteSpecification(id: number): Promise<boolean>;
-  getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<Specification[]>;
-  getSpecificationByVehicleParams(manufacturer: string, category: string, trimLevel: string | null, year: number, engineCapacity: string): Promise<Specification | undefined>;
+
   
   // Trim levels methods
   getAllTrimLevels(): Promise<TrimLevel[]>;
@@ -577,13 +570,7 @@ export class MemStorage implements IStorage {
     return appearance;
   }
   
-  async getAllSpecifications(): Promise<Specification[]> { return []; }
-  async getSpecification(id: number): Promise<Specification | undefined> { return undefined; }
-  async createSpecification(specification: InsertSpecification): Promise<Specification> { throw new Error("Not implemented"); }
-  async updateSpecification(id: number, specification: Partial<InsertSpecification>): Promise<Specification | undefined> { return undefined; }
-  async deleteSpecification(id: number): Promise<boolean> { return false; }
-  async getSpecificationsByVehicle(manufacturer: string, category: string, trimLevel?: string): Promise<Specification[]> { return []; }
-  async getSpecificationByVehicleParams(manufacturer: string, category: string, trimLevel: string | null, year: number, engineCapacity: string): Promise<Specification | undefined> { return undefined; }
+
   
   async getAllTrimLevels(): Promise<TrimLevel[]> { return []; }
   async getTrimLevel(id: number): Promise<TrimLevel | undefined> { return undefined; }

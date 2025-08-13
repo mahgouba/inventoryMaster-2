@@ -231,60 +231,7 @@ export const locationTransfers = pgTable("location_transfers", {
   notes: text("notes"), // ملاحظات
 });
 
-// Specifications table for storing detailed vehicle specifications
-export const specifications = pgTable("specifications", {
-  id: serial("id").primaryKey(),
-  manufacturer: text("manufacturer").notNull(), // الصانع
-  category: text("category").notNull(), // الفئة
-  trimLevel: text("trim_level"), // درجة التجهيز
-  year: integer("year").notNull(), // السنة
-  engineCapacity: text("engine_capacity").notNull(), // سعة المحرك
-  chassisNumber: text("chassis_number"), // رقم الهيكل (اختياري لربط المواصفات بسيارة معينة)
-  
-  // Engine & Performance Specifications
-  engineType: text("engine_type"), // نوع المحرك
-  horsepower: text("horsepower"), // القوة الحصانية
-  torque: text("torque"), // عزم الدوران
-  transmission: text("transmission"), // ناقل الحركة
-  fuelType: text("fuel_type"), // نوع الوقود
-  fuelConsumption: text("fuel_consumption"), // استهلاك الوقود
-  drivetrain: text("drivetrain"), // نوع الدفع
-  acceleration: text("acceleration"), // التسارع
-  topSpeed: text("top_speed"), // السرعة القصوى
-  
-  // Dimensions & Weight
-  length: text("length"), // الطول
-  width: text("width"), // العرض
-  height: text("height"), // الارتفاع
-  wheelbase: text("wheelbase"), // قاعدة العجلات
-  curbWeight: text("curb_weight"), // الوزن الفارغ
-  grossWeight: text("gross_weight"), // إجمالي الوزن
-  loadCapacity: text("load_capacity"), // سعة التحميل
-  seatingCapacity: text("seating_capacity"), // عدد المقاعد
-  
-  // Features & Equipment
-  safetyFeatures: text("safety_features"), // مميزات الأمان
-  comfortFeatures: text("comfort_features"), // مميزات الراحة
-  infotainment: text("infotainment"), // نظام المعلومات والترفيه
-  driverAssistance: text("driver_assistance"), // مساعدة السائق
-  exteriorFeatures: text("exterior_features"), // المميزات الخارجية
-  interiorFeatures: text("interior_features"), // المميزات الداخلية
-  
-  // Technical Specifications
-  tireSize: text("tire_size"), // مقاس الإطارات
-  suspension: text("suspension"), // نوع التعليق
-  brakes: text("brakes"), // نظام الكبح
-  steering: text("steering"), // نظام التوجيه
-  groundClearance: text("ground_clearance"), // ارتفاع عن الأرض
-  
-  // Additional Information
-  warranty: text("warranty"), // الضمان
-  notes: text("notes"), // ملاحظات إضافية
-  detailedDescription: text("detailed_description"), // الوصف التفصيلي الكامل
-  
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+
 
 // Trim levels table for managing trim levels per manufacturer and category
 export const trimLevels = pgTable("trim_levels", {
@@ -474,11 +421,7 @@ export const insertLocationTransferSchema = createInsertSchema(locationTransfers
   transferDate: true,
 });
 
-export const insertSpecificationSchema = createInsertSchema(specifications).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+
 
 export const insertTrimLevelSchema = createInsertSchema(trimLevels).omit({
   id: true,
@@ -663,8 +606,7 @@ export type InsertLocation = z.infer<typeof insertLocationSchema>;
 export type Location = typeof locations.$inferSelect;
 export type InsertLocationTransfer = z.infer<typeof insertLocationTransferSchema>;
 export type LocationTransfer = typeof locationTransfers.$inferSelect;
-export type InsertSpecification = z.infer<typeof insertSpecificationSchema>;
-export type Specification = typeof specifications.$inferSelect;
+
 export type InsertTrimLevel = z.infer<typeof insertTrimLevelSchema>;
 export type TrimLevel = typeof trimLevels.$inferSelect;
 export type InsertUserSession = z.infer<typeof insertUserSessionSchema>;
