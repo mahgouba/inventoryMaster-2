@@ -132,7 +132,13 @@ export default function SpecificationsManagement() {
     mutationFn: async (data: SpecificationFormData) => {
       const url = editingSpec ? `/api/vehicle-specifications/${editingSpec.id}` : '/api/vehicle-specifications';
       const method = editingSpec ? 'PUT' : 'POST';
-      return apiRequest(url, { method, body: data });
+      return apiRequest(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specifications'] });
@@ -158,7 +164,13 @@ export default function SpecificationsManagement() {
     mutationFn: async (data: ImageLinkFormData) => {
       const url = editingImage ? `/api/vehicle-image-links/${editingImage.id}` : '/api/vehicle-image-links';
       const method = editingImage ? 'PUT' : 'POST';
-      return apiRequest(url, { method, body: data });
+      return apiRequest(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-image-links'] });
@@ -182,7 +194,9 @@ export default function SpecificationsManagement() {
   // Delete specification mutation
   const deleteSpecMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/vehicle-specifications/${id}`, { method: 'DELETE' });
+      return apiRequest(`/api/vehicle-specifications/${id}`, {
+        method: 'DELETE',
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specifications'] });
@@ -196,7 +210,9 @@ export default function SpecificationsManagement() {
   // Delete image link mutation
   const deleteImageMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/vehicle-image-links/${id}`, { method: 'DELETE' });
+      return apiRequest(`/api/vehicle-image-links/${id}`, {
+        method: 'DELETE',
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-image-links'] });
@@ -222,7 +238,7 @@ export default function SpecificationsManagement() {
       category: spec.category || "",
       trimLevel: spec.trimLevel || "",
       year: spec.year || undefined,
-      engineCapacity: spec.engine || "",
+      engineCapacity: spec.engineCapacity || "",
       chassisNumber: spec.chassisNumber || "",
       specifications: spec.specifications || "",
       specificationsEn: spec.specificationsEn || "",
@@ -248,7 +264,7 @@ export default function SpecificationsManagement() {
     setIsImageDialogOpen(true);
   };
 
-  const filteredSpecs = specifications.filter((spec: VehicleSpecification) =>
+  const filteredSpecs = (specifications as VehicleSpecification[]).filter((spec: VehicleSpecification) =>
     !searchTerm ||
     spec.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     spec.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -256,7 +272,7 @@ export default function SpecificationsManagement() {
     spec.chassisNumber?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredImages = imageLinks.filter((image: VehicleImageLink) =>
+  const filteredImages = (imageLinks as VehicleImageLink[]).filter((image: VehicleImageLink) =>
     !searchTerm ||
     image.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     image.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -551,7 +567,7 @@ export default function SpecificationsManagement() {
                           </CardTitle>
                           <div className="flex gap-2 text-sm text-amber-600/80 dark:text-amber-300/80">
                             {spec.year && <span>السنة: {spec.year}</span>}
-                            {spec.engine && <span>المحرك: {spec.engine}</span>}
+                            {spec.engineCapacity && <span>المحرك: {spec.engineCapacity}</span>}
                             {spec.chassisNumber && <span>رقم الهيكل: {spec.chassisNumber}</span>}
                           </div>
                         </div>

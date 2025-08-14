@@ -314,11 +314,11 @@ export interface IStorage {
 
   // Vehicle Specifications methods
   getAllVehicleSpecifications(): Promise<VehicleSpecification[]>;
+  getVehicleSpecifications(): Promise<VehicleSpecification[]>;
   getVehicleSpecification(id: number): Promise<VehicleSpecification | undefined>;
   createVehicleSpecification(spec: InsertVehicleSpecification): Promise<VehicleSpecification>;
   updateVehicleSpecification(id: number, spec: Partial<InsertVehicleSpecification>): Promise<VehicleSpecification | undefined>;
   deleteVehicleSpecification(id: number): Promise<boolean>;
-  // getSpecificationsByHierarchy(manufacturer: string, category: string, trimLevel: string, model: string): Promise<VehicleSpecification[]>;
   getVehicleSpecificationsByFilters(filters: { 
     manufacturer?: string; 
     category?: string; 
@@ -326,14 +326,15 @@ export interface IStorage {
     year?: number; 
     chassisNumber?: string; 
   }): Promise<VehicleSpecification[]>;
+  getVehicleSpecificationsByChassisNumber(chassisNumber: string): Promise<VehicleSpecification[]>;
   
   // Vehicle Image Links methods
   getAllVehicleImageLinks(): Promise<VehicleImageLink[]>;
+  getVehicleImageLinks(): Promise<VehicleImageLink[]>;
   getVehicleImageLink(id: number): Promise<VehicleImageLink | undefined>;
   createVehicleImageLink(link: InsertVehicleImageLink): Promise<VehicleImageLink>;
   updateVehicleImageLink(id: number, link: Partial<InsertVehicleImageLink>): Promise<VehicleImageLink | undefined>;
   deleteVehicleImageLink(id: number): Promise<boolean>;
-  // getImageLinksByHierarchy(manufacturer: string, category: string, trimLevel: string, exteriorColor: string, interiorColor: string): Promise<VehicleImageLink[]>;
   getVehicleImageLinksByFilters(filters: { 
     manufacturer?: string; 
     category?: string; 
@@ -343,6 +344,7 @@ export interface IStorage {
     interiorColor?: string; 
     chassisNumber?: string; 
   }): Promise<VehicleImageLink[]>;
+  getVehicleImageLinksByChassisNumber(chassisNumber: string): Promise<VehicleImageLink[]>;
 
   saveImageLink(linkData: any): Promise<any>;
   getLeaveRequest(id: number): Promise<LeaveRequest | undefined>;
@@ -2077,6 +2079,14 @@ export class MemStorage implements IStorage {
 
   async getVehicleImageLinks(): Promise<VehicleImageLink[]> {
     return Array.from(this.vehicleImageLinks.values());
+  }
+
+  async getVehicleSpecificationsByChassisNumber(chassisNumber: string): Promise<VehicleSpecification[]> {
+    return Array.from(this.vehicleSpecifications.values()).filter(spec => spec.chassisNumber === chassisNumber);
+  }
+
+  async getVehicleImageLinksByChassisNumber(chassisNumber: string): Promise<VehicleImageLink[]> {
+    return Array.from(this.vehicleImageLinks.values()).filter(link => link.chassisNumber === chassisNumber);
   }
 
   async getVehicleImageLink(id: number): Promise<VehicleImageLink | undefined> {
