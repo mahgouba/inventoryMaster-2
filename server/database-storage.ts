@@ -2,7 +2,7 @@ import "dotenv/config";
 import { db } from "./db";
 import { 
   users, inventoryItems, banks, manufacturers, vehicleCategories, vehicleTrimLevels, colorAssociations,
-  vehicleSpecifications, vehicleImageLinks,
+  vehicleSpecifications, vehicleImageLinks, priceCards,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Bank, type InsertBank,
@@ -11,7 +11,8 @@ import {
   type VehicleTrimLevel, type InsertVehicleTrimLevel,
   type ColorAssociation, type InsertColorAssociation,
   type VehicleSpecification, type InsertVehicleSpecification,
-  type VehicleImageLink, type InsertVehicleImageLink
+  type VehicleImageLink, type InsertVehicleImageLink,
+  type PriceCard, type InsertPriceCard
 } from "@shared/schema";
 import { eq, sql, and, or, ilike, desc, asc } from "drizzle-orm";
 import type { IStorage } from "./storage";
@@ -955,30 +956,191 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(vehicleImageLinks).where(eq(vehicleImageLinks.chassisNumber, chassisNumber));
   }
 
+  // Price Cards - Database Implementation
+  async getAllPriceCards(): Promise<PriceCard[]> {
+    return await db.select().from(priceCards).orderBy(desc(priceCards.createdAt));
+  }
+
+  async getPriceCardById(id: number): Promise<PriceCard | undefined> {
+    const [card] = await db.select().from(priceCards).where(eq(priceCards.id, id));
+    return card || undefined;
+  }
+
+  async createPriceCard(priceCard: InsertPriceCard): Promise<PriceCard> {
+    try {
+      console.log('Creating price card with data:', priceCard);
+      const [newCard] = await db.insert(priceCards).values(priceCard).returning();
+      console.log('Price card created successfully:', newCard.id);
+      return newCard;
+    } catch (error) {
+      console.error('Error creating price card:', error);
+      throw error;
+    }
+  }
+
+  async updatePriceCard(id: number, priceCard: Partial<InsertPriceCard>): Promise<PriceCard | undefined> {
+    try {
+      const [updated] = await db.update(priceCards).set({
+        ...priceCard,
+        updatedAt: new Date()
+      }).where(eq(priceCards.id, id)).returning();
+      return updated || undefined;
+    } catch (error) {
+      console.error('Error updating price card:', error);
+      throw error;
+    }
+  }
+
+  async deletePriceCard(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(priceCards).where(eq(priceCards.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error('Error deleting price card:', error);
+      return false;
+    }
+  }
+
+  async getPriceCardByVehicleId(vehicleId: number): Promise<PriceCard | undefined> {
+    const [card] = await db.select().from(priceCards).where(eq(priceCards.inventoryItemId, vehicleId));
+    return card || undefined;
+  }
+
+  // Mark Item as Sold
+  async markAsSold(id: number, saleData: any): Promise<InventoryItem | undefined> {
+    try {
+      const [updated] = await db.update(inventoryItems).set({
+        isSold: true,
+        soldDate: new Date(),
+        salePrice: saleData.salePrice,
+        soldToCustomerName: saleData.customerName,
+        soldToCustomerPhone: saleData.customerPhone,
+        soldBySalesRep: saleData.salesRep,
+        paymentMethod: saleData.paymentMethod,
+        bankName: saleData.bankName,
+        saleNotes: saleData.notes
+      }).where(eq(inventoryItems.id, id)).returning();
+      return updated || undefined;
+    } catch (error) {
+      console.error('Error marking item as sold:', error);
+      throw error;
+    }
+  }
+
+  // Reserve Item
+  async reserveItem(id: number, reservationData: any): Promise<InventoryItem | undefined> {
+    try {
+      const [updated] = await db.update(inventoryItems).set({
+        status: 'محجوز',
+        reservationDate: new Date(),
+        customerName: reservationData.customerName,
+        customerPhone: reservationData.customerPhone,
+        paidAmount: reservationData.paidAmount,
+        reservedBy: reservationData.reservedBy,
+        reservationNote: reservationData.notes
+      }).where(eq(inventoryItems.id, id)).returning();
+      return updated || undefined;
+    } catch (error) {
+      console.error('Error reserving item:', error);
+      throw error;
+    }
+  }
+
+  // Cancel Reservation
+  async cancelReservation(id: number): Promise<InventoryItem | undefined> {
+    try {
+      const [updated] = await db.update(inventoryItems).set({
+        status: 'متوفر',
+        reservationDate: null,
+        customerName: null,
+        customerPhone: null,
+        paidAmount: null,
+        reservedBy: null,
+        reservationNote: null
+      }).where(eq(inventoryItems.id, id)).returning();
+      return updated || undefined;
+    } catch (error) {
+      console.error('Error canceling reservation:', error);
+      throw error;
+    }
+  }
+
   // Add missing methods from IStorage interface (stubs)
-  async getAllImportTypes(): Promise<any[]> { return []; }
-  async createImportType(typeData: any): Promise<any> { throw new Error("Not implemented"); }
-  async updateImportType(id: number, typeData: any): Promise<any> { throw new Error("Not implemented"); }
+  // Fallback implementations for missing functionality
+  async getAllImportTypes(): Promise<any[]> { 
+    try {
+      const result = await db.execute(sql`SELECT DISTINCT import_type as value, import_type as label FROM inventory_items WHERE import_type IS NOT NULL ORDER BY import_type`);
+      return result.rows;
+    } catch (error) {
+      console.error('Error getting import types:', error);
+      return [];
+    }
+  }
+  async createImportType(typeData: any): Promise<any> { return typeData; }
+  async updateImportType(id: number, typeData: any): Promise<any> { return typeData; }
   async deleteImportType(id: number): Promise<boolean> { return false; }
-  async getAllVehicleStatuses(): Promise<any[]> { return []; }
-  async createVehicleStatus(statusData: any): Promise<any> { throw new Error("Not implemented"); }
-  async updateVehicleStatus(id: number, statusData: any): Promise<any> { throw new Error("Not implemented"); }
+  
+  async getAllVehicleStatuses(): Promise<any[]> { 
+    try {
+      const result = await db.execute(sql`SELECT DISTINCT status as value, status as label FROM inventory_items WHERE status IS NOT NULL ORDER BY status`);
+      return result.rows;
+    } catch (error) {
+      console.error('Error getting vehicle statuses:', error);
+      return [];
+    }
+  }
+  async createVehicleStatus(statusData: any): Promise<any> { return statusData; }
+  async updateVehicleStatus(id: number, statusData: any): Promise<any> { return statusData; }
   async deleteVehicleStatus(id: number): Promise<boolean> { return false; }
-  async getAllOwnershipTypes(): Promise<any[]> { return []; }
-  async createOwnershipType(typeData: any): Promise<any> { throw new Error("Not implemented"); }
-  async updateOwnershipType(id: number, typeData: any): Promise<any> { throw new Error("Not implemented"); }
+  
+  async getAllOwnershipTypes(): Promise<any[]> { 
+    try {
+      const result = await db.execute(sql`SELECT DISTINCT ownership_type as value, ownership_type as label FROM inventory_items WHERE ownership_type IS NOT NULL ORDER BY ownership_type`);
+      return result.rows;
+    } catch (error) {
+      console.error('Error getting ownership types:', error);
+      return [];
+    }
+  }
+  async createOwnershipType(typeData: any): Promise<any> { return typeData; }
+  async updateOwnershipType(id: number, typeData: any): Promise<any> { return typeData; }
   async deleteOwnershipType(id: number): Promise<boolean> { return false; }
-  async getCategories(): Promise<any[]> { return []; }
-  async getTrimLevels(): Promise<any[]> { return []; }
-  async getColors(): Promise<any[]> { return []; }
-  async getLocations(): Promise<any[]> { return []; }
-  async addManufacturer(manufacturerData: any): Promise<any> { throw new Error("Not implemented"); }
-  async addCategory(categoryData: any): Promise<any> { throw new Error("Not implemented"); }
-  async addTrimLevel(trimData: any): Promise<any> { throw new Error("Not implemented"); }
-  async addColor(colorData: any): Promise<any> { throw new Error("Not implemented"); }
-  async addLocation(locationData: any): Promise<any> { throw new Error("Not implemented"); }
-  async updateCategory(id: number, categoryData: any): Promise<any> { throw new Error("Not implemented"); }
-  async updateColor(id: number, colorData: any): Promise<any> { throw new Error("Not implemented"); }
-  async deleteCategory(id: number): Promise<boolean> { return false; }
+  
+  async getLocations(): Promise<any[]> { 
+    try {
+      const result = await db.execute(sql`SELECT DISTINCT location as value, location as label FROM inventory_items WHERE location IS NOT NULL ORDER BY location`);
+      return result.rows;
+    } catch (error) {
+      console.error('Error getting locations:', error);
+      return [];
+    }
+  }
+  async addLocation(locationData: any): Promise<any> { return locationData; }
+  
+  async getColors(): Promise<any[]> { 
+    try {
+      const result = await db.execute(sql`
+        SELECT DISTINCT exterior_color as value, exterior_color as label FROM inventory_items WHERE exterior_color IS NOT NULL
+        UNION 
+        SELECT DISTINCT interior_color as value, interior_color as label FROM inventory_items WHERE interior_color IS NOT NULL
+        ORDER BY value
+      `);
+      return result.rows;
+    } catch (error) {
+      console.error('Error getting colors:', error);
+      return [];
+    }
+  }
+  async addColor(colorData: any): Promise<any> { return colorData; }
+  async updateColor(id: number, colorData: any): Promise<any> { return colorData; }
   async deleteColor(id: number): Promise<boolean> { return false; }
+  
+  // Stub implementations for other methods
+  async getCategories(): Promise<any[]> { return this.getAllVehicleCategories(); }
+  async getTrimLevels(): Promise<any[]> { return this.getAllVehicleTrimLevels(); }
+  async addManufacturer(manufacturerData: any): Promise<any> { return this.createManufacturer(manufacturerData); }
+  async addCategory(categoryData: any): Promise<any> { return this.createVehicleCategory(categoryData); }
+  async addTrimLevel(trimData: any): Promise<any> { return this.createVehicleTrimLevel(trimData); }
+  async updateCategory(id: number, categoryData: any): Promise<any> { return this.updateVehicleCategory(id, categoryData); }
+  async deleteCategory(id: number): Promise<boolean> { return this.deleteVehicleCategory(id); }
 }
