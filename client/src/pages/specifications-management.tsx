@@ -111,6 +111,23 @@ export default function SpecificationsManagement() {
     },
   });
 
+  // Watch chassis number to auto-fill vehicle data
+  const watchedChassisNumber = specForm.watch("chassisNumber");
+  useEffect(() => {
+    if (watchedChassisNumber && watchedChassisNumber.length > 3) {
+      const matchedVehicle = (inventoryItems as any[]).find(
+        (item: any) => item.chassisNumber === watchedChassisNumber
+      );
+      if (matchedVehicle) {
+        specForm.setValue("manufacturer", matchedVehicle.manufacturer || "");
+        specForm.setValue("category", matchedVehicle.category || "");
+        specForm.setValue("trimLevel", matchedVehicle.trimLevel || "");
+        specForm.setValue("year", matchedVehicle.year || undefined);
+        specForm.setValue("engineCapacity", matchedVehicle.engineCapacity || "");
+      }
+    }
+  }, [watchedChassisNumber, inventoryItems, specForm]);
+
   const imageForm = useForm<ImageLinkFormData>({
     resolver: zodResolver(imageLinkFormSchema),
     defaultValues: {
@@ -127,6 +144,25 @@ export default function SpecificationsManagement() {
       descriptionEn: "",
     },
   });
+
+  // Watch chassis number for image form to auto-fill vehicle data
+  const watchedImageChassisNumber = imageForm.watch("chassisNumber");
+  useEffect(() => {
+    if (watchedImageChassisNumber && watchedImageChassisNumber.length > 3) {
+      const matchedVehicle = (inventoryItems as any[]).find(
+        (item: any) => item.chassisNumber === watchedImageChassisNumber
+      );
+      if (matchedVehicle) {
+        imageForm.setValue("manufacturer", matchedVehicle.manufacturer || "");
+        imageForm.setValue("category", matchedVehicle.category || "");
+        imageForm.setValue("trimLevel", matchedVehicle.trimLevel || "");
+        imageForm.setValue("year", matchedVehicle.year || undefined);
+        imageForm.setValue("engineCapacity", matchedVehicle.engineCapacity || "");
+        imageForm.setValue("exteriorColor", matchedVehicle.exteriorColor || "");
+        imageForm.setValue("interiorColor", matchedVehicle.interiorColor || "");
+      }
+    }
+  }, [watchedImageChassisNumber, inventoryItems, imageForm]);
 
   // Create/Update specification mutation
   const specMutation = useMutation({
@@ -501,15 +537,22 @@ export default function SpecificationsManagement() {
                           name="chassisNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white drop-shadow-sm">رقم الهيكل (اختياري)</FormLabel>
+                              <FormLabel className="text-white drop-shadow-sm">رقم الهيكل (سيتم ملء البيانات تلقائياً)</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="رقم الهيكل"
+                                  placeholder="أدخل رقم الهيكل..."
                                   {...field}
                                   className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                                 />
                               </FormControl>
                               <FormMessage />
+                              {watchedChassisNumber && watchedChassisNumber.length > 3 && (
+                                <div className="text-xs text-green-400 drop-shadow-sm">
+                                  {(inventoryItems as any[]).find((item: any) => item.chassisNumber === watchedChassisNumber) 
+                                    ? "✓ تم العثور على المركبة وملء البيانات تلقائياً" 
+                                    : "⚠ لم يتم العثور على مركبة بهذا الرقم"}
+                                </div>
+                              )}
                             </FormItem>
                           )}
                         />
@@ -764,6 +807,31 @@ export default function SpecificationsManagement() {
                       
                       <FormField
                         control={imageForm.control}
+                        name="chassisNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white drop-shadow-sm">رقم الهيكل (سيتم ملء البيانات تلقائياً)</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="أدخل رقم الهيكل..."
+                                {...field}
+                                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                            {watchedImageChassisNumber && watchedImageChassisNumber.length > 3 && (
+                              <div className="text-xs text-green-400 drop-shadow-sm">
+                                {(inventoryItems as any[]).find((item: any) => item.chassisNumber === watchedImageChassisNumber) 
+                                  ? "✓ تم العثور على المركبة وملء البيانات تلقائياً" 
+                                  : "⚠ لم يتم العثور على مركبة بهذا الرقم"}
+                              </div>
+                            )}
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={imageForm.control}
                         name="imageUrl"
                         render={({ field }) => (
                           <FormItem>
@@ -862,6 +930,9 @@ export default function SpecificationsManagement() {
                       </div>
                       
                       <div className="space-y-2 text-sm">
+                        {image.chassisNumber && (
+                          <div className="text-white/80 drop-shadow-sm">رقم الهيكل: {image.chassisNumber}</div>
+                        )}
                         {image.exteriorColor && (
                           <div className="text-white/80 drop-shadow-sm">اللون الخارجي: {image.exteriorColor}</div>
                         )}
