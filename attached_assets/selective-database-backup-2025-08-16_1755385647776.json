@@ -1,0 +1,301 @@
+{
+  "metadata": {
+    "exportDate": "2025-08-16T23:03:47.020Z",
+    "version": "1.0.0",
+    "description": "Albarimi Auto System Selective Data Export",
+    "exportType": "selective",
+    "selectedTypes": [
+      "users",
+      "banks"
+    ]
+  },
+  "data": {
+    "banks": [
+      {
+        "id": 10,
+        "logo": "/nbd.png",
+        "bankName": "بنك الإمارات دبي الوطني",
+        "nameEn": "Emirates NBD",
+        "accountName": "شركة البريمي للسيارات",
+        "accountNumber": "1016050175301",
+        "iban": "SA4095000001016050175301",
+        "type": "شركة",
+        "isActive": true,
+        "createdAt": "2025-08-16T22:57:11.768Z",
+        "updatedAt": "2025-08-16T22:57:11.768Z"
+      },
+      {
+        "id": 9,
+        "logo": "/french.png",
+        "bankName": "البنك السعودي الفرنسي",
+        "nameEn": "Saudi French Bank",
+        "accountName": "شركة البريمي للسيارات",
+        "accountNumber": "97844900167",
+        "iban": "SA5655000000097844900167",
+        "type": "شركة",
+        "isActive": true,
+        "createdAt": "2025-08-16T22:57:11.655Z",
+        "updatedAt": "2025-08-16T22:57:11.655Z"
+      },
+      {
+        "id": 8,
+        "logo": "/jazira.png",
+        "bankName": "بنك الجزيرة",
+        "nameEn": "Bank AlJazira",
+        "accountName": "شركة البريمي للسيارات",
+        "accountNumber": "030495028555001",
+        "iban": "SA7060100030495028555001",
+        "type": "شركة",
+        "isActive": true,
+        "createdAt": "2025-08-16T22:57:11.542Z",
+        "updatedAt": "2025-08-16T22:57:11.542Z"
+      },
+      {
+        "id": 7,
+        "logo": "/sab.png",
+        "bankName": "البنك السعودي الأول (SAB)",
+        "nameEn": "Saudi Awwal Bank (SAB)",
+        "accountName": "شركة معرض البريمي للسيارات",
+        "accountNumber": "822173787001",
+        "iban": "SA6445000000822173787001",
+        "type": "شركة",
+        "isActive": true,
+        "createdAt": "2025-08-16T22:57:11.430Z",
+        "updatedAt": "2025-08-16T22:57:11.430Z"
+      },
+      {
+        "id": 6,
+        "logo": "/alinma.png",
+        "bankName": "مصرف الإنماء",
+        "nameEn": "Bank Alinma",
+        "accountName": "شركة البريمي للسيارات",
+        "accountNumber": "68201863704000",
+        "iban": "SA9605000068201863704000",
+        "type": "شركة",
+        "isActive": true,
+        "createdAt": "2025-08-16T22:57:11.317Z",
+        "updatedAt": "2025-08-16T22:57:11.317Z"
+      },
+      {
+        "id": 5,
+        "logo": "/riyad.png",
+        "bankName": "بنك الرياض",
+        "nameEn": "Riyad Bank",
+        "accountName": "شركة البريمي للسيارات",
+        "accountNumber": "2383212779940",
+        "iban": "SA1420000002383212779940",
+        "type": "شركة",
+        "isActive": true,
+        "createdAt": "2025-08-16T22:57:11.205Z",
+        "updatedAt": "2025-08-16T22:57:11.205Z"
+      },
+      {
+        "id": 4,
+        "logo": "/anb.png",
+        "bankName": "البنك العربي الوطني",
+        "nameEn": "Arab National Bank",
+        "accountName": "شركة البريمي للسيارات",
+        "accountNumber": "0108095322110019",
+        "iban": "SA0000000000000000000000",
+        "type": "شركة",
+        "isActive": true,
+        "createdAt": "2025-08-16T22:57:11.092Z",
+        "updatedAt": "2025-08-16T22:57:11.092Z"
+      },
+      {
+        "id": 3,
+        "logo": "/albilad.png",
+        "bankName": "بنك البلاد",
+        "nameEn": "Bank Albilad",
+        "accountName": "شركة البريمي للسيارات",
+        "accountNumber": "448888888780008",
+        "iban": "SA1315000448888888780008",
+        "type": "شركة",
+        "isActive": true,
+        "createdAt": "2025-08-16T22:57:10.978Z",
+        "updatedAt": "2025-08-16T22:57:10.978Z"
+      },
+      {
+        "id": 2,
+        "logo": "/snb.png",
+        "bankName": "البنك الأهلي السعودي",
+        "nameEn": "Saudi National Bank",
+        "accountName": "شركة البريمي للسيارات",
+        "accountNumber": "25268400000102",
+        "iban": "SA5110000025268400000102",
+        "type": "شركة",
+        "isActive": true,
+        "createdAt": "2025-08-16T22:57:10.866Z",
+        "updatedAt": "2025-08-16T22:57:10.866Z"
+      },
+      {
+        "id": 1,
+        "logo": "/rajhi.png",
+        "bankName": "مصرف الراجحي",
+        "nameEn": "Al Rajhi Bank",
+        "accountName": "شركة البريمي للسيارات",
+        "accountNumber": "575608010000904",
+        "iban": "SA8080000575608010000904",
+        "type": "شركة",
+        "isActive": true,
+        "createdAt": "2025-08-16T22:57:10.741Z",
+        "updatedAt": "2025-08-16T22:57:10.741Z"
+      }
+    ],
+    "users": [
+      {
+        "id": 19,
+        "name": "عبدالله الغنامي",
+        "jobTitle": "المالك",
+        "phoneNumber": "0533339333",
+        "username": "abdullah_alghanami",
+        "role": "admin",
+        "createdAt": "2025-08-16T22:57:15.345Z"
+      },
+      {
+        "id": 18,
+        "name": "عبدالمجيد عبدالله",
+        "jobTitle": "المدير التنفيذي",
+        "phoneNumber": "0553336741",
+        "username": "abdulmajeed_abdullah",
+        "role": "admin",
+        "createdAt": "2025-08-16T22:57:15.232Z"
+      },
+      {
+        "id": 17,
+        "name": "صادق الغنامي",
+        "jobTitle": "محاسب",
+        "phoneNumber": "0551813362",
+        "username": "sadiq_alghanami",
+        "role": "accountant",
+        "createdAt": "2025-08-16T22:57:15.118Z"
+      },
+      {
+        "id": 16,
+        "name": "فاروق الغنامي",
+        "jobTitle": "محاسب",
+        "phoneNumber": "0508222813",
+        "username": "farouq_alghanami",
+        "role": "accountant",
+        "createdAt": "2025-08-16T22:57:15.004Z"
+      },
+      {
+        "id": 15,
+        "name": "ساوي",
+        "jobTitle": "مندوب مبيعات",
+        "phoneNumber": "0559986086",
+        "username": "sawi",
+        "role": "user",
+        "createdAt": "2025-08-16T22:57:14.890Z"
+      },
+      {
+        "id": 14,
+        "name": "سامي احمد",
+        "jobTitle": "محاسب",
+        "phoneNumber": "0532649681",
+        "username": "sami_ahmad",
+        "role": "accountant",
+        "createdAt": "2025-08-16T22:57:14.777Z"
+      },
+      {
+        "id": 13,
+        "name": "محمود كمال",
+        "jobTitle": "محاسب",
+        "phoneNumber": "0598084630",
+        "username": "mahmoud_kamal",
+        "role": "accountant",
+        "createdAt": "2025-08-16T22:57:14.664Z"
+      },
+      {
+        "id": 12,
+        "name": "احمد كمال",
+        "jobTitle": "محاسب",
+        "phoneNumber": "0555053167",
+        "username": "ahmad_kamal",
+        "role": "accountant",
+        "createdAt": "2025-08-16T22:57:14.551Z"
+      },
+      {
+        "id": 11,
+        "name": "احمد الجوهري",
+        "jobTitle": "مندوب البنوك",
+        "phoneNumber": "0543266042",
+        "username": "ahmad_aljawhary",
+        "role": "accountant",
+        "createdAt": "2025-08-16T22:57:14.437Z"
+      },
+      {
+        "id": 10,
+        "name": "ايمن المليكي",
+        "jobTitle": "مدير المبيعات",
+        "phoneNumber": "0508059998",
+        "username": "ayman_almaliki",
+        "role": "user",
+        "createdAt": "2025-08-16T22:57:14.324Z"
+      },
+      {
+        "id": 9,
+        "name": "ايمن الموشكي",
+        "jobTitle": "مندوب مبيعات",
+        "phoneNumber": "0533014932",
+        "username": "ayman_almoshki",
+        "role": "user",
+        "createdAt": "2025-08-16T22:57:14.211Z"
+      },
+      {
+        "id": 8,
+        "name": "عزام الغنامي",
+        "jobTitle": "مندوب مبيعات",
+        "phoneNumber": "0598147975",
+        "username": "azzam_alghanami",
+        "role": "user",
+        "createdAt": "2025-08-16T22:57:14.097Z"
+      },
+      {
+        "id": 7,
+        "name": "عمار المليكي",
+        "jobTitle": "مندوب مبيعات",
+        "phoneNumber": "0550399991",
+        "username": "ammar_almaliki",
+        "role": "user",
+        "createdAt": "2025-08-16T22:57:13.984Z"
+      },
+      {
+        "id": 6,
+        "name": "عبدالله نصر",
+        "jobTitle": "مندوب مبيعات",
+        "phoneNumber": "0503715148",
+        "username": "abdullah_nasr",
+        "role": "user",
+        "createdAt": "2025-08-16T22:57:13.871Z"
+      },
+      {
+        "id": 5,
+        "name": "زايد حيدر",
+        "jobTitle": "مندوب مبيعات",
+        "phoneNumber": "0554497773",
+        "username": "zaid_haidar",
+        "role": "user",
+        "createdAt": "2025-08-16T22:57:13.758Z"
+      },
+      {
+        "id": 4,
+        "name": "احمد الزميتي",
+        "jobTitle": "مندوب مبيعات",
+        "phoneNumber": "0557449997",
+        "username": "ahmad_alzmaity",
+        "role": "user",
+        "createdAt": "2025-08-16T22:57:13.638Z"
+      },
+      {
+        "id": 1,
+        "name": "Test Admin",
+        "jobTitle": "مدير النظام",
+        "phoneNumber": "0000000000",
+        "username": "admin",
+        "role": "admin",
+        "createdAt": "2025-08-16T22:43:28.639Z"
+      }
+    ]
+  }
+}
