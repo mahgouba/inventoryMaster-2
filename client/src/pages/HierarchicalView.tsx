@@ -1192,12 +1192,6 @@ export default function HierarchicalView() {
       <div className="flex gap-4 justify-center flex-wrap">
         {/* Add Specification Button */}
         <Dialog open={isAddSpecificationOpen} onOpenChange={setIsAddSpecificationOpen}>
-          <DialogTrigger asChild>
-            <Button className="glass-button flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              إضافة مواصفات تفصيلية
-            </Button>
-          </DialogTrigger>
           <DialogContent className="glass-modal max-w-2xl" dir="rtl">
             <DialogHeader className="flex flex-row items-center justify-between">
               <div className="flex-1">
@@ -1502,12 +1496,6 @@ export default function HierarchicalView() {
 
         {/* Add Image Link Button */}
         <Dialog open={isAddImageLinkOpen} onOpenChange={setIsAddImageLinkOpen}>
-          <DialogTrigger asChild>
-            <Button className="glass-button flex items-center gap-2">
-              <Image className="h-4 w-4" />
-              إضافة روابط الصور
-            </Button>
-          </DialogTrigger>
           <DialogContent className="glass-modal max-w-2xl" dir="rtl">
             <DialogHeader className="flex flex-row items-center justify-between">
               <div className="flex-1">
