@@ -2,7 +2,7 @@ import "dotenv/config";
 import { db } from "./db";
 import { 
   users, inventoryItems, banks, manufacturers, vehicleCategories, vehicleTrimLevels, colorAssociations,
-  vehicleSpecifications, vehicleImageLinks, priceCards,
+  vehicleSpecifications, vehicleImageLinks, priceCards, dailyAttendance, employeeWorkSchedules,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Bank, type InsertBank,
@@ -12,7 +12,9 @@ import {
   type ColorAssociation, type InsertColorAssociation,
   type VehicleSpecification, type InsertVehicleSpecification,
   type VehicleImageLink, type InsertVehicleImageLink,
-  type PriceCard, type InsertPriceCard
+  type PriceCard, type InsertPriceCard,
+  type DailyAttendance, type InsertDailyAttendance,
+  type EmployeeWorkSchedule, type InsertEmployeeWorkSchedule
 } from "@shared/schema";
 import { eq, sql, and, or, ilike, desc, asc } from "drizzle-orm";
 import type { IStorage } from "./storage";
@@ -1143,4 +1145,83 @@ export class DatabaseStorage implements IStorage {
   async addTrimLevel(trimData: any): Promise<any> { return this.createVehicleTrimLevel(trimData); }
   async updateCategory(id: number, categoryData: any): Promise<any> { return this.updateVehicleCategory(id, categoryData); }
   async deleteCategory(id: number): Promise<boolean> { return this.deleteVehicleCategory(id); }
+
+  // Employee Work Schedule methods
+  async getAllEmployeeWorkSchedules(): Promise<EmployeeWorkSchedule[]> {
+    return await db.select().from(employeeWorkSchedules).orderBy(desc(employeeWorkSchedules.createdAt));
+  }
+
+  async getEmployeeWorkScheduleById(id: number): Promise<EmployeeWorkSchedule | undefined> {
+    const [schedule] = await db.select().from(employeeWorkSchedules).where(eq(employeeWorkSchedules.id, id));
+    return schedule || undefined;
+  }
+
+  async getEmployeeWorkScheduleByEmployeeId(employeeId: number): Promise<EmployeeWorkSchedule | undefined> {
+    const [schedule] = await db.select().from(employeeWorkSchedules).where(eq(employeeWorkSchedules.employeeId, employeeId));
+    return schedule || undefined;
+  }
+
+  async createEmployeeWorkSchedule(schedule: InsertEmployeeWorkSchedule): Promise<EmployeeWorkSchedule> {
+    const [newSchedule] = await db.insert(employeeWorkSchedules).values(schedule).returning();
+    return newSchedule;
+  }
+
+  async updateEmployeeWorkSchedule(id: number, schedule: InsertEmployeeWorkSchedule): Promise<EmployeeWorkSchedule | undefined> {
+    const [updated] = await db.update(employeeWorkSchedules).set(schedule).where(eq(employeeWorkSchedules.id, id)).returning();
+    return updated || undefined;
+  }
+
+  async deleteEmployeeWorkSchedule(id: number): Promise<boolean> {
+    const result = await db.delete(employeeWorkSchedules).where(eq(employeeWorkSchedules.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Daily Attendance methods
+  async getAllDailyAttendance(): Promise<DailyAttendance[]> {
+    return await db.select().from(dailyAttendance).orderBy(desc(dailyAttendance.date));
+  }
+
+  async getDailyAttendanceById(id: number): Promise<DailyAttendance | undefined> {
+    const [attendance] = await db.select().from(dailyAttendance).where(eq(dailyAttendance.id, id));
+    return attendance || undefined;
+  }
+
+  async getDailyAttendanceByEmployeeAndDate(employeeId: number, date: Date): Promise<DailyAttendance | undefined> {
+    const [attendance] = await db.select().from(dailyAttendance).where(
+      and(
+        eq(dailyAttendance.employeeId, employeeId),
+        eq(dailyAttendance.date, date)
+      )
+    );
+    return attendance || undefined;
+  }
+
+  async getDailyAttendanceByEmployeeAndDateRange(employeeId: number, startDate: Date, endDate: Date): Promise<DailyAttendance[]> {
+    return await db.select().from(dailyAttendance).where(
+      and(
+        eq(dailyAttendance.employeeId, employeeId),
+        sql`${dailyAttendance.date} >= ${startDate}`,
+        sql`${dailyAttendance.date} <= ${endDate}`
+      )
+    );
+  }
+
+  async getDailyAttendanceByDate(date: Date): Promise<DailyAttendance[]> {
+    return await db.select().from(dailyAttendance).where(eq(dailyAttendance.date, date));
+  }
+
+  async createDailyAttendance(attendance: InsertDailyAttendance): Promise<DailyAttendance> {
+    const [newAttendance] = await db.insert(dailyAttendance).values(attendance).returning();
+    return newAttendance;
+  }
+
+  async updateDailyAttendance(id: number, attendance: InsertDailyAttendance): Promise<DailyAttendance | undefined> {
+    const [updated] = await db.update(dailyAttendance).set(attendance).where(eq(dailyAttendance.id, id)).returning();
+    return updated || undefined;
+  }
+
+  async deleteDailyAttendance(id: number): Promise<boolean> {
+    const result = await db.delete(dailyAttendance).where(eq(dailyAttendance.id, id));
+    return result.rowCount > 0;
+  }
 }
