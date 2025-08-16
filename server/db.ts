@@ -1,39 +1,15 @@
-import { Pool } from 'pg';
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import ws from "ws";
 import * as schema from "@shared/schema";
 
-let pool: Pool | null = null;
-let db: any = null;
+neonConfig.webSocketConstructor = ws;
 
-// Only initialize database connection if DATABASE_URL is available
-if (process.env.DATABASE_URL) {
-  try {
-    console.log('🔌 Initializing database connection...');
-    
-    // Configure pool with SSL settings for Railway/external databases
-    const poolConfig = {
-      connectionString: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: false
-      },
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    };
-    
-    pool = new Pool(poolConfig);
-    db = drizzle({ client: pool, schema });
-    console.log('✅ Database connection initialized successfully');
-  } catch (error) {
-    console.warn('⚠️ Failed to initialize database connection:', error);
-    pool = null;
-    db = null;
-  }
-} else {
-  console.log('ℹ️ DATABASE_URL not found - running without database (using MemStorage)');
+if (!process.env.DATABASE_URL) {
+  throw new Error(
+    "DATABASE_URL must be set. Did you forget to provision a database?",
+  );
 }
 
-export { pool, db };
-
-// Export a default db instance for easier imports
-export default db;
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const db = drizzle({ client: pool, schema });
