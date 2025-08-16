@@ -15,6 +15,7 @@ import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Search, Car, Image, Settings, FileText, Link, Palette } from "lucide-react";
+import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import type { VehicleSpecification, InsertVehicleSpecification, VehicleImageLink, InsertVehicleImageLink } from "@shared/schema";
 
 // Schemas for form validation
@@ -280,48 +281,69 @@ export default function SpecificationsManagement() {
     image.chassisNumber?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-900 dark:via-slate-800 dark:to-amber-900/20 p-6" dir="rtl">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl border border-amber-200/50 dark:border-amber-700/30 p-6 shadow-lg shadow-amber-100/50 dark:shadow-slate-900/50">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-br from-amber-100 to-yellow-100 dark:bg-gradient-to-br dark:from-amber-900/50 dark:to-yellow-900/50 rounded-xl border border-amber-200 dark:border-amber-700/50">
-                <Settings className="w-7 h-7 text-amber-700 dark:text-amber-300" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-700 to-yellow-600 dark:from-amber-300 dark:to-yellow-200 bg-clip-text text-transparent">إدارة المواصفات والصور</h1>
-                <p className="text-amber-600/80 dark:text-amber-300/80 text-lg">إدارة مواصفات المركبات وروابط الصور التفصيلية</p>
-              </div>
-            </div>
+  if (specsLoading || imagesLoading) {
+    return (
+      <SystemGlassWrapper>
+        <div className="container mx-auto p-4">
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto"></div>
+            <p className="mt-2 text-white/70 drop-shadow-sm">جاري تحميل البيانات...</p>
           </div>
+        </div>
+      </SystemGlassWrapper>
+    );
+  }
 
-          {/* Search */}
+  return (
+    <SystemGlassWrapper>
+      <div className="container mx-auto p-4" dir="rtl">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-white drop-shadow-lg mb-2">
+            إدارة المواصفات والصور
+          </h1>
+          <p className="text-white/70 drop-shadow-sm">
+            إدارة مواصفات المركبات وروابط الصور التفصيلية
+          </p>
+        </div>
+
+        {/* Search */}
+        <div className="mb-6">
           <div className="relative">
-            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-500 dark:text-amber-400 w-5 h-5" />
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               placeholder="البحث في المواصفات والصور..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pr-10 border-amber-200 dark:border-amber-700/50 focus:border-amber-400 dark:focus:border-amber-500 bg-white/50 dark:bg-slate-700/50"
+              className="pr-10 text-right"
             />
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="glass-container p-4 text-center">
+            <div className="text-2xl font-bold text-blue-400 drop-shadow-lg">{filteredSpecs.length}</div>
+            <div className="text-sm text-white/70 drop-shadow-sm">مواصفات المركبات</div>
+          </div>
+          <div className="glass-container p-4 text-center">
+            <div className="text-2xl font-bold text-green-400 drop-shadow-lg">{filteredImages.length}</div>
+            <div className="text-sm text-white/70 drop-shadow-sm">روابط الصور</div>
           </div>
         </div>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-white/80 dark:bg-slate-800/80 border border-amber-200/50 dark:border-amber-700/30 rounded-xl p-1">
+          <TabsList className="grid w-full grid-cols-2 glass-container p-1">
             <TabsTrigger 
               value="specifications" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-500 data-[state=active]:text-white data-[state=active]:shadow-lg"
+              className="data-[state=active]:bg-blue-500/80 data-[state=active]:text-white data-[state=active]:shadow-lg text-white/70"
             >
               <FileText className="w-4 h-4 ml-2" />
               مواصفات المركبات
             </TabsTrigger>
             <TabsTrigger 
               value="images" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-500 data-[state=active]:text-white data-[state=active]:shadow-lg"
+              className="data-[state=active]:bg-blue-500/80 data-[state=active]:text-white data-[state=active]:shadow-lg text-white/70"
             >
               <Image className="w-4 h-4 ml-2" />
               روابط الصور
@@ -331,11 +353,11 @@ export default function SpecificationsManagement() {
           {/* Specifications Tab */}
           <TabsContent value="specifications" className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-amber-800 dark:text-amber-200">مواصفات المركبات</h2>
+              <h2 className="text-xl font-semibold text-white drop-shadow-lg">مواصفات المركبات</h2>
               <Dialog open={isSpecDialogOpen} onOpenChange={setIsSpecDialogOpen}>
                 <DialogTrigger asChild>
                   <Button 
-                    className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-lg"
+                    className="bg-green-500/80 hover:bg-green-500 text-white border-green-400/30 shadow-lg"
                     onClick={() => {
                       setEditingSpec(null);
                       specForm.reset();
@@ -345,9 +367,9 @@ export default function SpecificationsManagement() {
                     إضافة مواصفات جديدة
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-amber-200 dark:border-amber-700/50">
+                <DialogContent className="max-w-2xl glass-container">
                   <DialogHeader>
-                    <DialogTitle className="text-amber-800 dark:text-amber-200">
+                    <DialogTitle className="text-white drop-shadow-lg">
                       {editingSpec ? "تعديل المواصفات" : "إضافة مواصفات جديدة"}
                     </DialogTitle>
                   </DialogHeader>
@@ -359,10 +381,10 @@ export default function SpecificationsManagement() {
                           name="manufacturer"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-amber-700 dark:text-amber-300">الشركة المصنعة</FormLabel>
+                              <FormLabel className="text-white drop-shadow-sm">الشركة المصنعة</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                     <SelectValue placeholder="اختر الشركة المصنعة" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -383,10 +405,10 @@ export default function SpecificationsManagement() {
                           name="category"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-amber-700 dark:text-amber-300">الفئة</FormLabel>
+                              <FormLabel className="text-white drop-shadow-sm">الفئة</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                     <SelectValue placeholder="اختر الفئة" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -407,10 +429,10 @@ export default function SpecificationsManagement() {
                           name="trimLevel"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-amber-700 dark:text-amber-300">درجة التجهيز</FormLabel>
+                              <FormLabel className="text-white drop-shadow-sm">درجة التجهيز</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                     <SelectValue placeholder="اختر درجة التجهيز" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -431,10 +453,10 @@ export default function SpecificationsManagement() {
                           name="year"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-amber-700 dark:text-amber-300">السنة</FormLabel>
+                              <FormLabel className="text-white drop-shadow-sm">السنة</FormLabel>
                               <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
                                 <FormControl>
-                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                     <SelectValue placeholder="اختر السنة" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -455,10 +477,10 @@ export default function SpecificationsManagement() {
                           name="engineCapacity"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-amber-700 dark:text-amber-300">سعة المحرك</FormLabel>
+                              <FormLabel className="text-white drop-shadow-sm">سعة المحرك</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                     <SelectValue placeholder="اختر سعة المحرك" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -479,12 +501,12 @@ export default function SpecificationsManagement() {
                           name="chassisNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-amber-700 dark:text-amber-300">رقم الهيكل (اختياري)</FormLabel>
+                              <FormLabel className="text-white drop-shadow-sm">رقم الهيكل (اختياري)</FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="رقم الهيكل"
                                   {...field}
-                                  className="border-amber-200 dark:border-amber-700/50"
+                                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                                 />
                               </FormControl>
                               <FormMessage />
@@ -497,11 +519,11 @@ export default function SpecificationsManagement() {
                         name="specifications"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-amber-700 dark:text-amber-300">المواصفات (عربي)</FormLabel>
+                            <FormLabel className="text-white drop-shadow-sm">المواصفات (عربي)</FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="اكتب المواصفات التفصيلية..."
-                                className="h-32 border-amber-200 dark:border-amber-700/50"
+                                className="h-32 bg-white/10 border-white/20 text-white placeholder:text-white/50"
                                 {...field}
                               />
                             </FormControl>
@@ -514,11 +536,11 @@ export default function SpecificationsManagement() {
                         name="specificationsEn"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-amber-700 dark:text-amber-300">المواصفات (إنجليزي)</FormLabel>
+                            <FormLabel className="text-white drop-shadow-sm">المواصفات (إنجليزي)</FormLabel>
                             <FormControl>
                               <Textarea
-                                placeholder="Write detailed specifications..."
-                                className="h-32 border-amber-200 dark:border-amber-700/50"
+                                placeholder="Enter detailed specifications..."
+                                className="h-32 bg-white/10 border-white/20 text-white placeholder:text-white/50"
                                 {...field}
                               />
                             </FormControl>
@@ -526,21 +548,21 @@ export default function SpecificationsManagement() {
                           </FormItem>
                         )}
                       />
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={() => setIsSpecDialogOpen(false)}
-                          className="border-amber-200 dark:border-amber-700/50"
-                        >
-                          إلغاء
-                        </Button>
-                        <Button 
-                          type="submit" 
+                      <div className="flex gap-2 pt-4">
+                        <Button
+                          type="submit"
                           disabled={specMutation.isPending}
-                          className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white"
+                          className="bg-green-500/80 hover:bg-green-500 text-white border-green-400/30"
                         >
                           {specMutation.isPending ? "جاري الحفظ..." : "حفظ"}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsSpecDialogOpen(false)}
+                          className="border-white/20 text-white hover:bg-white/10"
+                        >
+                          إلغاء
                         </Button>
                       </div>
                     </form>
@@ -550,93 +572,92 @@ export default function SpecificationsManagement() {
             </div>
 
             {/* Specifications List */}
-            <div className="grid gap-4">
-              {specsLoading ? (
-                <div className="text-center py-8 text-amber-600 dark:text-amber-400">جاري التحميل...</div>
-              ) : filteredSpecs.length === 0 ? (
-                <div className="text-center py-8 text-amber-600 dark:text-amber-400">لا توجد مواصفات</div>
-              ) : (
-                filteredSpecs.map((spec: VehicleSpecification) => (
-                  <Card key={spec.id} className="bg-white/80 dark:bg-slate-800/80 border-amber-200/50 dark:border-amber-700/30 shadow-md hover:shadow-lg transition-shadow">
-                    <CardHeader className="pb-3">
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <CardTitle className="text-amber-800 dark:text-amber-200 flex items-center gap-2">
-                            <Car className="w-5 h-5" />
-                            {spec.manufacturer} {spec.category} {spec.trimLevel}
-                          </CardTitle>
-                          <div className="flex gap-2 text-sm text-amber-600/80 dark:text-amber-300/80">
-                            {spec.year && <span>السنة: {spec.year}</span>}
-                            {spec.engineCapacity && <span>المحرك: {spec.engineCapacity}</span>}
-                            {spec.chassisNumber && <span>رقم الهيكل: {spec.chassisNumber}</span>}
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
+            {filteredSpecs.length === 0 ? (
+              <div className="glass-container text-center py-8">
+                <FileText className="w-12 h-12 text-white/40 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-white drop-shadow-lg mb-2">
+                  لا توجد مواصفات
+                </h3>
+                <p className="text-white/70 drop-shadow-sm">
+                  لم يتم إضافة أي مواصفات بعد
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredSpecs.map((spec: VehicleSpecification) => (
+                  <div key={spec.id} className="glass-container">
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold text-white drop-shadow-lg">
+                          {spec.manufacturer} {spec.category}
+                        </h3>
+                        <div className="flex gap-1">
                           <Button
-                            variant="outline"
                             size="sm"
+                            variant="ghost"
                             onClick={() => handleEditSpec(spec)}
-                            className="border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/20"
+                            className="text-blue-400 hover:bg-blue-500/20 p-1 h-8 w-8"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
                           <Button
-                            variant="outline"
                             size="sm"
+                            variant="ghost"
                             onClick={() => deleteSpecMutation.mutate(spec.id)}
-                            className="border-red-300 text-red-700 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
+                            className="text-red-400 hover:bg-red-500/20 p-1 h-8 w-8"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        {spec.specifications && (
-                          <div>
-                            <h4 className="font-medium text-amber-700 dark:text-amber-300">المواصفات:</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 bg-amber-50/50 dark:bg-amber-900/10 p-2 rounded">
-                              {spec.specifications}
-                            </p>
-                          </div>
+                      
+                      <div className="space-y-2 text-sm">
+                        {spec.trimLevel && (
+                          <div className="text-white/80 drop-shadow-sm">درجة التجهيز: {spec.trimLevel}</div>
                         )}
-                        {spec.specificationsEn && (
-                          <div>
-                            <h4 className="font-medium text-amber-700 dark:text-amber-300">Specifications:</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 bg-amber-50/50 dark:bg-amber-900/10 p-2 rounded">
-                              {spec.specificationsEn}
-                            </p>
-                          </div>
+                        {spec.year && (
+                          <div className="text-white/80 drop-shadow-sm">السنة: {spec.year}</div>
+                        )}
+                        {spec.engineCapacity && (
+                          <div className="text-white/80 drop-shadow-sm">سعة المحرك: {spec.engineCapacity}</div>
+                        )}
+                        {spec.chassisNumber && (
+                          <div className="text-white/80 drop-shadow-sm">رقم الهيكل: {spec.chassisNumber}</div>
                         )}
                       </div>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
+                      
+                      <div className="mt-3 p-2 bg-white/5 rounded border border-white/10">
+                        <div className="text-xs text-white/90 drop-shadow-sm line-clamp-3">
+                          {spec.specifications}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           {/* Images Tab */}
           <TabsContent value="images" className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-amber-800 dark:text-amber-200">روابط الصور</h2>
+              <h2 className="text-xl font-semibold text-white drop-shadow-lg">روابط الصور</h2>
               <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
                 <DialogTrigger asChild>
                   <Button 
-                    className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-lg"
+                    className="bg-green-500/80 hover:bg-green-500 text-white border-green-400/30 shadow-lg"
                     onClick={() => {
                       setEditingImage(null);
                       imageForm.reset();
                     }}
                   >
                     <Plus className="w-4 h-4 ml-2" />
-                    إضافة رابط صورة جديد
+                    إضافة رابط صورة
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-amber-200 dark:border-amber-700/50">
+                <DialogContent className="max-w-2xl glass-container">
                   <DialogHeader>
-                    <DialogTitle className="text-amber-800 dark:text-amber-200">
+                    <DialogTitle className="text-white drop-shadow-lg">
                       {editingImage ? "تعديل رابط الصورة" : "إضافة رابط صورة جديد"}
                     </DialogTitle>
                   </DialogHeader>
@@ -648,10 +669,10 @@ export default function SpecificationsManagement() {
                           name="manufacturer"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-amber-700 dark:text-amber-300">الشركة المصنعة</FormLabel>
+                              <FormLabel className="text-white drop-shadow-sm">الشركة المصنعة</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                     <SelectValue placeholder="اختر الشركة المصنعة" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -672,10 +693,10 @@ export default function SpecificationsManagement() {
                           name="category"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-amber-700 dark:text-amber-300">الفئة</FormLabel>
+                              <FormLabel className="text-white drop-shadow-sm">الفئة</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                     <SelectValue placeholder="اختر الفئة" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -693,71 +714,20 @@ export default function SpecificationsManagement() {
                         />
                         <FormField
                           control={imageForm.control}
-                          name="trimLevel"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-amber-700 dark:text-amber-300">درجة التجهيز</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
-                                    <SelectValue placeholder="اختر درجة التجهيز" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {trimLevelOptions.map((trim) => (
-                                    <SelectItem key={trim} value={trim}>
-                                      {trim}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={imageForm.control}
-                          name="year"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-amber-700 dark:text-amber-300">السنة</FormLabel>
-                              <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
-                                <FormControl>
-                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
-                                    <SelectValue placeholder="اختر السنة" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {yearOptions.map((year) => (
-                                    <SelectItem key={year} value={year}>
-                                      {year}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={imageForm.control}
                           name="exteriorColor"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-amber-700 dark:text-amber-300">اللون الخارجي</FormLabel>
+                              <FormLabel className="text-white drop-shadow-sm">اللون الخارجي</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                     <SelectValue placeholder="اختر اللون الخارجي" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
                                   {colorOptions.map((color) => (
                                     <SelectItem key={color} value={color}>
-                                      <div className="flex items-center gap-2">
-                                        <Palette className="w-4 h-4" />
-                                        {color}
-                                      </div>
+                                      {color}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -771,20 +741,17 @@ export default function SpecificationsManagement() {
                           name="interiorColor"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-amber-700 dark:text-amber-300">اللون الداخلي</FormLabel>
+                              <FormLabel className="text-white drop-shadow-sm">اللون الداخلي</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="border-amber-200 dark:border-amber-700/50">
+                                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                     <SelectValue placeholder="اختر اللون الداخلي" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
                                   {colorOptions.map((color) => (
                                     <SelectItem key={color} value={color}>
-                                      <div className="flex items-center gap-2">
-                                        <Palette className="w-4 h-4" />
-                                        {color}
-                                      </div>
+                                      {color}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -794,50 +761,35 @@ export default function SpecificationsManagement() {
                           )}
                         />
                       </div>
-                      <FormField
-                        control={imageForm.control}
-                        name="chassisNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-amber-700 dark:text-amber-300">رقم الهيكل (اختياري)</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="رقم الهيكل"
-                                {...field}
-                                className="border-amber-200 dark:border-amber-700/50"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      
                       <FormField
                         control={imageForm.control}
                         name="imageUrl"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-amber-700 dark:text-amber-300">رابط الصورة *</FormLabel>
+                            <FormLabel className="text-white drop-shadow-sm">رابط الصورة</FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="https://example.com/image.jpg"
                                 {...field}
-                                className="border-amber-200 dark:border-amber-700/50"
+                                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
+                      
                       <FormField
                         control={imageForm.control}
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-amber-700 dark:text-amber-300">وصف الصورة (عربي)</FormLabel>
+                            <FormLabel className="text-white drop-shadow-sm">الوصف (عربي)</FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="وصف الصورة..."
-                                className="h-20 border-amber-200 dark:border-amber-700/50"
+                                className="h-24 bg-white/10 border-white/20 text-white placeholder:text-white/50"
                                 {...field}
                               />
                             </FormControl>
@@ -845,38 +797,22 @@ export default function SpecificationsManagement() {
                           </FormItem>
                         )}
                       />
-                      <FormField
-                        control={imageForm.control}
-                        name="descriptionEn"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-amber-700 dark:text-amber-300">وصف الصورة (إنجليزي)</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Image description..."
-                                className="h-20 border-amber-200 dark:border-amber-700/50"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={() => setIsImageDialogOpen(false)}
-                          className="border-amber-200 dark:border-amber-700/50"
-                        >
-                          إلغاء
-                        </Button>
-                        <Button 
-                          type="submit" 
+                      
+                      <div className="flex gap-2 pt-4">
+                        <Button
+                          type="submit"
                           disabled={imageMutation.isPending}
-                          className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white"
+                          className="bg-green-500/80 hover:bg-green-500 text-white border-green-400/30"
                         >
                           {imageMutation.isPending ? "جاري الحفظ..." : "حفظ"}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsImageDialogOpen(false)}
+                          className="border-white/20 text-white hover:bg-white/10"
+                        >
+                          إلغاء
                         </Button>
                       </div>
                     </form>
@@ -886,81 +822,82 @@ export default function SpecificationsManagement() {
             </div>
 
             {/* Images List */}
-            <div className="grid gap-4">
-              {imagesLoading ? (
-                <div className="text-center py-8 text-amber-600 dark:text-amber-400">جاري التحميل...</div>
-              ) : filteredImages.length === 0 ? (
-                <div className="text-center py-8 text-amber-600 dark:text-amber-400">لا توجد روابط صور</div>
-              ) : (
-                filteredImages.map((image: VehicleImageLink) => (
-                  <Card key={image.id} className="bg-white/80 dark:bg-slate-800/80 border-amber-200/50 dark:border-amber-700/30 shadow-md hover:shadow-lg transition-shadow">
-                    <CardHeader className="pb-3">
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <CardTitle className="text-amber-800 dark:text-amber-200 flex items-center gap-2">
-                            <Image className="w-5 h-5" />
-                            {image.manufacturer} {image.category} {image.trimLevel}
-                          </CardTitle>
-                          <div className="flex gap-2 text-sm text-amber-600/80 dark:text-amber-300/80">
-                            {image.year && <span>السنة: {image.year}</span>}
-                            {image.exteriorColor && <span>خارجي: {image.exteriorColor}</span>}
-                            {image.interiorColor && <span>داخلي: {image.interiorColor}</span>}
-                            {image.chassisNumber && <span>رقم الهيكل: {image.chassisNumber}</span>}
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
+            {filteredImages.length === 0 ? (
+              <div className="glass-container text-center py-8">
+                <Image className="w-12 h-12 text-white/40 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-white drop-shadow-lg mb-2">
+                  لا توجد روابط صور
+                </h3>
+                <p className="text-white/70 drop-shadow-sm">
+                  لم يتم إضافة أي روابط صور بعد
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredImages.map((image: VehicleImageLink) => (
+                  <div key={image.id} className="glass-container">
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold text-white drop-shadow-lg">
+                          {image.manufacturer} {image.category}
+                        </h3>
+                        <div className="flex gap-1">
                           <Button
-                            variant="outline"
                             size="sm"
+                            variant="ghost"
                             onClick={() => handleEditImage(image)}
-                            className="border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/20"
+                            className="text-blue-400 hover:bg-blue-500/20 p-1 h-8 w-8"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
                           <Button
-                            variant="outline"
                             size="sm"
+                            variant="ghost"
                             onClick={() => deleteImageMutation.mutate(image.id)}
-                            className="border-red-300 text-red-700 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
+                            className="text-red-400 hover:bg-red-500/20 p-1 h-8 w-8"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300">
-                          <Link className="w-4 h-4" />
-                          <a href={image.imageUrl} target="_blank" rel="noopener noreferrer" className="hover:underline break-all">
-                            {image.imageUrl}
-                          </a>
-                        </div>
-                        {image.description && (
-                          <div>
-                            <h4 className="font-medium text-amber-700 dark:text-amber-300">الوصف:</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 bg-amber-50/50 dark:bg-amber-900/10 p-2 rounded">
-                              {image.description}
-                            </p>
-                          </div>
+                      
+                      <div className="space-y-2 text-sm">
+                        {image.exteriorColor && (
+                          <div className="text-white/80 drop-shadow-sm">اللون الخارجي: {image.exteriorColor}</div>
                         )}
-                        {image.descriptionEn && (
-                          <div>
-                            <h4 className="font-medium text-amber-700 dark:text-amber-300">Description:</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 bg-amber-50/50 dark:bg-amber-900/10 p-2 rounded">
-                              {image.descriptionEn}
-                            </p>
-                          </div>
+                        {image.interiorColor && (
+                          <div className="text-white/80 drop-shadow-sm">اللون الداخلي: {image.interiorColor}</div>
                         )}
                       </div>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
+                      
+                      {image.imageUrl && (
+                        <div className="mt-3">
+                          <img 
+                            src={image.imageUrl} 
+                            alt={image.description || "صورة المركبة"}
+                            className="w-full h-32 object-cover rounded border border-white/20"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+                      
+                      {image.description && (
+                        <div className="mt-3 p-2 bg-white/5 rounded border border-white/10">
+                          <div className="text-xs text-white/90 drop-shadow-sm line-clamp-2">
+                            {image.description}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </SystemGlassWrapper>
   );
 }
