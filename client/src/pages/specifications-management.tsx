@@ -169,13 +169,7 @@ export default function SpecificationsManagement() {
     mutationFn: async (data: SpecificationFormData) => {
       const url = editingSpec ? `/api/vehicle-specifications/${editingSpec.id}` : '/api/vehicle-specifications';
       const method = editingSpec ? 'PUT' : 'POST';
-      return apiRequest(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      return apiRequest(method, url, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specifications'] });
@@ -201,13 +195,7 @@ export default function SpecificationsManagement() {
     mutationFn: async (data: ImageLinkFormData) => {
       const url = editingImage ? `/api/vehicle-image-links/${editingImage.id}` : '/api/vehicle-image-links';
       const method = editingImage ? 'PUT' : 'POST';
-      return apiRequest(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      return apiRequest(method, url, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-image-links'] });
@@ -231,9 +219,7 @@ export default function SpecificationsManagement() {
   // Delete specification mutation
   const deleteSpecMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/vehicle-specifications/${id}`, {
-        method: 'DELETE',
-      });
+      return apiRequest('DELETE', `/api/vehicle-specifications/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specifications'] });
@@ -247,9 +233,7 @@ export default function SpecificationsManagement() {
   // Delete image link mutation
   const deleteImageMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/vehicle-image-links/${id}`, {
-        method: 'DELETE',
-      });
+      return apiRequest('DELETE', `/api/vehicle-image-links/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-image-links'] });
