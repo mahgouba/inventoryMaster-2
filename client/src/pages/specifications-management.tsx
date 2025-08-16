@@ -391,18 +391,6 @@ export default function SpecificationsManagement() {
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold text-white drop-shadow-lg">مواصفات المركبات</h2>
               <Dialog open={isSpecDialogOpen} onOpenChange={setIsSpecDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button 
-                    className="bg-green-500/80 hover:bg-green-500 text-white border-green-400/30 shadow-lg"
-                    onClick={() => {
-                      setEditingSpec(null);
-                      specForm.reset();
-                    }}
-                  >
-                    <Plus className="w-4 h-4 ml-2" />
-                    إضافة مواصفات جديدة
-                  </Button>
-                </DialogTrigger>
                 <DialogContent className="max-w-2xl glass-container">
                   <DialogHeader>
                     <DialogTitle className="text-white drop-shadow-lg">
@@ -686,18 +674,6 @@ export default function SpecificationsManagement() {
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold text-white drop-shadow-lg">روابط الصور</h2>
               <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button 
-                    className="bg-green-500/80 hover:bg-green-500 text-white border-green-400/30 shadow-lg"
-                    onClick={() => {
-                      setEditingImage(null);
-                      imageForm.reset();
-                    }}
-                  >
-                    <Plus className="w-4 h-4 ml-2" />
-                    إضافة رابط صورة
-                  </Button>
-                </DialogTrigger>
                 <DialogContent className="max-w-2xl glass-container">
                   <DialogHeader>
                     <DialogTitle className="text-white drop-shadow-lg">
