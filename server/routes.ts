@@ -301,7 +301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const allTrimLevels = await getStorage().getAllTrimLevels();
           const categoryTrimLevels = allTrimLevels.filter(t => {
             // Handle both field names for compatibility
-            const catId = (t as any).category_id || t.categoryId;
+            const catId = (t as any).categoryId;
             return catId === vehicleCategory.id;
           });
           
@@ -320,7 +320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Combine all trim level sources with proper field mapping
           const allTrims = new Set([
             ...vehicleTrimLevels.map(t => t.nameAr),
-            ...categoryTrimLevels.map(t => (t as any).name_ar || t.nameAr),
+            ...categoryTrimLevels.map(t => t.trimLevel),
             ...inventoryTrims
           ]);
           
@@ -1706,7 +1706,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (trimLevel) filters.trimLevel = trimLevel;
       if (colorType) filters.colorType = colorType;
       
-      const colors = await getStorage().getColorAssociations(filters);
+      const colors = await getStorage().getColorAssociationsByFilters(filters);
       res.json(colors);
     } catch (error) {
       console.error("Error fetching hierarchical colors:", error);
@@ -2497,11 +2497,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const brand of carsData) {
         try {
           const existingManufacturers = await getStorage().getAllManufacturers();
-          const exists = existingManufacturers.some(m => m.name === brand.brand_ar);
+          const exists = existingManufacturers.some(m => m.nameAr === brand.brand_ar);
           
           if (!exists) {
             await getStorage().createManufacturer({
-              name: brand.brand_ar,
+              nameAr: brand.brand_ar,
+              nameEn: brand.brand_en || brand.brand_ar,
               logo: null
             });
           }
@@ -3198,7 +3199,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           date: date,
           scheduleType: "متصل",
           notes: isHoliday ? 'إجازة' : null,
-          isConfirmed: true // Mark holiday records as confirmed
         });
         res.status(201).json(newAttendance);
       }
