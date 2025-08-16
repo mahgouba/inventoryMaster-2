@@ -3021,6 +3021,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update employee work schedule
+  app.put("/api/employee-work-schedules/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid schedule ID" });
+      }
+
+      const scheduleData = insertEmployeeWorkScheduleSchema.parse(req.body);
+      const updatedSchedule = await getStorage().updateEmployeeWorkSchedule(id, scheduleData);
+      
+      if (!updatedSchedule) {
+        return res.status(404).json({ message: "Employee work schedule not found" });
+      }
+
+      res.json(updatedSchedule);
+    } catch (error) {
+      console.error("Error updating employee work schedule:", error);
+      res.status(500).json({ message: "Failed to update employee work schedule" });
+    }
+  });
+
+  // Delete employee work schedule
+  app.delete("/api/employee-work-schedules/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid schedule ID" });
+      }
+
+      const deleted = await getStorage().deleteEmployeeWorkSchedule(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Employee work schedule not found" });
+      }
+
+      res.json({ message: "Employee work schedule deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting employee work schedule:", error);
+      res.status(500).json({ message: "Failed to delete employee work schedule" });
+    }
+  });
+
   app.put("/api/employee-work-schedules/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);

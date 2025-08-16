@@ -33,7 +33,9 @@ import {
   CheckSquare,
   Printer,
   Search,
-  Filter
+  Filter,
+  Edit,
+  Trash2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay, parseISO, isBefore } from "date-fns";
@@ -167,6 +169,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState(false);
   const [selectedEmployeeForDialog, setSelectedEmployeeForDialog] = useState<EmployeeWorkSchedule | null>(null);
   const [isCreateRequestDialogOpen, setIsCreateRequestDialogOpen] = useState(false);
+  const [isEditScheduleDialogOpen, setIsEditScheduleDialogOpen] = useState(false);
+  const [selectedScheduleForEdit, setSelectedScheduleForEdit] = useState<EmployeeWorkSchedule | null>(null);
 
   // Create request form states
   const [requestType, setRequestType] = useState<string>("استئذان");
@@ -420,6 +424,86 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     },
   });
 
+  // Update work schedule mutation
+  const updateScheduleMutation = useMutation({
+    mutationFn: async (scheduleData: any) => {
+      const response = await fetch(`/api/employee-work-schedules/${scheduleData.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(scheduleData),
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "تم تحديث الجدول الزمني",
+        description: "تم تحديث جدول العمل بنجاح",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/employee-work-schedules"] });
+      setIsEditScheduleDialogOpen(false);
+      setSelectedScheduleForEdit(null);
+      resetScheduleForm();
+    },
+    onError: () => {
+      toast({
+        title: "خطأ في تحديث الجدول",
+        description: "حدث خطأ أثناء تحديث جدول العمل",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete work schedule mutation
+  const deleteScheduleMutation = useMutation({
+    mutationFn: async (scheduleId: number) => {
+      const response = await fetch(`/api/employee-work-schedules/${scheduleId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "تم حذف الجدول الزمني",
+        description: "تم حذف جدول العمل بنجاح",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/employee-work-schedules"] });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ في حذف الجدول",
+        description: "حدث خطأ أثناء حذف جدول العمل",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Reset schedule form
+  const resetScheduleForm = () => {
+    setSelectedEmployeeId("");
+    setSalary("");
+    setScheduleType("متصل");
+    setContinuousStartTime("09:00");
+    setContinuousEndTime("17:00");
+    setMorningStartTime("09:00");
+    setMorningEndTime("12:00");
+    setEveningStartTime("14:00");
+    setEveningEndTime("17:00");
+  };
+
   // Update attendance mutation
   const updateAttendanceMutation = useMutation({
     mutationFn: async ({ attendanceId, field, value, status }: { 
@@ -469,18 +553,6 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     },
   });
 
-  const resetScheduleForm = () => {
-    setSelectedEmployeeId("");
-    setScheduleType("متصل");
-    setSalary("");
-    setContinuousStartTime("09:00");
-    setContinuousEndTime("17:00");
-    setMorningStartTime("09:00");
-    setMorningEndTime("12:00");
-    setEveningStartTime("14:00");
-    setEveningEndTime("17:00");
-  };
-
   const handleApproveRequest = (id: number) => {
     updateRequestStatusMutation.mutate({ id, status: "approved" });
   };
@@ -515,6 +587,60 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     };
 
     createScheduleMutation.mutate(scheduleData);
+  };
+
+  // Handle editing a schedule
+  const handleEditSchedule = (schedule: EmployeeWorkSchedule) => {
+    setSelectedScheduleForEdit(schedule);
+    setSelectedEmployeeId(schedule.employeeId.toString());
+    setSalary(schedule.salary);
+    setScheduleType(schedule.scheduleType);
+    
+    if (schedule.scheduleType === "متصل") {
+      setContinuousStartTime(schedule.continuousStartTime || "09:00");
+      setContinuousEndTime(schedule.continuousEndTime || "17:00");
+    } else {
+      setMorningStartTime(schedule.morningStartTime || "09:00");
+      setMorningEndTime(schedule.morningEndTime || "12:00");
+      setEveningStartTime(schedule.eveningStartTime || "14:00");
+      setEveningEndTime(schedule.eveningEndTime || "17:00");
+    }
+    
+    setIsEditScheduleDialogOpen(true);
+  };
+
+  // Handle updating a schedule
+  const handleUpdateSchedule = () => {
+    if (!selectedScheduleForEdit || !salary) return;
+
+    const scheduleData = {
+      id: selectedScheduleForEdit.id,
+      employeeId: selectedScheduleForEdit.employeeId,
+      employeeName: selectedScheduleForEdit.employeeName,
+      salary: parseFloat(salary).toString(),
+      scheduleType,
+      ...(scheduleType === "متصل" 
+        ? {
+            continuousStartTime,
+            continuousEndTime
+          }
+        : {
+            morningStartTime,
+            morningEndTime,
+            eveningStartTime,
+            eveningEndTime
+          }
+      )
+    };
+
+    updateScheduleMutation.mutate(scheduleData);
+  };
+
+  // Handle deleting a schedule
+  const handleDeleteSchedule = (scheduleId: number) => {
+    if (confirm("هل أنت متأكد من حذف هذا الجدول الزمني؟")) {
+      deleteScheduleMutation.mutate(scheduleId);
+    }
   };
 
   const handleAttendanceUpdate = (attendanceId: number, field: string, value: string) => {
@@ -1845,6 +1971,32 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                         </div>
                       </div>
                     )}
+
+                    {/* Action Buttons */}
+                    {canManageSchedules && (
+                      <div className="flex gap-2 mt-4 pt-4 border-t border-white/10">
+                        <Button
+                          onClick={() => handleEditSchedule(schedule)}
+                          size="sm"
+                          variant="outline"
+                          className="bg-blue-500/20 border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors"
+                          data-testid={`edit-schedule-${schedule.id}`}
+                        >
+                          <Edit className="w-4 h-4 mr-2" />
+                          تعديل
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteSchedule(schedule.id)}
+                          size="sm"
+                          variant="outline"
+                          className="bg-red-500/20 border-red-500/30 text-red-400 hover:bg-red-500/30 transition-colors"
+                          data-testid={`delete-schedule-${schedule.id}`}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          حذف
+                        </Button>
+                      </div>
+                    )}
                   </GlassCard>
                 ))}
               </div>
@@ -2881,6 +3033,141 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
             </DialogContent>
           </Dialog>
         </Tabs>
+
+        {/* Edit Schedule Dialog */}
+        {isEditScheduleDialogOpen && selectedScheduleForEdit && (
+          <Dialog open={isEditScheduleDialogOpen} onOpenChange={setIsEditScheduleDialogOpen}>
+            <DialogContent className="sm:max-w-md bg-gray-900/95 backdrop-blur-sm border-gray-700">
+              <DialogHeader>
+                <DialogTitle className="text-white text-right">
+                  تعديل جدول العمل - {selectedScheduleForEdit.employeeName}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 p-4">
+                <div>
+                  <Label className="text-white mb-2 block">الراتب (ريال)</Label>
+                  <Input
+                    type="number"
+                    placeholder="أدخل الراتب"
+                    value={salary}
+                    onChange={(e) => setSalary(e.target.value)}
+                    className="bg-white/10 border-white/20 text-white"
+                    data-testid="edit-salary-input"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-white mb-2 block">نوع الجدول</Label>
+                  <Select value={scheduleType} onValueChange={setScheduleType}>
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="متصل">متصل</SelectItem>
+                      <SelectItem value="منقسم">منقسم</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {scheduleType === "متصل" ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-white mb-2 block">وقت الحضور</Label>
+                        <Input
+                          type="time"
+                          value={continuousStartTime}
+                          onChange={(e) => setContinuousStartTime(e.target.value)}
+                          className="bg-white/10 border-white/20 text-white"
+                          data-testid="edit-continuous-start-time"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-white mb-2 block">وقت الانصراف</Label>
+                        <Input
+                          type="time"
+                          value={continuousEndTime}
+                          onChange={(e) => setContinuousEndTime(e.target.value)}
+                          className="bg-white/10 border-white/20 text-white"
+                          data-testid="edit-continuous-end-time"
+                        />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-white mb-2 block">بداية الفترة الصباحية</Label>
+                        <Input
+                          type="time"
+                          value={morningStartTime}
+                          onChange={(e) => setMorningStartTime(e.target.value)}
+                          className="bg-white/10 border-white/20 text-white"
+                          data-testid="edit-morning-start-time"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-white mb-2 block">نهاية الفترة الصباحية</Label>
+                        <Input
+                          type="time"
+                          value={morningEndTime}
+                          onChange={(e) => setMorningEndTime(e.target.value)}
+                          className="bg-white/10 border-white/20 text-white"
+                          data-testid="edit-morning-end-time"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-white mb-2 block">بداية الفترة المسائية</Label>
+                        <Input
+                          type="time"
+                          value={eveningStartTime}
+                          onChange={(e) => setEveningStartTime(e.target.value)}
+                          className="bg-white/10 border-white/20 text-white"
+                          data-testid="edit-evening-start-time"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-white mb-2 block">نهاية الفترة المسائية</Label>
+                        <Input
+                          type="time"
+                          value={eveningEndTime}
+                          onChange={(e) => setEveningEndTime(e.target.value)}
+                          className="bg-white/10 border-white/20 text-white"
+                          data-testid="edit-evening-end-time"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    onClick={handleUpdateSchedule}
+                    disabled={updateScheduleMutation.isPending || !salary}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    data-testid="update-schedule-button"
+                  >
+                    {updateScheduleMutation.isPending ? "جارٍ التحديث..." : "تحديث الجدول"}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setIsEditScheduleDialogOpen(false);
+                      setSelectedScheduleForEdit(null);
+                      resetScheduleForm();
+                    }}
+                    variant="outline"
+                    className="border-white/20 text-white hover:bg-white/10"
+                  >
+                    إلغاء
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </GlassBackground>
   );
