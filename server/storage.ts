@@ -1077,24 +1077,18 @@ export class MemStorage implements IStorage {
     }
     
     // Find trim levels for this category
-    const trimLevels = Array.from(this.trimLevels.values()).filter(
-      t => (t as any).category_id === categoryObj.id
+    const trimLevels = Array.from(this.vehicleTrimLevels.values()).filter(
+      t => t.categoryId === categoryObj.id
     );
     
-    console.log(`🎚️ All trim levels in this.trimLevels:`, Array.from(this.trimLevels.values()).map(t => ({ id: t.id, category_id: (t as any).category_id, categoryId: (t as any).categoryId, nameAr: (t as any).name_ar || t.nameAr })));
+    console.log(`🎚️ All trim levels in vehicleTrimLevels:`, Array.from(this.vehicleTrimLevels.values()).map(t => ({ id: t.id, categoryId: t.categoryId, nameAr: t.nameAr })));
+    console.log(`🎚️ Total vehicleTrimLevels count:`, this.vehicleTrimLevels.size);
+    console.log(`🎚️ Also checking trimLevels count:`, this.trimLevels.size);
     console.log(`🎚️ Looking for categoryId: ${categoryObj.id}`);
-    console.log(`🎚️ Found ${trimLevels.length} trim levels for "${manufacturer}" -> "${category}":`, trimLevels.map(t => (t as any).name_ar || t.nameAr));
+    console.log(`🎚️ Found ${trimLevels.length} trim levels for "${manufacturer}" -> "${category}":`, trimLevels.map(t => t.nameAr));
     
-    // Transform to match expected interface
-    return trimLevels.map(t => ({
-      id: t.id,
-      categoryId: (t as any).category_id,
-      nameAr: (t as any).name_ar || t.nameAr,
-      nameEn: (t as any).name_en || t.nameEn,
-      isActive: true,
-      createdAt: t.createdAt,
-      updatedAt: t.updatedAt
-    }));
+    // Return the trim levels directly since they already match the interface
+    return trimLevels;
   }
   
   async getAllCategories(): Promise<{ category: string }[]> { return []; }
