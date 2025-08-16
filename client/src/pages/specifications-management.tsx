@@ -757,6 +757,54 @@ export default function SpecificationsManagement() {
                         />
                         <FormField
                           control={imageForm.control}
+                          name="trimLevel"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-white drop-shadow-sm">درجة التجهيز</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                                    <SelectValue placeholder="اختر درجة التجهيز" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {trimLevelOptions.map((trim) => (
+                                    <SelectItem key={trim} value={trim}>
+                                      {trim}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={imageForm.control}
+                          name="year"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-white drop-shadow-sm">السنة</FormLabel>
+                              <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                                <FormControl>
+                                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                                    <SelectValue placeholder="اختر السنة" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {yearOptions.map((year) => (
+                                    <SelectItem key={year} value={year}>
+                                      {year}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={imageForm.control}
                           name="exteriorColor"
                           render={({ field }) => (
                             <FormItem>
@@ -930,6 +978,15 @@ export default function SpecificationsManagement() {
                       </div>
                       
                       <div className="space-y-2 text-sm">
+                        {image.trimLevel && (
+                          <div className="text-white/80 drop-shadow-sm">درجة التجهيز: {image.trimLevel}</div>
+                        )}
+                        {image.year && (
+                          <div className="text-white/80 drop-shadow-sm">السنة: {image.year}</div>
+                        )}
+                        {image.engineCapacity && (
+                          <div className="text-white/80 drop-shadow-sm">سعة المحرك: {image.engineCapacity}</div>
+                        )}
                         {image.chassisNumber && (
                           <div className="text-white/80 drop-shadow-sm">رقم الهيكل: {image.chassisNumber}</div>
                         )}
