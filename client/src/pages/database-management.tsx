@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Database, Download, Upload, AlertTriangle, CheckCircle, XCircle, Users, Building, CreditCard, Percent, Car, Settings, Tags, Palette, UserCheck, Wrench } from "lucide-react";
+import { Database, Download, Upload, AlertTriangle, CheckCircle, XCircle, Users, Building, CreditCard, Percent, Car, Settings, Tags, Palette, UserCheck, Wrench, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 export default function DatabaseManagement() {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [isDeletingInventory, setIsDeletingInventory] = useState(false);
   const [selectedExportTypes, setSelectedExportTypes] = useState<string[]>([]);
   const [selectedImportTypes, setSelectedImportTypes] = useState<string[]>([]);
   const { toast } = useToast();
@@ -120,6 +121,40 @@ export default function DatabaseManagement() {
         ? prev.filter(id => id !== typeId)
         : [...prev, typeId]
     );
+  };
+
+  const handleDeleteInventory = async () => {
+    const confirmed = window.confirm("تحذير!\n\nسيتم حذف جميع عناصر المخزون بشكل دائم.\nهذه العملية لا يمكن التراجع عنها.\n\nهل أنت متأكد من المتابعة؟");
+    
+    if (!confirmed) return;
+    
+    const doubleConfirmed = window.confirm("تأكيد نهائي!\n\nسيتم حذف جميع السيارات من المخزون.\nتأكد من عمل نسخة احتياطية أولاً.\n\nهل تريد المتابعة بالفعل؟");
+    
+    if (!doubleConfirmed) return;
+
+    setIsDeletingInventory(true);
+    try {
+      const response = await apiRequest('DELETE', '/api/inventory/clear-all');
+      
+      toast({
+        title: "تم حذف المخزون بنجاح",
+        description: "تم حذف جميع عناصر المخزون من قاعدة البيانات",
+      });
+      
+      // Refresh after 2 seconds to show the change
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+      
+    } catch (error) {
+      toast({
+        title: "خطأ في حذف المخزون",
+        description: "حدث خطأ أثناء حذف المخزون. يرجى المحاولة مرة أخرى",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeletingInventory(false);
+    }
   };
 
   return (
@@ -318,6 +353,57 @@ export default function DatabaseManagement() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Dangerous Operations Section */}
+        <Card className="mt-8 bg-red-500/10 backdrop-blur-lg border-red-500/20">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-3">
+              <div className="p-3 bg-red-500/20 rounded-full">
+                <AlertTriangle className="w-6 h-6 text-red-400" />
+              </div>
+            </div>
+            <CardTitle className="text-white text-xl">عمليات خطيرة</CardTitle>
+            <p className="text-red-200 text-sm mt-2">
+              عمليات لا يمكن التراجع عنها - استخدم بحذر شديد
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Delete Inventory Warning */}
+            <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Trash2 className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="font-medium text-red-200 mb-2">حذف المخزون بالكامل</p>
+                  <ul className="space-y-1 text-red-300 text-xs">
+                    <li>• سيتم حذف جميع السيارات من النظام</li>
+                    <li>• لن يمكن استرداد البيانات بعد الحذف</li>
+                    <li>• تأكد من عمل نسخة احتياطية أولاً</li>
+                    <li>• هذه العملية تحتاج تأكيد مضاعف</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Delete Inventory Button */}
+            <Button 
+              onClick={handleDeleteInventory}
+              disabled={isDeletingInventory}
+              className="w-full bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeletingInventory ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  جاري حذف المخزون...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Trash2 className="w-4 h-4" />
+                  حذف المخزون بالكامل
+                </div>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Instructions */}
         <Card className="mt-8 bg-white/5 backdrop-blur-lg border-white/10">
