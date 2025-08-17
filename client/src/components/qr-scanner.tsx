@@ -29,24 +29,77 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
           return;
         }
 
-        // Create scanner instance
+        // Request camera permissions explicitly
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+              facingMode: 'environment',
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            } 
+          });
+          
+          // Stop the stream as QrScanner will handle it
+          stream.getTracks().forEach(track => track.stop());
+        } catch (permError: any) {
+          console.error('Camera permission error:', permError);
+          let errorMessage = 'يرجى السماح بالوصول للكاميرا في إعدادات المتصفح';
+          
+          // Check if it's HTTPS issue
+          if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
+            errorMessage = 'يتطلب الوصول للكاميرا اتصال آمن (HTTPS). يرجى استخدام الرابط الآمن أو localhost';
+          } else if (permError.name === 'NotAllowedError') {
+            errorMessage = 'تم رفض الوصول للكاميرا. يرجى السماح بالوصول في إعدادات المتصفح';
+          } else if (permError.name === 'NotFoundError') {
+            errorMessage = 'لم يتم العثور على كاميرا متاحة في الجهاز';
+          } else if (permError.name === 'NotReadableError') {
+            errorMessage = 'الكاميرا قيد الاستخدام من تطبيق آخر';
+          }
+          
+          setError(errorMessage);
+          return;
+        }
+
+        // Create scanner instance with improved settings
         const qrScanner = new QrScanner(
           videoRef.current!,
           (result) => {
+            console.log('QR Code scanned:', result.data);
             onScan(result.data);
             onClose();
           },
           {
             highlightScanRegion: true,
             highlightCodeOutline: true,
-            preferredCamera: 'environment', // Use back camera
+            preferredCamera: 'environment',
+            maxScansPerSecond: 5,
+            calculateScanRegion: (video) => {
+              const smallestDimension = Math.min(video.videoWidth, video.videoHeight);
+              const scanRegionSize = Math.round(2/3 * smallestDimension);
+              return {
+                x: Math.round((video.videoWidth - scanRegionSize) / 2),
+                y: Math.round((video.videoHeight - scanRegionSize) / 2),
+                width: scanRegionSize,
+                height: scanRegionSize,
+              };
+            },
           }
         );
 
         setScanner(qrScanner);
-        await qrScanner.start();
-        setHasPermission(true);
-        setError(null);
+        
+        // Add a small delay before starting
+        setTimeout(async () => {
+          try {
+            await qrScanner.start();
+            setHasPermission(true);
+            setError(null);
+            console.log('QR Scanner started successfully');
+          } catch (startError) {
+            console.error('Failed to start QR scanner:', startError);
+            setError('فشل في تشغيل الكاميرا. تأكد من منح الصلاحيات المناسبة.');
+          }
+        }, 100);
       } catch (err) {
         console.error('QR Scanner error:', err);
         setError('فشل في تشغيل الكاميرا. يرجى السماح بالوصول للكاميرا.');
@@ -91,12 +144,26 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 text-center">
               <p className="text-red-600 dark:text-red-400">{error}</p>
-              <Button
-                onClick={() => window.location.reload()}
-                className="mt-2 bg-red-500 hover:bg-red-600 text-white"
-              >
-                إعادة المحاولة
-              </Button>
+              <div className="mt-3 space-y-2">
+                <Button
+                  onClick={() => {
+                    setError(null);
+                    setHasPermission(null);
+                    // Try to reinitialize scanner
+                    if (scanner) {
+                      scanner.stop();
+                      scanner.destroy();
+                      setScanner(null);
+                    }
+                  }}
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  إعادة المحاولة
+                </Button>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  إذا استمرت المشكلة، تأكد من منح الصلاحيات في إعدادات المتصفح
+                </p>
+              </div>
             </div>
           )}
 
@@ -110,13 +177,20 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
                 )}
                 playsInline
                 muted
+                autoPlay
+                style={{ 
+                  transform: 'scaleX(-1)', // Mirror the video for better user experience
+                }}
               />
               
               {hasPermission === null && (
                 <div className="w-full aspect-square bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center">
-                  <div className="text-center space-y-2">
-                    <Camera className="w-12 h-12 mx-auto text-gray-400" />
-                    <p className="text-gray-500 dark:text-gray-400">جاري تحضير الكاميرا...</p>
+                  <div className="text-center space-y-3">
+                    <div className="animate-pulse">
+                      <Camera className="w-12 h-12 mx-auto text-blue-500" />
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-300 font-medium">جاري تحضير الكاميرا...</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">يرجى السماح بالوصول للكاميرا</p>
                   </div>
                 </div>
               )}
@@ -136,9 +210,15 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
           )}
 
           {hasPermission && !error && (
-            <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-              وجه الكاميرا نحو الكيو أر كود لمسحه
-            </p>
+            <div className="text-center space-y-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                وجه الكاميرا نحو الكيو أر كود لمسحه
+              </p>
+              <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span>الماسح نشط</span>
+              </div>
+            </div>
           )}
 
           <Button
