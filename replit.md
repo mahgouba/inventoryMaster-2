@@ -15,12 +15,7 @@ Enhanced main page filter design with:
 - Glass morphism background with gradient effects and decorative elements
 - Responsive grid layout (1 column mobile, 2 columns medium, 3 columns large screens)
 - Better desktop optimization with enhanced spacing and visual hierarchy
-Completely redesigned vehicle sharing dialog with modern UI:
-- New gradient-based color scheme (amber, green, blue, purple, orange themes)
-- Card-based layout with organized sections for better information hierarchy
-- Enhanced field selection with visual icons and improved checkboxes
-- Removed duplicate sections and streamlined data formatting
-- Improved responsive design and color-coded action buttons
+
 Removed duplicate manufacturer data issue in hierarchical view by disabling auto-populate function.
 Removed duplicate price card component (/components/price-card.tsx) to eliminate confusion and maintain clean architecture with single unified price card solution in /pages/price-cards.tsx. Completely removed /detailed-specifications, /images-management, and /theme-management pages per user request to simplify navigation and reduce unnecessary features. Removed duplicate hierarchy-management.tsx page - consolidated hierarchy management into single HierarchicalView component to eliminate confusion and streamline vehicle specifications management interface. Removed duplicate `/hierarchy` route - now using only `/hierarchy-management` for cleaner navigation structure.
 Single horizontal navigation system at the top - removed duplicate sidebar navigation component to eliminate confusion and maintain clean architecture.

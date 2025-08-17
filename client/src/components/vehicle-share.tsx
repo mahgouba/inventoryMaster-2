@@ -1,284 +1,343 @@
-import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import React, { useState, useEffect } from "react";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Car, Copy, MessageCircle, ExternalLink, Image, 
-  FileText, Calculator, Edit2, Settings, Eye,
-  Share, Phone, ImageIcon, LinkIcon, Palette
-} from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { Plus, Share2, Copy, Edit2, Save, X, Image, Link, Calculator, MessageCircle, Settings, Car, Gauge, Fuel, Palette, FileText, ExternalLink } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import type { InventoryItem, VehicleSpecification, VehicleImageLink } from "@shared/schema";
 
 interface VehicleShareProps {
-  vehicle: {
-    id: number;
-    manufacturer: string;
-    category: string;
-    trimLevel?: string;
-    engineCapacity: string;
-    year: number;
-    exteriorColor: string;
-    interiorColor: string;
-    status: string;
-    importType: string;
-    ownershipType: string;
-    location: string;
-    chassisNumber: string;
-    images?: string[];
-    price?: string;
-    mileage?: number;
-    detailedSpecifications?: string;
-  };
+  vehicle: InventoryItem;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-interface VehicleSpecification {
-  id: number;
-  manufacturer: string | null;
-  category: string | null;
-  trimLevel: string | null;
-  engineCapacity: string | null;
-  year: number | null;
-  chassisNumber: string | null;
-  specifications: string | null;
-  specificationsEn: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface VehicleImageLink {
-  id: number;
-  manufacturer: string | null;
-  category: string | null;
-  trimLevel: string | null;
-  engineCapacity: string | null;
-  year: number | null;
-  exteriorColor: string | null;
-  interiorColor: string | null;
-  chassisNumber: string | null;
-  imageUrl: string | null;
-  description: string | null;
-  descriptionEn: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export default function VehicleShareDialog({ vehicle, open, onOpenChange }: VehicleShareProps) {
-  const { toast } = useToast();
-  
-  // State management
-  const [sharePrice, setSharePrice] = useState(vehicle.price || "");
-  const [taxRate, setTaxRate] = useState("15");
-  const [whatsappPhoneNumber, setWhatsappPhoneNumber] = useState("");
-  const [isEditingPrice, setIsEditingPrice] = useState(false);
-  
-  // Hierarchy data
-  const [hierarchySpecifications, setHierarchySpecifications] = useState<VehicleSpecification[]>([]);
-  const [selectedHierarchySpec, setSelectedHierarchySpec] = useState<VehicleSpecification | null>(null);
-  const [selectedHierarchyImages, setSelectedHierarchyImages] = useState<VehicleImageLink[]>([]);
-  const [linkedImageUrl, setLinkedImageUrl] = useState("");
-
-  // Include fields state
-  const [includeFields, setIncludeFields] = useState({
-    basicInfo: true,
-    technical: true,
-    colors: true,
-    price: false,
-    images: true,
-    specifications: false,
-    linkedImage: false,
-    mileage: true
-  });
-
-  // Fetch hierarchy data on component mount
-  useEffect(() => {
-    if (!open) return;
-    
-    const fetchHierarchyData = async () => {
-      try {
-        // Fetch vehicle specifications
-        const specsResponse = await fetch('/api/vehicle-specifications');
-        if (specsResponse.ok) {
-          const allSpecs: VehicleSpecification[] = await specsResponse.json();
-          
-          // Find matching specifications
-          const matchingSpecs = allSpecs.filter((spec: VehicleSpecification) => {
-            // First try exact chassis number match
-            if (vehicle.chassisNumber && spec.chassisNumber === vehicle.chassisNumber) {
-              return true;
-            }
-            
-            // Otherwise match by vehicle details
-            return spec.manufacturer === vehicle.manufacturer &&
-                   spec.category === vehicle.category &&
-                   (!spec.trimLevel || spec.trimLevel === vehicle.trimLevel) &&
-                   (!spec.year || spec.year === vehicle.year);
-          });
-          
-          setHierarchySpecifications(matchingSpecs);
-          
-          if (matchingSpecs.length > 0) {
-            // Prefer chassis match first
-            const chassisMatch = matchingSpecs.find((spec: VehicleSpecification) => 
-              vehicle.chassisNumber && spec.chassisNumber === vehicle.chassisNumber
-            );
-            
-            // Then prefer exact trim and year match
-            const exactMatch = matchingSpecs.find((spec: VehicleSpecification) => 
-              spec.year === vehicle.year && spec.trimLevel === vehicle.trimLevel
-            );
-            
-            setSelectedHierarchySpec(chassisMatch || exactMatch || matchingSpecs[0]);
-          }
-        }
-
-        // Fetch vehicle image links
-        const imageResponse = await fetch('/api/vehicle-image-links');
-        if (imageResponse.ok) {
-          const allImageLinks: VehicleImageLink[] = await imageResponse.json();
-          
-          // Find matching image links
-          const matchingImages = allImageLinks.filter((imageLink: VehicleImageLink) => {
-            if (vehicle.chassisNumber && imageLink.chassisNumber === vehicle.chassisNumber) {
-              return true;
-            }
-            
-            return imageLink.manufacturer === vehicle.manufacturer &&
-                   imageLink.category === vehicle.category &&
-                   (!imageLink.trimLevel || imageLink.trimLevel === vehicle.trimLevel) &&
-                   (!imageLink.year || imageLink.year === vehicle.year);
-          });
-          
-          setSelectedHierarchyImages(matchingImages);
-          
-          // Set the first linked image URL if available
-          if (matchingImages.length > 0 && matchingImages[0].imageUrl) {
-            setLinkedImageUrl(matchingImages[0].imageUrl);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching hierarchy data:', error);
-      }
-    };
-
-    fetchHierarchyData();
-  }, [open, vehicle]);
-
-  const copyToClipboard = async (text: string) => {
-    try {
+// Utility function to copy text to clipboard with fallback
+const copyToClipboard = async (text: string): Promise<void> => {
+  try {
+    // First try the modern clipboard API
+    if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(text);
-    } catch (err) {
-      // Fallback for older browsers
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
+      return;
+    }
+    
+    // Fallback method using deprecated execCommand
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
       document.execCommand('copy');
+    } finally {
       document.body.removeChild(textArea);
     }
+  } catch (error) {
+    console.error('Failed to copy text to clipboard:', error);
+    throw error;
+  }
+};
+
+export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleShareProps) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const [sharePrice, setSharePrice] = useState(vehicle.price || "");
+  const [isEditingPrice, setIsEditingPrice] = useState(false);
+  const [taxRate, setTaxRate] = useState("15"); // Default VAT rate 15%
+  const [linkedImageUrl, setLinkedImageUrl] = useState<string>("");
+  const [whatsappPhoneNumber, setWhatsappPhoneNumber] = useState("");
+  const [hierarchySpecifications, setHierarchySpecifications] = useState<VehicleSpecification[]>([]);
+  const [hierarchyImageLinks, setHierarchyImageLinks] = useState<VehicleImageLink[]>([]);
+  const [selectedHierarchySpec, setSelectedHierarchySpec] = useState<VehicleSpecification | null>(null);
+  const [selectedHierarchyImages, setSelectedHierarchyImages] = useState<VehicleImageLink[]>([]);
+  
+  // Checkbox states for what to include in sharing
+  const [includeFields, setIncludeFields] = useState({
+    manufacturer: true,
+    category: true,
+    trimLevel: true,
+    year: true,
+    engineCapacity: true,
+    exteriorColor: true,
+    interiorColor: true,
+    status: false, // Hide status by default as requested
+    price: true,
+    specifications: true,
+    images: true,
+    linkedImage: true, // Include linked image from image management system
+    imageLink: true, // Include image link if available
+    mileage: false // Include mileage only when shown (for used cars)
+  });
+
+  // Fetch hierarchy management data for this vehicle
+  const fetchHierarchyData = async () => {
+    try {
+      // Fetch specifications from specifications-management page
+      const specsResponse = await fetch('/api/vehicle-specifications');
+      if (specsResponse.ok) {
+        const allSpecifications = await specsResponse.json();
+        
+        // Filter specifications based on vehicle data or chassis number
+        const matchingSpecs = allSpecifications.filter((spec: VehicleSpecification) => {
+          // First try to match by chassis number if available
+          if (vehicle.chassisNumber && spec.chassisNumber === vehicle.chassisNumber) {
+            return true;
+          }
+          
+          // Otherwise match by vehicle details
+          return spec.manufacturer === vehicle.manufacturer &&
+                 spec.category === vehicle.category &&
+                 (!spec.trimLevel || spec.trimLevel === vehicle.trimLevel) &&
+                 (!spec.year || spec.year === vehicle.year);
+        });
+        
+        setHierarchySpecifications(matchingSpecs);
+        
+        // Auto-select the best matching specification
+        if (matchingSpecs.length > 0) {
+          // Prefer chassis number match first
+          const chassisMatch = matchingSpecs.find((spec: VehicleSpecification) => 
+            vehicle.chassisNumber && spec.chassisNumber === vehicle.chassisNumber
+          );
+          
+          // Then prefer exact trim and year match
+          const exactMatch = matchingSpecs.find((spec: VehicleSpecification) => 
+            spec.year === vehicle.year && spec.trimLevel === vehicle.trimLevel
+          );
+          
+          setSelectedHierarchySpec(chassisMatch || exactMatch || matchingSpecs[0]);
+        }
+      }
+
+      // Fetch image links from specifications-management page
+      const imageResponse = await fetch('/api/vehicle-image-links');
+      if (imageResponse.ok) {
+        const allImageLinks = await imageResponse.json();
+        
+        // Filter image links based on vehicle data or chassis number
+        const matchingImages = allImageLinks.filter((link: VehicleImageLink) => {
+          // First try to match by chassis number if available
+          if (vehicle.chassisNumber && link.chassisNumber === vehicle.chassisNumber) {
+            return true;
+          }
+          
+          // Otherwise match by vehicle details
+          return link.manufacturer === vehicle.manufacturer &&
+                 link.category === vehicle.category &&
+                 (!link.trimLevel || link.trimLevel === vehicle.trimLevel) &&
+                 (!link.exteriorColor || link.exteriorColor === vehicle.exteriorColor) &&
+                 (!link.interiorColor || link.interiorColor === vehicle.interiorColor);
+        });
+        
+        setHierarchyImageLinks(allImageLinks);
+        setSelectedHierarchyImages(matchingImages);
+        
+        // Set the first linked image URL if available
+        if (matchingImages.length > 0 && matchingImages[0].imageUrl) {
+          setLinkedImageUrl(matchingImages[0].imageUrl);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching hierarchy data:', error);
+    }
   };
 
+  // Fetch hierarchy data when dialog opens and set mileage checkbox for used cars
+  useEffect(() => {
+    if (open) {
+      fetchHierarchyData();
+      // Enable mileage checkbox by default for used cars when dialog opens
+      if (vehicle.importType === "شخصي مستعمل" || vehicle.importType === "مستعمل") {
+        setIncludeFields(prev => ({ ...prev, mileage: true }));
+      }
+    }
+  }, [open, vehicle]);
+
+  // Calculate tax breakdown
   const calculatePriceBreakdown = () => {
-    if (!sharePrice || !taxRate) return null;
+    if (!sharePrice) return null;
     
-    const totalPrice = parseFloat(sharePrice);
-    const taxRateNum = parseFloat(taxRate);
-    const basePrice = totalPrice / (1 + taxRateNum / 100);
-    const taxAmount = totalPrice - basePrice;
+    const totalPriceWithTax = parseFloat(sharePrice.replace(/,/g, ''));
+    const taxRateDecimal = parseFloat(taxRate) / 100;
+    const basePriceBeforeTax = totalPriceWithTax / (1 + taxRateDecimal);
+    const taxAmount = totalPriceWithTax - basePriceBeforeTax;
     
     return {
-      basePrice: basePrice.toFixed(2),
+      basePrice: basePriceBeforeTax.toFixed(2),
       taxAmount: taxAmount.toFixed(2),
-      totalPrice: totalPrice.toFixed(2)
+      totalPrice: totalPriceWithTax.toFixed(2)
     };
   };
 
+  
+
   const generateShareText = () => {
-    if (!includeFields.basicInfo && !includeFields.technical && !includeFields.colors && !includeFields.price && !includeFields.specifications) {
-      return "";
-    }
-
     let shareText = "";
-
-    // Basic Information
-    if (includeFields.basicInfo) {
+    
+    // Build text based on selected fields
+    if (includeFields.manufacturer && includeFields.category) {
       shareText += `🚗 ${vehicle.manufacturer} ${vehicle.category}`;
-      if (vehicle.trimLevel) shareText += ` - ${vehicle.trimLevel}`;
-      shareText += `\n📅 الموديل: ${vehicle.year}`;
-      shareText += `\n📍 الموقع: ${vehicle.location}`;
-      shareText += `\n🔢 رقم الهيكل: ${vehicle.chassisNumber}`;
-      shareText += `\n📋 الحالة: ${vehicle.status}`;
-      shareText += `\n📦 نوع الاستيراد: ${vehicle.importType}`;
-      shareText += `\n🏢 نوع الملكية: ${vehicle.ownershipType}`;
     }
-
-    // Technical Details
-    if (includeFields.technical) {
-      shareText += `\n\n⚙️ المواصفات التقنية:`;
+    
+    if (includeFields.trimLevel && vehicle.trimLevel) {
+      shareText += `\n⚙️ درجة التجهيز: ${vehicle.trimLevel}`;
+    }
+    
+    if (includeFields.year) {
+      shareText += `\n📅 السنة: ${vehicle.year}`;
+    }
+    
+    if (includeFields.engineCapacity) {
       shareText += `\n🔧 سعة المحرك: ${vehicle.engineCapacity}`;
     }
 
-    // Colors
-    if (includeFields.colors) {
-      shareText += `\n\n🎨 الألوان:`;
+    if (includeFields.exteriorColor && vehicle.exteriorColor) {
       shareText += `\n🎨 اللون الخارجي: ${vehicle.exteriorColor}`;
-      shareText += `\n🛋️ اللون الداخلي: ${vehicle.interiorColor}`;
+    }
+    
+    if (includeFields.interiorColor && vehicle.interiorColor) {
+      shareText += `\n🪑 اللون الداخلي: ${vehicle.interiorColor}`;
     }
 
-    // Price
+    if (includeFields.status) {
+      shareText += `\n✅ الحالة: ${vehicle.status}`;
+    }
+
+    // Add price - with or without tax breakdown based on import type
     if (includeFields.price && sharePrice) {
-      const priceBreakdown = calculatePriceBreakdown();
-      shareText += `\n\n💰 تفاصيل السعر:`;
-      if (priceBreakdown) {
-        shareText += `\n💵 السعر الأساسي: ${Number(priceBreakdown.basePrice).toLocaleString()} ريال`;
-        shareText += `\n📊 الضريبة (${taxRate}%): ${Number(priceBreakdown.taxAmount).toLocaleString()} ريال`;
-        shareText += `\n💳 السعر الإجمالي: ${Number(priceBreakdown.totalPrice).toLocaleString()} ريال`;
+      // For used cars, show simple price without tax breakdown
+      if (vehicle.importType === "مستعمل" || vehicle.importType === "مستعمل شخصي") {
+        shareText += `\n💰 السعر: ${sharePrice}`;
       } else {
-        shareText += `\n💳 السعر: ${sharePrice}`;
-      }
-    }
-
-    // Specifications from hierarchy
-    if (includeFields.specifications && selectedHierarchySpec?.specifications) {
-      shareText += `\n\n📋 المواصفات التفصيلية:`;
-      const specs = selectedHierarchySpec.specifications;
-      
-      if (typeof specs === 'string') {
-        shareText += `\n${specs}`;
-      } else if (typeof specs === 'object') {
-        const specsObj = specs as any;
-        if (specsObj.engine) shareText += `\n🔧 المحرك: ${specsObj.engine}`;
-        if (specsObj.power) shareText += `\n⚡ القوة: ${specsObj.power}`;
-        if (specsObj.transmission) shareText += `\n⚙️ ناقل الحركة: ${specsObj.transmission}`;
-        if (specsObj.fuelType) shareText += `\n⛽ نوع الوقود: ${specsObj.fuelType}`;
-        if (specsObj.features) shareText += `\n✨ المزايا: ${specsObj.features}`;
-      }
-    }
-
-    // Mileage for used cars
-    if (includeFields.mileage && (vehicle.importType === "شخصي مستعمل" || vehicle.importType === "مستعمل") && vehicle.mileage) {
-      shareText += `\n\n📏 الممشي: ${vehicle.mileage.toLocaleString()} كم`;
-    }
-
-    // Image links from hierarchy
-    if (includeFields.linkedImage && selectedHierarchyImages.length > 0) {
-      shareText += `\n\n🖼️ روابط الصور:`;
-      selectedHierarchyImages.forEach((imageLink, index) => {
-        if (imageLink.imageUrl) {
-          shareText += `\n📸 صورة ${index + 1}: ${imageLink.imageUrl}`;
+        // For new cars, show detailed price breakdown
+        const priceBreakdown = calculatePriceBreakdown();
+        if (priceBreakdown) {
+          shareText += `\n💰 تفاصيل السعر:`;
+          shareText += `\n   📊 السعر الأساسي: ${Number(priceBreakdown.basePrice).toLocaleString()} ريال`;
+          shareText += `\n   📈 الضريبة (${taxRate}%): ${Number(priceBreakdown.taxAmount).toLocaleString()} ريال`;
+          shareText += `\n   💳 السعر الإجمالي: ${Number(priceBreakdown.totalPrice).toLocaleString()} ريال`;
+        } else {
+          shareText += `\n💰 السعر: ${sharePrice}`;
         }
+      }
+    }
+
+    // Add mileage for used cars if available and selected
+    if (includeFields.mileage && (vehicle.importType === "شخصي مستعمل" || vehicle.importType === "مستعمل") && vehicle.mileage) {
+      shareText += `\n🛣️ الممشي: ${vehicle.mileage.toLocaleString()} كيلومتر`;
+    }
+
+    // Add linked image URL if available and selected
+    if (includeFields.linkedImage && linkedImageUrl) {
+      shareText += `\n🖼️ رابط الصورة المرتبط: ${linkedImageUrl}`;
+    }
+
+    // Add image link for any vehicle with images if selected
+    if (includeFields.imageLink && vehicle.images && vehicle.images.length > 0) {
+      shareText += `\n📷 رابط الصورة: ${vehicle.images[0]}`;
+    }
+
+    // Add images info if available and selected
+    if (includeFields.images && vehicle.images && vehicle.images.length > 0) {
+      shareText += `\n📸 الصور المرفقة: ${vehicle.images.length} صورة`;
+      // Include image URLs
+      vehicle.images.forEach((imageUrl, index) => {
+        shareText += `\n   📷 صورة ${index + 1}: ${imageUrl}`;
       });
     }
 
+    // Add hierarchy specifications if available and selected
+    if (includeFields.specifications) {
+      if (selectedHierarchySpec && selectedHierarchySpec.specifications) {
+        shareText += `\n\n📋 المواصفات التفصيلية:`;
+        const specs = selectedHierarchySpec.specifications as any;
+        
+        // Handle different specification formats
+        if (typeof specs === 'string') {
+          shareText += `\n${specs}`;
+        } else if (typeof specs === 'object') {
+          // Handle object-based specifications
+          if (specs.engine) shareText += `\n🔧 المحرك: ${specs.engine}`;
+          if (specs.power) shareText += `\n⚡ القوة: ${specs.power}`;
+          if (specs.transmission) shareText += `\n⚙️ ناقل الحركة: ${specs.transmission}`;
+          if (specs.fuelType) shareText += `\n⛽ نوع الوقود: ${specs.fuelType}`;
+          if (specs.seatingCapacity) shareText += `\n👥 عدد المقاعد: ${specs.seatingCapacity}`;
+          if (specs.driveType) shareText += `\n🚗 نوع الدفع: ${specs.driveType}`;
+          if (specs.acceleration) shareText += `\n🏃 التسارع: ${specs.acceleration}`;
+          if (specs.topSpeed) shareText += `\n🏎️ السرعة القصوى: ${specs.topSpeed}`;
+          if (specs.fuelConsumption) shareText += `\n💨 استهلاك الوقود: ${specs.fuelConsumption}`;
+          if (specs.safetyRating) shareText += `\n🛡️ تقييم الأمان: ${specs.safetyRating}`;
+          if (specs.warranty) shareText += `\n📝 الضمان: ${specs.warranty}`;
+          if (specs.features) shareText += `\n✨ المزايا: ${specs.features}`;
+          if (specs.technology) shareText += `\n📱 التقنيات: ${specs.technology}`;
+          if (specs.comfort) shareText += `\n🛋️ وسائل الراحة: ${specs.comfort}`;
+          if (specs.entertainment) shareText += `\n🎵 الترفيه: ${specs.entertainment}`;
+        }
+      } else if (vehicle.detailedSpecifications) {
+        // Fallback to vehicle's own detailed specifications if no hierarchy specs
+        shareText += `\n\n📋 المواصفات التفصيلية:\n${vehicle.detailedSpecifications}`;
+      }
+    }
+
+    // Add hierarchy image links if available and selected
+    if (includeFields.linkedImage && selectedHierarchyImages.length > 0) {
+      shareText += `\n\n🖼️ روابط الصور من إدارة المواصفات:`;
+      selectedHierarchyImages.forEach((imageLink, index) => {
+        if (imageLink.imageUrl) {
+          shareText += `\n📸 صورة ${index + 1} (${imageLink.exteriorColor} - ${imageLink.interiorColor}): ${imageLink.imageUrl}`;
+        }
+      });
+    }
+    
     return shareText;
+  };
+
+  const handleCopyImageLinks = async () => {
+    if (!vehicle.images || vehicle.images.length === 0) {
+      toast({
+        title: "لا توجد صور",
+        description: "لا توجد صور مرفقة بهذه السيارة",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const imageLinks = vehicle.images.join('\n');
+    await copyToClipboard(imageLinks);
+    toast({
+      title: "تم نسخ روابط الصور",
+      description: `تم نسخ ${vehicle.images.length} رابط صورة إلى الحافظة`,
+    });
+  };
+
+  const handleCopyText = async () => {
+    const shareText = generateShareText();
+    try {
+      await copyToClipboard(shareText);
+      toast({
+        title: "تم النسخ بنجاح",
+        description: "تم نسخ بيانات السيارة إلى الحافظة",
+      });
+    } catch (error) {
+      toast({
+        title: "خطأ في النسخ",
+        description: "لم تتمكن من نسخ النص إلى الحافظة",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleShare = async () => {
@@ -291,408 +350,536 @@ export default function VehicleShareDialog({ vehicle, open, onOpenChange }: Vehi
           text: shareText,
         });
       } catch (error) {
-        await copyToClipboard(shareText);
-        toast({
-          title: "تم النسخ",
-          description: "تم نسخ تفاصيل السيارة إلى الحافظة",
-        });
+        // If share is cancelled or fails, fall back to copy
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.error("Error sharing:", error);
+          await handleCopyText();
+        }
       }
     } else {
-      await copyToClipboard(shareText);
-      toast({
-        title: "تم النسخ",
-        description: "تم نسخ تفاصيل السيارة إلى الحافظة",
-      });
-    }
-  };
-
-  const handleCopyText = async () => {
-    const shareText = generateShareText();
-    try {
-      await copyToClipboard(shareText);
-      toast({
-        title: "تم النسخ",
-        description: "تم نسخ النص إلى الحافظة",
-      });
-    } catch (error) {
-      toast({
-        title: "خطأ في النسخ",
-        description: "لم نتمكن من نسخ النص",
-        variant: "destructive",
-      });
+      await handleCopyText();
     }
   };
 
   const handleWhatsAppShare = () => {
     if (!whatsappPhoneNumber.trim()) {
       toast({
-        title: "رقم الهاتف مطلوب",
-        description: "يرجى إدخال رقم الهاتف أولاً",
-        variant: "destructive",
+        title: "خطأ",
+        description: "يرجى إدخال رقم الهاتف",
+        variant: "destructive"
       });
       return;
     }
 
     const shareText = generateShareText();
-    const cleanPhoneNumber = whatsappPhoneNumber.replace(/^0+/, "");
-    const formattedNumber = cleanPhoneNumber.startsWith("966") ? cleanPhoneNumber : `966${cleanPhoneNumber}`;
+    const formattedPhone = whatsappPhoneNumber.startsWith('+966') 
+      ? whatsappPhoneNumber 
+      : `+966${whatsappPhoneNumber.replace(/^0/, '')}`;
+    const whatsappUrl = `https://wa.me/${formattedPhone.replace(/\+/g, '')}?text=${encodeURIComponent(shareText)}`;
     
-    const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodeURIComponent(shareText)}`;
     window.open(whatsappUrl, '_blank');
+    setWhatsappPhoneNumber("");
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[95vh] bg-gradient-to-br from-white to-amber-50/30">
-        <DialogHeader className="bg-gradient-to-r from-amber-600 to-amber-700 text-white p-4 rounded-t-lg -m-6 mb-4">
-          <DialogTitle className="text-xl flex items-center gap-3">
-            <div className="p-2 bg-white/20 rounded-lg">
-              <Share className="h-6 w-6" />
-            </div>
-            <div>
-              <div>مشاركة السيارة</div>
-              <div className="text-sm font-normal text-amber-100">
-                {vehicle.manufacturer} {vehicle.category} - {vehicle.year}
-              </div>
-            </div>
+      <DialogContent className="max-w-2xl max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Car className="h-5 w-5" style={{color: '#C49632'}} />
+            مشاركة السيارة
           </DialogTitle>
+          <DialogDescription>
+            اختر البيانات التي تريد مشاركتها وقم بنسخها أو مشاركتها مباشرة
+          </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[calc(95vh-120px)]">
-          <div className="space-y-6 p-2">
-
-            {/* Fields Selection Card */}
-            <Card className="border-amber-200 shadow-lg bg-gradient-to-r from-white to-amber-50/50">
-              <CardHeader className="bg-gradient-to-r from-amber-100 to-amber-200/50 -m-6 mb-4 rounded-t-lg">
-                <CardTitle className="text-lg flex items-center gap-3 text-amber-800">
-                  <Eye className="h-5 w-5" />
-                  اختيار البيانات للمشاركة
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2 space-x-reverse p-3 bg-white rounded-lg border border-amber-200">
+        <ScrollArea className="h-[75vh]">
+          <div className="space-y-6 pr-4">
+          
+          {/* Fields Selection Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Settings className="h-5 w-5" style={{color: '#C49632'}} />
+                اختيار البيانات للمشاركة
+                <Checkbox 
+                  checked={Object.values(includeFields).every(Boolean)}
+                  onCheckedChange={(checked) => {
+                    setIncludeFields(prev => Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: !!checked }), {} as typeof prev));
+                  }}
+                  className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                />
+                اختيار البيانات للمشاركة
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2 space-x-reverse">
                   <Checkbox 
-                    id="basicInfo"
-                    checked={includeFields.basicInfo}
-                    onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, basicInfo: !!checked }))}
-                    className="data-[state=checked]:bg-amber-600 data-[state=checked]:border-amber-600"
+                    id="manufacturer"
+                    checked={includeFields.manufacturer && includeFields.category}
+                    onCheckedChange={(checked) => {
+                      setIncludeFields(prev => ({ ...prev, manufacturer: !!checked, category: !!checked }));
+                    }}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
-                  <div className="flex items-center gap-2">
-                    <Car className="h-4 w-4 text-amber-600" />
-                    <Label htmlFor="basicInfo" className="text-sm font-medium">المعلومات الأساسية</Label>
-                  </div>
+                  <Label htmlFor="manufacturer" className="text-sm">الصانع والفئة</Label>
+                  <span className="text-xs text-gray-500">({vehicle.manufacturer} {vehicle.category})</span>
+                </div>
+                
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Checkbox 
+                    id="trimLevel"
+                    checked={includeFields.trimLevel}
+                    onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, trimLevel: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                  />
+                  <Label htmlFor="trimLevel" className="text-sm">درجة التجهيز</Label>
+                  <span className="text-xs text-gray-500">({vehicle.trimLevel || "غير محدد"})</span>
+                </div>
+                
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Checkbox 
+                    id="year"
+                    checked={includeFields.year}
+                    onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, year: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                  />
+                  <Label htmlFor="year" className="text-sm">السنة</Label>
+                  <span className="text-xs text-gray-500">({vehicle.year})</span>
+                </div>
+                
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Checkbox 
+                    id="engineCapacity"
+                    checked={includeFields.engineCapacity}
+                    onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, engineCapacity: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                  />
+                  <Label htmlFor="engineCapacity" className="text-sm">سعة المحرك</Label>
+                  <span className="text-xs text-gray-500">({vehicle.engineCapacity})</span>
+                </div>
+                
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Checkbox 
+                    id="exteriorColor"
+                    checked={includeFields.exteriorColor}
+                    onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, exteriorColor: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                  />
+                  <Label htmlFor="exteriorColor" className="text-sm">اللون الخارجي</Label>
+                  <span className="text-xs text-gray-500">({vehicle.exteriorColor})</span>
+                </div>
+                
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Checkbox 
+                    id="interiorColor"
+                    checked={includeFields.interiorColor}
+                    onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, interiorColor: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                  />
+                  <Label htmlFor="interiorColor" className="text-sm">اللون الداخلي</Label>
+                  <span className="text-xs text-gray-500">({vehicle.interiorColor})</span>
+                </div>
+                
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Checkbox 
+                    id="specifications"
+                    checked={includeFields.specifications}
+                    onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, specifications: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                  />
+                  <Label htmlFor="specifications" className="text-sm">المواصفات التفصيلية</Label>
+                  <span className="text-xs text-gray-500">
+                    ({vehicle.detailedSpecifications ? "متوفرة" : "غير متوفرة"})
+                  </span>
+                </div>
+                
+                {/* Linked Image from Image Management */}
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Checkbox 
+                    id="linkedImage"
+                    checked={includeFields.linkedImage}
+                    onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, linkedImage: !!checked }))}
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                  />
+                  <Label htmlFor="linkedImage" className="text-sm">رابط الصورة المرتبط</Label>
+                  <span className="text-xs text-gray-500">
+                    ({linkedImageUrl ? "متوفر" : "غير متوفر"})
+                  </span>
+                  {linkedImageUrl && (
+                    <Link size={12} className="text-blue-500" />
+                  )}
                 </div>
 
-                <div className="flex items-center space-x-2 space-x-reverse p-3 bg-white rounded-lg border border-amber-200">
-                  <Checkbox 
-                    id="technical"
-                    checked={includeFields.technical}
-                    onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, technical: !!checked }))}
-                    className="data-[state=checked]:bg-amber-600 data-[state=checked]:border-amber-600"
-                  />
-                  <div className="flex items-center gap-2">
-                    <Settings className="h-4 w-4 text-amber-600" />
-                    <Label htmlFor="technical" className="text-sm font-medium">المواصفات التقنية</Label>
+                {/* Image Link for any vehicle with images */}
+                {(vehicle.images && vehicle.images.length > 0) && (
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <Checkbox 
+                      id="imageLink"
+                      checked={includeFields.imageLink}
+                      onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, imageLink: !!checked }))}
+                      className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    />
+                    <Label htmlFor="imageLink" className="text-sm">رابط الصورة</Label>
+                    <span className="text-xs text-gray-500">({vehicle.images.length} صورة)</span>
                   </div>
-                </div>
+                )}
 
-                <div className="flex items-center space-x-2 space-x-reverse p-3 bg-white rounded-lg border border-amber-200">
-                  <Checkbox 
-                    id="colors"
-                    checked={includeFields.colors}
-                    onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, colors: !!checked }))}
-                    className="data-[state=checked]:bg-amber-600 data-[state=checked]:border-amber-600"
-                  />
-                  <div className="flex items-center gap-2">
-                    <Palette className="h-4 w-4 text-amber-600" />
-                    <Label htmlFor="colors" className="text-sm font-medium">الألوان</Label>
+                {vehicle.images && vehicle.images.length > 0 && (
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <Checkbox 
+                      id="images"
+                      checked={includeFields.images}
+                      onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, images: !!checked }))}
+                      className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    />
+                    <Label htmlFor="images" className="text-sm">الصور المرفقة</Label>
+                    <span className="text-xs text-gray-500">({vehicle.images.length} صورة)</span>
                   </div>
-                </div>
+                )}
 
-                <div className="flex items-center space-x-2 space-x-reverse p-3 bg-white rounded-lg border border-amber-200">
+                {/* Mileage for used cars */}
+                {(vehicle.importType === "شخصي مستعمل" || vehicle.importType === "مستعمل") && (
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <Checkbox 
+                      id="mileage"
+                      checked={includeFields.mileage}
+                      onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, mileage: !!checked }))}
+                      className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    />
+                    <Label htmlFor="mileage" className="text-sm">الممشي (كيلومتر)</Label>
+                    <span className="text-xs text-gray-500">
+                      ({vehicle.mileage ? `${vehicle.mileage} كم` : "غير محدد"})
+                    </span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Price Configuration Card */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg flex items-center gap-2">
                   <Checkbox 
-                    id="price"
                     checked={includeFields.price}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, price: !!checked }))}
-                    className="data-[state=checked]:bg-amber-600 data-[state=checked]:border-amber-600"
+                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
                   />
-                  <div className="flex items-center gap-2">
-                    <Calculator className="h-4 w-4 text-amber-600" />
-                    <Label htmlFor="price" className="text-sm font-medium">السعر</Label>
-                  </div>
-                </div>
-
-                {hierarchySpecifications.length > 0 && (
-                  <div className="flex items-center space-x-2 space-x-reverse p-3 bg-white rounded-lg border border-amber-200">
-                    <Checkbox 
-                      id="specifications"
-                      checked={includeFields.specifications}
-                      onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, specifications: !!checked }))}
-                      className="data-[state=checked]:bg-amber-600 data-[state=checked]:border-amber-600"
-                    />
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-amber-600" />
-                      <Label htmlFor="specifications" className="text-sm font-medium">
-                        المواصفات التفصيلية
-                        <Badge variant="secondary" className="mr-2 bg-amber-100 text-amber-700">
-                          {hierarchySpecifications.length}
-                        </Badge>
-                      </Label>
-                    </div>
-                  </div>
-                )}
-
-                {selectedHierarchyImages.length > 0 && (
-                  <div className="flex items-center space-x-2 space-x-reverse p-3 bg-white rounded-lg border border-amber-200">
-                    <Checkbox 
-                      id="linkedImage"
-                      checked={includeFields.linkedImage}
-                      onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, linkedImage: !!checked }))}
-                      className="data-[state=checked]:bg-amber-600 data-[state=checked]:border-amber-600"
-                    />
-                    <div className="flex items-center gap-2">
-                      <LinkIcon className="h-4 w-4 text-amber-600" />
-                      <Label htmlFor="linkedImage" className="text-sm font-medium">
-                        روابط الصور المحفوظة
-                        <Badge variant="secondary" className="mr-2 bg-amber-100 text-amber-700">
-                          {selectedHierarchyImages.length}
-                        </Badge>
-                      </Label>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Price Configuration */}
-            {includeFields.price && (
-              <Card className="border-green-200 shadow-lg bg-gradient-to-r from-white to-green-50/50">
-                <CardHeader className="bg-gradient-to-r from-green-100 to-green-200/50 -m-6 mb-4 rounded-t-lg">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg flex items-center gap-3 text-green-800">
-                      <Calculator className="h-5 w-5" />
-                      تكوين السعر
-                    </CardTitle>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsEditingPrice(!isEditingPrice)}
-                      className="text-green-700 hover:bg-green-100"
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
+                  <Calculator className="h-5 w-5" style={{color: '#C49632'}} />
+                  تفاصيل السعر
+                </CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsEditingPrice(!isEditingPrice)}
+                  className="hover:bg-orange-50"
+                  style={{color: '#C49632'}}
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {includeFields.price && (
+                <>
                   {isEditingPrice ? (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <div>
-                        <Label className="text-sm font-medium text-green-800">السعر الإجمالي (شامل الضريبة)</Label>
+                        <Label className="text-sm font-medium">السعر الإجمالي (شامل الضريبة)</Label>
                         <Input
                           value={sharePrice}
                           onChange={(e) => setSharePrice(e.target.value)}
                           placeholder="أدخل السعر الإجمالي..."
-                          className="mt-1 border-green-200 focus:border-green-400"
+                          className="mt-1"
                         />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-green-800">معدل الضريبة (%)</Label>
+                        <Label className="text-sm font-medium">معدل الضريبة (%)</Label>
                         <Input
                           value={taxRate}
                           onChange={(e) => setTaxRate(e.target.value)}
                           placeholder="15"
-                          className="mt-1 border-green-200 focus:border-green-400"
+                          className="mt-1"
                         />
                       </div>
+                      <Button
+                        size="sm"
+                        onClick={() => setIsEditingPrice(false)}
+                        style={{backgroundColor: '#C49632', borderColor: '#C49632'}}
+                        className="hover:opacity-90"
+                      >
+                        <Save className="h-4 w-4 ml-1" />
+                        حفظ
+                      </Button>
                     </div>
                   ) : (
                     <div className="space-y-2">
                       {sharePrice && (() => {
                         const priceBreakdown = calculatePriceBreakdown();
                         return priceBreakdown ? (
-                          <div className="bg-green-50 p-4 rounded-lg space-y-2 border border-green-200">
+                          <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                             <div className="flex justify-between text-sm">
-                              <span className="text-green-700">السعر الأساسي:</span>
-                              <span className="font-mono text-green-800">{Number(priceBreakdown.basePrice).toLocaleString()} ريال</span>
+                              <span>السعر الأساسي:</span>
+                              <span className="font-mono">{Number(priceBreakdown.basePrice).toLocaleString()} ريال</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                              <span className="text-green-700">الضريبة ({taxRate}%):</span>
-                              <span className="font-mono text-green-800">{Number(priceBreakdown.taxAmount).toLocaleString()} ريال</span>
+                              <span>الضريبة ({taxRate}%):</span>
+                              <span className="font-mono">{Number(priceBreakdown.taxAmount).toLocaleString()} ريال</span>
                             </div>
-                            <Separator />
-                            <div className="flex justify-between text-sm font-bold">
-                              <span className="text-green-800">السعر الإجمالي:</span>
-                              <span className="font-mono text-green-900">{Number(priceBreakdown.totalPrice).toLocaleString()} ريال</span>
+                            <div className="flex justify-between text-sm font-bold border-t pt-2">
+                              <span>السعر الإجمالي:</span>
+                              <span className="font-mono">{Number(priceBreakdown.totalPrice).toLocaleString()} ريال</span>
                             </div>
                           </div>
                         ) : (
-                          <p className="text-green-600 font-medium text-center py-4">{sharePrice}</p>
+                          <p className="text-blue-600 font-medium">{sharePrice}</p>
                         );
                       })()}
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            )}
+                </>
+              )}
+              {!includeFields.price && (
+                <p className="text-gray-500 text-sm">السعر غير مُحدد للمشاركة</p>
+              )}
+            </CardContent>
+          </Card>
 
-            {/* Share Preview */}
-            <Card className="border-blue-200 shadow-lg bg-gradient-to-r from-white to-blue-50/50">
-              <CardHeader className="bg-gradient-to-r from-blue-100 to-blue-200/50 -m-6 mb-4 rounded-t-lg">
-                <CardTitle className="text-lg flex items-center gap-3 text-blue-800">
-                  <Eye className="h-5 w-5" />
-                  معاينة المشاركة
+          {/* المواصفات وروابط الصور من صفحة إدارة المواصفات */}
+          {(hierarchySpecifications.length > 0 || selectedHierarchyImages.length > 0) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <FileText className="h-5 w-5" style={{color: '#C49632'}} />
+                  المواصفات وروابط الصور المحفوظة
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* عرض المواصفات التفصيلية المتاحة */}
+                {hierarchySpecifications.length > 0 && (
+                  <div>
+                    <Label className="text-sm font-medium">المواصفات التفصيلية المحفوظة ({hierarchySpecifications.length})</Label>
+                    <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
+                      {hierarchySpecifications.map((spec) => (
+                        <div 
+                          key={spec.id} 
+                          className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                            selectedHierarchySpec?.id === spec.id 
+                              ? 'border-[#C49632] bg-yellow-50' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                          onClick={() => setSelectedHierarchySpec(spec)}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium text-sm">
+                                {spec.manufacturer} {spec.category} - {spec.year} {spec.trimLevel}
+                              </p>
+                              {spec.chassisNumber && (
+                                <p className="text-xs text-gray-500">رقم الهيكل: {spec.chassisNumber}</p>
+                              )}
+                              {spec.specifications && typeof spec.specifications === 'object' && (spec.specifications as any).engine && (
+                                <p className="text-xs text-gray-600">المحرك: {(spec.specifications as any).engine}</p>
+                              )}
+                            </div>
+                            {selectedHierarchySpec?.id === spec.id && (
+                              <div className="w-2 h-2 bg-[#C49632] rounded-full"></div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {selectedHierarchyImages.length > 0 && (
+                  <div>
+                    <Label className="text-sm font-medium">روابط الصور المطابقة ({selectedHierarchyImages.length})</Label>
+                    <div className="mt-2 space-y-2">
+                      {selectedHierarchyImages.map((imageLink) => (
+                        <div key={imageLink.id} className="p-3 border rounded-lg bg-blue-50 border-blue-200">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="text-sm font-medium">{imageLink.exteriorColor} - {imageLink.interiorColor}</p>
+                              <p className="text-xs text-gray-600">رابط صورة متاح</p>
+                              {imageLink.chassisNumber && (
+                                <p className="text-xs text-gray-500">رقم الهيكل: {imageLink.chassisNumber}</p>
+                              )}
+                            </div>
+                            <Image className="h-4 w-4 text-blue-600" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          
+
+          {/* Share Preview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <FileText className="h-5 w-5" style={{color: '#C49632'}} />
+                معاينة المشاركة
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-slate-50 p-4 rounded-lg border-r-4 min-h-[100px]" style={{borderRightColor: '#C49632'}}>
+                {generateShareText() ? (
+                  <pre className="text-sm whitespace-pre-wrap font-sans">{generateShareText()}</pre>
+                ) : (
+                  <p className="text-gray-500 text-center py-4">
+                    اختر البيانات التي تريد مشاركتها لرؤية المعاينة
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <div className="flex gap-3">
+              <Button
+                onClick={handleShare}
+                className="flex-1"
+                disabled={!generateShareText()}
+                style={{backgroundColor: '#C49632', borderColor: '#C49632'}}
+              >
+                <Car className="h-4 w-4 ml-1" />
+                مشاركة
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleCopyText}
+                className="flex-1"
+                disabled={!generateShareText()}
+                style={{borderColor: '#C49632', color: '#C49632'}}
+              >
+                <Copy className="h-4 w-4 ml-1" />
+                نسخ النص
+              </Button>
+            </div>
+
+            {/* WhatsApp Share Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5" style={{color: '#C49632'}} />
+                  مشاركة عبر الواتساب
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-gradient-to-r from-blue-50 to-slate-50 p-4 rounded-lg border-r-4 border-blue-400 min-h-[150px]">
-                  {generateShareText() ? (
-                    <pre className="text-sm whitespace-pre-wrap font-sans text-slate-700 leading-relaxed">
-                      {generateShareText()}
-                    </pre>
-                  ) : (
-                    <div className="text-center py-8">
-                      <FileText className="h-12 w-12 text-slate-400 mx-auto mb-3" />
-                      <p className="text-slate-500">
-                        اختر البيانات التي تريد مشاركتها لرؤية المعاينة
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
-              {/* Main Share Actions */}
-              <Card className="border-purple-200 shadow-lg bg-gradient-to-r from-white to-purple-50/30">
-                <CardHeader className="bg-gradient-to-r from-purple-100 to-purple-200/50 -m-6 mb-4 rounded-t-lg">
-                  <CardTitle className="text-lg flex items-center gap-3 text-purple-800">
-                    <Share className="h-5 w-5" />
-                    مشاركة عامة
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button
-                    onClick={handleShare}
-                    className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
-                    disabled={!generateShareText()}
-                  >
-                    <Share className="h-4 w-4 ml-2" />
-                    مشاركة
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleCopyText}
-                    className="w-full border-purple-300 text-purple-700 hover:bg-purple-50"
-                    disabled={!generateShareText()}
-                  >
-                    <Copy className="h-4 w-4 ml-2" />
-                    نسخ النص
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* WhatsApp Share */}
-              <Card className="border-green-200 shadow-lg bg-gradient-to-r from-white to-green-50/30">
-                <CardHeader className="bg-gradient-to-r from-green-100 to-green-200/50 -m-6 mb-4 rounded-t-lg">
-                  <CardTitle className="text-lg flex items-center gap-3 text-green-800">
-                    <MessageCircle className="h-5 w-5" />
-                    واتساب
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
+                <div className="space-y-3">
                   <div className="flex gap-2">
                     <Input
                       type="tel"
                       placeholder="5xxxxxxxx"
                       value={whatsappPhoneNumber}
                       onChange={(e) => setWhatsappPhoneNumber(e.target.value)}
-                      className="flex-1 border-green-200 focus:border-green-400"
+                      className="flex-1"
                       dir="ltr"
                       disabled={!generateShareText()}
                     />
                     <Button
                       onClick={handleWhatsAppShare}
-                      className="px-4 bg-green-600 hover:bg-green-700"
+                      className="px-4"
                       disabled={!generateShareText() || !whatsappPhoneNumber.trim()}
+                      style={{backgroundColor: '#C49632', borderColor: '#C49632'}}
                     >
                       <MessageCircle className="h-4 w-4" />
                     </Button>
                   </div>
-                  <p className="text-xs text-green-600 text-center">
-                    أدخل رقم الهاتف بدون +966
+                  <p className="text-xs text-gray-500">
+                    أدخل رقم الهاتف بدون +966 (مثال: 512345678)
                   </p>
-                </CardContent>
-              </Card>
-
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Image sharing buttons */}
+            <div className="space-y-2">
+              {/* Linked Image Button - show if linked image is available */}
+              {linkedImageUrl && includeFields.linkedImage && (
+                <Button
+                  variant="secondary"
+                  onClick={async () => {
+                    try {
+                      await copyToClipboard(linkedImageUrl);
+                      toast({
+                        title: "تم نسخ رابط الصورة",
+                        description: "تم نسخ رابط الصورة المرتبط إلى الحافظة",
+                      });
+                    } catch (error) {
+                      toast({
+                        title: "خطأ في النسخ",
+                        description: "لم تتمكن من نسخ رابط الصورة",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  className="w-full"
+                  style={{backgroundColor: '#C49632', borderColor: '#C49632', color: 'white'}}
+                >
+                  <ExternalLink className="h-4 w-4 ml-1" />
+                  نسخ رابط الصورة المرتبط
+                </Button>
+              )}
+              
+              {/* Regular images buttons - only show if images are selected and available */}
+              {includeFields.images && vehicle.images && vehicle.images.length > 0 && (
+                <div className="flex gap-3">
+                  <Button
+                    variant="secondary"
+                    onClick={handleCopyImageLinks}
+                    className="flex-1"
+                    style={{backgroundColor: '#C49632', borderColor: '#C49632', color: 'white'}}
+                  >
+                    <ExternalLink className="h-4 w-4 ml-1" />
+                    نسخ روابط الصور المرفقة ({vehicle.images.length})
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      const shareText = `${generateShareText()}\n\nالصور:\n${vehicle.images?.join('\n') || ''}`;
+                      if (navigator.share) {
+                        navigator.share({
+                          title: `${vehicle.manufacturer} ${vehicle.category}`,
+                          text: shareText,
+                        }).catch(() => {
+                          navigator.clipboard.writeText(shareText).then(() => {
+                            toast({
+                              title: "تم النسخ",
+                              description: "تم نسخ النص مع روابط الصور",
+                            });
+                          });
+                        });
+                      } else {
+                        navigator.clipboard.writeText(shareText).then(() => {
+                          toast({
+                            title: "تم النسخ",
+                            description: "تم نسخ النص مع روابط الصور",
+                          });
+                        });
+                      }
+                    }}
+                    className="flex-1"
+                  >
+                    <Image className="h-4 w-4 ml-1" />
+                    مشاركة مع الصور المرفقة
+                  </Button>
+                </div>
+              )}
             </div>
-
-            {/* Image Links Actions */}
-            {(includeFields.linkedImage && selectedHierarchyImages.length > 0) || (includeFields.images && vehicle.images && vehicle.images.length > 0) ? (
-              <Card className="border-orange-200 shadow-lg bg-gradient-to-r from-white to-orange-50/30">
-                <CardHeader className="bg-gradient-to-r from-orange-100 to-orange-200/50 -m-6 mb-4 rounded-t-lg">
-                  <CardTitle className="text-lg flex items-center gap-3 text-orange-800">
-                    <ImageIcon className="h-5 w-5" />
-                    روابط الصور
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {includeFields.linkedImage && linkedImageUrl && (
-                    <Button
-                      variant="secondary"
-                      onClick={async () => {
-                        try {
-                          await copyToClipboard(linkedImageUrl);
-                          toast({
-                            title: "تم النسخ",
-                            description: "تم نسخ رابط الصورة المحفوظ",
-                          });
-                        } catch (error) {
-                          toast({
-                            title: "خطأ في النسخ",
-                            description: "لم نتمكن من نسخ رابط الصورة",
-                            variant: "destructive",
-                          });
-                        }
-                      }}
-                      className="w-full bg-orange-100 hover:bg-orange-200 text-orange-800 border-orange-300"
-                    >
-                      <LinkIcon className="h-4 w-4 ml-2" />
-                      نسخ رابط الصورة المحفوظ
-                    </Button>
-                  )}
-                  
-                  {includeFields.images && vehicle.images && vehicle.images.length > 0 && (
-                    <Button
-                      variant="secondary"
-                      onClick={async () => {
-                        const imageLinks = vehicle.images!.join('\n');
-                        try {
-                          await copyToClipboard(imageLinks);
-                          toast({
-                            title: "تم النسخ",
-                            description: `تم نسخ ${vehicle.images!.length} رابط صورة`,
-                          });
-                        } catch (error) {
-                          toast({
-                            title: "خطأ في النسخ",
-                            description: "لم نتمكن من نسخ روابط الصور",
-                            variant: "destructive",
-                          });
-                        }
-                      }}
-                      className="w-full bg-orange-100 hover:bg-orange-200 text-orange-800 border-orange-300"
-                    >
-                      <ImageIcon className="h-4 w-4 ml-2" />
-                      نسخ روابط الصور المرفقة ({vehicle.images.length})
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            ) : null}
-
           </div>
+        </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>
