@@ -87,41 +87,69 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
   // Fetch hierarchy management data for this vehicle
   const fetchHierarchyData = async () => {
     try {
-      // Fetch specifications from hierarchy management
-      const specsResponse = await fetch(`/api/specifications/vehicle/${vehicle.manufacturer}/${vehicle.category}?trimLevel=${vehicle.trimLevel || ''}`);
+      // Fetch specifications from specifications-management page
+      const specsResponse = await fetch('/api/vehicle-specifications');
       if (specsResponse.ok) {
-        const specifications = await specsResponse.json();
-        setHierarchySpecifications(specifications);
+        const allSpecifications = await specsResponse.json();
         
-        // Auto-select the first matching specification
-        if (specifications.length > 0) {
-          const exactMatch = specifications.find((spec: VehicleSpecification) => 
-            spec.model === vehicle.year.toString() && spec.trimLevel === vehicle.trimLevel
+        // Filter specifications based on vehicle data or chassis number
+        const matchingSpecs = allSpecifications.filter((spec: VehicleSpecification) => {
+          // First try to match by chassis number if available
+          if (vehicle.chassisNumber && spec.chassisNumber === vehicle.chassisNumber) {
+            return true;
+          }
+          
+          // Otherwise match by vehicle details
+          return spec.manufacturer === vehicle.manufacturer &&
+                 spec.category === vehicle.category &&
+                 (!spec.trimLevel || spec.trimLevel === vehicle.trimLevel) &&
+                 (!spec.year || spec.year === vehicle.year);
+        });
+        
+        setHierarchySpecifications(matchingSpecs);
+        
+        // Auto-select the best matching specification
+        if (matchingSpecs.length > 0) {
+          // Prefer chassis number match first
+          const chassisMatch = matchingSpecs.find((spec: VehicleSpecification) => 
+            vehicle.chassisNumber && spec.chassisNumber === vehicle.chassisNumber
           );
-          setSelectedHierarchySpec(exactMatch || specifications[0]);
+          
+          // Then prefer exact trim and year match
+          const exactMatch = matchingSpecs.find((spec: VehicleSpecification) => 
+            spec.year === vehicle.year && spec.trimLevel === vehicle.trimLevel
+          );
+          
+          setSelectedHierarchySpec(chassisMatch || exactMatch || matchingSpecs[0]);
         }
       }
 
-      // Fetch image links from hierarchy management
-      const imageResponse = await fetch('/api/image-links');
+      // Fetch image links from specifications-management page
+      const imageResponse = await fetch('/api/vehicle-image-links');
       if (imageResponse.ok) {
-        const imageLinks = await imageResponse.json();
-        setHierarchyImageLinks(imageLinks);
+        const allImageLinks = await imageResponse.json();
         
-        // Find matching image links based on vehicle specifications
-        const matchingImages = imageLinks.filter((link: VehicleImageLink) => 
-          link.manufacturer === vehicle.manufacturer &&
-          link.category === vehicle.category &&
-          (link.trimLevel === vehicle.trimLevel || !link.trimLevel) &&
-          (link.exteriorColor === vehicle.exteriorColor || !link.exteriorColor) &&
-          (link.interiorColor === vehicle.interiorColor || !link.interiorColor)
-        );
+        // Filter image links based on vehicle data or chassis number
+        const matchingImages = allImageLinks.filter((link: VehicleImageLink) => {
+          // First try to match by chassis number if available
+          if (vehicle.chassisNumber && link.chassisNumber === vehicle.chassisNumber) {
+            return true;
+          }
+          
+          // Otherwise match by vehicle details
+          return link.manufacturer === vehicle.manufacturer &&
+                 link.category === vehicle.category &&
+                 (!link.trimLevel || link.trimLevel === vehicle.trimLevel) &&
+                 (!link.exteriorColor || link.exteriorColor === vehicle.exteriorColor) &&
+                 (!link.interiorColor || link.interiorColor === vehicle.interiorColor);
+        });
         
+        setHierarchyImageLinks(allImageLinks);
         setSelectedHierarchyImages(matchingImages);
         
         // Set the first linked image URL if available
-        if (matchingImages.length > 0 && matchingImages[0].imageUrls.length > 0) {
-          setLinkedImageUrl(matchingImages[0].imageUrls[0]);
+        if (matchingImages.length > 0 && matchingImages[0].imageUrl) {
+          setLinkedImageUrl(matchingImages[0].imageUrl);
         }
       }
     } catch (error) {
@@ -264,35 +292,42 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     // Add hierarchy specifications if available and selected
     if (includeFields.specifications) {
       if (selectedHierarchySpec && selectedHierarchySpec.specifications) {
-        shareText += `\n\n📋 المواصفات من إدارة التسلسل الهرمي:`;
+        shareText += `\n\n📋 المواصفات التفصيلية:`;
         const specs = selectedHierarchySpec.specifications as any;
         
-        if (specs.engine) shareText += `\n🔧 المحرك: ${specs.engine}`;
-        if (specs.power) shareText += `\n⚡ القوة: ${specs.power}`;
-        if (specs.transmission) shareText += `\n⚙️ ناقل الحركة: ${specs.transmission}`;
-        if (specs.fuelType) shareText += `\n⛽ نوع الوقود: ${specs.fuelType}`;
-        if (specs.drivetrain) shareText += `\n🚗 نوع الدفع: ${specs.drivetrain}`;
-        
-        if (specs.features && Array.isArray(specs.features) && specs.features.length > 0) {
-          shareText += `\n✨ المميزات:`;
-          specs.features.forEach((feature: string) => {
-            shareText += `\n   • ${feature}`;
-          });
+        // Handle different specification formats
+        if (typeof specs === 'string') {
+          shareText += `\n${specs}`;
+        } else if (typeof specs === 'object') {
+          // Handle object-based specifications
+          if (specs.engine) shareText += `\n🔧 المحرك: ${specs.engine}`;
+          if (specs.power) shareText += `\n⚡ القوة: ${specs.power}`;
+          if (specs.transmission) shareText += `\n⚙️ ناقل الحركة: ${specs.transmission}`;
+          if (specs.fuelType) shareText += `\n⛽ نوع الوقود: ${specs.fuelType}`;
+          if (specs.seatingCapacity) shareText += `\n👥 عدد المقاعد: ${specs.seatingCapacity}`;
+          if (specs.driveType) shareText += `\n🚗 نوع الدفع: ${specs.driveType}`;
+          if (specs.acceleration) shareText += `\n🏃 التسارع: ${specs.acceleration}`;
+          if (specs.topSpeed) shareText += `\n🏎️ السرعة القصوى: ${specs.topSpeed}`;
+          if (specs.fuelConsumption) shareText += `\n💨 استهلاك الوقود: ${specs.fuelConsumption}`;
+          if (specs.safetyRating) shareText += `\n🛡️ تقييم الأمان: ${specs.safetyRating}`;
+          if (specs.warranty) shareText += `\n📝 الضمان: ${specs.warranty}`;
+          if (specs.features) shareText += `\n✨ المزايا: ${specs.features}`;
+          if (specs.technology) shareText += `\n📱 التقنيات: ${specs.technology}`;
+          if (specs.comfort) shareText += `\n🛋️ وسائل الراحة: ${specs.comfort}`;
+          if (specs.entertainment) shareText += `\n🎵 الترفيه: ${specs.entertainment}`;
         }
       } else if (vehicle.detailedSpecifications) {
+        // Fallback to vehicle's own detailed specifications if no hierarchy specs
         shareText += `\n\n📋 المواصفات التفصيلية:\n${vehicle.detailedSpecifications}`;
       }
     }
 
     // Add hierarchy image links if available and selected
     if (includeFields.linkedImage && selectedHierarchyImages.length > 0) {
-      shareText += `\n\n🖼️ روابط الصور من إدارة التسلسل الهرمي:`;
+      shareText += `\n\n🖼️ روابط الصور من إدارة المواصفات:`;
       selectedHierarchyImages.forEach((imageLink, index) => {
-        if (imageLink.imageUrls && imageLink.imageUrls.length > 0) {
-          shareText += `\n📸 مجموعة ${index + 1} (${imageLink.exteriorColor} - ${imageLink.interiorColor}):`;
-          imageLink.imageUrls.forEach((url, urlIndex) => {
-            shareText += `\n   🔗 صورة ${urlIndex + 1}: ${url}`;
-          });
+        if (imageLink.imageUrl) {
+          shareText += `\n📸 صورة ${index + 1} (${imageLink.exteriorColor} - ${imageLink.interiorColor}): ${imageLink.imageUrl}`;
         }
       });
     }
@@ -644,20 +679,21 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
             </CardContent>
           </Card>
 
-          {/* Hierarchy Management Section */}
+          {/* المواصفات وروابط الصور من صفحة إدارة المواصفات */}
           {(hierarchySpecifications.length > 0 || selectedHierarchyImages.length > 0) && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Settings className="h-5 w-5" />
-                  إدارة التسلسل الهرمي
+                  <FileText className="h-5 w-5" style={{color: '#C49632'}} />
+                  المواصفات وروابط الصور المحفوظة
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* عرض المواصفات التفصيلية المتاحة */}
                 {hierarchySpecifications.length > 0 && (
                   <div>
-                    <Label className="text-sm font-medium">المواصفات المتاحة ({hierarchySpecifications.length})</Label>
-                    <div className="mt-2 space-y-2">
+                    <Label className="text-sm font-medium">المواصفات التفصيلية المحفوظة ({hierarchySpecifications.length})</Label>
+                    <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
                       {hierarchySpecifications.map((spec) => (
                         <div 
                           key={spec.id} 
@@ -670,7 +706,12 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                         >
                           <div className="flex justify-between items-start">
                             <div>
-                              <p className="font-medium text-sm">{spec.model} - {spec.trimLevel}</p>
+                              <p className="font-medium text-sm">
+                                {spec.manufacturer} {spec.category} - {spec.year} {spec.trimLevel}
+                              </p>
+                              {spec.chassisNumber && (
+                                <p className="text-xs text-gray-500">رقم الهيكل: {spec.chassisNumber}</p>
+                              )}
                               {spec.specifications && typeof spec.specifications === 'object' && (spec.specifications as any).engine && (
                                 <p className="text-xs text-gray-600">المحرك: {(spec.specifications as any).engine}</p>
                               )}
@@ -694,7 +735,10 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                           <div className="flex justify-between items-start">
                             <div>
                               <p className="text-sm font-medium">{imageLink.exteriorColor} - {imageLink.interiorColor}</p>
-                              <p className="text-xs text-gray-600">{imageLink.imageUrls.length} صورة متاحة</p>
+                              <p className="text-xs text-gray-600">رابط صورة متاح</p>
+                              {imageLink.chassisNumber && (
+                                <p className="text-xs text-gray-500">رقم الهيكل: {imageLink.chassisNumber}</p>
+                              )}
                             </div>
                             <Image className="h-4 w-4 text-blue-600" />
                           </div>

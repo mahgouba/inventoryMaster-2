@@ -9,11 +9,10 @@ UI preferences: Add specifications management button next to "Add Item" button f
 Removed neumorphism toggle button from card view page per user request to simplify interface.
 Completely removed the attendance interface dialog from the card view page per user request. All attendance management functionality has been removed from the cards page to simplify the interface and eliminate unnecessary navigation options.
 Replaced animated floating action button (FAB) with popup actions in inventory page with simple "إضافة عنصر" (Add Item) button at bottom-right corner per user request to simplify interface.
-Enhanced floating action button in card view page with advanced animations including glow effects, pulse rings, shimmer transitions, particle effects, and smooth interactions per user request. Added comprehensive CSS animation system with multiple keyframes for optimal visual appeal.
 Removed all animations from floating action button in card view page per user request to make it static and non-animated.
 Enhanced main page filter design with:
 - Improved filter toggle button with active filters indicator and smooth animations
-- Glass morphism background with gradient effects and decorative elements  
+- Glass morphism background with gradient effects and decorative elements
 - Responsive grid layout (1 column mobile, 2 columns medium, 3 columns large screens)
 - Better desktop optimization with enhanced spacing and visual hierarchy
 Removed duplicate manufacturer data issue in hierarchical view by disabling auto-populate function.
@@ -25,64 +24,12 @@ Removed detailed specifications box and "متوفر" availability checkbox from 
 Added gear (Settings) button in vehicle form header for controlling dropdown data (Year, Import Type, Status, Location, Ownership Type) with add/remove functionality.
 Updated sale status from "متوفر" to "متاح للبيع" for clearer terminology.
 Excel Import: Requested removal of specific fields from Excel import template (Serial Number, Payment System, Transmission, Fuel Type) to streamline data entry process. These fields are either auto-generated or use default values.
-
-## Recent Changes
-**August 16, 2025 - Complete CRUD System Implementation:**
-- **Successfully added comprehensive edit and delete functionality for employee work schedules**
-- **Implemented advanced edit dialog with full schedule modification capabilities (salary, schedule type, work hours)**
-- **Added permission-based access control** - only admin and sales_manager roles can edit/delete schedules
-- **Created PUT and DELETE API endpoints** for employee work schedules with proper error handling
-- **Enhanced UI with edit and delete buttons** featuring automotive-themed icons and consistent color scheme
-- **Added confirmation dialogs** for delete operations to prevent accidental data loss
-- **Implemented proper data validation** and error messaging for all CRUD operations
-- **Database operations fully functional** with proper transaction handling and data integrity
-- All edit and delete functionality tested and working correctly with real-time UI updates
-- **Configured default attendance time values** per user request:
-  - Split shift (دوام منفصل): 09:30am-01:00pm and 04:00pm-09:00pm
-  - Continuous shift (دوام متصل): 12:00pm-10:00pm
-
-**August 16, 2025 - Replit Migration Successfully Completed:**
-- Successfully migrated the inventory management system from Replit Agent to standard Replit environment
-- Fixed critical API routing issue: Added missing `/api/specifications/vehicle/...` and `/api/specifications/...` routes
-- Resolved JSON parsing errors in specifications management dialog
-- Verified all core functionality working: authentication, inventory management, statistics, quotations
-- Project now running cleanly on Replit with proper client/server separation and security practices
-- All required packages installed and configured properly
-- Database system working with intelligent fallback (MemStorage when no DATABASE_URL)
-- Server running on port 5000 with proper security settings using 0.0.0.0 for accessibility
-
-**August 13, 2025 - Migration and UI Updates Completed:**
-- Successfully migrated project from Replit Agent to standard Replit environment
-- Fixed critical JavaScript error in card view page (missing Car icon import)
-- Resolved API routing conflicts that caused statistics endpoints to fail
-- Reordered Express.js routes to ensure specific endpoints (/stats, /manufacturer-stats) come before parameterized routes (/:id)
-- **Fixed import type statistics calculation**: Updated backend to properly handle all import type variations (شخصي, شخصيي, سخصي, شركة, شركه, مستعمل) with proper trimming and matching
-- **Changed "مستعمل شخصي" display to "مستعمل"** in statistics boxes per user request
-- **Hidden "متاح للبيع" field** from vehicle addition dialog per user request to simplify interface
-- **Updated import type options**: Changed "مستعمل شخصي" to just "مستعمل" in dropdown selections
-- **Moved card view icon (البطاقات) to position below inventory icon (المخزون)** in horizontal navigation per user request
-- **Hidden engine capacity field when chassis number is entered** in vehicle form per user request to simplify data entry
-- Statistics dashboard now displays correct data for inventory counts and manufacturer breakdowns
-- All systems operational with proper client/server separation and security practices
-- Fixed notification badge disappearing issue when opening "وصل اليوم" (arrival notifications) interface
-- Changed default landing page from CardViewPage to MainDashboard (inventory page) per user request - main page button now redirects to inventory
-- Implemented manufacturer sorting by count (highest count displayed first) in card view interface
-
-**August 13, 2025 - Hierarchy Management Page Fixes Completed:**
-- **Fixed engine capacity field hiding**: Updated the vehicle specifications form to properly hide the engine capacity field when chassis number is entered
-- **Resolved vehicle specifications API errors**: Fixed schema validation issues in vehicleSpecifications table by making fields optional and updating storage methods
-- **Resolved vehicle image links API errors**: Fixed schema validation issues in vehicleImageLinks table by updating field structure and storage implementation
-- **Updated database schema**: Modified vehicleSpecifications and vehicleImageLinks tables to support flexible field requirements
-- **Fixed TypeScript errors**: Resolved all compilation errors in HierarchicalView component and storage layer
-- **Tested API endpoints**: Confirmed that both /api/vehicle-specifications and /api/vehicle-image-links endpoints work correctly for creating new entries
-- All hierarchy management functionality now operational with proper error handling and data validation
-
-**August 13, 2025 - Vehicle Sharing Interface Updates:**
-- **Updated all icons in vehicle sharing component** to use automotive-themed icons in color #C49632
-- **Replaced generic icons** with car-specific icons (Car, Settings, Calculator, FileText, ExternalLink)
-- **Applied consistent color scheme** (#C49632) to all buttons, icons, and UI elements in vehicle sharing dialog
-- **Enhanced visual identity** with automotive theme throughout the sharing interface
-- All sharing functionality maintained with improved visual design consistency
+Changed "مستعمل شخصي" display to "مستعمل" in statistics boxes per user request.
+Hidden "متاح للبيع" field from vehicle addition dialog per user request to simplify interface.
+Updated import type options: Changed "مستعمل شخصي" to just "مستعمل" in dropdown selections.
+Moved card view icon (البطاقات) to position below inventory icon (المخزون) in horizontal navigation per user request.
+Hidden engine capacity field when chassis number is entered in vehicle form per user request to simplify data entry.
+Changed default landing page from CardViewPage to MainDashboard (inventory page) per user request - main page button now redirects to inventory.
 
 ## System Architecture
 
@@ -118,7 +65,7 @@ The system follows a clear separation of concerns, with distinct layers for fron
 - **Data Management**: Import/export functionality for various data types via Excel and JSON, with enhanced Excel import for hierarchy data. Excel import system with custom template excluding Serial Number, Payment System, Transmission, and Fuel Type fields - these are auto-generated or use defaults. Automatic unique chassis number generation when duplicates or placeholder values ("000") are detected.
 - **Bank Management**: Management of company and personal bank accounts, including visibility toggles and share functionality.
 - **Financing Calculator**: APR-based calculation with integration to managed financing rates from Saudi banks.
-- **Integrated Attendance System**: Monthly attendance interface showing only confirmed attendance days, with attendance requests integrated into the leave request approval workflow. Includes daily attendance view with calendar format and progress bars.
+- **Integrated Attendance System**: Monthly attendance interface showing only confirmed attendance days, with attendance requests integrated into the leave request approval workflow. Includes daily attendance view with calendar format and progress bars. CRUD for employee work schedules with permission-based access control.
 - **Leave Request System**: Comprehensive system for managing employee leave requests, including auto-calculation, PDF generation, and role-based approval workflow.
 - **Role-Based Access Control (RBAC)**: Permissions system for admin, accountant, salesperson, and sales manager roles, dynamically adapting UI.
 - **Localization**: Arabic-first design with RTL support, Gregorian calendar (DD/MM/YYYY) and 24-hour time.
