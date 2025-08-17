@@ -3297,7 +3297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const newAttendance = await getStorage().createDailyAttendance({
           employeeId: parseInt(employeeId),
           employeeName: user.name,
-          date: date,
+          date: new Date(date + 'T00:00:00'),
           scheduleType: "متصل",
           notes: isHoliday ? 'إجازة' : null,
         });

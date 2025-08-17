@@ -729,9 +729,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     const end = format(endOfMonth(currentMonth), "yyyy-MM-dd");
     return dailyAttendance.filter(attendance => {
       const attendanceDate = typeof attendance.date === 'string' ? attendance.date : format(new Date(attendance.date), 'yyyy-MM-dd');
+      const normalizedAttendanceDate = attendanceDate.split('T')[0]; // Remove time part if present
       return attendance.employeeId === employeeId && 
-        attendanceDate >= start && 
-        attendanceDate <= end;
+        normalizedAttendanceDate >= start && 
+        normalizedAttendanceDate <= end;
     });
   };
 
@@ -754,7 +755,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
     let attendance = dailyAttendance.find(a => {
       const attendanceDate = typeof a.date === 'string' ? a.date : format(new Date(a.date), 'yyyy-MM-dd');
-      return a.employeeId === selectedEmployeeForDialog.employeeId && attendanceDate === dateStr;
+      const normalizedAttendanceDate = attendanceDate.split('T')[0]; // Remove time part if present
+      return a.employeeId === selectedEmployeeForDialog.employeeId && normalizedAttendanceDate === dateStr;
     });
 
     if (!attendance) {
@@ -1070,7 +1072,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
     let attendance = dailyAttendance.find(a => {
       const attendanceDate = typeof a.date === 'string' ? a.date : format(new Date(a.date), 'yyyy-MM-dd');
-      return a.employeeId === selectedEmployeeForDialog.employeeId && attendanceDate === dateStr;
+      const normalizedAttendanceDate = attendanceDate.split('T')[0]; // Remove time part if present
+      return a.employeeId === selectedEmployeeForDialog.employeeId && normalizedAttendanceDate === dateStr;
     });
 
     if (!attendance) {
@@ -1210,10 +1213,11 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     if (!selectedDayForAttendance || !selectedEmployeeForDialog) return;
     
     const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
-    const existingAttendance = dailyAttendance.find(a => 
-      a.employeeId === selectedEmployeeForDialog.employeeId && 
-      a.date === dateStr
-    );
+    const existingAttendance = dailyAttendance.find(a => {
+      const attendanceDate = typeof a.date === 'string' ? a.date : format(new Date(a.date), 'yyyy-MM-dd');
+      const normalizedAttendanceDate = attendanceDate.split('T')[0]; // Remove time part if present
+      return a.employeeId === selectedEmployeeForDialog.employeeId && normalizedAttendanceDate === dateStr;
+    });
     
     // Toggle holiday status if record exists
     const isCurrentlyHoliday = existingAttendance?.notes === 'إجازة';
@@ -2160,7 +2164,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               const dayStr = format(day, "yyyy-MM-dd");
                               const dayAttendance = monthAttendance.find(a => {
                                 const attendanceDate = typeof a.date === 'string' ? a.date : format(new Date(a.date), 'yyyy-MM-dd');
-                                return attendanceDate === dayStr;
+                                const normalizedAttendanceDate = attendanceDate.split('T')[0]; // Remove time part if present
+                                return normalizedAttendanceDate === dayStr;
                               });
                               const isToday = isSameDay(day, new Date());
                               const hasAttendance = !!dayAttendance;
@@ -2172,6 +2177,16 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               const hoursWorked = hasAttendance && !isHoliday ? parseFloat(calculateHoursWorked(schedule, dayAttendance)) : 0;
                               const expectedHours = calculateExpectedHours(schedule, day);
                               const approvedLeave = getApprovedLeaveForDay(schedule.employeeId, day);
+                              
+                              // Debug logging for progress bar calculation
+                              console.log(`Progress bar debug for ${format(day, 'yyyy-MM-dd')}:`, {
+                                hasAttendance,
+                                isHoliday,
+                                hoursWorked,
+                                expectedHours,
+                                dayAttendance,
+                                scheduleType: schedule.scheduleType
+                              });
                               
                               // Calculate work percentage properly for approved leave requests
                               let workPercentage = 0;
@@ -2221,6 +2236,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 // No attendance record and no approved leave
                                 workPercentage = 0;
                               }
+                              
+                              // Debug the final work percentage
+                              console.log(`Final work percentage for ${format(day, 'yyyy-MM-dd')}:`, workPercentage);
                               
                               // Get day name in Arabic
                               const dayName = format(day, "EEEE", { locale: ar });
@@ -2504,7 +2522,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                     const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
                     const existingAttendance = dailyAttendance.find(a => {
                       const attendanceDate = typeof a.date === 'string' ? a.date : format(new Date(a.date), 'yyyy-MM-dd');
-                      return a.employeeId === selectedEmployeeForDialog.employeeId && attendanceDate === dateStr;
+                      const normalizedAttendanceDate = attendanceDate.split('T')[0]; // Remove time part if present
+                      return a.employeeId === selectedEmployeeForDialog.employeeId && normalizedAttendanceDate === dateStr;
                     });
                     
                     // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
