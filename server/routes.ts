@@ -103,9 +103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // For now, skip password verification during migration
-      // TODO: Implement proper password verification
-      const isValidPassword = true; // await bcrypt.compare(password, user.password);
+      const isValidPassword = await bcrypt.compare(password, user.password);
       
       if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid credentials" });
