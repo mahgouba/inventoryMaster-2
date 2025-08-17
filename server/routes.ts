@@ -626,14 +626,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Clear all inventory items
   app.delete("/api/inventory/clear-all", async (req, res) => {
     try {
+      console.log("Starting to clear all inventory items...");
       const success = await getStorage().clearAllInventoryItems();
       if (!success) {
         return res.status(500).json({ message: "Failed to clear inventory items" });
       }
       
+      console.log("All inventory items cleared successfully");
       res.json({ message: "All inventory items cleared successfully" });
     } catch (error) {
-      res.status(500).json({ message: "Failed to clear inventory items" });
+      console.error("Error clearing inventory items:", error);
+      res.status(500).json({ 
+        message: "Failed to clear inventory items",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

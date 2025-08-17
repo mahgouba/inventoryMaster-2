@@ -84,8 +84,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async clearAllInventoryItems(): Promise<boolean> {
-    await db.delete(inventoryItems);
-    return true;
+    try {
+      console.log("Starting clearAllInventoryItems operation...");
+      
+      // Simple approach: use SQL directly
+      console.log("Deleting all price cards...");
+      await db.execute(sql`DELETE FROM price_cards`);
+      console.log("Price cards deleted successfully");
+      
+      console.log("Deleting all inventory items...");
+      await db.execute(sql`DELETE FROM inventory_items`);
+      console.log("Inventory items deleted successfully");
+      
+      console.log("clearAllInventoryItems completed successfully");
+      return true;
+    } catch (error) {
+      console.error("Error in clearAllInventoryItems:", error);
+      console.error("Error details:", error instanceof Error ? error.message : "Unknown error");
+      throw error;
+    }
   }
 
   async searchInventoryItems(query: string): Promise<InventoryItem[]> {
