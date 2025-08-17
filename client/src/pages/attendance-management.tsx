@@ -1442,8 +1442,18 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   const morningOut = dayAttendance.morningCheckoutTime;
                   const eveningIn = dayAttendance.eveningCheckinTime;
                   const eveningOut = dayAttendance.eveningCheckoutTime;
-                  checkinTime = [morningIn, eveningIn].filter(t => t).join(', ') || '-';
-                  checkoutTime = [morningOut, eveningOut].filter(t => t).join(', ') || '-';
+                  
+                  // Display both periods separately for better clarity
+                  const checkinTimes = [];
+                  const checkoutTimes = [];
+                  
+                  if (morningIn) checkinTimes.push(`صباحي: ${morningIn}`);
+                  if (eveningIn) checkinTimes.push(`مسائي: ${eveningIn}`);
+                  if (morningOut) checkoutTimes.push(`صباحي: ${morningOut}`);
+                  if (eveningOut) checkoutTimes.push(`مسائي: ${eveningOut}`);
+                  
+                  checkinTime = checkinTimes.join(', ') || '-';
+                  checkoutTime = checkoutTimes.join(', ') || '-';
                 }
                 workHours = calculateHoursWorked(schedule, dayAttendance);
                 delayHours = calculateDelayHours(schedule, dayAttendance, day).toFixed(2);
