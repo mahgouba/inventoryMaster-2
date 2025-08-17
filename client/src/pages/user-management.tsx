@@ -216,8 +216,20 @@ export default function UserManagement() {
     switch (role) {
       case "admin":
         return <Badge variant="destructive" className="bg-red-600 text-white"><Shield size={12} className="ml-1" />أدمن</Badge>;
+      case "sales_director":
+        return <Badge variant="destructive" className="bg-purple-600 text-white"><Shield size={12} className="ml-1" />مدير المبيعات</Badge>;
+      case "inventory_manager":
+        return <Badge variant="destructive" className="bg-green-600 text-white"><Shield size={12} className="ml-1" />مدير المخزون</Badge>;
+      case "bank_accountant":
+        return <Badge variant="destructive" className="bg-yellow-600 text-white"><Shield size={12} className="ml-1" />محاسب البنوك</Badge>;
+      case "accountant":
+        return <Badge variant="secondary" className="bg-orange-600 text-white"><ShieldCheck size={12} className="ml-1" />محاسب</Badge>;
+      case "sales_manager":
+        return <Badge variant="secondary" className="bg-indigo-600 text-white"><ShieldCheck size={12} className="ml-1" />مدير مبيعات</Badge>;
+      case "salesperson":
+        return <Badge variant="secondary" className="bg-cyan-600 text-white"><ShieldCheck size={12} className="ml-1" />موظف مبيعات</Badge>;
       case "seller":
-        return <Badge variant="secondary" className="bg-blue-600 text-white"><ShieldCheck size={12} className="ml-1" />مستخدم</Badge>;
+        return <Badge variant="secondary" className="bg-blue-600 text-white"><ShieldCheck size={12} className="ml-1" />مستخدم عادي</Badge>;
       default:
         return <Badge variant="outline">{role}</Badge>;
     }
@@ -348,6 +360,12 @@ export default function UserManagement() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="seller">مستخدم عادي</SelectItem>
+                        <SelectItem value="salesperson">موظف مبيعات</SelectItem>
+                        <SelectItem value="sales_manager">مدير مبيعات</SelectItem>
+                        <SelectItem value="sales_director">مدير المبيعات</SelectItem>
+                        <SelectItem value="inventory_manager">مدير المخزون</SelectItem>
+                        <SelectItem value="bank_accountant">محاسب البنوك</SelectItem>
+                        <SelectItem value="accountant">محاسب</SelectItem>
                         <SelectItem value="admin">أدمن</SelectItem>
                       </SelectContent>
                     </Select>
@@ -504,6 +522,12 @@ export default function UserManagement() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="seller">مستخدم عادي</SelectItem>
+                    <SelectItem value="salesperson">موظف مبيعات</SelectItem>
+                    <SelectItem value="sales_manager">مدير مبيعات</SelectItem>
+                    <SelectItem value="sales_director">مدير المبيعات</SelectItem>
+                    <SelectItem value="inventory_manager">مدير المخزون</SelectItem>
+                    <SelectItem value="bank_accountant">محاسب البنوك</SelectItem>
+                    <SelectItem value="accountant">محاسب</SelectItem>
                     <SelectItem value="admin">أدمن</SelectItem>
                   </SelectContent>
                 </Select>
