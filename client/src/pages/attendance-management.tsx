@@ -1232,6 +1232,12 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   const calculateHoursWorked = (schedule: EmployeeWorkSchedule, attendance: DailyAttendance): string => {
     console.log('Calculating hours for:', { scheduleType: schedule.scheduleType, attendance });
     
+    // إذا كانت الحالة إجازة، لا توجد ساعات عمل
+    if (attendance.notes === 'إجازة') {
+      console.log('Day marked as holiday, no work hours');
+      return "0.00";
+    }
+    
     if (schedule.scheduleType === "متصل") {
       if (attendance.continuousCheckinTime && attendance.continuousCheckoutTime) {
         try {
@@ -1254,16 +1260,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
           const morningCheckin = new Date(`2024-01-01T${attendance.morningCheckinTime}:00`);
           const morningCheckout = new Date(`2024-01-01T${attendance.morningCheckoutTime}:00`);
           const morningHours = (morningCheckout.getTime() - morningCheckin.getTime()) / (1000 * 60 * 60);
-          
-          // إذا كان وقت الانصراف نفس وقت الحضور، استخدم الوقت المحدد في الجدول
-          if (morningHours === 0 && attendance.morningCheckinTime === attendance.morningCheckoutTime) {
-            // استخدم الساعات المحددة في جدول العمل للفترة الصباحية
-            totalHours += 3.5; // الافتراضي للفترة الصباحية (9:30 AM - 1:00 PM)
-            console.log('Morning hours (default for same time):', 3.5);
-          } else {
-            totalHours += morningHours;
-            console.log('Morning hours:', morningHours.toFixed(2));
-          }
+          totalHours += morningHours;
+          console.log('Morning hours:', morningHours.toFixed(2));
         } catch (error) {
           console.error('Error calculating morning hours:', error);
         }
@@ -1275,16 +1273,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
           const eveningCheckin = new Date(`2024-01-01T${attendance.eveningCheckinTime}:00`);
           const eveningCheckout = new Date(`2024-01-01T${attendance.eveningCheckoutTime}:00`);
           const eveningHours = (eveningCheckout.getTime() - eveningCheckin.getTime()) / (1000 * 60 * 60);
-          
-          // إذا كان وقت الانصراف نفس وقت الحضور، استخدم الوقت المحدد في الجدول
-          if (eveningHours === 0 && attendance.eveningCheckinTime === attendance.eveningCheckoutTime) {
-            // استخدم الساعات المحددة في جدول العمل للفترة المسائية
-            totalHours += 5.0; // الافتراضي للفترة المسائية (4:00 PM - 9:00 PM)
-            console.log('Evening hours (default for same time):', 5.0);
-          } else {
-            totalHours += eveningHours;
-            console.log('Evening hours:', eveningHours.toFixed(2));
-          }
+          totalHours += eveningHours;
+          console.log('Evening hours:', eveningHours.toFixed(2));
         } catch (error) {
           console.error('Error calculating evening hours:', error);
         }
