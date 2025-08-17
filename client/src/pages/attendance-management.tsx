@@ -506,24 +506,13 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
 
   // Update attendance mutation
   const updateAttendanceMutation = useMutation({
-    mutationFn: async ({ attendanceId, field, value, status }: { 
+    mutationFn: async ({ attendanceId, updateData }: { 
       attendanceId: number; 
-      field: string; 
-      value: string; 
-      status?: string;
+      updateData: any;
     }) => {
-      const attendance = dailyAttendance.find(a => a.id === attendanceId);
-      if (!attendance) throw new Error("Attendance record not found");
-
-      const updateData = {
-        ...attendance,
-        [field]: value,
-        ...(status && { [`${field.replace('Time', 'Status')}`]: status }),
-        // Ensure date is in proper format
-        date: typeof attendance.date === 'string' ? attendance.date : 
-              format(new Date(attendance.date), 'yyyy-MM-dd')
-      };
-
+      console.log('Sending PUT request to:', `/api/daily-attendance/${attendanceId}`);
+      console.log('With data:', updateData);
+      
       const response = await fetch(`/api/daily-attendance/${attendanceId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -533,10 +522,13 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       
       if (!response.ok) {
         const errorText = await response.text();
+        console.error('Update failed:', errorText);
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
       
-      return await response.json();
+      const result = await response.json();
+      console.log('Update response:', result);
+      return result;
     },
     onSuccess: (data) => {
       console.log('Attendance update successful:', data);
@@ -650,7 +642,26 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
 
   const handleAttendanceUpdate = (attendanceId: number, field: string, value: string) => {
     console.log('Frontend updating attendance:', { attendanceId, field, value });
-    updateAttendanceMutation.mutate({ attendanceId, field, value });
+    
+    // Find the attendance record to update
+    const existingAttendance = dailyAttendance.find(a => a.id === attendanceId);
+    if (!existingAttendance) {
+      console.error('Attendance record not found for ID:', attendanceId);
+      return;
+    }
+    
+    // Create update payload with the specific field
+    const updatePayload = {
+      ...existingAttendance,
+      [field]: value,
+      // Ensure date is in correct format
+      date: typeof existingAttendance.date === 'string' ? 
+        existingAttendance.date.split('T')[0] : 
+        format(new Date(existingAttendance.date), 'yyyy-MM-dd')
+    };
+    
+    console.log('Sending update payload:', updatePayload);
+    updateAttendanceMutation.mutate({ attendanceId, updateData: updatePayload });
   };
 
   // Create daily attendance record
