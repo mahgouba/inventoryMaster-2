@@ -53,9 +53,7 @@ const copyToClipboard = async (text: string): Promise<void> => {
 export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleShareProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [showSpecificationForm, setShowSpecificationForm] = useState(false);
-  const [specificationDescription, setSpecificationDescription] = useState(vehicle.detailedSpecifications || "");
-  const [isUpdating, setIsUpdating] = useState(false);
+  
   const [sharePrice, setSharePrice] = useState(vehicle.price || "");
   const [isEditingPrice, setIsEditingPrice] = useState(false);
   const [taxRate, setTaxRate] = useState("15"); // Default VAT rate 15%
@@ -184,35 +182,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     };
   };
 
-  const updateSpecificationMutation = useMutation({
-    mutationFn: (data: { detailedSpecifications: string }) => 
-      apiRequest("PATCH", `/api/inventory/${vehicle.id}`, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
-      setShowSpecificationForm(false);
-      setIsUpdating(false);
-      toast({
-        title: "تم حفظ المواصفات بنجاح",
-        description: "تم حفظ الوصف التفصيلي لهذه السيارة",
-      });
-    },
-    onError: (error) => {
-      console.error("Error updating specification:", error);
-      setIsUpdating(false);
-      toast({
-        title: "خطأ في حفظ المواصفات",
-        description: "حدث خطأ أثناء حفظ الوصف التفصيلي",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleSaveSpecification = () => {
-    setIsUpdating(true);
-    updateSpecificationMutation.mutate({
-      detailedSpecifications: specificationDescription.trim(),
-    });
-  };
+  
 
   const generateShareText = () => {
     let shareText = "";
@@ -751,85 +721,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
             </Card>
           )}
 
-          {/* Specifications Section */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">المواصفات المخصصة</CardTitle>
-                {!showSpecificationForm && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowSpecificationForm(true)}
-                    className="text-blue-600 border-blue-300 hover:bg-blue-50"
-                  >
-                    {vehicle.detailedSpecifications ? (
-                      <>
-                        <Edit2 className="h-4 w-4 ml-1" />
-                        تعديل
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="h-4 w-4 ml-1" />
-                        إضافة الوصف
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              {!showSpecificationForm ? (
-                <div className="space-y-3">
-                  {vehicle.detailedSpecifications ? (
-                    <div className="p-4 bg-slate-50 rounded-lg">
-                      <p className="text-sm whitespace-pre-wrap">{vehicle.detailedSpecifications}</p>
-                    </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <div className="text-slate-400 text-4xl mb-2">📋</div>
-                      <p className="text-sm text-slate-600">لا توجد مواصفات مضافة لهذه السيارة</p>
-                      <p className="text-xs text-slate-500 mt-1">يمكنك إضافة مواصفات مخصصة لهذه السيارة فقط</p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="specification">الوصف التفصيلي لهذه السيارة</Label>
-                    <Textarea
-                      id="specification"
-                      placeholder="اكتب الوصف التفصيلي لهذه السيارة المحددة..."
-                      value={specificationDescription}
-                      onChange={(e) => setSpecificationDescription(e.target.value)}
-                      className="mt-2"
-                      rows={4}
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setShowSpecificationForm(false);
-                        setSpecificationDescription(vehicle.detailedSpecifications || "");
-                      }}
-                    >
-                      <X className="h-4 w-4 ml-1" />
-                      إلغاء
-                    </Button>
-                    <Button
-                      onClick={handleSaveSpecification}
-                      disabled={isUpdating}
-                      className="bg-[#BF9231] text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 flex-1"
-                    >
-                      <Save className="h-4 w-4 ml-1" />
-                      {isUpdating ? "جاري الحفظ..." : "حفظ"}
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          
 
           {/* Share Preview */}
           <Card>
