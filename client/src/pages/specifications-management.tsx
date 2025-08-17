@@ -47,28 +47,7 @@ const imageLinkFormSchema = z.object({
 type SpecificationFormData = z.infer<typeof specificationFormSchema>;
 type ImageLinkFormData = z.infer<typeof imageLinkFormSchema>;
 
-// Sample data for dropdowns
-const manufacturerOptions = [
-  "تويوتا", "نيسان", "هيونداي", "كيا", "مازدا", "هوندا", "فولكسفاغن", "شيفروليه", "فورد", "بي إم دبليو", "مرسيدس", "أودي", "جيب", "لكزس", "انفينيتي", "أكورا"
-];
-
-const categoryOptions = [
-  "سيدان", "SUV", "هاتشباك", "كوبيه", "كروس أوفر", "بيك آب", "فان", "كابريو"
-];
-
-const trimLevelOptions = [
-  "Base", "GL", "GLS", "GLX", "SE", "SEL", "Limited", "Premium", "Sport", "Luxury"
-];
-
-const yearOptions = Array.from({ length: 30 }, (_, i) => (new Date().getFullYear() - i).toString());
-
-const engineCapacityOptions = [
-  "1.0L", "1.2L", "1.4L", "1.5L", "1.6L", "1.8L", "2.0L", "2.2L", "2.4L", "2.5L", "2.7L", "3.0L", "3.5L", "4.0L", "4.5L", "5.0L"
-];
-
-const colorOptions = [
-  "أبيض", "أسود", "فضي", "رمادي", "أحمر", "أزرق", "أخضر", "بني", "ذهبي", "برتقالي", "أصفر", "بنفسجي", "وردي", "بيج"
-];
+// Database-driven options (will be replaced with API calls)
 
 export default function SpecificationsManagement() {
   const [activeTab, setActiveTab] = useState("specifications");
@@ -89,6 +68,23 @@ export default function SpecificationsManagement() {
   // Fetch image links
   const { data: imageLinks = [], isLoading: imagesLoading } = useQuery({
     queryKey: ['/api/vehicle-image-links'],
+  });
+
+  // Fetch hierarchy data from database
+  const { data: manufacturers = [] } = useQuery<any[]>({
+    queryKey: ["/api/hierarchical/manufacturers"],
+  });
+
+  const { data: vehicleYears = [] } = useQuery<number[]>({
+    queryKey: ["/api/vehicle-years"],
+  });
+
+  const { data: engineCapacities = [] } = useQuery<string[]>({
+    queryKey: ["/api/engine-capacities"],
+  });
+
+  const { data: colors = [] } = useQuery<any[]>({
+    queryKey: ["/api/hierarchical/colors"],
   });
 
   // Fetch inventory items for chassis numbers
@@ -409,9 +405,9 @@ export default function SpecificationsManagement() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {manufacturerOptions.map((manufacturer) => (
-                                    <SelectItem key={manufacturer} value={manufacturer}>
-                                      {manufacturer}
+                                  {manufacturers.map((manufacturer) => (
+                                    <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                                      {manufacturer.nameAr}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -433,11 +429,13 @@ export default function SpecificationsManagement() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {categoryOptions.map((category) => (
-                                    <SelectItem key={category} value={category}>
-                                      {category}
-                                    </SelectItem>
-                                  ))}
+                                  {manufacturers.flatMap(manufacturer => 
+                                    manufacturer.categories?.map((category: any) => (
+                                      <SelectItem key={category.id} value={category.name_ar || category.nameAr || category.category}>
+                                        {category.name_ar || category.nameAr || category.category}
+                                      </SelectItem>
+                                    )) || []
+                                  )}
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -457,11 +455,15 @@ export default function SpecificationsManagement() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {trimLevelOptions.map((trim) => (
-                                    <SelectItem key={trim} value={trim}>
-                                      {trim}
-                                    </SelectItem>
-                                  ))}
+                                  {manufacturers.flatMap(manufacturer => 
+                                    manufacturer.categories?.flatMap((category: any) => 
+                                      category.trimLevels?.map((trim: any) => (
+                                        <SelectItem key={trim.id} value={trim.name_ar}>
+                                          {trim.name_ar}
+                                        </SelectItem>
+                                      )) || []
+                                    ) || []
+                                  )}
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -481,8 +483,8 @@ export default function SpecificationsManagement() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {yearOptions.map((year) => (
-                                    <SelectItem key={year} value={year}>
+                                  {vehicleYears.map((year) => (
+                                    <SelectItem key={year} value={year.toString()}>
                                       {year}
                                     </SelectItem>
                                   ))}
@@ -505,7 +507,7 @@ export default function SpecificationsManagement() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {engineCapacityOptions.map((capacity) => (
+                                  {engineCapacities.map((capacity) => (
                                     <SelectItem key={capacity} value={capacity}>
                                       {capacity}
                                     </SelectItem>
@@ -704,9 +706,9 @@ export default function SpecificationsManagement() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {manufacturerOptions.map((manufacturer) => (
-                                    <SelectItem key={manufacturer} value={manufacturer}>
-                                      {manufacturer}
+                                  {manufacturers.map((manufacturer) => (
+                                    <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                                      {manufacturer.nameAr}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -728,11 +730,13 @@ export default function SpecificationsManagement() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {categoryOptions.map((category) => (
-                                    <SelectItem key={category} value={category}>
-                                      {category}
-                                    </SelectItem>
-                                  ))}
+                                  {manufacturers.flatMap(manufacturer => 
+                                    manufacturer.categories?.map((category: any) => (
+                                      <SelectItem key={category.id} value={category.name_ar || category.nameAr || category.category}>
+                                        {category.name_ar || category.nameAr || category.category}
+                                      </SelectItem>
+                                    )) || []
+                                  )}
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -752,11 +756,15 @@ export default function SpecificationsManagement() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {trimLevelOptions.map((trim) => (
-                                    <SelectItem key={trim} value={trim}>
-                                      {trim}
-                                    </SelectItem>
-                                  ))}
+                                  {manufacturers.flatMap(manufacturer => 
+                                    manufacturer.categories?.flatMap((category: any) => 
+                                      category.trimLevels?.map((trim: any) => (
+                                        <SelectItem key={trim.id} value={trim.name_ar}>
+                                          {trim.name_ar}
+                                        </SelectItem>
+                                      )) || []
+                                    ) || []
+                                  )}
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -776,8 +784,8 @@ export default function SpecificationsManagement() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {yearOptions.map((year) => (
-                                    <SelectItem key={year} value={year}>
+                                  {vehicleYears.map((year) => (
+                                    <SelectItem key={year} value={year.toString()}>
                                       {year}
                                     </SelectItem>
                                   ))}
@@ -800,9 +808,9 @@ export default function SpecificationsManagement() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {colorOptions.map((color) => (
-                                    <SelectItem key={color} value={color}>
-                                      {color}
+                                  {colors.filter((color: any) => color.type === 'exterior').map((color: any) => (
+                                    <SelectItem key={color.id} value={color.name}>
+                                      {color.name}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -824,9 +832,9 @@ export default function SpecificationsManagement() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {colorOptions.map((color) => (
-                                    <SelectItem key={color} value={color}>
-                                      {color}
+                                  {colors.filter((color: any) => color.type === 'interior').map((color: any) => (
+                                    <SelectItem key={color.id} value={color.name}>
+                                      {color.name}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>

@@ -2923,6 +2923,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Vehicle Data API endpoints for forms
+  app.get("/api/vehicle-years", async (req, res) => {
+    try {
+      const inventory = await getStorage().getAllInventoryItems();
+      const uniqueYears = [...new Set(inventory.map(item => item.year))].sort((a, b) => b - a);
+      res.json(uniqueYears);
+    } catch (error) {
+      console.error("Error fetching vehicle years:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle years" });
+    }
+  });
+
+  app.get("/api/engine-capacities", async (req, res) => {
+    try {
+      const inventory = await getStorage().getAllInventoryItems();
+      const uniqueEngineCapacities = [...new Set(inventory
+        .map(item => item.engineCapacity)
+        .filter(capacity => capacity && capacity.trim() !== ""))]
+        .sort();
+      res.json(uniqueEngineCapacities);
+    } catch (error) {
+      console.error("Error fetching engine capacities:", error);
+      res.status(500).json({ message: "Failed to fetch engine capacities" });
+    }
+  });
+
   // Leave Requests API - restored for attendance request approval workflow
   app.get("/api/leave-requests", async (req, res) => {
     try {

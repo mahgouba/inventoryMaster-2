@@ -54,6 +54,18 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   
   const [isEditingOptions, setIsEditingOptions] = useState(false);
   
+  // Fetch years from database
+  const { data: vehicleYears = [], isLoading: isLoadingYears } = useQuery<number[]>({
+    queryKey: ["/api/vehicle-years"],
+    enabled: open,
+  });
+
+  // Fetch engine capacities from database
+  const { data: engineCapacities = [], isLoading: isLoadingEngineCapacities } = useQuery<string[]>({
+    queryKey: ["/api/engine-capacities"],
+    enabled: open,
+  });
+
   // Local state for editable lists (keeping the same structure for other dropdowns)
   const [editableYears, setEditableYears] = useState<number[]>(initialYears);
   const [editableEngineCapacities, setEditableEngineCapacities] = useState<string[]>(initialEngineCapacities);
@@ -486,11 +498,23 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                             <SelectValue placeholder="سعة المحرك" />
                           </SelectTrigger>
                           <SelectContent>
-                            {editableEngineCapacities.filter(capacity => capacity && capacity.trim()).map((capacity) => (
-                              <SelectItem key={capacity} value={capacity}>
-                                {capacity}
+                            {isLoadingEngineCapacities ? (
+                              <SelectItem key="loading" disabled value="loading">
+                                جاري التحميل...
                               </SelectItem>
-                            ))}
+                            ) : engineCapacities.length > 0 ? (
+                              engineCapacities.filter(capacity => capacity && capacity.trim()).map((capacity) => (
+                                <SelectItem key={capacity} value={capacity}>
+                                  {capacity}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              editableEngineCapacities.filter(capacity => capacity && capacity.trim()).map((capacity) => (
+                                <SelectItem key={capacity} value={capacity}>
+                                  {capacity}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -513,11 +537,23 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                           <SelectValue placeholder="السنة" />
                         </SelectTrigger>
                         <SelectContent>
-                          {editableYears.map((year) => (
-                            <SelectItem key={year} value={year.toString()}>
-                              {year}
+                          {isLoadingYears ? (
+                            <SelectItem key="loading" disabled value="loading">
+                              جاري التحميل...
                             </SelectItem>
-                          ))}
+                          ) : vehicleYears.length > 0 ? (
+                            vehicleYears.map((year) => (
+                              <SelectItem key={year} value={year.toString()}>
+                                {year}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            editableYears.map((year) => (
+                              <SelectItem key={year} value={year.toString()}>
+                                {year}
+                              </SelectItem>
+                            ))
+                          )}
                         </SelectContent>
                       </Select>
                     </FormControl>

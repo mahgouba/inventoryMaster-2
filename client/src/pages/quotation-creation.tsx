@@ -396,43 +396,43 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     queryKey: ["/api/companies"]
   });
 
-  // Query for all available vehicles from complete database (not just inventory) - MOVED TO TOP
-  const { data: availableVehicles = [] } = useQuery<InventoryItem[]>({
-    queryKey: ["/api/cars/all-vehicles"]
+  // Database-driven vehicle hierarchy
+  const { data: manufacturers = [] } = useQuery<any[]>({
+    queryKey: ["/api/hierarchical/manufacturers"]
   });
 
-  // Get manufacturers from inventory data
-  const manufacturers = Array.from(new Set(availableVehicles.map(item => item.manufacturer)))
-    .filter(Boolean)
-    .map(manufacturer => ({
-      id: manufacturer,
-      name: manufacturer,
-      nameEn: manufacturer
-    }));
+  // Fetch categories based on selected manufacturer  
+  const selectedManufacturerName = vehicleManufacturer || editingQuotation?.manufacturer;
+  const { data: categories = [] } = useQuery<any[]>({
+    queryKey: ["/api/hierarchical/categories", selectedManufacturerName],
+    queryFn: async () => {
+      if (!selectedManufacturerName) return [];
+      const response = await fetch(`/api/hierarchical/categories?manufacturer=${encodeURIComponent(selectedManufacturerName)}`);
+      return response.json();
+    },
+    enabled: !!selectedManufacturerName,
+  });
+  
+  // Fetch trim levels based on selected category
+  const selectedCategoryName = vehicleCategory || editingQuotation?.category;
+  const { data: trimLevels = [] } = useQuery<any[]>({
+    queryKey: ["/api/hierarchical/trimLevels", selectedManufacturerName, selectedCategoryName],
+    queryFn: async () => {
+      if (!selectedManufacturerName || !selectedCategoryName) return [];
+      const response = await fetch(`/api/hierarchical/trimLevels?manufacturer=${encodeURIComponent(selectedManufacturerName)}&category=${encodeURIComponent(selectedCategoryName)}`);
+      return response.json();
+    },
+    enabled: !!selectedManufacturerName && !!selectedCategoryName,
+  });
 
-  // Get categories from inventory data based on selected manufacturer
-  const categories = Array.from(new Set(
-    availableVehicles
-      .filter(item => item.manufacturer === (vehicleManufacturer || editingQuotation?.manufacturer))
-      .map(item => item.category)
-      .filter(Boolean)
-  )).map(category => ({
-    category: category
-  }));
+  // Fetch years and engine capacities from database
+  const { data: vehicleYears = [] } = useQuery<number[]>({
+    queryKey: ["/api/vehicle-years"]
+  });
 
-  // Get trim levels from inventory data based on selected manufacturer and category
-  const trimLevels = Array.from(new Set(
-    availableVehicles
-      .filter(item => 
-        item.manufacturer === (vehicleManufacturer || editingQuotation?.manufacturer) &&
-        item.category === (vehicleCategory || editingQuotation?.category)
-      )
-      .map(item => item.trimLevel)
-      .filter(Boolean)
-  )).map(trimLevel => ({
-    id: trimLevel,
-    trimLevel: trimLevel
-  }));
+  const { data: engineCapacities = [] } = useQuery<string[]>({
+    queryKey: ["/api/engine-capacities"]
+  });
 
   // Vehicle editing state for editable form
   const [editingVehicleData, setEditingVehicleData] = useState({
@@ -447,38 +447,27 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     price: 0
   });
 
-  // Get editing categories from inventory data
-  const editingCategories = Array.from(new Set(
-    availableVehicles
-      .filter(item => item.manufacturer === editingVehicleData.manufacturer)
-      .map(item => item.category)
-      .filter(Boolean)
-  )).map(category => ({
-    category: category
-  }));
+  // Get editing categories from database
+  const { data: editingCategories = [] } = useQuery<any[]>({
+    queryKey: ["/api/hierarchical/categories", editingVehicleData.manufacturer],
+    queryFn: async () => {
+      if (!editingVehicleData.manufacturer) return [];
+      const response = await fetch(`/api/hierarchical/categories?manufacturer=${encodeURIComponent(editingVehicleData.manufacturer)}`);
+      return response.json();
+    },
+    enabled: !!editingVehicleData.manufacturer,
+  });
 
-  // Get editing trim levels from inventory data
-  const editingTrimLevels = Array.from(new Set(
-    availableVehicles
-      .filter(item => 
-        item.manufacturer === editingVehicleData.manufacturer &&
-        item.category === editingVehicleData.category
-      )
-      .map(item => item.trimLevel)
-      .filter(Boolean)
-  )).map(trimLevel => ({
-    id: trimLevel,
-    trimLevel: trimLevel
-  }));
-
-  // Get engine capacities from inventory data
-  const engineCapacities = Array.from(new Set(
-    availableVehicles
-      .map(item => item.engineCapacity)
-      .filter(Boolean)
-  )).map(engineCapacity => ({
-    engineCapacity: engineCapacity
-  }));
+  // Get editing trim levels from database
+  const { data: editingTrimLevels = [] } = useQuery<any[]>({
+    queryKey: ["/api/hierarchical/trimLevels", editingVehicleData.manufacturer, editingVehicleData.category],
+    queryFn: async () => {
+      if (!editingVehicleData.manufacturer || !editingVehicleData.category) return [];
+      const response = await fetch(`/api/hierarchical/trimLevels?manufacturer=${encodeURIComponent(editingVehicleData.manufacturer)}&category=${encodeURIComponent(editingVehicleData.category)}`);
+      return response.json();
+    },
+    enabled: !!editingVehicleData.manufacturer && !!editingVehicleData.category,
+  });
   
 
 
@@ -1996,8 +1985,8 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                           </SelectTrigger>
                           <SelectContent>
                             {manufacturers.map((manufacturer) => (
-                              <SelectItem key={manufacturer.id} value={manufacturer.name}>
-                                {manufacturer.name}
+                              <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                                {manufacturer.nameAr}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -2016,8 +2005,8 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                           </SelectTrigger>
                           <SelectContent>
                             {categories.map((category) => (
-                              <SelectItem key={category.category} value={category.category}>
-                                {category.category}
+                              <SelectItem key={category.id} value={category.nameAr}>
+                                {category.nameAr}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -2033,8 +2022,8 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                           </SelectTrigger>
                           <SelectContent>
                             {trimLevels.map((trimLevel) => (
-                              <SelectItem key={trimLevel.id} value={trimLevel.trimLevel}>
-                                {trimLevel.trimLevel}
+                              <SelectItem key={trimLevel.id} value={trimLevel.nameAr}>
+                                {trimLevel.nameAr}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -2049,7 +2038,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                             <SelectValue placeholder="اختر السنة" />
                           </SelectTrigger>
                           <SelectContent>
-                            {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                            {vehicleYears.map((year) => (
                               <SelectItem key={year} value={year.toString()}>
                                 {year}
                               </SelectItem>
@@ -2067,8 +2056,8 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                           </SelectTrigger>
                           <SelectContent>
                             {engineCapacities.map((capacity) => (
-                              <SelectItem key={capacity.engineCapacity} value={capacity.engineCapacity}>
-                                {capacity.engineCapacity}
+                              <SelectItem key={capacity} value={capacity}>
+                                {capacity}
                               </SelectItem>
                             ))}
                           </SelectContent>
