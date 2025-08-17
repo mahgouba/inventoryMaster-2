@@ -1126,10 +1126,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   // Check if employee is late
   const isEmployeeLate = (employee: EmployeeWorkSchedule, day: Date): boolean => {
     const dateStr = format(day, "yyyy-MM-dd");
-    const attendance = dailyAttendance.find(a => 
-      a.employeeId === employee.employeeId && 
-      a.date === dateStr
-    );
+    const attendance = dailyAttendance.find(a => {
+      const attendanceDate = typeof a.date === 'string' ? a.date.split('T')[0] : format(new Date(a.date), 'yyyy-MM-dd');
+      return a.employeeId === employee.employeeId && attendanceDate === dateStr;
+    });
 
     if (!attendance) return false;
 
@@ -1173,10 +1173,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   // Check if day is a holiday/leave
   const isDayHoliday = (employee: EmployeeWorkSchedule, day: Date): boolean => {
     const dateStr = format(day, "yyyy-MM-dd");
-    const attendance = dailyAttendance.find(a => 
-      a.employeeId === employee.employeeId && 
-      a.date === dateStr
-    );
+    const attendance = dailyAttendance.find(a => {
+      const attendanceDate = typeof a.date === 'string' ? a.date.split('T')[0] : format(new Date(a.date), 'yyyy-MM-dd');
+      return a.employeeId === employee.employeeId && attendanceDate === dateStr;
+    });
     
     return attendance?.notes === "إجازة";
   };
@@ -1419,12 +1419,22 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
             ${monthDays.map(day => {
               const dateStr = format(day, "yyyy-MM-dd");
               const dayAttendance = monthAttendance.find(a => {
-                const attendanceDate = typeof a.date === 'string' ? a.date : format(new Date(a.date), 'yyyy-MM-dd');
+                const attendanceDate = typeof a.date === 'string' ? a.date.split('T')[0] : format(new Date(a.date), 'yyyy-MM-dd');
                 return attendanceDate === dateStr;
               });
               const dayName = format(day, "EEEE", { locale: ar });
               const isHoliday = dayAttendance?.notes === 'إجازة';
               const approvedLeave = getApprovedLeaveForDay(schedule.employeeId, day);
+              
+              console.log('Report day debug:', { 
+                dateStr, 
+                dayAttendance: dayAttendance ? {
+                  id: dayAttendance.id,
+                  checkin: dayAttendance.continuousCheckinTime,
+                  checkout: dayAttendance.continuousCheckoutTime,
+                  notes: dayAttendance.notes
+                } : null
+              });
               
               let checkinTime = '-';
               let checkoutTime = '-';
@@ -1497,6 +1507,13 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                 workHours = calculateHoursWorked(schedule, dayAttendance);
                 delayHours = calculateDelayHours(schedule, dayAttendance, day).toFixed(2);
                 status = 'حاضر';
+                
+                console.log('Report work hours calculated:', {
+                  date: dateStr,
+                  workHours,
+                  checkin: dayAttendance.continuousCheckinTime,
+                  checkout: dayAttendance.continuousCheckoutTime
+                });
               }
               
               return `
