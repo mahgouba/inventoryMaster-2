@@ -70,7 +70,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
 
 
       case "/manufacturer-logos":
-        return user.role === "admin" ? <ManufacturerLogosPage userRole={user.role} onLogout={onLogout} /> : null;
+        return user.role === "admin" ? <ManufacturerLogosPage /> : null;
 
       case "/user-management":
         return user.role === "admin" ? <UserManagementPage /> : null;

@@ -396,6 +396,11 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     queryKey: ["/api/companies"]
   });
 
+  // Fetch inventory items for vehicle selection dialog
+  const { data: availableVehicles = [] } = useQuery({
+    queryKey: ["/api/inventory"]
+  });
+
   // Database-driven vehicle hierarchy
   const { data: manufacturers = [] } = useQuery<any[]>({
     queryKey: ["/api/hierarchical/manufacturers"]
