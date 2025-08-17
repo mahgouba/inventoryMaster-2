@@ -650,7 +650,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                           }`}
                           onClick={() => setSelectedHierarchySpec(spec)}
                         >
-                          <div className="flex justify-between items-start">
+                          <div className="flex justify-between items-start text-[#080808f2]">
                             <div>
                               <p className="font-medium text-sm">
                                 {spec.manufacturer} {spec.category} - {spec.year} {spec.trimLevel}
