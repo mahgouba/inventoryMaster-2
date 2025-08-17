@@ -1379,7 +1379,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
           <tbody>
             ${monthDays.map(day => {
               const dateStr = format(day, "yyyy-MM-dd");
-              const dayAttendance = monthAttendance.find(a => a.date === dateStr);
+              const dayAttendance = monthAttendance.find(a => {
+                const attendanceDate = typeof a.date === 'string' ? a.date : format(new Date(a.date), 'yyyy-MM-dd');
+                return attendanceDate === dateStr;
+              });
               const dayName = format(day, "EEEE", { locale: ar });
               const isHoliday = dayAttendance?.notes === 'إجازة';
               const approvedLeave = getApprovedLeaveForDay(schedule.employeeId, day);
@@ -2100,7 +2103,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                             {/* Calendar Days as Progress Bars */}
                             {monthDays.map((day) => {
                               const dayStr = format(day, "yyyy-MM-dd");
-                              const dayAttendance = monthAttendance.find(a => a.date === dayStr);
+                              const dayAttendance = monthAttendance.find(a => {
+                                const attendanceDate = typeof a.date === 'string' ? a.date : format(new Date(a.date), 'yyyy-MM-dd');
+                                return attendanceDate === dayStr;
+                              });
                               const isToday = isSameDay(day, new Date());
                               const hasAttendance = !!dayAttendance;
                               const isHoliday = dayAttendance?.notes === 'إجازة';
