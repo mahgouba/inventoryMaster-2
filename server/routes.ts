@@ -1484,7 +1484,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new user
   app.post("/api/users", async (req, res) => {
     try {
-      const { username, password, role } = req.body;
+      const { name, jobTitle, phoneNumber, username, password, role } = req.body;
       
       if (!username || !password || !role) {
         return res.status(400).json({ message: "Username, password, and role are required" });
@@ -1497,9 +1497,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const newUser = await getStorage().createUser({
-        name: username, // Use username as name for now
-        jobTitle: "مستخدم", // Default job title
-        phoneNumber: "000000000", // Default phone number
+        name: name || username, // Use provided name or fallback to username
+        jobTitle: jobTitle || "مستخدم", // Use provided job title or default
+        phoneNumber: phoneNumber || "000000000", // Use provided phone or default
         username,
         password,
         role

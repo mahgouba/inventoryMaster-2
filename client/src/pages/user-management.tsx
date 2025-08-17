@@ -60,8 +60,11 @@ export default function UserManagement() {
   // Create user mutation
   const createUserMutation = useMutation({
     mutationFn: async (userData: { name: string; jobTitle: string; phoneNumber: string; username: string; password: string; role: string }) => {
-      const response = await apiRequest("POST", "/api/users", userData);
-      return await response.json();
+      return await apiRequest("/api/users", {
+        method: "POST",
+        body: JSON.stringify(userData),
+        headers: { "Content-Type": "application/json" }
+      });
     },
     onSuccess: () => {
       toast({
@@ -84,8 +87,11 @@ export default function UserManagement() {
   // Update user mutation
   const updateUserMutation = useMutation({
     mutationFn: async (userData: Partial<User>) => {
-      const response = await apiRequest("PUT", `/api/users/${userData.id}`, userData);
-      return await response.json();
+      return await apiRequest(`/api/users/${userData.id}`, {
+        method: "PUT",
+        body: JSON.stringify(userData),
+        headers: { "Content-Type": "application/json" }
+      });
     },
     onSuccess: () => {
       toast({
@@ -108,7 +114,9 @@ export default function UserManagement() {
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      return await apiRequest("DELETE", `/api/users/${userId}`);
+      return await apiRequest(`/api/users/${userId}`, {
+        method: "DELETE"
+      });
     },
     onSuccess: () => {
       toast({
