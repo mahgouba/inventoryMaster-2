@@ -39,11 +39,18 @@ export default function ManufacturerLogos() {
   // Update logo mutation
   const updateLogoMutation = useMutation({
     mutationFn: async ({ id, logo }: { id: number; logo: string }) => {
-      return apiRequest(`/api/manufacturers/${id}/logo`, {
+      const response = await fetch(`/api/manufacturers/${id}/logo`, {
         method: 'PUT',
         body: JSON.stringify({ logo }),
         headers: { 'Content-Type': 'application/json' }
       });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to update logo: ${errorText}`);
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
