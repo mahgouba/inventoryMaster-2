@@ -10,7 +10,7 @@ export const users = pgTable("users", {
   phoneNumber: text("phone_number").notNull(), // رقم الجوال
   username: text("username").notNull().unique(), // اسم المستخدم
   password: text("password").notNull(), // كلمة المرور
-  role: text("role").notNull().default("seller"), // الصلاحيات: 'admin', 'accountant', 'salesperson', 'sales_manager'
+  role: text("role").notNull().default("seller"), // الصلاحيات: 'admin', 'accountant', 'salesperson', 'sales_manager', 'inventory_manager', 'bank_accountant'
   createdAt: timestamp("created_at").defaultNow().notNull(), // تاريخ الإنشاء
 });
 
