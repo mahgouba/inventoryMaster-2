@@ -1,3 +1,7 @@
+# Vehicle Inventory Management System - Replit Migration
+
+**Migration Status**: ✅ Successfully migrated from Replit Agent to Replit environment
+
 # Inventory Management System
 
 ## Overview
@@ -62,10 +66,15 @@ The system follows a clear separation of concerns, with distinct layers for fron
 
 ### Data Layer
 - **ORM**: Drizzle ORM for type-safe database operations.
-- **Database**: PostgreSQL.
+- **Database**: PostgreSQL (Replit-provisioned database).
 - **Schema Validation**: Zod schemas.
 - **Migrations**: Drizzle Kit for schema management.
-- **Storage**: Intelligent storage fallback system (DatabaseStorage when `DATABASE_URL` available, MemStorage otherwise).
+- **Storage**: Database storage using Replit's PostgreSQL environment.
+
+### Migration Changes (Replit Agent → Replit)
+- **Database Driver**: Changed from `@neondatabase/serverless` to standard PostgreSQL (`pg` package)
+- **Database Configuration**: Updated for Replit's PostgreSQL environment with appropriate SSL settings
+- **Environment**: Adapted for Replit's workflow and port management system
 
 ### Key Features & Technical Implementations
 - **Inventory Management**: CRUD for inventory items with detailed specifications, categories, versions, statuses, and images.
