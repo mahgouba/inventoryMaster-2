@@ -60,11 +60,18 @@ export default function UserManagement() {
   // Create user mutation
   const createUserMutation = useMutation({
     mutationFn: async (userData: { name: string; jobTitle: string; phoneNumber: string; username: string; password: string; role: string }) => {
-      return await apiRequest("/api/users", {
+      const response = await fetch("/api/users", {
         method: "POST",
         body: JSON.stringify(userData),
         headers: { "Content-Type": "application/json" }
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to create user");
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       toast({
@@ -87,11 +94,18 @@ export default function UserManagement() {
   // Update user mutation
   const updateUserMutation = useMutation({
     mutationFn: async (userData: Partial<User>) => {
-      return await apiRequest(`/api/users/${userData.id}`, {
+      const response = await fetch(`/api/users/${userData.id}`, {
         method: "PUT",
         body: JSON.stringify(userData),
         headers: { "Content-Type": "application/json" }
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update user");
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       toast({
@@ -114,9 +128,16 @@ export default function UserManagement() {
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      return await apiRequest(`/api/users/${userId}`, {
+      const response = await fetch(`/api/users/${userId}`, {
         method: "DELETE"
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete user");
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       toast({
