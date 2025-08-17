@@ -536,18 +536,21 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       
       return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Attendance update successful:', data);
       toast({
         title: "تم تحديث الحضور",
         description: "تم تحديث بيانات الحضور بنجاح",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/daily-attendance"] });
-      setIsAttendanceDialogOpen(false); // إغلاق الـ Dialog بعد النجاح
+      queryClient.refetchQueries({ queryKey: ["/api/daily-attendance"] });
+      // Don't close dialog automatically to allow multiple updates
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Attendance update error:', error);
       toast({
         title: "خطأ في تحديث الحضور",
-        description: "حدث خطأ أثناء تحديث بيانات الحضور",
+        description: error.message || "حدث خطأ أثناء تحديث بيانات الحضور",
         variant: "destructive",
       });
     },
@@ -644,6 +647,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   };
 
   const handleAttendanceUpdate = (attendanceId: number, field: string, value: string) => {
+    console.log('Updating attendance:', { attendanceId, field, value });
     updateAttendanceMutation.mutate({ attendanceId, field, value });
   };
 
