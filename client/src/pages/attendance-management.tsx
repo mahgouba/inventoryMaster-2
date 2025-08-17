@@ -519,7 +519,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         ...attendance,
         [field]: value,
         ...(status && { [`${field.replace('Time', 'Status')}`]: status }),
-        date: attendance.date // Keep date as string in YYYY-MM-DD format
+        // Ensure date is in proper format
+        date: typeof attendance.date === 'string' ? attendance.date : 
+              attendance.date instanceof Date ? format(attendance.date, 'yyyy-MM-dd') : 
+              format(new Date(attendance.date), 'yyyy-MM-dd')
       };
 
       const response = await fetch(`/api/daily-attendance/${attendanceId}`, {
@@ -647,7 +650,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   };
 
   const handleAttendanceUpdate = (attendanceId: number, field: string, value: string) => {
-    console.log('Updating attendance:', { attendanceId, field, value });
+    console.log('Frontend updating attendance:', { attendanceId, field, value });
     updateAttendanceMutation.mutate({ attendanceId, field, value });
   };
 
