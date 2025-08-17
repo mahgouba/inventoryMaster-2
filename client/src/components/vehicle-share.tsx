@@ -625,10 +625,6 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
             </CardContent>
           </Card>
 
-          
-
-          
-
           {/* Share Preview */}
           <Card>
             <CardHeader>
