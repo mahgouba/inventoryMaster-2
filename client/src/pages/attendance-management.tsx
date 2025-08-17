@@ -188,9 +188,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   const [eveningEndTime, setEveningEndTime] = useState("21:00");
 
   // Define permissions based on user role
-  const canApproveRequests = ["admin", "sales_manager"].includes(userRole);
-  const canManageSchedules = ["admin", "sales_manager"].includes(userRole);
-  const canManageAttendance = ["admin", "sales_manager", "accountant"].includes(userRole);
+  const canApproveRequests = ["admin", "sales_director"].includes(userRole);
+  const canManageSchedules = ["admin", "sales_director"].includes(userRole);
+  const canManageAttendance = ["admin", "sales_director", "accountant"].includes(userRole);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();

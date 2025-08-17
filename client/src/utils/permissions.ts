@@ -1,6 +1,6 @@
 // Permission utilities for role-based access control
 
-export type UserRole = 'admin' | 'accountant' | 'salesperson' | 'sales_manager' | 'inventory_manager' | 'bank_accountant' | 'sales_director';
+export type UserRole = 'admin' | 'accountant' | 'salesperson' | 'inventory_manager' | 'bank_accountant' | 'sales_director';
 
 export interface Permission {
   canView: boolean;
@@ -64,22 +64,7 @@ export const PERMISSIONS: Record<UserRole, Record<string, Permission>> = {
     attendanceManagement: { canView: true, canCreate: true, canEdit: false, canDelete: false, canShare: false, canReserve: false },
   },
 
-  sales_manager: {
-    // Sales manager has broader access but still limited
-    inventory: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: true, canReserve: true },
-    cardView: { canView: true, canCreate: false, canEdit: false, canDelete: false, canShare: true, canReserve: true },
-    quotationCreation: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: true, canReserve: true },
-    quotationManagement: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: true, canReserve: true },
-    invoiceManagement: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: true, canReserve: true },
-    reservations: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: true, canReserve: true },
-    soldVehicles: { canView: true, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
-    financingCalculator: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: true, canReserve: false },
-    priceCards: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: true, canReserve: false },
-    userManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
-    bankManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
-    leaveRequests: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: false, canReserve: false },
-    attendanceManagement: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: false, canReserve: false },
-  },
+
 
   inventory_manager: {
     // مدير المخزون - Full access to main page, inventory, reservations, sales, and bank management

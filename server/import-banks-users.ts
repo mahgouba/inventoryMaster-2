@@ -160,7 +160,7 @@ const usersData = [
     phoneNumber: "0508059998",
     username: "ayman_almaliki",
     password: "Pass59998",
-    role: "sales_manager"
+    role: "sales_director"
   },
   {
     name: "احمد الجوهري",

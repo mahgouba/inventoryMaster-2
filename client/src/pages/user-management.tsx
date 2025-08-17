@@ -224,8 +224,7 @@ export default function UserManagement() {
         return <Badge variant="destructive" className="bg-yellow-600 text-white"><Shield size={12} className="ml-1" />محاسب البنوك</Badge>;
       case "accountant":
         return <Badge variant="secondary" className="bg-orange-600 text-white"><ShieldCheck size={12} className="ml-1" />محاسب</Badge>;
-      case "sales_manager":
-        return <Badge variant="secondary" className="bg-indigo-600 text-white"><ShieldCheck size={12} className="ml-1" />مدير مبيعات</Badge>;
+
       case "salesperson":
         return <Badge variant="secondary" className="bg-cyan-600 text-white"><ShieldCheck size={12} className="ml-1" />موظف مبيعات</Badge>;
       case "seller":
@@ -361,7 +360,7 @@ export default function UserManagement() {
                       <SelectContent>
                         <SelectItem value="seller">مستخدم عادي</SelectItem>
                         <SelectItem value="salesperson">موظف مبيعات</SelectItem>
-                        <SelectItem value="sales_manager">مدير مبيعات</SelectItem>
+
                         <SelectItem value="sales_director">مدير المبيعات</SelectItem>
                         <SelectItem value="inventory_manager">مدير المخزون</SelectItem>
                         <SelectItem value="bank_accountant">محاسب البنوك</SelectItem>
@@ -523,7 +522,7 @@ export default function UserManagement() {
                   <SelectContent>
                     <SelectItem value="seller">مستخدم عادي</SelectItem>
                     <SelectItem value="salesperson">موظف مبيعات</SelectItem>
-                    <SelectItem value="sales_manager">مدير مبيعات</SelectItem>
+
                     <SelectItem value="sales_director">مدير المبيعات</SelectItem>
                     <SelectItem value="inventory_manager">مدير المخزون</SelectItem>
                     <SelectItem value="bank_accountant">محاسب البنوك</SelectItem>

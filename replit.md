@@ -41,8 +41,9 @@ Implemented comprehensive role-based access control (RBAC) system:
 - Inventory Manager (مدير المخزون): Full access to main page, inventory, reservations, sales, and bank management
 - Bank Accountant (محاسب البنوك): Limited access to main page with share/reserve actions only and quotation creation
 - Salesperson: Restricted to card view with share and reservation capabilities only
-- Sales Manager: Broad access but cannot delete items or access user management
+
 - Accountant: Access to inventory, quotations, financing, and bank management but no delete permissions
+
 Auto-assigned sales representative based on logged-in user when making reservations.
 
 ## System Architecture
@@ -86,7 +87,7 @@ The system follows a clear separation of concerns, with distinct layers for fron
 - **Financing Calculator**: APR-based calculation with integration to managed financing rates from Saudi banks.
 - **Integrated Attendance System**: Monthly attendance interface showing only confirmed attendance days, with attendance requests integrated into the leave request approval workflow. Includes daily attendance view with calendar format and progress bars. CRUD for employee work schedules with permission-based access control.
 - **Leave Request System**: Comprehensive system for managing employee leave requests, including auto-calculation, PDF generation, and role-based approval workflow.
-- **Role-Based Access Control (RBAC)**: Comprehensive permissions system for admin, sales_director, inventory_manager, bank_accountant, accountant, salesperson, and sales_manager roles, dynamically adapting UI and navigation based on role-specific permissions.
+- **Role-Based Access Control (RBAC)**: Comprehensive permissions system for admin, sales_director, inventory_manager, bank_accountant, accountant, and salesperson roles, dynamically adapting UI and navigation based on role-specific permissions.
 - **Localization**: Arabic-first design with RTL support, Gregorian calendar (DD/MM/YYYY) and 24-hour time.
 - **Print System**: Optimized PDF and JPG exports with high quality and proper print-specific CSS. Price card printing is clean without shadows, borders, or extra white space for A4 landscape.
 - **Smart Pricing Display**: Dynamic pricing system in price cards that handles different import types with appropriate VAT calculations and color coding.
