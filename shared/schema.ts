@@ -85,7 +85,7 @@ export const bankInterestRates = pgTable("bank_interest_rates", {
 export const manufacturers = pgTable("manufacturers", {
   id: serial("id").primaryKey(),
   nameAr: text("name_ar").notNull(), // الاسم العربي
-  nameEn: text("name_en").notNull(), // الاسم الإنجليزي  
+  nameEn: text("name_en"), // الاسم الإنجليزي (اختياري)
   logo: text("logo"), // الشعار
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
