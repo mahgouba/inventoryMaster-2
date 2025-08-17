@@ -3198,8 +3198,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid attendance ID" });
       }
 
+      console.log("🔄 Updating attendance ID:", id);
+      console.log("📋 Raw update data received:", req.body);
+
       const attendanceData = insertDailyAttendanceSchema.parse(req.body);
+      console.log("✅ Validated update data:", attendanceData);
+      
       const attendance = await getStorage().updateDailyAttendance(id, attendanceData);
+      console.log("💾 Updated attendance record:", attendance);
       
       if (!attendance) {
         return res.status(404).json({ message: "Daily attendance record not found" });
@@ -3207,7 +3213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(attendance);
     } catch (error) {
-      console.error("Error updating daily attendance:", error);
+      console.error("❌ Error updating daily attendance:", error);
       res.status(500).json({ message: "Failed to update daily attendance" });
     }
   });

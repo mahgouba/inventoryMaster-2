@@ -519,7 +519,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         ...attendance,
         [field]: value,
         ...(status && { [`${field.replace('Time', 'Status')}`]: status }),
-        date: new Date(attendance.date)
+        date: attendance.date // Keep date as string in YYYY-MM-DD format
       };
 
       const response = await fetch(`/api/daily-attendance/${attendanceId}`, {
