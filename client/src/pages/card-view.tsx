@@ -897,15 +897,15 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
             <div className="flex items-center space-x-2 space-x-reverse">
 
 
-              {/* Home Button */}
-              <Link href="/">
+              {/* Dashboard Button */}
+              <Link href="/inventory">
                 <Button variant="outline" size="sm" className={
                   neumorphismMode 
                     ? "neuro-button" 
                     : "glass-button glass-text-primary"
                 }>
                   <Home size={16} className="ml-1" />
-                  <span className="hidden sm:inline">الرئيسية</span>
+                  <span className="hidden sm:inline">لوحة التحكم</span>
                 </Button>
               </Link>
 
