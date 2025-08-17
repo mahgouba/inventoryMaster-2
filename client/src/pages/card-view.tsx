@@ -71,6 +71,7 @@ import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import { EnhancedSaleDialog } from "@/components/enhanced-sale-dialog";
 
 import type { InventoryItem } from "@shared/schema";
+import { UserRole, canViewPage, canCreateItem, canEditItem, canDeleteItem, canShareItem, canReserveItem } from "@/utils/permissions";
 
 interface CardViewPageProps {
   userRole: string;
@@ -897,17 +898,19 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
             <div className="flex items-center space-x-2 space-x-reverse">
 
 
-              {/* Dashboard Button */}
-              <Link href="/inventory">
-                <Button variant="outline" size="sm" className={
-                  neumorphismMode 
-                    ? "neuro-button" 
-                    : "glass-button glass-text-primary"
-                }>
-                  <Home size={16} className="ml-1" />
-                  <span className="hidden sm:inline">لوحة التحكم</span>
-                </Button>
-              </Link>
+              {/* Dashboard Button - Hidden for normal users (salesperson) */}
+              {canViewPage(userRole as UserRole, "inventory") && (
+                <Link href="/inventory">
+                  <Button variant="outline" size="sm" className={
+                    neumorphismMode 
+                      ? "neuro-button" 
+                      : "glass-button glass-text-primary"
+                  }>
+                    <Home size={16} className="ml-1" />
+                    <span className="hidden sm:inline">لوحة التحكم</span>
+                  </Button>
+                </Link>
+              )}
 
               {/* Arrived Today Button */}
               <div className="relative">
@@ -1563,62 +1566,72 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 <Share2 size={14} />
                               </Button>
 
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="px-2 h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
-                                onClick={() => handleSellItem(item)}
-                                disabled={sellingItemId === item.id || item.isSold}
-                                title="بيع"
-                              >
-                                <ShoppingCart size={14} />
-                              </Button>
-
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="px-2 h-8 text-purple-600 hover:text-purple-700 hover:bg-purple-50 border-purple-300"
-                                onClick={() => handleCreateQuote(item)}
-                                title="إنشاء عرض سعر"
-                              >
-                                <FileText size={14} />
-                              </Button>
-
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="px-2 h-8 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 border-indigo-300"
-                                onClick={() => {
-                                  localStorage.setItem('selectedVehicleForPriceCard', JSON.stringify(item));
-                                  window.location.href = '/price-cards';
-                                }}
-                                title="إنشاء بطاقة سعر"
-                              >
-                                <Receipt size={14} />
-                              </Button>
-
-                              {item.status === "محجوز" ? (
+                              {/* Hide action buttons for normal users, show only for admin/managers */}
+                              {canEditItem(userRole as UserRole, "cardView") && (
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="px-2 h-8 text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
-                                  onClick={() => handleCancelReservation(item)}
-                                  disabled={cancelingReservationId === item.id}
-                                  title="إلغاء الحجز"
+                                  className="px-2 h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
+                                  onClick={() => handleSellItem(item)}
+                                  disabled={sellingItemId === item.id || item.isSold}
+                                  title="بيع"
                                 >
-                                  <X size={14} />
+                                  <ShoppingCart size={14} />
                                 </Button>
-                              ) : (
+                              )}
+
+                              {canViewPage(userRole as UserRole, "quotationCreation") && (
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="px-2 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
-                                  onClick={() => handleReserveItem(item)}
-                                  disabled={item.status === "محجوز" || item.isSold}
-                                  title="حجز"
+                                  className="px-2 h-8 text-purple-600 hover:text-purple-700 hover:bg-purple-50 border-purple-300"
+                                  onClick={() => handleCreateQuote(item)}
+                                  title="إنشاء عرض سعر"
                                 >
-                                  <Calendar size={14} />
+                                  <FileText size={14} />
                                 </Button>
+                              )}
+
+                              {canViewPage(userRole as UserRole, "priceCards") && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="px-2 h-8 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 border-indigo-300"
+                                  onClick={() => {
+                                    localStorage.setItem('selectedVehicleForPriceCard', JSON.stringify(item));
+                                    window.location.href = '/price-cards';
+                                  }}
+                                  title="إنشاء بطاقة سعر"
+                                >
+                                  <Receipt size={14} />
+                                </Button>
+                              )}
+
+                              {/* Reservation buttons - Available for all users with reservation permission */}
+                              {canReserveItem(userRole as UserRole, "cardView") && (
+                                item.status === "محجوز" ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="px-2 h-8 text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
+                                    onClick={() => handleCancelReservation(item)}
+                                    disabled={cancelingReservationId === item.id}
+                                    title="إلغاء الحجز"
+                                  >
+                                    <X size={14} />
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="px-2 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
+                                    onClick={() => handleReserveItem(item)}
+                                    disabled={item.status === "محجوز" || item.isSold}
+                                    title="حجز"
+                                  >
+                                    <Calendar size={14} />
+                                  </Button>
+                                )
                               )}
                             </div>
                           </div>
@@ -1716,6 +1729,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         open={reserveDialogOpen}
         onOpenChange={setReserveDialogOpen}
         item={reserveItem}
+        username={username}
         onSuccess={handleReservationSuccess}
       />
 
@@ -1865,68 +1879,79 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           <div className="mt-4 pt-4 border-t border-white/20">
                             <h5 className="font-bold text-white mb-3 text-sm">إجراءات سريعة</h5>
                             <div className="flex gap-2 flex-wrap">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="px-3 h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
-                                onClick={() => handleSellItem(vehicle)}
-                                disabled={sellingItemId === vehicle.id || vehicle.status === "مباع"}
-                                title="بيع"
-                              >
-                                <ShoppingCart size={14} className="ml-1" />
-                                بيع
-                              </Button>
+                              {/* Hide action buttons for normal users, show only for admin/managers */}
+                              {canEditItem(userRole as UserRole, "cardView") && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="px-3 h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
+                                  onClick={() => handleSellItem(vehicle)}
+                                  disabled={sellingItemId === vehicle.id || vehicle.status === "مباع"}
+                                  title="بيع"
+                                >
+                                  <ShoppingCart size={14} className="ml-1" />
+                                  بيع
+                                </Button>
+                              )}
                               
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="px-3 h-8 hover:bg-yellow-50 border-yellow-300"
-                                style={{color: '#BF9231'}}
-                                onClick={() => handleShareItem(vehicle)}
-                                title="مشاركة"
-                              >
-                                <Share2 size={14} className="ml-1" />
-                                مشاركة
-                              </Button>
-
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="px-3 h-8 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 border-indigo-300"
-                                onClick={() => {
-                                  setSelectedVehicleForPriceCard(vehicle);
-                                  setPriceCardPreviewOpen(true);
-                                }}
-                                title="معاينة بطاقة السعر"
-                              >
-                                <Receipt size={14} className="ml-1" />
-                                بطاقة سعر
-                              </Button>
-
-                              {vehicle.status === "محجوز" ? (
+                              {/* Share button - Available for all users */}
+                              {canShareItem(userRole as UserRole, "cardView") && (
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="px-3 h-8 text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
-                                  onClick={() => handleCancelReservation(vehicle)}
-                                  disabled={cancelingReservationId === vehicle.id}
-                                  title="إلغاء الحجز"
+                                  className="px-3 h-8 hover:bg-yellow-50 border-yellow-300"
+                                  style={{color: '#BF9231'}}
+                                  onClick={() => handleShareItem(vehicle)}
+                                  title="مشاركة"
                                 >
-                                  <X size={14} className="ml-1" />
-                                  إلغاء الحجز
+                                  <Share2 size={14} className="ml-1" />
+                                  مشاركة
                                 </Button>
-                              ) : (
+                              )}
+
+                              {canViewPage(userRole as UserRole, "priceCards") && (
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="px-3 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
-                                  onClick={() => handleReserveItem(vehicle)}
-                                  disabled={vehicle.status === "محجوز" || vehicle.status === "مباع"}
-                                  title="حجز"
+                                  className="px-3 h-8 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 border-indigo-300"
+                                  onClick={() => {
+                                    setSelectedVehicleForPriceCard(vehicle);
+                                    setPriceCardPreviewOpen(true);
+                                  }}
+                                  title="معاينة بطاقة السعر"
                                 >
-                                  <Calendar size={14} className="ml-1" />
-                                  حجز
+                                  <Receipt size={14} className="ml-1" />
+                                  بطاقة سعر
                                 </Button>
+                              )}
+
+                              {/* Reservation buttons - Available for users with reservation permission */}
+                              {canReserveItem(userRole as UserRole, "cardView") && (
+                                vehicle.status === "محجوز" ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="px-3 h-8 text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-300"
+                                    onClick={() => handleCancelReservation(vehicle)}
+                                    disabled={cancelingReservationId === vehicle.id}
+                                    title="إلغاء الحجز"
+                                  >
+                                    <X size={14} className="ml-1" />
+                                    إلغاء الحجز
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="px-3 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
+                                    onClick={() => handleReserveItem(vehicle)}
+                                    disabled={vehicle.status === "محجوز" || vehicle.status === "مباع"}
+                                    title="حجز"
+                                  >
+                                    <Calendar size={14} className="ml-1" />
+                                    حجز
+                                  </Button>
+                                )
                               )}
                             </div>
                           </div>

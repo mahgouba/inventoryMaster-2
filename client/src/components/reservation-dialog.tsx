@@ -15,9 +15,10 @@ interface ReservationDialogProps {
   onOpenChange: (open: boolean) => void;
   item?: InventoryItem;
   onSuccess: () => void;
+  username?: string; // Add username to auto-assign sales representative
 }
 
-export function ReservationDialog({ open, onOpenChange, item, onSuccess }: ReservationDialogProps) {
+export function ReservationDialog({ open, onOpenChange, item, onSuccess, username }: ReservationDialogProps) {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [salesRepresentative, setSalesRepresentative] = useState("");
@@ -31,13 +32,17 @@ export function ReservationDialog({ open, onOpenChange, item, onSuccess }: Reser
   useEffect(() => {
     if (!open) {
       resetForm();
+    } else if (open && username) {
+      // Auto-assign sales representative when dialog opens
+      setSalesRepresentative(username);
     }
-  }, [open]);
+  }, [open, username]);
 
   const reserveMutation = useMutation({
     mutationFn: async (data: {
       customerName: string;
       customerPhone: string;
+      salesRepresentative: string;
       paidAmount: string;
       reservationNote: string;
     }) => {
@@ -155,7 +160,14 @@ export function ReservationDialog({ open, onOpenChange, item, onSuccess }: Reser
                 required
                 className="text-right"
                 dir="rtl"
+                readOnly={!!username} // Make readonly if username is provided
+                style={username ? { backgroundColor: '#f1f5f9' } : {}}
               />
+              {username && (
+                <p className="text-xs text-gray-500 text-right">
+                  تم تعيين مندوب المبيعات تلقائياً
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

@@ -31,6 +31,7 @@ Updated import type options: Changed "مستعمل شخصي" to just "مستعم
 Moved card view icon (البطاقات) to position below inventory icon (المخزون) in horizontal navigation per user request.
 Hidden engine capacity field when chassis number is entered in vehicle form per user request to simplify data entry.
 Changed default landing page from CardViewPage to MainDashboard (inventory page) per user request - main page button now redirects to inventory.
+Implemented role-based access control for normal users (salesperson role): Hidden control panel button, restricted action buttons on vehicle cards to only show share and reservation buttons while hiding sell/quotation/price card buttons. Auto-assigned sales representative based on logged-in user when making reservations.
 
 ## System Architecture
 
