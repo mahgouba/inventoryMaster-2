@@ -28,6 +28,8 @@ interface InventoryTableProps {
   statusFilter: string[];
   importTypeFilter: string[];
   ownershipTypeFilter: string[];
+  fromDate: string;
+  toDate: string;
   showSoldCars: boolean;
   userRole: string;
   username: string;
@@ -46,6 +48,8 @@ export default function InventoryTable({
   statusFilter, 
   importTypeFilter, 
   ownershipTypeFilter, 
+  fromDate,
+  toDate,
   showSoldCars, 
   userRole, 
   username, 
@@ -219,11 +223,30 @@ export default function InventoryTable({
       const matchesStatus = statusFilter.length === 0 || statusFilter.includes(item.status || "");
       const matchesImportType = importTypeFilter.length === 0 || importTypeFilter.includes(item.importType || "");
       const matchesOwnershipType = ownershipTypeFilter.length === 0 || ownershipTypeFilter.includes(item.ownershipType || "");
+      
+      // Date range filter
+      const matchesDateRange = (() => {
+        if (!fromDate && !toDate) return true;
+        
+        const itemDate = new Date(item.entryDate);
+        const from = fromDate ? new Date(fromDate) : null;
+        const to = toDate ? new Date(toDate) : null;
+        
+        if (from && to) {
+          return itemDate >= from && itemDate <= to;
+        } else if (from) {
+          return itemDate >= from;
+        } else if (to) {
+          return itemDate <= to;
+        }
+        return true;
+      })();
+      
       // إذا كان إظهار السيارات المباعة مفعلاً، اعرض جميع السيارات
       // إذا كان مطفياً، اعرض فقط السيارات غير المباعة
       const matchesSoldFilter = showSoldCars ? true : item.status !== "مباع";
       
-      return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesYear && matchesEngineCapacity && matchesInteriorColor && matchesExteriorColor && matchesStatus && matchesImportType && matchesOwnershipType && matchesSoldFilter;
+      return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesYear && matchesEngineCapacity && matchesInteriorColor && matchesExteriorColor && matchesStatus && matchesImportType && matchesOwnershipType && matchesDateRange && matchesSoldFilter;
     })
     .sort((a: InventoryItem, b: InventoryItem) => {
       if (!sortColumn) return 0;
@@ -329,6 +352,7 @@ export default function InventoryTable({
               <TableHead className="text-white text-right">رقم الهيكل</TableHead>
               <TableHead className="text-white text-right">نوع الملكية</TableHead>
               <TableHead className="text-white text-right">تاريخ الدخول</TableHead>
+              <TableHead className="text-white text-right">الممشي (كم)</TableHead>
               <TableHead className="text-white text-right">السعر</TableHead>
               <TableHead className="text-white text-right">الملاحظات</TableHead>
               <TableHead className="text-white text-right">الإجراءات</TableHead>
@@ -337,7 +361,7 @@ export default function InventoryTable({
           <TableBody>
             {filteredAndSortedItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={16} className="text-center py-8">
+                <TableCell colSpan={17} className="text-center py-8">
                   <p className="text-white/70">لا توجد عناصر للعرض</p>
                 </TableCell>
               </TableRow>
@@ -372,6 +396,9 @@ export default function InventoryTable({
                       month: '2-digit',
                       year: 'numeric'
                     })}
+                  </TableCell>
+                  <TableCell className="text-sm text-white font-latin">
+                    {item.mileage ? `${item.mileage?.toLocaleString()} كم` : '-'}
                   </TableCell>
                   <TableCell className="text-sm text-white font-latin">
                     {item.price ? `${parseFloat(item.price).toLocaleString()} ر.س` : '-'}

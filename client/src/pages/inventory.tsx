@@ -50,6 +50,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [ownershipTypeFilter, setOwnershipTypeFilter] = useState<string[]>([]);
   const [locationFilter, setLocationFilter] = useState("");
   const [showSoldCars, setShowSoldCars] = useState(false);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editItem, setEditItem] = useState<InventoryItem | undefined>(undefined);
 
@@ -71,6 +73,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
   const [showStatusFilter, setShowStatusFilter] = useState(false);
   const [showImportTypeFilter, setShowImportTypeFilter] = useState(false);
   const [showOwnershipTypeFilter, setShowOwnershipTypeFilter] = useState(false);
+  const [showDateFilter, setShowDateFilter] = useState(false);
   const [printDialogOpen, setPrintDialogOpen] = useState(false);
   const [excelImportDialogOpen, setExcelImportDialogOpen] = useState(false);
 
@@ -1031,6 +1034,44 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                       </Select>
                                     </div>
 
+                                    {/* Date Range Filter */}
+                                    <div className="min-w-[280px] space-y-2">
+                                      <div className="text-sm text-white mb-2">المدة من والي</div>
+                                      <div className="flex gap-2">
+                                        <div className="flex-1">
+                                          <input
+                                            type="date"
+                                            value={fromDate}
+                                            onChange={(e) => setFromDate(e.target.value)}
+                                            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-md text-white text-sm placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-custom-primary focus:border-transparent"
+                                            placeholder="من تاريخ"
+                                          />
+                                        </div>
+                                        <div className="flex-1">
+                                          <input
+                                            type="date"
+                                            value={toDate}
+                                            onChange={(e) => setToDate(e.target.value)}
+                                            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-md text-white text-sm placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-custom-primary focus:border-transparent"
+                                            placeholder="إلى تاريخ"
+                                          />
+                                        </div>
+                                      </div>
+                                      {(fromDate || toDate) && (
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => {
+                                            setFromDate("");
+                                            setToDate("");
+                                          }}
+                                          className="text-red-400 hover:text-red-300 text-xs p-1 h-6"
+                                        >
+                                          مسح التواريخ
+                                        </Button>
+                                      )}
+                                    </div>
+
                                     {/* Clear All Filters Button */}
                                     <Button
                                       variant="outline"
@@ -1046,6 +1087,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                         setStatusFilter([]);
                                         setImportTypeFilter([]);
                                         setOwnershipTypeFilter([]);
+                                        setFromDate("");
+                                        setToDate("");
                                       }}
                                       className="glass-button border-red-400/30 text-red-300 hover:bg-red-500/20 min-w-[100px]"
                                     >
@@ -1063,7 +1106,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                       إجمالي الفلاتر النشطة: {
                         (manufacturerFilter?.length || 0) + (categoryFilter?.length || 0) + (trimLevelFilter?.length || 0) + 
                         (yearFilter?.length || 0) + (engineCapacityFilter?.length || 0) + (exteriorColorFilter?.length || 0) + 
-                        (interiorColorFilter?.length || 0) + (statusFilter?.length || 0) + (importTypeFilter?.length || 0) + (ownershipTypeFilter?.length || 0)
+                        (interiorColorFilter?.length || 0) + (statusFilter?.length || 0) + (importTypeFilter?.length || 0) + (ownershipTypeFilter?.length || 0) + 
+                        (fromDate ? 1 : 0) + (toDate ? 1 : 0)
                       } فلتر
                     </div>
                     <Button
@@ -1080,6 +1124,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                         setStatusFilter([]);
                         setImportTypeFilter([]);
                         setOwnershipTypeFilter([]);
+                        setFromDate("");
+                        setToDate("");
                       }}
                       className="glass-button hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:hover:bg-red-900/20 min-w-[140px]"
                     >
@@ -1111,6 +1157,8 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
           statusFilter={statusFilter}
           importTypeFilter={importTypeFilter}
           ownershipTypeFilter={ownershipTypeFilter}
+          fromDate={fromDate}
+          toDate={toDate}
           showSoldCars={showSoldCars}
           userRole={userRole}
           username={username}
@@ -1138,9 +1186,28 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   const matchesStatus = statusFilter.length === 0 || statusFilter.includes(item.status || "");
                   const matchesImportType = importTypeFilter.length === 0 || importTypeFilter.includes(item.importType || "");
                   const matchesOwnershipType = ownershipTypeFilter.length === 0 || ownershipTypeFilter.includes(item.ownershipType || "");
+                  
+                  // Date range filter
+                  const matchesDateRange = (() => {
+                    if (!fromDate && !toDate) return true;
+                    
+                    const itemDate = new Date(item.entryDate);
+                    const from = fromDate ? new Date(fromDate) : null;
+                    const to = toDate ? new Date(toDate) : null;
+                    
+                    if (from && to) {
+                      return itemDate >= from && itemDate <= to;
+                    } else if (from) {
+                      return itemDate >= from;
+                    } else if (to) {
+                      return itemDate <= to;
+                    }
+                    return true;
+                  })();
+                  
                   const matchesSoldFilter = showSoldCars ? true : item.status !== "مباع";
                   
-                  return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesYear && matchesEngineCapacity && matchesInteriorColor && matchesExteriorColor && matchesStatus && matchesImportType && matchesOwnershipType && matchesSoldFilter;
+                  return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesYear && matchesEngineCapacity && matchesInteriorColor && matchesExteriorColor && matchesStatus && matchesImportType && matchesOwnershipType && matchesDateRange && matchesSoldFilter;
                 });
 
                 const stats = {
