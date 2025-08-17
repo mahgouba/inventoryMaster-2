@@ -395,6 +395,19 @@ export class DatabaseStorage implements IStorage {
     return result.rowCount > 0;
   }
 
+  async updateManufacturerLogo(id: number, logo: string): Promise<Manufacturer | undefined> {
+    try {
+      const [updated] = await db.update(manufacturers).set({
+        logo,
+        updatedAt: new Date()
+      }).where(eq(manufacturers.id, id)).returning();
+      return updated || undefined;
+    } catch (error) {
+      console.error('Error updating manufacturer logo:', error);
+      return undefined;
+    }
+  }
+
   // Categories
   async getCategoriesByManufacturer(manufacturer: string): Promise<VehicleCategory[]> {
     try {
