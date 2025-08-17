@@ -1,6 +1,6 @@
 // Permission utilities for role-based access control
 
-export type UserRole = 'admin' | 'accountant' | 'salesperson' | 'sales_manager' | 'inventory_manager' | 'bank_accountant';
+export type UserRole = 'admin' | 'accountant' | 'salesperson' | 'sales_manager' | 'inventory_manager' | 'bank_accountant' | 'sales_director';
 
 export interface Permission {
   canView: boolean;
@@ -113,6 +113,23 @@ export const PERMISSIONS: Record<UserRole, Record<string, Permission>> = {
     bankManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
     leaveRequests: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
     attendanceManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
+  },
+
+  sales_director: {
+    // مدير المبيعات - Full access to main page, inventory, sales, reservations, attendance, and pending leave requests
+    inventory: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
+    cardView: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
+    quotationCreation: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
+    quotationManagement: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
+    invoiceManagement: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
+    reservations: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
+    soldVehicles: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
+    financingCalculator: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: true, canReserve: false },
+    priceCards: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: false },
+    userManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
+    bankManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
+    leaveRequests: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: false, canReserve: false },
+    attendanceManagement: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: false, canReserve: false },
   }
 };
 

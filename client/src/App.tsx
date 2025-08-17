@@ -60,7 +60,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           <Route path="/locations" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           
           {/* Admin Routes through Main Dashboard */}
-          {(user.role === "admin" || user.role === "inventory_manager") && (
+          {(user.role === "admin" || user.role === "inventory_manager" || user.role === "sales_director") && (
             <>
               <Route path="/pdf-appearance" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
 
