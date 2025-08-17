@@ -180,12 +180,12 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   const [reason, setReason] = useState<string>("");
 
   // Schedule form states
-  const [continuousStartTime, setContinuousStartTime] = useState("09:00");
-  const [continuousEndTime, setContinuousEndTime] = useState("17:00");
-  const [morningStartTime, setMorningStartTime] = useState("09:00");
-  const [morningEndTime, setMorningEndTime] = useState("12:00");
-  const [eveningStartTime, setEveningStartTime] = useState("14:00");
-  const [eveningEndTime, setEveningEndTime] = useState("17:00");
+  const [continuousStartTime, setContinuousStartTime] = useState("12:00");
+  const [continuousEndTime, setContinuousEndTime] = useState("22:00");
+  const [morningStartTime, setMorningStartTime] = useState("09:30");
+  const [morningEndTime, setMorningEndTime] = useState("13:00");
+  const [eveningStartTime, setEveningStartTime] = useState("16:00");
+  const [eveningEndTime, setEveningEndTime] = useState("21:00");
 
   // Define permissions based on user role
   const canApproveRequests = ["admin", "sales_manager"].includes(userRole);
@@ -496,12 +496,12 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     setSelectedEmployeeId("");
     setSalary("");
     setScheduleType("متصل");
-    setContinuousStartTime("09:00");
-    setContinuousEndTime("17:00");
-    setMorningStartTime("09:00");
-    setMorningEndTime("12:00");
-    setEveningStartTime("14:00");
-    setEveningEndTime("17:00");
+    setContinuousStartTime("12:00");
+    setContinuousEndTime("22:00");
+    setMorningStartTime("09:30");
+    setMorningEndTime("13:00");
+    setEveningStartTime("16:00");
+    setEveningEndTime("21:00");
   };
 
   // Update attendance mutation
@@ -597,13 +597,13 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     setScheduleType(schedule.scheduleType);
     
     if (schedule.scheduleType === "متصل") {
-      setContinuousStartTime(schedule.continuousStartTime || "09:00");
-      setContinuousEndTime(schedule.continuousEndTime || "17:00");
+      setContinuousStartTime(schedule.continuousStartTime || "12:00");
+      setContinuousEndTime(schedule.continuousEndTime || "22:00");
     } else {
-      setMorningStartTime(schedule.morningStartTime || "09:00");
-      setMorningEndTime(schedule.morningEndTime || "12:00");
-      setEveningStartTime(schedule.eveningStartTime || "14:00");
-      setEveningEndTime(schedule.eveningEndTime || "17:00");
+      setMorningStartTime(schedule.morningStartTime || "09:30");
+      setMorningEndTime(schedule.morningEndTime || "13:00");
+      setEveningStartTime(schedule.eveningStartTime || "16:00");
+      setEveningEndTime(schedule.eveningEndTime || "21:00");
     }
     
     setIsEditScheduleDialogOpen(true);

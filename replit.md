@@ -37,6 +37,9 @@ Excel Import: Requested removal of specific fields from Excel import template (S
 - **Implemented proper data validation** and error messaging for all CRUD operations
 - **Database operations fully functional** with proper transaction handling and data integrity
 - All edit and delete functionality tested and working correctly with real-time UI updates
+- **Configured default attendance time values** per user request:
+  - Split shift (دوام منفصل): 09:30am-01:00pm and 04:00pm-09:00pm
+  - Continuous shift (دوام متصل): 12:00pm-10:00pm
 
 **August 16, 2025 - Replit Migration Successfully Completed:**
 - Successfully migrated the inventory management system from Replit Agent to standard Replit environment
