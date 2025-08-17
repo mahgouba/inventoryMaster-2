@@ -778,6 +778,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         )
       };
       
+      console.log('Creating new attendance record:', attendanceData);
       createAttendanceMutation.mutate(attendanceData);
     } else {
       // Update existing attendance

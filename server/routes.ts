@@ -3183,14 +3183,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("📋 Processed attendance data:", attendanceData);
       
-      // Validate with schema
-      const validatedData = insertDailyAttendanceSchema.parse(attendanceData);
-      console.log("✅ Validated attendance data:", validatedData);
+      // Check if attendance already exists for this employee and date
+      const existingAttendance = await getStorage().getDailyAttendanceByEmployeeAndDate(
+        attendanceData.employeeId,
+        new Date(attendanceData.date)
+      );
       
-      const attendance = await getStorage().createDailyAttendance(validatedData);
-      console.log("💾 Created attendance record:", attendance);
-      
-      res.status(201).json(attendance);
+      if (existingAttendance && existingAttendance.length > 0) {
+        console.log("⚠️ Attendance already exists, updating instead of creating new");
+        
+        // Update the existing attendance record with new data
+        const updateData = {
+          ...existingAttendance[0],
+          ...attendanceData,
+          id: existingAttendance[0].id // Keep the original ID
+        };
+        
+        const updatedAttendance = await getStorage().updateDailyAttendance(existingAttendance[0].id, updateData);
+        console.log("💾 Updated existing attendance record:", updatedAttendance);
+        
+        res.status(200).json(updatedAttendance);
+      } else {
+        // Validate with schema
+        const validatedData = insertDailyAttendanceSchema.parse(attendanceData);
+        console.log("✅ Validated attendance data:", validatedData);
+        
+        const attendance = await getStorage().createDailyAttendance(validatedData);
+        console.log("💾 Created new attendance record:", attendance);
+        
+        res.status(201).json(attendance);
+      }
     } catch (error) {
       console.error("❌ Error creating daily attendance:", error);
       res.status(500).json({ message: "Failed to create daily attendance" });
