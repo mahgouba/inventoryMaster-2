@@ -1225,27 +1225,55 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   };
 
   const calculateHoursWorked = (schedule: EmployeeWorkSchedule, attendance: DailyAttendance): string => {
+    console.log('Calculating hours for:', { scheduleType: schedule.scheduleType, attendance });
+    
     if (schedule.scheduleType === "متصل") {
       if (attendance.continuousCheckinTime && attendance.continuousCheckoutTime) {
-        const checkin = new Date(`2024-01-01T${attendance.continuousCheckinTime}`);
-        const checkout = new Date(`2024-01-01T${attendance.continuousCheckoutTime}`);
-        const diff = (checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60);
-        return diff.toFixed(2);
+        try {
+          const checkin = new Date(`2024-01-01T${attendance.continuousCheckinTime}:00`);
+          const checkout = new Date(`2024-01-01T${attendance.continuousCheckoutTime}:00`);
+          const diff = (checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60);
+          console.log('Continuous hours calculated:', diff.toFixed(2));
+          return diff.toFixed(2);
+        } catch (error) {
+          console.error('Error calculating continuous hours:', error);
+          return "0.00";
+        }
       }
     } else {
       let totalHours = 0;
+      
+      // Morning shift
       if (attendance.morningCheckinTime && attendance.morningCheckoutTime) {
-        const morningCheckin = new Date(`2024-01-01T${attendance.morningCheckinTime}`);
-        const morningCheckout = new Date(`2024-01-01T${attendance.morningCheckoutTime}`);
-        totalHours += (morningCheckout.getTime() - morningCheckin.getTime()) / (1000 * 60 * 60);
+        try {
+          const morningCheckin = new Date(`2024-01-01T${attendance.morningCheckinTime}:00`);
+          const morningCheckout = new Date(`2024-01-01T${attendance.morningCheckoutTime}:00`);
+          const morningHours = (morningCheckout.getTime() - morningCheckin.getTime()) / (1000 * 60 * 60);
+          totalHours += morningHours;
+          console.log('Morning hours:', morningHours.toFixed(2));
+        } catch (error) {
+          console.error('Error calculating morning hours:', error);
+        }
       }
+      
+      // Evening shift
       if (attendance.eveningCheckinTime && attendance.eveningCheckoutTime) {
-        const eveningCheckin = new Date(`2024-01-01T${attendance.eveningCheckinTime}`);
-        const eveningCheckout = new Date(`2024-01-01T${attendance.eveningCheckoutTime}`);
-        totalHours += (eveningCheckout.getTime() - eveningCheckin.getTime()) / (1000 * 60 * 60);
+        try {
+          const eveningCheckin = new Date(`2024-01-01T${attendance.eveningCheckinTime}:00`);
+          const eveningCheckout = new Date(`2024-01-01T${attendance.eveningCheckoutTime}:00`);
+          const eveningHours = (eveningCheckout.getTime() - eveningCheckin.getTime()) / (1000 * 60 * 60);
+          totalHours += eveningHours;
+          console.log('Evening hours:', eveningHours.toFixed(2));
+        } catch (error) {
+          console.error('Error calculating evening hours:', error);
+        }
       }
+      
+      console.log('Total hours calculated:', totalHours.toFixed(2));
       return totalHours.toFixed(2);
     }
+    
+    console.log('No hours calculated, returning 0.00');
     return "0.00";
   };
 
