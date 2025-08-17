@@ -485,13 +485,12 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                 )}
               />
 
-              {/* سعة المحرك - مخفي عند وجود رقم الهيكل */}
-              {!form.watch("chassisNumber") && (
-                <FormField
-                  control={form.control}
-                  name="engineCapacity"
-                  render={({ field }) => (
-                    <FormItem>
+              {/* سعة المحرك */}
+              <FormField
+                control={form.control}
+                name="engineCapacity"
+                render={({ field }) => (
+                  <FormItem>
                       <FormControl>
                         <Select onValueChange={field.onChange} value={field.value || undefined}>
                           <SelectTrigger className="glass-input border-white/20 text-white">
@@ -522,7 +521,6 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                     </FormItem>
                   )}
                 />
-              )}
 
               {/* السنة */}
               <FormField

@@ -33,7 +33,7 @@ Changed "مستعمل شخصي" display to "مستعمل" in statistics boxes pe
 Hidden "متاح للبيع" field from vehicle addition dialog per user request to simplify interface.
 Updated import type options: Changed "مستعمل شخصي" to just "مستعمل" in dropdown selections.
 Moved card view icon (البطاقات) to position below inventory icon (المخزون) in horizontal navigation per user request.
-Hidden engine capacity field when chassis number is entered in vehicle form per user request to simplify data entry.
+Removed engine capacity field hiding when chassis number is entered - now both fields are always visible per user request.
 Changed default landing page from CardViewPage to MainDashboard (inventory page) per user request - main page button now redirects to inventory.
 Implemented comprehensive role-based access control (RBAC) system:
 - Admin: Full system access
