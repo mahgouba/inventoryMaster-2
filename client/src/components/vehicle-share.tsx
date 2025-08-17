@@ -189,80 +189,61 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
     
     // Build text based on selected fields
     if (includeFields.manufacturer && includeFields.category) {
-      shareText += `🚗 ${vehicle.manufacturer} ${vehicle.category}`;
+      shareText += `${vehicle.manufacturer} ${vehicle.category}`;
     }
     
     if (includeFields.trimLevel && vehicle.trimLevel) {
-      shareText += `\n⚙️ درجة التجهيز: ${vehicle.trimLevel}`;
+      shareText += `\n• درجة التجهيز: ${vehicle.trimLevel}`;
     }
     
     if (includeFields.year) {
-      shareText += `\n📅 السنة: ${vehicle.year}`;
+      shareText += `\n• السنة: ${vehicle.year}`;
     }
     
     if (includeFields.engineCapacity) {
-      shareText += `\n🔧 سعة المحرك: ${vehicle.engineCapacity}`;
+      shareText += `\n• سعة المحرك: ${vehicle.engineCapacity}`;
     }
 
     if (includeFields.exteriorColor && vehicle.exteriorColor) {
-      shareText += `\n🎨 اللون الخارجي: ${vehicle.exteriorColor}`;
+      shareText += `\n• اللون الخارجي: ${vehicle.exteriorColor}`;
     }
     
     if (includeFields.interiorColor && vehicle.interiorColor) {
-      shareText += `\n🪑 اللون الداخلي: ${vehicle.interiorColor}`;
+      shareText += `\n• اللون الداخلي: ${vehicle.interiorColor}`;
     }
 
     if (includeFields.status) {
-      shareText += `\n✅ الحالة: ${vehicle.status}`;
+      shareText += `\n• الحالة: ${vehicle.status}`;
     }
 
     // Add price - with or without tax breakdown based on import type
     if (includeFields.price && sharePrice) {
       // For used cars, show simple price without tax breakdown
       if (vehicle.importType === "مستعمل" || vehicle.importType === "مستعمل شخصي") {
-        shareText += `\n💰 السعر: ${sharePrice}`;
+        shareText += `\n• السعر: ${sharePrice}`;
       } else {
         // For new cars, show detailed price breakdown
         const priceBreakdown = calculatePriceBreakdown();
         if (priceBreakdown) {
-          shareText += `\n💰 تفاصيل السعر:`;
-          shareText += `\n   📊 السعر الأساسي: ${Number(priceBreakdown.basePrice).toLocaleString()} ريال`;
-          shareText += `\n   📈 الضريبة (${taxRate}%): ${Number(priceBreakdown.taxAmount).toLocaleString()} ريال`;
-          shareText += `\n   💳 السعر الإجمالي: ${Number(priceBreakdown.totalPrice).toLocaleString()} ريال`;
+          shareText += `\n\nتفاصيل السعر:`;
+          shareText += `\n• السعر الأساسي: ${Number(priceBreakdown.basePrice).toLocaleString()} ريال`;
+          shareText += `\n• الضريبة (${taxRate}%): ${Number(priceBreakdown.taxAmount).toLocaleString()} ريال`;
+          shareText += `\n• السعر الإجمالي: ${Number(priceBreakdown.totalPrice).toLocaleString()} ريال`;
         } else {
-          shareText += `\n💰 السعر: ${sharePrice}`;
+          shareText += `\n• السعر: ${sharePrice}`;
         }
       }
     }
 
     // Add mileage for used cars if available and selected
     if (includeFields.mileage && (vehicle.importType === "شخصي مستعمل" || vehicle.importType === "مستعمل") && vehicle.mileage) {
-      shareText += `\n🛣️ الممشي: ${vehicle.mileage.toLocaleString()} كيلومتر`;
-    }
-
-    // Add linked image URL if available and selected
-    if (includeFields.linkedImage && linkedImageUrl) {
-      shareText += `\n🖼️ رابط الصورة المرتبط: ${linkedImageUrl}`;
-    }
-
-    // Add image link for any vehicle with images if selected
-    if (includeFields.imageLink && vehicle.images && vehicle.images.length > 0) {
-      shareText += `\n📷 رابط الصورة: ${vehicle.images[0]}`;
-    }
-
-    // Add images info if available and selected
-    if (includeFields.images && vehicle.images && vehicle.images.length > 0) {
-      shareText += `\n📸 الصور المرفقة: ${vehicle.images.length} صورة`;
-      // Include image URLs
-      vehicle.images.forEach((imageUrl, index) => {
-        shareText += `\n   📷 صورة ${index + 1}: ${imageUrl}`;
-      });
+      shareText += `\n• الممشي: ${vehicle.mileage.toLocaleString()} كيلومتر`;
     }
 
     // Add hierarchy specifications if available and selected
     if (includeFields.specifications) {
       if (selectedHierarchySpec && selectedHierarchySpec.specifications) {
-        shareText += `\n\n📋 المواصفات التفصيلية:`;
+        shareText += `\n\nالمواصفات التفصيلية:`;
         const specs = selectedHierarchySpec.specifications as any;
         
         // Handle different specification formats
@@ -270,36 +251,31 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
           shareText += `\n${specs}`;
         } else if (typeof specs === 'object') {
           // Handle object-based specifications
-          if (specs.engine) shareText += `\n🔧 المحرك: ${specs.engine}`;
-          if (specs.power) shareText += `\n⚡ القوة: ${specs.power}`;
-          if (specs.transmission) shareText += `\n⚙️ ناقل الحركة: ${specs.transmission}`;
-          if (specs.fuelType) shareText += `\n⛽ نوع الوقود: ${specs.fuelType}`;
-          if (specs.seatingCapacity) shareText += `\n👥 عدد المقاعد: ${specs.seatingCapacity}`;
-          if (specs.driveType) shareText += `\n🚗 نوع الدفع: ${specs.driveType}`;
-          if (specs.acceleration) shareText += `\n🏃 التسارع: ${specs.acceleration}`;
-          if (specs.topSpeed) shareText += `\n🏎️ السرعة القصوى: ${specs.topSpeed}`;
-          if (specs.fuelConsumption) shareText += `\n💨 استهلاك الوقود: ${specs.fuelConsumption}`;
-          if (specs.safetyRating) shareText += `\n🛡️ تقييم الأمان: ${specs.safetyRating}`;
-          if (specs.warranty) shareText += `\n📝 الضمان: ${specs.warranty}`;
-          if (specs.features) shareText += `\n✨ المزايا: ${specs.features}`;
-          if (specs.technology) shareText += `\n📱 التقنيات: ${specs.technology}`;
-          if (specs.comfort) shareText += `\n🛋️ وسائل الراحة: ${specs.comfort}`;
-          if (specs.entertainment) shareText += `\n🎵 الترفيه: ${specs.entertainment}`;
+          if (specs.engine) shareText += `\n• المحرك: ${specs.engine}`;
+          if (specs.power) shareText += `\n• القوة: ${specs.power}`;
+          if (specs.transmission) shareText += `\n• ناقل الحركة: ${specs.transmission}`;
+          if (specs.fuelType) shareText += `\n• نوع الوقود: ${specs.fuelType}`;
+          if (specs.seatingCapacity) shareText += `\n• عدد المقاعد: ${specs.seatingCapacity}`;
+          if (specs.driveType) shareText += `\n• نوع الدفع: ${specs.driveType}`;
+          if (specs.acceleration) shareText += `\n• التسارع: ${specs.acceleration}`;
+          if (specs.topSpeed) shareText += `\n• السرعة القصوى: ${specs.topSpeed}`;
+          if (specs.fuelConsumption) shareText += `\n• استهلاك الوقود: ${specs.fuelConsumption}`;
+          if (specs.safetyRating) shareText += `\n• تقييم الأمان: ${specs.safetyRating}`;
+          if (specs.warranty) shareText += `\n• الضمان: ${specs.warranty}`;
+          if (specs.features) shareText += `\n• المزايا: ${specs.features}`;
+          if (specs.technology) shareText += `\n• التقنيات: ${specs.technology}`;
+          if (specs.comfort) shareText += `\n• وسائل الراحة: ${specs.comfort}`;
+          if (specs.entertainment) shareText += `\n• الترفيه: ${specs.entertainment}`;
         }
       } else if (vehicle.detailedSpecifications) {
         // Fallback to vehicle's own detailed specifications if no hierarchy specs
-        shareText += `\n\n📋 المواصفات التفصيلية:\n${vehicle.detailedSpecifications}`;
+        shareText += `\n\nالمواصفات التفصيلية:\n${vehicle.detailedSpecifications}`;
       }
     }
 
-    // Add hierarchy image links if available and selected
-    if (includeFields.linkedImage && selectedHierarchyImages.length > 0) {
-      shareText += `\n\n🖼️ روابط الصور من إدارة المواصفات:`;
-      selectedHierarchyImages.forEach((imageLink, index) => {
-        if (imageLink.imageUrl) {
-          shareText += `\n📸 صورة ${index + 1} (${imageLink.exteriorColor} - ${imageLink.interiorColor}): ${imageLink.imageUrl}`;
-        }
-      });
+    // Add linked image URL if available and selected (only one instance)
+    if (includeFields.linkedImage && linkedImageUrl) {
+      shareText += `\n\nرابط الصورة: ${linkedImageUrl}`;
     }
     
     return shareText;
