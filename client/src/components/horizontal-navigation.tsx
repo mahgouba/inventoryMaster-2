@@ -238,17 +238,17 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
 
   const menuItems = [
     { 
-      title: "المخزون", 
-      href: "/inventory", 
+      title: "الرئيسية", 
+      href: "/card-view", 
       icon: LayoutDashboard,
-      internal: true,
+      internal: false,
       permission: "inventory"
     },
     { 
-      title: "البطاقات", 
-      href: "/card-view", 
+      title: "المخزون", 
+      href: "/inventory", 
       icon: Package,
-      internal: false,
+      internal: true,
       permission: "cardView"
     },
     { 
