@@ -626,76 +626,88 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
           </Card>
 
           {/* المواصفات وروابط الصور من صفحة إدارة المواصفات */}
-          {(hierarchySpecifications.length > 0 || selectedHierarchyImages.length > 0) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <FileText className="h-5 w-5" style={{color: '#C49632'}} />
-                  المواصفات وروابط الصور المحفوظة
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* عرض المواصفات التفصيلية المتاحة */}
-                {hierarchySpecifications.length > 0 && (
-                  <div>
-                    <Label className="text-sm font-medium">المواصفات التفصيلية المحفوظة ({hierarchySpecifications.length})</Label>
-                    <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
-                      {hierarchySpecifications.map((spec) => (
-                        <div 
-                          key={spec.id} 
-                          className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                            selectedHierarchySpec?.id === spec.id 
-                              ? 'border-[#C49632] bg-yellow-50' 
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                          onClick={() => setSelectedHierarchySpec(spec)}
-                        >
-                          <div className="flex justify-between items-start text-[#080808f2]">
-                            <div>
-                              <p className="font-medium text-sm">
-                                {spec.manufacturer} {spec.category} - {spec.year} {spec.trimLevel}
-                              </p>
-                              {spec.chassisNumber && (
-                                <p className="text-xs text-gray-500">رقم الهيكل: {spec.chassisNumber}</p>
-                              )}
-                              {spec.specifications && typeof spec.specifications === 'object' && (spec.specifications as any).engine && (
-                                <p className="text-xs text-gray-600">المحرك: {(spec.specifications as any).engine}</p>
-                              )}
-                            </div>
-                            {selectedHierarchySpec?.id === spec.id && (
-                              <div className="w-2 h-2 bg-[#C49632] rounded-full"></div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <FileText className="h-5 w-5" style={{color: '#C49632'}} />
+                المواصفات وروابط الصور المحفوظة
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* عرض المواصفات التفصيلية المتاحة */}
+              {hierarchySpecifications.length > 0 ? (
+                <div>
+                  <Label className="text-sm font-medium">المواصفات التفصيلية المحفوظة ({hierarchySpecifications.length})</Label>
+                  <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
+                    {hierarchySpecifications.map((spec) => (
+                      <div 
+                        key={spec.id} 
+                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                          selectedHierarchySpec?.id === spec.id 
+                            ? 'border-[#C49632] bg-yellow-50' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => setSelectedHierarchySpec(spec)}
+                      >
+                        <div className="flex justify-between items-start text-[#080808f2]">
+                          <div>
+                            <p className="font-medium text-sm">
+                              {spec.manufacturer} {spec.category} - {spec.year} {spec.trimLevel}
+                            </p>
+                            {spec.chassisNumber && (
+                              <p className="text-xs text-gray-500">رقم الهيكل: {spec.chassisNumber}</p>
+                            )}
+                            {spec.specifications && typeof spec.specifications === 'object' && (spec.specifications as any).engine && (
+                              <p className="text-xs text-gray-600">المحرك: {(spec.specifications as any).engine}</p>
                             )}
                           </div>
+                          {selectedHierarchySpec?.id === spec.id && (
+                            <div className="w-2 h-2 bg-[#C49632] rounded-full"></div>
+                          )}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                )}
-                
-                {selectedHierarchyImages.length > 0 && (
-                  <div>
-                    <Label className="text-sm font-medium">روابط الصور المطابقة ({selectedHierarchyImages.length})</Label>
-                    <div className="mt-2 space-y-2">
-                      {selectedHierarchyImages.map((imageLink) => (
-                        <div key={imageLink.id} className="p-3 border rounded-lg bg-blue-50 border-blue-200">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <p className="text-sm font-medium">{imageLink.exteriorColor} - {imageLink.interiorColor}</p>
-                              <p className="text-xs text-gray-600">رابط صورة متاح</p>
-                              {imageLink.chassisNumber && (
-                                <p className="text-xs text-gray-500">رقم الهيكل: {imageLink.chassisNumber}</p>
-                              )}
-                            </div>
-                            <Image className="h-4 w-4 text-blue-600" />
+                </div>
+              ) : (
+                <div>
+                  <Label className="text-sm font-medium">المواصفات التفصيلية المحفوظة</Label>
+                  <div className="mt-2 p-4 border rounded-lg bg-gray-50 text-center">
+                    <p className="text-sm text-gray-500">لا توجد مواصفات محفوظة لهذه السيارة</p>
+                  </div>
+                </div>
+              )}
+              
+              {selectedHierarchyImages.length > 0 ? (
+                <div>
+                  <Label className="text-sm font-medium">روابط الصور المطابقة ({selectedHierarchyImages.length})</Label>
+                  <div className="mt-2 space-y-2">
+                    {selectedHierarchyImages.map((imageLink) => (
+                      <div key={imageLink.id} className="p-3 border rounded-lg bg-blue-50 border-blue-200">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="text-sm font-medium">{imageLink.exteriorColor} - {imageLink.interiorColor}</p>
+                            <p className="text-xs text-gray-600">رابط صورة متاح</p>
+                            {imageLink.chassisNumber && (
+                              <p className="text-xs text-gray-500">رقم الهيكل: {imageLink.chassisNumber}</p>
+                            )}
                           </div>
+                          <Image className="h-4 w-4 text-blue-600" />
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                </div>
+              ) : (
+                <div>
+                  <Label className="text-sm font-medium">روابط الصور المطابقة</Label>
+                  <div className="mt-2 p-4 border rounded-lg bg-gray-50 text-center">
+                    <p className="text-sm text-gray-500">لا توجد روابط صور محفوظة لهذه السيارة</p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           
 
