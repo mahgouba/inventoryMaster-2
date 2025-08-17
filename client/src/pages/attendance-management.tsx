@@ -521,7 +521,6 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         ...(status && { [`${field.replace('Time', 'Status')}`]: status }),
         // Ensure date is in proper format
         date: typeof attendance.date === 'string' ? attendance.date : 
-              attendance.date instanceof Date ? format(attendance.date, 'yyyy-MM-dd') : 
               format(new Date(attendance.date), 'yyyy-MM-dd')
       };
 
@@ -728,11 +727,12 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   const getEmployeeMonthAttendance = (employeeId: number) => {
     const start = format(startOfMonth(currentMonth), "yyyy-MM-dd");
     const end = format(endOfMonth(currentMonth), "yyyy-MM-dd");
-    return dailyAttendance.filter(attendance => 
-      attendance.employeeId === employeeId && 
-      attendance.date >= start && 
-      attendance.date <= end
-    );
+    return dailyAttendance.filter(attendance => {
+      const attendanceDate = typeof attendance.date === 'string' ? attendance.date : format(new Date(attendance.date), 'yyyy-MM-dd');
+      return attendance.employeeId === employeeId && 
+        attendanceDate >= start && 
+        attendanceDate <= end;
+    });
   };
 
   // Handle clicking on employee to show monthly calendar
@@ -752,10 +752,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     if (!selectedDayForAttendance || !selectedEmployeeForDialog) return;
     
     const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
-    let attendance = dailyAttendance.find(a => 
-      a.employeeId === selectedEmployeeForDialog.employeeId && 
-      a.date === dateStr
-    );
+    let attendance = dailyAttendance.find(a => {
+      const attendanceDate = typeof a.date === 'string' ? a.date : format(new Date(a.date), 'yyyy-MM-dd');
+      return a.employeeId === selectedEmployeeForDialog.employeeId && attendanceDate === dateStr;
+    });
 
     if (!attendance) {
       // Create new attendance record with proper timing data
@@ -1067,10 +1067,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     if (!selectedDayForAttendance || !selectedEmployeeForDialog) return;
     
     const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
-    let attendance = dailyAttendance.find(a => 
-      a.employeeId === selectedEmployeeForDialog.employeeId && 
-      a.date === dateStr
-    );
+    let attendance = dailyAttendance.find(a => {
+      const attendanceDate = typeof a.date === 'string' ? a.date : format(new Date(a.date), 'yyyy-MM-dd');
+      return a.employeeId === selectedEmployeeForDialog.employeeId && attendanceDate === dateStr;
+    });
 
     if (!attendance) {
       // Create new attendance record with both times
@@ -2441,10 +2441,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   
                   {selectedEmployeeForDialog && selectedDayForAttendance && (() => {
                     const dateStr = format(selectedDayForAttendance, "yyyy-MM-dd");
-                    const existingAttendance = dailyAttendance.find(a => 
-                      a.employeeId === selectedEmployeeForDialog.employeeId && 
-                      a.date === dateStr
-                    );
+                    const existingAttendance = dailyAttendance.find(a => {
+                      const attendanceDate = typeof a.date === 'string' ? a.date : format(new Date(a.date), 'yyyy-MM-dd');
+                      return a.employeeId === selectedEmployeeForDialog.employeeId && attendanceDate === dateStr;
+                    });
                     
                     // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
                     const isFriday = format(selectedDayForAttendance, "EEEE", { locale: ar }) === "الجمعة";
