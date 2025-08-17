@@ -338,7 +338,7 @@ export function printTableWithSettings(settings: PrintSettings) {
         <!-- Rebuilt Table with Proper Column Alignment -->
         ${(() => {
           // Column configuration with Arabic headers
-          const columnConfig = {
+          const columnConfig: { [key: string]: string } = {
             'manufacturer': 'الصانع',
             'category': 'الفئة', 
             'trimLevel': 'درجة التجهيز',
@@ -352,8 +352,8 @@ export function printTableWithSettings(settings: PrintSettings) {
             'chassisNumber': 'رقم الهيكل',
             'price': 'السعر',
             'ownershipType': 'نوع الملكية',
-            'engineer': 'المهندس',
             'entryDate': 'تاريخ الدخول',
+            'mileage': 'الممشي (كم)',
             'notes': 'ملاحظات'
           };
 
@@ -382,7 +382,7 @@ export function printTableWithSettings(settings: PrintSettings) {
                 const cells = row.querySelectorAll('td');
                 
                 // Map column names to cell indices based on actual table structure
-                const columnIndexMap = {
+                const columnIndexMap: { [key: string]: number } = {
                   'manufacturer': 0,      // الصانع
                   'category': 1,          // الفئة 
                   'trimLevel': 2,         // درجة التجهيز
@@ -396,9 +396,10 @@ export function printTableWithSettings(settings: PrintSettings) {
                   'chassisNumber': 10,    // رقم الهيكل
                   'ownershipType': 11,    // نوع الملكية
                   'entryDate': 12,        // تاريخ الدخول
-                  'price': 13,            // السعر
-                  'notes': 14             // الملاحظات
-                  // Skip index 15 which is الإجراءات (Actions)
+                  'mileage': 13,          // الممشي (كم)
+                  'price': 14,            // السعر
+                  'notes': 15             // الملاحظات
+                  // Skip index 16 which is الإجراءات (Actions)
                 };
 
                 const cellIndex = columnIndexMap[column];
@@ -436,7 +437,7 @@ export function printTableWithSettings(settings: PrintSettings) {
 // Keep the original function for backward compatibility
 export function printTable() {
   const defaultSettings: PrintSettings = {
-    visibleColumns: ['manufacturer', 'category', 'trimLevel', 'engineCapacity', 'year', 'exteriorColor', 'interiorColor', 'status', 'importType', 'location', 'chassisNumber', 'price', 'ownershipType', 'entryDate', 'notes'],
+    visibleColumns: ['manufacturer', 'category', 'trimLevel', 'engineCapacity', 'year', 'exteriorColor', 'interiorColor', 'status', 'importType', 'location', 'chassisNumber', 'price', 'ownershipType', 'entryDate', 'mileage', 'notes'],
     orientation: 'landscape',
     colorTheme: 'default',
     fontSize: 'medium',

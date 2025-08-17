@@ -37,6 +37,7 @@ const columnOptions = [
   { id: 'price', label: 'السعر' },
   { id: 'ownershipType', label: 'نوع الملكية' },
   { id: 'entryDate', label: 'تاريخ الدخول' },
+  { id: 'mileage', label: 'الممشي (كم)' },
   { id: 'notes', label: 'الملاحظات' }
 ];
 
