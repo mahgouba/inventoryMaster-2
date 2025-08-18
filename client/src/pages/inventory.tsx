@@ -1259,40 +1259,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
           </CardContent>
         </Card>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-end mt-8">
-          <div className="glass-pagination flex items-center space-x-2 space-x-reverse">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
-              className="glass-button glass-text-primary"
-            >
-              السابق
-            </Button>
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => (
-              <Button
-                key={i + 1}
-                variant={currentPage === i + 1 ? "default" : "outline"}
-                size="sm"
-                onClick={() => setCurrentPage(i + 1)}
-                className={currentPage === i + 1 ? "glass-button-primary" : "glass-button glass-text-primary"}
-              >
-                {i + 1}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(currentPage + 1)}
-              className="glass-button glass-text-primary"
-            >
-              التالي
-            </Button>
-          </div>
-        </div>
+
       </main>
 
 
