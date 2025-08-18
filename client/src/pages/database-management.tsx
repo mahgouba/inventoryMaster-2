@@ -258,6 +258,44 @@ export default function DatabaseManagement() {
     }
   };
 
+  const handleDatabaseExport = async () => {
+    if (connectionStatus !== 'connected') {
+      toast({
+        title: "لا يوجد اتصال",
+        description: "يرجى اختبار الاتصال أولاً قبل التصدير",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "تأكيد التصدير!\n\nسيتم تصدير جميع بيانات النظام الحالي إلى قاعدة البيانات الخارجية.\nسيتم استبدال البيانات الموجودة في قاعدة البيانات الخارجية.\n\nهل تريد المتابعة؟"
+    );
+    
+    if (!confirmed) return;
+
+    setIsExporting(true);
+    try {
+      await apiRequest('POST', '/api/database/export-to-external', {
+        connectionString: connectionString.trim()
+      });
+      
+      toast({
+        title: "تم التصدير بنجاح",
+        description: "تم تصدير جميع البيانات إلى قاعدة البيانات الخارجية بنجاح",
+      });
+      
+    } catch (error) {
+      toast({
+        title: "خطأ في التصدير",
+        description: "حدث خطأ أثناء تصدير البيانات إلى قاعدة البيانات الخارجية",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const toggleExportType = (typeId: string) => {
     setSelectedExportTypes(prev => 
       prev.includes(typeId) 
@@ -589,6 +627,25 @@ export default function DatabaseManagement() {
                           <div className="flex items-center gap-2">
                             <Server className="w-4 h-4" />
                             استيراد من قاعدة البيانات المتصلة
+                          </div>
+                        )}
+                      </Button>
+
+                      <Button 
+                        onClick={handleDatabaseExport}
+                        disabled={isExporting || connectionStatus !== 'connected'}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white disabled:opacity-50"
+                        data-testid="button-export-database-data"
+                      >
+                        {isExporting ? (
+                          <div className="flex items-center gap-2">
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            جاري التصدير...
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Download className="w-4 h-4" />
+                            تصدير إلى قاعدة البيانات المتصلة
                           </div>
                         )}
                       </Button>

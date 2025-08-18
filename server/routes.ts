@@ -1,7 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { getDatabase } from "./db";
-import { users, inventoryItems, manufacturers, banks } from "@shared/schema";
+import { users, inventoryItems, manufacturers, banks, vehicleCategories, vehicleTrimLevels } from "@shared/schema";
+import { Pool } from 'pg';
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
@@ -257,7 +258,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Test the external database connection
-      const { Pool } = require('pg');
       const testPool = new Pool({
         connectionString,
         ssl: { rejectUnauthorized: false },
@@ -481,13 +481,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Import from external database using the existing import function
-      const { importFromExternalDatabase } = require('./import-external-db');
+      const { importFromExternalDatabase } = await import('./import-external-db');
       await importFromExternalDatabase(connectionString);
       
       res.json({ message: "External database import completed successfully" });
     } catch (error) {
       console.error("External import error:", error);
       res.status(500).json({ message: "Failed to import from external database" });
+    }
+  });
+
+  app.post("/api/database/export-to-external", async (req, res) => {
+    try {
+      const { connectionString } = req.body;
+      
+      if (!connectionString) {
+        return res.status(400).json({ message: "Connection string is required" });
+      }
+
+      // Export to external database
+      const { exportToExternalDatabase } = await import('./export-to-external');
+      await exportToExternalDatabase(connectionString);
+      
+      res.json({ message: "Database exported to external database successfully" });
+    } catch (error) {
+      console.error("External export error:", error);
+      res.status(500).json({ message: "Failed to export to external database" });
     }
   });
 
