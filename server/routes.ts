@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { db } from "./db";
+import { getDatabase } from "./db";
 import { users, inventoryItems, manufacturers, banks } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -15,6 +15,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username and password required" });
       }
 
+      const { db } = getDatabase();
       const [user] = await db.select().from(users).where(eq(users.username, username));
       
       if (!user) {
@@ -42,6 +43,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all inventory items
   app.get("/api/inventory", async (req, res) => {
     try {
+      const { db } = getDatabase();
       const items = await db.select().from(inventoryItems);
       res.json(items);
     } catch (error) {
@@ -53,6 +55,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get inventory stats
   app.get("/api/inventory/stats", async (req, res) => {
     try {
+      const { db } = getDatabase();
       const allItems = await db.select().from(inventoryItems);
       
       const stats = {
@@ -77,6 +80,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get manufacturer statistics
   app.get("/api/inventory/manufacturer-stats", async (req, res) => {
     try {
+      const { db } = getDatabase();
       const allItems = await db.select().from(inventoryItems);
       const manufacturerStats = new Map();
       
@@ -111,6 +115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all manufacturers  
   app.get("/api/manufacturers", async (req, res) => {
     try {
+      const { db } = getDatabase();
       const allManufacturers = await db.select().from(manufacturers);
       res.json(allManufacturers);
     } catch (error) {
@@ -122,6 +127,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all banks
   app.get("/api/banks", async (req, res) => {
     try {
+      const { db } = getDatabase();
       const allBanks = await db.select().from(banks);
       res.json(allBanks);
     } catch (error) {
@@ -161,6 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle data endpoints
   app.get("/api/vehicle-years", async (req, res) => {
     try {
+      const { db } = getDatabase();
       const items = await db.select().from(inventoryItems);
       const uniqueYears = [...new Set(items.map(item => item.year))].sort((a, b) => b - a);
       res.json(uniqueYears);
@@ -172,6 +179,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/engine-capacities", async (req, res) => {
     try {
+      const { db } = getDatabase();
       const items = await db.select().from(inventoryItems);
       const uniqueEngineCapacities = [...new Set(items
         .map(item => item.engineCapacity)
