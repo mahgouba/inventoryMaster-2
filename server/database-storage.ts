@@ -2,7 +2,7 @@ import "dotenv/config";
 import { db } from "./db";
 import { 
   users, inventoryItems, banks, manufacturers, vehicleCategories, vehicleTrimLevels, colorAssociations,
-  vehicleSpecifications, vehicleImageLinks, priceCards, dailyAttendance, employeeWorkSchedules,
+  vehicleSpecifications, vehicleImageLinks, priceCards, dailyAttendance, employeeWorkSchedules, leaveRequests,
   type User, type InsertUser, 
   type InventoryItem, type InsertInventoryItem, 
   type Bank, type InsertBank,
@@ -14,7 +14,8 @@ import {
   type VehicleImageLink, type InsertVehicleImageLink,
   type PriceCard, type InsertPriceCard,
   type DailyAttendance, type InsertDailyAttendance,
-  type EmployeeWorkSchedule, type InsertEmployeeWorkSchedule
+  type EmployeeWorkSchedule, type InsertEmployeeWorkSchedule,
+  type LeaveRequest, type InsertLeaveRequest
 } from "@shared/schema";
 import { eq, sql, and, or, ilike, desc, asc } from "drizzle-orm";
 import type { IStorage } from "./storage";
@@ -686,13 +687,87 @@ export class DatabaseStorage implements IStorage {
   async createFinancingCalculation(calculation: any): Promise<any> { return calculation; }
   async updateFinancingCalculation(id: number, calculation: any): Promise<any> { return null; }
   async deleteFinancingCalculation(id: number): Promise<boolean> { return false; }
-  async getAllLeaveRequests(): Promise<any[]> { return []; }
-  async getLeaveRequestById(id: number): Promise<any> { return null; }
-  async createLeaveRequest(request: any): Promise<any> { return request; }
-  async updateLeaveRequest(id: number, request: any): Promise<any> { return null; }
-  async deleteLeaveRequest(id: number): Promise<boolean> { return false; }
-  async getLeaveRequestsByUser(userId: number): Promise<any[]> { return []; }
-  async getLeaveRequestsByStatus(status: string): Promise<any[]> { return []; }
+  async getAllLeaveRequests(): Promise<LeaveRequest[]> { 
+    try {
+      return await db.select().from(leaveRequests).orderBy(desc(leaveRequests.createdAt));
+    } catch (error) {
+      console.error('Error fetching leave requests:', error);
+      return [];
+    }
+  }
+  
+  async getLeaveRequestById(id: number): Promise<LeaveRequest | undefined> { 
+    try {
+      const [request] = await db.select().from(leaveRequests).where(eq(leaveRequests.id, id));
+      return request || undefined;
+    } catch (error) {
+      console.error('Error fetching leave request by id:', error);
+      return undefined;
+    }
+  }
+  
+  async createLeaveRequest(request: InsertLeaveRequest): Promise<LeaveRequest> { 
+    try {
+      console.log('Creating leave request with data:', request);
+      const [newRequest] = await db.insert(leaveRequests).values({
+        ...request,
+        status: request.status || 'pending'
+      }).returning();
+      console.log('Leave request created successfully:', newRequest.id);
+      return newRequest;
+    } catch (error) {
+      console.error('Error creating leave request:', error);
+      throw error;
+    }
+  }
+  
+  async updateLeaveRequestStatus(id: number, status: string, approvedBy?: number, approvedByName?: string, rejectionReason?: string): Promise<LeaveRequest | undefined> { 
+    try {
+      const updateData: any = {
+        status,
+        updatedAt: new Date()
+      };
+      
+      if (approvedBy) updateData.approvedBy = approvedBy;
+      if (approvedByName) updateData.approvedByName = approvedByName;
+      if (status === 'approved') updateData.approvedAt = new Date();
+      if (rejectionReason) updateData.rejectionReason = rejectionReason;
+      
+      const [updated] = await db.update(leaveRequests).set(updateData).where(eq(leaveRequests.id, id)).returning();
+      return updated || undefined;
+    } catch (error) {
+      console.error('Error updating leave request status:', error);
+      return undefined;
+    }
+  }
+  
+  async deleteLeaveRequest(id: number): Promise<boolean> { 
+    try {
+      const result = await db.delete(leaveRequests).where(eq(leaveRequests.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error('Error deleting leave request:', error);
+      return false;
+    }
+  }
+  
+  async getLeaveRequestsByUser(userId: number): Promise<LeaveRequest[]> { 
+    try {
+      return await db.select().from(leaveRequests).where(eq(leaveRequests.userId, userId)).orderBy(desc(leaveRequests.createdAt));
+    } catch (error) {
+      console.error('Error fetching leave requests by user:', error);
+      return [];
+    }
+  }
+  
+  async getLeaveRequestsByStatus(status: string): Promise<LeaveRequest[]> { 
+    try {
+      return await db.select().from(leaveRequests).where(eq(leaveRequests.status, status)).orderBy(desc(leaveRequests.createdAt));
+    } catch (error) {
+      console.error('Error fetching leave requests by status:', error);
+      return [];
+    }
+  }
   async getAllBankInterestRates(): Promise<any[]> { return []; }
   async getBankInterestRate(id: number): Promise<any> { return null; }
   async createBankInterestRate(rate: any): Promise<any> { return rate; }
