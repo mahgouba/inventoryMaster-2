@@ -125,7 +125,7 @@ export function AttendanceInterface({ open, onOpenChange }: AttendanceInterfaceP
   // Get daily attendance records for management
   const { data: dailyAttendance = [] } = useQuery({
     queryKey: ['/api/daily-attendance'],
-    refetchInterval: 2000,
+    refetchInterval: 30000, // Refetch every 30 seconds instead of 2 seconds
   });
 
   // Get users list

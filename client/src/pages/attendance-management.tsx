@@ -220,7 +220,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   // Fetch all daily attendance data
   const { data: dailyAttendance = [], refetch: refetchAttendance } = useQuery<DailyAttendance[]>({
     queryKey: ["/api/daily-attendance"],
-    refetchInterval: 2000, // Refetch every 2 seconds
+    refetchInterval: 30000, // Refetch every 30 seconds instead of 2 seconds
   });
 
   // Set default scheduled times when attendance dialog opens
