@@ -1,107 +1,54 @@
-# دليل نشر المشروع على منصات مختلفة
+# دليل النشر - Deployment Guide
 
-## الاستضافة باستخدام Docker
+## متطلبات النشر - Deployment Requirements
 
-### 1. نشر على DigitalOcean
-1. قم بإنشاء Droplet جديد مع Ubuntu 22.04
-2. قم بتثبيت Docker و Docker Compose:
-```bash
-sudo apt update
-sudo apt install docker.io docker-compose-v2 -y
-sudo systemctl start docker
-sudo systemctl enable docker
-```
+### 1. متغيرات البيئة - Environment Variables
+يجب أن تكون متغيرات البيئة التالية متوفرة في بيئة النشر:
 
-3. انسخ المشروع إلى الخادم:
-```bash
-git clone <your-repo-url>
-cd inventory-management-system
-```
-
-4. أنشئ ملف البيئة:
-```bash
-cp .env.example .env
-# قم بتعديل قاعدة البيانات ومتغيرات البيئة
-```
-
-5. ابدأ التشغيل:
-```bash
-sudo docker-compose up -d
-```
-
-### 2. نشر على AWS EC2
-1. قم بإنشاء EC2 Instance مع Amazon Linux 2
-2. اتصل بالخادم وثبت Docker:
-```bash
-sudo yum update -y
-sudo yum install docker -y
-sudo service docker start
-sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-```
-
-3. انسخ المشروع وابدأ التشغيل:
-```bash
-git clone <your-repo-url>
-cd inventory-management-system
-sudo docker-compose up -d
-```
-
-### 3. نشر على Google Cloud Platform
-1. قم بإنشاء VM Instance جديد
-2. اختر Ubuntu 20.04 LTS
-3. فعل HTTP/HTTPS traffic
-4. اتبع نفس خطوات DigitalOcean
-
-## الاستضافة على منصات الاستضافة السحابية
-
-### 1. نشر على Vercel (للواجهة الأمامية فقط)
-⚠️ ملاحظة: Vercel لا يدعم Express.js بشكل كامل. ستحتاج لفصل الواجهة الأمامية
-
-### 2. نشر على Railway
-1. قم بإنشاء حساب على Railway.app
-2. اربط مستودع GitHub الخاص بك
-3. Railway سيتولى البناء والنشر تلقائياً
-4. أضف متغيرات البيئة في لوحة التحكم
-
-### 3. نشر على Render.com
-1. قم بإنشاء حساب على Render.com
-2. اربط مستودع GitHub
-3. اختر "Web Service"
-4. أضف متغيرات البيئة:
-   - NODE_ENV=production
-   - DATABASE_URL=<postgresql-url>
-
-## إعداد قاعدة البيانات
-
-### PostgreSQL على منصات مختلفة:
-- **DigitalOcean**: استخدم Managed PostgreSQL Database
-- **AWS**: استخدم RDS PostgreSQL
-- **Google Cloud**: استخدم Cloud SQL
-- **Railway**: يوفر PostgreSQL مدمج
-- **Render**: يوفر PostgreSQL مدمج
-
-## المتغيرات المطلوبة
 ```env
-NODE_ENV=production
 DATABASE_URL=postgresql://username:password@host:port/database
-OPENAI_API_KEY=your_openai_key (اختياري)
+PGHOST=your-db-host
+PGPORT=5432
+PGUSER=your-username
+PGPASSWORD=your-password
+PGDATABASE=your-database-name
+NODE_ENV=production
 ```
 
-## أوامر البناء والتشغيل
-```bash
-# للبناء
-npm run build
+### 2. إعداد قاعدة البيانات - Database Setup
+- تأكد من أن قاعدة البيانات PostgreSQL متاحة ويمكن الوصول إليها
+- قم بتشغيل المايجريشن قبل النشر: `npm run db:push`
 
-# للتشغيل في الإنتاج
-npm start
+### 3. خطوات النشر - Deployment Steps
 
-# لبناء الجداول
-npm run db:push
-```
+#### في Replit:
+1. تأكد من أن قاعدة البيانات مُعدة في Database tab
+2. تحقق من أن متغيرات البيئة متزامنة في Secrets
+3. انقر على Deploy في لوحة التحكم
+4. اختر نوع النشر المناسب (Reserved VM أو Autoscale)
 
-## نصائح مهمة
-1. تأكد من تحديث DATABASE_URL للإنتاج
-2. قم بتفعيل HTTPS للأمان
-3. اعمل نسخ احتياطية دورية لقاعدة البيانات
-4. راقب استهلاك الموارد والأداء
+#### للنشر الخارجي:
+1. قم بإعداد قاعدة البيانات PostgreSQL
+2. أضف متغيرات البيئة المطلوبة
+3. قم بتشغيل: `npm run build` (إذا لزم الأمر)
+4. قم بتشغيل: `npm start`
+
+### 4. التحقق من النشر - Deployment Verification
+- تحقق من أن الخادم يعمل على المنفذ الصحيح
+- تأكد من أن قاعدة البيانات متصلة
+- اختبر تسجيل الدخول بالمستخدمين الافتراضيين
+
+### 5. استكشاف الأخطاء - Troubleshooting
+- إذا فشل الاتصال بقاعدة البيانات، تحقق من DATABASE_URL
+- تأكد من أن المنفذ 5000 متاح
+- راجع سجلات الخادم للأخطاء
+
+## الأمان - Security
+- لا تشارك متغيرات البيئة الحساسة
+- استخدم HTTPS في بيئة الإنتاج
+- قم بتحديث كلمات المرور الافتراضية
+
+## الدعم - Support
+للمساعدة في النشر، راجع:
+- وثائق Replit: https://docs.replit.com/hosting/deployments
+- دعم PostgreSQL: https://www.postgresql.org/docs/

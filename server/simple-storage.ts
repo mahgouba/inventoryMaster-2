@@ -5,6 +5,9 @@ import {
   type InventoryItem, type InsertInventoryItem, 
   type Bank, type InsertBank,
   type Manufacturer, type InsertManufacturer,
+  type EmployeeWorkSchedule, type InsertEmployeeWorkSchedule,
+  type DailyAttendance, type InsertDailyAttendance,
+  type LeaveRequest, type InsertLeaveRequest
 } from "@shared/schema";
 
 // Simplified memory storage implementation for Replit compatibility
@@ -313,6 +316,24 @@ export class SimpleMemStorage {
     return baseSpecs.join('\n• ');
   }
 
+  // Attendance Management Methods
+  async getAllEmployeeWorkSchedules() { return []; }
+  async createEmployeeWorkSchedule(schedule: any) { return schedule; }
+  async updateEmployeeWorkSchedule(id: number, schedule: any) { return schedule; }
+  async deleteEmployeeWorkSchedule(id: number) { return true; }
+  
+  async getAllDailyAttendance() { return []; }
+  async getDailyAttendanceByEmployeeAndDate(employeeId: number, date: Date) { return []; }
+  async getDailyAttendanceByEmployeeAndDateRange(employeeId: number, startDate: Date, endDate: Date) { return []; }
+  async getDailyAttendanceByDate(date: Date) { return []; }
+  async createDailyAttendance(attendance: any) { return attendance; }
+  async updateDailyAttendance(id: number, attendance: any) { return attendance; }
+  async deleteDailyAttendance(id: number) { return true; }
+  
+  async getAllLeaveRequests() { return []; }
+  async createLeaveRequest(request: any) { return request; }
+  async updateLeaveRequestStatus(id: number, status: string, rejectionReason?: string) { return { id, status }; }
+  
   // Placeholder methods - implement as needed
   async getManufacturerStats() { return []; }
   async getLocationStats() { return []; }
