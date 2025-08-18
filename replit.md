@@ -44,10 +44,17 @@ Core entities:
 - `vehicle_trim_levels` - Trim level specifications
 
 ## Recent Changes
-- Migrated from Replit Agent to Replit environment
-- Set up PostgreSQL database connection
-- Configured proper client/server separation
-- Updated project structure for Replit compatibility
+- ✅ Migrated from Replit Agent to Replit environment (Aug 18, 2025)
+- ✅ Set up PostgreSQL database connection with all tables
+- ✅ Configured proper client/server separation
+- ✅ Updated project structure for Replit compatibility
+- ✅ Created default user accounts for testing
+
+## Default Login Credentials
+- **Admin**: username: `admin`, password: `admin123`
+- **Sales Manager**: username: `sales_manager`, password: `admin123`
+- **Accountant**: username: `accountant`, password: `admin123`
+- **Salesperson**: username: `salesperson`, password: `admin123`
 
 ## User Preferences
 None specified yet.
