@@ -7,6 +7,13 @@ import { Switch } from "@/components/ui/switch";
 import { QrCode, Phone, Mail, Globe, Building, FileText, User, Building2, Settings, Calculator, Stamp } from "lucide-react";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import type { Company, InventoryItem, Specification } from "@shared/schema";
+
+// Extended Specification interface that includes additional properties
+interface ExtendedSpecification extends Specification {
+  year?: number;
+  engineCapacity?: string;
+  detailedDescription?: string;
+}
 import { getManufacturerLogo } from "@shared/manufacturer-logos";
 import QRCode from "qrcode";
 
@@ -20,7 +27,7 @@ const backgroundImages = {
 interface QuotationA4PreviewProps {
   selectedCompany: Company | null;
   selectedVehicle: InventoryItem | null;
-  vehicleSpecs?: Specification | null;
+  vehicleSpecs?: ExtendedSpecification | null;
   quoteNumber: string;
   customerName: string;
   customerPhone: string;
@@ -381,43 +388,46 @@ export default function QuotationA4Preview({
               <div className="text-sm space-y-1">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex justify-between">
+                    <span className="font-semibold text-black/80">الصانع:</span>
+                    <span className="text-black/80">{vehicleSpecs.manufacturer}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-black/80">الفئة:</span>
+                    <span className="text-black/80">{vehicleSpecs.category}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-black/80">درجة التجهيز:</span>
+                    <span className="text-black/80">{vehicleSpecs.trimLevel || "قياسي"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-black/80">سنة الصنع:</span>
+                    <span className="text-black/80">{vehicleSpecs.year}</span>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="font-semibold text-black/80">سعة المحرك:</span>
                     <span className="text-black/80">{vehicleSpecs.engineCapacity}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="font-semibold text-black/80">نوع الوقود:</span>
-                    <span className="text-black/80">{vehicleSpecs.fuelType || "غير محدد"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-semibold text-black/80">ناقل الحركة:</span>
-                    <span className="text-black/80">{vehicleSpecs.transmission || "غير محدد"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-semibold text-black/80">نوع الدفع:</span>
-                    <span className="text-black/80">{vehicleSpecs.drivetrain || "غير محدد"}</span>
-                  </div>
                 </div>
                 
-                {(vehicleSpecs.detailedDescription || isEditingSpecs) && (
-                  <div className="mt-2">
-                    <span className="font-semibold text-black/80 block mb-1">مواصفات إضافية:</span>
-                    {isEditingSpecs ? (
-                      <textarea
-                        value={editableSpecs}
-                        onChange={(e) => setEditableSpecs(e.target.value)}
-                        onBlur={() => setIsEditingSpecs(false)}
-                        className="w-full text-black/80 text-xs leading-relaxed border border-gray-300 rounded p-2 resize-none"
-                        rows={3}
-                        style={{ fontFamily: '"Noto Sans Arabic", Arial, sans-serif', direction: 'rtl' }}
-                        autoFocus
-                      />
-                    ) : (
-                      <div className="text-black/80 text-xs leading-relaxed">
-                        {editableSpecs || vehicleSpecs.detailedDescription}
-                      </div>
-                    )}
-                  </div>
-                )}
+                {/* Detailed Specifications Section - Always Show */}
+                <div className="mt-3 border-t border-[#C79C45]/30 pt-2">
+                  <span className="font-semibold text-black/80 block mb-2 text-base">المواصفات التفصيلية:</span>
+                  {isEditingSpecs ? (
+                    <textarea
+                      value={editableSpecs}
+                      onChange={(e) => setEditableSpecs(e.target.value)}
+                      onBlur={() => setIsEditingSpecs(false)}
+                      className="w-full text-black/80 text-xs leading-relaxed border border-gray-300 rounded p-2 resize-none"
+                      rows={6}
+                      style={{ fontFamily: '"Noto Sans Arabic", Arial, sans-serif', direction: 'rtl' }}
+                      autoFocus
+                    />
+                  ) : (
+                    <div className="text-black/80 text-xs leading-relaxed whitespace-pre-line">
+                      {editableSpecs || vehicleSpecs.detailedDescription || "لم يتم تحديد المواصفات التفصيلية"}
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="text-center text-black/80 py-2">

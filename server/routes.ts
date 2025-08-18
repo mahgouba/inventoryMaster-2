@@ -5515,23 +5515,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/specifications/vehicle/:manufacturer/:category/:trimLevel/:year/:engineCapacity", async (req, res) => {
     try {
       const { manufacturer, category, trimLevel, year, engineCapacity } = req.params;
-      const storage = storage;
       
       console.log("Specs route called with params:", { manufacturer, category, trimLevel, year, engineCapacity });
       
-      // Try to find specifications based on the vehicle parameters
-      const specifications = await storage.getVehicleSpecificationsByFilters({
-        manufacturer: decodeURIComponent(manufacturer),
-        category: decodeURIComponent(category),
-        trimLevel: trimLevel === 'null' ? null : decodeURIComponent(trimLevel),
-        year: parseInt(year),
-        engineCapacity: decodeURIComponent(engineCapacity)
-      });
+      // Use the new getSpecifications method that generates detailed specs
+      const specifications = await storage.getSpecifications(
+        manufacturer === 'null' ? '' : decodeURIComponent(manufacturer),
+        category === 'null' ? '' : decodeURIComponent(category), 
+        trimLevel === 'null' ? '' : decodeURIComponent(trimLevel),
+        year === 'null' ? '' : year,
+        engineCapacity === 'null' ? '' : decodeURIComponent(engineCapacity)
+      );
       
       console.log("Found specifications:", specifications);
       
-      // Return the first matching specification or null
-      res.json(specifications.length > 0 ? specifications[0] : null);
+      res.json(specifications);
     } catch (error) {
       console.error("Error fetching vehicle specifications by parameters:", error);
       res.status(500).json({ error: "فشل في جلب مواصفات المركبة" });
@@ -5542,23 +5540,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/specifications/:manufacturer/:category/:trimLevel/:year/:engineCapacity", async (req, res) => {
     try {
       const { manufacturer, category, trimLevel, year, engineCapacity } = req.params;
-      const storage = storage;
       
       console.log("Alt specs route called with params:", { manufacturer, category, trimLevel, year, engineCapacity });
       
-      // Try to find specifications based on the vehicle parameters
-      const specifications = await storage.getVehicleSpecificationsByFilters({
-        manufacturer: decodeURIComponent(manufacturer),
-        category: decodeURIComponent(category),
-        trimLevel: trimLevel === 'null' ? null : decodeURIComponent(trimLevel),
-        year: parseInt(year),
-        engineCapacity: decodeURIComponent(engineCapacity)
-      });
-      
+      // Use the new getSpecifications method that generates detailed specs
+      const specifications = await storage.getSpecifications(
+        manufacturer === 'null' ? '' : decodeURIComponent(manufacturer),
+        category === 'null' ? '' : decodeURIComponent(category), 
+        trimLevel === 'null' ? '' : decodeURIComponent(trimLevel),
+        year === 'null' ? '' : year,
+        engineCapacity === 'null' ? '' : decodeURIComponent(engineCapacity)
+      );
+
       console.log("Alt found specifications:", specifications);
       
-      // Return the first matching specification or null
-      res.json(specifications.length > 0 ? specifications[0] : null);
+      res.json(specifications);
     } catch (error) {
       console.error("Error fetching vehicle specifications by parameters:", error);
       res.status(500).json({ error: "فشل في جلب مواصفات المركبة" });

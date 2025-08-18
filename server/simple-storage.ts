@@ -248,6 +248,71 @@ export class SimpleMemStorage {
     return items;
   }
 
+  // Specifications methods
+  async getSpecifications(manufacturer: string, category: string, trimLevel: string, year: string, engineCapacity: string) {
+    // Return specifications matching the TrimLevel schema structure but with added properties
+    const specs = {
+      id: 1,
+      manufacturer,
+      category,
+      trimLevel: trimLevel || 'Standard',
+      year: parseInt(year) || 2025,
+      engineCapacity,
+      description: `${manufacturer} ${category} ${trimLevel || ''} موديل ${year}`,
+      detailedDescription: this.generateDetailedDescription(manufacturer, category, trimLevel, year, engineCapacity),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    console.log('📋 Fetching specifications for:', { manufacturer, category, trimLevel, year, engineCapacity });
+    return specs;
+  }
+
+  private generateDetailedDescription(manufacturer: string, category: string, trimLevel: string, year: string, engineCapacity: string): string {
+    // Generate detailed Arabic specifications based on vehicle parameters
+    const baseSpecs = [
+      `الصانع: ${manufacturer}`,
+      `الفئة: ${category}`,
+      `درجة التجهيز: ${trimLevel || 'قياسي'}`,
+      `سنة الصنع: ${year}`,
+      `سعة المحرك: ${engineCapacity}`,
+      `نوع الوقود: بنزين`,
+      `ناقل الحركة: أوتوماتيك`,
+      `نظام الدفع: دفع أمامي`,
+      `عدد المقاعد: 5 مقاعد`,
+      `نوع الجسم: سيدان`,
+      `لون الهيكل: حسب المتوفر`,
+      `لون الداخلية: حسب المتوفر`
+    ];
+
+    // Add luxury features based on trim level
+    if (trimLevel && (trimLevel.includes('SV') || trimLevel.includes('Long') || trimLevel.includes('Premium'))) {
+      baseSpecs.push(
+        `نظام الترفيه: شاشة تعمل باللمس مع نظام الملاحة`,
+        `المقاعد: جلد فاخر مع التدفئة والتبريد`,
+        `النوافذ: كهربائية مع الصعود والهبوط الآلي`,
+        `نظام الأمان: كاميرا خلفية وأجهزة استشعار`,
+        `العجلات: سبيكة معدنية مقاس كبير`,
+        `الإضاءة: LED للمصابيح الأمامية والخلفية`,
+        `التكييف: تحكم مزدوج في درجة الحرارة`,
+        `المرايا: كهربائية قابلة للطي`
+      );
+    } else {
+      baseSpecs.push(
+        `نظام الترفيه: راديو مع مشغل MP3`,
+        `المقاعد: قماش عالي الجودة`,
+        `النوافذ: كهربائية`,
+        `نظام الأمان: أحزمة الأمان وأكياس هوائية`,
+        `العجلات: فولاذية أو سبيكة معدنية`,
+        `الإضاءة: هالوجين`,
+        `التكييف: تحكم يدوي`,
+        `المرايا: كهربائية`
+      );
+    }
+
+    return baseSpecs.join('\n• ');
+  }
+
   // Placeholder methods - implement as needed
   async getManufacturerStats() { return []; }
   async getLocationStats() { return []; }
