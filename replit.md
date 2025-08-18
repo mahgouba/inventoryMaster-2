@@ -18,6 +18,10 @@ A full-stack vehicle inventory management system built with React/TypeScript fro
 - Bank integration for financing calculations
 - Manufacturer and model hierarchy management
 - Image and document handling
+- Employee attendance management with collapsible daily views
+- Editable attendance records with time tracking
+- Leave request system with approval workflow
+- Monthly attendance reporting and printing
 
 ## Project Structure
 ```
@@ -49,6 +53,10 @@ Core entities:
 - ✅ Configured proper client/server separation
 - ✅ Updated project structure for Replit compatibility
 - ✅ Created default user accounts for testing
+- ✅ Added collapsible employee lists in attendance management (Aug 18, 2025)
+- ✅ Added edit functionality for individual attendance days (Aug 18, 2025)
+- ✅ Improved UI with hide/show buttons for better organization (Aug 18, 2025)
+- ✅ Fixed React hooks error and optimized performance (Aug 18, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`

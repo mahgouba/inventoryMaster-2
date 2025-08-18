@@ -175,6 +175,15 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   const [collapsedEmployees, setCollapsedEmployees] = useState<Set<number>>(new Set());
   const [isEditDayDialogOpen, setIsEditDayDialogOpen] = useState(false);
   const [selectedDayForEdit, setSelectedDayForEdit] = useState<{ employee: EmployeeWorkSchedule; day: Date; attendance?: DailyAttendance } | null>(null);
+  
+  // Edit day form states
+  const [editCheckinTime, setEditCheckinTime] = useState('12:00');
+  const [editCheckoutTime, setEditCheckoutTime] = useState('22:00');
+  const [editMorningCheckinTime, setEditMorningCheckinTime] = useState('09:30');
+  const [editMorningCheckoutTime, setEditMorningCheckoutTime] = useState('13:00');
+  const [editEveningCheckinTime, setEditEveningCheckinTime] = useState('16:00');
+  const [editEveningCheckoutTime, setEditEveningCheckoutTime] = useState('21:00');
+  const [editNotes, setEditNotes] = useState('');
 
   // Create request form states
   const [requestType, setRequestType] = useState<string>("استئذان");
@@ -770,6 +779,27 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   // Handle editing a specific day's attendance
   const handleEditDay = (employee: EmployeeWorkSchedule, day: Date, attendance?: DailyAttendance) => {
     setSelectedDayForEdit({ employee, day, attendance });
+    
+    // Set default values based on existing attendance or schedule defaults
+    if (attendance) {
+      setEditCheckinTime(attendance.continuousCheckinTime || '12:00');
+      setEditCheckoutTime(attendance.continuousCheckoutTime || '22:00');
+      setEditMorningCheckinTime(attendance.morningCheckinTime || '09:30');
+      setEditMorningCheckoutTime(attendance.morningCheckoutTime || '13:00');
+      setEditEveningCheckinTime(attendance.eveningCheckinTime || '16:00');
+      setEditEveningCheckoutTime(attendance.eveningCheckoutTime || '21:00');
+      setEditNotes(attendance.notes || '');
+    } else {
+      // Set schedule defaults for new records
+      setEditCheckinTime(employee.continuousStartTime || '12:00');
+      setEditCheckoutTime(employee.continuousEndTime || '22:00');
+      setEditMorningCheckinTime(employee.morningStartTime || '09:30');
+      setEditMorningCheckoutTime(employee.morningEndTime || '13:00');
+      setEditEveningCheckinTime(employee.eveningStartTime || '16:00');
+      setEditEveningCheckoutTime(employee.eveningEndTime || '21:00');
+      setEditNotes('');
+    }
+    
     setIsEditDayDialogOpen(true);
   };
 
@@ -3360,13 +3390,6 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
             
             {selectedDayForEdit && (() => {
               const { employee, day, attendance } = selectedDayForEdit;
-              const [editCheckinTime, setEditCheckinTime] = useState(attendance?.continuousCheckinTime || '12:00');
-              const [editCheckoutTime, setEditCheckoutTime] = useState(attendance?.continuousCheckoutTime || '22:00');
-              const [editMorningCheckinTime, setEditMorningCheckinTime] = useState(attendance?.morningCheckinTime || '09:30');
-              const [editMorningCheckoutTime, setEditMorningCheckoutTime] = useState(attendance?.morningCheckoutTime || '13:00');
-              const [editEveningCheckinTime, setEditEveningCheckinTime] = useState(attendance?.eveningCheckinTime || '16:00');
-              const [editEveningCheckoutTime, setEditEveningCheckoutTime] = useState(attendance?.eveningCheckoutTime || '21:00');
-              const [editNotes, setEditNotes] = useState(attendance?.notes || '');
 
               const handleSaveDay = () => {
                 const dateStr = format(day, "yyyy-MM-dd");
