@@ -137,6 +137,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all users
+  app.get("/api/users", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const allUsers = await db.select().from(users);
+      
+      // Remove password from response for security
+      const usersWithoutPassword = allUsers.map(user => ({
+        id: user.id,
+        name: user.name,
+        jobTitle: user.jobTitle,
+        phoneNumber: user.phoneNumber,
+        username: user.username,
+        role: user.role,
+        createdAt: user.createdAt
+      }));
+      
+      res.json(usersWithoutPassword);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Get all vehicle categories
+  app.get("/api/vehicle-categories", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const allCategories = await db.select().from(vehicleCategories);
+      res.json(allCategories);
+    } catch (error) {
+      console.error("Error fetching vehicle categories:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle categories" });
+    }
+  });
+
+  // Get all vehicle trim levels
+  app.get("/api/vehicle-trim-levels", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const allTrimLevels = await db.select().from(vehicleTrimLevels);
+      res.json(allTrimLevels);
+    } catch (error) {
+      console.error("Error fetching vehicle trim levels:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle trim levels" });
+    }
+  });
+
+  // Get hierarchical data (manufacturers with categories and trim levels)
+  app.get("/api/hierarchy/full", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      
+      const manufacturersData = await db.select().from(manufacturers);
+      const categoriesData = await db.select().from(vehicleCategories);
+      const trimLevelsData = await db.select().from(vehicleTrimLevels);
+      
+      // Build hierarchy
+      const hierarchy = manufacturersData.map(manufacturer => ({
+        ...manufacturer,
+        categories: categoriesData
+          .filter(category => category.manufacturerId === manufacturer.id)
+          .map(category => ({
+            ...category,
+            trimLevels: trimLevelsData.filter(trimLevel => trimLevel.categoryId === category.id)
+          }))
+      }));
+      
+      res.json(hierarchy);
+    } catch (error) {
+      console.error("Error fetching hierarchy:", error);
+      res.status(500).json({ message: "Failed to fetch hierarchy" });
+    }
+  });
+
+  // Get hierarchical manufacturers
+  app.get("/api/hierarchical/manufacturers", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const manufacturersData = await db.select().from(manufacturers);
+      res.json(manufacturersData);
+    } catch (error) {
+      console.error("Error fetching hierarchical manufacturers:", error);
+      res.status(500).json({ message: "Failed to fetch hierarchical manufacturers" });
+    }
+  });
+
   // Attendance management placeholder endpoints
   app.get("/api/daily-attendance", async (req, res) => {
     try {
