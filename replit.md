@@ -63,6 +63,8 @@ Core entities:
 - ✅ Completely redesigned database management page with advanced features (Aug 18, 2025)
 - ✅ Added external database connection capability with import/export functions (Aug 18, 2025)
 - ✅ Successfully exported complete database to external Neon database (Aug 18, 2025)
+- ✅ Migrated to external Neon database as primary database (Aug 18, 2025)
+- ✅ All system data now operates from external database with 18 users, 31 manufacturers, 10 banks, 117 vehicle categories, 478 trim levels, and 109 inventory items (Aug 18, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
