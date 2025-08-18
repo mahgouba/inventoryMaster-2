@@ -6,12 +6,15 @@ let pool: Pool | null = null;
 let db: any = null;
 
 export async function initializeDatabase() {
-  if (process.env.DATABASE_URL) {
+  // Use the main production database URL
+  const DATABASE_URL = process.env.DATABASE_URL || "postgresql://neondb_owner:npg_aKGc5jdCuOI4@ep-solitary-hill-a69yqw2u.us-west-2.aws.neon.tech/neondb?sslmode=require";
+  
+  if (DATABASE_URL) {
     try {
       console.log('🔌 Initializing database connection...');
       
       const poolConfig = {
-        connectionString: process.env.DATABASE_URL,
+        connectionString: DATABASE_URL,
         ssl: {
           rejectUnauthorized: false
         },
