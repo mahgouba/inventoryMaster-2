@@ -35,7 +35,8 @@ import {
   Search,
   Filter,
   Edit,
-  Trash2
+  Trash2,
+  EyeOff
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay, parseISO, isBefore } from "date-fns";
@@ -171,6 +172,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   const [isCreateRequestDialogOpen, setIsCreateRequestDialogOpen] = useState(false);
   const [isEditScheduleDialogOpen, setIsEditScheduleDialogOpen] = useState(false);
   const [selectedScheduleForEdit, setSelectedScheduleForEdit] = useState<EmployeeWorkSchedule | null>(null);
+  const [collapsedEmployees, setCollapsedEmployees] = useState<Set<number>>(new Set());
+  const [isEditDayDialogOpen, setIsEditDayDialogOpen] = useState(false);
+  const [selectedDayForEdit, setSelectedDayForEdit] = useState<{ employee: EmployeeWorkSchedule; day: Date; attendance?: DailyAttendance } | null>(null);
 
   // Create request form states
   const [requestType, setRequestType] = useState<string>("استئذان");
@@ -750,6 +754,23 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   // Handle clicking on employee to show monthly calendar
   const handleEmployeeClick = (employee: EmployeeWorkSchedule) => {
     setSelectedEmployeeForAttendance(employee.employeeId);
+  };
+
+  // Toggle employee collapse state
+  const toggleEmployeeCollapse = (employeeId: number) => {
+    const newCollapsed = new Set(collapsedEmployees);
+    if (newCollapsed.has(employeeId)) {
+      newCollapsed.delete(employeeId);
+    } else {
+      newCollapsed.add(employeeId);
+    }
+    setCollapsedEmployees(newCollapsed);
+  };
+
+  // Handle editing a specific day's attendance
+  const handleEditDay = (employee: EmployeeWorkSchedule, day: Date, attendance?: DailyAttendance) => {
+    setSelectedDayForEdit({ employee, day, attendance });
+    setIsEditDayDialogOpen(true);
   };
 
   // Handle day click to show attendance dialog
@@ -2138,10 +2159,12 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   return (
                     <GlassCard key={schedule.id} className="p-4">
                       <div 
-                        className="flex justify-between items-center cursor-pointer"
-                        onClick={() => handleEmployeeClick(schedule)}
+                        className="flex justify-between items-center"
                       >
-                        <div className="flex items-center gap-3">
+                        <div 
+                          className="flex items-center gap-3 cursor-pointer flex-1"
+                          onClick={() => handleEmployeeClick(schedule)}
+                        >
                           <UserCheck className="w-5 h-5 text-blue-400" />
                           <div>
                             <h3 className="font-semibold text-white text-lg">{schedule.employeeName}</h3>
@@ -2156,13 +2179,37 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                             {monthAttendance.length} يوم حضور هذا الشهر
                           </Badge>
                           <Button
-                            onClick={() => handlePrintMonthlyReport(schedule)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePrintMonthlyReport(schedule);
+                            }}
                             size="sm"
                             variant="outline"
                             className="bg-green-500/20 border-green-500/30 text-green-400 hover:bg-green-500/30 transition-colors"
                           >
                             <Printer className="w-4 h-4 mr-2" />
                             طباعة التقرير
+                          </Button>
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleEmployeeCollapse(schedule.employeeId);
+                            }}
+                            size="sm"
+                            variant="outline"
+                            className="bg-white/10 border-white/20 text-white hover:bg-white/20 transition-colors"
+                          >
+                            {collapsedEmployees.has(schedule.employeeId) ? (
+                              <>
+                                <Eye className="w-4 h-4 mr-2" />
+                                إظهار
+                              </>
+                            ) : (
+                              <>
+                                <EyeOff className="w-4 h-4 mr-2" />
+                                إخفاء
+                              </>
+                            )}
                           </Button>
                           <ChevronLeft 
                             className={`w-5 h-5 text-gray-300 transition-transform ${
@@ -2172,8 +2219,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                         </div>
                       </div>
 
-                      {/* Calendar View when expanded */}
-                      {isExpanded && (
+                      {/* Calendar View when expanded and not collapsed */}
+                      {isExpanded && !collapsedEmployees.has(schedule.employeeId) && (
                         <div className="mt-6 space-y-4">
                           {/* Bar-style Calendar */}
                           <div className="bg-white/5 rounded-lg p-6 space-y-3">
@@ -2441,20 +2488,36 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                       </div>
                                     </div>
                                     
-                                    {/* Status Icon */}
-                                    <div className="min-w-[40px] flex justify-center">
-                                      {isHoliday || hasApprovedLeaveForDay ? (
-                                        <Coffee className="w-5 h-5 text-yellow-400" />
-                                      ) : hasAttendance ? (
-                                        isLate ? (
-                                          <XCircle className="w-5 h-5 text-red-400" />
-                                        ) : workPercentage >= 100 ? (
-                                          <CheckCircle className="w-5 h-5 text-green-400" />
+                                    {/* Status Icon and Edit Button */}
+                                    <div className="min-w-[80px] flex items-center gap-2">
+                                      <div className="flex justify-center">
+                                        {isHoliday || hasApprovedLeaveForDay ? (
+                                          <Coffee className="w-5 h-5 text-yellow-400" />
+                                        ) : hasAttendance ? (
+                                          isLate ? (
+                                            <XCircle className="w-5 h-5 text-red-400" />
+                                          ) : workPercentage >= 100 ? (
+                                            <CheckCircle className="w-5 h-5 text-green-400" />
+                                          ) : (
+                                            <Clock className="w-5 h-5 text-blue-400" />
+                                          )
                                         ) : (
-                                          <Clock className="w-5 h-5 text-blue-400" />
-                                        )
-                                      ) : (
-                                        <div className="w-5 h-5 border-2 border-gray-500 rounded-full opacity-30"></div>
+                                          <div className="w-5 h-5 border-2 border-gray-500 rounded-full opacity-30"></div>
+                                        )}
+                                      </div>
+                                      {canManageAttendance && (
+                                        <Button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditDay(schedule, day, dayAttendance);
+                                          }}
+                                          size="sm"
+                                          variant="outline"
+                                          className="w-8 h-8 p-0 bg-blue-500/20 border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors opacity-60 hover:opacity-100"
+                                          data-testid={`edit-day-${format(day, 'yyyy-MM-dd')}`}
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
                                       )}
                                     </div>
                                   </div>
@@ -3273,6 +3336,207 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
             </DialogContent>
           </Dialog>
         )}
+
+        {/* Edit Day Dialog */}
+        <Dialog open={isEditDayDialogOpen} onOpenChange={setIsEditDayDialogOpen}>
+          <DialogContent 
+            className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-2xl"
+            aria-describedby="edit-day-dialog-description"
+          >
+            <DialogHeader>
+              <DialogTitle className="text-xl text-center">
+                تحرير بيانات اليوم
+              </DialogTitle>
+              {selectedDayForEdit && (
+                <p className="text-gray-300 text-center">
+                  {selectedDayForEdit.employee.employeeName} - {format(selectedDayForEdit.day, "EEEE، dd MMMM yyyy", { locale: ar })}
+                </p>
+              )}
+            </DialogHeader>
+            
+            <div id="edit-day-dialog-description" className="sr-only">
+              تحرير أوقات الحضور والانصراف للموظف في التاريخ المحدد
+            </div>
+            
+            {selectedDayForEdit && (() => {
+              const { employee, day, attendance } = selectedDayForEdit;
+              const [editCheckinTime, setEditCheckinTime] = useState(attendance?.continuousCheckinTime || '12:00');
+              const [editCheckoutTime, setEditCheckoutTime] = useState(attendance?.continuousCheckoutTime || '22:00');
+              const [editMorningCheckinTime, setEditMorningCheckinTime] = useState(attendance?.morningCheckinTime || '09:30');
+              const [editMorningCheckoutTime, setEditMorningCheckoutTime] = useState(attendance?.morningCheckoutTime || '13:00');
+              const [editEveningCheckinTime, setEditEveningCheckinTime] = useState(attendance?.eveningCheckinTime || '16:00');
+              const [editEveningCheckoutTime, setEditEveningCheckoutTime] = useState(attendance?.eveningCheckoutTime || '21:00');
+              const [editNotes, setEditNotes] = useState(attendance?.notes || '');
+
+              const handleSaveDay = () => {
+                const dateStr = format(day, "yyyy-MM-dd");
+                
+                if (!attendance) {
+                  // Create new attendance record
+                  const attendanceData = {
+                    employeeId: employee.employeeId,
+                    employeeName: employee.employeeName,
+                    date: dateStr,
+                    scheduleType: employee.scheduleType,
+                    notes: editNotes,
+                    ...(employee.scheduleType === "متصل" 
+                      ? {
+                          continuousCheckinTime: editCheckinTime,
+                          continuousCheckoutTime: editCheckoutTime
+                        }
+                      : {
+                          morningCheckinTime: editMorningCheckinTime,
+                          morningCheckoutTime: editMorningCheckoutTime,
+                          eveningCheckinTime: editEveningCheckinTime,
+                          eveningCheckoutTime: editEveningCheckoutTime
+                        }
+                    )
+                  };
+                  createAttendanceMutation.mutate(attendanceData);
+                } else {
+                  // Update existing attendance
+                  const updateData = {
+                    ...attendance,
+                    notes: editNotes,
+                    date: dateStr,
+                    ...(employee.scheduleType === "متصل" 
+                      ? {
+                          continuousCheckinTime: editCheckinTime,
+                          continuousCheckoutTime: editCheckoutTime
+                        }
+                      : {
+                          morningCheckinTime: editMorningCheckinTime,
+                          morningCheckoutTime: editMorningCheckoutTime,
+                          eveningCheckinTime: editEveningCheckinTime,
+                          eveningCheckoutTime: editEveningCheckoutTime
+                        }
+                    )
+                  };
+                  updateAttendanceMutation.mutate({ attendanceId: attendance.id, updateData });
+                }
+                setIsEditDayDialogOpen(false);
+              };
+
+              return (
+                <div className="space-y-6">
+                  {employee.scheduleType === "متصل" ? (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-white mb-2 block">وقت الحضور</Label>
+                        <Input
+                          type="time"
+                          value={editCheckinTime}
+                          onChange={(e) => setEditCheckinTime(e.target.value)}
+                          className="bg-white/10 border-white/20 text-white"
+                          data-testid="edit-checkin-time"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-white mb-2 block">وقت الانصراف</Label>
+                        <Input
+                          type="time"
+                          value={editCheckoutTime}
+                          onChange={(e) => setEditCheckoutTime(e.target.value)}
+                          className="bg-white/10 border-white/20 text-white"
+                          data-testid="edit-checkout-time"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-white mb-2 block">حضور الفترة الصباحية</Label>
+                          <Input
+                            type="time"
+                            value={editMorningCheckinTime}
+                            onChange={(e) => setEditMorningCheckinTime(e.target.value)}
+                            className="bg-white/10 border-white/20 text-white"
+                            data-testid="edit-morning-checkin-time"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-white mb-2 block">انصراف الفترة الصباحية</Label>
+                          <Input
+                            type="time"
+                            value={editMorningCheckoutTime}
+                            onChange={(e) => setEditMorningCheckoutTime(e.target.value)}
+                            className="bg-white/10 border-white/20 text-white"
+                            data-testid="edit-morning-checkout-time"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-white mb-2 block">حضور الفترة المسائية</Label>
+                          <Input
+                            type="time"
+                            value={editEveningCheckinTime}
+                            onChange={(e) => setEditEveningCheckinTime(e.target.value)}
+                            className="bg-white/10 border-white/20 text-white"
+                            data-testid="edit-evening-checkin-time"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-white mb-2 block">انصراف الفترة المسائية</Label>
+                          <Input
+                            type="time"
+                            value={editEveningCheckoutTime}
+                            onChange={(e) => setEditEveningCheckoutTime(e.target.value)}
+                            className="bg-white/10 border-white/20 text-white"
+                            data-testid="edit-evening-checkout-time"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  
+                  <div>
+                    <Label className="text-white mb-2 block">ملاحظات</Label>
+                    <Textarea
+                      value={editNotes}
+                      onChange={(e) => setEditNotes(e.target.value)}
+                      className="bg-white/10 border-white/20 text-white min-h-[80px]"
+                      placeholder="أضف ملاحظات إضافية (اختياري)"
+                      data-testid="edit-notes"
+                    />
+                  </div>
+
+                  <div className="flex gap-2 pt-4">
+                    <Button
+                      onClick={handleSaveDay}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      data-testid="save-day-button"
+                    >
+                      حفظ التغييرات
+                    </Button>
+                    <Button
+                      onClick={() => setIsEditDayDialogOpen(false)}
+                      variant="outline"
+                      className="border-white/20 text-white hover:bg-white/10"
+                    >
+                      إلغاء
+                    </Button>
+                    {attendance && (
+                      <Button
+                        onClick={() => {
+                          if (confirm('هل أنت متأكد من حذف سجل الحضور لهذا اليوم؟')) {
+                            // Add delete functionality here if needed
+                            setIsEditDayDialogOpen(false);
+                          }
+                        }}
+                        variant="outline"
+                        className="bg-red-500/20 border-red-500/30 text-red-400 hover:bg-red-500/30"
+                      >
+                        حذف السجل
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+          </DialogContent>
+        </Dialog>
       </div>
     </GlassBackground>
   );
