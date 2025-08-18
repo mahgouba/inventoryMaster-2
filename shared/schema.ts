@@ -433,6 +433,11 @@ export const insertTrimLevelSchema = createInsertSchema(trimLevels).omit({
   createdAt: true,
 });
 
+export const insertSpecificationSchema = createInsertSchema(trimLevels).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertInvoiceSchema = createInsertSchema(invoices).omit({
   id: true,
   createdAt: true,
@@ -614,6 +619,8 @@ export type LocationTransfer = typeof locationTransfers.$inferSelect;
 
 export type InsertTrimLevel = z.infer<typeof insertTrimLevelSchema>;
 export type TrimLevel = typeof trimLevels.$inferSelect;
+export type Specification = typeof trimLevels.$inferSelect;
+export type InsertSpecification = z.infer<typeof insertSpecificationSchema>;
 export type InsertUserSession = z.infer<typeof insertUserSessionSchema>;
 export type UserSession = typeof userSessions.$inferSelect;
 export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;

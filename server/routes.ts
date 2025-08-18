@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { getStorage } from "./storage";
+import storage from "./simple-storage";
 
 import railwayImportRoutes from "./routes/railway-import.js";
 import { 
@@ -95,9 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!username || !password) {
         return res.status(400).json({ message: "Username and password required" });
       }
-
-      const storage = getStorage();
-      const user = await getStorage().getUserByUsername(username);
+      const user = await storage.getUserByUsername(username);
       
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
@@ -130,7 +128,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user already exists
-      const existingUser = await getStorage().getUserByUsername(username);
+      const existingUser = await storage.getUserByUsername(username);
       if (existingUser) {
         return res.status(409).json({ message: "Username already exists" });
       }
@@ -139,7 +137,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Create user
-      const newUser = await getStorage().createUser({
+      const newUser = await storage.createUser({
         name: username, // Use username as name for now
         jobTitle: "مستخدم", // Default job title
         phoneNumber: "000000000", // Default phone number
@@ -165,7 +163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all inventory items
   app.get("/api/inventory", async (req, res) => {
     try {
-      const items = await getStorage().getAllInventoryItems();
+      const items = await storage.getAllInventoryItems();
       res.json(items);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch inventory items" });
@@ -175,7 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get inventory stats - MUST come BEFORE :id routes
   app.get("/api/inventory/stats", async (req, res) => {
     try {
-      const stats = await getStorage().getInventoryStats();
+      const stats = await storage.getInventoryStats();
       res.json(stats);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch inventory stats" });
@@ -185,7 +183,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get manufacturer statistics - MUST come BEFORE :id routes
   app.get("/api/inventory/manufacturer-stats", async (req, res) => {
     try {
-      const stats = await getStorage().getManufacturerStats();
+      const stats = await storage.getManufacturerStats();
       res.json(stats);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch manufacturer stats" });
@@ -195,7 +193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get location statistics - MUST come BEFORE :id routes
   app.get("/api/inventory/location-stats", async (req, res) => {
     try {
-      const stats = await getStorage().getLocationStats();
+      const stats = await storage.getLocationStats();
       res.json(stats);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch location stats" });
@@ -209,7 +207,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!query) {
         return res.status(400).json({ message: "Search query is required" });
       }
-      const items = await getStorage().searchInventoryItems(query);
+      const items = await storage.searchInventoryItems(query);
       res.json(items);
     } catch (error) {
       res.status(500).json({ message: "Failed to search inventory items" });
@@ -236,7 +234,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (importType) filters.importType = importType as string;
       if (location) filters.location = location as string;
       
-      const items = await getStorage().filterInventoryItems(filters);
+      const items = await storage.filterInventoryItems(filters);
       res.json(items);
     } catch (error) {
       res.status(500).json({ message: "Failed to filter inventory items" });
@@ -251,7 +249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid item ID" });
       }
       
-      const items = await getStorage().getAllInventoryItems();
+      const items = await storage.getAllInventoryItems();
       const item = items.find(item => item.id === id);
       
       if (!item) {
@@ -271,7 +269,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const manufacturerFilter = req.query.manufacturer as string;
       
       // Get all manufacturers or filter by specific one
-      const manufacturers = await getStorage().getAllManufacturers();
+      const manufacturers = await storage.getAllManufacturers();
       const filteredManufacturers = manufacturerFilter && manufacturerFilter !== 'all' 
         ? manufacturers.filter(m => m.nameAr === manufacturerFilter)
         : manufacturers;
@@ -280,10 +278,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       for (const manufacturer of filteredManufacturers) {
         // Get all vehicle categories for this manufacturer
-        const vehicleCategories = await getStorage().getVehicleCategoriesByManufacturer(manufacturer.id);
+        const vehicleCategories = await storage.getVehicleCategoriesByManufacturer(manufacturer.id);
         
         // Get inventory items for vehicle count
-        const allInventory = await getStorage().getAllInventoryItems();
+        const allInventory = await storage.getAllInventoryItems();
         const manufacturerInventory = allInventory.filter(item => 
           item.manufacturer === manufacturer.nameAr
         );
@@ -293,10 +291,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         for (const vehicleCategory of vehicleCategories) {
           // Get trim levels for this category from multiple sources
-          const vehicleTrimLevels = await getStorage().getVehicleTrimLevelsByCategory(vehicleCategory.id);
+          const vehicleTrimLevels = await storage.getVehicleTrimLevelsByCategory(vehicleCategory.id);
           
           // Get all trim levels and filter by category_id (not categoryId)
-          const allTrimLevels = await getStorage().getAllTrimLevels();
+          const allTrimLevels = await storage.getAllTrimLevels();
           const categoryTrimLevels = allTrimLevels.filter(t => {
             // Handle both field names for compatibility
             const catId = (t as any).categoryId;
@@ -337,7 +335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                                 });
               
               // Get colors for this trim level
-              const trimColors = await getStorage().getColorAssociationsByTrimLevel(manufacturer.nameAr, vehicleCategory.nameAr, trimLevel);
+              const trimColors = await storage.getColorAssociationsByTrimLevel(manufacturer.nameAr, vehicleCategory.nameAr, trimLevel);
               
               return {
                 id: dbTrimLevel?.id || Math.random(),
@@ -415,7 +413,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Location is required" });
       }
       
-      const success = await getStorage().transferItem(id, location);
+      const success = await storage.transferItem(id, location);
       if (!success) {
         return res.status(404).json({ message: "Item not found" });
       }
@@ -434,7 +432,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid item ID" });
       }
       
-      const success = await getStorage().markAsSold(id, {});
+      const success = await storage.markAsSold(id, {});
       if (!success) {
         return res.status(404).json({ message: "Item not found" });
       }
@@ -459,7 +457,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Customer name, phone, sales representative and paid amount are required" });
       }
       
-      const success = await getStorage().reserveItem(id, {
+      const success = await storage.reserveItem(id, {
         customerName,
         customerPhone,
         salesRepresentative,
@@ -481,7 +479,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get reserved inventory items
   app.get("/api/inventory/reserved", async (req, res) => {
     try {
-      const items = await getStorage().getReservedItems();
+      const items = await storage.getReservedItems();
       res.json(items);
     } catch (error) {
       console.error("Error fetching reserved items:", error);
@@ -513,7 +511,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Use provided sale date or current date (Gregorian calendar)
       const soldDate = saleDate ? new Date(saleDate) : new Date();
 
-      const item = await getStorage().updateInventoryItem(id, {
+      const item = await storage.updateInventoryItem(id, {
         status: "مباع",
         isSold: true,
         soldDate: soldDate,
@@ -549,7 +547,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Customer name, phone, sales representative, sale price and payment method are required" });
       }
       
-      const item = await getStorage().updateInventoryItem(id, {
+      const item = await storage.updateInventoryItem(id, {
         status: "مباع",
         isSold: true,
         soldDate: new Date(),
@@ -583,7 +581,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get sold inventory items
   app.get("/api/inventory/sold", async (req, res) => {
     try {
-      const items = await getStorage().getSoldItems();
+      const items = await storage.getSoldItems();
       res.json(items);
     } catch (error) {
       console.error("Error fetching sold items:", error);
@@ -599,7 +597,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid item ID" });
       }
 
-      const item = await getStorage().updateInventoryItem(id, {
+      const item = await storage.updateInventoryItem(id, {
         status: "متوفر",
         reservationDate: undefined,
         reservedBy: undefined,
@@ -625,7 +623,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/inventory/clear-all", async (req, res) => {
     try {
       console.log("Starting to clear all inventory items...");
-      const success = await getStorage().clearAllInventoryItems();
+      const success = await storage.clearAllInventoryItems();
       if (!success) {
         return res.status(500).json({ message: "Failed to clear inventory items" });
       }
@@ -649,7 +647,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid item ID" });
       }
       
-      const success = await getStorage().cancelReservation(id);
+      const success = await storage.cancelReservation(id);
       if (!success) {
         return res.status(404).json({ message: "Item not found" });
       }
@@ -673,11 +671,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const item = await getStorage().createInventoryItem(validation.data);
+      const item = await storage.createInventoryItem(validation.data);
       
       // Automatically create price card data when a new vehicle is added
       try {
-        await getStorage().createPriceCard({
+        await storage.createPriceCard({
           inventoryItemId: item.id,
           manufacturer: item.manufacturer,
           category: item.category,
@@ -738,7 +736,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           
           // Check for duplicate chassis number
-          const existingItems = await getStorage().getAllInventoryItems();
+          const existingItems = await storage.getAllInventoryItems();
           let isDuplicate = existingItems.some((existing: any) => 
             existing.chassisNumber === chassisNumber
           );
@@ -791,11 +789,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           const validatedItem = validation.data;
 
-          const createdItem = await getStorage().createInventoryItem(validatedItem);
+          const createdItem = await storage.createInventoryItem(validatedItem);
           
           // Also create price card data for each imported item
           try {
-            await getStorage().createPriceCard({
+            await storage.createPriceCard({
               inventoryItemId: createdItem.id,
               manufacturer: createdItem.manufacturer,
               category: createdItem.category,
@@ -856,7 +854,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log("Validated data:", validation.data);
-      const item = await getStorage().updateInventoryItem(id, validation.data);
+      const item = await storage.updateInventoryItem(id, validation.data);
       if (!item) {
         console.log("Item not found for ID:", id);
         return res.status(404).json({ message: "Item not found" });
@@ -890,7 +888,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log("PUT Validated data:", validation.data);
-      const item = await getStorage().updateInventoryItem(id, validation.data);
+      const item = await storage.updateInventoryItem(id, validation.data);
       if (!item) {
         console.log("PUT Item not found for ID:", id);
         return res.status(404).json({ message: "Item not found" });
@@ -912,7 +910,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid item ID" });
       }
 
-      const item = await getStorage().updateInventoryItem(id, {
+      const item = await storage.updateInventoryItem(id, {
         status: "مباع",
         isSold: true,
         soldDate: new Date()
@@ -932,7 +930,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Image Links API endpoints
   app.get('/api/image-links', async (req, res) => {
     try {
-      const imageLinks = await getStorage().getAllImageLinks();
+      const imageLinks = await storage.getAllImageLinks();
       res.json(imageLinks);
     } catch (error) {
       console.error('Error fetching image links:', error);
@@ -942,7 +940,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/image-links', async (req, res) => {
     try {
-      const imageLink = await getStorage().createImageLink(req.body);
+      const imageLink = await storage.createImageLink(req.body);
       res.status(201).json(imageLink);
     } catch (error) {
       console.error('Error creating image link:', error);
@@ -953,7 +951,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/image-links/:id', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const imageLink = await getStorage().updateImageLink(id, req.body);
+      const imageLink = await storage.updateImageLink(id, req.body);
       res.json(imageLink);
     } catch (error) {
       console.error('Error updating image link:', error);
@@ -964,7 +962,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/image-links/:id', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await getStorage().deleteImageLink(id);
+      const success = await storage.deleteImageLink(id);
       if (success) {
         res.status(204).send();
       } else {
@@ -984,7 +982,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid item ID" });
       }
 
-      const deleted = await getStorage().deleteInventoryItem(id);
+      const deleted = await storage.deleteInventoryItem(id);
       if (!deleted) {
         return res.status(404).json({ message: "Item not found" });
       }
@@ -998,7 +996,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Clear all inventory items
   app.delete("/api/inventory", async (req, res) => {
     try {
-      const cleared = await getStorage().clearAllInventoryItems();
+      const cleared = await storage.clearAllInventoryItems();
       if (!cleared) {
         return res.status(500).json({ message: "Failed to clear inventory" });
       }
@@ -1013,7 +1011,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Manufacturers endpoints
   app.get("/api/manufacturers", async (req, res) => {
     try {
-      const manufacturers = await getStorage().getAllManufacturers();
+      const manufacturers = await storage.getAllManufacturers();
       res.json(manufacturers);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch manufacturers" });
@@ -1027,7 +1025,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Parsed manufacturer data:", manufacturerData);
       
       // Check if manufacturer already exists
-      const existingManufacturers = await getStorage().getAllManufacturers();
+      const existingManufacturers = await storage.getAllManufacturers();
       const existingManufacturer = existingManufacturers.find(
         m => m.nameAr.toLowerCase() === manufacturerData.nameAr.toLowerCase()
       );
@@ -1039,7 +1037,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const manufacturer = await getStorage().createManufacturer(manufacturerData);
+      const manufacturer = await storage.createManufacturer(manufacturerData);
       res.status(201).json(manufacturer);
     } catch (error) {
       console.error("Error creating manufacturer:", error);
@@ -1060,7 +1058,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const manufacturerData = insertManufacturerSchema.parse(req.body);
-      const manufacturer = await getStorage().updateManufacturer(id, manufacturerData);
+      const manufacturer = await storage.updateManufacturer(id, manufacturerData);
       if (manufacturer) {
         res.json(manufacturer);
       } else {
@@ -1090,7 +1088,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Allow empty string to clear logo
-      const manufacturer = await getStorage().updateManufacturerLogo(id, logo);
+      const manufacturer = await storage.updateManufacturerLogo(id, logo);
       if (manufacturer) {
         console.log(`Successfully updated logo for manufacturer: ${manufacturer.nameAr}`);
         res.json(manufacturer);
@@ -1109,7 +1107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       console.log(`Deleting manufacturer with ID: ${id}`);
       
-      const success = await getStorage().deleteManufacturer(id);
+      const success = await storage.deleteManufacturer(id);
       if (success) {
         console.log(`Successfully deleted manufacturer with ID: ${id}`);
         res.json({ message: "Manufacturer deleted successfully" });
@@ -1126,7 +1124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Location endpoints
   app.get("/api/locations", async (req, res) => {
     try {
-      const locations = await getStorage().getAllLocations();
+      const locations = await storage.getAllLocations();
       res.json(locations);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch locations" });
@@ -1136,7 +1134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/locations", async (req, res) => {
     try {
       const locationData = insertLocationSchema.parse(req.body);
-      const location = await getStorage().createLocation(locationData);
+      const location = await storage.createLocation(locationData);
       res.status(201).json(location);
     } catch (error) {
       res.status(400).json({ message: "Invalid location data" });
@@ -1147,7 +1145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const locationData = req.body;
-      const location = await getStorage().updateLocation(id, locationData);
+      const location = await storage.updateLocation(id, locationData);
       if (location) {
         res.json(location);
       } else {
@@ -1161,7 +1159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/locations/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await getStorage().deleteLocation(id);
+      const success = await storage.deleteLocation(id);
       if (success) {
         res.json({ message: "Location deleted successfully" });
       } else {
@@ -1175,7 +1173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Location transfer endpoints
   app.get("/api/location-transfers", async (req, res) => {
     try {
-      const transfers = await getStorage().getLocationTransfers();
+      const transfers = await storage.getLocationTransfers();
       res.json(transfers);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch location transfers" });
@@ -1185,7 +1183,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/location-transfers", async (req, res) => {
     try {
       const transferData = insertLocationTransferSchema.parse(req.body);
-      const transfer = await getStorage().createLocationTransfer(transferData);
+      const transfer = await storage.createLocationTransfer(transferData);
       res.status(201).json(transfer);
     } catch (error) {
       res.status(400).json({ message: "Invalid transfer data" });
@@ -1202,7 +1200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "New location is required" });
       }
 
-      const success = await getStorage().transferItem(id, newLocation, reason, transferredBy);
+      const success = await storage.transferItem(id, newLocation, reason, transferredBy);
       if (success) {
         res.json({ message: "Item transferred successfully" });
       } else {
@@ -1275,7 +1273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // System Settings Routes
   app.get("/api/system-settings", async (req, res) => {
     try {
-      const settings = await getStorage().getSystemSettings();
+      const settings = await storage.getSystemSettings();
       res.json(settings);
     } catch (error) {
       console.error("Error fetching system settings:", error);
@@ -1287,7 +1285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { key } = req.params;
       const { value } = req.body;
-      const setting = await getStorage().updateSystemSetting(key, value);
+      const setting = await storage.updateSystemSetting(key, value);
       res.json(setting);
     } catch (error) {
       console.error("Error updating system setting:", error);
@@ -1297,9 +1295,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/system-settings/default-company", async (req, res) => {
     try {
-      const defaultCompanyId = await getStorage().getDefaultCompanyId();
+      const defaultCompanyId = await storage.getDefaultCompanyId();
       if (defaultCompanyId) {
-        const company = await getStorage().getCompany(defaultCompanyId);
+        const company = await storage.getCompany(defaultCompanyId);
         res.json(company);
       } else {
         res.status(404).json({ message: "No default company set" });
@@ -1313,8 +1311,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/system-settings/default-company/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      await getStorage().updateSystemSetting("default_company_id", id);
-      const company = await getStorage().getCompany(parseInt(id));
+      await storage.updateSystemSetting("default_company_id", id);
+      const company = await storage.getCompany(parseInt(id));
       res.json({ message: "Default company updated", company });
     } catch (error) {
       console.error("Error updating default company:", error);
@@ -1325,7 +1323,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Terms and Conditions Routes
   app.get("/api/terms-conditions", async (req, res) => {
     try {
-      const terms = await getStorage().getAllTermsConditions();
+      const terms = await storage.getAllTermsConditions();
       res.json(terms);
     } catch (error) {
       console.error("Error fetching terms and conditions:", error);
@@ -1348,7 +1346,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }));
       
       // Save to storage
-      await getStorage().updateTermsConditions(termsArray);
+      await storage.updateTermsConditions(termsArray);
       
       res.json({ message: "Terms and conditions saved successfully", terms: termsArray });
     } catch (error) {
@@ -1360,7 +1358,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Color management API endpoints
   app.get("/api/colors/exterior", async (req, res) => {
     try {
-      const colors = await getStorage().getExteriorColors();
+      const colors = await storage.getExteriorColors();
       res.json(colors);
     } catch (error) {
       console.error("Error fetching exterior colors:", error);
@@ -1370,7 +1368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/colors/interior", async (req, res) => {
     try {
-      const colors = await getStorage().getInteriorColors();
+      const colors = await storage.getInteriorColors();
       res.json(colors);
     } catch (error) {
       console.error("Error fetching interior colors:", error);
@@ -1381,7 +1379,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/colors/exterior", async (req, res) => {
     try {
       const colorData = req.body;
-      const color = await getStorage().createExteriorColor(colorData);
+      const color = await storage.createExteriorColor(colorData);
       res.status(201).json(color);
     } catch (error) {
       console.error("Error creating exterior color:", error);
@@ -1392,7 +1390,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/colors/interior", async (req, res) => {
     try {
       const colorData = req.body;
-      const color = await getStorage().createInteriorColor(colorData);
+      const color = await storage.createInteriorColor(colorData);
       res.status(201).json(color);
     } catch (error) {
       console.error("Error creating interior color:", error);
@@ -1404,7 +1402,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/color-associations", async (req, res) => {
     try {
       const { manufacturer, category, trimLevel, colorType, scope } = req.query;
-      const associations = await getStorage().getColorAssociations();
+      const associations = await storage.getColorAssociations();
       res.json(associations);
     } catch (error) {
       console.error("Error fetching color associations:", error);
@@ -1415,7 +1413,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/color-associations", async (req, res) => {
     try {
       const associationData = insertColorAssociationSchema.parse(req.body);
-      const association = await getStorage().createColorAssociation(associationData);
+      const association = await storage.createColorAssociation(associationData);
       res.status(201).json(association);
     } catch (error) {
       console.error("Error creating color association:", error);
@@ -1426,7 +1424,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/color-associations/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await getStorage().deleteColorAssociation(id);
+      const success = await storage.deleteColorAssociation(id);
       if (success) {
         res.json({ message: "Color association deleted successfully" });
       } else {
@@ -1442,7 +1440,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/categories", async (req, res) => {
     try {
       const { name_ar, name_en, manufacturer_id } = req.body;
-      const category = await getStorage().createVehicleCategory({ nameAr: name_ar, nameEn: name_en, manufacturerId: manufacturer_id });
+      const category = await storage.createVehicleCategory({ nameAr: name_ar, nameEn: name_en, manufacturerId: manufacturer_id });
       res.status(201).json(category);
     } catch (error) {
       console.error("Error creating category:", error);
@@ -1454,7 +1452,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/trim-levels", async (req, res) => {
     try {
       const { name_ar, name_en, category_id } = req.body;
-      const trimLevel = await getStorage().createVehicleTrimLevel({ nameAr: name_ar, nameEn: name_en, categoryId: category_id });
+      const trimLevel = await storage.createVehicleTrimLevel({ nameAr: name_ar, nameEn: name_en, categoryId: category_id });
       res.status(201).json(trimLevel);
     } catch (error) {
       console.error("Error creating trim level:", error);
@@ -1469,7 +1467,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all users
   app.get("/api/users", async (req, res) => {
     try {
-      const users = await getStorage().getAllUsers();
+      const users = await storage.getAllUsers();
       // Remove password from response for security
       const safeUsers = users.map(user => {
         const { password, ...safeUser } = user;
@@ -1495,12 +1493,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user already exists
-      const existingUser = await getStorage().getUserByUsername(username);
+      const existingUser = await storage.getUserByUsername(username);
       if (existingUser) {
         return res.status(400).json({ message: "المستخدم موجود بالفعل" });
       }
 
-      const newUser = await getStorage().createUser({
+      const newUser = await storage.createUser({
         name: name || username, // Use provided name or fallback to username
         jobTitle: jobTitle || "مستخدم", // Use provided job title or default
         phoneNumber: phoneNumber || "000000000", // Use provided phone or default
@@ -1532,7 +1530,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (role) updateData.role = role;
       if (password) updateData.password = password;
 
-      const updatedUser = await getStorage().updateUser(id, updateData);
+      const updatedUser = await storage.updateUser(id, updateData);
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -1554,7 +1552,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid user ID" });
       }
 
-      const deleted = await getStorage().deleteUser(id);
+      const deleted = await storage.deleteUser(id);
       if (!deleted) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -1570,7 +1568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Trim Levels API Routes
   app.get("/api/trim-levels", async (req, res) => {
     try {
-      const trimLevels = await getStorage().getAllTrimLevels();
+      const trimLevels = await storage.getAllTrimLevels();
       res.json(trimLevels);
     } catch (error) {
       console.error("Error fetching trim levels:", error);
@@ -1585,7 +1583,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid trim level ID" });
       }
 
-      const trimLevel = await getStorage().getTrimLevel(id);
+      const trimLevel = await storage.getTrimLevel(id);
       if (!trimLevel) {
         return res.status(404).json({ message: "Trim level not found" });
       }
@@ -1600,7 +1598,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/trim-levels", async (req, res) => {
     try {
       const trimLevelData = insertTrimLevelSchema.parse(req.body);
-      const trimLevel = await getStorage().createTrimLevel(trimLevelData);
+      const trimLevel = await storage.createTrimLevel(trimLevelData);
       res.status(201).json(trimLevel);
     } catch (error) {
       console.error("Error creating trim level:", error);
@@ -1616,7 +1614,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const trimLevelData = insertTrimLevelSchema.parse(req.body);
-      const trimLevel = await getStorage().updateTrimLevel(id, trimLevelData);
+      const trimLevel = await storage.updateTrimLevel(id, trimLevelData);
       
       if (!trimLevel) {
         return res.status(404).json({ message: "Trim level not found" });
@@ -1636,7 +1634,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid trim level ID" });
       }
 
-      const deleted = await getStorage().deleteTrimLevel(id);
+      const deleted = await storage.deleteTrimLevel(id);
       if (!deleted) {
         return res.status(404).json({ message: "Trim level not found" });
       }
@@ -1652,7 +1650,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { manufacturer, category } = req.params;
       
-      const trimLevels = await getStorage().getTrimLevelsByCategory(manufacturer, category);
+      const trimLevels = await storage.getTrimLevelsByCategory(manufacturer, category);
       res.json(trimLevels);
     } catch (error) {
       console.error("Error fetching trim levels by category:", error);
@@ -1663,7 +1661,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Hierarchical API Routes for frontend form
   app.get("/api/hierarchical/manufacturers", async (req, res) => {
     try {
-      const manufacturers = await getStorage().getAllManufacturers();
+      const manufacturers = await storage.getAllManufacturers();
       res.json(manufacturers);
     } catch (error) {
       console.error("Error fetching hierarchical manufacturers:", error);
@@ -1677,7 +1675,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!manufacturer) {
         return res.json([]);
       }
-      const categories = await getStorage().getCategoriesByManufacturer(manufacturer as string);
+      const categories = await storage.getCategoriesByManufacturer(manufacturer as string);
       res.json(categories);
     } catch (error) {
       console.error("Error fetching hierarchical categories:", error);
@@ -1691,7 +1689,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!manufacturer || !category) {
         return res.json([]);
       }
-      const trimLevels = await getStorage().getTrimLevelsByCategory(manufacturer as string, category as string);
+      const trimLevels = await storage.getTrimLevelsByCategory(manufacturer as string, category as string);
       res.json(trimLevels);
     } catch (error) {
       console.error("Error fetching hierarchical trim levels:", error);
@@ -1710,7 +1708,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (trimLevel) filters.trimLevel = trimLevel;
       if (colorType) filters.colorType = colorType;
       
-      const colors = await getStorage().getColorAssociationsByFilters(filters);
+      const colors = await storage.getColorAssociationsByFilters(filters);
       res.json(colors);
     } catch (error) {
       console.error("Error fetching hierarchical colors:", error);
@@ -1721,7 +1719,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Categories API Routes
   app.get("/api/categories", async (req, res) => {
     try {
-      const categories = await getStorage().getAllCategories();
+      const categories = await storage.getAllCategories();
       res.json(categories);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -1732,7 +1730,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/categories/:manufacturer", async (req, res) => {
     try {
       const { manufacturer } = req.params;
-      const categories = await getStorage().getCategoriesByManufacturer(manufacturer);
+      const categories = await storage.getCategoriesByManufacturer(manufacturer);
       res.json(categories);
     } catch (error) {
       console.error("Error fetching categories by manufacturer:", error);
@@ -1743,7 +1741,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Engine Capacities API Routes
   app.get("/api/engine-capacities", async (req, res) => {
     try {
-      const engineCapacities = await getStorage().getAllEngineCapacities();
+      const engineCapacities = await storage.getAllEngineCapacities();
       res.json(engineCapacities);
     } catch (error) {
       console.error("Error fetching engine capacities:", error);
@@ -1846,7 +1844,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/quotations/status/:status", async (req, res) => {
     try {
       const { status } = req.params;
-      const quotations = await getStorage().getQuotationsByStatus(status);
+      const quotations = await storage.getQuotationsByStatus(status);
       res.json(quotations);
     } catch (error) {
       console.error("Error fetching quotations by status:", error);
@@ -1857,7 +1855,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/quotations/number/:quoteNumber", async (req, res) => {
     try {
       const { quoteNumber } = req.params;
-      const quotation = await getStorage().getQuotationByNumber(quoteNumber);
+      const quotation = await storage.getQuotationByNumber(quoteNumber);
       
       if (!quotation) {
         return res.status(404).json({ message: "Quotation not found" });
@@ -1873,7 +1871,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Company management routes
   app.get("/api/companies", async (req, res) => {
     try {
-      const companies = await getStorage().getAllCompanies();
+      const companies = await storage.getAllCompanies();
       res.json(companies);
     } catch (error) {
       console.error("Error fetching companies:", error);
@@ -1888,7 +1886,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid company ID" });
       }
 
-      const company = await getStorage().getCompany(id);
+      const company = await storage.getCompany(id);
       if (!company) {
         return res.status(404).json({ message: "Company not found" });
       }
@@ -1903,7 +1901,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/companies", async (req, res) => {
     try {
       const companyData = insertCompanySchema.parse(req.body);
-      const company = await getStorage().createCompany(companyData);
+      const company = await storage.createCompany(companyData);
       res.status(201).json(company);
     } catch (error) {
       console.error("Error creating company:", error);
@@ -1919,7 +1917,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const companyData = insertCompanySchema.partial().parse(req.body);
-      const company = await getStorage().updateCompany(id, companyData);
+      const company = await storage.updateCompany(id, companyData);
       
       if (!company) {
         return res.status(404).json({ message: "Company not found" });
@@ -1939,7 +1937,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid company ID" });
       }
 
-      const success = await getStorage().deleteCompany(id);
+      const success = await storage.deleteCompany(id);
       
       if (!success) {
         return res.status(404).json({ message: "Company not found" });
@@ -1960,7 +1958,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const companyData = insertCompanySchema.parse(req.body);
-      const company = await getStorage().updateCompany(id, companyData);
+      const company = await storage.updateCompany(id, companyData);
       
       if (!company) {
         return res.status(404).json({ message: "Company not found" });
@@ -1980,7 +1978,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid company ID" });
       }
 
-      const deleted = await getStorage().deleteCompany(id);
+      const deleted = await storage.deleteCompany(id);
       if (!deleted) {
         return res.status(404).json({ message: "Company not found" });
       }
@@ -2020,7 +2018,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/invoices/:id", async (req, res) => {
     try {
-      const invoice = await getStorage().getInvoiceById(parseInt(req.params.id));
+      const invoice = await storage.getInvoiceById(parseInt(req.params.id));
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
@@ -2033,7 +2031,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/invoices/:id", async (req, res) => {
     try {
-      const invoice = await getStorage().updateInvoice(parseInt(req.params.id), req.body);
+      const invoice = await storage.updateInvoice(parseInt(req.params.id), req.body);
       res.json(invoice);
     } catch (error) {
       console.error("Error updating invoice:", error);
@@ -2043,7 +2041,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/invoices/:id", async (req, res) => {
     try {
-      const success = await getStorage().deleteInvoice(parseInt(req.params.id));
+      const success = await storage.deleteInvoice(parseInt(req.params.id));
       if (success) {
         res.json({ message: "Invoice deleted successfully" });
       } else {
@@ -2057,7 +2055,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/invoices/number/:invoiceNumber", async (req, res) => {
     try {
-      const invoice = await getStorage().getInvoiceByNumber(req.params.invoiceNumber);
+      const invoice = await storage.getInvoiceByNumber(req.params.invoiceNumber);
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
@@ -2070,7 +2068,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/invoices/status/:status", async (req, res) => {
     try {
-      const invoices = await getStorage().getInvoicesByStatus(req.params.status);
+      const invoices = await storage.getInvoicesByStatus(req.params.status);
       res.json(invoices);
     } catch (error) {
       console.error("Error getting invoices by status:", error);
@@ -2164,7 +2162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
         case 'postgresql':
           try {
-            const testQuery = await getStorage().getInventoryStats();
+            const testQuery = await storage.getInventoryStats();
             res.json({ success: true, message: 'تم اختبار قاعدة البيانات بنجاح' });
           } catch (error) {
             res.json({ success: false, message: 'فشل في الاتصال بقاعدة البيانات' });
@@ -2268,7 +2266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             isActive: true
           };
 
-          const manufacturer = await getStorage().createManufacturer(manufacturerData);
+          const manufacturer = await storage.createManufacturer(manufacturerData);
           manufacturersCreated++;
           console.log(`Created manufacturer: ${brand.brand_ar}`);
 
@@ -2282,7 +2280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 isActive: true
               };
 
-              const category = await getStorage().createVehicleCategory(categoryData);
+              const category = await storage.createVehicleCategory(categoryData);
               categoriesCreated++;
               console.log(`Created category: ${model.model_ar} for ${brand.brand_ar}`);
 
@@ -2296,7 +2294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     isActive: true
                   };
 
-                  await getStorage().createVehicleTrimLevel(trimData);
+                  await storage.createVehicleTrimLevel(trimData);
                   trimLevelsCreated++;
                   console.log(`Created trim level: ${trim.trim_ar} for ${model.model_ar}`);
                 } catch (trimError: any) {
@@ -2500,11 +2498,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Import manufacturers
       for (const brand of carsData) {
         try {
-          const existingManufacturers = await getStorage().getAllManufacturers();
+          const existingManufacturers = await storage.getAllManufacturers();
           const exists = existingManufacturers.some(m => m.nameAr === brand.brand_ar);
           
           if (!exists) {
-            await getStorage().createManufacturer({
+            await storage.createManufacturer({
               nameAr: brand.brand_ar,
               nameEn: brand.brand_en || brand.brand_ar,
               logo: null
@@ -2523,7 +2521,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Import trim levels
           for (const trim of model.trims) {
             try {
-              const existingTrimLevels = await getStorage().getAllTrimLevels();
+              const existingTrimLevels = await storage.getAllTrimLevels();
               const trimExists = existingTrimLevels.some(t =>
                 t.manufacturer === brand.brand_ar &&
                 t.category === model.model_ar &&
@@ -2531,7 +2529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               );
               
               if (!trimExists) {
-                await getStorage().createTrimLevel({
+                await storage.createTrimLevel({
                   manufacturer: brand.brand_ar,
                   category: model.model_ar,
                   trimLevel: trim.trim_ar,
@@ -2560,7 +2558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Import Types endpoints
   app.get("/api/import-types", async (req, res) => {
     try {
-      const importTypes = await getStorage().getAllImportTypes();
+      const importTypes = await storage.getAllImportTypes();
       res.json(importTypes);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch import types" });
@@ -2569,7 +2567,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/import-types", async (req, res) => {
     try {
-      const importType = await getStorage().createImportType(req.body);
+      const importType = await storage.createImportType(req.body);
       res.status(201).json(importType);
     } catch (error) {
       res.status(500).json({ message: "Failed to create import type" });
@@ -2579,7 +2577,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/import-types/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const importType = await getStorage().updateImportType(id, req.body);
+      const importType = await storage.updateImportType(id, req.body);
       res.json(importType);
     } catch (error) {
       res.status(500).json({ message: "Failed to update import type" });
@@ -2589,7 +2587,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/import-types/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      await getStorage().deleteImportType(id);
+      await storage.deleteImportType(id);
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete import type" });
@@ -2599,7 +2597,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle Statuses endpoints
   app.get("/api/statuses", async (req, res) => {
     try {
-      const statuses = await getStorage().getAllVehicleStatuses();
+      const statuses = await storage.getAllVehicleStatuses();
       res.json(statuses);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch vehicle statuses" });
@@ -2608,7 +2606,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/statuses", async (req, res) => {
     try {
-      const status = await getStorage().createVehicleStatus(req.body);
+      const status = await storage.createVehicleStatus(req.body);
       res.status(201).json(status);
     } catch (error) {
       res.status(500).json({ message: "Failed to create vehicle status" });
@@ -2618,7 +2616,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/statuses/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const status = await getStorage().updateVehicleStatus(id, req.body);
+      const status = await storage.updateVehicleStatus(id, req.body);
       res.json(status);
     } catch (error) {
       res.status(500).json({ message: "Failed to update vehicle status" });
@@ -2628,7 +2626,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/statuses/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      await getStorage().deleteVehicleStatus(id);
+      await storage.deleteVehicleStatus(id);
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete vehicle status" });
@@ -2638,7 +2636,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Ownership Types endpoints
   app.get("/api/ownership-types", async (req, res) => {
     try {
-      const ownershipTypes = await getStorage().getAllOwnershipTypes();
+      const ownershipTypes = await storage.getAllOwnershipTypes();
       res.json(ownershipTypes);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch ownership types" });
@@ -2647,7 +2645,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/ownership-types", async (req, res) => {
     try {
-      const ownershipType = await getStorage().createOwnershipType(req.body);
+      const ownershipType = await storage.createOwnershipType(req.body);
       res.status(201).json(ownershipType);
     } catch (error) {
       res.status(500).json({ message: "Failed to create ownership type" });
@@ -2657,7 +2655,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/ownership-types/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const ownershipType = await getStorage().updateOwnershipType(id, req.body);
+      const ownershipType = await storage.updateOwnershipType(id, req.body);
       res.json(ownershipType);
     } catch (error) {
       res.status(500).json({ message: "Failed to update ownership type" });
@@ -2667,7 +2665,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/ownership-types/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      await getStorage().deleteOwnershipType(id);
+      await storage.deleteOwnershipType(id);
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete ownership type" });
@@ -2677,7 +2675,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Financing calculations endpoints
   app.get("/api/financing-calculations", async (req, res) => {
     try {
-      const calculations = await getStorage().getAllFinancingCalculations();
+      const calculations = await storage.getAllFinancingCalculations();
       res.json(calculations);
     } catch (error) {
       console.error("Error fetching financing calculations:", error);
@@ -2692,7 +2690,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid calculation ID" });
       }
 
-      const calculation = await getStorage().getFinancingCalculation(id);
+      const calculation = await storage.getFinancingCalculation(id);
       if (!calculation) {
         return res.status(404).json({ message: "Financing calculation not found" });
       }
@@ -2707,7 +2705,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/financing-calculations", async (req, res) => {
     try {
       const calculationData = insertFinancingCalculationSchema.parse(req.body);
-      const calculation = await getStorage().createFinancingCalculation(calculationData);
+      const calculation = await storage.createFinancingCalculation(calculationData);
       res.status(201).json(calculation);
     } catch (error) {
       console.error("Error creating financing calculation:", error);
@@ -2727,7 +2725,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const calculationData = insertFinancingCalculationSchema.partial().parse(req.body);
-      const calculation = await getStorage().updateFinancingCalculation(id, calculationData);
+      const calculation = await storage.updateFinancingCalculation(id, calculationData);
       
       if (!calculation) {
         return res.status(404).json({ message: "Financing calculation not found" });
@@ -2747,7 +2745,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid calculation ID" });
       }
 
-      const success = await getStorage().deleteFinancingCalculation(id);
+      const success = await storage.deleteFinancingCalculation(id);
       
       if (!success) {
         return res.status(404).json({ message: "Financing calculation not found" });
@@ -2763,7 +2761,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Bank Management API Routes
   app.get("/api/banks", async (req, res) => {
     try {
-      const banks = await getStorage().getAllBanks();
+      const banks = await storage.getAllBanks();
       res.json(banks);
     } catch (error) {
       console.error("Error fetching banks:", error);
@@ -2778,7 +2776,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid bank type" });
       }
       
-      const allBanks = await getStorage().getAllBanks();
+      const allBanks = await storage.getAllBanks();
       const banks = allBanks.filter((bank: any) => bank.type === type && bank.isActive);
       
       res.json(banks);
@@ -2795,7 +2793,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid bank ID" });
       }
 
-      const bank = await getStorage().getBank(id);
+      const bank = await storage.getBank(id);
       if (!bank) {
         return res.status(404).json({ message: "Bank not found" });
       }
@@ -2810,7 +2808,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/banks", async (req, res) => {
     try {
       const bankData = insertBankSchema.parse(req.body);
-      const bank = await getStorage().createBank(bankData);
+      const bank = await storage.createBank(bankData);
       res.status(201).json(bank);
     } catch (error) {
       console.error("Error creating bank:", error);
@@ -2826,7 +2824,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const bankData = insertBankSchema.partial().parse(req.body);
-      const bank = await getStorage().updateBank(id, bankData);
+      const bank = await storage.updateBank(id, bankData);
       
       if (!bank) {
         return res.status(404).json({ message: "Bank not found" });
@@ -2846,7 +2844,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid bank ID" });
       }
 
-      const success = await getStorage().deleteBank(id);
+      const success = await storage.deleteBank(id);
       
       if (!success) {
         return res.status(404).json({ message: "Bank not found" });
@@ -2867,7 +2865,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid bank ID" });
       }
 
-      const rates = await getStorage().getBankInterestRates(bankId);
+      const rates = await storage.getBankInterestRates(bankId);
       res.json(rates);
     } catch (error) {
       console.error("Error fetching bank interest rates:", error);
@@ -2878,7 +2876,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/bank-interest-rates", async (req, res) => {
     try {
       const rateData = insertBankInterestRateSchema.parse(req.body);
-      const rate = await getStorage().createBankInterestRate(rateData);
+      const rate = await storage.createBankInterestRate(rateData);
       res.status(201).json(rate);
     } catch (error) {
       console.error("Error creating bank interest rate:", error);
@@ -2894,7 +2892,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const rateData = insertBankInterestRateSchema.partial().parse(req.body);
-      const rate = await getStorage().updateBankInterestRate(id, rateData);
+      const rate = await storage.updateBankInterestRate(id, rateData);
       
       if (!rate) {
         return res.status(404).json({ message: "Bank interest rate not found" });
@@ -2914,7 +2912,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid rate ID" });
       }
 
-      const success = await getStorage().deleteBankInterestRate(id);
+      const success = await storage.deleteBankInterestRate(id);
       
       if (!success) {
         return res.status(404).json({ message: "Bank interest rate not found" });
@@ -2930,7 +2928,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle Data API endpoints for forms
   app.get("/api/vehicle-years", async (req, res) => {
     try {
-      const inventory = await getStorage().getAllInventoryItems();
+      const inventory = await storage.getAllInventoryItems();
       const uniqueYears = [...new Set(inventory.map(item => item.year))].sort((a, b) => b - a);
       res.json(uniqueYears);
     } catch (error) {
@@ -2941,7 +2939,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/engine-capacities", async (req, res) => {
     try {
-      const inventory = await getStorage().getAllInventoryItems();
+      const inventory = await storage.getAllInventoryItems();
       const uniqueEngineCapacities = [...new Set(inventory
         .map(item => item.engineCapacity)
         .filter(capacity => capacity && capacity.trim() !== ""))]
@@ -2956,7 +2954,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Leave Requests API - restored for attendance request approval workflow
   app.get("/api/leave-requests", async (req, res) => {
     try {
-      const requests = await getStorage().getAllLeaveRequests();
+      const requests = await storage.getAllLeaveRequests();
       res.json(requests);
     } catch (error) {
       console.error("Error fetching leave requests:", error);
@@ -2975,7 +2973,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const leaveRequest = await getStorage().createLeaveRequest(validation.data);
+      const leaveRequest = await storage.createLeaveRequest(validation.data);
       res.status(201).json(leaveRequest);
     } catch (error) {
       console.error("Error creating leave request:", error);
@@ -2991,7 +2989,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { status, approvedBy, approvedByName, rejectionReason } = req.body;
-      const request = await getStorage().updateLeaveRequestStatus(
+      const request = await storage.updateLeaveRequestStatus(
         id, 
         status, 
         approvedBy, 
@@ -3013,7 +3011,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Employee Work Schedules API Routes
   app.get("/api/employee-work-schedules", async (req, res) => {
     try {
-      const schedules = await getStorage().getAllEmployeeWorkSchedules();
+      const schedules = await storage.getAllEmployeeWorkSchedules();
       res.json(schedules);
     } catch (error) {
       console.error("Error fetching employee work schedules:", error);
@@ -3028,7 +3026,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid schedule ID" });
       }
 
-      const schedule = await getStorage().getEmployeeWorkScheduleById(id);
+      const schedule = await storage.getEmployeeWorkScheduleById(id);
       if (!schedule) {
         return res.status(404).json({ message: "Employee work schedule not found" });
       }
@@ -3043,7 +3041,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/employee-work-schedules", async (req, res) => {
     try {
       const scheduleData = insertEmployeeWorkScheduleSchema.parse(req.body);
-      const schedule = await getStorage().createEmployeeWorkSchedule(scheduleData);
+      const schedule = await storage.createEmployeeWorkSchedule(scheduleData);
       res.status(201).json(schedule);
     } catch (error) {
       console.error("Error creating employee work schedule:", error);
@@ -3060,7 +3058,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const scheduleData = insertEmployeeWorkScheduleSchema.parse(req.body);
-      const updatedSchedule = await getStorage().updateEmployeeWorkSchedule(id, scheduleData);
+      const updatedSchedule = await storage.updateEmployeeWorkSchedule(id, scheduleData);
       
       if (!updatedSchedule) {
         return res.status(404).json({ message: "Employee work schedule not found" });
@@ -3081,7 +3079,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid schedule ID" });
       }
 
-      const deleted = await getStorage().deleteEmployeeWorkSchedule(id);
+      const deleted = await storage.deleteEmployeeWorkSchedule(id);
       
       if (!deleted) {
         return res.status(404).json({ message: "Employee work schedule not found" });
@@ -3102,7 +3100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const scheduleData = insertEmployeeWorkScheduleSchema.parse(req.body);
-      const schedule = await getStorage().updateEmployeeWorkSchedule(id, scheduleData);
+      const schedule = await storage.updateEmployeeWorkSchedule(id, scheduleData);
       
       if (!schedule) {
         return res.status(404).json({ message: "Employee work schedule not found" });
@@ -3122,7 +3120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid schedule ID" });
       }
 
-      const success = await getStorage().deleteEmployeeWorkSchedule(id);
+      const success = await storage.deleteEmployeeWorkSchedule(id);
       
       if (!success) {
         return res.status(404).json({ message: "Employee work schedule not found" });
@@ -3142,20 +3140,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let attendance;
       
       if (employeeId && date) {
-        attendance = await getStorage().getDailyAttendanceByEmployeeAndDate(
+        attendance = await storage.getDailyAttendanceByEmployeeAndDate(
           parseInt(employeeId as string), 
           new Date(date as string)
         );
       } else if (employeeId && startDate && endDate) {
-        attendance = await getStorage().getDailyAttendanceByEmployeeAndDateRange(
+        attendance = await storage.getDailyAttendanceByEmployeeAndDateRange(
           parseInt(employeeId as string), 
           new Date(startDate as string), 
           new Date(endDate as string)
         );
       } else if (date) {
-        attendance = await getStorage().getDailyAttendanceByDate(new Date(date as string));
+        attendance = await storage.getDailyAttendanceByDate(new Date(date as string));
       } else {
-        attendance = await getStorage().getAllDailyAttendance();
+        attendance = await storage.getAllDailyAttendance();
       }
       
       res.json(attendance);
@@ -3182,7 +3180,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("📋 Processed attendance data:", attendanceData);
       
       // Check if attendance already exists for this employee and date
-      const existingAttendance = await getStorage().getDailyAttendanceByEmployeeAndDate(
+      const existingAttendance = await storage.getDailyAttendanceByEmployeeAndDate(
         attendanceData.employeeId,
         new Date(attendanceData.date)
       );
@@ -3197,7 +3195,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: existingAttendance[0].id // Keep the original ID
         };
         
-        const updatedAttendance = await getStorage().updateDailyAttendance(existingAttendance[0].id, updateData);
+        const updatedAttendance = await storage.updateDailyAttendance(existingAttendance[0].id, updateData);
         console.log("💾 Updated existing attendance record:", updatedAttendance);
         
         res.status(200).json(updatedAttendance);
@@ -3206,7 +3204,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const validatedData = insertDailyAttendanceSchema.parse(attendanceData);
         console.log("✅ Validated attendance data:", validatedData);
         
-        const attendance = await getStorage().createDailyAttendance(validatedData);
+        const attendance = await storage.createDailyAttendance(validatedData);
         console.log("💾 Created new attendance record:", attendance);
         
         res.status(201).json(attendance);
@@ -3230,7 +3228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const attendanceData = insertDailyAttendanceSchema.parse(req.body);
       console.log("✅ Validated update data:", attendanceData);
       
-      const attendance = await getStorage().updateDailyAttendance(id, attendanceData);
+      const attendance = await storage.updateDailyAttendance(id, attendanceData);
       console.log("💾 Updated attendance record:", attendance);
       
       if (!attendance) {
@@ -3251,7 +3249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid attendance ID" });
       }
 
-      const success = await getStorage().deleteDailyAttendance(id);
+      const success = await storage.deleteDailyAttendance(id);
       
       if (!success) {
         return res.status(404).json({ message: "Daily attendance record not found" });
@@ -3274,27 +3272,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get employee information first
-      const user = await getStorage().getUser(parseInt(employeeId));
+      const user = await storage.getUser(parseInt(employeeId));
       if (!user) {
         return res.status(404).json({ message: "Employee not found" });
       }
 
       // Check if attendance record exists for this employee and date
-      let attendance = await getStorage().getDailyAttendanceByEmployeeAndDate(
+      let attendance = await storage.getDailyAttendanceByEmployeeAndDate(
         parseInt(employeeId), 
         new Date(date + 'T00:00:00')
       );
 
       if (attendance) {
         // Update existing record to mark as holiday
-        const updatedAttendance = await getStorage().updateDailyAttendance(attendance.id, {
+        const updatedAttendance = await storage.updateDailyAttendance(attendance.id, {
           ...attendance,
           notes: isHoliday ? 'إجازة' : (attendance.notes !== 'إجازة' ? attendance.notes : null)
         });
         res.json(updatedAttendance);
       } else {
         // Create new holiday record with proper employee info
-        const newAttendance = await getStorage().createDailyAttendance({
+        const newAttendance = await storage.createDailyAttendance({
           employeeId: parseInt(employeeId),
           employeeName: user.name,
           date: new Date(date + 'T00:00:00'),
@@ -3312,7 +3310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Financing Rates API Routes
   app.get("/api/financing-rates", async (req, res) => {
     try {
-      const rates = await getStorage().getAllFinancingRates();
+      const rates = await storage.getAllFinancingRates();
       res.json(rates);
     } catch (error) {
       console.error("Error fetching financing rates:", error);
@@ -3327,7 +3325,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid rate ID" });
       }
 
-      const rate = await getStorage().getFinancingRate(id);
+      const rate = await storage.getFinancingRate(id);
       if (!rate) {
         return res.status(404).json({ message: "Financing rate not found" });
       }
@@ -3342,7 +3340,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/financing-rates", async (req, res) => {
     try {
       const rateData = insertFinancingRateSchema.parse(req.body);
-      const rate = await getStorage().createFinancingRate(rateData);
+      const rate = await storage.createFinancingRate(rateData);
       res.status(201).json(rate);
     } catch (error) {
       console.error("Error creating financing rate:", error);
@@ -3358,7 +3356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const rateData = insertFinancingRateSchema.partial().parse(req.body);
-      const rate = await getStorage().updateFinancingRate(id, rateData);
+      const rate = await storage.updateFinancingRate(id, rateData);
       
       if (!rate) {
         return res.status(404).json({ message: "Financing rate not found" });
@@ -3378,7 +3376,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid rate ID" });
       }
 
-      const success = await getStorage().deleteFinancingRate(id);
+      const success = await storage.deleteFinancingRate(id);
       
       if (!success) {
         return res.status(404).json({ message: "Financing rate not found" });
@@ -3398,7 +3396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid financing type. Must be 'personal' or 'commercial'" });
       }
 
-      const rates = await getStorage().getFinancingRatesByType(type);
+      const rates = await storage.getFinancingRatesByType(type);
       res.json(rates);
     } catch (error) {
       console.error("Error fetching financing rates by type:", error);
@@ -3409,7 +3407,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Color association endpoints
   app.get("/api/color-associations", async (req, res) => {
     try {
-      const associations = await getStorage().getAllColorAssociations();
+      const associations = await storage.getAllColorAssociations();
       res.json(associations);
     } catch (error) {
       console.error("Error fetching color associations:", error);
@@ -3424,7 +3422,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid association ID" });
       }
 
-      const association = await getStorage().getColorAssociation(id);
+      const association = await storage.getColorAssociation(id);
       if (!association) {
         return res.status(404).json({ message: "Color association not found" });
       }
@@ -3446,7 +3444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const association = await getStorage().createColorAssociation(validation.data);
+      const association = await storage.createColorAssociation(validation.data);
       res.status(201).json(association);
     } catch (error) {
       console.error("Error creating color association:", error);
@@ -3469,7 +3467,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const association = await getStorage().updateColorAssociation(id, validation.data);
+      const association = await storage.updateColorAssociation(id, validation.data);
       if (!association) {
         return res.status(404).json({ message: "Color association not found" });
       }
@@ -3488,7 +3486,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid association ID" });
       }
 
-      const success = await getStorage().deleteColorAssociation(id);
+      const success = await storage.deleteColorAssociation(id);
       if (!success) {
         return res.status(404).json({ message: "Color association not found" });
       }
@@ -3503,7 +3501,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/color-associations/manufacturer/:manufacturer", async (req, res) => {
     try {
       const { manufacturer } = req.params;
-      const associations = await getStorage().getColorAssociationsByManufacturer(manufacturer);
+      const associations = await storage.getColorAssociationsByManufacturer(manufacturer);
       res.json(associations);
     } catch (error) {
       console.error("Error fetching color associations by manufacturer:", error);
@@ -3516,7 +3514,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/color-associations/category/:manufacturer/:category", async (req, res) => {
     try {
       const { manufacturer, category } = req.params;
-      const associations = await getStorage().getColorAssociationsByCategory(manufacturer, category);
+      const associations = await storage.getColorAssociationsByCategory(manufacturer, category);
       res.json(associations);
     } catch (error) {
       console.error("Error fetching color associations by category:", error);
@@ -3527,7 +3525,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/color-associations/trim/:manufacturer/:category/:trimLevel", async (req, res) => {
     try {
       const { manufacturer, category, trimLevel } = req.params;
-      const associations = await getStorage().getColorAssociationsByTrimLevel(manufacturer, category, trimLevel);
+      const associations = await storage.getColorAssociationsByTrimLevel(manufacturer, category, trimLevel);
       res.json(associations);
     } catch (error) {
       console.error("Error fetching color associations by trim level:", error);
@@ -3538,7 +3536,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Cars.json migration route  
   app.post('/api/cars-json/migrate', async (req, res) => {
     try {
-      const result = await getStorage().migrateCarsJsonToDatabase();
+      const result = await storage.migrateCarsJsonToDatabase();
       res.json({
         success: true,
         message: 'تم توزيع البيانات بنجاح',
@@ -3557,7 +3555,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle Categories routes
   app.get('/api/vehicle-categories', async (req, res) => {
     try {
-      const categories = await getStorage().getAllVehicleCategories();
+      const categories = await storage.getAllVehicleCategories();
       res.json(categories);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -3567,7 +3565,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/vehicle-categories/manufacturer/:manufacturerId', async (req, res) => {
     try {
       const manufacturerId = parseInt(req.params.manufacturerId);
-      const categories = await getStorage().getVehicleCategoriesByManufacturer(manufacturerId);
+      const categories = await storage.getVehicleCategoriesByManufacturer(manufacturerId);
       res.json(categories);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -3577,7 +3575,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle Trim Levels routes
   app.get('/api/vehicle-trim-levels', async (req, res) => {
     try {
-      const trimLevels = await getStorage().getAllVehicleTrimLevels();
+      const trimLevels = await storage.getAllVehicleTrimLevels();
       res.json(trimLevels);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -3587,7 +3585,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/vehicle-trim-levels/category/:categoryId', async (req, res) => {
     try {
       const categoryId = parseInt(req.params.categoryId);
-      const trimLevels = await getStorage().getVehicleTrimLevelsByCategory(categoryId);
+      const trimLevels = await storage.getVehicleTrimLevelsByCategory(categoryId);
       res.json(trimLevels);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -3599,7 +3597,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get manufacturers for inventory form with hierarchical relationships
   app.get("/api/hierarchical/manufacturers", async (req, res) => {
     try {
-      const manufacturers = await getStorage().getManufacturers();
+      const manufacturers = await storage.getManufacturers();
       res.json(manufacturers);
     } catch (error) {
       console.error("Error fetching manufacturers:", error);
@@ -3611,7 +3609,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/hierarchical/categories", async (req, res) => {
     try {
       const { manufacturer } = req.query;
-      const categories = await getStorage().getCategories(manufacturer as string);
+      const categories = await storage.getCategories(manufacturer as string);
       res.json(categories);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -3623,7 +3621,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/hierarchical/trimLevels", async (req, res) => {
     try {
       const { manufacturer, category } = req.query;
-      const trimLevels = await getStorage().getTrimLevels(manufacturer as string, category as string);
+      const trimLevels = await storage.getTrimLevels(manufacturer as string, category as string);
       res.json(trimLevels);
     } catch (error) {
       console.error("Error fetching trim levels:", error);
@@ -3634,7 +3632,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get colors
   app.get("/api/hierarchical/colors", async (req, res) => {
     try {
-      const colors = await getStorage().getColors();
+      const colors = await storage.getColors();
       res.json(colors);
     } catch (error) {
       console.error("Error fetching colors:", error);
@@ -3645,7 +3643,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get locations
   app.get("/api/hierarchical/locations", async (req, res) => {
     try {
-      const locations = await getStorage().getLocations();
+      const locations = await storage.getLocations();
       res.json(locations);
     } catch (error) {
       console.error("Error fetching locations:", error);
@@ -3656,7 +3654,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST routes for adding new items
   app.post("/api/hierarchical/manufacturers", async (req, res) => {
     try {
-      const manufacturer = await getStorage().addManufacturer(req.body);
+      const manufacturer = await storage.addManufacturer(req.body);
       res.json(manufacturer);
     } catch (error) {
       console.error("Error adding manufacturer:", error);
@@ -3678,7 +3676,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         manufacturerId: parseInt(manufacturer_id)
       };
 
-      const category = await getStorage().addCategory(categoryData);
+      const category = await storage.addCategory(categoryData);
       res.json(category);
     } catch (error) {
       console.error("Error adding category:", error);
@@ -3688,7 +3686,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/hierarchical/trimLevels", async (req, res) => {
     try {
-      const trimLevel = await getStorage().addTrimLevel(req.body);
+      const trimLevel = await storage.addTrimLevel(req.body);
       res.json(trimLevel);
     } catch (error) {
       console.error("Error adding trim level:", error);
@@ -3711,7 +3709,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         nameEn: name_en || name_ar
       };
 
-      const trimLevel = await getStorage().addTrimLevel(trimLevelData);
+      const trimLevel = await storage.addTrimLevel(trimLevelData);
       res.json(trimLevel);
     } catch (error) {
       console.error("Error adding trim level:", error);
@@ -3721,7 +3719,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/hierarchical/colors", async (req, res) => {
     try {
-      const color = await getStorage().addColor(req.body);
+      const color = await storage.addColor(req.body);
       res.json(color);
     } catch (error) {
       console.error("Error adding color:", error);
@@ -3732,7 +3730,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PUT routes for updating items
   app.put("/api/hierarchical/manufacturers/:id", async (req, res) => {
     try {
-      const manufacturer = await getStorage().updateManufacturer(req.params.id, req.body);
+      const manufacturer = await storage.updateManufacturer(req.params.id, req.body);
       res.json(manufacturer);
     } catch (error) {
       console.error("Error updating manufacturer:", error);
@@ -3742,7 +3740,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/hierarchical/categories/:id", async (req, res) => {
     try {
-      const category = await getStorage().updateCategory(parseInt(req.params.id), req.body);
+      const category = await storage.updateCategory(parseInt(req.params.id), req.body);
       res.json(category);
     } catch (error) {
       console.error("Error updating category:", error);
@@ -3752,7 +3750,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/hierarchical/trimLevels/:id", async (req, res) => {
     try {
-      const trimLevel = await getStorage().updateTrimLevel(parseInt(req.params.id), req.body);
+      const trimLevel = await storage.updateTrimLevel(parseInt(req.params.id), req.body);
       res.json(trimLevel);
     } catch (error) {
       console.error("Error updating trim level:", error);
@@ -3762,7 +3760,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/hierarchical/colors/:id", async (req, res) => {
     try {
-      const color = await getStorage().updateColor(parseInt(req.params.id), req.body);
+      const color = await storage.updateColor(parseInt(req.params.id), req.body);
       res.json(color);
     } catch (error) {
       console.error("Error updating color:", error);
@@ -3773,7 +3771,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // DELETE routes for removing items
   app.delete("/api/hierarchical/manufacturers/:id", async (req, res) => {
     try {
-      const success = await getStorage().deleteManufacturer(req.params.id);
+      const success = await storage.deleteManufacturer(req.params.id);
       if (success) {
         res.json({ message: "Manufacturer deleted successfully" });
       } else {
@@ -3787,7 +3785,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/hierarchical/categories/:id", async (req, res) => {
     try {
-      const success = await getStorage().deleteCategory(parseInt(req.params.id));
+      const success = await storage.deleteCategory(parseInt(req.params.id));
       if (success) {
         res.json({ message: "Category deleted successfully" });
       } else {
@@ -3801,7 +3799,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/hierarchical/trimLevels/:id", async (req, res) => {
     try {
-      const success = await getStorage().deleteTrimLevel(parseInt(req.params.id));
+      const success = await storage.deleteTrimLevel(parseInt(req.params.id));
       if (success) {
         res.json({ message: "Trim level deleted successfully" });
       } else {
@@ -3815,7 +3813,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/hierarchical/colors/:id", async (req, res) => {
     try {
-      const success = await getStorage().deleteColor(parseInt(req.params.id));
+      const success = await storage.deleteColor(parseInt(req.params.id));
       if (success) {
         res.json({ message: "Color deleted successfully" });
       } else {
@@ -3829,7 +3827,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/hierarchical/locations", async (req, res) => {
     try {
-      const location = await getStorage().addLocation(req.body);
+      const location = await storage.addLocation(req.body);
       res.json(location);
     } catch (error) {
       console.error("Error adding location:", error);
@@ -3840,7 +3838,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PUT routes for updating items
   app.put("/api/hierarchical/manufacturers/:id", async (req, res) => {
     try {
-      const manufacturer = await getStorage().updateManufacturer(req.params.id, req.body);
+      const manufacturer = await storage.updateManufacturer(req.params.id, req.body);
       res.json(manufacturer);
     } catch (error) {
       console.error("Error updating manufacturer:", error);
@@ -3850,7 +3848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/hierarchical/categories/:id", async (req, res) => {
     try {
-      const category = await getStorage().updateCategory(parseInt(req.params.id), req.body);
+      const category = await storage.updateCategory(parseInt(req.params.id), req.body);
       res.json(category);
     } catch (error) {
       console.error("Error updating category:", error);
@@ -3860,7 +3858,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/hierarchical/trimLevels/:id", async (req, res) => {
     try {
-      const trimLevel = await getStorage().updateTrimLevel(parseInt(req.params.id), req.body);
+      const trimLevel = await storage.updateTrimLevel(parseInt(req.params.id), req.body);
       res.json(trimLevel);
     } catch (error) {
       console.error("Error updating trim level:", error);
@@ -3870,7 +3868,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/hierarchical/colors/:id", async (req, res) => {
     try {
-      const color = await getStorage().updateColor(parseInt(req.params.id), req.body);
+      const color = await storage.updateColor(parseInt(req.params.id), req.body);
       res.json(color);
     } catch (error) {
       console.error("Error updating color:", error);
@@ -3880,7 +3878,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/hierarchical/locations/:id", async (req, res) => {
     try {
-      const location = await getStorage().updateLocation(parseInt(req.params.id), req.body);
+      const location = await storage.updateLocation(parseInt(req.params.id), req.body);
       res.json(location);
     } catch (error) {
       console.error("Error updating location:", error);
@@ -3891,7 +3889,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // DELETE routes for removing items
   app.delete("/api/hierarchical/manufacturers/:id", async (req, res) => {
     try {
-      const result = await getStorage().deleteManufacturer(req.params.id);
+      const result = await storage.deleteManufacturer(req.params.id);
       res.json({ success: result });
     } catch (error) {
       console.error("Error deleting manufacturer:", error);
@@ -3901,7 +3899,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/hierarchical/categories/:id", async (req, res) => {
     try {
-      const result = await getStorage().deleteCategory(parseInt(req.params.id));
+      const result = await storage.deleteCategory(parseInt(req.params.id));
       res.json({ success: result });
     } catch (error) {
       console.error("Error deleting category:", error);
@@ -3911,7 +3909,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/hierarchical/trimLevels/:id", async (req, res) => {
     try {
-      const result = await getStorage().deleteTrimLevel(parseInt(req.params.id));
+      const result = await storage.deleteTrimLevel(parseInt(req.params.id));
       res.json({ success: result });
     } catch (error) {
       console.error("Error deleting trim level:", error);
@@ -3921,7 +3919,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/hierarchical/colors/:id", async (req, res) => {
     try {
-      const result = await getStorage().deleteColor(parseInt(req.params.id));
+      const result = await storage.deleteColor(parseInt(req.params.id));
       res.json({ success: result });
     } catch (error) {
       console.error("Error deleting color:", error);
@@ -3952,7 +3950,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/hierarchical/locations/:id", async (req, res) => {
     try {
-      const result = await getStorage().deleteLocation(parseInt(req.params.id));
+      const result = await storage.deleteLocation(parseInt(req.params.id));
       res.json({ success: result });
     } catch (error) {
       console.error("Error deleting location:", error);
@@ -4042,7 +4040,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             continue;
           }
           
-          const inventoryItem = await getStorage().createInventoryItem(validatedData.data);
+          const inventoryItem = await storage.createInventoryItem(validatedData.data);
           results.push({ success: true, row, result: inventoryItem });
           
         } catch (error: any) {
@@ -4483,7 +4481,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Price Cards API endpoints
   app.get("/api/price-cards", async (req, res) => {
     try {
-      const priceCards = await getStorage().getAllPriceCards();
+      const priceCards = await storage.getAllPriceCards();
       res.json(priceCards);
     } catch (error) {
       console.error("Error fetching price cards:", error);
@@ -4498,7 +4496,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid price card ID" });
       }
 
-      const priceCard = await getStorage().getAllPriceCards().then(cards => cards.find(c => c.id === id));
+      const priceCard = await storage.getAllPriceCards().then(cards => cards.find(c => c.id === id));
       if (!priceCard) {
         return res.status(404).json({ message: "Price card not found" });
       }
@@ -4512,7 +4510,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/price-cards", async (req, res) => {
     try {
-      const priceCard = await getStorage().createPriceCard(req.body);
+      const priceCard = await storage.createPriceCard(req.body);
       res.status(201).json(priceCard);
     } catch (error) {
       console.error("Error creating price card:", error);
@@ -4527,7 +4525,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid price card ID" });
       }
 
-      const priceCard = await getStorage().updatePriceCard(id, req.body);
+      const priceCard = await storage.updatePriceCard(id, req.body);
       if (!priceCard) {
         return res.status(404).json({ message: "Price card not found" });
       }
@@ -4546,7 +4544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid price card ID" });
       }
 
-      const success = await getStorage().deletePriceCard(id);
+      const success = await storage.deletePriceCard(id);
       if (!success) {
         return res.status(404).json({ message: "Price card not found" });
       }
@@ -4565,7 +4563,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid vehicle ID" });
       }
 
-      const priceCard = await getStorage().getPriceCardByVehicleId(vehicleId);
+      const priceCard = await storage.getPriceCardByVehicleId(vehicleId);
       if (!priceCard) {
         return res.status(404).json({ message: "Price card not found for this vehicle" });
       }
@@ -4592,27 +4590,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If selective export, only fetch requested data types
       if (isSelective) {
         if (selectedTypes.includes('inventory')) {
-          data.inventory = await getStorage().getAllInventoryItems();
+          data.inventory = await storage.getAllInventoryItems();
         }
         if (selectedTypes.includes('banks')) {
-          data.banks = await getStorage().getAllBanks();
+          data.banks = await storage.getAllBanks();
         }
         if (selectedTypes.includes('quotations')) {
-          data.quotations = await getStorage().getAllQuotations();
+          data.quotations = await storage.getAllQuotations();
         }
         if (selectedTypes.includes('users')) {
-          const users = await getStorage().getAllUsers();
+          const users = await storage.getAllUsers();
           data.users = users.map(user => ({ ...user, password: undefined })); // Remove passwords for security
         }
         if (selectedTypes.includes('manufacturers')) {
-          data.manufacturers = await getStorage().getAllManufacturers();
+          data.manufacturers = await storage.getAllManufacturers();
         }
         if (selectedTypes.includes('categories')) {
-          data.companies = await getStorage().getAllCompanies();
-          data.categories = await getStorage().getAllCategories();
-          data.trimLevels = await getStorage().getAllTrimLevels();
-          data.engineCapacities = await getStorage().getAllEngineCapacities();
-          data.specifications = await getStorage().getAllSpecifications();
+          data.companies = await storage.getAllCompanies();
+          data.categories = await storage.getAllCategories();
+          data.trimLevels = await storage.getAllTrimLevels();
+          data.engineCapacities = await storage.getAllEngineCapacities();
+          data.specifications = await storage.getAllSpecifications();
           // Add cars.json data for categories export
           try {
             data.carsJson = readCarsData();
@@ -4622,27 +4620,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         if (selectedTypes.includes('trimLevels')) {
-          data.trimLevels = await getStorage().getAllTrimLevels();
+          data.trimLevels = await storage.getAllTrimLevels();
         }
         if (selectedTypes.includes('interiorColors')) {
           // Get unique interior colors from inventory items
-          const inventoryItems = await getStorage().getAllInventoryItems();
+          const inventoryItems = await storage.getAllInventoryItems();
           data.interiorColors = [...new Set(inventoryItems.map(item => item.interiorColor).filter(Boolean))];
         }
         if (selectedTypes.includes('exteriorColors')) {
           // Get unique exterior colors from inventory items
-          const inventoryItems = await getStorage().getAllInventoryItems();
+          const inventoryItems = await storage.getAllInventoryItems();
           data.exteriorColors = [...new Set(inventoryItems.map(item => item.exteriorColor).filter(Boolean))];
         }
         if (selectedTypes.includes('leaveRequests')) {
-          data.leaveRequests = await getStorage().getAllLeaveRequests();
+          data.leaveRequests = await storage.getAllLeaveRequests();
         }
         if (selectedTypes.includes('financingRates')) {
-          data.financingRates = await getStorage().getAllFinancingRates();
+          data.financingRates = await storage.getAllFinancingRates();
         }
         if (selectedTypes.includes('settings')) {
-          data.imageLinks = await getStorage().getAllImageLinks();
-          data.colorAssociations = await getStorage().getAllColorAssociations();
+          data.imageLinks = await storage.getAllImageLinks();
+          data.colorAssociations = await storage.getAllColorAssociations();
         }
       } else {
         // Full export - fetch all data
@@ -4662,20 +4660,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           engineCapacities,
           colorAssociations
         ] = await Promise.all([
-          getStorage().getAllInventoryItems(),
-          getStorage().getAllBanks(),
-          getStorage().getAllQuotations(),
-          getStorage().getAllUsers(),
-          getStorage().getAllManufacturers(),
-          getStorage().getAllCompanies(),
-          getStorage().getAllLeaveRequests(),
-          getStorage().getAllFinancingRates(),
-          getStorage().getAllImageLinks(),
+          storage.getAllInventoryItems(),
+          storage.getAllBanks(),
+          storage.getAllQuotations(),
+          storage.getAllUsers(),
+          storage.getAllManufacturers(),
+          storage.getAllCompanies(),
+          storage.getAllLeaveRequests(),
+          storage.getAllFinancingRates(),
+          storage.getAllImageLinks(),
 
-          getStorage().getAllTrimLevels(),
-          getStorage().getAllCategories(),
-          getStorage().getAllEngineCapacities(),
-          getStorage().getAllColorAssociations()
+          storage.getAllTrimLevels(),
+          storage.getAllCategories(),
+          storage.getAllEngineCapacities(),
+          storage.getAllColorAssociations()
         ]);
 
         data.inventory = inventory;
@@ -4777,7 +4775,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const item of data.inventory) {
           try {
             const validatedItem = insertInventoryItemSchema.parse(item);
-            await getStorage().createInventoryItem(validatedItem);
+            await storage.createInventoryItem(validatedItem);
             importResults.inventory++;
           } catch (error) {
             console.log(`Skipped invalid inventory item:`, error);
@@ -4790,7 +4788,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const bank of data.banks) {
           try {
             const validatedBank = insertBankSchema.parse(bank);
-            await getStorage().createBank(validatedBank);
+            await storage.createBank(validatedBank);
             importResults.banks++;
           } catch (error) {
             console.log(`Skipped invalid bank:`, error);
@@ -4803,7 +4801,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const quotation of data.quotations) {
           try {
             const validatedQuotation = insertQuotationSchema.parse(quotation);
-            await getStorage().createQuotation(validatedQuotation);
+            await storage.createQuotation(validatedQuotation);
             importResults.quotations++;
           } catch (error) {
             console.log(`Skipped invalid quotation:`, error);
@@ -4820,7 +4818,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               user.password = await bcrypt.hash(user.password, 10);
             }
             const validatedUser = insertUserSchema.parse(user);
-            await getStorage().createUser(validatedUser);
+            await storage.createUser(validatedUser);
             importResults.users++;
           } catch (error) {
             console.log(`Skipped invalid user:`, error);
@@ -4833,7 +4831,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const manufacturer of data.manufacturers) {
           try {
             const validatedManufacturer = insertManufacturerSchema.parse(manufacturer);
-            await getStorage().createManufacturer(validatedManufacturer);
+            await storage.createManufacturer(validatedManufacturer);
             importResults.manufacturers++;
           } catch (error) {
             console.log(`Skipped invalid manufacturer:`, error);
@@ -4846,7 +4844,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const company of data.companies) {
           try {
             const validatedCompany = insertCompanySchema.parse(company);
-            await getStorage().createCompany(validatedCompany);
+            await storage.createCompany(validatedCompany);
             importResults.companies++;
           } catch (error) {
             console.log(`Skipped invalid company:`, error);
@@ -4859,7 +4857,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const leaveRequest of data.leaveRequests) {
           try {
             const validatedLeaveRequest = insertLeaveRequestSchema.parse(leaveRequest);
-            await getStorage().createLeaveRequest(validatedLeaveRequest);
+            await storage.createLeaveRequest(validatedLeaveRequest);
             importResults.leaveRequests++;
           } catch (error) {
             console.log(`Skipped invalid leave request:`, error);
@@ -4872,7 +4870,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const rate of data.financingRates) {
           try {
             const validatedRate = insertFinancingRateSchema.parse(rate);
-            await getStorage().createFinancingRate(validatedRate);
+            await storage.createFinancingRate(validatedRate);
             importResults.financingRates++;
           } catch (error) {
             console.log(`Skipped invalid financing rate:`, error);
@@ -4884,7 +4882,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if ((!isSelective || selectedTypes.includes('settings')) && data.imageLinks && Array.isArray(data.imageLinks)) {
         for (const imageLink of data.imageLinks) {
           try {
-            await getStorage().saveImageLink(imageLink.imageName, imageLink.imageUrl);
+            await storage.saveImageLink(imageLink.imageName, imageLink.imageUrl);
             importResults.imageLinks++;
           } catch (error) {
             console.log(`Skipped invalid image link:`, error);
@@ -4933,11 +4931,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const manufacturer of data.manufacturers) {
           try {
             // Check if manufacturer already exists
-            const existing = await getStorage().getAllManufacturers();
+            const existing = await storage.getAllManufacturers();
             const exists = existing.some(m => m.nameAr === manufacturer.name_ar || m.nameEn === manufacturer.name_en);
             
             if (!exists) {
-              await getStorage().createManufacturer({
+              await storage.createManufacturer({
                 nameAr: manufacturer.name_ar,
                 nameEn: manufacturer.name_en,
                 logo: manufacturer.logo,
@@ -4959,11 +4957,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Importing ${data.categories.length} categories...`);
         for (const category of data.categories) {
           try {
-            const existing = await getStorage().getAllCategories();
+            const existing = await storage.getAllCategories();
             const exists = existing.some(c => c.nameAr === category.name_ar);
             
             if (!exists) {
-              await getStorage().createCategory({
+              await storage.createCategory({
                 nameAr: category.name_ar,
                 nameEn: category.name_en,
                 isActive: category.isActive !== false
@@ -4984,7 +4982,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Importing ${data.trimLevels.length} trim levels...`);
         for (const trimLevel of data.trimLevels) {
           try {
-            const existing = await getStorage().getAllTrimLevels();
+            const existing = await storage.getAllTrimLevels();
             const exists = existing.some(t => 
               t.manufacturer === trimLevel.manufacturer && 
               t.category === trimLevel.category && 
@@ -4992,7 +4990,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             );
             
             if (!exists) {
-              await getStorage().createTrimLevel({
+              await storage.createTrimLevel({
                 manufacturer: trimLevel.manufacturer,
                 category: trimLevel.category,
                 trimLevel: trimLevel.trim_level_ar,
@@ -5014,11 +5012,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Importing ${data.banks.length} banks...`);
         for (const bank of data.banks) {
           try {
-            const existing = await getStorage().getAllBanks();
+            const existing = await storage.getAllBanks();
             const exists = existing.some(b => b.accountNumber === bank.accountNumber);
             
             if (!exists) {
-              await getStorage().createBank({
+              await storage.createBank({
                 bankName: bank.bankName,
                 nameEn: bank.nameEn,
                 accountName: bank.accountName,
@@ -5044,11 +5042,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Importing ${data.users.length} users...`);
         for (const user of data.users) {
           try {
-            const existing = await getStorage().getAllUsers();
+            const existing = await storage.getAllUsers();
             const exists = existing.some(u => u.username === user.username);
             
             if (!exists) {
-              await getStorage().createUser({
+              await storage.createUser({
                 name: user.name,
                 username: user.username,
                 password: user.password || "defaultpass123",
@@ -5072,11 +5070,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Importing ${data.inventory.length} inventory items...`);
         for (const item of data.inventory) {
           try {
-            const existing = await getStorage().getAllInventoryItems();
+            const existing = await storage.getAllInventoryItems();
             const exists = existing.some(i => i.chassisNumber === item.chassisNumber);
             
             if (!exists) {
-              await getStorage().createInventoryItem({
+              await storage.createInventoryItem({
                 manufacturer: item.manufacturer,
                 category: item.category,
                 trimLevel: item.trimLevel,
@@ -5111,7 +5109,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Importing ${data.quotations.length} quotations...`);
         for (const quotation of data.quotations) {
           try {
-            await getStorage().createQuotation(quotation);
+            await storage.createQuotation(quotation);
             importResults.quotations++;
           } catch (error) {
             console.log(`Skipped quotation:`, error);
@@ -5125,7 +5123,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Importing ${data.companies.length} companies...`);
         for (const company of data.companies) {
           try {
-            await getStorage().createCompany(company);
+            await storage.createCompany(company);
             importResults.companies++;
           } catch (error) {
             console.log(`Skipped company:`, error);
@@ -5139,7 +5137,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Importing ${data.exteriorColors.length} exterior colors...`);
         for (const color of data.exteriorColors) {
           try {
-            await getStorage().createExteriorColor(color);
+            await storage.createExteriorColor(color);
             importResults.exteriorColors++;
           } catch (error) {
             console.log(`Skipped exterior color:`, error);
@@ -5153,7 +5151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Importing ${data.interiorColors.length} interior colors...`);
         for (const color of data.interiorColors) {
           try {
-            await getStorage().createInteriorColor(color);
+            await storage.createInteriorColor(color);
             importResults.interiorColors++;
           } catch (error) {
             console.log(`Skipped interior color:`, error);
@@ -5167,7 +5165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Importing ${data.financingRates.length} financing rates...`);
         for (const rate of data.financingRates) {
           try {
-            await getStorage().createFinancingRate(rate);
+            await storage.createFinancingRate(rate);
             importResults.financingRates++;
           } catch (error) {
             console.log(`Skipped financing rate:`, error);
@@ -5201,7 +5199,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Price Cards API endpoints
   app.get("/api/price-cards", async (req, res) => {
     try {
-      const priceCards = await getStorage().getAllPriceCards();
+      const priceCards = await storage.getAllPriceCards();
       res.json(priceCards);
     } catch (error) {
       console.error("Error fetching price cards:", error);
@@ -5216,7 +5214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid price card ID" });
       }
       
-      const priceCard = await getStorage().getAllPriceCards().then(cards => cards.find(c => c.id === id));
+      const priceCard = await storage.getAllPriceCards().then(cards => cards.find(c => c.id === id));
       if (!priceCard) {
         return res.status(404).json({ message: "Price card not found" });
       }
@@ -5238,7 +5236,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const priceCard = await getStorage().createPriceCard(validation.data);
+      const priceCard = await storage.createPriceCard(validation.data);
       res.status(201).json(priceCard);
     } catch (error) {
       console.error("Error creating price card:", error);
@@ -5261,7 +5259,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const priceCard = await getStorage().updatePriceCard(id, validation.data);
+      const priceCard = await storage.updatePriceCard(id, validation.data);
       if (!priceCard) {
         return res.status(404).json({ message: "Price card not found" });
       }
@@ -5280,7 +5278,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid price card ID" });
       }
 
-      const success = await getStorage().deletePriceCard(id);
+      const success = await storage.deletePriceCard(id);
       if (!success) {
         return res.status(404).json({ message: "Price card not found" });
       }
@@ -5394,7 +5392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle Specifications API Routes
   app.get("/api/vehicle-specifications", async (req, res) => {
     try {
-      const specifications = await getStorage().getVehicleSpecifications();
+      const specifications = await storage.getVehicleSpecifications();
       res.json(specifications);
     } catch (error) {
       console.error("Error fetching vehicle specifications:", error);
@@ -5405,7 +5403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/vehicle-specifications", async (req, res) => {
     try {
       const validatedData = insertVehicleSpecificationSchema.parse(req.body);
-      const specification = await getStorage().createVehicleSpecification(validatedData);
+      const specification = await storage.createVehicleSpecification(validatedData);
       res.status(201).json(specification);
     } catch (error) {
       console.error("Error creating vehicle specification:", error);
@@ -5420,7 +5418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid specification ID" });
       }
       
-      const success = await getStorage().deleteVehicleSpecification(id);
+      const success = await storage.deleteVehicleSpecification(id);
       if (success) {
         res.json({ message: "Vehicle specification deleted successfully" });
       } else {
@@ -5443,7 +5441,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         chassisNumber: chassisNumber as string
       };
       
-      const specifications = await getStorage().getVehicleSpecificationsByFilters(filters);
+      const specifications = await storage.getVehicleSpecificationsByFilters(filters);
       res.json(specifications);
     } catch (error) {
       console.error("Error searching vehicle specifications:", error);
@@ -5454,7 +5452,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle Image Links API Routes
   app.get("/api/vehicle-image-links", async (req, res) => {
     try {
-      const imageLinks = await getStorage().getVehicleImageLinks();
+      const imageLinks = await storage.getVehicleImageLinks();
       res.json(imageLinks);
     } catch (error) {
       console.error("Error fetching vehicle image links:", error);
@@ -5465,7 +5463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/vehicle-image-links", async (req, res) => {
     try {
       const validatedData = insertVehicleImageLinkSchema.parse(req.body);
-      const imageLink = await getStorage().createVehicleImageLink(validatedData);
+      const imageLink = await storage.createVehicleImageLink(validatedData);
       res.status(201).json(imageLink);
     } catch (error) {
       console.error("Error creating vehicle image link:", error);
@@ -5480,7 +5478,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid image link ID" });
       }
       
-      const success = await getStorage().deleteVehicleImageLink(id);
+      const success = await storage.deleteVehicleImageLink(id);
       if (success) {
         res.json({ message: "Vehicle image link deleted successfully" });
       } else {
@@ -5505,7 +5503,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         chassisNumber: chassisNumber as string
       };
       
-      const imageLinks = await getStorage().getVehicleImageLinksByFilters(filters);
+      const imageLinks = await storage.getVehicleImageLinksByFilters(filters);
       res.json(imageLinks);
     } catch (error) {
       console.error("Error searching vehicle image links:", error);
@@ -5517,7 +5515,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/specifications/vehicle/:manufacturer/:category/:trimLevel/:year/:engineCapacity", async (req, res) => {
     try {
       const { manufacturer, category, trimLevel, year, engineCapacity } = req.params;
-      const storage = getStorage();
+      const storage = storage;
       
       console.log("Specs route called with params:", { manufacturer, category, trimLevel, year, engineCapacity });
       
@@ -5544,7 +5542,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/specifications/:manufacturer/:category/:trimLevel/:year/:engineCapacity", async (req, res) => {
     try {
       const { manufacturer, category, trimLevel, year, engineCapacity } = req.params;
-      const storage = getStorage();
+      const storage = storage;
       
       console.log("Alt specs route called with params:", { manufacturer, category, trimLevel, year, engineCapacity });
       
@@ -5572,7 +5570,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/vehicle-specifications", async (req, res) => {
     try {
       const validatedData = insertVehicleSpecificationSchema.parse(req.body);
-      const storage = getStorage();
+      const storage = storage;
       const specification = await storage.createVehicleSpecification(validatedData);
       res.json(specification);
     } catch (error) {
@@ -5589,7 +5587,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const validatedData = insertVehicleSpecificationSchema.parse(req.body);
-      const storage = getStorage();
+      const storage = storage;
       const specification = await storage.updateVehicleSpecification(id, validatedData);
       res.json(specification);
     } catch (error) {
@@ -5605,7 +5603,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/vehicle-specifications/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const storage = getStorage();
+      const storage = storage;
       await storage.deleteVehicleSpecification(id);
       res.json({ success: true });
     } catch (error) {
@@ -5617,7 +5615,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle Image Links endpoints
   app.get("/api/vehicle-image-links", async (req, res) => {
     try {
-      const storage = getStorage();
+      const storage = storage;
       const imageLinks = await storage.getVehicleImageLinks();
       res.json(imageLinks);
     } catch (error) {
@@ -5629,7 +5627,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/vehicle-image-links", async (req, res) => {
     try {
       const validatedData = insertVehicleImageLinkSchema.parse(req.body);
-      const storage = getStorage();
+      const storage = storage;
       const imageLink = await storage.createVehicleImageLink(validatedData);
       res.json(imageLink);
     } catch (error) {
@@ -5646,7 +5644,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const validatedData = insertVehicleImageLinkSchema.parse(req.body);
-      const storage = getStorage();
+      const storage = storage;
       const imageLink = await storage.updateVehicleImageLink(id, validatedData);
       res.json(imageLink);
     } catch (error) {
@@ -5662,7 +5660,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/vehicle-image-links/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const storage = getStorage();
+      const storage = storage;
       await storage.deleteVehicleImageLink(id);
       res.json({ success: true });
     } catch (error) {
@@ -5675,7 +5673,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/vehicle-data/:chassisNumber", async (req, res) => {
     try {
       const chassisNumber = req.params.chassisNumber;
-      const storage = getStorage();
+      const storage = storage;
       
       const specifications = await storage.getVehicleSpecificationsByChassisNumber(chassisNumber);
       const imageLinks = await storage.getVehicleImageLinksByChassisNumber(chassisNumber);

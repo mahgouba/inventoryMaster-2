@@ -2146,38 +2146,25 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Use createStorageInstance to automatically choose between DatabaseStorage and MemStorage
-import { createStorageInstance } from "./storage-init";
+// Initialize storage system for Replit compatibility
+// Use MemStorage by default
 
-// Create storage instance based on database availability
 let storageInstance: IStorage | null = null;
-
-// Initialize storage asynchronously
-(async () => {
-  try {
-    console.log('🚀 Initializing storage system...');
-    storageInstance = await createStorageInstance();
-    console.log('✅ Storage initialized successfully');
-  } catch (error) {
-    console.error('❌ Failed to initialize storage, using MemStorage:', error);
-    storageInstance = new MemStorage();
-  }
-})();
 
 // Export a function to get the storage instance
 export function getStorage(): IStorage {
   if (storageInstance) {
-    console.log('📦 Using initialized storage instance');
     return storageInstance;
-  } else {
-    console.log('📦 Using fallback MemStorage');
-    return new MemStorage();
   }
+  
+  // Initialize MemStorage by default for Replit compatibility
+  storageInstance = new MemStorage();
+  console.log('✅ Using MemStorage for Replit compatibility');
+  return storageInstance;
 }
 
 // For backward compatibility, export a default instance
-export const storage = new MemStorage(); // Fallback for immediate use
+export const storage = new MemStorage();
 
 // Log the current storage configuration
-console.log('🔧 Storage configuration loaded');
-console.log('📋 DATABASE_URL:', process.env.DATABASE_URL ? 'Available' : 'Not available');
+console.log('🔧 Storage configured for Replit with MemStorage');
