@@ -102,7 +102,7 @@ export default function DatabaseManagement() {
     try {
       const result = await apiRequest('POST', '/api/database/test-connection', {
         connectionString: connectionString.trim()
-      });
+      }) as { success: boolean; error?: string; message?: string };
       
       if (result.success) {
         setConnectionStatus('connected');
