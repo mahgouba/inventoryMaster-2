@@ -75,11 +75,11 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
       case "/user-management":
         return user.role === "admin" ? <UserManagementPage /> : null;
       case "/bank-management":
-        return user.role === "admin" ? <BankManagement /> : null;
+        return (user.role === "admin" || user.role === "accountant" || user.role === "bank_accountant") ? <BankManagement /> : null;
       case "/bank-management-full":
-        return user.role === "admin" ? <BankManagement /> : null;
+        return (user.role === "admin" || user.role === "accountant" || user.role === "bank_accountant") ? <BankManagement /> : null;
       case "/financing-rates":
-        return user.role === "admin" ? <FinancingRatesPage /> : null;
+        return (user.role === "admin" || user.role === "accountant" || user.role === "bank_accountant") ? <FinancingRatesPage /> : null;
 
       case "/database-management":
         return user.role === "admin" ? <DatabaseManagement /> : null;

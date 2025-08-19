@@ -37,8 +37,17 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
     <div className="min-h-screen">
       <SystemGlassWrapper>
         <Switch>
-          {/* Default landing page - Redirect to Card View */}
-          <Route path="/" component={() => <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />} />
+          {/* Default landing page - Role-based redirect */}
+          <Route path="/" component={() => {
+            // Redirect different roles to appropriate pages
+            if (user.role === "admin" || user.role === "inventory_manager" || user.role === "sales_director") {
+              return <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />;
+            } else if (user.role === "accountant" || user.role === "bank_accountant") {
+              return <MainDashboard user={user} onLogout={onLogout} />;
+            } else {
+              return <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />;
+            }
+          }} />
           <Route path="/inventory" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/quotation-creation" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/quotation-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
