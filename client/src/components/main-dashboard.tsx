@@ -27,6 +27,7 @@ import CarsMigrationPage from "@/pages/cars-migration";
 
 import PriceCardsPage from "@/pages/price-cards";
 import SpecificationsManagement from "@/pages/specifications-management";
+import DropdownOptionsManagement from "@/pages/dropdown-options-management";
 
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
@@ -90,6 +91,8 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
 
       case "/specifications-management":
         return user.role === "admin" ? <SpecificationsManagement /> : null;
+      case "/dropdown-options-management":
+        return user.role === "admin" ? <DropdownOptionsManagement /> : null;
 
       case "/price-cards":
         return <PriceCardsPage />;
