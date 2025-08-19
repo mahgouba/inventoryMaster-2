@@ -194,8 +194,8 @@ export default function ManufacturerLogos() {
     "كاديلاك ": "/logos /Cadillac--Streamline-Simple-Icons.svg",
     
     // ROX
-    "روكس": "/logos /ROX.svg",
-    "روكس ": "/logos /ROX.svg"
+    "روكس": "/logos /tesla.svg",
+    "روكس ": "/logos /tesla.svg"
   };
 
   // Link all logos automatically
