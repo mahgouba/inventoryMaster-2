@@ -82,6 +82,7 @@ interface HierarchyData {
   nameAr: string;
   nameEn?: string;
   logo?: string;
+  isActive?: boolean;
   categories: CategoryWithTrimLevels[];
 }
 
@@ -123,7 +124,81 @@ export default function DropdownOptionsManagement() {
   });
 
   const { data: manufacturers = [] } = useQuery<Manufacturer[]>({
-    queryKey: ['/api/hierarchical/manufacturers'],
+    queryKey: ['/api/manufacturers'],
+  });
+
+  const { data: categories = [] } = useQuery<CategoryWithTrimLevels[]>({
+    queryKey: ['/api/categories'],
+  });
+
+  const { data: trimLevels = [] } = useQuery<TrimLevel[]>({
+    queryKey: ['/api/trim-levels'],
+  });
+
+  // Toggle manufacturer active status
+  const toggleManufacturerMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
+      return apiRequest(`/api/manufacturers/${id}/toggle`, 'PUT', { isActive });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تم التحديث",
+        description: "تم تحديث حالة الشركة المصنعة بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "فشل في تحديث حالة الشركة المصنعة",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Toggle category active status
+  const toggleCategoryMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
+      return apiRequest(`/api/categories/${id}/toggle`, 'PUT', { isActive });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/categories'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تم التحديث",
+        description: "تم تحديث حالة الفئة بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "فشل في تحديث حالة الفئة",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Toggle trim level active status
+  const toggleTrimLevelMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
+      return apiRequest(`/api/trim-levels/${id}/toggle`, 'PUT', { isActive });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/trim-levels'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تم التحديث",
+        description: "تم تحديث حالة درجة التجهيز بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "فشل في تحديث حالة درجة التجهيز",
+        variant: "destructive",
+      });
+    }
   });
 
   // Toggle expanded state
@@ -617,6 +692,25 @@ export default function DropdownOptionsManagement() {
                             </Badge>
                           </div>
                           <div className="flex items-center gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className={`glass-button ${item.isActive !== false ? 'bg-green-600/20' : 'bg-red-600/20'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleManufacturerMutation.mutate({ 
+                                  id: item.id, 
+                                  isActive: item.isActive === false 
+                                });
+                              }}
+                              data-testid={`toggle-manufacturer-${item.id}`}
+                            >
+                              {item.isActive !== false ? (
+                                <Eye className="w-4 h-4 text-green-300" />
+                              ) : (
+                                <EyeOff className="w-4 h-4 text-red-300" />
+                              )}
+                            </Button>
                             <Button variant="ghost" size="sm" className="glass-button">
                               <Edit className="w-4 h-4 text-white" />
                             </Button>
@@ -660,6 +754,25 @@ export default function DropdownOptionsManagement() {
                                         </Badge>
                                       </div>
                                       <div className="flex items-center gap-2">
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          className={`glass-button ${category.isActive !== false ? 'bg-green-600/20' : 'bg-red-600/20'}`}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleCategoryMutation.mutate({ 
+                                              id: category.id, 
+                                              isActive: category.isActive === false 
+                                            });
+                                          }}
+                                          data-testid={`toggle-category-${category.id}`}
+                                        >
+                                          {category.isActive !== false ? (
+                                            <Eye className="w-4 h-4 text-green-300" />
+                                          ) : (
+                                            <EyeOff className="w-4 h-4 text-red-300" />
+                                          )}
+                                        </Button>
                                         <Button variant="ghost" size="sm" className="glass-button">
                                           <Edit className="w-4 h-4 text-white" />
                                         </Button>
@@ -693,6 +806,25 @@ export default function DropdownOptionsManagement() {
                                                 </div>
                                               </div>
                                               <div className="flex items-center gap-1">
+                                                <Button 
+                                                  variant="ghost" 
+                                                  size="sm" 
+                                                  className={`glass-button ${trimLevel.isActive !== false ? 'bg-green-600/20' : 'bg-red-600/20'}`}
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleTrimLevelMutation.mutate({ 
+                                                      id: trimLevel.id, 
+                                                      isActive: trimLevel.isActive === false 
+                                                    });
+                                                  }}
+                                                  data-testid={`toggle-trimlevel-${trimLevel.id}`}
+                                                >
+                                                  {trimLevel.isActive !== false ? (
+                                                    <Eye className="w-4 h-4 text-green-300" />
+                                                  ) : (
+                                                    <EyeOff className="w-4 h-4 text-red-300" />
+                                                  )}
+                                                </Button>
                                                 <Button variant="ghost" size="sm" className="glass-button">
                                                   <Edit className="w-4 h-4 text-white" />
                                                 </Button>

@@ -587,11 +587,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/hierarchical/manufacturers", async (req, res) => {
     try {
       const { db } = getDatabase();
-      const manufacturersData = await db.select().from(manufacturers);
+      const manufacturersData = await db.select().from(manufacturers).where(eq(manufacturers.isActive, true));
       res.json(manufacturersData);
     } catch (error) {
       console.error("Error fetching hierarchical manufacturers:", error);
       res.status(500).json({ message: "Failed to fetch hierarchical manufacturers" });
+    }
+  });
+
+  // Get categories by manufacturer
+  app.get("/api/hierarchical/categories/:manufacturerId", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const manufacturerId = parseInt(req.params.manufacturerId);
+      const categoriesData = await db.select().from(vehicleCategories)
+        .where(and(eq(vehicleCategories.manufacturerId, manufacturerId), eq(vehicleCategories.isActive, true)));
+      res.json(categoriesData);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  // Get trim levels by category
+  app.get("/api/hierarchical/trim-levels/:categoryId", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const categoryId = parseInt(req.params.categoryId);
+      const trimLevelsData = await db.select().from(vehicleTrimLevels)
+        .where(and(eq(vehicleTrimLevels.categoryId, categoryId), eq(vehicleTrimLevels.isActive, true)));
+      res.json(trimLevelsData);
+    } catch (error) {
+      console.error("Error fetching trim levels:", error);
+      res.status(500).json({ message: "Failed to fetch trim levels" });
+    }
+  });
+
+  // Manufacturers management
+  // Get all manufacturers (including inactive)
+  app.get("/api/manufacturers", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const manufacturersData = await db.select().from(manufacturers);
+      res.json(manufacturersData);
+    } catch (error) {
+      console.error("Error fetching manufacturers:", error);
+      res.status(500).json({ message: "Failed to fetch manufacturers" });
+    }
+  });
+
+  // Toggle manufacturer active status
+  app.put("/api/manufacturers/:id/toggle", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const manufacturerId = parseInt(req.params.id);
+      const { isActive } = req.body;
+
+      const [updatedManufacturer] = await db.update(manufacturers)
+        .set({
+          isActive: isActive,
+          updatedAt: new Date()
+        })
+        .where(eq(manufacturers.id, manufacturerId))
+        .returning();
+
+      if (!updatedManufacturer) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      res.json(updatedManufacturer);
+    } catch (error) {
+      console.error("Error toggling manufacturer status:", error);
+      res.status(500).json({ message: "Failed to toggle manufacturer status" });
+    }
+  });
+
+  // Categories management
+  // Get all categories (including inactive)  
+  app.get("/api/categories", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const categoriesData = await db.select().from(vehicleCategories);
+      res.json(categoriesData);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  // Toggle category active status
+  app.put("/api/categories/:id/toggle", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const categoryId = parseInt(req.params.id);
+      const { isActive } = req.body;
+
+      const [updatedCategory] = await db.update(vehicleCategories)
+        .set({
+          isActive: isActive,
+          updatedAt: new Date()
+        })
+        .where(eq(vehicleCategories.id, categoryId))
+        .returning();
+
+      if (!updatedCategory) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+
+      res.json(updatedCategory);
+    } catch (error) {
+      console.error("Error toggling category status:", error);
+      res.status(500).json({ message: "Failed to toggle category status" });
+    }
+  });
+
+  // Trim levels management
+  // Get all trim levels (including inactive)
+  app.get("/api/trim-levels", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const trimLevelsData = await db.select().from(vehicleTrimLevels);
+      res.json(trimLevelsData);
+    } catch (error) {
+      console.error("Error fetching trim levels:", error);
+      res.status(500).json({ message: "Failed to fetch trim levels" });
+    }
+  });
+
+  // Toggle trim level active status
+  app.put("/api/trim-levels/:id/toggle", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const trimLevelId = parseInt(req.params.id);
+      const { isActive } = req.body;
+
+      const [updatedTrimLevel] = await db.update(vehicleTrimLevels)
+        .set({
+          isActive: isActive,
+          updatedAt: new Date()
+        })
+        .where(eq(vehicleTrimLevels.id, trimLevelId))
+        .returning();
+
+      if (!updatedTrimLevel) {
+        return res.status(404).json({ message: "Trim level not found" });
+      }
+
+      res.json(updatedTrimLevel);
+    } catch (error) {
+      console.error("Error toggling trim level status:", error);
+      res.status(500).json({ message: "Failed to toggle trim level status" });
     }
   });
 
@@ -1403,6 +1548,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Hierarchy import error:", error);
       res.status(500).json({ message: "Failed to replace hierarchy data" });
+    }
+  });
+
+  // Toggle manufacturer active status
+  app.put("/api/manufacturers/:id/toggle", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const manufacturerId = parseInt(req.params.id);
+      const { isActive } = req.body;
+
+      const [updatedManufacturer] = await db
+        .update(manufacturers)
+        .set({ isActive })
+        .where(eq(manufacturers.id, manufacturerId))
+        .returning();
+
+      if (!updatedManufacturer) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      res.json(updatedManufacturer);
+    } catch (error) {
+      console.error("Error toggling manufacturer status:", error);
+      res.status(500).json({ message: "Failed to toggle manufacturer status" });
+    }
+  });
+
+  // Toggle category active status
+  app.put("/api/categories/:id/toggle", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const categoryId = parseInt(req.params.id);
+      const { isActive } = req.body;
+
+      const [updatedCategory] = await db
+        .update(vehicleCategories)
+        .set({ isActive })
+        .where(eq(vehicleCategories.id, categoryId))
+        .returning();
+
+      if (!updatedCategory) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+
+      res.json(updatedCategory);
+    } catch (error) {
+      console.error("Error toggling category status:", error);
+      res.status(500).json({ message: "Failed to toggle category status" });
+    }
+  });
+
+  // Toggle trim level active status
+  app.put("/api/trim-levels/:id/toggle", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const trimLevelId = parseInt(req.params.id);
+      const { isActive } = req.body;
+
+      const [updatedTrimLevel] = await db
+        .update(vehicleTrimLevels)
+        .set({ isActive })
+        .where(eq(vehicleTrimLevels.id, trimLevelId))
+        .returning();
+
+      if (!updatedTrimLevel) {
+        return res.status(404).json({ message: "Trim level not found" });
+      }
+
+      res.json(updatedTrimLevel);
+    } catch (error) {
+      console.error("Error toggling trim level status:", error);
+      res.status(500).json({ message: "Failed to toggle trim level status" });
     }
   });
 

@@ -23,22 +23,25 @@ interface InventoryFormProps {
 interface Manufacturer {
   id: number;
   nameAr: string;
-  nameEn: string;
+  nameEn?: string;
   logo?: string;
+  isActive?: boolean;
 }
 
 interface Category {
   id: number;
   manufacturer_id: number;
-  nameAr: string;
-  nameEn: string;
+  name_ar: string;
+  name_en?: string;
+  isActive?: boolean;
 }
 
 interface TrimLevel {
   id: number;
   category_id: number;
-  nameAr: string;
-  nameEn: string;
+  name_ar: string;
+  name_en?: string;
+  isActive?: boolean;
 }
 const initialEngineCapacities = ["2.0L", "1.5L", "3.0L", "4.0L", "5.0L", "V6", "V8"];
 const initialYears = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018];
@@ -109,9 +112,9 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
     },
   });
 
-  // Fetch manufacturers from database
+  // Fetch manufacturers from database using the new endpoint
   const { data: manufacturers = [], isLoading: isLoadingManufacturers } = useQuery<Manufacturer[]>({
-    queryKey: ["/api/hierarchical/manufacturers"],
+    queryKey: ["/api/manufacturers"],
     enabled: open, // Only fetch when dialog is open
   });
   
@@ -121,83 +124,44 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   // Get current category name for trim levels query  
   const selectedCategoryName = form.watch("category");
   
+  // Get manufacturer ID for hierarchy queries
+  const selectedManufacturer = manufacturers.find(m => m.nameAr === selectedManufacturerName);
+  const selectedManufacturerId = selectedManufacturer?.id;
+
   // Fetch categories based on selected manufacturer
   const { data: categories = [], isLoading: isLoadingCategories } = useQuery<Category[]>({
-    queryKey: ["/api/hierarchical/categories", selectedManufacturerName],
+    queryKey: ["/api/categories", selectedManufacturerId],
     queryFn: async () => {
-      if (!selectedManufacturerName) return [];
-      console.log('Fetching categories for manufacturer:', selectedManufacturerName);
-      const response = await fetch(`/api/hierarchical/categories?manufacturer=${encodeURIComponent(selectedManufacturerName)}`);
-      const data = await response.json();
-      console.log('Categories received:', data);
-      return data;
+      if (!selectedManufacturerId) return [];
+      const response = await fetch(`/api/categories?manufacturerId=${selectedManufacturerId}`);
+      return response.json();
     },
-    enabled: open && !!selectedManufacturerName,
+    enabled: open && !!selectedManufacturerId,
   });
   
+  // Get category ID for trim levels query
+  const selectedCategory = categories.find(c => c.name_ar === selectedCategoryName);
+  const selectedCategoryId = selectedCategory?.id;
+
   // Fetch trim levels based on selected category
   const { data: trimLevels = [], isLoading: isLoadingTrimLevels } = useQuery<TrimLevel[]>({
-    queryKey: ["/api/hierarchical/trimLevels", selectedManufacturerName, selectedCategoryName],
+    queryKey: ["/api/trim-levels", selectedCategoryId],
     queryFn: async () => {
-      if (!selectedManufacturerName || !selectedCategoryName) return [];
-      console.log('Fetching trim levels for:', selectedManufacturerName, selectedCategoryName);
-      const response = await fetch(`/api/hierarchical/trimLevels?manufacturer=${encodeURIComponent(selectedManufacturerName)}&category=${encodeURIComponent(selectedCategoryName)}`);
-      const data = await response.json();
-      console.log('Trim levels received:', data);
-      return data;
+      if (!selectedCategoryId) return [];
+      const response = await fetch(`/api/trim-levels?categoryId=${selectedCategoryId}`);
+      return response.json();
     },
-    enabled: open && !!selectedManufacturerName && !!selectedCategoryName,
+    enabled: open && !!selectedCategoryId,
   });
 
   // Get current trim level for colors query
   const selectedTrimLevelName = form.watch("trimLevel");
 
-  // Fetch exterior colors based on manufacturer, category, and trim level
-  const { data: hierarchicalExteriorColors = [] } = useQuery({
-    queryKey: ["/api/hierarchical/colors", selectedManufacturerName, selectedCategoryName, selectedTrimLevelName, "exterior"],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (selectedManufacturerName) params.append('manufacturer', selectedManufacturerName);
-      if (selectedCategoryName) params.append('category', selectedCategoryName);
-      if (selectedTrimLevelName) params.append('trimLevel', selectedTrimLevelName);
-      params.append('colorType', 'exterior');
-      
-      console.log('Fetching exterior colors with params:', params.toString());
-      const response = await fetch(`/api/hierarchical/colors?${params}`);
-      const data = await response.json();
-      console.log('Exterior colors received:', data);
-      return data;
-    },
-    enabled: open && !!selectedManufacturerName && !!selectedTrimLevelName,
-  });
+  // For now, we'll use the editable colors as we don't have specific color APIs yet
+  const availableExteriorColors = editableExteriorColors;
+  const availableInteriorColors = editableInteriorColors;
 
-  // Fetch interior colors based on manufacturer, category, and trim level
-  const { data: hierarchicalInteriorColors = [] } = useQuery({
-    queryKey: ["/api/hierarchical/colors", selectedManufacturerName, selectedCategoryName, selectedTrimLevelName, "interior"],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (selectedManufacturerName) params.append('manufacturer', selectedManufacturerName);
-      if (selectedCategoryName) params.append('category', selectedCategoryName);
-      if (selectedTrimLevelName) params.append('trimLevel', selectedTrimLevelName);
-      params.append('colorType', 'interior');
-      
-      console.log('Fetching interior colors with params:', params.toString());
-      const response = await fetch(`/api/hierarchical/colors?${params}`);
-      const data = await response.json();
-      console.log('Interior colors received:', data);
-      return data;
-    },
-    enabled: open && !!selectedManufacturerName && !!selectedTrimLevelName,
-  });
 
-  // Combine hierarchical colors with fallback colors
-  const availableExteriorColors = hierarchicalExteriorColors.length > 0 
-    ? hierarchicalExteriorColors.map((color: any) => color.colorName)
-    : editableExteriorColors;
-
-  const availableInteriorColors = hierarchicalInteriorColors.length > 0 
-    ? hierarchicalInteriorColors.map((color: any) => color.colorName)
-    : editableInteriorColors;
 
   // Handle manufacturer change
   const handleManufacturerChange = (manufacturerName: string) => {
@@ -425,9 +389,9 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                               اختر الصانع أولاً
                             </SelectItem>
                           ) : categories.length > 0 ? (
-                            categories.map((category) => (
-                              <SelectItem key={category.id} value={category.nameAr}>
-                                {category.nameAr}
+                            categories.filter(category => category.isActive !== false).map((category) => (
+                              <SelectItem key={category.id} value={category.name_ar}>
+                                {category.name_ar}
                               </SelectItem>
                             ))
                           ) : (
@@ -467,9 +431,9 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                               اختر الفئة أولاً
                             </SelectItem>
                           ) : trimLevels.length > 0 ? (
-                            trimLevels.map((trimLevel) => (
-                              <SelectItem key={trimLevel.id} value={trimLevel.nameAr}>
-                                {trimLevel.nameAr}
+                            trimLevels.filter(trimLevel => trimLevel.isActive !== false).map((trimLevel) => (
+                              <SelectItem key={trimLevel.id} value={trimLevel.name_ar}>
+                                {trimLevel.name_ar}
                               </SelectItem>
                             ))
                           ) : (
