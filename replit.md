@@ -104,6 +104,8 @@ Core entities:
 - ✅ Fixed missing inventory management endpoints for reserve, sell, delete, and update operations (Aug 19, 2025)
 - ✅ Successfully completed full migration from Replit Agent to Replit environment with all functionality restored (Aug 19, 2025)
 - ✅ Fixed critical security vulnerability - banks pages now require authentication (Aug 19, 2025)
+- ✅ Fixed user role permissions for regular users - price card buttons and prices now visible (Aug 19, 2025)
+- ✅ Implemented role-based vehicle filtering - cars with status "خاص" or "تشغيل" now hidden from regular users (Aug 19, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
