@@ -89,6 +89,8 @@ Core entities:
 - ✅ Fixed authentication system with proper password hashing for all existing users (Aug 19, 2025)
 - ✅ All users now use password 'admin123' for testing and development (Aug 19, 2025)
 - ✅ Fixed role-based routing issues - all user types now redirect to appropriate pages (Aug 19, 2025)
+- ✅ Fixed regular user permissions - chassis numbers and price card buttons now visible (Aug 19, 2025)
+- ✅ Updated permissions for user, seller, and salesperson roles for better access control (Aug 19, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
