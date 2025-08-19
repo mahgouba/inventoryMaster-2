@@ -1613,8 +1613,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 </Button>
                               )}
 
-                              {/* Show price card button for bank_accountant, hide for salesperson */}
-                              {canViewPage(userRole as UserRole, "priceCards") && userRole !== "salesperson" && (
+                              {/* Hide price card button for salesperson and bank_accountant roles */}
+                              {canViewPage(userRole as UserRole, "priceCards") && userRole !== "salesperson" && userRole !== "bank_accountant" && (
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -1938,8 +1938,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 </Button>
                               )}
 
-                              {/* Show price card button for bank_accountant and other authorized roles */}
-                              {canViewPage(userRole as UserRole, "priceCards") && userRole !== "salesperson" && (
+                              {/* Hide price card button for bank_accountant and salesperson roles */}
+                              {canViewPage(userRole as UserRole, "priceCards") && userRole !== "salesperson" && userRole !== "bank_accountant" && (
                                 <Button
                                   size="sm"
                                   variant="outline"
