@@ -11,6 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import SystemGlassWrapper from "@/components/system-glass-wrapper";
 import {
   Building2,
   Car,
@@ -150,30 +151,33 @@ export default function DropdownOptionsManagement() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
-        <div className="container mx-auto p-6">
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-lg text-gray-600 dark:text-gray-300">جاري تحميل بيانات القوائم...</p>
+      <SystemGlassWrapper>
+        <div className="relative z-10" dir="rtl">
+          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pr-24">
+            <div className="flex items-center justify-center min-h-[60vh]">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white/60 mx-auto mb-4"></div>
+                <p className="text-lg text-white/80">جاري تحميل بيانات القوائم...</p>
+              </div>
             </div>
-          </div>
+          </main>
         </div>
-      </div>
+      </SystemGlassWrapper>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700" dir="rtl">
-      <div className="container mx-auto p-6 space-y-6">
+    <SystemGlassWrapper>
+      <div className="relative z-10" dir="rtl">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pr-24 space-y-6">
         
         {/* Header Section */}
-        <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 dark:border-slate-700/30 p-8">
+        <Card className="glass-container p-8">
           <div className="text-center mb-6">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl font-bold text-white mb-4">
               إدارة الشركات المصنعة والفئات ودرجات التجهيز
             </h1>
-            <p className="text-lg text-slate-600 dark:text-slate-300">
+            <p className="text-lg text-white/80">
               إدارة شاملة لجميع خيارات القوائم المنسدلة في النظام
             </p>
           </div>
@@ -181,17 +185,17 @@ export default function DropdownOptionsManagement() {
           {/* Search and Filter Controls */}
           <div className="flex flex-col lg:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
-              <Search className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
+              <Search className="absolute right-3 top-3 h-4 w-4 text-white/60" />
               <Input
                 placeholder="البحث في الشركات المصنعة..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10 h-12 text-lg border-2 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 rounded-xl"
+                className="glass-search pr-10 h-12 text-lg"
                 data-testid="search-manufacturers"
               />
             </div>
             <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-full lg:w-48 h-12 border-2 border-gray-200 dark:border-gray-600 rounded-xl">
+              <SelectTrigger className="glass-button w-full lg:w-48 h-12">
                 <Filter className="w-4 h-4 ml-2" />
                 <SelectValue placeholder="نوع البيانات" />
               </SelectTrigger>
@@ -208,7 +212,7 @@ export default function DropdownOptionsManagement() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <Dialog open={isAddManufacturerOpen} onOpenChange={setIsAddManufacturerOpen}>
               <DialogTrigger asChild>
-                <Button className="h-16 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg rounded-2xl transition-all duration-300 hover:scale-105">
+                <Button className="glass-button-primary h-16 shadow-lg rounded-2xl transition-all duration-300 hover:scale-105">
                   <div className="flex flex-col items-center gap-2">
                     <Building2 className="w-6 h-6" />
                     <span className="font-semibold">شركة مصنعة</span>
@@ -283,7 +287,7 @@ export default function DropdownOptionsManagement() {
 
             <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
               <DialogTrigger asChild>
-                <Button className="h-16 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg rounded-2xl transition-all duration-300 hover:scale-105">
+                <Button className="glass-button-primary h-16 shadow-lg rounded-2xl transition-all duration-300 hover:scale-105">
                   <div className="flex flex-col items-center gap-2">
                     <Car className="w-6 h-6" />
                     <span className="font-semibold">فئة جديدة</span>
@@ -360,7 +364,7 @@ export default function DropdownOptionsManagement() {
 
             <Dialog open={isAddTrimLevelOpen} onOpenChange={setIsAddTrimLevelOpen}>
               <DialogTrigger asChild>
-                <Button className="h-16 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg rounded-2xl transition-all duration-300 hover:scale-105">
+                <Button className="glass-button-primary h-16 shadow-lg rounded-2xl transition-all duration-300 hover:scale-105">
                   <div className="flex flex-col items-center gap-2">
                     <Settings className="w-6 h-6" />
                     <span className="font-semibold">درجة تجهيز</span>
@@ -439,7 +443,7 @@ export default function DropdownOptionsManagement() {
 
             <Dialog open={isAddColorOpen} onOpenChange={setIsAddColorOpen}>
               <DialogTrigger asChild>
-                <Button className="h-16 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg rounded-2xl transition-all duration-300 hover:scale-105">
+                <Button className="glass-button-primary h-16 shadow-lg rounded-2xl transition-all duration-300 hover:scale-105">
                   <div className="flex flex-col items-center gap-2">
                     <Palette className="w-6 h-6" />
                     <span className="font-semibold">لون جديد</span>
@@ -517,72 +521,72 @@ export default function DropdownOptionsManagement() {
               </DialogContent>
             </Dialog>
           </div>
-        </div>
+        </Card>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/30 shadow-xl rounded-2xl">
+          <Card className="glass-container shadow-xl rounded-2xl">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">إجمالي الشركات</p>
-                  <p className="text-3xl font-bold text-blue-600">{filteredData.length}</p>
+                  <p className="text-sm text-white/60">إجمالي الشركات</p>
+                  <p className="text-3xl font-bold text-white">{filteredData.length}</p>
                 </div>
-                <Building2 className="w-12 h-12 text-blue-600" />
+                <Building2 className="w-12 h-12 text-white/60" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/30 shadow-xl rounded-2xl">
+          <Card className="glass-container shadow-xl rounded-2xl">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">إجمالي الفئات</p>
-                  <p className="text-3xl font-bold text-green-600">
+                  <p className="text-sm text-white/60">إجمالي الفئات</p>
+                  <p className="text-3xl font-bold text-white">
                     {filteredData.reduce((total, item) => total + item.categories.length, 0)}
                   </p>
                 </div>
-                <Car className="w-12 h-12 text-green-600" />
+                <Car className="w-12 h-12 text-white/60" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/30 shadow-xl rounded-2xl">
+          <Card className="glass-container shadow-xl rounded-2xl">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">درجات التجهيز</p>
-                  <p className="text-3xl font-bold text-purple-600">
+                  <p className="text-sm text-white/60">درجات التجهيز</p>
+                  <p className="text-3xl font-bold text-white">
                     {filteredData.reduce((total, item) => 
                       total + item.categories.reduce((catTotal, cat) => 
                         catTotal + cat.trimLevels.length, 0), 0)}
                   </p>
                 </div>
-                <Settings className="w-12 h-12 text-purple-600" />
+                <Settings className="w-12 h-12 text-white/60" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/30 shadow-xl rounded-2xl">
+          <Card className="glass-container shadow-xl rounded-2xl">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">الألوان</p>
-                  <p className="text-3xl font-bold text-orange-600">0</p>
+                  <p className="text-sm text-white/60">الألوان</p>
+                  <p className="text-3xl font-bold text-white">0</p>
                 </div>
-                <Palette className="w-12 h-12 text-orange-600" />
+                <Palette className="w-12 h-12 text-white/60" />
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Main Content */}
-        <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 dark:border-slate-700/30 p-8">
+        <Card className="glass-container p-8">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+            <h2 className="text-2xl font-bold text-white mb-2">
               الهيكل الهرمي للشركات والفئات
             </h2>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-white/80">
               عرض تفصيلي للشركات المصنعة والفئات ودرجات التجهيز
             </p>
           </div>
@@ -590,39 +594,39 @@ export default function DropdownOptionsManagement() {
           <ScrollArea className="h-[600px]">
             <div className="space-y-4">
               {filteredData && filteredData.length > 0 ? filteredData.map((item: HierarchyData) => (
-                <Card key={item.id} className="bg-gradient-to-r from-white to-gray-50 dark:from-slate-700 dark:to-slate-800 border-2 border-gray-200 dark:border-slate-600 shadow-lg rounded-2xl overflow-hidden">
+                <Card key={item.id} className="glass-container border-2 border-white/20 shadow-lg rounded-2xl overflow-hidden">
                   <Collapsible 
                     open={expandedItems.has(`manufacturer-${item.id}`)}
                     onOpenChange={() => toggleExpanded(`manufacturer-${item.id}`)}
                   >
                     <CollapsibleTrigger asChild>
-                      <CardHeader className="cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600 transition-all duration-300 p-6">
+                      <CardHeader className="cursor-pointer hover:bg-white/10 transition-all duration-300 p-6">
                         <CardTitle className="flex items-center justify-between text-xl">
                           <div className="flex items-center gap-4">
-                            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-2xl">
-                              <Building2 className="w-8 h-8 text-blue-600" />
+                            <div className="p-3 bg-white/20 rounded-2xl">
+                              <Building2 className="w-8 h-8 text-white" />
                             </div>
                             <div>
-                              <h3 className="text-2xl font-bold text-gray-800 dark:text-white">{item.nameAr}</h3>
+                              <h3 className="text-2xl font-bold text-white">{item.nameAr}</h3>
                               {item.nameEn && (
-                                <p className="text-sm text-gray-500 dark:text-gray-400">({item.nameEn})</p>
+                                <p className="text-sm text-white/60">({item.nameEn})</p>
                               )}
                             </div>
-                            <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700 px-4 py-2 text-lg">
+                            <Badge variant="outline" className="bg-white/20 text-white border-white/30 px-4 py-2 text-lg">
                               {item.categories.length} فئة
                             </Badge>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="sm" className="hover:bg-blue-100 dark:hover:bg-blue-900/30">
-                              <Edit className="w-4 h-4 text-blue-600" />
+                            <Button variant="ghost" size="sm" className="glass-button">
+                              <Edit className="w-4 h-4 text-white" />
                             </Button>
-                            <Button variant="ghost" size="sm" className="hover:bg-red-100 dark:hover:bg-red-900/30">
-                              <Trash2 className="w-4 h-4 text-red-600" />
+                            <Button variant="ghost" size="sm" className="glass-button">
+                              <Trash2 className="w-4 h-4 text-white" />
                             </Button>
                             {expandedItems.has(`manufacturer-${item.id}`) ? (
-                              <ChevronDown className="w-6 h-6 text-gray-600" />
+                              <ChevronDown className="w-6 h-6 text-white" />
                             ) : (
-                              <ChevronRight className="w-6 h-6 text-gray-600" />
+                              <ChevronRight className="w-6 h-6 text-white" />
                             )}
                           </div>
                         </CardTitle>
@@ -634,66 +638,66 @@ export default function DropdownOptionsManagement() {
                         {item.categories.length > 0 ? (
                           <div className="space-y-4">
                             {item.categories.map((category) => (
-                              <div key={category.id} className="border border-gray-200 dark:border-slate-600 rounded-2xl overflow-hidden">
+                              <div key={category.id} className="border border-white/20 rounded-2xl overflow-hidden">
                                 <Collapsible 
                                   open={expandedItems.has(`category-${category.id}`)}
                                   onOpenChange={() => toggleExpanded(`category-${category.id}`)}
                                 >
                                   <CollapsibleTrigger asChild>
-                                    <div className="flex items-center justify-between p-6 bg-green-50 dark:bg-green-900/20 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 transition-all duration-300">
+                                    <div className="flex items-center justify-between p-6 bg-white/10 cursor-pointer hover:bg-white/20 transition-all duration-300">
                                       <div className="flex items-center gap-4">
-                                        <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-xl">
-                                          <Car className="w-6 h-6 text-green-600" />
+                                        <div className="p-2 bg-white/20 rounded-xl">
+                                          <Car className="w-6 h-6 text-white" />
                                         </div>
                                         <div>
-                                          <h4 className="font-bold text-lg text-gray-800 dark:text-white">{category.name_ar}</h4>
+                                          <h4 className="font-bold text-lg text-white">{category.name_ar}</h4>
                                           {category.name_en && (
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">({category.name_en})</p>
+                                            <p className="text-sm text-white/60">({category.name_en})</p>
                                           )}
                                         </div>
-                                        <Badge variant="outline" className="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700">
+                                        <Badge variant="outline" className="bg-white/20 text-white border-white/30">
                                           {category.trimLevels.length} درجة تجهيز
                                         </Badge>
                                       </div>
                                       <div className="flex items-center gap-2">
-                                        <Button variant="ghost" size="sm" className="hover:bg-green-100 dark:hover:bg-green-900/30">
-                                          <Edit className="w-4 h-4 text-green-600" />
+                                        <Button variant="ghost" size="sm" className="glass-button">
+                                          <Edit className="w-4 h-4 text-white" />
                                         </Button>
-                                        <Button variant="ghost" size="sm" className="hover:bg-red-100 dark:hover:bg-red-900/30">
-                                          <Trash2 className="w-4 h-4 text-red-600" />
+                                        <Button variant="ghost" size="sm" className="glass-button">
+                                          <Trash2 className="w-4 h-4 text-white" />
                                         </Button>
                                         {expandedItems.has(`category-${category.id}`) ? (
-                                          <ChevronDown className="w-5 h-5 text-gray-600" />
+                                          <ChevronDown className="w-5 h-5 text-white" />
                                         ) : (
-                                          <ChevronRight className="w-5 h-5 text-gray-600" />
+                                          <ChevronRight className="w-5 h-5 text-white" />
                                         )}
                                       </div>
                                     </div>
                                   </CollapsibleTrigger>
                                   
                                   <CollapsibleContent>
-                                    <div className="p-6 bg-white dark:bg-slate-800">
+                                    <div className="p-6 bg-white/5">
                                       {category.trimLevels.length > 0 ? (
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                           {category.trimLevels.map((trimLevel) => (
-                                            <div key={trimLevel.id} className="flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-700">
+                                            <div key={trimLevel.id} className="flex items-center justify-between p-4 bg-white/10 rounded-xl border border-white/20">
                                               <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                                                  <Settings className="w-5 h-5 text-purple-600" />
+                                                <div className="p-2 bg-white/20 rounded-lg">
+                                                  <Settings className="w-5 h-5 text-white" />
                                                 </div>
                                                 <div>
-                                                  <p className="font-semibold text-gray-800 dark:text-white">{trimLevel.name_ar}</p>
+                                                  <p className="font-semibold text-white">{trimLevel.name_ar}</p>
                                                   {trimLevel.name_en && (
-                                                    <p className="text-sm text-gray-500 dark:text-gray-400">({trimLevel.name_en})</p>
+                                                    <p className="text-sm text-white/60">({trimLevel.name_en})</p>
                                                   )}
                                                 </div>
                                               </div>
                                               <div className="flex items-center gap-1">
-                                                <Button variant="ghost" size="sm" className="hover:bg-purple-100 dark:hover:bg-purple-900/30">
-                                                  <Edit className="w-4 h-4 text-purple-600" />
+                                                <Button variant="ghost" size="sm" className="glass-button">
+                                                  <Edit className="w-4 h-4 text-white" />
                                                 </Button>
-                                                <Button variant="ghost" size="sm" className="hover:bg-red-100 dark:hover:bg-red-900/30">
-                                                  <Trash2 className="w-4 h-4 text-red-600" />
+                                                <Button variant="ghost" size="sm" className="glass-button">
+                                                  <Trash2 className="w-4 h-4 text-white" />
                                                 </Button>
                                               </div>
                                             </div>
@@ -701,8 +705,8 @@ export default function DropdownOptionsManagement() {
                                         </div>
                                       ) : (
                                         <div className="text-center py-8">
-                                          <Settings className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                          <p className="text-gray-500 dark:text-gray-400">لا توجد درجات تجهيز لهذه الفئة</p>
+                                          <Settings className="w-16 h-16 text-white/40 mx-auto mb-4" />
+                                          <p className="text-white/60">لا توجد درجات تجهيز لهذه الفئة</p>
                                         </div>
                                       )}
                                     </div>
@@ -713,8 +717,8 @@ export default function DropdownOptionsManagement() {
                           </div>
                         ) : (
                           <div className="text-center py-12">
-                            <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                            <p className="text-gray-500 dark:text-gray-400 text-lg">لا توجد فئات لهذه الشركة المصنعة</p>
+                            <Car className="w-16 h-16 text-white/40 mx-auto mb-4" />
+                            <p className="text-white/60 text-lg">لا توجد فئات لهذه الشركة المصنعة</p>
                           </div>
                         )}
                       </CardContent>
@@ -722,13 +726,13 @@ export default function DropdownOptionsManagement() {
                   </Collapsible>
                 </Card>
               )) : (
-                <Card className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl">
+                <Card className="glass-container text-center py-16 rounded-2xl">
                   <CardContent>
-                    <Building2 className="w-24 h-24 text-gray-400 mx-auto mb-6" />
-                    <h3 className="text-2xl font-semibold text-gray-600 dark:text-gray-300 mb-4">
+                    <Building2 className="w-24 h-24 text-white/40 mx-auto mb-6" />
+                    <h3 className="text-2xl font-semibold text-white mb-4">
                       لا توجد بيانات للعرض
                     </h3>
-                    <p className="text-gray-500 dark:text-gray-400 text-lg">
+                    <p className="text-white/60 text-lg">
                       ابدأ بإضافة شركة مصنعة جديدة لتظهر هنا
                     </p>
                   </CardContent>
@@ -736,8 +740,9 @@ export default function DropdownOptionsManagement() {
               )}
             </div>
           </ScrollArea>
-        </div>
+        </Card>
+        </main>
       </div>
-    </div>
+    </SystemGlassWrapper>
   );
 }
