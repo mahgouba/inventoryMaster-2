@@ -289,13 +289,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
     },
 
 
-    { 
-      title: "التسلسل الهرمي", 
-      href: "/hierarchy-management", 
-      icon: TreePine,
-      internal: true,
-      permission: "admin"
-    },
+    
     // External pages (will navigate away)
     { 
       title: "بطاقات الأسعار", 
