@@ -63,6 +63,244 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get reserved inventory items
+  app.get("/api/inventory/reserved", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const items = await db.select().from(inventoryItems).where(eq(inventoryItems.status, "محجوز"));
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching reserved inventory:", error);
+      res.status(500).json({ message: "Failed to fetch reserved inventory items" });
+    }
+  });
+
+  // Get sold inventory items
+  app.get("/api/inventory/sold", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const items = await db.select().from(inventoryItems).where(eq(inventoryItems.status, "مباع"));
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching sold inventory:", error);
+      res.status(500).json({ message: "Failed to fetch sold inventory items" });
+    }
+  });
+
+  // Reserve an inventory item
+  app.put("/api/inventory/:id/reserve", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const itemId = parseInt(req.params.id);
+      const { customerName, customerPhone, salesRepresentative, reservationNote, paidAmount } = req.body;
+
+      // Check if item exists
+      const [existingItem] = await db.select().from(inventoryItems).where(eq(inventoryItems.id, itemId));
+      if (!existingItem) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+
+      // Check if item is available
+      if (existingItem.status !== "متوفر") {
+        return res.status(400).json({ message: "Vehicle is not available for reservation" });
+      }
+
+      // Update the inventory item to reserved status
+      const [updatedItem] = await db.update(inventoryItems)
+        .set({
+          status: "محجوز",
+          reservationDate: new Date(),
+          reservedBy: customerName || "",
+          customerName: customerName || "",
+          customerPhone: customerPhone || "",
+          salesRepresentative: salesRepresentative || "",
+          reservationNote: reservationNote || "",
+          paidAmount: paidAmount || 0
+        })
+        .where(eq(inventoryItems.id, itemId))
+        .returning();
+
+      res.json(updatedItem);
+    } catch (error) {
+      console.error("Error reserving inventory item:", error);
+      res.status(500).json({ message: "Failed to reserve inventory item" });
+    }
+  });
+
+  // Cancel reservation for an inventory item
+  app.put("/api/inventory/:id/cancel-reservation", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const itemId = parseInt(req.params.id);
+
+      // Check if item exists
+      const [existingItem] = await db.select().from(inventoryItems).where(eq(inventoryItems.id, itemId));
+      if (!existingItem) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+
+      // Check if item is reserved
+      if (existingItem.status !== "محجوز") {
+        return res.status(400).json({ message: "Vehicle is not reserved" });
+      }
+
+      // Update the inventory item to available status
+      const [updatedItem] = await db.update(inventoryItems)
+        .set({
+          status: "متوفر",
+          reservationDate: null,
+          reservedBy: null,
+          customerName: null,
+          customerPhone: null,
+          salesRepresentative: null,
+          reservationNote: null,
+          paidAmount: null
+        })
+        .where(eq(inventoryItems.id, itemId))
+        .returning();
+
+      res.json(updatedItem);
+    } catch (error) {
+      console.error("Error canceling reservation:", error);
+      res.status(500).json({ message: "Failed to cancel reservation" });
+    }
+  });
+
+  // Sell an inventory item
+  app.put("/api/inventory/:id/sell", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const itemId = parseInt(req.params.id);
+      const { 
+        customerName, 
+        customerPhone, 
+        salesRepresentative, 
+        salePrice, 
+        paymentMethod, 
+        bankName, 
+        saleNotes,
+        paidAmount 
+      } = req.body;
+
+      // Check if item exists
+      const [existingItem] = await db.select().from(inventoryItems).where(eq(inventoryItems.id, itemId));
+      if (!existingItem) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+
+      // Check if item is available for sale (available or reserved)
+      if (existingItem.status !== "متوفر" && existingItem.status !== "محجوز") {
+        return res.status(400).json({ message: "Vehicle is not available for sale" });
+      }
+
+      // Update the inventory item to sold status
+      const [updatedItem] = await db.update(inventoryItems)
+        .set({
+          status: "مباع",
+          isSold: true,
+          soldDate: new Date(),
+          soldToCustomerName: customerName || "",
+          soldToCustomerPhone: customerPhone || "",
+          soldBySalesRep: salesRepresentative || "",
+          salePrice: salePrice || 0,
+          paymentMethod: paymentMethod || "",
+          bankName: bankName || "",
+          saleNotes: saleNotes || "",
+          paidAmount: paidAmount || 0
+        })
+        .where(eq(inventoryItems.id, itemId))
+        .returning();
+
+      res.json(updatedItem);
+    } catch (error) {
+      console.error("Error selling inventory item:", error);
+      res.status(500).json({ message: "Failed to sell inventory item" });
+    }
+  });
+
+  // Update an inventory item
+  app.put("/api/inventory/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const itemId = parseInt(req.params.id);
+      const updateData = req.body;
+
+      // Check if item exists
+      const [existingItem] = await db.select().from(inventoryItems).where(eq(inventoryItems.id, itemId));
+      if (!existingItem) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+
+      // Update the inventory item
+      const [updatedItem] = await db.update(inventoryItems)
+        .set(updateData)
+        .where(eq(inventoryItems.id, itemId))
+        .returning();
+
+      res.json(updatedItem);
+    } catch (error) {
+      console.error("Error updating inventory item:", error);
+      res.status(500).json({ message: "Failed to update inventory item" });
+    }
+  });
+
+  // Delete an inventory item
+  app.delete("/api/inventory/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const itemId = parseInt(req.params.id);
+
+      // Check if item exists
+      const [existingItem] = await db.select().from(inventoryItems).where(eq(inventoryItems.id, itemId));
+      if (!existingItem) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+
+      // Delete the inventory item
+      await db.delete(inventoryItems).where(eq(inventoryItems.id, itemId));
+
+      res.json({ message: "Vehicle deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting inventory item:", error);
+      res.status(500).json({ message: "Failed to delete inventory item" });
+    }
+  });
+
+  // Create a new inventory item
+  app.post("/api/inventory", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const vehicleData = req.body;
+
+      // Create new inventory item
+      const [newItem] = await db.insert(inventoryItems).values({
+        manufacturer: vehicleData.manufacturer,
+        category: vehicleData.category,
+        trimLevel: vehicleData.trimLevel,
+        engineCapacity: vehicleData.engineCapacity,
+        year: vehicleData.year,
+        exteriorColor: vehicleData.exteriorColor,
+        interiorColor: vehicleData.interiorColor,
+        status: vehicleData.status || "متوفر",
+        importType: vehicleData.importType || "شخصي",
+        ownershipType: vehicleData.ownershipType || "ملك الشركة",
+        location: vehicleData.location,
+        chassisNumber: vehicleData.chassisNumber,
+        images: vehicleData.images || [],
+        logo: vehicleData.logo,
+        notes: vehicleData.notes,
+        detailedSpecifications: vehicleData.detailedSpecifications,
+        price: vehicleData.price,
+        mileage: vehicleData.mileage
+      }).returning();
+
+      res.status(201).json(newItem);
+    } catch (error) {
+      console.error("Error creating inventory item:", error);
+      res.status(500).json({ message: "Failed to create inventory item" });
+    }
+  });
+
   // Get inventory stats
   app.get("/api/inventory/stats", async (req, res) => {
     try {
