@@ -152,6 +152,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { db } = getDatabase();
       const { type } = req.params;
+      const banksByType = await db.select().from(banks).where(eq(banks.type, type));
+      res.json(banksByType);
+    } catch (error) {
+      console.error("Error fetching banks by type:", error);
+      res.status(500).json({ message: "Failed to fetch banks by type" });
+    }
+  });
+
+  // Create new bank
+  app.post("/api/banks", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const bankData = req.body;
+      
+      const [newBank] = await db.insert(banks).values({
+        logo: bankData.logo || null,
+        bankName: bankData.bankName,
+        nameEn: bankData.nameEn || null,
+        accountName: bankData.accountName,
+        accountNumber: bankData.accountNumber,
+        iban: bankData.iban,
+        type: bankData.type,
+        isActive: bankData.isActive ?? true
+      }).returning();
+
+      res.json(newBank);
+    } catch (error) {
+      console.error("Error creating bank:", error);
+      res.status(500).json({ message: "Failed to create bank" });
+    }
+  });
+
+  // Update bank
+  app.put("/api/banks/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const bankId = parseInt(req.params.id);
+      const bankData = req.body;
+      
+      const [updatedBank] = await db.update(banks)
+        .set({
+          logo: bankData.logo,
+          bankName: bankData.bankName,
+          nameEn: bankData.nameEn,
+          accountName: bankData.accountName,
+          accountNumber: bankData.accountNumber,
+          iban: bankData.iban,
+          type: bankData.type,
+          isActive: bankData.isActive,
+          updatedAt: new Date()
+        })
+        .where(eq(banks.id, bankId))
+        .returning();
+
+      if (!updatedBank) {
+        return res.status(404).json({ message: "Bank not found" });
+      }
+
+      res.json(updatedBank);
+    } catch (error) {
+      console.error("Error updating bank:", error);
+      res.status(500).json({ message: "Failed to update bank" });
+    }
+  });
+
+  // Delete bank
+  app.delete("/api/banks/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const bankId = parseInt(req.params.id);
+      
+      const [deletedBank] = await db.delete(banks)
+        .where(eq(banks.id, bankId))
+        .returning();
+
+      if (!deletedBank) {
+        return res.status(404).json({ message: "Bank not found" });
+      }
+
+      res.json({ message: "Bank deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting bank:", error);
+      res.status(500).json({ message: "Failed to delete bank" });
+    }
+  });
+
+  // Get banks by type
+  app.get("/api/banks/type/:type", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { type } = req.params;
       const decodedType = decodeURIComponent(type);
       
       const banksByType = await db.select().from(banks).where(eq(banks.type, decodedType));
