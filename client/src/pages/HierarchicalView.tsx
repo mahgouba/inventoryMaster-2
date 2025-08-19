@@ -1314,7 +1314,7 @@ export default function HierarchicalView() {
                         </SelectTrigger>
                         <SelectContent>
                           {Array.isArray(manufacturers) && manufacturers.map((manufacturer: Manufacturer) => (
-                            <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                            <SelectItem key={`spec-mfg-${manufacturer.id}`} value={manufacturer.nameAr}>
                               {manufacturer.nameAr}
                             </SelectItem>
                           ))}
@@ -1639,7 +1639,7 @@ export default function HierarchicalView() {
                         </SelectTrigger>
                         <SelectContent>
                           {Array.isArray(manufacturers) && manufacturers.map((manufacturer: Manufacturer) => (
-                            <SelectItem key={manufacturer.id} value={manufacturer.nameAr}>
+                            <SelectItem key={`image-mfg-${manufacturer.id}`} value={manufacturer.nameAr}>
                               {manufacturer.nameAr}
                             </SelectItem>
                           ))}
@@ -1878,7 +1878,7 @@ export default function HierarchicalView() {
                   </SelectTrigger>
                   <SelectContent>
                     {Array.isArray(manufacturers) && manufacturers.filter(m => m.id && m.nameAr).map((manufacturer: Manufacturer) => (
-                      <SelectItem key={manufacturer.id} value={manufacturer.id.toString()}>
+                      <SelectItem key={`category-mfg-${manufacturer.id}`} value={manufacturer.id.toString()}>
                         {manufacturer.nameAr}
                       </SelectItem>
                     ))}
@@ -2085,7 +2085,7 @@ export default function HierarchicalView() {
                     <SelectContent>
                       <SelectItem value="none">بدون تحديد صانع</SelectItem>
                       {Array.isArray(manufacturers) && manufacturers.filter(m => m.id && m.nameAr).map((manufacturer: Manufacturer) => (
-                        <SelectItem key={`color-mfg-${manufacturer.id}`} value={manufacturer.id.toString()}>
+                        <SelectItem key={`color-dialog-mfg-${manufacturer.id}`} value={manufacturer.id.toString()}>
                           {manufacturer.nameAr}
                         </SelectItem>
                       ))}
