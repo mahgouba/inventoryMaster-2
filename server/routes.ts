@@ -654,6 +654,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Database synchronization endpoint
+  app.post("/api/database/sync-external", async (req, res) => {
+    try {
+      const { syncExternalDatabase } = await import("./sync-external-db");
+      const result = await syncExternalDatabase();
+      
+      if (result.success) {
+        res.json({
+          message: "Database synchronized successfully",
+          counts: result.counts
+        });
+      } else {
+        res.status(500).json({
+          message: "Failed to synchronize database",
+          error: result.error
+        });
+      }
+    } catch (error) {
+      console.error("Error in sync endpoint:", error);
+      res.status(500).json({ message: "Failed to synchronize database" });
+    }
+  });
+
   // Vehicle data endpoints
   app.get("/api/vehicle-years", async (req, res) => {
     try {
