@@ -1253,24 +1253,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     
                                     <div className="flex gap-2 mb-3">
                                       {/* Show Used Cars Toggle */}
-                                      <Button
-                                        variant={showUsedCars ? "default" : "outline"}
-                                        size="sm"
-                                        onClick={() => setShowUsedCars(!showUsedCars)}
-                                        className={`glass-button transition-all duration-200 ${
-                                          showUsedCars
-                                            ? "glass-button-primary text-white"
-                                            : "glass-text-primary"
-                                        }`}
-                                      >
-                                        <Car className="h-4 w-4 ml-2" />
-                                        {showUsedCars ? "إخفاء المستعملة" : "إظهار المستعملة فقط"}
-                                        {showUsedCars && (
-                                          <Badge variant="secondary" className="mr-2 bg-blue-500/20 text-blue-300 border-blue-400/30">
-                                            {filteredItems.filter(item => item.importType?.includes('مستعمل')).length}
-                                          </Badge>
-                                        )}
-                                      </Button>
+                                      
 
                                       {/* Show Sold Cars Toggle */}
                                       <Button
