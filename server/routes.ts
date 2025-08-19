@@ -224,6 +224,128 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User management routes
+  // Create new user
+  app.post("/api/users", async (req, res) => {
+    try {
+      const { name, username, password, role, jobTitle, phoneNumber } = req.body;
+      
+      if (!name || !username || !password || !role) {
+        return res.status(400).json({ message: "Missing required fields: name, username, password, role" });
+      }
+
+      const { db } = getDatabase();
+      
+      // Check if username already exists
+      const [existingUser] = await db.select().from(users).where(eq(users.username, username));
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 12);
+
+      // Create new user
+      const [newUser] = await db.insert(users).values({
+        name,
+        username,
+        password: hashedPassword,
+        role,
+        jobTitle: jobTitle || '',
+        phoneNumber: phoneNumber || '',
+        createdAt: new Date()
+      }).returning();
+
+      // Return user without password
+      const { password: _, ...userWithoutPassword } = newUser;
+      res.status(201).json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Failed to create user" });
+    }
+  });
+
+  // Update existing user
+  app.put("/api/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { name, username, password, role, jobTitle, phoneNumber } = req.body;
+
+      if (!userId) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+
+      const { db } = getDatabase();
+      
+      // Check if user exists
+      const [existingUser] = await db.select().from(users).where(eq(users.id, userId));
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if username already exists for another user
+      if (username && username !== existingUser.username) {
+        const [userWithSameUsername] = await db.select().from(users).where(eq(users.username, username));
+        if (userWithSameUsername && userWithSameUsername.id !== userId) {
+          return res.status(400).json({ message: "Username already exists" });
+        }
+      }
+
+      // Prepare update data
+      const updateData: any = {};
+      if (name) updateData.name = name;
+      if (username) updateData.username = username;
+      if (role) updateData.role = role;
+      if (jobTitle !== undefined) updateData.jobTitle = jobTitle;
+      if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
+
+      // Hash new password if provided
+      if (password && password.trim() !== '') {
+        updateData.password = await bcrypt.hash(password, 12);
+      }
+
+      // Update user
+      const [updatedUser] = await db.update(users)
+        .set(updateData)
+        .where(eq(users.id, userId))
+        .returning();
+
+      // Return user without password
+      const { password: _, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+
+  // Delete user
+  app.delete("/api/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+
+      if (!userId) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+
+      const { db } = getDatabase();
+      
+      // Check if user exists
+      const [existingUser] = await db.select().from(users).where(eq(users.id, userId));
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Delete user
+      await db.delete(users).where(eq(users.id, userId));
+
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
   // Attendance management placeholder endpoints
   app.get("/api/daily-attendance", async (req, res) => {
     try {
