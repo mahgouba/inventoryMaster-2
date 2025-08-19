@@ -64,13 +64,18 @@ interface Color {
 }
 
 interface HierarchyData {
-  manufacturer: Manufacturer;
-  categories: {
-    category: Category;
-    trimLevels: TrimLevel[];
-    colors: Color[];
+  id: number;
+  nameAr: string;
+  nameEn?: string;
+  logo?: string;
+  categories?: {
+    id: number;
+    name_ar: string;
+    name_en?: string;
+    manufacturer_id: number;
+    trimLevels?: TrimLevel[];
+    colors?: Color[];
   }[];
-  colors: Color[];
 }
 
 export default function DropdownOptionsManagement() {
@@ -108,11 +113,11 @@ export default function DropdownOptionsManagement() {
   const [colorTrimLevelId, setColorTrimLevelId] = useState<number | null>(null);
 
   // Fetch data
-  const { data: hierarchyData = [], isLoading } = useQuery({
+  const { data: hierarchyData = [], isLoading } = useQuery<HierarchyData[]>({
     queryKey: ['/api/hierarchy/full'],
   });
 
-  const { data: manufacturers = [] } = useQuery({
+  const { data: manufacturers = [] } = useQuery<Manufacturer[]>({
     queryKey: ['/api/hierarchical/manufacturers'],
   });
 
@@ -243,7 +248,7 @@ export default function DropdownOptionsManagement() {
                       <SelectValue placeholder="اختر الشركة المصنعة" />
                     </SelectTrigger>
                     <SelectContent>
-                      {manufacturers.map((manufacturer: Manufacturer) => (
+                      {Array.isArray(manufacturers) && manufacturers.map((manufacturer: Manufacturer) => (
                         <SelectItem key={manufacturer.id} value={manufacturer.id.toString()}>
                           {manufacturer.nameAr}
                         </SelectItem>
@@ -317,10 +322,10 @@ export default function DropdownOptionsManagement() {
                       <SelectValue placeholder="اختر الفئة" />
                     </SelectTrigger>
                     <SelectContent>
-                      {hierarchyData.flatMap((item: HierarchyData) => 
-                        item.categories.map(cat => (
-                          <SelectItem key={cat.category.id} value={cat.category.id.toString()}>
-                            {item.manufacturer.nameAr} - {cat.category.name_ar}
+                      {Array.isArray(hierarchyData) && hierarchyData.flatMap((item: HierarchyData) => 
+                        (item.categories || []).map(cat => (
+                          <SelectItem key={cat.id} value={cat.id.toString()}>
+                            {item.nameAr} - {cat.name_ar}
                           </SelectItem>
                         ))
                       )}
@@ -464,26 +469,26 @@ export default function DropdownOptionsManagement() {
 
         {/* Hierarchy Display */}
         <div className="space-y-4">
-          {hierarchyData.map((item: HierarchyData) => (
-            <Card key={item.manufacturer.id} className="overflow-hidden shadow-lg">
+          {Array.isArray(hierarchyData) && hierarchyData.length > 0 ? hierarchyData.map((item: HierarchyData) => (
+            <Card key={item.id} className="overflow-hidden shadow-lg">
               <Collapsible.Root 
-                open={expandedItems.has(`manufacturer-${item.manufacturer.id}`)}
-                onOpenChange={() => toggleExpanded(`manufacturer-${item.manufacturer.id}`)}
+                open={expandedItems.has(`manufacturer-${item.id}`)}
+                onOpenChange={() => toggleExpanded(`manufacturer-${item.id}`)}
               >
                 <Collapsible.Trigger asChild>
                   <CardHeader className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <CardTitle className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Building2 className="w-6 h-6 text-blue-600" />
-                        <span className="text-xl">{item.manufacturer.nameAr}</span>
-                        {item.manufacturer.nameEn && (
-                          <span className="text-sm text-gray-500">({item.manufacturer.nameEn})</span>
+                        <span className="text-xl">{item.nameAr}</span>
+                        {item.nameEn && (
+                          <span className="text-sm text-gray-500">({item.nameEn})</span>
                         )}
                         <Badge variant="outline" className="mr-2">
-                          {item.categories.length} فئة
+                          {item.categories ? item.categories.length : 0} فئة
                         </Badge>
                       </div>
-                      {expandedItems.has(`manufacturer-${item.manufacturer.id}`) ? (
+                      {expandedItems.has(`manufacturer-${item.id}`) ? (
                         <ChevronDown className="w-5 h-5" />
                       ) : (
                         <ChevronRight className="w-5 h-5" />
@@ -494,25 +499,25 @@ export default function DropdownOptionsManagement() {
                 
                 <Collapsible.Content>
                   <CardContent className="pt-0">
-                    {item.categories.map((categoryGroup) => (
-                      <div key={categoryGroup.category.id} className="mb-6 last:mb-0">
+                    {item.categories && item.categories.length > 0 ? item.categories.map((category) => (
+                      <div key={category.id} className="mb-6 last:mb-0">
                         <Collapsible.Root 
-                          open={expandedItems.has(`category-${categoryGroup.category.id}`)}
-                          onOpenChange={() => toggleExpanded(`category-${categoryGroup.category.id}`)}
+                          open={expandedItems.has(`category-${category.id}`)}
+                          onOpenChange={() => toggleExpanded(`category-${category.id}`)}
                         >
                           <Collapsible.Trigger asChild>
                             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                               <div className="flex items-center gap-3">
                                 <Car className="w-5 h-5 text-green-600" />
-                                <span className="font-semibold">{categoryGroup.category.name_ar}</span>
-                                {categoryGroup.category.name_en && (
-                                  <span className="text-sm text-gray-500">({categoryGroup.category.name_en})</span>
+                                <span className="font-semibold">{category.name_ar}</span>
+                                {category.name_en && (
+                                  <span className="text-sm text-gray-500">({category.name_en})</span>
                                 )}
                                 <Badge variant="outline" className="mr-2">
-                                  {categoryGroup.trimLevels.length} درجة تجهيز
+                                  {category.trimLevels ? category.trimLevels.length : 0} درجة تجهيز
                                 </Badge>
                               </div>
-                              {expandedItems.has(`category-${categoryGroup.category.id}`) ? (
+                              {expandedItems.has(`category-${category.id}`) ? (
                                 <ChevronDown className="w-4 h-4" />
                               ) : (
                                 <ChevronRight className="w-4 h-4" />
@@ -522,7 +527,7 @@ export default function DropdownOptionsManagement() {
                           
                           <Collapsible.Content>
                             <div className="mr-8 mt-3 space-y-2">
-                              {categoryGroup.trimLevels.map((trimLevel) => (
+                              {category.trimLevels && category.trimLevels.length > 0 ? category.trimLevels.map((trimLevel) => (
                                 <div key={trimLevel.id} className="flex items-center gap-3 p-2 bg-white dark:bg-gray-900 rounded border">
                                   <Settings className="w-4 h-4 text-purple-600" />
                                   <span>{trimLevel.name_ar}</span>
@@ -530,25 +535,23 @@ export default function DropdownOptionsManagement() {
                                     <span className="text-sm text-gray-500">({trimLevel.name_en})</span>
                                   )}
                                 </div>
-                              ))}
-                              {categoryGroup.trimLevels.length === 0 && (
+                              )) : (
                                 <p className="text-gray-500 text-sm mr-7">لا توجد درجات تجهيز</p>
                               )}
                             </div>
                           </Collapsible.Content>
                         </Collapsible.Root>
                       </div>
-                    ))}
-                    {item.categories.length === 0 && (
+                    )) : (
                       <p className="text-gray-500 text-center py-4">لا توجد فئات لهذه الشركة المصنعة</p>
                     )}
                   </CardContent>
                 </Collapsible.Content>
               </Collapsible.Root>
             </Card>
-          ))}
+          )) : null}
           
-          {hierarchyData.length === 0 && (
+          {(!Array.isArray(hierarchyData) || hierarchyData.length === 0) && (
             <Card className="text-center py-12">
               <CardContent>
                 <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
