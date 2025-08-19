@@ -135,6 +135,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get hierarchical manufacturers (for filtering)
+  app.get("/api/hierarchical/manufacturers", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const allManufacturers = await db.select().from(manufacturers);
+      res.json(allManufacturers);
+    } catch (error) {
+      console.error("Error fetching hierarchical manufacturers:", error);
+      res.status(500).json({ message: "Failed to fetch hierarchical manufacturers" });
+    }
+  });
+
   // Get all banks
   app.get("/api/banks", async (req, res) => {
     try {

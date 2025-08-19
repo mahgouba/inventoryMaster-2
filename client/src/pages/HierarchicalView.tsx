@@ -1361,7 +1361,20 @@ export default function HierarchicalView() {
                           <SelectValue placeholder="اختر درجة التجهيز" />
                         </SelectTrigger>
                         <SelectContent>
-                          {trimLevelsData.map(trim => (
+                          {/* Get trim levels for selected category and manufacturer */}
+                          {specCategory && specManufacturer && Array.isArray(hierarchyData) && hierarchyData
+                            .filter((data: HierarchyData) => data.manufacturer.nameAr === specManufacturer)
+                            .flatMap((data: HierarchyData) => data.categories)
+                            .filter((category: any) => (category.category.nameAr || category.category.name_ar) === specCategory)
+                            .flatMap((category: any) => category.trimLevels || [])
+                            .map((trim: any) => (
+                              <SelectItem key={trim.id} value={trim.name_ar}>
+                                {trim.name_ar}
+                              </SelectItem>
+                            ))
+                          }
+                          {/* Fallback trim levels if no specific ones found */}
+                          {(!specCategory || !specManufacturer) && trimLevelsData.map(trim => (
                             <SelectItem key={trim.name_en} value={trim.name_ar}>
                               {trim.name_ar}
                             </SelectItem>
@@ -1673,7 +1686,20 @@ export default function HierarchicalView() {
                           <SelectValue placeholder="اختر درجة التجهيز" />
                         </SelectTrigger>
                         <SelectContent>
-                          {trimLevelsData.map(trim => (
+                          {/* Get trim levels for selected category and manufacturer */}
+                          {imageCategory && imageManufacturer && Array.isArray(hierarchyData) && hierarchyData
+                            .filter((data: HierarchyData) => data.manufacturer.nameAr === imageManufacturer)
+                            .flatMap((data: HierarchyData) => data.categories)
+                            .filter((category: any) => (category.category.nameAr || category.category.name_ar) === imageCategory)
+                            .flatMap((category: any) => category.trimLevels || [])
+                            .map((trim: any) => (
+                              <SelectItem key={trim.id} value={trim.name_ar}>
+                                {trim.name_ar}
+                              </SelectItem>
+                            ))
+                          }
+                          {/* Fallback trim levels if no specific ones found */}
+                          {(!imageCategory || !imageManufacturer) && trimLevelsData.map(trim => (
                             <SelectItem key={trim.name_en} value={trim.name_ar}>
                               {trim.name_ar}
                             </SelectItem>
