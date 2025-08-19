@@ -105,8 +105,8 @@ const logoMapping: { [key: string]: string } = {
   "كاديلاك ": "/logos /Cadillac--Streamline-Simple-Icons.svg",
   
   // ROX
-  "روكس": "/logos /tesla.svg",
-  "روكس ": "/logos /tesla.svg"
+  "روكس": "/logos /ROX.svg",
+  "روكس ": "/logos /ROX.svg"
 };
 
 async function linkLogosToManufacturers() {
