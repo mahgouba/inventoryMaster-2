@@ -85,6 +85,9 @@ Core entities:
 - ✅ Fixed banks display issue - added proper API route for banks by type with Arabic text support (Aug 19, 2025)
 - ✅ Added complete bank management API routes (create, update, delete) with proper error handling (Aug 19, 2025)
 - ✅ Fixed bank visibility toggle and hide/show functionality (Aug 19, 2025)
+- ✅ Completed migration from Replit Agent to Replit environment (Aug 19, 2025)
+- ✅ Fixed authentication system with proper password hashing for all existing users (Aug 19, 2025)
+- ✅ All users now use password 'admin123' for testing and development (Aug 19, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
