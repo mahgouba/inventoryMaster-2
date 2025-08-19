@@ -1220,14 +1220,14 @@ export default function HierarchicalView() {
                     <div className="space-y-4 overflow-y-auto max-h-[60vh]">
                       {/* قائمة المواصفات المحفوظة */}
                       <div className="space-y-2">
-                        <Label className="text-right block">المواصفات المحفوظة ({savedSpecifications.length}):</Label>
+                        <Label className="text-right block">المواصفات المحفوظة ({Array.isArray(savedSpecifications) ? savedSpecifications.length : 0}):</Label>
                         <div className="grid gap-3">
-                          {savedSpecifications.length === 0 ? (
+                          {!Array.isArray(savedSpecifications) || savedSpecifications.length === 0 ? (
                             <div className="glass-card p-6 border rounded-lg text-center text-gray-400">
                               لا توجد مواصفات محفوظة حتى الآن
                             </div>
                           ) : (
-                            savedSpecifications.map((spec: any) => (
+                            Array.isArray(savedSpecifications) && savedSpecifications.map((spec: any) => (
                               <div key={spec.id} className="glass-card p-4 border rounded-lg">
                                 <div className="flex justify-between items-start">
                                   <div className="flex-1">
@@ -1537,14 +1537,14 @@ export default function HierarchicalView() {
                     <div className="space-y-4 overflow-y-auto max-h-[60vh]">
                       {/* قائمة روابط الصور المحفوظة */}
                       <div className="space-y-2">
-                        <Label className="text-right block">روابط الصور المحفوظة ({savedImageLinks.length}):</Label>
+                        <Label className="text-right block">روابط الصور المحفوظة ({Array.isArray(savedImageLinks) ? savedImageLinks.length : 0}):</Label>
                         <div className="grid gap-3">
-                          {savedImageLinks.length === 0 ? (
+                          {!Array.isArray(savedImageLinks) || savedImageLinks.length === 0 ? (
                             <div className="glass-card p-6 border rounded-lg text-center text-gray-400">
                               لا توجد روابط صور محفوظة حتى الآن
                             </div>
                           ) : (
-                            savedImageLinks.map((link: any) => (
+                            Array.isArray(savedImageLinks) && savedImageLinks.map((link: any) => (
                               <div key={link.id} className="glass-card p-4 border rounded-lg">
                                 <div className="flex justify-between items-start">
                                   <div className="flex-1">
