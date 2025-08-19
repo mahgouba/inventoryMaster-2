@@ -119,6 +119,10 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [sellDialogOpen, setSellDialogOpen] = useState(false);
   const [selectedVehicleForSale, setSelectedVehicleForSale] = useState<InventoryItem | null>(null);
 
+  // Price card states
+  const [selectedVehicleForPriceCard, setSelectedVehicleForPriceCard] = useState<InventoryItem | null>(null);
+  const [priceCardPreviewOpen, setPriceCardPreviewOpen] = useState(false);
+
   const [quotationManagementOpen, setQuotationManagementOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
