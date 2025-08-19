@@ -109,6 +109,8 @@ Core entities:
 - ✅ Updated salesperson UI - only share and reservation buttons are visible, all other action buttons hidden (Aug 19, 2025)
 - ✅ Optimized mobile layout for vehicle count badges - reduced size and spacing for better mobile display (Aug 19, 2025)
 - ✅ Enhanced attendance management dialog for mobile - responsive design with proper sizing and spacing (Aug 19, 2025)
+- ✅ Confirmed Tesla logo is properly linked to manufacturer "تسلا" in the logo system (Aug 19, 2025)
+- ✅ Fixed ROX manufacturer logo mapping to use correct /logos /ROX.svg file instead of Tesla logo (Aug 19, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
