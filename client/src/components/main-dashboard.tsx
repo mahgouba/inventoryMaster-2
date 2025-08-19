@@ -22,7 +22,7 @@ import FinancingRatesPage from "@/pages/financing-rates";
 import DatabaseManagement from "@/pages/database-management";
 import CarsMigrationPage from "@/pages/cars-migration";
 
-import HierarchicalView from "@/pages/HierarchicalView";
+
 
 
 import PriceCardsPage from "@/pages/price-cards";
@@ -87,8 +87,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return user.role === "admin" ? <CarsMigrationPage /> : null;
 
 
-      case "/hierarchy-management":
-        return user.role === "admin" ? <HierarchicalView /> : null;
+
       case "/specifications-management":
         return user.role === "admin" ? <SpecificationsManagement /> : null;
 

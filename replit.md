@@ -91,8 +91,8 @@ Core entities:
 - ✅ Fixed role-based routing issues - all user types now redirect to appropriate pages (Aug 19, 2025)
 - ✅ Fixed regular user permissions - chassis numbers and price card buttons now visible (Aug 19, 2025)
 - ✅ Updated permissions for user, seller, and salesperson roles for better access control (Aug 19, 2025)
-- ✅ Fixed hierarchical view dropdowns to use real database data instead of static arrays (Aug 19, 2025)
-- ✅ All manufacturer, category, and trim level dropdowns now properly cascade and show real data (Aug 19, 2025)
+- ✅ Completely removed hierarchy management pages from the system per user request (Aug 19, 2025)
+- ✅ All references to HierarchicalView component and /hierarchy routes have been deleted (Aug 19, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
