@@ -1383,6 +1383,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Import new hierarchy data
+  app.post("/api/database/import-new-hierarchy", async (req, res) => {
+    try {
+      const { importNewHierarchy } = await import('./import-new-hierarchy');
+      const result = await importNewHierarchy();
+      
+      if (result.success) {
+        res.json({
+          message: "Hierarchy data replaced successfully",
+          counts: result.counts
+        });
+      } else {
+        res.status(500).json({
+          message: "Failed to replace hierarchy data",
+          error: result.error
+        });
+      }
+    } catch (error) {
+      console.error("Hierarchy import error:", error);
+      res.status(500).json({ message: "Failed to replace hierarchy data" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
