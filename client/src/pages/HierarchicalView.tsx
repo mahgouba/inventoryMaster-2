@@ -725,16 +725,24 @@ export default function HierarchicalView() {
       return apiRequest('POST', '/api/hierarchical/manufacturers', data);
     },
     onSuccess: () => {
+      // تحديث جميع الاستعلامات ذات الصلة
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/manufacturers'] });
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/manufacturers'] });
+      
       toast({
         title: "تمت إضافة الصانع",
         description: `تم إضافة صانع "${manufacturerNameAr}" بنجاح`,
       });
+      
+      // إعادة تعيين النموذج
       setManufacturerNameAr("");
       setManufacturerNameEn("");
       setManufacturerLogo("");
       setIsAddManufacturerOpen(false);
+      
+      // إجبار إعادة تحميل البيانات فوراً
+      queryClient.refetchQueries({ queryKey: ['/api/hierarchy/full'] });
     },
     onError: (error) => {
       toast({
@@ -752,6 +760,7 @@ export default function HierarchicalView() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/categories'] });
       toast({
         title: "تمت إضافة الفئة",
         description: `تم إضافة فئة "${newCategoryNameAr}" بنجاح`,
@@ -760,6 +769,8 @@ export default function HierarchicalView() {
       setNewCategoryNameEn("");
       setSelectedManufacturerForCategory(null);
       setIsAddCategoryOpen(false);
+      // إجبار إعادة تحميل البيانات فوراً
+      queryClient.refetchQueries({ queryKey: ['/api/hierarchy/full'] });
     },
     onError: (error) => {
       toast({
@@ -777,6 +788,7 @@ export default function HierarchicalView() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchical/trimLevels'] });
       toast({
         title: "تمت إضافة درجة التجهيز",
         description: `تم إضافة درجة التجهيز "${newTrimLevelNameAr}" بنجاح`,
@@ -785,6 +797,8 @@ export default function HierarchicalView() {
       setNewTrimLevelNameEn("");
       setSelectedCategoryForTrimLevel(null);
       setIsAddTrimLevelOpen(false);
+      // إجبار إعادة تحميل البيانات فوراً
+      queryClient.refetchQueries({ queryKey: ['/api/hierarchy/full'] });
     },
     onError: (error) => {
       toast({
