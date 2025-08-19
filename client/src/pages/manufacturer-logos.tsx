@@ -191,7 +191,11 @@ export default function ManufacturerLogos() {
     
     // Cadillac
     "كاديلاك": "/logos /Cadillac--Streamline-Simple-Icons.svg",
-    "كاديلاك ": "/logos /Cadillac--Streamline-Simple-Icons.svg"
+    "كاديلاك ": "/logos /Cadillac--Streamline-Simple-Icons.svg",
+    
+    // ROX
+    "روكس": "/logos /ROX.svg",
+    "روكس ": "/logos /ROX.svg"
   };
 
   // Link all logos automatically
