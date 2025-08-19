@@ -44,7 +44,11 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
               return <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />;
             } else if (user.role === "accountant" || user.role === "bank_accountant") {
               return <MainDashboard user={user} onLogout={onLogout} />;
+            } else if (user.role === "user" || user.role === "seller" || user.role === "salesperson") {
+              // Regular users, sellers, and salespersons go to card view for vehicle browsing
+              return <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />;
             } else {
+              // Default fallback - send to card view
               return <CardViewPage userRole={user.role} username={user.username} onLogout={onLogout} />;
             }
           }} />

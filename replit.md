@@ -88,6 +88,7 @@ Core entities:
 - ✅ Completed migration from Replit Agent to Replit environment (Aug 19, 2025)
 - ✅ Fixed authentication system with proper password hashing for all existing users (Aug 19, 2025)
 - ✅ All users now use password 'admin123' for testing and development (Aug 19, 2025)
+- ✅ Fixed role-based routing issues - all user types now redirect to appropriate pages (Aug 19, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
