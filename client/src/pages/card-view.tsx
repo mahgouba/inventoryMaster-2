@@ -1565,24 +1565,27 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           {/* Action Buttons - First Row */}
                           <div className="pt-3 mt-3 border-t border-slate-200">
                             <div className="flex justify-center gap-1 mb-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className={`px-2 h-8 ${
-                                  neumorphismMode 
-                                    ? 'neuro-button' 
-                                    : 'hover:bg-yellow-50 border-yellow-300'
-                                }`}
-                                style={{color: neumorphismMode ? '#333' : '#BF9231'}}
-                                onClick={() => handleShareItem(item)}
-                                title="مشاركة"
-                                data-testid={`button-share-${item.id}`}
-                              >
-                                <Share2 size={14} />
-                              </Button>
+                              {/* Share button - Available for all users with share permission */}
+                              {canShareItem(userRole as UserRole, "cardView") && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className={`px-2 h-8 ${
+                                    neumorphismMode 
+                                      ? 'neuro-button' 
+                                      : 'hover:bg-yellow-50 border-yellow-300'
+                                  }`}
+                                  style={{color: neumorphismMode ? '#333' : '#BF9231'}}
+                                  onClick={() => handleShareItem(item)}
+                                  title="مشاركة"
+                                  data-testid={`button-share-${item.id}`}
+                                >
+                                  <Share2 size={14} />
+                                </Button>
+                              )}
 
-                              {/* Hide action buttons for normal users, show only for admin/managers */}
-                              {canEditItem(userRole as UserRole, "cardView") && (
+                              {/* Hide sell button for salesperson role */}
+                              {canEditItem(userRole as UserRole, "cardView") && userRole !== "salesperson" && (
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -1596,7 +1599,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 </Button>
                               )}
 
-                              {canViewPage(userRole as UserRole, "quotationCreation") && (
+                              {/* Hide quote button for salesperson role */}
+                              {canViewPage(userRole as UserRole, "quotationCreation") && userRole !== "salesperson" && (
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -1609,7 +1613,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 </Button>
                               )}
 
-                              {canViewPage(userRole as UserRole, "priceCards") && (
+                              {/* Hide price card button for salesperson role */}
+                              {canViewPage(userRole as UserRole, "priceCards") && userRole !== "salesperson" && (
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -1676,18 +1681,20 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
         )}
       </div>
 
-      {/* Static Floating Action Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button
-          onClick={() => setShowEditDialog(true)}
-          className="bg-custom-primary hover:bg-custom-primary-dark text-white shadow-lg hover:shadow-xl rounded-full w-16 h-16 flex items-center justify-center transition-colors duration-200"
-          size="lg"
-          data-testid="button-add-vehicle"
-          title="إضافة مركبة جديدة"
-        >
-          <Plus size={24} />
-        </Button>
-      </div>
+      {/* Static Floating Action Button - Hidden for salesperson */}
+      {canCreateItem(userRole as UserRole, "cardView") && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
+            onClick={() => setShowEditDialog(true)}
+            className="bg-custom-primary hover:bg-custom-primary-dark text-white shadow-lg hover:shadow-xl rounded-full w-16 h-16 flex items-center justify-center transition-colors duration-200"
+            size="lg"
+            data-testid="button-add-vehicle"
+            title="إضافة مركبة جديدة"
+          >
+            <Plus size={24} />
+          </Button>
+        </div>
+      )}
 
 
 

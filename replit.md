@@ -106,6 +106,7 @@ Core entities:
 - ✅ Fixed critical security vulnerability - banks pages now require authentication (Aug 19, 2025)
 - ✅ Fixed user role permissions for regular users - price card buttons and prices now visible (Aug 19, 2025)
 - ✅ Implemented role-based vehicle filtering - cars with status "خاص" or "تشغيل" now hidden from regular users (Aug 19, 2025)
+- ✅ Updated salesperson UI - only share and reservation buttons are visible, all other action buttons hidden (Aug 19, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
