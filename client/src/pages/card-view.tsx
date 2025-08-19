@@ -1584,8 +1584,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 </Button>
                               )}
 
-                              {/* Hide sell button for salesperson role */}
-                              {canEditItem(userRole as UserRole, "cardView") && userRole !== "salesperson" && (
+                              {/* Hide sell button for salesperson and bank_accountant roles */}
+                              {canEditItem(userRole as UserRole, "cardView") && userRole !== "salesperson" && userRole !== "bank_accountant" && (
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -1599,7 +1599,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 </Button>
                               )}
 
-                              {/* Hide quote button for salesperson role */}
+                              {/* Show quote button for bank_accountant, hide for salesperson */}
                               {canViewPage(userRole as UserRole, "quotationCreation") && userRole !== "salesperson" && (
                                 <Button
                                   size="sm"
@@ -1613,7 +1613,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 </Button>
                               )}
 
-                              {/* Hide price card button for salesperson role */}
+                              {/* Show price card button for bank_accountant, hide for salesperson */}
                               {canViewPage(userRole as UserRole, "priceCards") && userRole !== "salesperson" && (
                                 <Button
                                   size="sm"
@@ -1908,8 +1908,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           <div className="mt-4 pt-4 border-t border-white/20">
                             <h5 className="font-bold text-white mb-3 text-sm">إجراءات سريعة</h5>
                             <div className="flex gap-2 flex-wrap">
-                              {/* Hide action buttons for normal users, show only for admin/managers */}
-                              {canEditItem(userRole as UserRole, "cardView") && (
+                              {/* Hide sell button for bank_accountant and salesperson roles */}
+                              {canEditItem(userRole as UserRole, "cardView") && userRole !== "bank_accountant" && userRole !== "salesperson" && (
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -1938,7 +1938,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 </Button>
                               )}
 
-                              {canViewPage(userRole as UserRole, "priceCards") && (
+                              {/* Show price card button for bank_accountant and other authorized roles */}
+                              {canViewPage(userRole as UserRole, "priceCards") && userRole !== "salesperson" && (
                                 <Button
                                   size="sm"
                                   variant="outline"

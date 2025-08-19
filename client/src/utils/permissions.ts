@@ -84,8 +84,8 @@ export const PERMISSIONS: Record<UserRole, Record<string, Permission>> = {
   },
 
   bank_accountant: {
-    // محاسب البنوك - Limited access: main page with share/reserve only and quotation creation  
-    inventory: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
+    // محاسب البنوك - Limited access: main page, inventory, and price cards with only share/reserve/price card buttons
+    inventory: { canView: true, canCreate: false, canEdit: false, canDelete: false, canShare: true, canReserve: true },
     cardView: { canView: true, canCreate: false, canEdit: false, canDelete: false, canShare: true, canReserve: true },
     quotationCreation: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: true, canReserve: false },
     quotationManagement: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: true, canReserve: false },
@@ -93,7 +93,7 @@ export const PERMISSIONS: Record<UserRole, Record<string, Permission>> = {
     reservations: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
     soldVehicles: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
     financingCalculator: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
-    priceCards: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
+    priceCards: { canView: true, canCreate: true, canEdit: true, canDelete: false, canShare: true, canReserve: false },
     userManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
     bankManagement: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
     leaveRequests: { canView: false, canCreate: false, canEdit: false, canDelete: false, canShare: false, canReserve: false },
