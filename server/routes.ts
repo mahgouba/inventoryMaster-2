@@ -1,9 +1,19 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { getDatabase } from "./db";
-import { users, inventoryItems, manufacturers, banks, vehicleCategories, vehicleTrimLevels } from "@shared/schema";
+import { 
+  users, 
+  inventoryItems, 
+  manufacturers, 
+  banks, 
+  vehicleCategories, 
+  vehicleTrimLevels,
+  dailyAttendance,
+  employeeWorkSchedules,
+  leaveRequests 
+} from "@shared/schema";
 import { Pool } from 'pg';
-import { eq } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -346,10 +356,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Attendance management placeholder endpoints
+  // Attendance management endpoints with role-based access
   app.get("/api/daily-attendance", async (req, res) => {
     try {
-      res.json([]);
+      const { db } = getDatabase();
+      
+      // Check if user is authenticated
+      if (!req.session?.passport?.user?.id) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const userRole = req.session.passport.user.role;
+      const userId = req.session.passport.user.id;
+
+      let attendanceData;
+
+      // Admin and sales_manager can see all attendance records
+      if (userRole === 'admin' || userRole === 'sales_manager') {
+        attendanceData = await db.select().from(dailyAttendance).orderBy(desc(dailyAttendance.date));
+      } 
+      // Other roles (accountant, bank_accountant, salesperson, seller) can only see their own records
+      else {
+        attendanceData = await db.select()
+          .from(dailyAttendance)
+          .where(eq(dailyAttendance.employeeId, userId))
+          .orderBy(desc(dailyAttendance.date));
+      }
+
+      res.json(attendanceData);
     } catch (error) {
       console.error("Error fetching daily attendance:", error);
       res.status(500).json({ message: "Failed to fetch daily attendance" });
@@ -358,7 +392,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/employee-work-schedules", async (req, res) => {
     try {
-      res.json([]);
+      const { db } = getDatabase();
+      
+      // Check if user is authenticated
+      if (!req.session?.passport?.user?.id) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const userRole = req.session.passport.user.role;
+      const userId = req.session.passport.user.id;
+
+      let scheduleData;
+
+      // Admin and sales_manager can see all work schedules
+      if (userRole === 'admin' || userRole === 'sales_manager') {
+        scheduleData = await db.select().from(employeeWorkSchedules)
+          .where(eq(employeeWorkSchedules.isActive, true))
+          .orderBy(employeeWorkSchedules.employeeName);
+      } 
+      // Other roles can only see their own schedule
+      else {
+        scheduleData = await db.select()
+          .from(employeeWorkSchedules)
+          .where(and(
+            eq(employeeWorkSchedules.employeeId, userId),
+            eq(employeeWorkSchedules.isActive, true)
+          ))
+          .orderBy(employeeWorkSchedules.employeeName);
+      }
+
+      res.json(scheduleData);
     } catch (error) {
       console.error("Error fetching work schedules:", error);
       res.status(500).json({ message: "Failed to fetch work schedules" });
@@ -367,10 +430,227 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/leave-requests", async (req, res) => {
     try {
-      res.json([]);
+      const { db } = getDatabase();
+      
+      // Check if user is authenticated
+      if (!req.session?.passport?.user?.id) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const userRole = req.session.passport.user.role;
+      const userId = req.session.passport.user.id;
+
+      let leaveData;
+
+      // Admin and sales_manager can see all leave requests
+      if (userRole === 'admin' || userRole === 'sales_manager') {
+        leaveData = await db.select().from(leaveRequests).orderBy(desc(leaveRequests.createdAt));
+      } 
+      // Other roles can only see their own leave requests
+      else {
+        leaveData = await db.select()
+          .from(leaveRequests)
+          .where(eq(leaveRequests.userId, userId))
+          .orderBy(desc(leaveRequests.createdAt));
+      }
+
+      res.json(leaveData);
     } catch (error) {
       console.error("Error fetching leave requests:", error);
       res.status(500).json({ message: "Failed to fetch leave requests" });
+    }
+  });
+
+  // Create leave request
+  app.post("/api/leave-requests", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      
+      if (!req.session?.passport?.user?.id) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const userId = req.session.passport.user.id;
+      const userName = req.session.passport.user.username;
+
+      const { requestType, startDate, endDate, duration, durationType, reason } = req.body;
+
+      const [newRequest] = await db.insert(leaveRequests).values({
+        userId,
+        userName,
+        requestType,
+        startDate: new Date(startDate),
+        endDate: endDate ? new Date(endDate) : null,
+        duration,
+        durationType,
+        reason,
+        requestedBy: userId,
+        requestedByName: userName,
+        status: "pending"
+      }).returning();
+
+      res.json(newRequest);
+    } catch (error) {
+      console.error("Error creating leave request:", error);
+      res.status(500).json({ message: "Failed to create leave request" });
+    }
+  });
+
+  // Update leave request status
+  app.put("/api/leave-requests/:id/status", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      
+      if (!req.session?.passport?.user?.id) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const userRole = req.session.passport.user.role;
+      const userId = req.session.passport.user.id;
+      const userName = req.session.passport.user.username;
+
+      // Only admin and sales_manager can approve/reject requests
+      if (userRole !== 'admin' && userRole !== 'sales_manager') {
+        return res.status(403).json({ message: "Insufficient permissions" });
+      }
+
+      const requestId = parseInt(req.params.id);
+      const { status, rejectionReason } = req.body;
+
+      const updateData: any = {
+        status,
+        approvedBy: userId,
+        approvedByName: userName,
+        approvedAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      if (status === 'rejected' && rejectionReason) {
+        updateData.rejectionReason = rejectionReason;
+      }
+
+      const [updatedRequest] = await db.update(leaveRequests)
+        .set(updateData)
+        .where(eq(leaveRequests.id, requestId))
+        .returning();
+
+      if (!updatedRequest) {
+        return res.status(404).json({ message: "Request not found" });
+      }
+
+      res.json(updatedRequest);
+    } catch (error) {
+      console.error("Error updating leave request:", error);
+      res.status(500).json({ message: "Failed to update leave request" });
+    }
+  });
+
+  // Create employee work schedule
+  app.post("/api/employee-work-schedules", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      
+      if (!req.session?.passport?.user?.id) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const userRole = req.session.passport.user.role;
+
+      // Only admin and sales_manager can create schedules
+      if (userRole !== 'admin' && userRole !== 'sales_manager') {
+        return res.status(403).json({ message: "Insufficient permissions" });
+      }
+
+      const scheduleData = req.body;
+      
+      const [newSchedule] = await db.insert(employeeWorkSchedules).values({
+        ...scheduleData,
+        isActive: true
+      }).returning();
+
+      res.json(newSchedule);
+    } catch (error) {
+      console.error("Error creating work schedule:", error);
+      res.status(500).json({ message: "Failed to create work schedule" });
+    }
+  });
+
+  // Create daily attendance record
+  app.post("/api/daily-attendance", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      
+      if (!req.session?.passport?.user?.id) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const userRole = req.session.passport.user.role;
+      const createdBy = req.session.passport.user.id;
+      const createdByName = req.session.passport.user.username;
+
+      // Only admin and sales_manager can create attendance records for others
+      if (userRole !== 'admin' && userRole !== 'sales_manager') {
+        return res.status(403).json({ message: "Insufficient permissions" });
+      }
+
+      const attendanceData = {
+        ...req.body,
+        createdBy,
+        createdByName,
+        date: new Date(req.body.date)
+      };
+      
+      const [newAttendance] = await db.insert(dailyAttendance).values(attendanceData).returning();
+
+      res.json(newAttendance);
+    } catch (error) {
+      console.error("Error creating attendance record:", error);
+      res.status(500).json({ message: "Failed to create attendance record" });
+    }
+  });
+
+  // Update daily attendance record
+  app.put("/api/daily-attendance/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      
+      if (!req.session?.passport?.user?.id) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const userRole = req.session.passport.user.role;
+      const userId = req.session.passport.user.id;
+
+      const attendanceId = parseInt(req.params.id);
+      
+      // Check if user can edit this record
+      const [existingRecord] = await db.select()
+        .from(dailyAttendance)
+        .where(eq(dailyAttendance.id, attendanceId));
+
+      if (!existingRecord) {
+        return res.status(404).json({ message: "Attendance record not found" });
+      }
+
+      // Admin and sales_manager can edit all records, others can only edit their own
+      if (userRole !== 'admin' && userRole !== 'sales_manager' && existingRecord.employeeId !== userId) {
+        return res.status(403).json({ message: "Insufficient permissions" });
+      }
+
+      const updateData = {
+        ...req.body,
+        updatedAt: new Date()
+      };
+      
+      const [updatedAttendance] = await db.update(dailyAttendance)
+        .set(updateData)
+        .where(eq(dailyAttendance.id, attendanceId))
+        .returning();
+
+      res.json(updatedAttendance);
+    } catch (error) {
+      console.error("Error updating attendance record:", error);
+      res.status(500).json({ message: "Failed to update attendance record" });
     }
   });
 
