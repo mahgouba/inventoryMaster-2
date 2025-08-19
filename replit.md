@@ -76,6 +76,9 @@ Core entities:
 - ✅ Enhanced action buttons functionality with proper data-testid attributes for testing (Aug 19, 2025)
 - ✅ Restored missing "Show Used Cars" toggle button in card view filters (Aug 19, 2025)
 - ✅ All action buttons now work properly: share, sell, quote, price card, reserve, cancel reservation (Aug 19, 2025)
+- ✅ Connected to external Neon database as requested by user (Aug 19, 2025)
+- ✅ Fixed ahmad_aljawhary login authentication with proper password encryption (Aug 19, 2025)
+- ✅ Added sample vehicle inventory data to external database (Aug 19, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
