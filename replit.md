@@ -108,6 +108,7 @@ Core entities:
 - ✅ Implemented role-based vehicle filtering - cars with status "خاص" or "تشغيل" now hidden from regular users (Aug 19, 2025)
 - ✅ Updated salesperson UI - only share and reservation buttons are visible, all other action buttons hidden (Aug 19, 2025)
 - ✅ Optimized mobile layout for vehicle count badges - reduced size and spacing for better mobile display (Aug 19, 2025)
+- ✅ Enhanced attendance management dialog for mobile - responsive design with proper sizing and spacing (Aug 19, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`

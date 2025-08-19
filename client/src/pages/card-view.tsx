@@ -2101,14 +2101,14 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
       {/* Attendance Management Dialog */}
       <Dialog open={attendanceDialogOpen} onOpenChange={setAttendanceDialogOpen}>
         <DialogContent 
-          className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-6xl max-h-[90vh] overflow-y-auto"
+          className="glass-container backdrop-blur-md bg-slate-900/90 border border-white/20 text-white max-w-[95vw] sm:max-w-6xl max-h-[90vh] overflow-y-auto p-3 sm:p-6"
           aria-describedby="attendance-management-description"
         >
-          <DialogHeader>
-            <DialogTitle className="text-xl text-center">
+          <DialogHeader className="space-y-1 sm:space-y-2">
+            <DialogTitle className="text-lg sm:text-xl text-center">
               إدارة الدوام
             </DialogTitle>
-            <p className="text-gray-300 text-center">
+            <p className="text-gray-300 text-center text-sm sm:text-base">
               الحضور اليومي والطلبات المعلقة
             </p>
           </DialogHeader>
@@ -2364,56 +2364,56 @@ function AttendanceManagementContent() {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="daily-attendance" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
+        <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 h-auto">
           <TabsTrigger 
             value="daily-attendance" 
-            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs sm:text-sm py-2 px-2 sm:px-4"
           >
             الحضور اليومي
           </TabsTrigger>
           <TabsTrigger 
             value="approved-requests"
-            className="data-[state=active]:bg-green-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-xs sm:text-sm py-2 px-2 sm:px-4"
           >
             الطلبات المعتمدة
             {approvedLeaveRequests.length > 0 && (
-              <Badge className="ml-2 bg-green-500 text-black">
+              <Badge className="ml-1 sm:ml-2 bg-green-500 text-black text-xs">
                 {approvedLeaveRequests.length}
               </Badge>
             )}
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="daily-attendance" className="mt-6">
-          <div className="glass-container backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6">
+        <TabsContent value="daily-attendance" className="mt-3 sm:mt-6">
+          <div className="glass-container backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-3 sm:p-6">
             {/* Month Navigation */}
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-white">الحضور اليومي</h2>
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 gap-2 sm:gap-0">
+              <h2 className="text-lg sm:text-xl font-semibold text-white">الحضور اليومي</h2>
+              <div className="flex items-center gap-2 sm:gap-4">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="glass-button"
+                  className="glass-button p-1.5 sm:p-2"
                   onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
-                <h3 className="text-lg font-medium text-white min-w-[140px] text-center">
+                <h3 className="text-sm sm:text-lg font-medium text-white min-w-[120px] sm:min-w-[140px] text-center">
                   {format(currentMonth, "MMMM yyyy", { locale: ar })}
                 </h3>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="glass-button"
+                  className="glass-button p-1.5 sm:p-2"
                   onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
               </div>
             </div>
 
             {/* Employee Monthly Calendars */}
-            <div className="space-y-6">
+            <div className="space-y-3 sm:space-y-6">
               {employeeSchedules.filter((schedule: any) => {
                 // Show all employees for admin, only current user for others
                 if (!currentUser) return true; // Show all if user info not loaded
@@ -2425,19 +2425,19 @@ function AttendanceManagementContent() {
                 );
 
                 return (
-                  <div key={schedule.id} className="glass-container backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-4">
-                    <div className="flex justify-between items-center mb-4">
+                  <div key={schedule.id} className="glass-container backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-2 sm:p-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 sm:mb-4 gap-2 sm:gap-0">
                       <div>
-                        <h3 className="font-semibold text-white text-lg">{schedule.employeeName}</h3>
-                        <p className="text-gray-300 text-sm">{schedule.scheduleType} • {monthAttendance.length} يوم حضور</p>
+                        <h3 className="font-semibold text-white text-base sm:text-lg">{schedule.employeeName}</h3>
+                        <p className="text-gray-300 text-xs sm:text-sm">{schedule.scheduleType} • {monthAttendance.length} يوم حضور</p>
                       </div>
-                      <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
+                      <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 text-xs sm:text-sm self-start sm:self-auto">
                         {format(currentMonth, "MMMM", { locale: ar })}
                       </Badge>
                     </div>
 
                     {/* Monthly Progress Bars */}
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       {monthDays.map((day) => {
                         const dayStr = format(day, "yyyy-MM-dd");
                         const dayAttendance = monthAttendance.find(a => a.date === dayStr);
@@ -2459,13 +2459,13 @@ function AttendanceManagementContent() {
                             key={day.toISOString()}
                             className={`
                               group cursor-pointer transition-all duration-300 hover:scale-[1.02]
-                              ${isToday ? 'ring-2 ring-blue-400 rounded-lg p-1' : ''}
+                              ${isToday ? 'ring-1 sm:ring-2 ring-blue-400 rounded-lg p-0.5 sm:p-1' : ''}
                             `}
                           >
-                            <div className="flex items-center gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10">
+                            <div className="flex items-center gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg bg-white/5 hover:bg-white/10">
                               {/* Date Info */}
-                              <div className="flex flex-col items-center min-w-[80px]">
-                                <div className={`text-2xl font-bold ${isToday ? 'text-blue-400' : 'text-white'}`}>
+                              <div className="flex flex-col items-center min-w-[50px] sm:min-w-[80px]">
+                                <div className={`text-lg sm:text-2xl font-bold ${isToday ? 'text-blue-400' : 'text-white'}`}>
                                   {format(day, "d")}
                                 </div>
                                 <div className="text-xs text-gray-400 truncate">
@@ -2476,7 +2476,7 @@ function AttendanceManagementContent() {
                               {/* Progress Bar Container */}
                               <div className="flex-1 space-y-1">
                                 <div className="flex justify-between items-center">
-                                  <div className="text-sm text-gray-300">
+                                  <div className="text-xs sm:text-sm text-gray-300 truncate">
                                     {(() => {
                                       if (isHoliday) return 'إجازة';
                                       if (approvedLeave) {
@@ -2492,7 +2492,7 @@ function AttendanceManagementContent() {
                                       return `${hoursWorked.toFixed(1)} ساعة`;
                                     })()}
                                   </div>
-                                  <div className="text-xs text-gray-400">
+                                  <div className="text-xs text-gray-400 shrink-0">
                                     {hasAttendance && !isHoliday && !approvedLeave ? `${workPercentage.toFixed(0)}%` : ''}
                                   </div>
                                 </div>
