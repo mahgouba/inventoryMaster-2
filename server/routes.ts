@@ -147,6 +147,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get banks by type
+  app.get("/api/banks/type/:type", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { type } = req.params;
+      const decodedType = decodeURIComponent(type);
+      
+      const banksByType = await db.select().from(banks).where(eq(banks.type, decodedType));
+      res.json(banksByType);
+    } catch (error) {
+      console.error("Error fetching banks by type:", error);
+      res.status(500).json({ message: "Failed to fetch banks by type" });
+    }
+  });
+
   // Get all users
   app.get("/api/users", async (req, res) => {
     try {

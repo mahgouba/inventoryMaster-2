@@ -1253,7 +1253,25 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     
                                     <div className="flex gap-2 mb-3">
                                       {/* Show Used Cars Toggle */}
-                                      
+                                      <Button
+                                        variant={showUsedCars ? "default" : "outline"}
+                                        size="sm"
+                                        onClick={() => setShowUsedCars(!showUsedCars)}
+                                        className={`glass-button transition-all duration-200 ${
+                                          showUsedCars
+                                            ? "glass-button-primary text-white"
+                                            : "glass-text-primary"
+                                        }`}
+                                        data-testid="button-toggle-used-cars"
+                                      >
+                                        <Car className="h-4 w-4 ml-2" />
+                                        {showUsedCars ? "إخفاء المستعملة" : "إظهار المستعملة"}
+                                        {showUsedCars && (
+                                          <Badge variant="secondary" className="mr-2 bg-orange-500/20 text-orange-300 border-orange-400/30">
+                                            {filteredItems.filter(item => item.importType?.includes('مستعمل')).length}
+                                          </Badge>
+                                        )}
+                                      </Button>
 
                                       {/* Show Sold Cars Toggle */}
                                       <Button
@@ -1265,6 +1283,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                             ? "glass-button-primary text-white"
                                             : "glass-text-primary"
                                         }`}
+                                        data-testid="button-toggle-sold-cars"
                                       >
                                         <CheckCircle className="h-4 w-4 ml-2" />
                                         {showSoldCars ? "إخفاء المباعة" : "إظهار المباعة"}
@@ -1295,6 +1314,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                         setShowSoldCars(false);
                                       }}
                                       className="glass-button w-full"
+                                      data-testid="button-reset-all-filters"
                                     >
                                       <X className="h-4 w-4 ml-2" />
                                       مسح جميع الفلاتر والعروض
@@ -1545,6 +1565,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                 style={{color: neumorphismMode ? '#333' : '#BF9231'}}
                                 onClick={() => handleShareItem(item)}
                                 title="مشاركة"
+                                data-testid={`button-share-${item.id}`}
                               >
                                 <Share2 size={14} />
                               </Button>
@@ -1558,6 +1579,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                   onClick={() => handleSellItem(item)}
                                   disabled={sellingItemId === item.id || item.isSold}
                                   title="بيع"
+                                  data-testid={`button-sell-${item.id}`}
                                 >
                                   <ShoppingCart size={14} />
                                 </Button>
@@ -1570,6 +1592,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                   className="px-2 h-8 text-purple-600 hover:text-purple-700 hover:bg-purple-50 border-purple-300"
                                   onClick={() => handleCreateQuote(item)}
                                   title="إنشاء عرض سعر"
+                                  data-testid={`button-quote-${item.id}`}
                                 >
                                   <FileText size={14} />
                                 </Button>
@@ -1585,6 +1608,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     window.location.href = '/price-cards';
                                   }}
                                   title="إنشاء بطاقة سعر"
+                                  data-testid={`button-price-card-${item.id}`}
                                 >
                                   <Receipt size={14} />
                                 </Button>
@@ -1600,6 +1624,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     onClick={() => handleCancelReservation(item)}
                                     disabled={cancelingReservationId === item.id}
                                     title="إلغاء الحجز"
+                                    data-testid={`button-cancel-reservation-${item.id}`}
                                   >
                                     <X size={14} />
                                   </Button>
@@ -1611,6 +1636,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                     onClick={() => handleReserveItem(item)}
                                     disabled={item.status === "محجوز" || item.isSold}
                                     title="حجز"
+                                    data-testid={`button-reserve-${item.id}`}
                                   >
                                     <Calendar size={14} />
                                   </Button>
@@ -1645,6 +1671,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
           onClick={() => setShowEditDialog(true)}
           className="bg-custom-primary hover:bg-custom-primary-dark text-white shadow-lg hover:shadow-xl rounded-full w-16 h-16 flex items-center justify-center transition-colors duration-200"
           size="lg"
+          data-testid="button-add-vehicle"
+          title="إضافة مركبة جديدة"
         >
           <Plus size={24} />
         </Button>
