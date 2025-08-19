@@ -147,12 +147,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get banks by type
+  // Get banks by type (only active banks for display)
   app.get("/api/banks/type/:type", async (req, res) => {
     try {
       const { db } = getDatabase();
       const { type } = req.params;
-      const banksByType = await db.select().from(banks).where(eq(banks.type, type));
+      const banksByType = await db.select().from(banks).where(
+        and(
+          eq(banks.type, type),
+          eq(banks.isActive, true)
+        )
+      );
       res.json(banksByType);
     } catch (error) {
       console.error("Error fetching banks by type:", error);

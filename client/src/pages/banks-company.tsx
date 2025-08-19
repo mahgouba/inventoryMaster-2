@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Building2, Copy, Share2, ChevronDown, ChevronUp, MessageCircle, Send } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Bank } from "@shared/schema";
 
@@ -17,6 +17,7 @@ export default function CompanyBanks() {
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
   const [phoneNumber, setPhoneNumber] = useState("");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: banks = [], isLoading } = useQuery({
     queryKey: ["/api/banks/type/شركة"],
@@ -35,6 +36,18 @@ export default function CompanyBanks() {
       return response.json();
     }
   });
+
+  // Listen for bank data changes from management page
+  useEffect(() => {
+    const handleBankDataChanged = () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/banks/type/شركة"] });
+    };
+
+    window.addEventListener('bankDataChanged', handleBankDataChanged);
+    return () => {
+      window.removeEventListener('bankDataChanged', handleBankDataChanged);
+    };
+  }, [queryClient]);
 
   const toggleExpanded = (bankId: number) => {
     const newExpanded = new Set(expandedBanks);
