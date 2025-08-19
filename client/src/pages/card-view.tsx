@@ -1417,14 +1417,14 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                       
                       {/* Manufacturer Name and Count */}
                       <div className="flex flex-col">
-                        <h2 className="text-2xl font-bold text-white dark:text-white mb-2 drop-shadow-lg">{manufacturer}</h2>
-                        <div className="flex items-center space-x-3 space-x-reverse">
-                          <Badge variant="secondary" className="bg-white/20 text-white dark:text-white px-3 py-1 text-sm font-semibold backdrop-blur-sm border border-white/30">
+                        <h2 className="text-xl sm:text-2xl font-bold text-white dark:text-white mb-2 drop-shadow-lg">{manufacturer}</h2>
+                        <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                          <Badge variant="secondary" className="bg-white/20 text-white dark:text-white px-1.5 sm:px-3 py-0.5 sm:py-1 text-xs font-medium sm:font-semibold backdrop-blur-sm border border-white/30 shrink-0">
                             {showSoldCars 
                               ? allGroupedData[manufacturer]?.items.length || 0 
                               : allGroupedData[manufacturer]?.items.filter(item => item.status !== "مباع").length || 0} مركبة
                           </Badge>
-                          <Badge variant="outline" className="border-green-300/40 text-green-200 bg-green-500/20 dark:bg-green-900/40 backdrop-blur-sm px-3 py-1 text-sm font-semibold">
+                          <Badge variant="outline" className="border-green-300/40 text-green-200 bg-green-500/20 dark:bg-green-900/40 backdrop-blur-sm px-1.5 sm:px-3 py-0.5 sm:py-1 text-xs font-medium sm:font-semibold shrink-0">
                             {data.items.filter(item => item.status === "متوفر").length} متوفر
                           </Badge>
                         </div>

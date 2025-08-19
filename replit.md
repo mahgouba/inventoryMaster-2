@@ -107,6 +107,7 @@ Core entities:
 - ✅ Fixed user role permissions for regular users - price card buttons and prices now visible (Aug 19, 2025)
 - ✅ Implemented role-based vehicle filtering - cars with status "خاص" or "تشغيل" now hidden from regular users (Aug 19, 2025)
 - ✅ Updated salesperson UI - only share and reservation buttons are visible, all other action buttons hidden (Aug 19, 2025)
+- ✅ Optimized mobile layout for vehicle count badges - reduced size and spacing for better mobile display (Aug 19, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
