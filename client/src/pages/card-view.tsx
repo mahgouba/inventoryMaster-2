@@ -1504,7 +1504,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               <img src="/location.svg" alt="Location" className="w-6 h-6 filter drop-shadow-sm" style={{filter: 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%) drop-shadow(0 1px 2px rgba(0,0,0,0.3))'}} />
                               <span className="font-semibold text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.location}</span>
                             </div>
-                            {item.chassisNumber && (
+                            {item.chassisNumber && item.chassisNumber.trim() !== '' && (
                               <div className="flex items-center gap-2">
                                 <span className="font-bold text-xs text-white drop-shadow-sm">VIN:</span>
                                 <span className="font-medium font-latin text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.chassisNumber}</span>
