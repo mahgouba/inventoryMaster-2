@@ -1233,6 +1233,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         updatedAt: new Date()
       };
+
+      // Convert date fields to proper Date objects if they exist
+      if (updateData.date && typeof updateData.date === 'string') {
+        updateData.date = new Date(updateData.date);
+      }
+      if (updateData.createdAt && typeof updateData.createdAt === 'string') {
+        updateData.createdAt = new Date(updateData.createdAt);
+      }
       
       const [updatedAttendance] = await db.update(dailyAttendance)
         .set(updateData)
