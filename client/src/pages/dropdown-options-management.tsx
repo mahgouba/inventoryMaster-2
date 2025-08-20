@@ -793,46 +793,57 @@ export default function DropdownOptionsManagement() {
                                   <CollapsibleContent>
                                     <div className="p-6 bg-white/5">
                                       {category.trimLevels && category.trimLevels.length > 0 ? (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
                                           {category.trimLevels.map((trimLevel) => (
-                                            <div key={trimLevel.id} className="flex items-center justify-between p-4 bg-white/10 rounded-xl border border-white/20">
-                                              <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-white/20 rounded-lg">
-                                                  <Settings className="w-5 h-5 text-white" />
+                                            <div key={trimLevel.id} className="bg-white/10 rounded-xl border border-white/20 p-4 hover:bg-white/15 transition-all duration-300 group">
+                                              <div className="flex flex-col items-center text-center space-y-3">
+                                                <div className="p-3 bg-white/20 rounded-xl group-hover:bg-white/30 transition-colors">
+                                                  <Settings className="w-6 h-6 text-white" />
                                                 </div>
-                                                <div>
-                                                  <p className="font-semibold text-white">{trimLevel.name_ar}</p>
+                                                <div className="flex-1 min-h-[3rem] flex flex-col justify-center">
+                                                  <p className="font-bold text-white text-sm leading-tight">{trimLevel.name_ar}</p>
                                                   {trimLevel.name_en && (
-                                                    <p className="text-sm text-white/60">({trimLevel.name_en})</p>
+                                                    <p className="text-xs text-white/60 mt-1">({trimLevel.name_en})</p>
                                                   )}
                                                 </div>
-                                              </div>
-                                              <div className="flex items-center gap-1">
-                                                <Button 
-                                                  variant="ghost" 
-                                                  size="sm" 
-                                                  className={`glass-button ${trimLevel.isActive !== false ? 'bg-green-600/20' : 'bg-red-600/20'}`}
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    toggleTrimLevelMutation.mutate({ 
-                                                      id: trimLevel.id, 
-                                                      isActive: trimLevel.isActive === false 
-                                                    });
-                                                  }}
-                                                  data-testid={`toggle-trimlevel-${trimLevel.id}`}
-                                                >
-                                                  {trimLevel.isActive !== false ? (
-                                                    <Eye className="w-4 h-4 text-green-300" />
-                                                  ) : (
-                                                    <EyeOff className="w-4 h-4 text-red-300" />
-                                                  )}
-                                                </Button>
-                                                <Button variant="ghost" size="sm" className="glass-button">
-                                                  <Edit className="w-4 h-4 text-white" />
-                                                </Button>
-                                                <Button variant="ghost" size="sm" className="glass-button">
-                                                  <Trash2 className="w-4 h-4 text-white" />
-                                                </Button>
+                                                <div className="flex items-center justify-center gap-1 w-full pt-2 border-t border-white/20">
+                                                  <Button 
+                                                    variant="ghost" 
+                                                    size="sm" 
+                                                    className={`glass-button h-8 w-8 p-0 ${trimLevel.isActive !== false ? 'bg-green-600/30 hover:bg-green-600/40' : 'bg-red-600/30 hover:bg-red-600/40'}`}
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      toggleTrimLevelMutation.mutate({ 
+                                                        id: trimLevel.id, 
+                                                        isActive: trimLevel.isActive === false 
+                                                      });
+                                                    }}
+                                                    data-testid={`toggle-trim-${trimLevel.id}`}
+                                                    title={trimLevel.isActive !== false ? 'إخفاء' : 'إظهار'}
+                                                  >
+                                                    {trimLevel.isActive !== false ? (
+                                                      <Eye className="w-3 h-3 text-green-300" />
+                                                    ) : (
+                                                      <EyeOff className="w-3 h-3 text-red-300" />
+                                                    )}
+                                                  </Button>
+                                                  <Button 
+                                                    variant="ghost" 
+                                                    size="sm" 
+                                                    className="glass-button h-8 w-8 p-0 hover:bg-blue-600/30"
+                                                    title="تعديل"
+                                                  >
+                                                    <Edit className="w-3 h-3 text-white" />
+                                                  </Button>
+                                                  <Button 
+                                                    variant="ghost" 
+                                                    size="sm" 
+                                                    className="glass-button h-8 w-8 p-0 hover:bg-red-600/30"
+                                                    title="حذف"
+                                                  >
+                                                    <Trash2 className="w-3 h-3 text-white" />
+                                                  </Button>
+                                                </div>
                                               </div>
                                             </div>
                                           ))}
