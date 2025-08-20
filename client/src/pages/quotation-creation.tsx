@@ -33,7 +33,8 @@ import {
   FileUp,
   Settings2,
   X,
-  Info
+  Info,
+  Car
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
