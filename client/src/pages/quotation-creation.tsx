@@ -41,6 +41,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import GlassBackground from "@/components/glass-background";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
+import { VehicleDetailedSpecifications } from "@/components/vehicle-detailed-specifications";
 
 import type { InventoryItem, Specification, InsertQuotation, Company, TermsAndConditions } from "@shared/schema";
 import { numberToArabic } from "@/utils/number-to-arabic";
@@ -2154,22 +2155,21 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                       </Button>
                     </div>
 
-                    {/* Enhanced Vehicle Specifications Display */}
-                    {vehicleManufacturer && vehicleCategory && vehicleYear && vehicleEngineCapacity && (
-                      <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm">
-                        <div className="flex items-center space-x-3 space-x-reverse mb-4">
-                          <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                          <h4 className="font-semibold text-lg text-blue-900 dark:text-blue-100">المواصفات التفصيلية</h4>
-                        </div>
-                        <VehicleSpecificationsDisplayComponent 
-                          manufacturer={vehicleManufacturer}
-                          category={vehicleCategory}
-                          trimLevel={vehicleTrimLevel}
-                          year={vehicleYear}
-                          engineCapacity={vehicleEngineCapacity}
-                        />
-                      </div>
-                    )}
+                    {/* Vehicle Detailed Specifications Section */}
+                    {(vehicleManufacturer && vehicleCategory && vehicleYear && vehicleEngineCapacity) || vehicleChassisNumber ? (
+                      <VehicleDetailedSpecifications 
+                        manufacturer={vehicleManufacturer}
+                        category={vehicleCategory}
+                        trimLevel={vehicleTrimLevel}
+                        year={vehicleYear}
+                        engineCapacity={vehicleEngineCapacity}
+                        chassisNumber={vehicleChassisNumber}
+                        onSpecificationsUpdate={(specs) => {
+                          // Update specifications in the quotation preview
+                          console.log('Updated specifications:', specs);
+                        }}
+                      />
+                    ) : null}
                   </div>
                 )}
                 </div>
