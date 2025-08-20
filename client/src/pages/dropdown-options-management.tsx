@@ -138,7 +138,7 @@ export default function DropdownOptionsManagement() {
   // Toggle manufacturer active status
   const toggleManufacturerMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
-      return apiRequest(`/api/manufacturers/${id}/toggle`, 'PUT', { isActive });
+      return apiRequest('PUT', `/api/manufacturers/${id}/toggle`, { isActive });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/manufacturers'] });
@@ -160,7 +160,7 @@ export default function DropdownOptionsManagement() {
   // Toggle category active status
   const toggleCategoryMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
-      return apiRequest(`/api/categories/${id}/toggle`, 'PUT', { isActive });
+      return apiRequest('PUT', `/api/categories/${id}/toggle`, { isActive });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/categories'] });
@@ -182,7 +182,7 @@ export default function DropdownOptionsManagement() {
   // Toggle trim level active status
   const toggleTrimLevelMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
-      return apiRequest(`/api/trim-levels/${id}/toggle`, 'PUT', { isActive });
+      return apiRequest('PUT', `/api/trim-levels/${id}/toggle`, { isActive });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/trim-levels'] });
