@@ -92,6 +92,13 @@ export default function DropdownOptionsManagement() {
   const [isAddTrimLevelOpen, setIsAddTrimLevelOpen] = useState(false);
   const [isAddColorOpen, setIsAddColorOpen] = useState(false);
   
+  // State for contextual adding (linked to specific items)
+  const [isAddCategoryToManufacturerOpen, setIsAddCategoryToManufacturerOpen] = useState(false);
+  const [isAddTrimLevelToCategoryOpen, setIsAddTrimLevelToCategoryOpen] = useState(false);
+  const [isAddColorToManufacturerOpen, setIsAddColorToManufacturerOpen] = useState(false);
+  const [isAddColorToCategoryOpen, setIsAddColorToCategoryOpen] = useState(false);
+  const [isAddColorToTrimLevelOpen, setIsAddColorToTrimLevelOpen] = useState(false);
+  
   // Form states for adding new items
   const [manufacturerNameAr, setManufacturerNameAr] = useState("");
   const [manufacturerNameEn, setManufacturerNameEn] = useState("");
@@ -109,6 +116,11 @@ export default function DropdownOptionsManagement() {
   const [colorNameEn, setColorNameEn] = useState("");
   const [colorCode, setColorCode] = useState("#FFFFFF");
   const [colorType, setColorType] = useState<'exterior' | 'interior'>('exterior');
+  
+  // State for tracking contextual relationships
+  const [contextManufacturerId, setContextManufacturerId] = useState<number | null>(null);
+  const [contextCategoryId, setContextCategoryId] = useState<number | null>(null);
+  const [contextTrimLevelId, setContextTrimLevelId] = useState<number | null>(null);
 
   // Fetch data
   const { data: hierarchyData = [], isLoading } = useQuery<HierarchyData[]>({
@@ -586,6 +598,375 @@ export default function DropdownOptionsManagement() {
                 </div>
               </DialogContent>
             </Dialog>
+
+            {/* Contextual Add Category to Manufacturer Dialog */}
+            <Dialog open={isAddCategoryToManufacturerOpen} onOpenChange={setIsAddCategoryToManufacturerOpen}>
+              <DialogContent className="max-w-md rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl text-center text-blue-600">إضافة فئة للصانع</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6 p-2">
+                  <div>
+                    <Label className="text-lg">الصانع المحدد</Label>
+                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-200">
+                      <span className="text-blue-800 font-medium">
+                        {hierarchyData.find(m => m.id === contextManufacturerId)?.nameAr || "غير محدد"}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-lg">الاسم بالعربية</Label>
+                    <Input
+                      value={categoryNameAr}
+                      onChange={(e) => setCategoryNameAr(e.target.value)}
+                      placeholder="أدخل اسم الفئة بالعربية"
+                      className="h-12 text-lg rounded-xl"
+                      data-testid="input-category-name-ar-contextual"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-lg">الاسم بالإنجليزية (اختياري)</Label>
+                    <Input
+                      value={categoryNameEn}
+                      onChange={(e) => setCategoryNameEn(e.target.value)}
+                      placeholder="أدخل اسم الفئة بالإنجليزية"
+                      className="h-12 text-lg rounded-xl"
+                      data-testid="input-category-name-en-contextual"
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <Button 
+                      onClick={() => {
+                        toast({
+                          title: "قريباً",
+                          description: "ستتم إضافة هذه الميزة قريباً",
+                        });
+                      }}
+                      className="flex-1 h-12 bg-green-600 hover:bg-green-700 rounded-xl"
+                      data-testid="button-save-category-contextual"
+                    >
+                      <Save className="w-5 h-5 ml-2" />
+                      حفظ
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsAddCategoryToManufacturerOpen(false)}
+                      className="h-12 rounded-xl"
+                      data-testid="button-cancel-category-contextual"
+                    >
+                      <X className="w-5 h-5 ml-2" />
+                      إلغاء
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            {/* Contextual Add Trim Level to Category Dialog */}
+            <Dialog open={isAddTrimLevelToCategoryOpen} onOpenChange={setIsAddTrimLevelToCategoryOpen}>
+              <DialogContent className="max-w-md rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl text-center text-purple-600">إضافة درجة تجهيز للفئة</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6 p-2">
+                  <div>
+                    <Label className="text-lg">الفئة المحددة</Label>
+                    <div className="p-3 bg-purple-50 rounded-xl border border-purple-200">
+                      <span className="text-purple-800 font-medium">
+                        {hierarchyData.flatMap(m => m.categories).find(c => c.id === contextCategoryId)?.nameAr || "غير محدد"}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-lg">الاسم بالعربية</Label>
+                    <Input
+                      value={trimLevelNameAr}
+                      onChange={(e) => setTrimLevelNameAr(e.target.value)}
+                      placeholder="أدخل اسم درجة التجهيز بالعربية"
+                      className="h-12 text-lg rounded-xl"
+                      data-testid="input-trimlevel-name-ar-contextual"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-lg">الاسم بالإنجليزية (اختياري)</Label>
+                    <Input
+                      value={trimLevelNameEn}
+                      onChange={(e) => setTrimLevelNameEn(e.target.value)}
+                      placeholder="أدخل اسم درجة التجهيز بالإنجليزية"
+                      className="h-12 text-lg rounded-xl"
+                      data-testid="input-trimlevel-name-en-contextual"
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <Button 
+                      onClick={() => {
+                        toast({
+                          title: "قريباً",
+                          description: "ستتم إضافة هذه الميزة قريباً",
+                        });
+                      }}
+                      className="flex-1 h-12 bg-green-600 hover:bg-green-700 rounded-xl"
+                      data-testid="button-save-trimlevel-contextual"
+                    >
+                      <Save className="w-5 h-5 ml-2" />
+                      حفظ
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsAddTrimLevelToCategoryOpen(false)}
+                      className="h-12 rounded-xl"
+                      data-testid="button-cancel-trimlevel-contextual"
+                    >
+                      <X className="w-5 h-5 ml-2" />
+                      إلغاء
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            {/* Contextual Add Color to Manufacturer Dialog */}
+            <Dialog open={isAddColorToManufacturerOpen} onOpenChange={setIsAddColorToManufacturerOpen}>
+              <DialogContent className="max-w-md rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl text-center text-orange-600">إضافة لون للصانع</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6 p-2">
+                  <div>
+                    <Label className="text-lg">الصانع المحدد</Label>
+                    <div className="p-3 bg-orange-50 rounded-xl border border-orange-200">
+                      <span className="text-orange-800 font-medium">
+                        {hierarchyData.find(m => m.id === contextManufacturerId)?.nameAr || "غير محدد"}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-lg">نوع اللون</Label>
+                    <Select value={colorType} onValueChange={(value: 'exterior' | 'interior') => setColorType(value)}>
+                      <SelectTrigger className="h-12 rounded-xl" data-testid="select-color-type-manufacturer">
+                        <SelectValue placeholder="اختر نوع اللون" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="exterior">خارجي</SelectItem>
+                        <SelectItem value="interior">داخلي</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-lg">الاسم بالعربية</Label>
+                    <Input
+                      value={colorName}
+                      onChange={(e) => setColorName(e.target.value)}
+                      placeholder="أدخل اسم اللون بالعربية"
+                      className="h-12 text-lg rounded-xl"
+                      data-testid="input-color-name-manufacturer"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-lg">كود اللون</Label>
+                    <div className="flex gap-3">
+                      <Input
+                        value={colorCode}
+                        onChange={(e) => setColorCode(e.target.value)}
+                        placeholder="#FFFFFF"
+                        className="h-12 text-lg rounded-xl"
+                        data-testid="input-color-code-manufacturer"
+                      />
+                      <div 
+                        className="w-16 h-12 rounded-xl border-2 border-gray-300"
+                        style={{ backgroundColor: colorCode }}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button 
+                      onClick={() => {
+                        toast({
+                          title: "قريباً",
+                          description: "ستتم إضافة هذه الميزة قريباً",
+                        });
+                      }}
+                      className="flex-1 h-12 bg-green-600 hover:bg-green-700 rounded-xl"
+                      data-testid="button-save-color-manufacturer"
+                    >
+                      <Save className="w-5 h-5 ml-2" />
+                      حفظ
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsAddColorToManufacturerOpen(false)}
+                      className="h-12 rounded-xl"
+                      data-testid="button-cancel-color-manufacturer"
+                    >
+                      <X className="w-5 h-5 ml-2" />
+                      إلغاء
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            {/* Contextual Add Color to Category Dialog */}
+            <Dialog open={isAddColorToCategoryOpen} onOpenChange={setIsAddColorToCategoryOpen}>
+              <DialogContent className="max-w-md rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl text-center text-pink-600">إضافة لون للفئة</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6 p-2">
+                  <div>
+                    <Label className="text-lg">الفئة المحددة</Label>
+                    <div className="p-3 bg-pink-50 rounded-xl border border-pink-200">
+                      <span className="text-pink-800 font-medium">
+                        {hierarchyData.flatMap(m => m.categories).find(c => c.id === contextCategoryId)?.nameAr || "غير محدد"}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-lg">نوع اللون</Label>
+                    <Select value={colorType} onValueChange={(value: 'exterior' | 'interior') => setColorType(value)}>
+                      <SelectTrigger className="h-12 rounded-xl" data-testid="select-color-type-category">
+                        <SelectValue placeholder="اختر نوع اللون" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="exterior">خارجي</SelectItem>
+                        <SelectItem value="interior">داخلي</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-lg">الاسم بالعربية</Label>
+                    <Input
+                      value={colorName}
+                      onChange={(e) => setColorName(e.target.value)}
+                      placeholder="أدخل اسم اللون بالعربية"
+                      className="h-12 text-lg rounded-xl"
+                      data-testid="input-color-name-category"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-lg">كود اللون</Label>
+                    <div className="flex gap-3">
+                      <Input
+                        value={colorCode}
+                        onChange={(e) => setColorCode(e.target.value)}
+                        placeholder="#FFFFFF"
+                        className="h-12 text-lg rounded-xl"
+                        data-testid="input-color-code-category"
+                      />
+                      <div 
+                        className="w-16 h-12 rounded-xl border-2 border-gray-300"
+                        style={{ backgroundColor: colorCode }}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button 
+                      onClick={() => {
+                        toast({
+                          title: "قريباً",
+                          description: "ستتم إضافة هذه الميزة قريباً",
+                        });
+                      }}
+                      className="flex-1 h-12 bg-green-600 hover:bg-green-700 rounded-xl"
+                      data-testid="button-save-color-category"
+                    >
+                      <Save className="w-5 h-5 ml-2" />
+                      حفظ
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsAddColorToCategoryOpen(false)}
+                      className="h-12 rounded-xl"
+                      data-testid="button-cancel-color-category"
+                    >
+                      <X className="w-5 h-5 ml-2" />
+                      إلغاء
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            {/* Contextual Add Color to Trim Level Dialog */}
+            <Dialog open={isAddColorToTrimLevelOpen} onOpenChange={setIsAddColorToTrimLevelOpen}>
+              <DialogContent className="max-w-md rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl text-center text-yellow-600">إضافة لون لدرجة التجهيز</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6 p-2">
+                  <div>
+                    <Label className="text-lg">درجة التجهيز المحددة</Label>
+                    <div className="p-3 bg-yellow-50 rounded-xl border border-yellow-200">
+                      <span className="text-yellow-800 font-medium">
+                        {hierarchyData.flatMap(m => m.categories).flatMap(c => c.trimLevels).find(t => t.id === contextTrimLevelId)?.nameAr || "غير محدد"}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-lg">نوع اللون</Label>
+                    <Select value={colorType} onValueChange={(value: 'exterior' | 'interior') => setColorType(value)}>
+                      <SelectTrigger className="h-12 rounded-xl" data-testid="select-color-type-trimlevel">
+                        <SelectValue placeholder="اختر نوع اللون" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="exterior">خارجي</SelectItem>
+                        <SelectItem value="interior">داخلي</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-lg">الاسم بالعربية</Label>
+                    <Input
+                      value={colorName}
+                      onChange={(e) => setColorName(e.target.value)}
+                      placeholder="أدخل اسم اللون بالعربية"
+                      className="h-12 text-lg rounded-xl"
+                      data-testid="input-color-name-trimlevel"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-lg">كود اللون</Label>
+                    <div className="flex gap-3">
+                      <Input
+                        value={colorCode}
+                        onChange={(e) => setColorCode(e.target.value)}
+                        placeholder="#FFFFFF"
+                        className="h-12 text-lg rounded-xl"
+                        data-testid="input-color-code-trimlevel"
+                      />
+                      <div 
+                        className="w-16 h-12 rounded-xl border-2 border-gray-300"
+                        style={{ backgroundColor: colorCode }}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button 
+                      onClick={() => {
+                        toast({
+                          title: "قريباً",
+                          description: "ستتم إضافة هذه الميزة قريباً",
+                        });
+                      }}
+                      className="flex-1 h-12 bg-green-600 hover:bg-green-700 rounded-xl"
+                      data-testid="button-save-color-trimlevel"
+                    >
+                      <Save className="w-5 h-5 ml-2" />
+                      حفظ
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsAddColorToTrimLevelOpen(false)}
+                      className="h-12 rounded-xl"
+                      data-testid="button-cancel-color-trimlevel"
+                    >
+                      <X className="w-5 h-5 ml-2" />
+                      إلغاء
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </Card>
 
@@ -686,6 +1067,41 @@ export default function DropdownOptionsManagement() {
                             </Badge>
                           </div>
                           <div className="flex items-center gap-2">
+                            {/* Add Category Button */}
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="glass-button bg-blue-600/20 hover:bg-blue-600/30"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setContextManufacturerId(item.id);
+                                setSelectedManufacturerId(item.id);
+                                setIsAddCategoryToManufacturerOpen(true);
+                              }}
+                              data-testid={`add-category-${item.id}`}
+                              title="إضافة فئة"
+                            >
+                              <Plus className="w-4 h-4 text-blue-300" />
+                              <Car className="w-4 h-4 text-blue-300 mr-1" />
+                            </Button>
+                            
+                            {/* Add Color to Manufacturer Button */}
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="glass-button bg-orange-600/20 hover:bg-orange-600/30"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setContextManufacturerId(item.id);
+                                setIsAddColorToManufacturerOpen(true);
+                              }}
+                              data-testid={`add-color-manufacturer-${item.id}`}
+                              title="إضافة لون للصانع"
+                            >
+                              <Plus className="w-4 h-4 text-orange-300" />
+                              <Palette className="w-4 h-4 text-orange-300 mr-1" />
+                            </Button>
+                            
                             <Button 
                               variant="ghost" 
                               size="sm" 
@@ -748,6 +1164,41 @@ export default function DropdownOptionsManagement() {
                                         </Badge>
                                       </div>
                                       <div className="flex items-center gap-2">
+                                        {/* Add Trim Level Button */}
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          className="glass-button bg-purple-600/20 hover:bg-purple-600/30"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setContextCategoryId(category.id);
+                                            setSelectedCategoryId(category.id);
+                                            setIsAddTrimLevelToCategoryOpen(true);
+                                          }}
+                                          data-testid={`add-trim-level-${category.id}`}
+                                          title="إضافة درجة تجهيز"
+                                        >
+                                          <Plus className="w-4 h-4 text-purple-300" />
+                                          <Settings className="w-4 h-4 text-purple-300 mr-1" />
+                                        </Button>
+                                        
+                                        {/* Add Color to Category Button */}
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          className="glass-button bg-pink-600/20 hover:bg-pink-600/30"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setContextCategoryId(category.id);
+                                            setIsAddColorToCategoryOpen(true);
+                                          }}
+                                          data-testid={`add-color-category-${category.id}`}
+                                          title="إضافة لون للفئة"
+                                        >
+                                          <Plus className="w-4 h-4 text-pink-300" />
+                                          <Palette className="w-4 h-4 text-pink-300 mr-1" />
+                                        </Button>
+                                        
                                         <Button 
                                           variant="ghost" 
                                           size="sm" 
@@ -799,6 +1250,22 @@ export default function DropdownOptionsManagement() {
                                                   )}
                                                 </div>
                                                 <div className="flex items-center justify-center gap-1 w-full pt-2 border-t border-white/20">
+                                                  {/* Add Color to Trim Level Button */}
+                                                  <Button 
+                                                    variant="ghost" 
+                                                    size="sm" 
+                                                    className="glass-button h-8 w-8 p-0 bg-yellow-600/20 hover:bg-yellow-600/30"
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      setContextTrimLevelId(trimLevel.id);
+                                                      setIsAddColorToTrimLevelOpen(true);
+                                                    }}
+                                                    data-testid={`add-color-trim-${trimLevel.id}`}
+                                                    title="إضافة لون لدرجة التجهيز"
+                                                  >
+                                                    <Plus className="w-3 h-3 text-yellow-300" />
+                                                  </Button>
+                                                  
                                                   <Button 
                                                     variant="ghost" 
                                                     size="sm" 
