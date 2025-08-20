@@ -58,100 +58,7 @@ interface QuotationCreationPageProps {
   vehicleData?: InventoryItem;
 }
 
-// Simple component to display general vehicle specifications
-function VehicleGeneralSpecifications({ manufacturer, category, trimLevel, year, engineCapacity, chassisNumber }: {
-  manufacturer?: string;
-  category?: string;
-  trimLevel?: string;
-  year?: string;
-  engineCapacity?: string;
-  chassisNumber?: string;
-}) {
-  const { data: specs, isLoading } = useQuery({
-    queryKey: ['vehicle-general-specs', chassisNumber, manufacturer, category, trimLevel, year, engineCapacity],
-    queryFn: async () => {
-      // Use chassis number endpoint if available
-      if (chassisNumber && chassisNumber.trim()) {
-        try {
-          const response = await fetch(`/api/specifications-by-chassis/${encodeURIComponent(chassisNumber.trim())}`);
-          if (response.ok) {
-            return response.json();
-          }
-        } catch (error) {
-          console.log('Error fetching specifications by chassis:', error);
-        }
-      }
-      
-      // Fallback to general specifications
-      if (manufacturer && category && year && engineCapacity) {
-        try {
-          const response = await fetch(
-            `/api/specifications/${encodeURIComponent(manufacturer)}/${encodeURIComponent(category)}/${encodeURIComponent(trimLevel || 'null')}/${year}/${encodeURIComponent(engineCapacity)}`
-          );
-          if (response.ok) {
-            return response.json();
-          }
-        } catch (error) {
-          console.log('Error fetching general specifications:', error);
-        }
-      }
-      return null;
-    },
-    enabled: Boolean(chassisNumber || (manufacturer && category && year && engineCapacity))
-  });
 
-  if (!chassisNumber && (!manufacturer || !category || !year || !engineCapacity)) {
-    return null;
-  }
-
-  if (isLoading) {
-    return (
-      <div className="mt-6 pt-6 border-t border-white/20">
-        <h4 className="text-md font-semibold text-white drop-shadow-md mb-4 flex items-center">
-          <Car className="ml-2" size={18} />
-          المواصفات العامة
-        </h4>
-        <div className="flex items-center justify-center space-x-2 space-x-reverse p-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-          <span className="text-gray-300">جاري تحميل المواصفات العامة...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (!specs || !specs.specifications) {
-    return (
-      <div className="mt-6 pt-6 border-t border-white/20">
-        <h4 className="text-md font-semibold text-white drop-shadow-md mb-4 flex items-center">
-          <Car className="ml-2" size={18} />
-          المواصفات العامة
-        </h4>
-        <div className="text-center p-6 bg-yellow-50/10 backdrop-blur-sm rounded-lg border border-yellow-200/20">
-          <Info className="mx-auto h-8 w-8 text-yellow-500 mb-2" />
-          <p className="text-yellow-200">لا توجد مواصفات عامة متاحة</p>
-        </div>
-      </div>
-    );
-  }
-
-  const specificationsText = typeof specs.specifications === 'string' 
-    ? specs.specifications 
-    : JSON.stringify(specs.specifications, null, 2);
-
-  return (
-    <div className="mt-6 pt-6 border-t border-white/20">
-      <h4 className="text-md font-semibold text-white drop-shadow-md mb-4 flex items-center">
-        <Car className="ml-2" size={18} />
-        المواصفات العامة
-      </h4>
-      <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-4">
-        <pre className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap font-cairo">
-          {specificationsText}
-        </pre>
-      </div>
-    </div>
-  );
-}
 
 // Component to display vehicle specifications with enhanced styling
 function VehicleSpecificationsDisplayComponent({ manufacturer, category, trimLevel, year, engineCapacity, chassisNumber }: {
@@ -2074,15 +1981,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                       </div>
                     </div>
 
-                    {/* Vehicle General Specifications Section - Right after vehicle data */}
-                    <VehicleGeneralSpecifications 
-                      manufacturer={editableVehicle.manufacturer}
-                      category={editableVehicle.category}
-                      trimLevel={editableVehicle.trimLevel}
-                      year={editableVehicle.year?.toString()}
-                      engineCapacity={editableVehicle.engineCapacity}
-                      chassisNumber={editableVehicle.chassisNumber}
-                    />
+
                   </div>
                 ) : (
                   // Vehicle Data Selection Form

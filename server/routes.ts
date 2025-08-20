@@ -1409,13 +1409,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         let parsedSpecs = {};
         if (spec.specifications) {
           try {
-            parsedSpecs = typeof spec.specifications === 'string' 
-              ? JSON.parse(spec.specifications) 
-              : spec.specifications;
+            // Check if it's already an object
+            if (typeof spec.specifications === 'object') {
+              parsedSpecs = spec.specifications;
+            } else {
+              // Try to parse as JSON first
+              parsedSpecs = JSON.parse(spec.specifications);
+            }
           } catch (e) {
             console.log('Error parsing specifications JSON:', e);
+            // If JSON parsing fails, treat as raw text
             parsedSpecs = {
-              "المواصفات العامة": spec.specifications || "غير متوفر",
+              "المواصفات العامة": spec.specifications.toString() || "غير متوفر",
               "نوع المحرك": spec.engineCapacity || "غير محدد",
               "سنة الصنع": spec.year?.toString() || "غير محدد",
               "الفئة": spec.category || "غير محدد"
@@ -1467,12 +1472,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         let parsedSpecs = {};
         if (spec.specifications) {
           try {
-            parsedSpecs = typeof spec.specifications === 'string' 
-              ? JSON.parse(spec.specifications) 
-              : spec.specifications;
+            // Check if it's already an object
+            if (typeof spec.specifications === 'object') {
+              parsedSpecs = spec.specifications;
+            } else {
+              // Try to parse as JSON first
+              parsedSpecs = JSON.parse(spec.specifications);
+            }
           } catch (e) {
+            console.log('Error parsing specifications JSON:', e);
+            // If JSON parsing fails, treat as raw text
             parsedSpecs = {
-              "المواصفات العامة": spec.specifications || "غير متوفر",
+              "المواصفات العامة": spec.specifications.toString() || "غير متوفر",
               "نوع المحرك": spec.engineCapacity || "غير محدد",
               "سنة الصنع": spec.year?.toString() || "غير محدد",
               "الفئة": spec.category || "غير محدد"
@@ -1559,14 +1570,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         let parsedSpecs = {};
         if (spec.specifications) {
           try {
-            parsedSpecs = typeof spec.specifications === 'string' 
-              ? JSON.parse(spec.specifications) 
-              : spec.specifications;
+            // Check if it's already an object
+            if (typeof spec.specifications === 'object') {
+              parsedSpecs = spec.specifications;
+            } else {
+              // Try to parse as JSON first
+              parsedSpecs = JSON.parse(spec.specifications);
+            }
           } catch (e) {
             console.log('Error parsing specifications JSON:', e);
-            // Return as simple object with the raw text
+            // If JSON parsing fails, treat as raw text
             parsedSpecs = {
-              "المواصفات العامة": spec.specifications || "غير متوفر",
+              "المواصفات العامة": spec.specifications.toString() || "غير متوفر",
               "نوع المحرك": engineCapacity || "غير محدد",
               "سنة الصنع": year || "غير محدد",
               "الفئة": category || "غير محدد"
