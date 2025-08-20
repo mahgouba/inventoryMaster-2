@@ -76,7 +76,6 @@ interface HierarchyData {
   logo?: string;
   isActive?: boolean;
   categories: Category[];
-  categories: CategoryWithTrimLevels[];
 }
 
 export default function DropdownOptionsManagement() {
@@ -120,7 +119,7 @@ export default function DropdownOptionsManagement() {
     queryKey: ['/api/manufacturers'],
   });
 
-  const { data: categories = [] } = useQuery<CategoryWithTrimLevels[]>({
+  const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ['/api/categories'],
   });
 
@@ -453,7 +452,7 @@ export default function DropdownOptionsManagement() {
                         {Array.isArray(hierarchyData) && hierarchyData.flatMap((item: HierarchyData) => 
                           item.categories.map(cat => (
                             <SelectItem key={cat.id} value={cat.id.toString()}>
-                              {item.nameAr} - {cat.name_ar}
+                              {item.nameAr} - {cat.nameAr}
                             </SelectItem>
                           ))
                         )}
