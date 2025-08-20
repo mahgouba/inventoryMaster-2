@@ -121,12 +121,6 @@ export default function DropdownOptionsManagement() {
   // Fetch data
   const { data: hierarchyData = [], isLoading } = useQuery<HierarchyData[]>({
     queryKey: ['/api/hierarchy/full'],
-    onSuccess: (data) => {
-      console.log('📊 Hierarchy data received:', data);
-      console.log('📊 First manufacturer:', data?.[0]);
-      console.log('📊 First category of first manufacturer:', data?.[0]?.categories?.[0]);
-      console.log('📊 First trim level:', data?.[0]?.categories?.[0]?.trimLevels?.[0]);
-    }
   });
 
   const { data: manufacturers = [] } = useQuery<Manufacturer[]>({
@@ -218,25 +212,16 @@ export default function DropdownOptionsManagement() {
     setExpandedItems(newExpanded);
   };
 
-  // Filter data based on search and type
+  // Filter data based on search and type - show ALL manufacturers (active and inactive)
   const filteredData = hierarchyData.filter(item => {
-    if (!item || !item.nameAr) {
-      console.log('❌ Filtering out invalid item:', item);
-      return false;
-    }
+    if (!item || !item.nameAr) return false;
     
     const matchesSearch = item.nameAr.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          (item.nameEn && item.nameEn.toLowerCase().includes(searchQuery.toLowerCase()));
     
-    if (filterType === "all") return matchesSearch;
-    if (filterType === "manufacturers") return matchesSearch;
-    // Add more filter types as needed
-    
+    // Show all manufacturers regardless of active status for management purposes
     return matchesSearch;
   });
-
-  console.log('🔍 Filtered data:', filteredData.length, 'items');
-  console.log('🔍 First filtered item:', filteredData[0]);
 
   if (isLoading) {
     return (
@@ -683,7 +668,7 @@ export default function DropdownOptionsManagement() {
           <ScrollArea className="h-[600px]">
             <div className="space-y-4">
               {filteredData.length > 0 ? filteredData.map((item: HierarchyData) => (
-                <Card key={item.id} className="glass-container border-2 border-white/20 shadow-lg rounded-2xl overflow-hidden">
+                <Card key={item.id} className={`glass-container border-2 shadow-lg rounded-2xl overflow-hidden ${item.isActive !== false ? 'border-green-400/30 bg-green-900/10' : 'border-red-400/30 bg-red-900/10 opacity-75'}`}>
                   <Collapsible 
                     open={expandedItems.has(`manufacturer-${item.id}`)}
                     onOpenChange={() => toggleExpanded(`manufacturer-${item.id}`)}
@@ -696,9 +681,12 @@ export default function DropdownOptionsManagement() {
                               <Building2 className="w-8 h-8 text-white" />
                             </div>
                             <div>
-                              <h3 className="text-2xl font-bold text-white">{item.nameAr}</h3>
+                              <h3 className={`text-2xl font-bold ${item.isActive !== false ? 'text-white' : 'text-white/70'}`}>{item.nameAr}</h3>
                               {item.nameEn && (
-                                <p className="text-sm text-white/60">({item.nameEn})</p>
+                                <p className={`text-sm ${item.isActive !== false ? 'text-white/60' : 'text-white/40'}`}>({item.nameEn})</p>
+                              )}
+                              {item.isActive === false && (
+                                <p className="text-xs text-red-300 font-medium">مخفي</p>
                               )}
                             </div>
                             <Badge variant="outline" className="bg-white/20 text-white border-white/30 px-4 py-2 text-lg">
