@@ -425,7 +425,9 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     queryFn: async () => {
       if (!selectedManufacturerName || !selectedCategoryName) return [];
       const response = await fetch(`/api/hierarchical/trimLevels?manufacturer=${encodeURIComponent(selectedManufacturerName)}&category=${encodeURIComponent(selectedCategoryName)}`);
-      return response.json();
+      if (!response.ok) return [];
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
     },
     enabled: !!selectedManufacturerName && !!selectedCategoryName,
   });
@@ -469,7 +471,9 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     queryFn: async () => {
       if (!editingVehicleData.manufacturer || !editingVehicleData.category) return [];
       const response = await fetch(`/api/hierarchical/trimLevels?manufacturer=${encodeURIComponent(editingVehicleData.manufacturer)}&category=${encodeURIComponent(editingVehicleData.category)}`);
-      return response.json();
+      if (!response.ok) return [];
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
     },
     enabled: !!editingVehicleData.manufacturer && !!editingVehicleData.category,
   });
