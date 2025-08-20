@@ -10,7 +10,10 @@ import {
   vehicleTrimLevels,
   dailyAttendance,
   employeeWorkSchedules,
-  leaveRequests 
+  leaveRequests,
+  colorAssociations,
+  vehicleSpecifications,
+  vehicleImageLinks
 } from "@shared/schema";
 import { Pool } from 'pg';
 import { eq, desc, and } from "drizzle-orm";
@@ -1188,7 +1191,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { db } = getDatabase();
       const items = await db.select().from(inventoryItems);
-      const uniqueYears = [...new Set(items.map(item => item.year))].sort((a, b) => b - a);
+      const uniqueYears = [...new Set(items.map((item: any) => item.year))].sort((a: any, b: any) => b - a);
       res.json(uniqueYears);
     } catch (error) {
       console.error("Error fetching vehicle years:", error);
@@ -1201,13 +1204,229 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { db } = getDatabase();
       const items = await db.select().from(inventoryItems);
       const uniqueEngineCapacities = [...new Set(items
-        .map(item => item.engineCapacity)
-        .filter(capacity => capacity && capacity.trim() !== ""))]
+        .map((item: any) => item.engineCapacity)
+        .filter((capacity: any) => capacity && capacity.trim() !== ""))]
         .sort();
       res.json(uniqueEngineCapacities);
     } catch (error) {
       console.error("Error fetching engine capacities:", error);
       res.status(500).json({ message: "Failed to fetch engine capacities" });
+    }
+  });
+
+  // Get hierarchical colors (color associations)
+  app.get("/api/hierarchical/colors", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { manufacturer, category, trimLevel, colorType } = req.query;
+      
+      let query = db.select().from(colorAssociations).where(eq(colorAssociations.isActive, true));
+      
+      // Add filters if provided
+      if (manufacturer) {
+        query = query.where(eq(colorAssociations.manufacturer, manufacturer as string));
+      }
+      if (category) {
+        query = query.where(eq(colorAssociations.category, category as string));
+      }
+      if (trimLevel) {
+        query = query.where(eq(colorAssociations.trimLevel, trimLevel as string));
+      }
+      if (colorType) {
+        query = query.where(eq(colorAssociations.colorType, colorType as string));
+      }
+      
+      const colors = await query;
+      res.json(colors);
+    } catch (error) {
+      console.error("Error fetching hierarchical colors:", error);
+      res.status(500).json({ message: "Failed to fetch hierarchical colors" });
+    }
+  });
+
+  // Get vehicle specifications
+  app.get("/api/vehicle-specifications", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const specifications = await db.select().from(vehicleSpecifications);
+      res.json(specifications);
+    } catch (error) {
+      console.error("Error fetching vehicle specifications:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle specifications" });
+    }
+  });
+
+  // Create vehicle specification
+  app.post("/api/vehicle-specifications", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { manufacturer, category, trimLevel, year, engineCapacity, chassisNumber, specifications, specificationsEn } = req.body;
+      
+      const [newSpec] = await db.insert(vehicleSpecifications).values({
+        manufacturer,
+        category,
+        trimLevel,
+        year,
+        engineCapacity,
+        chassisNumber,
+        specifications,
+        specificationsEn
+      }).returning();
+
+      res.json(newSpec);
+    } catch (error) {
+      console.error("Error creating vehicle specification:", error);
+      res.status(500).json({ message: "Failed to create vehicle specification" });
+    }
+  });
+
+  // Update vehicle specification
+  app.put("/api/vehicle-specifications/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      const { manufacturer, category, trimLevel, year, engineCapacity, chassisNumber, specifications, specificationsEn } = req.body;
+      
+      const [updatedSpec] = await db.update(vehicleSpecifications)
+        .set({
+          manufacturer,
+          category,
+          trimLevel,
+          year,
+          engineCapacity,
+          chassisNumber,
+          specifications,
+          specificationsEn,
+          updatedAt: new Date()
+        })
+        .where(eq(vehicleSpecifications.id, id))
+        .returning();
+
+      if (!updatedSpec) {
+        return res.status(404).json({ message: "Vehicle specification not found" });
+      }
+
+      res.json(updatedSpec);
+    } catch (error) {
+      console.error("Error updating vehicle specification:", error);
+      res.status(500).json({ message: "Failed to update vehicle specification" });
+    }
+  });
+
+  // Delete vehicle specification
+  app.delete("/api/vehicle-specifications/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      
+      const [deletedSpec] = await db.delete(vehicleSpecifications)
+        .where(eq(vehicleSpecifications.id, id))
+        .returning();
+
+      if (!deletedSpec) {
+        return res.status(404).json({ message: "Vehicle specification not found" });
+      }
+
+      res.json({ message: "Vehicle specification deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting vehicle specification:", error);
+      res.status(500).json({ message: "Failed to delete vehicle specification" });
+    }
+  });
+
+  // Get vehicle image links
+  app.get("/api/vehicle-image-links", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const imageLinks = await db.select().from(vehicleImageLinks);
+      res.json(imageLinks);
+    } catch (error) {
+      console.error("Error fetching vehicle image links:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle image links" });
+    }
+  });
+
+  // Create vehicle image link
+  app.post("/api/vehicle-image-links", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { manufacturer, category, trimLevel, year, engineCapacity, exteriorColor, interiorColor, chassisNumber, imageUrl, description, descriptionEn } = req.body;
+      
+      const [newImageLink] = await db.insert(vehicleImageLinks).values({
+        manufacturer,
+        category,
+        trimLevel,
+        year,
+        engineCapacity,
+        exteriorColor,
+        interiorColor,
+        chassisNumber,
+        imageUrl,
+        description,
+        descriptionEn
+      }).returning();
+
+      res.json(newImageLink);
+    } catch (error) {
+      console.error("Error creating vehicle image link:", error);
+      res.status(500).json({ message: "Failed to create vehicle image link" });
+    }
+  });
+
+  // Update vehicle image link
+  app.put("/api/vehicle-image-links/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      const { manufacturer, category, trimLevel, year, engineCapacity, exteriorColor, interiorColor, chassisNumber, imageUrl, description, descriptionEn } = req.body;
+      
+      const [updatedImageLink] = await db.update(vehicleImageLinks)
+        .set({
+          manufacturer,
+          category,
+          trimLevel,
+          year,
+          engineCapacity,
+          exteriorColor,
+          interiorColor,
+          chassisNumber,
+          imageUrl,
+          description,
+          descriptionEn,
+          updatedAt: new Date()
+        })
+        .where(eq(vehicleImageLinks.id, id))
+        .returning();
+
+      if (!updatedImageLink) {
+        return res.status(404).json({ message: "Vehicle image link not found" });
+      }
+
+      res.json(updatedImageLink);
+    } catch (error) {
+      console.error("Error updating vehicle image link:", error);
+      res.status(500).json({ message: "Failed to update vehicle image link" });
+    }
+  });
+
+  // Delete vehicle image link
+  app.delete("/api/vehicle-image-links/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      
+      const [deletedImageLink] = await db.delete(vehicleImageLinks)
+        .where(eq(vehicleImageLinks.id, id))
+        .returning();
+
+      if (!deletedImageLink) {
+        return res.status(404).json({ message: "Vehicle image link not found" });
+      }
+
+      res.json({ message: "Vehicle image link deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting vehicle image link:", error);
+      res.status(500).json({ message: "Failed to delete vehicle image link" });
     }
   });
 
