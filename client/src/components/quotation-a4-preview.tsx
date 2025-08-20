@@ -560,8 +560,35 @@ function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetail
     );
   }
 
-  // Get raw specifications data directly
-  const rawSpecsText = specificationsData?.specifications;
+  // Get raw specifications data and handle different formats
+  const getSpecsText = () => {
+    const specs = specificationsData?.specifications;
+    if (!specs) return null;
+    
+    // If it's a string, return it directly
+    if (typeof specs === 'string') {
+      return specs;
+    }
+    
+    // If it's an object, look for the original text content
+    if (typeof specs === 'object') {
+      // Look for "المواصفات العامة" field first
+      if (specs['المواصفات العامة']) {
+        return specs['المواصفات العامة'];
+      }
+      
+      // Otherwise, return the first non-empty string value found
+      for (const [key, value] of Object.entries(specs)) {
+        if (typeof value === 'string' && value.trim() && value !== 'غير محدد' && value !== 'غير متوفر') {
+          return value;
+        }
+      }
+    }
+    
+    return null;
+  };
+
+  const rawSpecsText = getSpecsText();
   
   return (
     <div className="mb-3">
