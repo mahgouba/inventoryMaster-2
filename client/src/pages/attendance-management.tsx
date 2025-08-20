@@ -1627,10 +1627,16 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   // للدوام المتصل أو يوم الجمعة، عرض في الفترة الأولى فقط
                   if (isFriday) {
                     // يوم الجمعة: استخدم الفترة المسائية كفترة واحدة
-                    checkinTime = `${dayAttendance.eveningCheckinTime || '-'} - ${dayAttendance.eveningCheckoutTime || '-'}`;
+                    const eveningIn = dayAttendance.eveningCheckinTime;
+                    const eveningOut = dayAttendance.eveningCheckoutTime;
+                    checkinTime = (eveningIn && eveningOut) ? 
+                      (eveningIn === eveningOut ? '-' : `${eveningIn} - ${eveningOut}`) : '-';
                   } else {
                     // الدوام المتصل العادي
-                    checkinTime = `${dayAttendance.continuousCheckinTime || '-'} - ${dayAttendance.continuousCheckoutTime || '-'}`;
+                    const continuousIn = dayAttendance.continuousCheckinTime;
+                    const continuousOut = dayAttendance.continuousCheckoutTime;
+                    checkinTime = (continuousIn && continuousOut) ? 
+                      (continuousIn === continuousOut ? '-' : `${continuousIn} - ${continuousOut}`) : '-';
                   }
                   checkoutTime = '-';
                 } else {
@@ -1641,10 +1647,12 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   const eveningOut = dayAttendance.eveningCheckoutTime;
                   
                   // عرض الفترة الأولى (الصباحية)
-                  checkinTime = (morningIn && morningOut) ? `${morningIn} - ${morningOut}` : '-';
+                  checkinTime = (morningIn && morningOut) ? 
+                    (morningIn === morningOut ? '-' : `${morningIn} - ${morningOut}`) : '-';
                   
                   // عرض الفترة الثانية (المسائية)
-                  checkoutTime = (eveningIn && eveningOut) ? `${eveningIn} - ${eveningOut}` : '-';
+                  checkoutTime = (eveningIn && eveningOut) ? 
+                    (eveningIn === eveningOut ? '-' : `${eveningIn} - ${eveningOut}`) : '-';
                 }
                 const calculatedHours = parseFloat(calculateHoursWorked(schedule, dayAttendance));
                 const calculatedDelay = calculateDelayHours(schedule, dayAttendance, day);
