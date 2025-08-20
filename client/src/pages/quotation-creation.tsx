@@ -909,7 +909,7 @@ export default function QuotationCreationPage({ vehicleData }: QuotationCreation
     if (selectedEmployee && sendToWorkNumber) {
       // Use employee's work number
       const selectedRep = users.find((user: any) => user.id.toString() === selectedEmployee);
-      if (selectedRep) {
+      if (selectedRep && selectedRep.phone) {
         targetNumber = selectedRep.phone.startsWith('+') ? selectedRep.phone : `+966${selectedRep.phone.replace(/^0/, '')}`;
       }
     } else {

@@ -153,6 +153,10 @@ Core entities:
 - ✅ Fixed vehicle specifications display system - now shows structured detailed specifications with organized categories (Aug 20, 2025)
 - ✅ Enhanced specifications API endpoints to provide detailed vehicle information including engine, dimensions, features, and technical specs (Aug 20, 2025)
 - ✅ Updated frontend component to display structured specifications with better formatting and visual hierarchy (Aug 20, 2025)
+- ✅ Added detailed specifications section in quotation A4 preview under vehicle data section (Aug 20, 2025)
+- ✅ Implemented double-click editing functionality for specifications in quotation preview with direct database save (Aug 20, 2025)
+- ✅ Fixed runtime error in WhatsApp sharing functionality by adding null check for selectedRep.phone (Aug 20, 2025)
+- ✅ Enhanced specifications display to show only raw data from specifications management system (Aug 20, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
