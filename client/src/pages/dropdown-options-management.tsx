@@ -42,39 +42,31 @@ interface Manufacturer {
 
 interface Category {
   id: number;
-  name_ar: string;
-  name_en?: string;
-  manufacturer_id: number;
+  nameAr: string;
+  nameEn?: string;
+  manufacturerId: number;
   isActive?: boolean;
+  trimLevels: TrimLevel[];
 }
 
 interface TrimLevel {
   id: number;
-  name_ar: string;
-  name_en?: string;
-  category_id: number;
+  nameAr: string;
+  nameEn?: string;
+  categoryId: number;
   isActive?: boolean;
 }
 
 interface Color {
   id: number;
   name: string;
-  name_en?: string;
+  nameEn?: string;
   code: string;
   type: 'exterior' | 'interior';
-  manufacturer_id?: number;
-  category_id?: number;
-  trim_level_id?: number;
+  manufacturerId?: number;
+  categoryId?: number;
+  trimLevelId?: number;
   isActive?: boolean;
-}
-
-interface CategoryWithTrimLevels {
-  id: number;
-  name_ar: string;
-  name_en?: string;
-  manufacturerId: number;
-  isActive?: boolean;
-  trimLevels: TrimLevel[];
 }
 
 interface HierarchyData {
@@ -83,6 +75,7 @@ interface HierarchyData {
   nameEn?: string;
   logo?: string;
   isActive?: boolean;
+  categories: Category[];
   categories: CategoryWithTrimLevels[];
 }
 
@@ -746,9 +739,9 @@ export default function DropdownOptionsManagement() {
                                           <Car className="w-6 h-6 text-white" />
                                         </div>
                                         <div>
-                                          <h4 className="font-bold text-lg text-white">{category.name_ar}</h4>
-                                          {category.name_en && (
-                                            <p className="text-sm text-white/60">({category.name_en})</p>
+                                          <h4 className="font-bold text-lg text-white">{category.nameAr}</h4>
+                                          {category.nameEn && (
+                                            <p className="text-sm text-white/60">({category.nameEn})</p>
                                           )}
                                         </div>
                                         <Badge variant="outline" className="bg-white/20 text-white border-white/30">
@@ -801,9 +794,9 @@ export default function DropdownOptionsManagement() {
                                                   <Settings className="w-6 h-6 text-white" />
                                                 </div>
                                                 <div className="flex-1 min-h-[3rem] flex flex-col justify-center">
-                                                  <p className="font-bold text-white text-sm leading-tight">{trimLevel.name_ar}</p>
-                                                  {trimLevel.name_en && (
-                                                    <p className="text-xs text-white/60 mt-1">({trimLevel.name_en})</p>
+                                                  <p className="font-bold text-white text-sm leading-tight">{trimLevel.nameAr}</p>
+                                                  {trimLevel.nameEn && (
+                                                    <p className="text-xs text-white/60 mt-1">({trimLevel.nameEn})</p>
                                                   )}
                                                 </div>
                                                 <div className="flex items-center justify-center gap-1 w-full pt-2 border-t border-white/20">
