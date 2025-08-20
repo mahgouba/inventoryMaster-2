@@ -4,9 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { QrCode, Phone, Mail, Globe, Building, FileText, User, Building2, Settings, Calculator, Stamp } from "lucide-react";
+import { QrCode, Phone, Mail, Globe, Building, FileText, User, Building2, Settings, Calculator, Stamp, Car } from "lucide-react";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import type { Company, InventoryItem, Specification } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
 
 // Extended Specification interface that includes additional properties
 interface ExtendedSpecification extends Specification {
@@ -371,7 +372,12 @@ export default function QuotationA4Preview({
             )}
           </div>
 
-          
+          {/* Vehicle Detailed Specifications Section */}
+          {selectedVehicle && (
+            <VehicleDetailedSpecificationsSection 
+              selectedVehicle={selectedVehicle}
+            />
+          )}
 
           {/* Top Row: Terms & Conditions and Price Details (switched positions) */}
           <div className="flex gap-3 mb-3">
@@ -486,6 +492,91 @@ export default function QuotationA4Preview({
           )}
 
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Vehicle Detailed Specifications Section Component
+interface VehicleDetailedSpecificationsSectionProps {
+  selectedVehicle: InventoryItem;
+}
+
+function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetailedSpecificationsSectionProps) {
+  // Fetch specifications from the specifications management system
+  const { data: specificationsData, isLoading } = useQuery({
+    queryKey: ['/api/specifications-by-chassis', selectedVehicle.chassisNumber],
+    queryFn: () => 
+      selectedVehicle.chassisNumber 
+        ? fetch(`/api/specifications-by-chassis/${selectedVehicle.chassisNumber}`).then(res => res.ok ? res.json() : null)
+        : fetch(`/api/specifications/${selectedVehicle.manufacturer}/${selectedVehicle.category || ''}/${selectedVehicle.trimLevel || 'null'}/${selectedVehicle.year}/${selectedVehicle.engineCapacity || ''}`).then(res => res.ok ? res.json() : null)
+  });
+
+  // Format specifications for display
+  const formatSpecifications = (specs: any) => {
+    if (!specs || typeof specs !== 'object') return null;
+    
+    const formatted: string[] = [];
+    
+    Object.entries(specs).forEach(([category, items]) => {
+      if (typeof items === 'object' && items !== null) {
+        formatted.push(`📋 ${category}:`);
+        Object.entries(items).forEach(([key, value]) => {
+          if (value && value !== 'غير محدد' && value !== 'نعم') {
+            formatted.push(`   • ${key}: ${value}`);
+          } else if (value === 'نعم') {
+            formatted.push(`   ✓ ${key}`);
+          }
+        });
+        formatted.push(''); // Empty line between categories
+      } else if (items && items !== 'غير محدد') {
+        formatted.push(`• ${category}: ${items}`);
+      }
+    });
+    
+    return formatted.join('\n');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="mb-3">
+        <div className="flex items-center gap-2 mb-2">
+          <Car className="text-[#C79C45] w-5 h-5" />
+          <span className="text-lg font-bold text-black/80">المواصفات التفصيلية</span>
+        </div>
+        <div className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
+          <div className="text-center text-sm text-black/60 py-2">
+            جاري تحميل المواصفات التفصيلية...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const formattedSpecs = specificationsData?.specifications ? formatSpecifications(specificationsData.specifications) : null;
+
+  return (
+    <div className="mb-3">
+      <div className="flex items-center gap-2 mb-2">
+        <Car className="text-[#C79C45] w-5 h-5" />
+        <span className="text-lg font-bold text-black/80">المواصفات التفصيلية</span>
+        {specificationsData?.chassisNumber && (
+          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+            مربوطة برقم الهيكل
+          </span>
+        )}
+      </div>
+      
+      <div className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
+        {formattedSpecs ? (
+          <div className="text-xs text-black/80 leading-relaxed whitespace-pre-line max-h-32 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+            {formattedSpecs}
+          </div>
+        ) : (
+          <div className="text-center text-sm text-black/60 py-2">
+            لم يتم إدراج مواصفات تفصيلية لهذه المركبة بعد
+          </div>
+        )}
       </div>
     </div>
   );
