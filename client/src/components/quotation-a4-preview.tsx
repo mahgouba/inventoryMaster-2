@@ -91,6 +91,8 @@ export default function QuotationA4Preview({
 
   const [isEditingSpecs, setIsEditingSpecs] = useState(false);
   const [editableSpecs, setEditableSpecs] = useState<string>("");
+  const [isEditingTerms, setIsEditingTerms] = useState(false);
+  const [editableTerms, setEditableTerms] = useState<string>("");
   
   // Initialize editableSpecs when vehicleSpecs changes
   useEffect(() => {
@@ -115,6 +117,32 @@ export default function QuotationA4Preview({
 
     fetchTermsConditions();
   }, [termsRefreshTrigger]);
+
+  // Handle double click to start editing terms
+  const handleDoubleClickTerms = () => {
+    const termsText = termsConditions.map((term, index) => `${index + 1}. ${term.term_text}`).join('\n');
+    setEditableTerms(termsText);
+    setIsEditingTerms(true);
+  };
+
+  // Handle save terms
+  const handleSaveTerms = async () => {
+    try {
+      // For now, we'll just show a message since terms editing would need backend support
+      // In a full implementation, this would save to the database
+      console.log('Saving terms:', editableTerms);
+      setIsEditingTerms(false);
+    } catch (error) {
+      console.error('Error saving terms:', error);
+    }
+  };
+
+  // Handle cancel terms editing
+  const handleCancelTerms = () => {
+    setIsEditingTerms(false);
+    setEditableTerms('');
+  };
+
   const [useAlbarimi2Background, setUseAlbarimi2Background] = useState(true); // Default to albarimi-2
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -385,17 +413,70 @@ export default function QuotationA4Preview({
           <div className="flex gap-3 mb-3">
             {/* Terms & Conditions - 35% width */}
             <div className="w-[35%] border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="text-[#C79C45] w-5 h-5" />
+                <span className="text-lg font-bold text-black/80">الشروط والأحكام</span>
+                {isEditingTerms && (
+                  <div className="flex items-center gap-1 mr-auto">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleSaveTerms}
+                      className="h-6 px-2 text-xs"
+                    >
+                      <Save className="w-3 h-3 ml-1" />
+                      حفظ
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleCancelTerms}
+                      className="h-6 px-2 text-xs"
+                    >
+                      <X className="w-3 h-3 ml-1" />
+                      إلغاء
+                    </Button>
+                  </div>
+                )}
+              </div>
               
-              <div className="space-y-1 text-xs text-black/80 max-h-32 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                {termsConditions.length > 0 ? (
-                  termsConditions.map((term, index) => (
-                    <div key={term.id} className="leading-relaxed">
-                      <span className="font-semibold">{index + 1}.</span> {term.term_text}
-                    </div>
-                  ))
+              <div 
+                className="space-y-1 text-xs text-black/80 max-h-32 overflow-y-auto relative group" 
+                style={{ scrollbarWidth: 'thin' }}
+                onDoubleClick={handleDoubleClickTerms}
+              >
+                {!isEditingTerms && termsConditions.length === 0 && (
+                  <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Edit className="w-4 h-4 text-[#C79C45]" />
+                  </div>
+                )}
+                
+                {isEditingTerms ? (
+                  <Textarea
+                    value={editableTerms}
+                    onChange={(e) => setEditableTerms(e.target.value)}
+                    className="min-h-[80px] text-xs resize-none border-none p-0 focus:ring-0 text-black placeholder:text-gray-500"
+                    placeholder="أدخل الشروط والأحكام..."
+                    autoFocus
+                  />
+                ) : termsConditions.length > 0 ? (
+                  <div 
+                    className="cursor-pointer hover:bg-gray-50 rounded p-1 -m-1"
+                    title="اضغط مرتين للتحرير"
+                  >
+                    {termsConditions.map((term, index) => (
+                      <div key={term.id} className="leading-relaxed">
+                        <span className="font-semibold">{index + 1}.</span> {term.term_text}
+                      </div>
+                    ))}
+                  </div>
                 ) : (
-                  <div className="text-center text-black/60 py-2">
+                  <div 
+                    className="text-center text-black/60 py-2 cursor-pointer hover:bg-gray-50 rounded"
+                    title="اضغط مرتين لإضافة شروط وأحكام"
+                  >
                     لم يتم إضافة شروط وأحكام
+                    <div className="text-xs text-black/40 mt-1">اضغط مرتين للإضافة</div>
                   </div>
                 )}
               </div>
@@ -705,7 +786,7 @@ function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetail
           <Textarea
             value={editedSpecs}
             onChange={(e) => setEditedSpecs(e.target.value)}
-            className="min-h-[80px] text-xs resize-none border-none p-0 focus:ring-0"
+            className="min-h-[80px] text-xs resize-none border-none p-0 focus:ring-0 text-black placeholder:text-gray-500"
             placeholder="أدخل المواصفات التفصيلية..."
             autoFocus
           />

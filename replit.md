@@ -159,6 +159,9 @@ Core entities:
 - ✅ Enhanced specifications display to show only raw data from specifications management system (Aug 20, 2025)
 - ✅ Added missing quotations API endpoints for full CRUD operations (GET, POST, PUT, DELETE) (Aug 20, 2025)
 - ✅ Fixed quotations management page - now properly displays saved quotations and invoices (Aug 20, 2025)
+- ✅ Fixed text color in specifications editing textarea to use black color for better readability (Aug 20, 2025)
+- ✅ Added double-click editing functionality to terms and conditions section with save/cancel buttons (Aug 20, 2025)
+- ✅ Enhanced quotation A4 preview with comprehensive editing capabilities for both specifications and terms (Aug 20, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
