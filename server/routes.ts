@@ -269,6 +269,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Fix duplicate manufacturers
+  app.post("/api/fix-duplicates", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      
+      console.log("🔍 Fixing duplicate manufacturers...");
+      
+      // Get all manufacturers
+      const allManufacturers = await db.select().from(manufacturers).orderBy(manufacturers.nameAr);
+      
+      // Group by nameAr to find duplicates
+      const manufacturerGroups = new Map<string, typeof allManufacturers>();
+      
+      for (const manufacturer of allManufacturers) {
+        const key = manufacturer.nameAr;
+        if (!manufacturerGroups.has(key)) {
+          manufacturerGroups.set(key, []);
+        }
+        manufacturerGroups.get(key)!.push(manufacturer);
+      }
+
+      // Find duplicates
+      const duplicateGroups = Array.from(manufacturerGroups.entries()).filter(([_, group]) => group.length > 1);
+      let deletedCount = 0;
+      
+      for (const [nameAr, group] of duplicateGroups) {
+        // Keep the first one (lowest ID), delete others
+        const keepManufacturer = group[0];
+        const duplicatesToDelete = group.slice(1);
+        
+        console.log(`Fixing ${nameAr}: keeping ID ${keepManufacturer.id}, deleting ${duplicatesToDelete.length} duplicates`);
+        
+        // Delete duplicates one by one
+        for (const duplicate of duplicatesToDelete) {
+          await db.delete(manufacturers).where(eq(manufacturers.id, duplicate.id));
+          deletedCount++;
+        }
+      }
+      
+      console.log(`✅ Deleted ${deletedCount} duplicate manufacturers`);
+      
+      // Return updated count
+      const finalManufacturers = await db.select().from(manufacturers);
+      res.json({ 
+        success: true, 
+        deletedCount,
+        totalManufacturers: finalManufacturers.length,
+        message: `تم حذف ${deletedCount} صانع مكرر بنجاح`
+      });
+      
+    } catch (error) {
+      console.error("Error fixing duplicates:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "خطأ في إصلاح التكرار", 
+        error: error.message 
+      });
+    }
+  });
+
   // Create a new inventory item
   app.post("/api/inventory", async (req, res) => {
     try {
