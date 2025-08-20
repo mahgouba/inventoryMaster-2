@@ -19,6 +19,64 @@ import { Pool } from 'pg';
 import { eq, desc, asc, or, like, count, sql, ne, isNull, isNotNull, and } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
+// Helper function to get vehicle specifications from database
+const getVehicleSpecifications = async (vehicle: any) => {
+  try {
+    const { db } = getDatabase();
+    
+    // First try to find exact match specifications
+    const conditions = [
+      eq(vehicleSpecifications.manufacturer, vehicle.manufacturer),
+      eq(vehicleSpecifications.category, vehicle.category || ''),
+      eq(vehicleSpecifications.year, vehicle.year || 0),
+      eq(vehicleSpecifications.engineCapacity, vehicle.engineCapacity || '')
+    ];
+
+    if (vehicle.trimLevel) {
+      conditions.push(eq(vehicleSpecifications.trimLevel, vehicle.trimLevel));
+    }
+
+    const specs = await db.select().from(vehicleSpecifications)
+      .where(and(...conditions));
+    
+    if (specs.length > 0) {
+      const spec = specs[0];
+      if (spec.specifications) {
+        try {
+          // Parse the JSON specifications
+          return typeof spec.specifications === 'object' 
+            ? spec.specifications 
+            : JSON.parse(spec.specifications);
+        } catch (e) {
+          console.log('Error parsing specifications JSON:', e);
+        }
+      }
+    }
+    
+    // If no specifications found, return basic structure
+    return {
+      "المواصفات الأساسية": {
+        "الصانع": vehicle.manufacturer || "غير محدد",
+        "الفئة": vehicle.category || "غير محدد",
+        "سنة الصنع": vehicle.year?.toString() || "غير محدد",
+        "نوع المحرك": vehicle.engineCapacity || "غير محدد",
+        "درجة التجهيز": vehicle.trimLevel || "قياسي"
+      },
+      "معلومات المركبة": {
+        "رقم الهيكل": vehicle.chassisNumber || "غير متوفر",
+        "اللون الخارجي": vehicle.exteriorColor || "غير محدد",
+        "اللون الداخلي": vehicle.interiorColor || "غير محدد",
+        "حالة المركبة": vehicle.status || "غير محدد"
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching vehicle specifications:', error);
+    return {
+      "خطأ": "حدث خطأ في جلب المواصفات، يرجى المحاولة مرة أخرى"
+    };
+  }
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/auth/login", async (req, res) => {
@@ -1514,41 +1572,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         year: vehicle.year,
         engineCapacity: vehicle.engineCapacity,
         chassisNumber: vehicle.chassisNumber,
-        specifications: {
-          "المحرك والأداء": {
-            "نوع المحرك": vehicle.engineCapacity || "غير محدد",
-            "سعة المحرك": vehicle.engineCapacity || "غير محدد", 
-            "نوع الوقود": "بنزين",
-            "ناقل الحركة": "أوتوماتيك",
-            "نوع الدفع": "دفع رباعي"
-          },
-          "الأبعاد والوزن": {
-            "الطول": "حسب المواصفات",
-            "العرض": "حسب المواصفات", 
-            "الارتفاع": "حسب المواصفات",
-            "المسافة بين المحاور": "حسب المواصفات"
-          },
-          "المميزات والتجهيزات": {
-            "نظام الترفيه والمعلومات": "شاشة لمس",
-            "نظام السلامة والأمان": "وسائد هوائية متعددة",
-            "المقاعد والراحة": "مقاعد جلدية",
-            "التجهيزات الخارجية": "عجلات معدنية",
-            "نظام التكييف": "تكييف أوتوماتيك"
-          },
-          "المواصفات التقنية": {
-            "سنة الصنع": vehicle.year?.toString() || "غير محدد",
-            "الفئة": vehicle.category || "غير محدد",
-            "درجة التجهيز": vehicle.trimLevel || "قياسي",
-            "اللون الخارجي": vehicle.exteriorColor || "غير محدد",
-            "اللون الداخلي": vehicle.interiorColor || "غير محدد"
-          },
-          "معلومات إضافية": {
-            "رقم الهيكل": vehicle.chassisNumber || "غير متوفر",
-            "حالة المركبة": vehicle.status || "غير محدد",
-            "نوع الاستيراد": vehicle.importType || "غير محدد",
-            "الموقع الحالي": vehicle.location || "غير محدد"
-          }
-        },
+        specifications: await getVehicleSpecifications(vehicle),
         specificationsEn: null,
         source: 'default'
       });
@@ -1641,34 +1665,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           trimLevel: trimLevel || null,
           year: parseInt(year),
           engineCapacity,
-          specifications: {
-            "المحرك والأداء": {
-              "نوع المحرك": engineCapacity || "غير محدد",
-              "سعة المحرك": engineCapacity || "غير محدد", 
-              "نوع الوقود": "بنزين",
-              "ناقل الحركة": "أوتوماتيك",
-              "نوع الدفع": "دفع رباعي"
-            },
-            "الأبعاد والوزن": {
-              "الطول": "حسب المواصفات",
-              "العرض": "حسب المواصفات", 
-              "الارتفاع": "حسب المواصفات",
-              "المسافة بين المحاور": "حسب المواصفات"
-            },
-            "المميزات والتجهيزات": {
-              "نظام الترفيه والمعلومات": "شاشة لمس",
-              "نظام السلامة والأمان": "وسائد هوائية متعددة",
-              "المقاعد والراحة": "مقاعد جلدية",
-              "التجهيزات الخارجية": "عجلات معدنية",
-              "نظام التكييف": "تكييف أوتوماتيك"
-            },
-            "المواصفات التقنية": {
-              "سنة الصنع": year || "غير محدد",
-              "الفئة": category || "غير محدد",
-              "درجة التجهيز": trimLevel || "قياسي",
-              "الصانع": manufacturer || "غير محدد"
-            }
-          },
+          specifications: await getVehicleSpecifications({
+            manufacturer, 
+            category, 
+            year: parseInt(year), 
+            engineCapacity, 
+            trimLevel
+          }),
           specificationsEn: null
         });
       }
