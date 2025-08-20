@@ -658,7 +658,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get categories by manufacturer
+  // Get categories by manufacturer (by name via query parameter)
+  app.get("/api/hierarchical/categories", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { manufacturer } = req.query;
+      
+      if (!manufacturer) {
+        return res.status(400).json({ message: "Manufacturer name is required" });
+      }
+
+      // First find the manufacturer by name
+      const [manufacturerData] = await db.select().from(manufacturers)
+        .where(and(eq(manufacturers.nameAr, manufacturer as string), eq(manufacturers.isActive, true)));
+      
+      if (!manufacturerData) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      // Then get categories for this manufacturer
+      const categoriesData = await db.select().from(vehicleCategories)
+        .where(and(eq(vehicleCategories.manufacturerId, manufacturerData.id), eq(vehicleCategories.isActive, true)));
+      
+      res.json(categoriesData);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  // Get categories by manufacturer ID (keeping the original endpoint for backward compatibility)
   app.get("/api/hierarchical/categories/:manufacturerId", async (req, res) => {
     try {
       const { db } = getDatabase();
@@ -672,7 +701,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get trim levels by category
+  // Get trim levels by manufacturer and category names (via query parameters)
+  app.get("/api/hierarchical/trimLevels", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { manufacturer, category } = req.query;
+      
+      if (!manufacturer || !category) {
+        return res.status(400).json({ message: "Manufacturer and category names are required" });
+      }
+
+      // First find the manufacturer by name
+      const [manufacturerData] = await db.select().from(manufacturers)
+        .where(and(eq(manufacturers.nameAr, manufacturer as string), eq(manufacturers.isActive, true)));
+      
+      if (!manufacturerData) {
+        return res.status(404).json({ message: "Manufacturer not found" });
+      }
+
+      // Then find the category for this manufacturer
+      const [categoryData] = await db.select().from(vehicleCategories)
+        .where(and(
+          eq(vehicleCategories.manufacturerId, manufacturerData.id),
+          eq(vehicleCategories.nameAr, category as string),
+          eq(vehicleCategories.isActive, true)
+        ));
+      
+      if (!categoryData) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+
+      // Finally get trim levels for this category
+      const trimLevelsData = await db.select().from(vehicleTrimLevels)
+        .where(and(eq(vehicleTrimLevels.categoryId, categoryData.id), eq(vehicleTrimLevels.isActive, true)));
+      
+      res.json(trimLevelsData);
+    } catch (error) {
+      console.error("Error fetching trim levels:", error);
+      res.status(500).json({ message: "Failed to fetch trim levels" });
+    }
+  });
+
+  // Get trim levels by category ID (keeping the original endpoint for backward compatibility)
   app.get("/api/hierarchical/trim-levels/:categoryId", async (req, res) => {
     try {
       const { db } = getDatabase();
