@@ -1188,7 +1188,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         createdBy,
         createdByName,
-        date: new Date(req.body.date)
+        date: new Date(req.body.date),
+        scheduleType: req.body.scheduleType || 'متصل' // إضافة نوع الدوام
       };
       
       const [newAttendance] = await db.insert(dailyAttendance).values(attendanceData).returning();
