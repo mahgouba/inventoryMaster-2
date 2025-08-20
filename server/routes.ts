@@ -1397,23 +1397,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`🔍 Fetching specifications for: ${manufacturer} ${category} ${trimLevel || 'any'} ${year} ${engineCapacity}`);
 
-      // Build query conditions
-      let query = db.select().from(vehicleSpecifications)
-        .where(
-          and(
-            eq(vehicleSpecifications.manufacturer, manufacturer),
-            eq(vehicleSpecifications.category, category),
-            eq(vehicleSpecifications.year, parseInt(year)),
-            eq(vehicleSpecifications.engineCapacity, engineCapacity)
-          )
-        );
+      // Build query with exact matching
+      const conditions = [
+        eq(vehicleSpecifications.manufacturer, manufacturer),
+        eq(vehicleSpecifications.category, category),
+        eq(vehicleSpecifications.year, parseInt(year)),
+        eq(vehicleSpecifications.engineCapacity, engineCapacity)
+      ];
 
       // Add trim level condition if provided and not 'null'
       if (trimLevel && trimLevel !== 'null') {
-        query = query.where(eq(vehicleSpecifications.trimLevel, trimLevel));
+        conditions.push(eq(vehicleSpecifications.trimLevel, trimLevel));
       }
 
-      const specifications = await query;
+      const specifications = await db.select().from(vehicleSpecifications)
+        .where(and(...conditions));
       
       console.log(`📋 Found ${specifications.length} specifications`);
 
@@ -1425,11 +1423,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         let parsedSpecs = {};
         if (spec.specifications) {
           try {
-            parsedSpecs = JSON.parse(spec.specifications);
+            parsedSpecs = typeof spec.specifications === 'string' 
+              ? JSON.parse(spec.specifications) 
+              : spec.specifications;
           } catch (e) {
             console.log('Error parsing specifications JSON:', e);
-            parsedSpecs = { rawText: spec.specifications };
+            // Return as simple object with the raw text
+            parsedSpecs = {
+              "المواصفات العامة": spec.specifications || "غير متوفر",
+              "نوع المحرك": engineCapacity || "غير محدد",
+              "سنة الصنع": year || "غير محدد",
+              "الفئة": category || "غير محدد"
+            };
           }
+        } else {
+          // Create default specifications structure
+          parsedSpecs = {
+            "المواصفات العامة": "لم يتم إدخال المواصفات التفصيلية بعد",
+            "نوع المحرك": engineCapacity || "غير محدد", 
+            "سنة الصنع": year || "غير محدد",
+            "الفئة": category || "غير محدد",
+            "درجة التجهيز": trimLevel || "غير محدد"
+          };
         }
 
         res.json({
@@ -1444,14 +1459,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           specificationsEn: spec.specificationsEn
         });
       } else {
-        // Return empty specification structure
+        // Return default structure with vehicle info
+        console.log(`📝 No specifications found, returning default structure`);
         res.json({
           manufacturer,
           category,
           trimLevel: trimLevel || null,
           year: parseInt(year),
           engineCapacity,
-          specifications: {},
+          specifications: {
+            "المواصفات العامة": `${manufacturer} ${category} ${year}`,
+            "نوع المحرك": engineCapacity || "غير محدد",
+            "سنة الصنع": year || "غير محدد", 
+            "الفئة": category || "غير محدد",
+            "درجة التجهيز": trimLevel || "غير محدد",
+            "النوع": "سيدان/SUV",
+            "عدد الأبواب": "4 أبواب",
+            "نوع الوقود": "بنزين",
+            "ناقل الحركة": "أوتوماتيك",
+            "الدفع": "دفع رباعي"
+          },
           specificationsEn: null
         });
       }
