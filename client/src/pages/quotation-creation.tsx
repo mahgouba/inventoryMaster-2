@@ -1977,6 +1977,25 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                         )}
                       </div>
                     </div>
+
+                    {/* Vehicle Detailed Specifications Section - Right after vehicle data */}
+                    <div className="mt-6 pt-6 border-t border-white/20">
+                      <h4 className="text-md font-semibold text-white drop-shadow-md mb-4 flex items-center">
+                        <Car className="ml-2" size={18} />
+                        المواصفات التفصيلية للمركبة
+                      </h4>
+                      <VehicleDetailedSpecifications 
+                        manufacturer={editableVehicle.manufacturer}
+                        category={editableVehicle.category}
+                        trimLevel={editableVehicle.trimLevel}
+                        year={editableVehicle.year?.toString()}
+                        engineCapacity={editableVehicle.engineCapacity}
+                        chassisNumber={editableVehicle.chassisNumber}
+                        onSpecificationsUpdate={(specs) => {
+                          console.log('Updated specifications for selected vehicle:', specs);
+                        }}
+                      />
+                    </div>
                   </div>
                 ) : (
                   // Vehicle Data Selection Form
