@@ -188,6 +188,28 @@ export function VehicleDetailedSpecifications({
 
   const displaySpecs = () => {
     if (!editableSpecs) return "انقر مرتين لإضافة المواصفات التفصيلية";
+    
+    try {
+      // Try to parse as JSON first to see if it's structured data
+      const parsed = JSON.parse(editableSpecs);
+      
+      // If it's an object, format it nicely
+      if (typeof parsed === 'object' && parsed !== null) {
+        return Object.entries(parsed).map(([key, value]) => {
+          if (typeof value === 'object' && value !== null) {
+            // Handle nested objects with better formatting
+            return `📋 ${key}:\n${Object.entries(value).map(([subKey, subValue]) => 
+              `   • ${subKey}: ${subValue}`
+            ).join('\n')}`;
+          } else {
+            return `📌 ${key}: ${value}`;
+          }
+        }).join('\n\n');
+      }
+    } catch (e) {
+      // If JSON parsing fails, return as is
+    }
+    
     return editableSpecs;
   };
 
