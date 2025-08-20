@@ -1444,6 +1444,22 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     return totalDelayHours;
   };
 
+  // دالة تحويل الساعات العشرية إلى ساعات ودقائق
+  const formatHoursToHoursMinutes = (decimalHours: number): string => {
+    if (decimalHours === 0) return '0س 0د';
+    
+    const hours = Math.floor(decimalHours);
+    const minutes = Math.round((decimalHours - hours) * 60);
+    
+    if (hours === 0) {
+      return `${minutes}د`;
+    } else if (minutes === 0) {
+      return `${hours}س`;
+    } else {
+      return `${hours}س ${minutes}د`;
+    }
+  };
+
   // دالة طباعة تقرير الحضور الشهري
   const handlePrintMonthlyReport = (schedule: EmployeeWorkSchedule) => {
     const monthAttendance = getEmployeeMonthAttendance(schedule.employeeId);
@@ -1470,8 +1486,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
             <tr style="background-color: #C49632; color: white;">
               <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">التاريخ</th>
               <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">اليوم</th>
-              <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">الحضور</th>
-              <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">الانصراف</th>
+              <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">الفترة الأولى</th>
+              <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">الفترة الثانية</th>
               <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">ساعات العمل</th>
               <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">ساعات التأخير</th>
               <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">الحالة</th>
@@ -1546,28 +1562,27 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                 }
               } else if (dayAttendance) {
                 if (schedule.scheduleType === "متصل") {
-                  checkinTime = dayAttendance.continuousCheckinTime || '-';
-                  checkoutTime = dayAttendance.continuousCheckoutTime || '-';
+                  // للدوام المتصل، عرض في الفترة الأولى فقط
+                  checkinTime = `${dayAttendance.continuousCheckinTime || '-'} - ${dayAttendance.continuousCheckoutTime || '-'}`;
+                  checkoutTime = '-';
                 } else {
+                  // للدوام المنفصل، عرض الفترتين منفصلتين
                   const morningIn = dayAttendance.morningCheckinTime;
                   const morningOut = dayAttendance.morningCheckoutTime;
                   const eveningIn = dayAttendance.eveningCheckinTime;
                   const eveningOut = dayAttendance.eveningCheckoutTime;
                   
-                  // Display both periods separately for better clarity
-                  const checkinTimes = [];
-                  const checkoutTimes = [];
+                  // عرض الفترة الأولى (الصباحية)
+                  checkinTime = (morningIn && morningOut) ? `${morningIn} - ${morningOut}` : '-';
                   
-                  if (morningIn) checkinTimes.push(`صباحي: ${morningIn}`);
-                  if (eveningIn) checkinTimes.push(`مسائي: ${eveningIn}`);
-                  if (morningOut) checkoutTimes.push(`صباحي: ${morningOut}`);
-                  if (eveningOut) checkoutTimes.push(`مسائي: ${eveningOut}`);
-                  
-                  checkinTime = checkinTimes.join(', ') || '-';
-                  checkoutTime = checkoutTimes.join(', ') || '-';
+                  // عرض الفترة الثانية (المسائية)
+                  checkoutTime = (eveningIn && eveningOut) ? `${eveningIn} - ${eveningOut}` : '-';
                 }
-                workHours = calculateHoursWorked(schedule, dayAttendance);
-                delayHours = calculateDelayHours(schedule, dayAttendance, day).toFixed(2);
+                const calculatedHours = parseFloat(calculateHoursWorked(schedule, dayAttendance));
+                const calculatedDelay = calculateDelayHours(schedule, dayAttendance, day);
+                
+                workHours = formatHoursToHoursMinutes(calculatedHours);
+                delayHours = formatHoursToHoursMinutes(calculatedDelay);
                 status = 'حاضر';
                 
                 console.log('Report work hours calculated:', {
@@ -1615,19 +1630,21 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               <strong>أيام الإجازة:</strong> ${monthAttendance.filter(a => a.notes === 'إجازة').length} يوم
             </div>
             <div style="color: #00627F;">
-              <strong>إجمالي ساعات العمل:</strong> ${monthAttendance
-                .filter(a => a.notes !== 'إجازة')
-                .reduce((total, a) => total + parseFloat(calculateHoursWorked(schedule, a)), 0)
-                .toFixed(2)} ساعة
+              <strong>إجمالي ساعات العمل:</strong> ${formatHoursToHoursMinutes(
+                monthAttendance
+                  .filter(a => a.notes !== 'إجازة')
+                  .reduce((total, a) => total + parseFloat(calculateHoursWorked(schedule, a)), 0)
+              )}
             </div>
             <div style="color: #C49632;">
-              <strong>إجمالي ساعات التأخير:</strong> ${monthAttendance
-                .filter(a => a.notes !== 'إجازة')
-                .reduce((total, a) => {
-                  const dayDate = new Date(a.date);
-                  return total + calculateDelayHours(schedule, a, dayDate);
-                }, 0)
-                .toFixed(2)} ساعة
+              <strong>إجمالي ساعات التأخير:</strong> ${formatHoursToHoursMinutes(
+                monthAttendance
+                  .filter(a => a.notes !== 'إجازة')
+                  .reduce((total, a) => {
+                    const dayDate = new Date(a.date);
+                    return total + calculateDelayHours(schedule, a, dayDate);
+                  }, 0)
+              )}
             </div>
           </div>
           
