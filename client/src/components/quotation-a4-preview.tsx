@@ -512,29 +512,36 @@ function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetail
         : fetch(`/api/specifications/${selectedVehicle.manufacturer}/${selectedVehicle.category || ''}/${selectedVehicle.trimLevel || 'null'}/${selectedVehicle.year}/${selectedVehicle.engineCapacity || ''}`).then(res => res.ok ? res.json() : null)
   });
 
-  // Format specifications for display
+  // Format specifications for display - show only raw specifications data
   const formatSpecifications = (specs: any) => {
     if (!specs || typeof specs !== 'object') return null;
     
     const formatted: string[] = [];
     
-    Object.entries(specs).forEach(([category, items]) => {
-      if (typeof items === 'object' && items !== null) {
-        formatted.push(`📋 ${category}:`);
-        Object.entries(items).forEach(([key, value]) => {
-          if (value && value !== 'غير محدد' && value !== 'نعم') {
-            formatted.push(`   • ${key}: ${value}`);
-          } else if (value === 'نعم') {
-            formatted.push(`   ✓ ${key}`);
-          }
-        });
-        formatted.push(''); // Empty line between categories
-      } else if (items && items !== 'غير محدد') {
-        formatted.push(`• ${category}: ${items}`);
+    // Look for raw specifications text in different possible formats
+    if (specs.specifications) {
+      // If there's a specifications field, display it as is
+      if (typeof specs.specifications === 'string') {
+        return specs.specifications;
+      }
+      if (typeof specs.specifications === 'object') {
+        return JSON.stringify(specs.specifications, null, 2);
+      }
+    }
+    
+    // If specs is directly the content, display it
+    if (typeof specs === 'string') {
+      return specs;
+    }
+    
+    // Look for any meaningful content in the object
+    Object.entries(specs).forEach(([key, value]) => {
+      if (value && typeof value === 'string' && value !== 'غير محدد' && value !== 'غير متوفر') {
+        formatted.push(`• ${key}: ${value}`);
       }
     });
     
-    return formatted.join('\n');
+    return formatted.length > 0 ? formatted.join('\n') : null;
   };
 
   if (isLoading) {
@@ -553,8 +560,9 @@ function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetail
     );
   }
 
-  const formattedSpecs = specificationsData?.specifications ? formatSpecifications(specificationsData.specifications) : null;
-
+  // Get raw specifications data directly
+  const rawSpecsText = specificationsData?.specifications;
+  
   return (
     <div className="mb-3">
       <div className="flex items-center gap-2 mb-2">
@@ -568,9 +576,9 @@ function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetail
       </div>
       
       <div className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
-        {formattedSpecs ? (
-          <div className="text-xs text-black/80 leading-relaxed whitespace-pre-line max-h-32 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-            {formattedSpecs}
+        {rawSpecsText ? (
+          <div className="text-xs text-black/80 leading-relaxed max-h-32 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+            • المواصفات العامة: {rawSpecsText}
           </div>
         ) : (
           <div className="text-center text-sm text-black/60 py-2">
