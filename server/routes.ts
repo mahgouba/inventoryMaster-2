@@ -16,7 +16,7 @@ import {
   vehicleImageLinks
 } from "@shared/schema";
 import { Pool } from 'pg';
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, asc, or, like, count, sql, ne, isNull, isNotNull, and } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1383,6 +1383,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { db } = getDatabase();
       const specifications = await db.select().from(vehicleSpecifications);
       res.json(specifications);
+    } catch (error) {
+      console.error("Error fetching vehicle specifications:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle specifications" });
+    }
+  });
+
+  // Get specific vehicle specifications by parameters - for quotation page
+  app.get("/api/specifications/:manufacturer/:category/:trimLevel?/:year/:engineCapacity", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { manufacturer, category, trimLevel, year, engineCapacity } = req.params;
+      
+      console.log(`🔍 Fetching specifications for: ${manufacturer} ${category} ${trimLevel || 'any'} ${year} ${engineCapacity}`);
+
+      // Build query conditions
+      let query = db.select().from(vehicleSpecifications)
+        .where(
+          and(
+            eq(vehicleSpecifications.manufacturer, manufacturer),
+            eq(vehicleSpecifications.category, category),
+            eq(vehicleSpecifications.year, parseInt(year)),
+            eq(vehicleSpecifications.engineCapacity, engineCapacity)
+          )
+        );
+
+      // Add trim level condition if provided and not 'null'
+      if (trimLevel && trimLevel !== 'null') {
+        query = query.where(eq(vehicleSpecifications.trimLevel, trimLevel));
+      }
+
+      const specifications = await query;
+      
+      console.log(`📋 Found ${specifications.length} specifications`);
+
+      if (specifications.length > 0) {
+        // Return the first matching specification
+        const spec = specifications[0];
+        
+        // Parse the specifications JSON if it exists
+        let parsedSpecs = {};
+        if (spec.specifications) {
+          try {
+            parsedSpecs = JSON.parse(spec.specifications);
+          } catch (e) {
+            console.log('Error parsing specifications JSON:', e);
+            parsedSpecs = { rawText: spec.specifications };
+          }
+        }
+
+        res.json({
+          id: spec.id,
+          manufacturer: spec.manufacturer,
+          category: spec.category,
+          trimLevel: spec.trimLevel,
+          year: spec.year,
+          engineCapacity: spec.engineCapacity,
+          chassisNumber: spec.chassisNumber,
+          specifications: parsedSpecs,
+          specificationsEn: spec.specificationsEn
+        });
+      } else {
+        // Return empty specification structure
+        res.json({
+          manufacturer,
+          category,
+          trimLevel: trimLevel || null,
+          year: parseInt(year),
+          engineCapacity,
+          specifications: {},
+          specificationsEn: null
+        });
+      }
     } catch (error) {
       console.error("Error fetching vehicle specifications:", error);
       res.status(500).json({ message: "Failed to fetch vehicle specifications" });
