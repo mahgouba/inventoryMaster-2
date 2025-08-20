@@ -121,6 +121,12 @@ export default function DropdownOptionsManagement() {
   // Fetch data
   const { data: hierarchyData = [], isLoading } = useQuery<HierarchyData[]>({
     queryKey: ['/api/hierarchy/full'],
+    onSuccess: (data) => {
+      console.log('📊 Hierarchy data received:', data);
+      console.log('📊 First manufacturer:', data?.[0]);
+      console.log('📊 First category of first manufacturer:', data?.[0]?.categories?.[0]);
+      console.log('📊 First trim level:', data?.[0]?.categories?.[0]?.trimLevels?.[0]);
+    }
   });
 
   const { data: manufacturers = [] } = useQuery<Manufacturer[]>({
@@ -214,7 +220,10 @@ export default function DropdownOptionsManagement() {
 
   // Filter data based on search and type
   const filteredData = hierarchyData.filter(item => {
-    if (!item || !item.nameAr) return false;
+    if (!item || !item.nameAr) {
+      console.log('❌ Filtering out invalid item:', item);
+      return false;
+    }
     
     const matchesSearch = item.nameAr.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          (item.nameEn && item.nameEn.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -225,6 +234,9 @@ export default function DropdownOptionsManagement() {
     
     return matchesSearch;
   });
+
+  console.log('🔍 Filtered data:', filteredData.length, 'items');
+  console.log('🔍 First filtered item:', filteredData[0]);
 
   if (isLoading) {
     return (
