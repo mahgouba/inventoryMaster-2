@@ -1962,18 +1962,6 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                             </div>
                           </div>
                         )}
-                        {!editableVehicle.detailedSpecifications && (
-                          <div className="col-span-2">
-                            <div 
-                              className="mt-2 p-3 bg-white/5 backdrop-blur-sm rounded-lg border border-dashed border-white/30 cursor-pointer hover:bg-white/10 transition-colors text-center"
-                              onDoubleClick={() => setVehicleEditOpen(true)}
-                              title="انقر مرتين لإضافة المواصفات التفصيلية"
-                            >
-                              <p className="text-sm text-white/70">لا توجد مواصفات تفصيلية</p>
-                              <p className="text-xs text-white/50 mt-1">انقر مرتين للإضافة</p>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
