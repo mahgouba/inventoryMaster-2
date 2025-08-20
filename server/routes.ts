@@ -1389,6 +1389,142 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get specifications by chassis number with fallback to general specifications
+  app.get("/api/specifications-by-chassis/:chassisNumber", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { chassisNumber } = req.params;
+      
+      console.log(`🔍 Fetching specifications for chassis: ${chassisNumber}`);
+
+      // First, try to find specifications by chassis number
+      const chassisSpecs = await db.select().from(vehicleSpecifications)
+        .where(eq(vehicleSpecifications.chassisNumber, chassisNumber));
+      
+      if (chassisSpecs.length > 0) {
+        console.log(`📋 Found chassis-specific specifications`);
+        const spec = chassisSpecs[0];
+        
+        // Parse the specifications JSON if it exists
+        let parsedSpecs = {};
+        if (spec.specifications) {
+          try {
+            parsedSpecs = typeof spec.specifications === 'string' 
+              ? JSON.parse(spec.specifications) 
+              : spec.specifications;
+          } catch (e) {
+            console.log('Error parsing specifications JSON:', e);
+            parsedSpecs = {
+              "المواصفات العامة": spec.specifications || "غير متوفر",
+              "نوع المحرك": spec.engineCapacity || "غير محدد",
+              "سنة الصنع": spec.year?.toString() || "غير محدد",
+              "الفئة": spec.category || "غير محدد"
+            };
+          }
+        }
+
+        return res.json({
+          id: spec.id,
+          manufacturer: spec.manufacturer,
+          category: spec.category,
+          trimLevel: spec.trimLevel,
+          year: spec.year,
+          engineCapacity: spec.engineCapacity,
+          chassisNumber: spec.chassisNumber,
+          specifications: parsedSpecs,
+          specificationsEn: spec.specificationsEn,
+          source: 'chassis'
+        });
+      }
+
+      // If no chassis-specific specs found, look for vehicle in inventory
+      const [vehicle] = await db.select().from(inventoryItems)
+        .where(eq(inventoryItems.chassisNumber, chassisNumber));
+      
+      if (!vehicle) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+
+      // Look for general specifications matching vehicle details
+      const conditions = [
+        eq(vehicleSpecifications.manufacturer, vehicle.manufacturer),
+        eq(vehicleSpecifications.category, vehicle.category),
+        eq(vehicleSpecifications.year, vehicle.year),
+        eq(vehicleSpecifications.engineCapacity, vehicle.engineCapacity)
+      ];
+
+      if (vehicle.trimLevel) {
+        conditions.push(eq(vehicleSpecifications.trimLevel, vehicle.trimLevel));
+      }
+
+      const generalSpecs = await db.select().from(vehicleSpecifications)
+        .where(and(...conditions));
+      
+      if (generalSpecs.length > 0) {
+        console.log(`📋 Found general specifications for vehicle`);
+        const spec = generalSpecs[0];
+        
+        let parsedSpecs = {};
+        if (spec.specifications) {
+          try {
+            parsedSpecs = typeof spec.specifications === 'string' 
+              ? JSON.parse(spec.specifications) 
+              : spec.specifications;
+          } catch (e) {
+            parsedSpecs = {
+              "المواصفات العامة": spec.specifications || "غير متوفر",
+              "نوع المحرك": spec.engineCapacity || "غير محدد",
+              "سنة الصنع": spec.year?.toString() || "غير محدد",
+              "الفئة": spec.category || "غير محدد"
+            };
+          }
+        }
+
+        return res.json({
+          id: spec.id,
+          manufacturer: spec.manufacturer,
+          category: spec.category,
+          trimLevel: spec.trimLevel,
+          year: spec.year,
+          engineCapacity: spec.engineCapacity,
+          chassisNumber: null,
+          specifications: parsedSpecs,
+          specificationsEn: spec.specificationsEn,
+          source: 'general'
+        });
+      }
+
+      // No specifications found, return default
+      console.log(`📝 No specifications found, returning default structure`);
+      res.json({
+        manufacturer: vehicle.manufacturer,
+        category: vehicle.category,
+        trimLevel: vehicle.trimLevel,
+        year: vehicle.year,
+        engineCapacity: vehicle.engineCapacity,
+        chassisNumber: vehicle.chassisNumber,
+        specifications: {
+          "المواصفات العامة": `${vehicle.manufacturer} ${vehicle.category} ${vehicle.year}`,
+          "نوع المحرك": vehicle.engineCapacity || "غير محدد",
+          "سنة الصنع": vehicle.year?.toString() || "غير محدد", 
+          "الفئة": vehicle.category || "غير محدد",
+          "درجة التجهيز": vehicle.trimLevel || "غير محدد",
+          "النوع": "سيدان/SUV",
+          "عدد الأبواب": "4 أبواب",
+          "نوع الوقود": "بنزين",
+          "ناقل الحركة": "أوتوماتيك",
+          "الدفع": "دفع رباعي"
+        },
+        specificationsEn: null,
+        source: 'default'
+      });
+
+    } catch (error) {
+      console.error("Error fetching specifications by chassis:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle specifications" });
+    }
+  });
+
   // Get specific vehicle specifications by parameters - for quotation page
   app.get("/api/specifications/:manufacturer/:category/:trimLevel?/:year/:engineCapacity", async (req, res) => {
     try {

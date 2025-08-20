@@ -45,56 +45,41 @@ export function VehicleDetailedSpecifications({
 
   // Fetch vehicle specifications from database with priority for chassis number
   const { data: specifications, isLoading, error } = useQuery({
-    queryKey: ['vehicle-specifications', manufacturer, category, trimLevel, year, engineCapacity, chassisNumber],
+    queryKey: ['vehicle-specifications', chassisNumber],
     queryFn: async () => {
-      let foundSpec = null;
-      
-      // Priority 1: Search by chassis number (highest priority)
+      // Use the new API endpoint that handles chassis number priority
       if (chassisNumber && chassisNumber.trim()) {
-        console.log(`🔍 Searching specifications by chassis number: ${chassisNumber}`);
+        console.log(`🔍 Fetching specifications for chassis: ${chassisNumber}`);
         try {
-          const response = await fetch(`/api/vehicle-specifications?chassisNumber=${encodeURIComponent(chassisNumber.trim())}`);
+          const response = await fetch(`/api/specifications-by-chassis/${encodeURIComponent(chassisNumber.trim())}`);
           if (response.ok) {
             const data = await response.json();
-            if (data.length > 0) {
-              console.log(`✅ Found specification by chassis number:`, data[0]);
-              return data[0];
-            }
+            console.log(`✅ Found specifications:`, data);
+            return data;
           }
         } catch (error) {
-          console.log('Error searching by chassis number:', error);
+          console.log('Error fetching specifications by chassis:', error);
         }
       }
       
-      // Priority 2: Search by vehicle details (manufacturer, category, year, engine)
+      // Fallback to general specifications if no chassis number
       if (manufacturer && category && year && engineCapacity) {
-        console.log(`🔍 Searching specifications by vehicle details: ${manufacturer} ${category} ${year} ${engineCapacity}`);
+        console.log(`🔍 Fetching general specifications: ${manufacturer} ${category} ${year} ${engineCapacity}`);
         try {
-          const queryParams = new URLSearchParams({
-            manufacturer: manufacturer,
-            category: category,
-            year: year.toString(),
-            engineCapacity: engineCapacity
-          });
-          
-          if (trimLevel && trimLevel.trim()) {
-            queryParams.append('trimLevel', trimLevel);
-          }
-          
-          const response = await fetch(`/api/vehicle-specifications?${queryParams}`);
+          const response = await fetch(
+            `/api/specifications/${encodeURIComponent(manufacturer)}/${encodeURIComponent(category)}/${encodeURIComponent(trimLevel || 'null')}/${year}/${encodeURIComponent(engineCapacity)}`
+          );
           if (response.ok) {
             const data = await response.json();
-            if (data.length > 0) {
-              console.log(`✅ Found specification by vehicle details:`, data[0]);
-              return data[0];
-            }
+            console.log(`✅ Found general specifications:`, data);
+            return data;
           }
         } catch (error) {
-          console.log('Error searching by vehicle details:', error);
+          console.log('Error fetching general specifications:', error);
         }
       }
       
-      console.log('❌ No specifications found in database');
+      console.log('❌ No specifications found');
       return null;
     },
     enabled: Boolean(chassisNumber || (manufacturer && category && year && engineCapacity))

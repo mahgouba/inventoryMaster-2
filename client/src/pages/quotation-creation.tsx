@@ -58,22 +58,34 @@ interface QuotationCreationPageProps {
 }
 
 // Component to display vehicle specifications with enhanced styling
-function VehicleSpecificationsDisplayComponent({ manufacturer, category, trimLevel, year, engineCapacity }: {
+function VehicleSpecificationsDisplayComponent({ manufacturer, category, trimLevel, year, engineCapacity, chassisNumber }: {
   manufacturer: string;
   category: string;
   trimLevel: string;
   year: string;
   engineCapacity: string;
+  chassisNumber?: string;
 }) {
   const { data: specs, isLoading } = useQuery<Specification>({
-    queryKey: ['/api/specifications', manufacturer, category, trimLevel, year, engineCapacity],
-    enabled: !!(manufacturer && category && year && engineCapacity),
+    queryKey: ['/api/specifications', chassisNumber, manufacturer, category, trimLevel, year, engineCapacity],
+    enabled: !!(chassisNumber || (manufacturer && category && year && engineCapacity)),
     queryFn: async () => {
-      const response = await fetch(
-        `/api/specifications/${manufacturer}/${category}/${trimLevel || 'null'}/${year}/${engineCapacity}`
-      );
-      if (response.ok) {
-        return response.json();
+      // Use chassis number endpoint if available
+      if (chassisNumber && chassisNumber.trim()) {
+        const response = await fetch(`/api/specifications-by-chassis/${encodeURIComponent(chassisNumber.trim())}`);
+        if (response.ok) {
+          return response.json();
+        }
+      }
+      
+      // Fallback to general specifications
+      if (manufacturer && category && year && engineCapacity) {
+        const response = await fetch(
+          `/api/specifications/${encodeURIComponent(manufacturer)}/${encodeURIComponent(category)}/${encodeURIComponent(trimLevel || 'null')}/${year}/${encodeURIComponent(engineCapacity)}`
+        );
+        if (response.ok) {
+          return response.json();
+        }
       }
       return null;
     }
