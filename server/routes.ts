@@ -13,7 +13,8 @@ import {
   leaveRequests,
   colorAssociations,
   vehicleSpecifications,
-  vehicleImageLinks
+  vehicleImageLinks,
+  quotations
 } from "@shared/schema";
 import { Pool } from 'pg';
 import { eq, desc, asc, or, like, count, sql, ne, isNull, isNotNull, and } from "drizzle-orm";
@@ -2264,6 +2265,153 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error toggling trim level status:", error);
       res.status(500).json({ message: "Failed to toggle trim level status" });
+    }
+  });
+
+  // ===== QUOTATIONS API ENDPOINTS =====
+  
+  // Get all quotations
+  app.get("/api/quotations", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const allQuotations = await db.select().from(quotations).orderBy(desc(quotations.createdAt));
+      res.json(allQuotations);
+    } catch (error) {
+      console.error("Error fetching quotations:", error);
+      res.status(500).json({ message: "Failed to fetch quotations" });
+    }
+  });
+
+  // Get single quotation by ID
+  app.get("/api/quotations/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      
+      const quotationList = await db.select().from(quotations).where(eq(quotations.id, id));
+      
+      if (quotationList.length === 0) {
+        return res.status(404).json({ message: "Quotation not found" });
+      }
+      
+      res.json(quotationList[0]);
+    } catch (error) {
+      console.error("Error fetching quotation:", error);
+      res.status(500).json({ message: "Failed to fetch quotation" });
+    }
+  });
+
+  // Create new quotation
+  app.post("/api/quotations", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const quotationData = req.body;
+      
+      const [newQuotation] = await db.insert(quotations).values({
+        quoteNumber: quotationData.quoteNumber,
+        inventoryItemId: quotationData.inventoryItemId || 0,
+        manufacturer: quotationData.manufacturer,
+        category: quotationData.category,
+        trimLevel: quotationData.trimLevel,
+        year: quotationData.year,
+        exteriorColor: quotationData.exteriorColor || 'غير محدد',
+        interiorColor: quotationData.interiorColor || 'غير محدد',
+        chassisNumber: quotationData.chassisNumber,
+        engineCapacity: quotationData.engineCapacity,
+        specifications: quotationData.specifications,
+        basePrice: quotationData.basePrice.toString(),
+        finalPrice: quotationData.finalPrice.toString(),
+        customerName: quotationData.customerName,
+        customerPhone: quotationData.customerPhone,
+        customerEmail: quotationData.customerEmail,
+        customerTitle: quotationData.customerTitle,
+        notes: quotationData.notes,
+        validUntil: quotationData.validUntil ? new Date(quotationData.validUntil) : null,
+        status: quotationData.status || 'مسودة',
+        createdBy: quotationData.createdBy,
+        companyData: typeof quotationData.companyData === 'string' ? quotationData.companyData : JSON.stringify(quotationData.companyData),
+        representativeData: typeof quotationData.representativeData === 'string' ? quotationData.representativeData : JSON.stringify(quotationData.representativeData),
+        quoteAppearance: typeof quotationData.quoteAppearance === 'string' ? quotationData.quoteAppearance : JSON.stringify(quotationData.quoteAppearance),
+        pricingDetails: typeof quotationData.pricingDetails === 'string' ? quotationData.pricingDetails : JSON.stringify(quotationData.pricingDetails),
+        qrCodeData: quotationData.qrCodeData
+      }).returning();
+
+      res.json(newQuotation);
+    } catch (error) {
+      console.error("Error creating quotation:", error);
+      res.status(500).json({ message: "Failed to create quotation" });
+    }
+  });
+
+  // Update quotation
+  app.put("/api/quotations/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      const quotationData = req.body;
+      
+      const [updatedQuotation] = await db.update(quotations)
+        .set({
+          quoteNumber: quotationData.quoteNumber,
+          inventoryItemId: quotationData.inventoryItemId || 0,
+          manufacturer: quotationData.manufacturer,
+          category: quotationData.category,
+          trimLevel: quotationData.trimLevel,
+          year: quotationData.year,
+          exteriorColor: quotationData.exteriorColor || 'غير محدد',
+          interiorColor: quotationData.interiorColor || 'غير محدد',
+          chassisNumber: quotationData.chassisNumber,
+          engineCapacity: quotationData.engineCapacity,
+          specifications: quotationData.specifications,
+          basePrice: quotationData.basePrice.toString(),
+          finalPrice: quotationData.finalPrice.toString(),
+          customerName: quotationData.customerName,
+          customerPhone: quotationData.customerPhone,
+          customerEmail: quotationData.customerEmail,
+          customerTitle: quotationData.customerTitle,
+          notes: quotationData.notes,
+          validUntil: quotationData.validUntil ? new Date(quotationData.validUntil) : null,
+          status: quotationData.status || 'مسودة',
+          createdBy: quotationData.createdBy,
+          companyData: typeof quotationData.companyData === 'string' ? quotationData.companyData : JSON.stringify(quotationData.companyData),
+          representativeData: typeof quotationData.representativeData === 'string' ? quotationData.representativeData : JSON.stringify(quotationData.representativeData),
+          quoteAppearance: typeof quotationData.quoteAppearance === 'string' ? quotationData.quoteAppearance : JSON.stringify(quotationData.quoteAppearance),
+          pricingDetails: typeof quotationData.pricingDetails === 'string' ? quotationData.pricingDetails : JSON.stringify(quotationData.pricingDetails),
+          qrCodeData: quotationData.qrCodeData,
+          updatedAt: new Date()
+        })
+        .where(eq(quotations.id, id))
+        .returning();
+
+      if (!updatedQuotation) {
+        return res.status(404).json({ message: "Quotation not found" });
+      }
+
+      res.json(updatedQuotation);
+    } catch (error) {
+      console.error("Error updating quotation:", error);
+      res.status(500).json({ message: "Failed to update quotation" });
+    }
+  });
+
+  // Delete quotation
+  app.delete("/api/quotations/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      
+      const [deletedQuotation] = await db.delete(quotations)
+        .where(eq(quotations.id, id))
+        .returning();
+
+      if (!deletedQuotation) {
+        return res.status(404).json({ message: "Quotation not found" });
+      }
+
+      res.json({ message: "Quotation deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting quotation:", error);
+      res.status(500).json({ message: "Failed to delete quotation" });
     }
   });
 

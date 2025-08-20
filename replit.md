@@ -157,6 +157,8 @@ Core entities:
 - ✅ Implemented double-click editing functionality for specifications in quotation preview with direct database save (Aug 20, 2025)
 - ✅ Fixed runtime error in WhatsApp sharing functionality by adding null check for selectedRep.phone (Aug 20, 2025)
 - ✅ Enhanced specifications display to show only raw data from specifications management system (Aug 20, 2025)
+- ✅ Added missing quotations API endpoints for full CRUD operations (GET, POST, PUT, DELETE) (Aug 20, 2025)
+- ✅ Fixed quotations management page - now properly displays saved quotations and invoices (Aug 20, 2025)
 
 ## Default Login Credentials
 - **Admin**: username: `admin`, password: `admin123`
