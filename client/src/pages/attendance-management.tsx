@@ -1595,9 +1595,18 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                     break;
                 }
               } else if (dayAttendance) {
-                if (schedule.scheduleType === "متصل") {
-                  // للدوام المتصل، عرض في الفترة الأولى فقط
-                  checkinTime = `${dayAttendance.continuousCheckinTime || '-'} - ${dayAttendance.continuousCheckoutTime || '-'}`;
+                // التحقق من يوم الجمعة
+                const isFriday = format(day, "EEEE", { locale: ar }) === "الجمعة";
+                
+                if (schedule.scheduleType === "متصل" || isFriday) {
+                  // للدوام المتصل أو يوم الجمعة، عرض في الفترة الأولى فقط
+                  if (isFriday) {
+                    // يوم الجمعة: استخدم الفترة المسائية كفترة واحدة
+                    checkinTime = `${dayAttendance.eveningCheckinTime || '-'} - ${dayAttendance.eveningCheckoutTime || '-'}`;
+                  } else {
+                    // الدوام المتصل العادي
+                    checkinTime = `${dayAttendance.continuousCheckinTime || '-'} - ${dayAttendance.continuousCheckoutTime || '-'}`;
+                  }
                   checkoutTime = '-';
                 } else {
                   // للدوام المنفصل، عرض الفترتين منفصلتين
