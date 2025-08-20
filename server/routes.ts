@@ -796,11 +796,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Categories management
-  // Get all categories (including inactive)  
+  // Get all categories (including inactive) with optional manufacturer filter
   app.get("/api/categories", async (req, res) => {
     try {
       const { db } = getDatabase();
-      const categoriesData = await db.select().from(vehicleCategories);
+      const { manufacturerId } = req.query;
+      
+      let query = db.select().from(vehicleCategories);
+      
+      // Filter by manufacturer if provided
+      if (manufacturerId) {
+        query = query.where(eq(vehicleCategories.manufacturerId, parseInt(manufacturerId as string)));
+      }
+      
+      const categoriesData = await query;
       res.json(categoriesData);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -835,11 +844,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Trim levels management
-  // Get all trim levels (including inactive)
+  // Get all trim levels (including inactive) with optional category filter
   app.get("/api/trim-levels", async (req, res) => {
     try {
       const { db } = getDatabase();
-      const trimLevelsData = await db.select().from(vehicleTrimLevels);
+      const { categoryId } = req.query;
+      
+      let query = db.select().from(vehicleTrimLevels);
+      
+      // Filter by category if provided
+      if (categoryId) {
+        query = query.where(eq(vehicleTrimLevels.categoryId, parseInt(categoryId as string)));
+      }
+      
+      const trimLevelsData = await query;
       res.json(trimLevelsData);
     } catch (error) {
       console.error("Error fetching trim levels:", error);

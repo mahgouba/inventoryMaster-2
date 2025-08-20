@@ -30,17 +30,17 @@ interface Manufacturer {
 
 interface Category {
   id: number;
-  manufacturer_id: number;
-  name_ar: string;
-  name_en?: string;
+  manufacturerId: number;
+  nameAr: string;
+  nameEn?: string;
   isActive?: boolean;
 }
 
 interface TrimLevel {
   id: number;
-  category_id: number;
-  name_ar: string;
-  name_en?: string;
+  categoryId: number;
+  nameAr: string;
+  nameEn?: string;
   isActive?: boolean;
 }
 const initialEngineCapacities = ["2.0L", "1.5L", "3.0L", "4.0L", "5.0L", "V6", "V8"];
@@ -140,7 +140,7 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
   });
   
   // Get category ID for trim levels query
-  const selectedCategory = categories.find(c => c.name_ar === selectedCategoryName);
+  const selectedCategory = categories.find(c => c.nameAr === selectedCategoryName);
   const selectedCategoryId = selectedCategory?.id;
 
   // Fetch trim levels based on selected category
@@ -390,8 +390,8 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                             </SelectItem>
                           ) : categories.length > 0 ? (
                             categories.filter(category => category.isActive !== false).map((category) => (
-                              <SelectItem key={category.id} value={category.name_ar}>
-                                {category.name_ar}
+                              <SelectItem key={category.id} value={category.nameAr}>
+                                {category.nameAr}
                               </SelectItem>
                             ))
                           ) : (
@@ -432,8 +432,8 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
                             </SelectItem>
                           ) : trimLevels.length > 0 ? (
                             trimLevels.filter(trimLevel => trimLevel.isActive !== false).map((trimLevel) => (
-                              <SelectItem key={trimLevel.id} value={trimLevel.name_ar}>
-                                {trimLevel.name_ar}
+                              <SelectItem key={trimLevel.id} value={trimLevel.nameAr}>
+                                {trimLevel.nameAr}
                               </SelectItem>
                             ))
                           ) : (
