@@ -4,10 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { QrCode, Phone, Mail, Globe, Building, FileText, User, Building2, Settings, Calculator, Stamp, Car } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { QrCode, Phone, Mail, Globe, Building, FileText, User, Building2, Settings, Calculator, Stamp, Car, Edit, Save, X } from "lucide-react";
 import { numberToArabic } from "@/utils/number-to-arabic";
 import type { Company, InventoryItem, Specification } from "@shared/schema";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 // Extended Specification interface that includes additional properties
 interface ExtendedSpecification extends Specification {
@@ -503,6 +505,11 @@ interface VehicleDetailedSpecificationsSectionProps {
 }
 
 function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetailedSpecificationsSectionProps) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedSpecs, setEditedSpecs] = useState('');
+
   // Fetch specifications from the specifications management system
   const { data: specificationsData, isLoading } = useQuery({
     queryKey: ['/api/specifications-by-chassis', selectedVehicle.chassisNumber],
@@ -510,6 +517,46 @@ function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetail
       selectedVehicle.chassisNumber 
         ? fetch(`/api/specifications-by-chassis/${selectedVehicle.chassisNumber}`).then(res => res.ok ? res.json() : null)
         : fetch(`/api/specifications/${selectedVehicle.manufacturer}/${selectedVehicle.category || ''}/${selectedVehicle.trimLevel || 'null'}/${selectedVehicle.year}/${selectedVehicle.engineCapacity || ''}`).then(res => res.ok ? res.json() : null)
+  });
+
+  // Mutation for updating specifications
+  const updateSpecsMutation = useMutation({
+    mutationFn: async (newSpecs: string) => {
+      if (!specificationsData?.id) {
+        throw new Error('لا يمكن العثور على معرف المواصفات');
+      }
+      
+      const response = await fetch(`/api/vehicle-specifications/${specificationsData.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          specifications: newSpecs
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('فشل في حفظ المواصفات');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/specifications-by-chassis', selectedVehicle.chassisNumber] });
+      setIsEditing(false);
+      toast({
+        title: "تم الحفظ بنجاح",
+        description: "تم تحديث المواصفات التفصيلية",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ في الحفظ",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   });
 
   // Format specifications for display - show only raw specifications data
@@ -589,6 +636,25 @@ function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetail
   };
 
   const rawSpecsText = getSpecsText();
+
+  // Handle double click to start editing
+  const handleDoubleClick = () => {
+    if (specificationsData?.id) {
+      setEditedSpecs(rawSpecsText || '');
+      setIsEditing(true);
+    }
+  };
+
+  // Handle save
+  const handleSave = () => {
+    updateSpecsMutation.mutate(editedSpecs);
+  };
+
+  // Handle cancel
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditedSpecs('');
+  };
   
   return (
     <div className="mb-3">
@@ -600,16 +666,64 @@ function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetail
             مربوطة برقم الهيكل
           </span>
         )}
+        {isEditing && (
+          <div className="flex items-center gap-1 mr-auto">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleSave}
+              disabled={updateSpecsMutation.isPending}
+              className="h-6 px-2 text-xs"
+            >
+              <Save className="w-3 h-3 ml-1" />
+              حفظ
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleCancel}
+              className="h-6 px-2 text-xs"
+            >
+              <X className="w-3 h-3 ml-1" />
+              إلغاء
+            </Button>
+          </div>
+        )}
       </div>
       
-      <div className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50">
-        {rawSpecsText ? (
-          <div className="text-xs text-black/80 leading-relaxed max-h-32 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+      <div 
+        className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50 relative group"
+        onDoubleClick={handleDoubleClick}
+      >
+        {!isEditing && !rawSpecsText && (
+          <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Edit className="w-4 h-4 text-[#C79C45]" />
+          </div>
+        )}
+        
+        {isEditing ? (
+          <Textarea
+            value={editedSpecs}
+            onChange={(e) => setEditedSpecs(e.target.value)}
+            className="min-h-[80px] text-xs resize-none border-none p-0 focus:ring-0"
+            placeholder="أدخل المواصفات التفصيلية..."
+            autoFocus
+          />
+        ) : rawSpecsText ? (
+          <div 
+            className="text-xs text-black/80 leading-relaxed max-h-32 overflow-y-auto cursor-pointer hover:bg-gray-50 rounded p-1 -m-1" 
+            style={{ scrollbarWidth: 'thin' }}
+            title="اضغط مرتين للتحرير"
+          >
             • المواصفات العامة: {rawSpecsText}
           </div>
         ) : (
-          <div className="text-center text-sm text-black/60 py-2">
+          <div 
+            className="text-center text-sm text-black/60 py-2 cursor-pointer hover:bg-gray-50 rounded"
+            title="اضغط مرتين لإضافة مواصفات"
+          >
             لم يتم إدراج مواصفات تفصيلية لهذه المركبة بعد
+            <div className="text-xs text-black/40 mt-1">اضغط مرتين لإضافة مواصفات</div>
           </div>
         )}
       </div>
