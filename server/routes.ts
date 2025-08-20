@@ -269,6 +269,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clear all inventory items
+  app.delete("/api/inventory/clear-all", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+
+      // Get count before deletion for logging
+      const allItems = await db.select().from(inventoryItems);
+      const totalCount = allItems.length;
+
+      // Delete all inventory items
+      await db.delete(inventoryItems);
+
+      console.log(`Cleared all inventory: ${totalCount} items deleted`);
+      res.json({ 
+        message: "All inventory items cleared successfully", 
+        deletedCount: totalCount 
+      });
+    } catch (error) {
+      console.error("Error clearing all inventory:", error);
+      res.status(500).json({ message: "Failed to clear inventory" });
+    }
+  });
+
   // Fix duplicate manufacturers
   app.post("/api/fix-duplicates", async (req, res) => {
     try {

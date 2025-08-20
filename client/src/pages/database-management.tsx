@@ -56,6 +56,7 @@ export default function DatabaseManagement() {
   const [selectedImportTypes, setSelectedImportTypes] = useState<string[]>([]);
   const [databaseStats, setDatabaseStats] = useState<any>(null);
   const [importSource, setImportSource] = useState<'file' | 'database'>('file');
+  const [isClearingInventory, setIsClearingInventory] = useState(false);
   const { toast } = useToast();
 
   // Updated data types based on current schema
@@ -312,6 +313,42 @@ export default function DatabaseManagement() {
     );
   };
 
+  const handleClearInventory = async () => {
+    const confirmed = window.confirm(
+      "تحذير!\n\nسيتم حذف جميع عناصر المخزون نهائياً.\nهذا الإجراء لا يمكن التراجع عنه.\n\nهل تريد المتابعة؟"
+    );
+    
+    if (!confirmed) return;
+
+    const doubleConfirmed = window.confirm(
+      "تأكيد نهائي!\n\nأنت على وشك حذف جميع السيارات والعناصر في المخزون.\nهل أنت متأكد 100%؟"
+    );
+    
+    if (!doubleConfirmed) return;
+
+    setIsClearingInventory(true);
+    try {
+      await apiRequest('DELETE', '/api/inventory/clear-all');
+      
+      toast({
+        title: "تم حذف المخزون",
+        description: "تم حذف جميع عناصر المخزون بنجاح",
+      });
+      
+      // Refresh stats
+      await loadDatabaseStats();
+      
+    } catch (error) {
+      toast({
+        title: "خطأ في حذف المخزون",
+        description: "حدث خطأ أثناء حذف المخزون",
+        variant: "destructive",
+      });
+    } finally {
+      setIsClearingInventory(false);
+    }
+  };
+
   const getStatusIcon = () => {
     switch (connectionStatus) {
       case 'connected':
@@ -472,6 +509,38 @@ export default function DatabaseManagement() {
                         تصدير البيانات المحددة ({selectedExportTypes.length})
                       </div>
                     </Button>
+
+                    {/* Clear Inventory Button */}
+                    <div className="border-t border-white/10 pt-4 mt-4">
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <AlertTriangle className="w-5 h-5 text-red-400" />
+                          <span className="text-red-200 font-semibold">منطقة خطرة</span>
+                        </div>
+                        <p className="text-red-200/80 text-sm">
+                          سيتم حذف جميع عناصر المخزون والسيارات نهائياً. لا يمكن التراجع عن هذا الإجراء.
+                        </p>
+                      </div>
+                      <Button 
+                        onClick={handleClearInventory}
+                        disabled={isClearingInventory}
+                        variant="destructive"
+                        className="w-full bg-red-600 hover:bg-red-700 text-white"
+                        data-testid="button-clear-inventory"
+                      >
+                        {isClearingInventory ? (
+                          <div className="flex items-center gap-2">
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            جاري حذف المخزون...
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Trash2 className="w-4 h-4" />
+                            حذف المخزون بالكامل ({databaseStats?.inventory || 0} عنصر)
+                          </div>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
