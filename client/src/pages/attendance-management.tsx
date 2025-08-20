@@ -1426,8 +1426,33 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         }
       }
     } else {
-      // للدوام المنفصل - فقط للأيام العادية (ليس الجمعة)
-      if (!isFriday) {
+      // للدوام المنفصل
+      if (isFriday) {
+        // يوم الجمعة: الدوام من 4:00 مساءً إلى 9:00 مساءً
+        const expectedFridayStart = "16:00";
+        const expectedFridayEnd = "21:00";
+        
+        if (attendance.eveningCheckinTime) {
+          const expectedStart = new Date(`2024-01-01T${expectedFridayStart}`);
+          const actualStart = new Date(`2024-01-01T${attendance.eveningCheckinTime}`);
+          if (actualStart > expectedStart) {
+            const delayMinutes = (actualStart.getTime() - expectedStart.getTime()) / (1000 * 60);
+            totalDelayHours += delayMinutes / 60;
+            console.log('Friday late arrival:', delayMinutes, 'minutes');
+          }
+        }
+        
+        if (attendance.eveningCheckoutTime) {
+          const expectedEnd = new Date(`2024-01-01T${expectedFridayEnd}`);
+          const actualEnd = new Date(`2024-01-01T${attendance.eveningCheckoutTime}`);
+          if (actualEnd < expectedEnd) {
+            const earlyLeaveMinutes = (expectedEnd.getTime() - actualEnd.getTime()) / (1000 * 60);
+            totalDelayHours += earlyLeaveMinutes / 60;
+            console.log('Friday early leave:', earlyLeaveMinutes, 'minutes');
+          }
+        }
+      } else {
+        // الأيام العادية - الدوام المنفصل
         // الفترة الصباحية - تأخير في الحضور
         if (schedule.morningStartTime && attendance.morningCheckinTime) {
           const expectedMorningStart = new Date(`2024-01-01T${schedule.morningStartTime}`);
