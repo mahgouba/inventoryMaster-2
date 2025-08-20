@@ -212,13 +212,8 @@ export default function DropdownOptionsManagement() {
     setExpandedItems(newExpanded);
   };
 
-  // Debug logging
-  console.log('hierarchyData:', hierarchyData);
-  console.log('isArray:', Array.isArray(hierarchyData));
-  console.log('hierarchyData length:', hierarchyData?.length);
-
   // Filter data based on search and type
-  const filteredData = Array.isArray(hierarchyData) && hierarchyData.length > 0 ? hierarchyData.filter(item => {
+  const filteredData = hierarchyData.filter(item => {
     if (!item || !item.nameAr) return false;
     
     const matchesSearch = item.nameAr.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -229,10 +224,7 @@ export default function DropdownOptionsManagement() {
     // Add more filter types as needed
     
     return matchesSearch;
-  }) : [];
-  
-  console.log('filteredData:', filteredData);
-  console.log('filteredData length:', filteredData.length);
+  });
 
   if (isLoading) {
     return (
@@ -678,7 +670,7 @@ export default function DropdownOptionsManagement() {
 
           <ScrollArea className="h-[600px]">
             <div className="space-y-4">
-              {filteredData && filteredData.length > 0 ? filteredData.map((item: HierarchyData) => (
+              {filteredData.length > 0 ? filteredData.map((item: HierarchyData) => (
                 <Card key={item.id} className="glass-container border-2 border-white/20 shadow-lg rounded-2xl overflow-hidden">
                   <Collapsible 
                     open={expandedItems.has(`manufacturer-${item.id}`)}
@@ -739,7 +731,7 @@ export default function DropdownOptionsManagement() {
                     
                     <CollapsibleContent>
                       <CardContent className="px-8 pb-6">
-                        {item.categories.length > 0 ? (
+                        {item.categories && item.categories.length > 0 ? (
                           <div className="space-y-4">
                             {item.categories.map((category) => (
                               <div key={category.id} className="border border-white/20 rounded-2xl overflow-hidden">
@@ -800,7 +792,7 @@ export default function DropdownOptionsManagement() {
                                   
                                   <CollapsibleContent>
                                     <div className="p-6 bg-white/5">
-                                      {category.trimLevels.length > 0 ? (
+                                      {category.trimLevels && category.trimLevels.length > 0 ? (
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                           {category.trimLevels.map((trimLevel) => (
                                             <div key={trimLevel.id} className="flex items-center justify-between p-4 bg-white/10 rounded-xl border border-white/20">
