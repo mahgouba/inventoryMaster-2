@@ -371,70 +371,7 @@ export default function QuotationA4Preview({
             )}
           </div>
 
-          {/* Vehicle Specifications */}
-          <div className="mb-3">
-            <div className="flex items-center gap-2 mb-2">
-              <div 
-                className="text-[#C79C45] cursor-pointer hover:text-[#d4a653] transition-colors" 
-                onClick={() => setIsEditingSpecs(!isEditingSpecs)}
-                title="انقر للتحرير أو الإضافة"
-              >
-                <Settings className="w-5 h-5" />
-              </div>
-              <span className="text-lg font-bold text-black/80">المواصفات التفصيلية</span>
-            </div>
-            
-            {vehicleSpecs ? (
-              <div className="text-sm space-y-1">
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="flex justify-between">
-                    <span className="font-semibold text-black/80">الصانع:</span>
-                    <span className="text-black/80">{vehicleSpecs.manufacturer}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-semibold text-black/80">الفئة:</span>
-                    <span className="text-black/80">{vehicleSpecs.category}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-semibold text-black/80">درجة التجهيز:</span>
-                    <span className="text-black/80">{vehicleSpecs.trimLevel || "قياسي"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-semibold text-black/80">سنة الصنع:</span>
-                    <span className="text-black/80">{vehicleSpecs.year}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-semibold text-black/80">سعة المحرك:</span>
-                    <span className="text-black/80">{vehicleSpecs.engineCapacity}</span>
-                  </div>
-                </div>
-                
-                {/* Detailed Specifications Section - Always Show */}
-                <div className="mt-3 border-t border-[#C79C45]/30 pt-2">
-                  <span className="font-semibold text-black/80 block mb-2 text-base">المواصفات التفصيلية:</span>
-                  {isEditingSpecs ? (
-                    <textarea
-                      value={editableSpecs}
-                      onChange={(e) => setEditableSpecs(e.target.value)}
-                      onBlur={() => setIsEditingSpecs(false)}
-                      className="w-full text-black/80 text-xs leading-relaxed border border-gray-300 rounded p-2 resize-none"
-                      rows={6}
-                      style={{ fontFamily: '"Noto Sans Arabic", Arial, sans-serif', direction: 'rtl' }}
-                      autoFocus
-                    />
-                  ) : (
-                    <div className="text-black/80 text-xs leading-relaxed whitespace-pre-line">
-                      {editableSpecs || vehicleSpecs.detailedDescription || "لم يتم تحديد المواصفات التفصيلية"}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center text-black/80 py-2">
-                لم يتم تحديد مواصفات للمركبة
-              </div>
-            )}
-          </div>
+          
 
           {/* Top Row: Terms & Conditions and Price Details (switched positions) */}
           <div className="flex gap-3 mb-3">
