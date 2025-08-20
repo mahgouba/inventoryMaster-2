@@ -1384,6 +1384,21 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   const calculateDelayHours = (schedule: EmployeeWorkSchedule, attendance: DailyAttendance, day: Date): number => {
     let totalDelayHours = 0;
     
+    // تحقق من وجود بيانات الحضور
+    if (!attendance) return 0;
+    
+    console.log('Calculating delay for date:', format(day, 'yyyy-MM-dd'), {
+      scheduleType: schedule.scheduleType,
+      attendance: {
+        morningCheckin: attendance.morningCheckinTime,
+        morningCheckout: attendance.morningCheckoutTime,
+        eveningCheckin: attendance.eveningCheckinTime,
+        eveningCheckout: attendance.eveningCheckoutTime,
+        continuousCheckin: attendance.continuousCheckinTime,
+        continuousCheckout: attendance.continuousCheckoutTime
+      }
+    });
+    
     // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
     const isFriday = format(day, "EEEE", { locale: ar }) === "الجمعة";
     
@@ -1396,51 +1411,70 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         const expectedStartTime = new Date(`2024-01-01T${expectedStart}`);
         const actualStartTime = new Date(`2024-01-01T${attendance.continuousCheckinTime}`);
         if (actualStartTime > expectedStartTime) {
-          totalDelayHours += (actualStartTime.getTime() - expectedStartTime.getTime()) / (1000 * 60 * 60);
+          const delayMinutes = (actualStartTime.getTime() - expectedStartTime.getTime()) / (1000 * 60);
+          totalDelayHours += delayMinutes / 60;
+          console.log('Late arrival (continuous):', delayMinutes, 'minutes');
         }
         
         // حساب الإنصراف المبكر
         const expectedEndTime = new Date(`2024-01-01T${expectedEnd}`);
         const actualEndTime = new Date(`2024-01-01T${attendance.continuousCheckoutTime}`);
         if (actualEndTime < expectedEndTime) {
-          totalDelayHours += (expectedEndTime.getTime() - actualEndTime.getTime()) / (1000 * 60 * 60);
+          const earlyLeaveMinutes = (expectedEndTime.getTime() - actualEndTime.getTime()) / (1000 * 60);
+          totalDelayHours += earlyLeaveMinutes / 60;
+          console.log('Early leave (continuous):', earlyLeaveMinutes, 'minutes');
         }
       }
     } else {
       // للدوام المنفصل - فقط للأيام العادية (ليس الجمعة)
       if (!isFriday) {
-        // الفترة الصباحية
-        if (schedule.morningStartTime && schedule.morningEndTime && attendance.morningCheckinTime && attendance.morningCheckoutTime) {
+        // الفترة الصباحية - تأخير في الحضور
+        if (schedule.morningStartTime && attendance.morningCheckinTime) {
           const expectedMorningStart = new Date(`2024-01-01T${schedule.morningStartTime}`);
           const actualMorningStart = new Date(`2024-01-01T${attendance.morningCheckinTime}`);
           if (actualMorningStart > expectedMorningStart) {
-            totalDelayHours += (actualMorningStart.getTime() - expectedMorningStart.getTime()) / (1000 * 60 * 60);
-          }
-          
-          const expectedMorningEnd = new Date(`2024-01-01T${schedule.morningEndTime}`);
-          const actualMorningEnd = new Date(`2024-01-01T${attendance.morningCheckoutTime}`);
-          if (actualMorningEnd < expectedMorningEnd) {
-            totalDelayHours += (expectedMorningEnd.getTime() - actualMorningEnd.getTime()) / (1000 * 60 * 60);
+            const delayMinutes = (actualMorningStart.getTime() - expectedMorningStart.getTime()) / (1000 * 60);
+            totalDelayHours += delayMinutes / 60;
+            console.log('Morning late arrival:', delayMinutes, 'minutes');
           }
         }
         
-        // الفترة المسائية
-        if (schedule.eveningStartTime && schedule.eveningEndTime && attendance.eveningCheckinTime && attendance.eveningCheckoutTime) {
+        // الفترة الصباحية - انصراف مبكر
+        if (schedule.morningEndTime && attendance.morningCheckoutTime) {
+          const expectedMorningEnd = new Date(`2024-01-01T${schedule.morningEndTime}`);
+          const actualMorningEnd = new Date(`2024-01-01T${attendance.morningCheckoutTime}`);
+          if (actualMorningEnd < expectedMorningEnd) {
+            const earlyLeaveMinutes = (expectedMorningEnd.getTime() - actualMorningEnd.getTime()) / (1000 * 60);
+            totalDelayHours += earlyLeaveMinutes / 60;
+            console.log('Morning early leave:', earlyLeaveMinutes, 'minutes');
+          }
+        }
+        
+        // الفترة المسائية - تأخير في الحضور
+        if (schedule.eveningStartTime && attendance.eveningCheckinTime) {
           const expectedEveningStart = new Date(`2024-01-01T${schedule.eveningStartTime}`);
           const actualEveningStart = new Date(`2024-01-01T${attendance.eveningCheckinTime}`);
           if (actualEveningStart > expectedEveningStart) {
-            totalDelayHours += (actualEveningStart.getTime() - expectedEveningStart.getTime()) / (1000 * 60 * 60);
+            const delayMinutes = (actualEveningStart.getTime() - expectedEveningStart.getTime()) / (1000 * 60);
+            totalDelayHours += delayMinutes / 60;
+            console.log('Evening late arrival:', delayMinutes, 'minutes');
           }
-          
+        }
+        
+        // الفترة المسائية - انصراف مبكر
+        if (schedule.eveningEndTime && attendance.eveningCheckoutTime) {
           const expectedEveningEnd = new Date(`2024-01-01T${schedule.eveningEndTime}`);
           const actualEveningEnd = new Date(`2024-01-01T${attendance.eveningCheckoutTime}`);
           if (actualEveningEnd < expectedEveningEnd) {
-            totalDelayHours += (expectedEveningEnd.getTime() - actualEveningEnd.getTime()) / (1000 * 60 * 60);
+            const earlyLeaveMinutes = (expectedEveningEnd.getTime() - actualEveningEnd.getTime()) / (1000 * 60);
+            totalDelayHours += earlyLeaveMinutes / 60;
+            console.log('Evening early leave:', earlyLeaveMinutes, 'minutes');
           }
         }
       }
     }
     
+    console.log('Total delay hours calculated:', totalDelayHours);
     return totalDelayHours;
   };
 
@@ -1628,6 +1662,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
             </div>
             <div style="color: #C49632;">
               <strong>أيام الإجازة:</strong> ${monthAttendance.filter(a => a.notes === 'إجازة').length} يوم
+            </div>
+            <div style="color: #ef4444;">
+              <strong>أيام الغياب:</strong> ${monthDays.length - monthAttendance.length} يوم
             </div>
             <div style="color: #00627F;">
               <strong>إجمالي ساعات العمل:</strong> ${formatHoursToHoursMinutes(
