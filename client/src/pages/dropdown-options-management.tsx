@@ -212,8 +212,15 @@ export default function DropdownOptionsManagement() {
     setExpandedItems(newExpanded);
   };
 
+  // Debug logging
+  console.log('hierarchyData:', hierarchyData);
+  console.log('isArray:', Array.isArray(hierarchyData));
+  console.log('hierarchyData length:', hierarchyData?.length);
+
   // Filter data based on search and type
-  const filteredData = Array.isArray(hierarchyData) ? hierarchyData.filter(item => {
+  const filteredData = Array.isArray(hierarchyData) && hierarchyData.length > 0 ? hierarchyData.filter(item => {
+    if (!item || !item.nameAr) return false;
+    
     const matchesSearch = item.nameAr.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          (item.nameEn && item.nameEn.toLowerCase().includes(searchQuery.toLowerCase()));
     
@@ -223,6 +230,9 @@ export default function DropdownOptionsManagement() {
     
     return matchesSearch;
   }) : [];
+  
+  console.log('filteredData:', filteredData);
+  console.log('filteredData length:', filteredData.length);
 
   if (isLoading) {
     return (
@@ -862,11 +872,25 @@ export default function DropdownOptionsManagement() {
                   <CardContent>
                     <Building2 className="w-24 h-24 text-white/40 mx-auto mb-6" />
                     <h3 className="text-2xl font-semibold text-white mb-4">
-                      لا توجد بيانات للعرض
+                      {hierarchyData && hierarchyData.length > 0 
+                        ? "لا توجد بيانات تطابق البحث" 
+                        : "لا توجد بيانات للعرض"
+                      }
                     </h3>
                     <p className="text-white/60 text-lg">
-                      ابدأ بإضافة شركة مصنعة جديدة لتظهر هنا
+                      {hierarchyData && hierarchyData.length > 0 
+                        ? "جرب تغيير معايير البحث أو الفلتر" 
+                        : "ابدأ بإضافة شركة مصنعة جديدة لتظهر هنا"
+                      }
                     </p>
+                    <div className="mt-4 p-4 bg-yellow-500/20 rounded-lg">
+                      <p className="text-sm text-yellow-200">
+                        البيانات المتاحة: {hierarchyData?.length || 0} شركة
+                      </p>
+                      <p className="text-sm text-yellow-200">
+                        البيانات المفلترة: {filteredData?.length || 0} شركة
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               )}
