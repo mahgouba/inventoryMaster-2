@@ -12,7 +12,7 @@ import LeaveRequestsPage from "@/pages/leave-requests";
 import AttendanceManagementPage from "@/pages/attendance-management";
 
 
-import ManufacturerLogosPage from "@/pages/manufacturer-logos";
+
 import UserManagementPage from "@/pages/user-management";
 import BankManagement from "@/pages/bank-management";
 // Removed bank-management-full as it was consolidated into bank-management
@@ -71,8 +71,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
 
 
 
-      case "/manufacturer-logos":
-        return user.role === "admin" ? <ManufacturerLogosPage /> : null;
+
 
       case "/user-management":
         return user.role === "admin" ? <UserManagementPage /> : null;

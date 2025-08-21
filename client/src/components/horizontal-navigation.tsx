@@ -315,13 +315,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
   ];
 
   const adminItems = [
-    { 
-      title: "الشعارات", 
-      href: "/manufacturer-logos", 
-      icon: Image,
-      internal: true,
-      permission: "admin"
-    },
+
 
     { 
       title: "المستخدمين", 
