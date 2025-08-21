@@ -1,6 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { getDatabase } from "./db";
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs/promises';
 import { 
   users, 
   inventoryItems, 
@@ -2464,6 +2467,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting quotation:", error);
       res.status(500).json({ message: "Failed to delete quotation" });
+    }
+  });
+
+  // Configure multer for logo uploads
+  const logoStorage = multer.diskStorage({
+    destination: async (req, file, cb) => {
+      const logosDir = path.join(process.cwd(), 'public', 'logos');
+      try {
+        await fs.mkdir(logosDir, { recursive: true });
+        cb(null, logosDir);
+      } catch (error) {
+        cb(error, '');
+      }
+    },
+    filename: (req, file, cb) => {
+      // Extract manufacturer info from request
+      const manufacturerId = req.params.id;
+      // Get file extension
+      const ext = path.extname(file.originalname);
+      // Use manufacturer ID as filename (will be updated with actual name later)
+      cb(null, `temp_${manufacturerId}${ext}`);
+    }
+  });
+
+  const uploadLogo = multer({
+    storage: logoStorage,
+    fileFilter: (req, file, cb) => {
+      // Check file type
+      const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/jpg'];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error('نوع الملف غير مدعوم. يرجى رفع ملف SVG أو PNG فقط.'));
+      }
+    },
+    limits: {
+      fileSize: 2 * 1024 * 1024 // 2MB limit
+    }
+  });
+
+  // Upload manufacturer logo endpoint
+  app.post('/api/manufacturers/:id/upload-logo', uploadLogo.single('logo'), async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const manufacturerId = parseInt(req.params.id);
+      
+      if (!req.file) {
+        return res.status(400).json({ message: 'لم يتم تحديد ملف' });
+      }
+
+      // Get manufacturer info to determine final filename
+      const manufacturer = await db.select()
+        .from(manufacturers)
+        .where(eq(manufacturers.id, manufacturerId))
+        .limit(1);
+
+      if (manufacturer.length === 0) {
+        // Delete uploaded file if manufacturer not found
+        await fs.unlink(req.file.path).catch(() => {});
+        return res.status(404).json({ message: 'الصانع غير موجود' });
+      }
+
+      const manufacturerData = manufacturer[0];
+      const fileExt = path.extname(req.file.originalname);
+      
+      // Determine final filename using Arabic or English name
+      let finalFileName: string;
+      if (manufacturerData.nameEn && manufacturerData.nameEn.trim()) {
+        // Use English name if available
+        finalFileName = `${manufacturerData.nameEn.trim()}${fileExt}`;
+      } else {
+        // Use Arabic name as fallback
+        finalFileName = `${manufacturerData.nameAr.trim()}${fileExt}`;
+      }
+
+      const finalPath = path.join(path.dirname(req.file.path), finalFileName);
+      
+      // Rename file to final name
+      await fs.rename(req.file.path, finalPath);
+      
+      // Update manufacturer logo path in database
+      await db.update(manufacturers)
+        .set({ 
+          logo: `/logos/${finalFileName}`,
+          updatedAt: new Date()
+        })
+        .where(eq(manufacturers.id, manufacturerId));
+
+      res.json({ 
+        message: 'تم رفع الشعار بنجاح',
+        logoPath: `/logos/${finalFileName}`,
+        fileName: finalFileName
+      });
+    } catch (error) {
+      // Clean up uploaded file on error
+      if (req.file) {
+        await fs.unlink(req.file.path).catch(() => {});
+      }
+      
+      console.error('خطأ في رفع الشعار:', error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : 'فشل في رفع الشعار' 
+      });
     }
   });
 

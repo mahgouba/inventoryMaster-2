@@ -12,6 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
+import { ManufacturerLogo } from "@/components/manufacturer-logo";
 import {
   Building2,
   Car,
@@ -29,7 +30,8 @@ import {
   Search,
   Filter,
   Download,
-  Upload
+  Upload,
+  Image
 } from "lucide-react";
 
 interface Manufacturer {
@@ -98,6 +100,10 @@ export default function DropdownOptionsManagement() {
   const [isAddColorToManufacturerOpen, setIsAddColorToManufacturerOpen] = useState(false);
   const [isAddColorToCategoryOpen, setIsAddColorToCategoryOpen] = useState(false);
   const [isAddColorToTrimLevelOpen, setIsAddColorToTrimLevelOpen] = useState(false);
+  
+  // State for logo upload
+  const [isLogoUploadOpen, setIsLogoUploadOpen] = useState(false);
+  const [selectedManufacturerForLogo, setSelectedManufacturerForLogo] = useState<number | null>(null);
   
   // Form states for adding new items
   const [manufacturerNameAr, setManufacturerNameAr] = useState("");
@@ -204,6 +210,75 @@ export default function DropdownOptionsManagement() {
       });
     }
   });
+
+  // Logo upload mutation
+  const uploadLogoMutation = useMutation({
+    mutationFn: async ({ manufacturerId, file }: { manufacturerId: number; file: File }) => {
+      const formData = new FormData();
+      formData.append('logo', file);
+      
+      const response = await fetch(`/api/manufacturers/${manufacturerId}/upload-logo`, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('فشل في رفع الشعار');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/manufacturers'] });
+      toast({
+        title: "تم الرفع بنجاح",
+        description: "تم رفع شعار الصانع بنجاح",
+      });
+      setIsLogoUploadOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ في الرفع",
+        description: error instanceof Error ? error.message : "فشل في رفع الشعار",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Handle file upload
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && selectedManufacturerForLogo) {
+      // Validate file type
+      const validTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/jpg'];
+      if (!validTypes.includes(file.type)) {
+        toast({
+          title: "نوع الملف غير مدعوم",
+          description: "يرجى رفع ملف بصيغة SVG أو PNG فقط",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          title: "الملف كبير جداً",
+          description: "يرجى رفع ملف أصغر من 2 ميجابايت",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      uploadLogoMutation.mutate({ 
+        manufacturerId: selectedManufacturerForLogo, 
+        file 
+      });
+    }
+    // Reset the input value to allow re-selecting the same file
+    event.target.value = '';
+  };
 
   // Toggle expanded state
   const toggleExpanded = (key: string) => {
@@ -1050,8 +1125,20 @@ export default function DropdownOptionsManagement() {
                       <CardHeader className="cursor-pointer hover:bg-white/10 transition-all duration-300 p-6">
                         <CardTitle className="flex items-center justify-between text-xl">
                           <div className="flex items-center gap-4">
-                            <div className="p-3 bg-white/20 rounded-2xl">
-                              <Building2 className="w-8 h-8 text-white" />
+                            <div 
+                              className="p-3 bg-white/20 rounded-2xl cursor-pointer hover:bg-white/30 transition-all duration-300"
+                              onDoubleClick={() => {
+                                setSelectedManufacturerForLogo(item.id);
+                                setIsLogoUploadOpen(true);
+                              }}
+                              title="اضغط دبل كليك لرفع الشعار"
+                            >
+                              <ManufacturerLogo 
+                                manufacturerName={item.nameAr}
+                                size="lg"
+                                className="w-8 h-8"
+                                showFallback={true}
+                              />
                             </div>
                             <div>
                               <h3 className={`text-2xl font-bold ${item.isActive !== false ? 'text-white' : 'text-white/70'}`}>{item.nameAr}</h3>
@@ -1359,6 +1446,80 @@ export default function DropdownOptionsManagement() {
             </div>
           </ScrollArea>
         </Card>
+
+        {/* Logo Upload Dialog */}
+        <Dialog open={isLogoUploadOpen} onOpenChange={setIsLogoUploadOpen}>
+          <DialogContent className="max-w-md rounded-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-2xl text-center text-blue-600 flex items-center justify-center gap-3">
+                <Image className="w-8 h-8" />
+                رفع شعار الصانع
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6 p-2">
+              <div>
+                <Label className="text-lg">الصانع المحدد</Label>
+                <div className="p-3 bg-blue-50 rounded-xl border border-blue-200">
+                  <span className="text-blue-800 font-medium">
+                    {hierarchyData.find(m => m.id === selectedManufacturerForLogo)?.nameAr || "غير محدد"}
+                  </span>
+                </div>
+              </div>
+              
+              {selectedManufacturerForLogo && (
+                <div>
+                  <Label className="text-lg mb-3 block">الشعار الحالي</Label>
+                  <div className="flex items-center justify-center p-6 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                    <ManufacturerLogo 
+                      manufacturerName={hierarchyData.find(m => m.id === selectedManufacturerForLogo)?.nameAr || ""}
+                      size="lg"
+                      className="w-16 h-16"
+                      showFallback={true}
+                    />
+                  </div>
+                </div>
+              )}
+              
+              <div>
+                <Label htmlFor="logo-upload" className="text-lg">اختيار ملف الشعار الجديد</Label>
+                <div className="mt-2">
+                  <input
+                    id="logo-upload"
+                    type="file"
+                    accept=".svg,.png,.jpg,.jpeg"
+                    onChange={handleLogoUpload}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    data-testid="input-logo-upload"
+                  />
+                  <p className="text-sm text-gray-500 mt-2">
+                    الصيغ المدعومة: SVG, PNG, JPG (أقصى حجم: 2 ميجابايت)
+                  </p>
+                </div>
+              </div>
+              
+              {uploadLogoMutation.isPending && (
+                <div className="flex items-center justify-center p-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <span className="mr-3 text-blue-600">جاري رفع الشعار...</span>
+                </div>
+              )}
+              
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsLogoUploadOpen(false)}
+                  className="flex-1 h-12 rounded-xl"
+                  disabled={uploadLogoMutation.isPending}
+                  data-testid="button-cancel-logo-upload"
+                >
+                  <X className="w-5 h-5 ml-2" />
+                  إلغاء
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         </main>
       </div>
     </SystemGlassWrapper>
