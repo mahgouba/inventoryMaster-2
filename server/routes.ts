@@ -914,6 +914,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add new manufacturer
+  app.post("/api/manufacturers", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { nameAr, nameEn, logo } = req.body;
+
+      if (!nameAr?.trim()) {
+        return res.status(400).json({ message: "الاسم بالعربية مطلوب" });
+      }
+
+      // Check if manufacturer already exists
+      const existingManufacturer = await db.select()
+        .from(manufacturers)
+        .where(eq(manufacturers.nameAr, nameAr.trim()))
+        .limit(1);
+
+      if (existingManufacturer.length > 0) {
+        return res.status(400).json({ message: "اسم الشركة المصنعة موجود بالفعل" });
+      }
+
+      const [newManufacturer] = await db.insert(manufacturers)
+        .values({
+          nameAr: nameAr.trim(),
+          nameEn: nameEn?.trim() || null,
+          logo: logo || null,
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+
+      res.json(newManufacturer);
+    } catch (error) {
+      console.error("Error creating manufacturer:", error);
+      res.status(500).json({ message: "فشل في إضافة الشركة المصنعة" });
+    }
+  });
+
+  // Update manufacturer
+  app.put("/api/manufacturers/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const manufacturerId = parseInt(req.params.id);
+      const { nameAr, nameEn, logo } = req.body;
+
+      if (!nameAr?.trim()) {
+        return res.status(400).json({ message: "الاسم بالعربية مطلوب" });
+      }
+
+      // Check if another manufacturer with the same name exists
+      const existingManufacturer = await db.select()
+        .from(manufacturers)
+        .where(and(
+          eq(manufacturers.nameAr, nameAr.trim()),
+          not(eq(manufacturers.id, manufacturerId))
+        ))
+        .limit(1);
+
+      if (existingManufacturer.length > 0) {
+        return res.status(400).json({ message: "اسم الشركة المصنعة موجود بالفعل" });
+      }
+
+      const [updatedManufacturer] = await db.update(manufacturers)
+        .set({
+          nameAr: nameAr.trim(),
+          nameEn: nameEn?.trim() || null,
+          logo: logo || null,
+          updatedAt: new Date()
+        })
+        .where(eq(manufacturers.id, manufacturerId))
+        .returning();
+
+      if (!updatedManufacturer) {
+        return res.status(404).json({ message: "الشركة المصنعة غير موجودة" });
+      }
+
+      res.json(updatedManufacturer);
+    } catch (error) {
+      console.error("Error updating manufacturer:", error);
+      res.status(500).json({ message: "فشل في تحديث الشركة المصنعة" });
+    }
+  });
+
+  // Delete manufacturer
+  app.delete("/api/manufacturers/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const manufacturerId = parseInt(req.params.id);
+
+      // Check if manufacturer has associated categories or vehicles
+      const associatedCategories = await db.select()
+        .from(vehicleCategories)
+        .where(eq(vehicleCategories.manufacturerId, manufacturerId))
+        .limit(1);
+
+      const associatedVehicles = await db.select()
+        .from(inventoryItems)
+        .where(eq(inventoryItems.manufacturer, manufacturerId.toString()))
+        .limit(1);
+
+      if (associatedCategories.length > 0 || associatedVehicles.length > 0) {
+        return res.status(400).json({ 
+          message: "لا يمكن حذف الشركة المصنعة لأنها مرتبطة بفئات أو مركبات موجودة" 
+        });
+      }
+
+      const [deletedManufacturer] = await db.delete(manufacturers)
+        .where(eq(manufacturers.id, manufacturerId))
+        .returning();
+
+      if (!deletedManufacturer) {
+        return res.status(404).json({ message: "الشركة المصنعة غير موجودة" });
+      }
+
+      res.json({ message: "تم حذف الشركة المصنعة بنجاح", deletedManufacturer });
+    } catch (error) {
+      console.error("Error deleting manufacturer:", error);
+      res.status(500).json({ message: "فشل في حذف الشركة المصنعة" });
+    }
+  });
+
   // Toggle manufacturer active status
   app.put("/api/manufacturers/:id/toggle", async (req, res) => {
     try {

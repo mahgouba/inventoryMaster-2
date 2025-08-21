@@ -211,6 +211,77 @@ export default function DropdownOptionsManagement() {
     }
   });
 
+  // Add manufacturer mutation
+  const addManufacturerMutation = useMutation({
+    mutationFn: async (data: { nameAr: string; nameEn?: string; logo?: string }) => {
+      return apiRequest('POST', '/api/manufacturers', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تم الإنشاء بنجاح",
+        description: "تم إضافة الشركة المصنعة بنجاح",
+      });
+      // Reset form
+      setManufacturerNameAr("");
+      setManufacturerNameEn("");
+      setManufacturerLogo("");
+      setIsAddManufacturerOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "خطأ في الإنشاء",
+        description: error?.message || "فشل في إضافة الشركة المصنعة",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Update manufacturer mutation
+  const updateManufacturerMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: { nameAr: string; nameEn?: string; logo?: string } }) => {
+      return apiRequest('PUT', `/api/manufacturers/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تم التحديث",
+        description: "تم تحديث الشركة المصنعة بنجاح",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "خطأ في التحديث",
+        description: error?.message || "فشل في تحديث الشركة المصنعة",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Delete manufacturer mutation
+  const deleteManufacturerMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest('DELETE', `/api/manufacturers/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف الشركة المصنعة بنجاح",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "خطأ في الحذف",
+        description: error?.message || "فشل في حذف الشركة المصنعة",
+        variant: "destructive"
+      });
+    }
+  });
+
   // Logo upload mutation
   const uploadLogoMutation = useMutation({
     mutationFn: async ({ manufacturerId, file }: { manufacturerId: number; file: File }) => {
@@ -413,20 +484,35 @@ export default function DropdownOptionsManagement() {
                   <div className="flex gap-3">
                     <Button 
                       onClick={() => {
-                        toast({
-                          title: "قريباً",
-                          description: "ستتم إضافة هذه الميزة قريباً",
+                        if (!manufacturerNameAr.trim()) {
+                          toast({
+                            title: "خطأ",
+                            description: "يرجى إدخال اسم الشركة بالعربية",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        addManufacturerMutation.mutate({
+                          nameAr: manufacturerNameAr.trim(),
+                          nameEn: manufacturerNameEn.trim() || undefined,
+                          logo: manufacturerLogo.trim() || undefined,
                         });
                       }}
-                      className="flex-1 h-12 bg-green-600 hover:bg-green-700 rounded-xl"
+                      disabled={addManufacturerMutation.isPending}
+                      className="flex-1 h-12 bg-green-600 hover:bg-green-700 rounded-xl disabled:opacity-50"
                       data-testid="button-save-manufacturer"
                     >
                       <Save className="w-5 h-5 ml-2" />
-                      حفظ
+                      {addManufacturerMutation.isPending ? "جاري الحفظ..." : "حفظ"}
                     </Button>
                     <Button 
                       variant="outline" 
-                      onClick={() => setIsAddManufacturerOpen(false)}
+                      onClick={() => {
+                        setManufacturerNameAr("");
+                        setManufacturerNameEn("");
+                        setManufacturerLogo("");
+                        setIsAddManufacturerOpen(false);
+                      }}
                       className="h-12 rounded-xl"
                       data-testid="button-cancel-manufacturer"
                     >
