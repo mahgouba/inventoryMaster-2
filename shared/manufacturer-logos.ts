@@ -15,17 +15,17 @@ export const manufacturerLogos: Record<string, string> = {
   "لامبورغيني": "/lamborghini.svg",
   "بوغاتي": "/bugatti.svg",
   "بورشه": "/porsche-svgrepo-com.svg",
-  "تيسلا": "/logos /tesla.svg",
-  "تسلا": "/logos /tesla.svg",
+  "تيسلا": "/logos/tesla.svg",
+  "تسلا": "/logos/tesla.svg",
   "فولكس فاغن": "/volkswagen.svg",
   "فورد": "/ford-mustang.svg",
   "لينكولن": "/lincoln.svg",
   "رام": "/ram.svg",
-  "جي إم سي": "/logos /gmc.svg",
+  "جي إم سي": "/logos/gmc.svg",
   "مايباخ": "/maybach.svg",
   "لوتس": "/lotus.svg",
-  "روكس": "/logos /ROX.svg",
-  "كاديلاك": "/logos /Cadillac--Streamline-Simple-Icons.svg",
+  "روكس": "/logos/ROX.svg",
+  "كاديلاك": "/logos/Cadillac.svg",
   
   // English names as fallback
   "Mercedes": "/mercedes.svg",
@@ -41,17 +41,17 @@ export const manufacturerLogos: Record<string, string> = {
   "Lamborghini": "/lamborghini.svg",
   "Bugatti": "/bugatti.svg",
   "Porsche": "/porsche-svgrepo-com.svg",
-  "Tesla": "/logos /tesla.svg",
+  "Tesla": "/logos/tesla.svg",
   "Volkswagen": "/volkswagen.svg",
   "Ford": "/ford-mustang.svg",
   "Lincoln": "/lincoln.svg",
   "Ram": "/ram.svg",
-  "GMC": "/logos /gmc.svg",
+  "GMC": "/logos/gmc.svg",
   "Maybach": "/maybach.svg",
   "Lotus": "/lotus.svg",
   "Infiniti": "/infiniti.svg",
-  "ROX": "/logos /ROX.svg",
-  "Cadillac": "/logos /Cadillac--Streamline-Simple-Icons.svg"
+  "ROX": "/logos/ROX.svg",
+  "Cadillac": "/logos/Cadillac.svg"
 };
 
 export function getManufacturerLogo(manufacturerName: string): string | null {
