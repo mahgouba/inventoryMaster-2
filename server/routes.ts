@@ -280,6 +280,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Sell a reserved vehicle specifically (enhanced version with reservation data preserved)
+  app.put("/api/inventory/:id/sell-reserved", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const itemId = parseInt(req.params.id);
+      const { 
+        salePrice, 
+        saleDate,
+        customerName, 
+        customerPhone, 
+        salesRepresentative, 
+        saleNotes 
+      } = req.body;
+
+      // Check if item exists
+      const [existingItem] = await db.select().from(inventoryItems).where(eq(inventoryItems.id, itemId));
+      if (!existingItem) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+
+      // Check if item is reserved
+      if (existingItem.status !== "محجوز") {
+        return res.status(400).json({ message: "Vehicle is not reserved for sale" });
+      }
+
+      // Update the inventory item to sold status, preserving reservation data
+      const [updatedItem] = await db.update(inventoryItems)
+        .set({
+          status: "مباع",
+          isSold: true,
+          soldDate: saleDate ? new Date(saleDate) : new Date(),
+          soldToCustomerName: customerName || existingItem.customerName || "",
+          soldToCustomerPhone: customerPhone || existingItem.customerPhone || "",
+          soldBySalesRep: salesRepresentative || existingItem.salesRepresentative || "",
+          salePrice: parseFloat(salePrice) || 0,
+          saleNotes: saleNotes || "",
+          // Preserve the original reservation data
+          reservationDate: existingItem.reservationDate,
+          reservedBy: existingItem.reservedBy,
+          reservationNote: existingItem.reservationNote,
+          paidAmount: existingItem.paidAmount
+        })
+        .where(eq(inventoryItems.id, itemId))
+        .returning();
+
+      res.json(updatedItem);
+    } catch (error) {
+      console.error("Error selling reserved inventory item:", error);
+      res.status(500).json({ message: "Failed to sell reserved inventory item" });
+    }
+  });
+
   // Update an inventory item
   app.put("/api/inventory/:id", async (req, res) => {
     try {
