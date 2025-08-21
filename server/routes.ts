@@ -1410,6 +1410,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Mark day as holiday endpoint
+  app.post("/api/daily-attendance/holiday", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { employeeId, date, isHoliday } = req.body;
+      
+      if (!employeeId || !date) {
+        return res.status(400).json({ message: "Employee ID and date are required" });
+      }
+
+      // Get employee information first
+      const [user] = await db.select()
+        .from(users)
+        .where(eq(users.id, parseInt(employeeId)))
+        .limit(1);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+
+      const dateObj = new Date(date + 'T00:00:00');
+      
+      // Check if attendance record exists for this employee and date
+      const [existingAttendance] = await db.select()
+        .from(dailyAttendance)
+        .where(
+          and(
+            eq(dailyAttendance.employeeId, parseInt(employeeId)),
+            eq(dailyAttendance.date, dateObj)
+          )
+        )
+        .limit(1);
+
+      if (existingAttendance) {
+        // Update existing record to mark as holiday or remove holiday marking
+        const updatedNotes = isHoliday ? 'إجازة' : (existingAttendance.notes === 'إجازة' ? null : existingAttendance.notes);
+        
+        const [updatedAttendance] = await db.update(dailyAttendance)
+          .set({
+            notes: updatedNotes,
+            updatedAt: new Date()
+          })
+          .where(eq(dailyAttendance.id, existingAttendance.id))
+          .returning();
+          
+        res.json(updatedAttendance);
+      } else {
+        // Create new holiday record with proper employee info
+        const attendanceData = {
+          employeeId: parseInt(employeeId),
+          employeeName: user.name,
+          date: dateObj,
+          scheduleType: "متصل",
+          notes: isHoliday ? 'إجازة' : null,
+          createdBy: req.session?.passport?.user?.id || 1,
+          createdByName: req.session?.passport?.user?.username || 'admin'
+        };
+        
+        const [newAttendance] = await db.insert(dailyAttendance)
+          .values(attendanceData)
+          .returning();
+          
+        res.status(201).json(newAttendance);
+      }
+    } catch (error) {
+      console.error("Error marking holiday:", error);
+      res.status(500).json({ message: "Failed to mark day as holiday" });
+    }
+  });
+
   // Database synchronization endpoint
   app.post("/api/database/sync-external", async (req, res) => {
     try {
