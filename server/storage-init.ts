@@ -5,7 +5,7 @@ import type { IStorage } from "./storage";
 export async function createStorageInstance(): Promise<IStorage> {
   try {
     // Use the main production database URL
-    const dbUrl = process.env.DATABASE_URL || "postgresql://neondb_owner:npg_aKGc5jdCuOI4@ep-solitary-hill-a69yqw2u.us-west-2.aws.neon.tech/neondb?sslmode=require";
+    const dbUrl = process.env.DATABASE_URL;
     console.log('🔍 Checking database configuration...');
     console.log('📋 DATABASE_URL:', dbUrl ? 'Found' : 'Not found');
     console.log('🔗 Database connection:', db ? 'Available' : 'Not available');

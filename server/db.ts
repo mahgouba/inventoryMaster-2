@@ -10,8 +10,8 @@ export function initializeDatabase() {
     return { pool, db };
   }
 
-  // Use the specified external Neon database
-  const DATABASE_URL = "postgresql://neondb_owner:npg_E9MhlZt2CTGz@ep-dry-night-afnnpvw9-pooler.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+  // Use environment variable for database URL
+  const DATABASE_URL = process.env.DATABASE_URL;
 
   if (!DATABASE_URL) {
     throw new Error(

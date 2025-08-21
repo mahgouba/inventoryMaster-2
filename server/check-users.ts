@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 
-const DATABASE_URL = "postgresql://neondb_owner:npg_E9MhlZt2CTGz@ep-dry-night-afnnpvw9-pooler.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+const DATABASE_URL = process.env.DATABASE_URL;
 
 async function checkUsers() {
   const pool = new Pool({
