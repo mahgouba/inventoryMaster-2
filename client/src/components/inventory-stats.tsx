@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { Package, Truck, CheckCircle, Wrench, ShoppingCart, User, Building, Users, Calendar } from "lucide-react";
-import { getManufacturerLogo } from "@shared/manufacturer-logos";
+import { ManufacturerLogo } from "@/components/manufacturer-logo";
 
 // Type definitions for inventory statistics
 interface InventoryStats {
@@ -167,22 +167,17 @@ export default function InventoryStats() {
       {/* Manufacturer Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
         {(Array.isArray(manufacturerStats) ? manufacturerStats : []).map((manufacturer: any, index: number) => {
-          const logoPath = getManufacturerLogo(manufacturer.manufacturer);
           return (
             <Card key={index} className="glass-container">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  {logoPath ? (
-                    <img 
-                      src={logoPath} 
-                      alt={manufacturer.manufacturer}
-                      className="w-5 h-5 object-contain rounded"
-                    />
-                  ) : (
-                    <div className="w-5 h-5 bg-white/20 rounded flex items-center justify-center">
-                      <span className="text-xs text-white/60">N/A</span>
-                    </div>
-                  )}
+                  <ManufacturerLogo 
+                    manufacturerName={manufacturer.manufacturer}
+                    customLogo={manufacturer.logo}
+                    size="sm"
+                    className="w-5 h-5"
+                    showFallback={true}
+                  />
                   <span className="text-sm font-semibold text-white">{manufacturer.manufacturer}</span>
                 </div>
                 <div className="space-y-1">

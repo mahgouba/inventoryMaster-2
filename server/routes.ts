@@ -531,7 +531,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { db } = getDatabase();
       const allItems = await db.select().from(inventoryItems);
+      const allManufacturers = await db.select().from(manufacturers);
+      
       const manufacturerStats = new Map();
+      
+      // Create a map for manufacturers with their logos
+      const manufacturerLogos = new Map();
+      allManufacturers.forEach(mfg => {
+        manufacturerLogos.set(mfg.nameAr, mfg.logo);
+      });
       
       allItems.forEach(item => {
         const key = item.manufacturer;
@@ -542,7 +550,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             personal: 0,
             company: 0,
             usedPersonal: 0,
-            logo: null
+            logo: manufacturerLogos.get(key) || null
           });
         }
         
