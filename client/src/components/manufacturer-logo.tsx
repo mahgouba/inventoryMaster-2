@@ -6,6 +6,7 @@ interface ManufacturerLogoProps {
   className?: string;
   size?: "sm" | "md" | "lg";
   showFallback?: boolean;
+  customLogo?: string; // Base64 or URL for uploaded logo
 }
 
 const sizeClasses = {
@@ -18,9 +19,11 @@ export function ManufacturerLogo({
   manufacturerName, 
   className = "", 
   size = "md", 
-  showFallback = true 
+  showFallback = true,
+  customLogo
 }: ManufacturerLogoProps) {
-  const logoPath = getManufacturerLogo(manufacturerName);
+  // Prioritize custom uploaded logo over static logo
+  const logoPath = customLogo || getManufacturerLogo(manufacturerName);
   
   if (logoPath) {
     return (

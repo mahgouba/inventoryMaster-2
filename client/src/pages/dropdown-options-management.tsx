@@ -1135,6 +1135,7 @@ export default function DropdownOptionsManagement() {
                             >
                               <ManufacturerLogo 
                                 manufacturerName={item.nameAr}
+                                customLogo={item.logo}
                                 size="lg"
                                 className="w-8 h-8"
                                 showFallback={true}
@@ -1472,6 +1473,7 @@ export default function DropdownOptionsManagement() {
                   <div className="flex items-center justify-center p-6 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
                     <ManufacturerLogo 
                       manufacturerName={hierarchyData.find(m => m.id === selectedManufacturerForLogo)?.nameAr || ""}
+                      customLogo={hierarchyData.find(m => m.id === selectedManufacturerForLogo)?.logo}
                       size="lg"
                       className="w-16 h-16"
                       showFallback={true}
