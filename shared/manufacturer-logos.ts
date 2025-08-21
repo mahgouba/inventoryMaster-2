@@ -23,6 +23,7 @@ export const manufacturerLogos: Record<string, string> = {
   "جي إم سي": "/gmc.svg",
   "مايباخ": "/maybach.svg",
   "لوتس": "/lotus.svg",
+  "روكس": "/logos /ROX.svg",
   
   // English names as fallback
   "Mercedes": "/mercedes.svg",
@@ -46,7 +47,8 @@ export const manufacturerLogos: Record<string, string> = {
   "GMC": "/gmc.svg",
   "Maybach": "/maybach.svg",
   "Lotus": "/lotus.svg",
-  "Infiniti": "/infiniti.svg"
+  "Infiniti": "/infiniti.svg",
+  "ROX": "/logos /ROX.svg"
 };
 
 export function getManufacturerLogo(manufacturerName: string): string | null {
