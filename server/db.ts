@@ -11,7 +11,12 @@ export function initializeDatabase() {
   }
 
   // Use environment variable for database URL
-  const DATABASE_URL = process.env.DATABASE_URL;
+  let DATABASE_URL = process.env.DATABASE_URL;
+  
+  // Clean the URL if it includes psql command wrapper
+  if (DATABASE_URL && DATABASE_URL.startsWith("psql '")) {
+    DATABASE_URL = DATABASE_URL.replace(/^psql '/, '').replace(/'$/, '');
+  }
 
   if (!DATABASE_URL) {
     throw new Error(
