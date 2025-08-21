@@ -12,7 +12,8 @@ import * as XLSX from 'xlsx';
 export default function SoldVehiclesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [salesRepFilter, setSalesRepFilter] = useState("all");
-  const [dateFilter, setDateFilter] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
 
   const { data: soldVehicles = [], isLoading } = useQuery({
@@ -53,17 +54,33 @@ export default function SoldVehiclesPage() {
       filtered = filtered.filter((item: any) => item.paymentMethod === paymentMethodFilter);
     }
 
-    if (dateFilter) {
-      const filterDate = new Date(dateFilter);
+    // Filter by date range
+    if (fromDate || toDate) {
       filtered = filtered.filter((item: any) => {
         if (!item.soldDate) return false;
         const itemDate = new Date(item.soldDate);
-        return itemDate.toDateString() === filterDate.toDateString();
+        
+        // Check if date is within range
+        if (fromDate && toDate) {
+          const from = new Date(fromDate);
+          const to = new Date(toDate);
+          to.setHours(23, 59, 59, 999); // Include the entire "to" date
+          return itemDate >= from && itemDate <= to;
+        } else if (fromDate) {
+          const from = new Date(fromDate);
+          return itemDate >= from;
+        } else if (toDate) {
+          const to = new Date(toDate);
+          to.setHours(23, 59, 59, 999); // Include the entire "to" date
+          return itemDate <= to;
+        }
+        
+        return true;
       });
     }
 
     return filtered;
-  }, [soldVehicles, searchQuery, salesRepFilter, paymentMethodFilter, dateFilter]);
+  }, [soldVehicles, searchQuery, salesRepFilter, paymentMethodFilter, fromDate, toDate]);
 
   const formatCurrency = (amount: string | null | undefined) => {
     if (!amount) return "غير محدد";
@@ -168,12 +185,13 @@ export default function SoldVehiclesPage() {
           <p>إجمالي السيارات المباعة: ${filteredVehicles.length}</p>
         </div>
 
-        ${salesRepFilter || paymentMethodFilter || dateFilter ? `
+        ${salesRepFilter || paymentMethodFilter || fromDate || toDate ? `
         <div class="filters">
           <h3>الفلاتر المطبقة:</h3>
           ${salesRepFilter ? `<span class="filter-item"><strong>مندوب المبيعات:</strong> ${salesRepFilter}</span>` : ''}
           ${paymentMethodFilter ? `<span class="filter-item"><strong>طريقة الدفع:</strong> ${paymentMethodFilter}</span>` : ''}
-          ${dateFilter ? `<span class="filter-item"><strong>تاريخ البيع:</strong> ${new Date(dateFilter).toLocaleDateString('en-GB')}</span>` : ''}
+          ${fromDate ? `<span class="filter-item"><strong>من تاريخ:</strong> ${new Date(fromDate).toLocaleDateString('en-GB')}</span>` : ''}
+          ${toDate ? `<span class="filter-item"><strong>إلى تاريخ:</strong> ${new Date(toDate).toLocaleDateString('en-GB')}</span>` : ''}
         </div>
         ` : ''}
 
@@ -256,7 +274,7 @@ export default function SoldVehiclesPage() {
 
         {/* Filters and Search */}
         <div className="mb-6 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
@@ -292,13 +310,28 @@ export default function SoldVehiclesPage() {
               </SelectContent>
             </Select>
 
-            <Input
-              type="date"
-              placeholder="فلتر حسب تاريخ البيع"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="text-right"
-            />
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs text-white/70 mb-1">من تاريخ</label>
+                <Input
+                  type="date"
+                  placeholder="من تاريخ"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className="text-right text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-white/70 mb-1">إلى تاريخ</label>
+                <Input
+                  type="date"
+                  placeholder="إلى تاريخ"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className="text-right text-sm"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Action Buttons */}
@@ -324,7 +357,8 @@ export default function SoldVehiclesPage() {
                 setSearchQuery("");
                 setSalesRepFilter("all");
                 setPaymentMethodFilter("all");
-                setDateFilter("");
+                setFromDate("");
+                setToDate("");
               }}
               variant="outline"
             >
@@ -366,10 +400,10 @@ export default function SoldVehiclesPage() {
           <div className="glass-container text-center py-8">
             <Car className="w-12 h-12 text-white/40 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-white drop-shadow-lg mb-2">
-              {searchQuery || salesRepFilter || paymentMethodFilter || dateFilter ? "لا توجد نتائج للبحث" : "لا توجد سيارات مباعة"}
+              {searchQuery || salesRepFilter || paymentMethodFilter || fromDate || toDate ? "لا توجد نتائج للبحث" : "لا توجد سيارات مباعة"}
             </h3>
             <p className="text-white/70 drop-shadow-sm">
-              {searchQuery || salesRepFilter || paymentMethodFilter || dateFilter ? "جرب تعديل الفلاتر أو البحث" : "لم يتم بيع أي سيارات بعد"}
+              {searchQuery || salesRepFilter || paymentMethodFilter || fromDate || toDate ? "جرب تعديل الفلاتر أو البحث" : "لم يتم بيع أي سيارات بعد"}
             </p>
           </div>
         ) : (
