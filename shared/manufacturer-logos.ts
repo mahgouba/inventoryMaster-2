@@ -24,7 +24,7 @@ export const manufacturerLogos: Record<string, string> = {
   "جي إم سي": "/logos/GMC.svg",
   "مايباخ": "/maybach.svg",
   "لوتس": "/lotus.svg",
-  "روكس": "/logos/ROX.svg",
+  "روكس": "/logos/Rox.svg",
   "كاديلاك": "/logos/cadillac.svg",
   
   // English names as fallback
@@ -50,7 +50,7 @@ export const manufacturerLogos: Record<string, string> = {
   "Maybach": "/maybach.svg",
   "Lotus": "/lotus.svg",
   "Infiniti": "/infiniti.svg",
-  "ROX": "/logos/ROX.svg",
+  "ROX": "/logos/Rox.svg",
   "Cadillac": "/logos/cadillac.svg"
 };
 

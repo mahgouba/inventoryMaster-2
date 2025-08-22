@@ -180,15 +180,21 @@ export class DatabaseStorage implements IStorage {
   }>> {
     const stats = await db
       .select({
-        manufacturer: inventoryItems.manufacturer,
+        manufacturer: sql<string>`TRIM(${inventoryItems.manufacturer})`,
         total: sql<number>`count(*)::int`,
         personal: sql<number>`sum(case when ${inventoryItems.importType} = 'شخصي' then 1 else 0 end)::int`,
         company: sql<number>`sum(case when ${inventoryItems.importType} = 'شركة' then 1 else 0 end)::int`,
         usedPersonal: sql<number>`sum(case when ${inventoryItems.importType} = 'مستعمل شخصي' then 1 else 0 end)::int`,
-        logo: inventoryItems.logo,
+        logo: sql<string | null>`(
+          SELECT m.logo 
+          FROM manufacturers m 
+          WHERE m.name_ar = TRIM(${inventoryItems.manufacturer}) 
+             OR m.name_en = TRIM(${inventoryItems.manufacturer})
+          LIMIT 1
+        )`,
       })
       .from(inventoryItems)
-      .groupBy(inventoryItems.manufacturer, inventoryItems.logo);
+      .groupBy(sql`TRIM(${inventoryItems.manufacturer})`);
 
     return stats;
   }
