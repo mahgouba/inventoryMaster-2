@@ -2147,7 +2147,7 @@ export class MemStorage implements IStorage {
 }
 
 // Initialize storage system for Replit compatibility
-// Use MemStorage by default
+// Use DatabaseStorage when DATABASE_URL is available
 
 let storageInstance: IStorage | null = null;
 
@@ -2157,14 +2157,29 @@ export function getStorage(): IStorage {
     return storageInstance;
   }
   
-  // Initialize MemStorage by default for Replit compatibility
-  storageInstance = new MemStorage();
-  console.log('✅ Using MemStorage for Replit compatibility');
-  return storageInstance;
+  // Check if DATABASE_URL is available
+  if (process.env.DATABASE_URL) {
+    try {
+      // Import and use DatabaseStorage
+      const { DatabaseStorage } = require('./database-storage');
+      storageInstance = new DatabaseStorage();
+      console.log('✅ Database connection successful');
+      return storageInstance;
+    } catch (error) {
+      console.warn('⚠️  Database connection failed, falling back to MemStorage:', error.message);
+      storageInstance = new MemStorage();
+      return storageInstance;
+    }
+  } else {
+    // Fallback to MemStorage
+    storageInstance = new MemStorage();
+    console.log('ℹ️ DATABASE_URL not found - using memory storage');
+    return storageInstance;
+  }
 }
 
 // For backward compatibility, export a default instance
-export const storage = new MemStorage();
+export const storage = getStorage();
 
 // Log the current storage configuration
-console.log('🔧 Storage configured for Replit with MemStorage');
+console.log('🔧 Storage system initialized');
