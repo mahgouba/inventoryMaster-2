@@ -1853,6 +1853,13 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
 
 
   return (
+    <div className="relative min-h-screen">
+      {/* Watermark */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-5" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200'%3E%3Ctext x='200' y='100' text-anchor='middle' dominant-baseline='central' fill='white' font-size='24' font-weight='bold' transform='rotate(-45 200 100)'%3E%D8%A7%D9%84%D8%A8%D8%B1%D9%8A%D9%85%D9%8A %D9%84%D9%84%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA%3C/text%3E%3C/svg%3E")`,
+        backgroundRepeat: 'repeat',
+        backgroundSize: '300px 150px'
+      }}></div>
     <SystemGlassWrapper>
       {/* Header */}
       <GlassBackground variant="header" className="glass-header sticky top-0 z-50 no-print">
@@ -1888,7 +1895,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                   // Existing Vehicle Display
                   <div className="flex items-start space-x-4 space-x-reverse">
                     {/* Manufacturer Logo */}
-                    <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center overflow-hidden border border-white/20">
+                    <div className="w-32 h-32 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center overflow-hidden border border-white/20">
                       {manufacturerData?.logo ? (
                         <img 
                           src={manufacturerData.logo} 
@@ -1896,7 +1903,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                           className="w-full h-full object-contain"
                         />
                       ) : (
-                        <span className="text-2xl font-bold text-white drop-shadow-md">
+                        <span className="text-4xl font-bold text-white drop-shadow-md">
                           {editableVehicle.manufacturer?.charAt(0)}
                         </span>
                       )}
@@ -1981,6 +1988,26 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                       </div>
                     </div>
 
+                    {/* Additional Manufacturer Logo under Vehicle Data */}
+                    <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10 text-center">
+                      <h4 className="text-sm font-medium text-white/70 mb-3">شعار الصانع</h4>
+                      <div className="flex justify-center mb-2">
+                        <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center overflow-hidden border border-white/20">
+                          {manufacturerData?.logo ? (
+                            <img 
+                              src={manufacturerData.logo} 
+                              alt={editableVehicle.manufacturer} 
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <span className="text-2xl font-bold text-white drop-shadow-md">
+                              {editableVehicle.manufacturer?.charAt(0)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-xs text-white/60">{editableVehicle.manufacturer}</p>
+                    </div>
 
                   </div>
                 ) : (
@@ -2210,7 +2237,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                           id="invoiceNumber"
                           value={invoiceNumber}
                           readOnly
-                          className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50"
+                          className="glass-input bg-white/10 border-white/20 text-green-700 dark:text-green-400 placeholder-green-500/70"
                           placeholder="INV-123456"
                         />
                       </div>
@@ -2220,7 +2247,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                           id="quoteReference"
                           value={quoteNumber}
                           readOnly
-                          className="glass-input bg-white/10 border-white/20 text-white/70 placeholder-white/50"
+                          className="glass-input bg-white/10 border-white/20 text-green-700 dark:text-green-400 placeholder-green-500/70"
                           placeholder="QT-123456"
                         />
                       </div>
@@ -2231,7 +2258,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                           value={authorizationNumber}
                           onChange={(e) => setAuthorizationNumber(e.target.value)}
                           placeholder="أدخل رقم التعميد"
-                          className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50 font-medium"
+                          className="glass-input bg-white/10 border-white/20 text-green-700 dark:text-green-400 placeholder-green-500/70 font-medium"
                         />
                       </div>
                     </div>
@@ -2345,7 +2372,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                       type="number"
                       value={pricingDetails.basePrice}
                       onChange={(e) => setPricingDetails(prev => ({ ...prev, basePrice: parseFloat(e.target.value) || 0 }))}
-                      className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50"
+                      className="glass-input bg-white/10 border-white/20 text-green-700 dark:text-green-400 placeholder-green-500/70"
                     />
                   </div>
                   <div>
@@ -2356,7 +2383,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                       min="1"
                       value={pricingDetails.quantity}
                       onChange={(e) => setPricingDetails(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
-                      className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50"
+                      className="glass-input bg-white/10 border-white/20 text-green-700 dark:text-green-400 placeholder-green-500/70"
                     />
                   </div>
                   <div>
@@ -2368,7 +2395,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                       max="100"
                       value={pricingDetails.taxRate}
                       onChange={(e) => setPricingDetails(prev => ({ ...prev, taxRate: parseFloat(e.target.value) || 0 }))}
-                      className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50"
+                      className="glass-input bg-white/10 border-white/20 text-green-700 dark:text-green-400 placeholder-green-500/70"
                     />
                   </div>
                   <div className="flex items-center space-x-2 space-x-reverse pt-6">
@@ -2405,7 +2432,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                           type="number"
                           value={pricingDetails.licensePlatePrice}
                           onChange={(e) => setPricingDetails(prev => ({ ...prev, licensePlatePrice: parseFloat(e.target.value) || 0 }))}
-                          className="glass-input bg-white/10 border-white/20 text-white placeholder-white/50"
+                          className="glass-input bg-white/10 border-white/20 text-green-700 dark:text-green-400 placeholder-green-500/70"
                         />
                       </div>
                       <div className="flex items-center space-x-2 space-x-reverse pt-6">
@@ -4034,5 +4061,6 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
       </Dialog>
 
     </SystemGlassWrapper>
+    </div>
   );
 }
