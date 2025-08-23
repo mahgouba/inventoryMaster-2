@@ -34,8 +34,8 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
           const stream = await navigator.mediaDevices.getUserMedia({ 
             video: { 
               facingMode: 'environment',
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
+              width: { ideal: 1280, min: 640 },
+              height: { ideal: 720, min: 480 }
             } 
           });
           
@@ -46,7 +46,7 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
           let errorMessage = 'يرجى السماح بالوصول للكاميرا في إعدادات المتصفح';
           
           // Check if it's HTTPS issue
-          if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
+          if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost' && !window.location.hostname.includes('replit')) {
             errorMessage = 'يتطلب الوصول للكاميرا اتصال آمن (HTTPS). يرجى استخدام الرابط الآمن أو localhost';
           } else if (permError.name === 'NotAllowedError') {
             errorMessage = 'تم رفض الوصول للكاميرا. يرجى السماح بالوصول في إعدادات المتصفح';
@@ -172,7 +172,7 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
               <video
                 ref={videoRef}
                 className={cn(
-                  "w-full aspect-square object-cover rounded-2xl bg-black",
+                  "w-full aspect-square object-cover rounded-2xl",
                   hasPermission === false && "hidden"
                 )}
                 playsInline
@@ -180,6 +180,7 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
                 autoPlay
                 style={{ 
                   transform: 'scaleX(-1)', // Mirror the video for better user experience
+                  backgroundColor: '#1f2937' // Better fallback color
                 }}
               />
               
