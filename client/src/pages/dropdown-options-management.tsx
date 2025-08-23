@@ -246,6 +246,28 @@ export default function DropdownOptionsManagement() {
     }
   });
 
+  // Delete manufacturer mutation
+  const deleteManufacturerMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest('DELETE', `/api/manufacturers/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف الشركة المصنعة بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "فشل في حذف الشركة المصنعة",
+        variant: "destructive",
+      });
+    }
+  });
+
   // Edit category mutation  
   const editCategoryMutation = useMutation({
     mutationFn: async (data: { id: number; nameAr: string; nameEn?: string; manufacturerId: number }) => {
