@@ -1032,7 +1032,7 @@ export default function PriceCardsPage() {
               >
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <ManufacturerLogo manufacturer={manufacturer} size="md" />
+                    <ManufacturerLogo manufacturerName={manufacturer} size="md" />
                     <div>
                       <span className="text-xl font-bold">{manufacturer}</span>
                       <Badge variant="secondary" className="mr-2">

@@ -22,6 +22,18 @@ export function ManufacturerLogo({
   showFallback = true,
   customLogo
 }: ManufacturerLogoProps) {
+  // Check if manufacturerName is valid
+  if (!manufacturerName || typeof manufacturerName !== 'string') {
+    if (showFallback) {
+      return (
+        <div className={`${sizeClasses[size]} ${className} flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-md`}>
+          <Building2 className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+        </div>
+      );
+    }
+    return null;
+  }
+
   // Prioritize custom uploaded logo over static logo
   const logoPath = customLogo || getManufacturerLogo(manufacturerName);
   
