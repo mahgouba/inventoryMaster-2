@@ -27,21 +27,34 @@ export function ManufacturerLogo({
   
   if (logoPath) {
     return (
-      <img
-        src={logoPath}
-        alt={`شعار ${manufacturerName}`}
-        className={`object-contain ${sizeClasses[size]} ${className}`}
-        onError={(e) => {
-          // Fallback to icon if image fails to load
-          if (showFallback) {
-            e.currentTarget.style.display = 'none';
-            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-            if (fallback) {
-              fallback.style.display = 'flex';
+      <div className={`${sizeClasses[size]} ${className} flex items-center justify-center relative`}>
+        <img
+          src={logoPath}
+          alt={`شعار ${manufacturerName}`}
+          className="object-contain w-full h-full"
+          style={{
+            filter: manufacturerName.includes('جي إم سي') || manufacturerName.includes('GMC') 
+              ? 'brightness(0) saturate(100%) invert(59%) sepia(11%) saturate(200%) hue-rotate(356deg) brightness(99%) contrast(83%)'
+              : 'none'
+          }}
+          onError={(e) => {
+            console.log(`Failed to load logo for: ${manufacturerName} at path: ${logoPath}`);
+            // Fallback to icon if image fails to load
+            if (showFallback) {
+              e.currentTarget.style.display = 'none';
+              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+              if (fallback) {
+                fallback.style.display = 'flex';
+              }
             }
-          }
-        }}
-      />
+          }}
+        />
+        {showFallback && (
+          <div className="hidden absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-md">
+            <Building2 className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          </div>
+        )}
+      </div>
     );
   }
 

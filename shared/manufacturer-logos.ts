@@ -22,6 +22,7 @@ export const manufacturerLogos: Record<string, string> = {
   "لينكولن": "/lincoln.svg",
   "رام": "/ram.svg",
   "جي إم سي": "/logos/GMC.svg",
+  "جي ام سي": "/logos/GMC.svg",
   "مايباخ": "/maybach.svg",
   "لوتس": "/lotus.svg",
   "روكس": "/logos/Rox.svg",
