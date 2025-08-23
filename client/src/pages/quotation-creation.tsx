@@ -3295,10 +3295,15 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                 <Label htmlFor="editDetailedSpecifications">المواصفات التفصيلية</Label>
                 <textarea
                   id="editDetailedSpecifications"
-                  className="w-full min-h-[120px] p-3 border border-gray-300 rounded-md resize-vertical focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full min-h-[120px] p-3 border border-gray-300 rounded-md resize-vertical focus:ring-2 focus:ring-green-500 focus:border-green-500 text-green-700 dark:text-green-400 placeholder-green-500/70"
                   placeholder="أدخل المواصفات التفصيلية للسيارة..."
                   value={editableVehicle?.detailedSpecifications || ""}
                   onChange={(e) => setEditableVehicle(prev => prev ? { ...prev, detailedSpecifications: e.target.value } : null)}
+                  style={{ 
+                    fontFamily: '"Noto Sans Arabic", Arial, sans-serif', 
+                    direction: 'rtl',
+                    lineHeight: '1.6'
+                  }}
                 />
               </div>
             </div>

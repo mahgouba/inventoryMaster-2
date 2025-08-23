@@ -286,7 +286,7 @@ export function VehicleDetailedSpecifications({
           <Textarea
             value={editableSpecs}
             onChange={(e) => setEditableSpecs(e.target.value)}
-            className="w-full min-h-[180px] text-sm text-gray-800 dark:text-gray-200 resize-none border-0 bg-transparent focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="w-full min-h-[180px] text-sm text-green-700 dark:text-green-400 resize-none border-0 bg-transparent focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder="أدخل المواصفات التفصيلية للمركبة..."
             style={{ 
               fontFamily: '"Noto Sans Arabic", Arial, sans-serif', 
