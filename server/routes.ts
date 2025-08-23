@@ -2635,9 +2635,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { db } = getDatabase();
       const quotationData = req.body;
       
+      // Validate inventoryItemId to prevent integer overflow
+      const inventoryItemId = quotationData.inventoryItemId || 0;
+      const validInventoryItemId = typeof inventoryItemId === 'number' && 
+                                   inventoryItemId >= -2147483648 && 
+                                   inventoryItemId <= 2147483647 ? 
+                                   inventoryItemId : 0;
+      
       const [newQuotation] = await db.insert(quotations).values({
         quoteNumber: quotationData.quoteNumber,
-        inventoryItemId: quotationData.inventoryItemId || 0,
+        inventoryItemId: validInventoryItemId,
         manufacturer: quotationData.manufacturer,
         category: quotationData.category,
         trimLevel: quotationData.trimLevel,
@@ -2678,10 +2685,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const quotationData = req.body;
       
+      // Validate inventoryItemId to prevent integer overflow
+      const inventoryItemId = quotationData.inventoryItemId || 0;
+      const validInventoryItemId = typeof inventoryItemId === 'number' && 
+                                   inventoryItemId >= -2147483648 && 
+                                   inventoryItemId <= 2147483647 ? 
+                                   inventoryItemId : 0;
+      
       const [updatedQuotation] = await db.update(quotations)
         .set({
           quoteNumber: quotationData.quoteNumber,
-          inventoryItemId: quotationData.inventoryItemId || 0,
+          inventoryItemId: validInventoryItemId,
           manufacturer: quotationData.manufacturer,
           category: quotationData.category,
           trimLevel: quotationData.trimLevel,
@@ -2853,7 +2867,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const terms = await db.select().from(termsConditions)
         .where(eq(termsConditions.isActive, true))
         .orderBy(asc(termsConditions.displayOrder));
-      res.json(terms);
+      
+      // Transform the response to match expected frontend format
+      const formattedTerms = terms.map(term => ({
+        id: term.id,
+        term_text: term.termText,
+        display_order: term.displayOrder
+      }));
+      
+      res.json(formattedTerms);
     } catch (error) {
       console.error("Error fetching terms and conditions:", error);
       res.status(500).json({ message: "Failed to fetch terms and conditions" });
