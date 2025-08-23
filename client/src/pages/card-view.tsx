@@ -177,6 +177,16 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     queryKey: ["/api/inventory/manufacturer-stats"],
   });
 
+  // Fetch manufacturers with logos from database (for dropdown-options-management integration)
+  const { data: manufacturersWithLogo = [] } = useQuery<Array<{
+    id: number;
+    nameAr: string;
+    nameEn?: string;
+    logo: string | null;
+  }>>({
+    queryKey: ["/api/manufacturers"],
+  });
+
   // Filter out sold cars from display unless showSoldCars is true
   let availableItems = showSoldCars ? inventoryData : inventoryData.filter(item => item.status !== "مباع");
 
@@ -549,7 +559,17 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     return acc;
   }, {} as Record<string, { items: InventoryItem[], logo: string | null }>);
 
-  // Get manufacturer logo
+  // Get manufacturer logo from database (dropdown-options-management integration)
+  const getManufacturerLogoFromDB = (manufacturerName: string) => {
+    if (!manufacturersWithLogo || !Array.isArray(manufacturersWithLogo)) return null;
+    // Try to find manufacturer by Arabic name
+    const manufacturer = manufacturersWithLogo.find((m: any) => 
+      m.nameAr === manufacturerName.trim() || m.nameEn === manufacturerName.trim()
+    );
+    return manufacturer?.logo || null;
+  };
+
+  // Get manufacturer logo (legacy function for manufacturerStats)
   const getManufacturerLogo = (manufacturerName: string) => {
     if (!manufacturerStats || !Array.isArray(manufacturerStats)) return null;
     const manufacturer = manufacturerStats.find((m: any) => m.manufacturer === manufacturerName);
@@ -1404,7 +1424,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           <ManufacturerLogo 
                             manufacturerName={manufacturer} 
                             size="lg" 
-                            className="w-12 h-12 transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-md" 
+                            className="w-12 h-12 transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-md"
+                            customLogo={getManufacturerLogoFromDB(manufacturer)}
                           />
                         </div>
                         
@@ -1798,6 +1819,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               manufacturerName={vehicle.manufacturer} 
                               size="lg" 
                               className="w-16 h-16"
+                              customLogo={getManufacturerLogoFromDB(vehicle.manufacturer)}
                             />
                             <div>
                               <h3 className="font-bold text-white text-xl">
