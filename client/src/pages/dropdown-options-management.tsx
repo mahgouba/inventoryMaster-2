@@ -123,6 +123,14 @@ export default function DropdownOptionsManagement() {
   const [colorCode, setColorCode] = useState("#FFFFFF");
   const [colorType, setColorType] = useState<'exterior' | 'interior'>('exterior');
   
+  // Edit states
+  const [isEditManufacturerOpen, setIsEditManufacturerOpen] = useState(false);
+  const [isEditCategoryOpen, setIsEditCategoryOpen] = useState(false);
+  const [isEditTrimLevelOpen, setIsEditTrimLevelOpen] = useState(false);
+  const [editingManufacturer, setEditingManufacturer] = useState<Manufacturer | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingTrimLevel, setEditingTrimLevel] = useState<TrimLevel | null>(null);
+  
   // State for tracking contextual relationships
   const [contextManufacturerId, setContextManufacturerId] = useState<number | null>(null);
   const [contextCategoryId, setContextCategoryId] = useState<number | null>(null);
@@ -211,6 +219,133 @@ export default function DropdownOptionsManagement() {
     }
   });
 
+  // Edit manufacturer mutation
+  const editManufacturerMutation = useMutation({
+    mutationFn: async (data: { id: number; nameAr: string; nameEn?: string }) => {
+      return apiRequest('PUT', `/api/manufacturers/${data.id}`, { 
+        nameAr: data.nameAr, 
+        nameEn: data.nameEn 
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/manufacturers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      setIsEditManufacturerOpen(false);
+      setEditingManufacturer(null);
+      toast({
+        title: "تم التحديث",
+        description: "تم تحديث بيانات الشركة المصنعة بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "فشل في تحديث بيانات الشركة المصنعة",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Edit category mutation  
+  const editCategoryMutation = useMutation({
+    mutationFn: async (data: { id: number; nameAr: string; nameEn?: string; manufacturerId: number }) => {
+      return apiRequest('PUT', `/api/categories/${data.id}`, { 
+        nameAr: data.nameAr, 
+        nameEn: data.nameEn,
+        manufacturerId: data.manufacturerId
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/categories'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      setIsEditCategoryOpen(false);
+      setEditingCategory(null);
+      toast({
+        title: "تم التحديث",
+        description: "تم تحديث بيانات الفئة بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "فشل في تحديث بيانات الفئة",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Delete category mutation
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest('DELETE', `/api/categories/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/categories'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف الفئة بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "فشل في حذف الفئة",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Edit trim level mutation
+  const editTrimLevelMutation = useMutation({
+    mutationFn: async (data: { id: number; nameAr: string; nameEn?: string; categoryId: number }) => {
+      return apiRequest('PUT', `/api/trim-levels/${data.id}`, { 
+        nameAr: data.nameAr, 
+        nameEn: data.nameEn,
+        categoryId: data.categoryId
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/trim-levels'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      setIsEditTrimLevelOpen(false);
+      setEditingTrimLevel(null);
+      toast({
+        title: "تم التحديث",
+        description: "تم تحديث بيانات درجة التجهيز بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "فشل في تحديث بيانات درجة التجهيز",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Delete trim level mutation
+  const deleteTrimLevelMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest('DELETE', `/api/trim-levels/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/trim-levels'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف درجة التجهيز بنجاح",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "فشل في حذف درجة التجهيز",
+        variant: "destructive",
+      });
+    }
+  });
+
   // Add manufacturer mutation
   const addManufacturerMutation = useMutation({
     mutationFn: async (data: { nameAr: string; nameEn?: string; logo?: string }) => {
@@ -238,49 +373,6 @@ export default function DropdownOptionsManagement() {
     }
   });
 
-  // Update manufacturer mutation
-  const updateManufacturerMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: { nameAr: string; nameEn?: string; logo?: string } }) => {
-      return apiRequest('PUT', `/api/manufacturers/${id}`, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/manufacturers'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
-      toast({
-        title: "تم التحديث",
-        description: "تم تحديث الشركة المصنعة بنجاح",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في التحديث",
-        description: error?.message || "فشل في تحديث الشركة المصنعة",
-        variant: "destructive"
-      });
-    }
-  });
-
-  // Delete manufacturer mutation
-  const deleteManufacturerMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return apiRequest('DELETE', `/api/manufacturers/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/manufacturers'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/hierarchy/full'] });
-      toast({
-        title: "تم الحذف",
-        description: "تم حذف الشركة المصنعة بنجاح",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الحذف",
-        description: error?.message || "فشل في حذف الشركة المصنعة",
-        variant: "destructive"
-      });
-    }
-  });
 
   // Logo upload mutation
   const uploadLogoMutation = useMutation({
@@ -1295,10 +1387,33 @@ export default function DropdownOptionsManagement() {
                                 <EyeOff className="w-4 h-4 text-red-300" />
                               )}
                             </Button>
-                            <Button variant="ghost" size="sm" className="glass-button">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="glass-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingManufacturer(item);
+                                setIsEditManufacturerOpen(true);
+                              }}
+                              data-testid={`edit-manufacturer-${item.id}`}
+                              title="تحرير الصانع"
+                            >
                               <Edit className="w-4 h-4 text-white" />
                             </Button>
-                            <Button variant="ghost" size="sm" className="glass-button">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="glass-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (window.confirm(`هل أنت متأكد من حذف الصانع "${item.nameAr}"؟`)) {
+                                  deleteManufacturerMutation.mutate(item.id);
+                                }
+                              }}
+                              data-testid={`delete-manufacturer-${item.id}`}
+                              title="حذف الصانع"
+                            >
                               <Trash2 className="w-4 h-4 text-white" />
                             </Button>
                             {expandedItems.has(`manufacturer-${item.id}`) ? (
@@ -1392,10 +1507,33 @@ export default function DropdownOptionsManagement() {
                                             <EyeOff className="w-4 h-4 text-red-300" />
                                           )}
                                         </Button>
-                                        <Button variant="ghost" size="sm" className="glass-button">
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          className="glass-button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEditingCategory(category);
+                                            setIsEditCategoryOpen(true);
+                                          }}
+                                          data-testid={`edit-category-${category.id}`}
+                                          title="تحرير الفئة"
+                                        >
                                           <Edit className="w-4 h-4 text-white" />
                                         </Button>
-                                        <Button variant="ghost" size="sm" className="glass-button">
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          className="glass-button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (window.confirm(`هل أنت متأكد من حذف الفئة "${category.nameAr}"؟`)) {
+                                              deleteCategoryMutation.mutate(category.id);
+                                            }
+                                          }}
+                                          data-testid={`delete-category-${category.id}`}
+                                          title="حذف الفئة"
+                                        >
                                           <Trash2 className="w-4 h-4 text-white" />
                                         </Button>
                                         {expandedItems.has(`category-${category.id}`) ? (
@@ -1464,7 +1602,13 @@ export default function DropdownOptionsManagement() {
                                                     variant="ghost" 
                                                     size="sm" 
                                                     className="glass-button h-8 w-8 p-0 hover:bg-blue-600/30"
-                                                    title="تعديل"
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      setEditingTrimLevel(trimLevel);
+                                                      setIsEditTrimLevelOpen(true);
+                                                    }}
+                                                    data-testid={`edit-trim-${trimLevel.id}`}
+                                                    title="تحرير درجة التجهيز"
                                                   >
                                                     <Edit className="w-3 h-3 text-white" />
                                                   </Button>
@@ -1472,7 +1616,14 @@ export default function DropdownOptionsManagement() {
                                                     variant="ghost" 
                                                     size="sm" 
                                                     className="glass-button h-8 w-8 p-0 hover:bg-red-600/30"
-                                                    title="حذف"
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      if (window.confirm(`هل أنت متأكد من حذف درجة التجهيز "${trimLevel.nameAr}"؟`)) {
+                                                        deleteTrimLevelMutation.mutate(trimLevel.id);
+                                                      }
+                                                    }}
+                                                    data-testid={`delete-trim-${trimLevel.id}`}
+                                                    title="حذف درجة التجهيز"
                                                   >
                                                     <Trash2 className="w-3 h-3 text-white" />
                                                   </Button>
@@ -1602,6 +1753,215 @@ export default function DropdownOptionsManagement() {
                 >
                   <X className="w-5 h-5 ml-2" />
                   إلغاء
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Manufacturer Dialog */}
+        <Dialog open={isEditManufacturerOpen} onOpenChange={setIsEditManufacturerOpen}>
+          <DialogContent className="max-w-md rounded-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-2xl text-center text-blue-600 flex items-center justify-center gap-3">
+                <Edit className="w-8 h-8" />
+                تحرير الصانع
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6 p-2">
+              <div>
+                <Label htmlFor="editManufacturerNameAr" className="text-lg">الاسم بالعربي</Label>
+                <Input
+                  id="editManufacturerNameAr"
+                  value={editingManufacturer?.nameAr || ""}
+                  onChange={(e) => setEditingManufacturer(prev => prev ? {...prev, nameAr: e.target.value} : null)}
+                  className="text-lg h-12 rounded-xl"
+                  dir="rtl"
+                  data-testid="input-edit-manufacturer-name-ar"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editManufacturerNameEn" className="text-lg">الاسم بالإنجليزي (اختياري)</Label>
+                <Input
+                  id="editManufacturerNameEn"
+                  value={editingManufacturer?.nameEn || ""}
+                  onChange={(e) => setEditingManufacturer(prev => prev ? {...prev, nameEn: e.target.value} : null)}
+                  className="text-lg h-12 rounded-xl"
+                  placeholder="Manufacturer Name (Optional)"
+                  data-testid="input-edit-manufacturer-name-en"
+                />
+              </div>
+              
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsEditManufacturerOpen(false);
+                    setEditingManufacturer(null);
+                  }}
+                  className="flex-1 h-12 rounded-xl"
+                  data-testid="button-cancel-edit-manufacturer"
+                >
+                  <X className="w-5 h-5 ml-2" />
+                  إلغاء
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (editingManufacturer) {
+                      editManufacturerMutation.mutate({
+                        id: editingManufacturer.id,
+                        nameAr: editingManufacturer.nameAr,
+                        nameEn: editingManufacturer.nameEn || ""
+                      });
+                    }
+                  }}
+                  disabled={!editingManufacturer?.nameAr || editManufacturerMutation.isPending}
+                  className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+                  data-testid="button-submit-edit-manufacturer"
+                >
+                  <Save className="w-5 h-5 ml-2" />
+                  {editManufacturerMutation.isPending ? "جاري التحديث..." : "تحديث"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Category Dialog */}
+        <Dialog open={isEditCategoryOpen} onOpenChange={setIsEditCategoryOpen}>
+          <DialogContent className="max-w-md rounded-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-2xl text-center text-blue-600 flex items-center justify-center gap-3">
+                <Edit className="w-8 h-8" />
+                تحرير الفئة
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6 p-2">
+              <div>
+                <Label htmlFor="editCategoryNameAr" className="text-lg">الاسم بالعربي</Label>
+                <Input
+                  id="editCategoryNameAr"
+                  value={editingCategory?.nameAr || ""}
+                  onChange={(e) => setEditingCategory(prev => prev ? {...prev, nameAr: e.target.value} : null)}
+                  className="text-lg h-12 rounded-xl"
+                  dir="rtl"
+                  data-testid="input-edit-category-name-ar"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editCategoryNameEn" className="text-lg">الاسم بالإنجليزي (اختياري)</Label>
+                <Input
+                  id="editCategoryNameEn"
+                  value={editingCategory?.nameEn || ""}
+                  onChange={(e) => setEditingCategory(prev => prev ? {...prev, nameEn: e.target.value} : null)}
+                  className="text-lg h-12 rounded-xl"
+                  placeholder="Category Name (Optional)"
+                  data-testid="input-edit-category-name-en"
+                />
+              </div>
+              
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsEditCategoryOpen(false);
+                    setEditingCategory(null);
+                  }}
+                  className="flex-1 h-12 rounded-xl"
+                  data-testid="button-cancel-edit-category"
+                >
+                  <X className="w-5 h-5 ml-2" />
+                  إلغاء
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (editingCategory) {
+                      editCategoryMutation.mutate({
+                        id: editingCategory.id,
+                        nameAr: editingCategory.nameAr,
+                        nameEn: editingCategory.nameEn || "",
+                        manufacturerId: editingCategory.manufacturerId
+                      });
+                    }
+                  }}
+                  disabled={!editingCategory?.nameAr || editCategoryMutation.isPending}
+                  className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+                  data-testid="button-submit-edit-category"
+                >
+                  <Save className="w-5 h-5 ml-2" />
+                  {editCategoryMutation.isPending ? "جاري التحديث..." : "تحديث"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Trim Level Dialog */}
+        <Dialog open={isEditTrimLevelOpen} onOpenChange={setIsEditTrimLevelOpen}>
+          <DialogContent className="max-w-md rounded-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-2xl text-center text-blue-600 flex items-center justify-center gap-3">
+                <Edit className="w-8 h-8" />
+                تحرير درجة التجهيز
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6 p-2">
+              <div>
+                <Label htmlFor="editTrimLevelNameAr" className="text-lg">الاسم بالعربي</Label>
+                <Input
+                  id="editTrimLevelNameAr"
+                  value={editingTrimLevel?.nameAr || ""}
+                  onChange={(e) => setEditingTrimLevel(prev => prev ? {...prev, nameAr: e.target.value} : null)}
+                  className="text-lg h-12 rounded-xl"
+                  dir="rtl"
+                  data-testid="input-edit-trim-level-name-ar"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editTrimLevelNameEn" className="text-lg">الاسم بالإنجليزي (اختياري)</Label>
+                <Input
+                  id="editTrimLevelNameEn"
+                  value={editingTrimLevel?.nameEn || ""}
+                  onChange={(e) => setEditingTrimLevel(prev => prev ? {...prev, nameEn: e.target.value} : null)}
+                  className="text-lg h-12 rounded-xl"
+                  placeholder="Trim Level Name (Optional)"
+                  data-testid="input-edit-trim-level-name-en"
+                />
+              </div>
+              
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsEditTrimLevelOpen(false);
+                    setEditingTrimLevel(null);
+                  }}
+                  className="flex-1 h-12 rounded-xl"
+                  data-testid="button-cancel-edit-trim-level"
+                >
+                  <X className="w-5 h-5 ml-2" />
+                  إلغاء
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (editingTrimLevel) {
+                      editTrimLevelMutation.mutate({
+                        id: editingTrimLevel.id,
+                        nameAr: editingTrimLevel.nameAr,
+                        nameEn: editingTrimLevel.nameEn || "",
+                        categoryId: editingTrimLevel.categoryId
+                      });
+                    }
+                  }}
+                  disabled={!editingTrimLevel?.nameAr || editTrimLevelMutation.isPending}
+                  className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+                  data-testid="button-submit-edit-trim-level"
+                >
+                  <Save className="w-5 h-5 ml-2" />
+                  {editTrimLevelMutation.isPending ? "جاري التحديث..." : "تحديث"}
                 </Button>
               </div>
             </div>
