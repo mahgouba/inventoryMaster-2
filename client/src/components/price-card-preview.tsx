@@ -71,20 +71,22 @@ export function PriceCardPreview({ vehicle }: PriceCardPreviewProps) {
           justifyContent: 'center',
           alignItems: 'center'
         }}>
-          {/* Manufacturer Logo */}
-          <div style={{ 
-            width: '200px', 
-            height: '130px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            margin: '0 auto 15px auto'
-          }}>
-            <ManufacturerLogo 
-              manufacturerName={vehicle.manufacturer} 
-              className="w-full h-full object-contain opacity-80"
-            />
-          </div>
+          {/* Manufacturer Logo - Hide for Land Rover */}
+          {vehicle.manufacturer !== "لاند روفر" && vehicle.manufacturer !== "Land Rover" && (
+            <div style={{ 
+              width: '200px', 
+              height: '130px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              margin: '0 auto 15px auto'
+            }}>
+              <ManufacturerLogo 
+                manufacturerName={vehicle.manufacturer} 
+                className="w-full h-full object-contain opacity-80"
+              />
+            </div>
+          )}
           
           {/* Vehicle Details */}
           <div style={{ 
