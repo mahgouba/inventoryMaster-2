@@ -17,7 +17,8 @@ import {
   colorAssociations,
   vehicleSpecifications,
   vehicleImageLinks,
-  quotations
+  quotations,
+  termsConditions
 } from "@shared/schema";
 import { Pool } from 'pg';
 import { eq, desc, asc, or, like, count, sql, ne, isNull, isNotNull, and } from "drizzle-orm";
@@ -2842,6 +2843,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         message: error instanceof Error ? error.message : 'فشل في رفع الشعار' 
       });
+    }
+  });
+
+  // Terms and Conditions endpoints
+  app.get("/api/terms-conditions", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const terms = await db.select().from(termsConditions)
+        .where(eq(termsConditions.isActive, true))
+        .orderBy(asc(termsConditions.displayOrder));
+      res.json(terms);
+    } catch (error) {
+      console.error("Error fetching terms and conditions:", error);
+      res.status(500).json({ message: "Failed to fetch terms and conditions" });
+    }
+  });
+
+  app.post("/api/terms-conditions", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { content } = req.body;
+      
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ message: "Content is required" });
+      }
+
+      // Split content by lines and create separate terms
+      const terms = content.split('\n').filter(line => line.trim());
+      
+      if (terms.length === 0) {
+        return res.status(400).json({ message: "At least one term is required" });
+      }
+
+      // First, deactivate all existing terms
+      await db.update(termsConditions)
+        .set({ isActive: false, updatedAt: new Date() });
+
+      // Insert new terms
+      const insertPromises = terms.map((term, index) => 
+        db.insert(termsConditions).values({
+          termText: term.trim(),
+          displayOrder: index + 1,
+          isActive: true
+        }).returning()
+      );
+
+      const results = await Promise.all(insertPromises);
+      
+      res.json({ 
+        message: "Terms and conditions saved successfully", 
+        count: results.length 
+      });
+    } catch (error) {
+      console.error("Error saving terms and conditions:", error);
+      res.status(500).json({ message: "Failed to save terms and conditions" });
     }
   });
 

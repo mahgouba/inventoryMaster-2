@@ -248,6 +248,16 @@ export const trimLevels = pgTable("trim_levels", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Terms and Conditions table for storing terms text
+export const termsConditions = pgTable("terms_conditions", {
+  id: serial("id").primaryKey(),
+  termText: text("term_text").notNull(), // نص الشرط
+  displayOrder: integer("display_order").default(1).notNull(), // ترتيب العرض
+  isActive: boolean("is_active").default(true).notNull(), // نشط
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Quotations table for managing price quotes
 export const quotations = pgTable("quotations", {
   id: serial("id").primaryKey(),
@@ -942,8 +952,15 @@ export type ColorAssociation = typeof colorAssociations.$inferSelect;
 export type Company = typeof companies.$inferSelect;
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 
-export type TermsAndConditions = typeof termsAndConditions.$inferSelect;
-export type InsertTermsAndConditions = z.infer<typeof insertTermsSchema>;
+// Terms and Conditions schema
+export const insertTermsConditionsSchema = createInsertSchema(termsConditions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type TermsConditions = typeof termsConditions.$inferSelect;
+export type InsertTermsConditions = z.infer<typeof insertTermsConditionsSchema>;
 
 // Appearance settings table
 export const appearanceSettings = pgTable("appearance_settings", {
