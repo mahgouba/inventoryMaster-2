@@ -742,11 +742,6 @@ function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetail
       <div className="flex items-center gap-2 mb-2">
         <Car className="text-[#C79C45] w-5 h-5" />
         <span className="text-lg font-bold text-black/80">المواصفات التفصيلية</span>
-        {specificationsData?.chassisNumber && (
-          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-            مربوطة برقم الهيكل
-          </span>
-        )}
         {isEditing && (
           <div className="flex items-center gap-1 mr-auto">
             <Button
@@ -796,7 +791,7 @@ function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetail
             style={{ scrollbarWidth: 'thin' }}
             title="اضغط مرتين للتحرير"
           >
-            • المواصفات العامة: {rawSpecsText}
+            {rawSpecsText}
           </div>
         ) : (
           <div 
