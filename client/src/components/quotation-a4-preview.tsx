@@ -737,5 +737,77 @@ function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetail
     setEditedSpecs('');
   };
   
-  return null;
+  return (
+    <div className="mb-3">
+      <div className="flex items-center gap-2 mb-2">
+        <Car className="text-[#C79C45] w-5 h-5" />
+        <span className="text-lg font-bold text-black/80">المواصفات التفصيلية</span>
+        {specificationsData?.chassisNumber && (
+          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+            مربوطة برقم الهيكل
+          </span>
+        )}
+        {isEditing && (
+          <div className="flex items-center gap-1 mr-auto">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleSave}
+              disabled={updateSpecsMutation.isPending}
+              className="h-6 px-2 text-xs"
+            >
+              <Save className="w-3 h-3 ml-1" />
+              حفظ
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleCancel}
+              className="h-6 px-2 text-xs"
+            >
+              <X className="w-3 h-3 ml-1" />
+              إلغاء
+            </Button>
+          </div>
+        )}
+      </div>
+      
+      <div 
+        className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50 relative group"
+        onDoubleClick={handleDoubleClick}
+      >
+        {!isEditing && !rawSpecsText && (
+          <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Edit className="w-4 h-4 text-[#C79C45]" />
+          </div>
+        )}
+        
+        {isEditing ? (
+          <Textarea
+            value={editedSpecs}
+            onChange={(e) => setEditedSpecs(e.target.value)}
+            className="min-h-[80px] text-xs resize-none border-none p-0 focus:ring-0 text-black placeholder:text-gray-500"
+            placeholder="أدخل المواصفات التفصيلية..."
+            autoFocus
+          />
+        ) : rawSpecsText ? (
+          <div 
+            className="text-xs text-black/80 leading-relaxed max-h-32 overflow-y-auto cursor-pointer hover:bg-gray-50 rounded p-1 -m-1" 
+            style={{ scrollbarWidth: 'thin' }}
+            title="اضغط مرتين للتحرير"
+          >
+            • المواصفات العامة: {rawSpecsText}
+          </div>
+        ) : (
+          <div 
+            className="text-center text-sm text-black/60 py-2 cursor-pointer hover:bg-gray-50 rounded"
+            title="اضغط مرتين لإضافة مواصفات"
+          >
+            لم يتم إدراج مواصفات تفصيلية لهذه المركبة بعد
+            <div className="text-xs text-black/40 mt-1">اضغط مرتين لإضافة مواصفات</div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
