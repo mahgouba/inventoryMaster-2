@@ -10,8 +10,8 @@ export function initializeDatabase() {
     return { pool, db };
   }
 
-  // Use environment variable for database URL
-  let DATABASE_URL = process.env.DATABASE_URL;
+  // Force use of external database URL
+  let DATABASE_URL = "postgresql://neondb_owner:npg_E9MhlZt2CTGz@ep-dry-night-afnnpvw9-pooler.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
   
   // Clean the URL if it includes psql command wrapper
   if (DATABASE_URL && DATABASE_URL.startsWith("psql '")) {
