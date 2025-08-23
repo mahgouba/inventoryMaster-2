@@ -107,7 +107,7 @@ export function PriceCardPreview({ vehicle }: PriceCardPreviewProps) {
               flexWrap: 'wrap'
             }}>
               {vehicle.category && <span>{vehicle.category}</span>}
-              {vehicle.trimLevel && <span>{vehicle.trimLevel}</span>}
+              {vehicle.trimLevel && vehicle.trimLevel !== 'SE' && <span>{vehicle.trimLevel}</span>}
               {vehicle.engineCapacity && <span>{vehicle.engineCapacity}</span>}
             </div>
           </div>
