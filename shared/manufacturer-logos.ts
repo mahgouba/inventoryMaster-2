@@ -28,6 +28,12 @@ export const manufacturerLogos: Record<string, string> = {
   "روكس": "/logos/Rox.svg",
   "كاديلاك": "/logos/cadillac.svg",
   
+  // Additional variations for ROX
+  "Rox": "/logos/Rox.svg",
+  "rox": "/logos/Rox.svg",
+  "RoX": "/logos/Rox.svg",
+  "روكس ROX": "/logos/Rox.svg",
+  
   // English names as fallback
   "Mercedes": "/mercedes.svg",
   "Lexus": "/lexus.svg", 
@@ -52,11 +58,18 @@ export const manufacturerLogos: Record<string, string> = {
   "Lotus": "/lotus.svg",
   "Infiniti": "/infiniti.svg",
   "ROX": "/logos/Rox.svg",
-  "Cadillac": "/logos/cadillac.svg"
+  "Cadillac": "/logos/cadillac.svg",
+  
+  // Additional variations for GMC
+  "جي ام سي GMC": "/logos/GMC.svg",
+  "GMC جي ام سي": "/logos/GMC.svg",
+  "gmc": "/logos/GMC.svg",
 };
 
 export function getManufacturerLogo(manufacturerName: string): string | null {
-  return manufacturerLogos[manufacturerName] || null;
+  // Clean the manufacturer name by trimming spaces and normalizing
+  const cleanName = manufacturerName.trim();
+  return manufacturerLogos[cleanName] || null;
 }
 
 export function getAllManufacturerLogos(): typeof manufacturerLogos {
