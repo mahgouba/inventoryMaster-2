@@ -1291,7 +1291,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     });
   };
 
-  const calculateHoursWorked = (schedule: EmployeeWorkSchedule, attendance: DailyAttendance): string => {
+  const calculateHoursWorked = (schedule: EmployeeWorkSchedule, attendance: DailyAttendance, day?: Date): string => {
     console.log('Calculating hours for:', { scheduleType: schedule.scheduleType, attendance });
     
     // إذا كانت الحالة إجازة، لا توجد ساعات عمل
@@ -1300,7 +1300,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       return "0.00";
     }
     
-    if (schedule.scheduleType === "متصل") {
+    // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
+    const isFriday = day && format(day, "EEEE", { locale: ar }) === "الجمعة";
+    
+    if (schedule.scheduleType === "متصل" || isFriday) {
       if (attendance.continuousCheckinTime && attendance.continuousCheckoutTime) {
         try {
           const checkin = new Date(`2024-01-01T${attendance.continuousCheckinTime}:00`);
@@ -1313,7 +1316,34 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
           return "0.00";
         }
       }
+      // يوم الجمعة: تحقق من سجل الحضور في الفترة المسائية للدوام المنفصل
+      if (isFriday && schedule.scheduleType === "منفصل") {
+        if (attendance.eveningCheckinTime && attendance.eveningCheckoutTime) {
+          try {
+            const eveningCheckin = new Date(`2024-01-01T${attendance.eveningCheckinTime}:00`);
+            const eveningCheckout = new Date(`2024-01-01T${attendance.eveningCheckoutTime}:00`);
+            const eveningHours = (eveningCheckout.getTime() - eveningCheckin.getTime()) / (1000 * 60 * 60);
+            console.log('Friday evening hours:', eveningHours.toFixed(2));
+            return eveningHours.toFixed(2);
+          } catch (error) {
+            console.error('Error calculating Friday evening hours:', error);
+          }
+        }
+        // تحقق من سجل الحضور في الفترة الصباحية كبديل
+        if (attendance.morningCheckinTime && attendance.morningCheckoutTime) {
+          try {
+            const morningCheckin = new Date(`2024-01-01T${attendance.morningCheckinTime}:00`);
+            const morningCheckout = new Date(`2024-01-01T${attendance.morningCheckoutTime}:00`);
+            const morningHours = (morningCheckout.getTime() - morningCheckin.getTime()) / (1000 * 60 * 60);
+            console.log('Friday morning hours (fallback):', morningHours.toFixed(2));
+            return morningHours.toFixed(2);
+          } catch (error) {
+            console.error('Error calculating Friday morning hours:', error);
+          }
+        }
+      }
     } else {
+      // الدوام المنفصل للأيام العادية
       let totalHours = 0;
       
       // Morning shift
@@ -1588,7 +1618,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                 let permissionHours = 0;
                 
                 if (dayAttendance) {
-                  actualWorkHours = parseFloat(calculateHoursWorked(schedule, dayAttendance));
+                  actualWorkHours = parseFloat(calculateHoursWorked(schedule, dayAttendance, day));
                 }
                 
                 switch (approvedLeave.requestType) {
@@ -1654,7 +1684,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   checkoutTime = (eveningIn && eveningOut) ? 
                     (eveningIn === eveningOut ? '-' : `${eveningIn} - ${eveningOut}`) : '-';
                 }
-                const calculatedHours = parseFloat(calculateHoursWorked(schedule, dayAttendance));
+                const calculatedHours = parseFloat(calculateHoursWorked(schedule, dayAttendance, day));
                 const calculatedDelay = calculateDelayHours(schedule, dayAttendance, day);
                 
                 workHours = formatHoursToHoursMinutes(calculatedHours);
@@ -2365,7 +2395,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               const isLate = hasAttendance && !isHoliday && !hasApprovedLeaveForDay && isEmployeeLate(schedule, day);
                               
                               // Calculate hours worked and percentage with special handling for approved leave
-                              const hoursWorked = hasAttendance && !isHoliday ? parseFloat(calculateHoursWorked(schedule, dayAttendance)) : 0;
+                              const hoursWorked = hasAttendance && !isHoliday ? parseFloat(calculateHoursWorked(schedule, dayAttendance, day)) : 0;
                               const expectedHours = calculateExpectedHours(schedule, day);
                               const approvedLeave = getApprovedLeaveForDay(schedule.employeeId, day);
                               
@@ -2573,12 +2603,14 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                                   barWidth = 100;
                                                   break;
                                               }
-                                            } else if (isLate) {
-                                              bgColor = 'bg-gradient-to-r from-red-500 to-red-600';
-                                              icon = <XCircle className="w-3 h-3 text-white" />;
                                             } else if (workPercentage >= 100) {
+                                              // الأولوية للعمل المكتمل - حتى لو كان هناك تأخير
                                               bgColor = 'bg-gradient-to-r from-green-500 to-emerald-500';
                                               icon = <CheckCircle className="w-3 h-3 text-white" />;
+                                            } else if (isLate && workPercentage < 90) {
+                                              // إظهار التأخير فقط عندما تكون ساعات العمل أقل من 90%
+                                              bgColor = 'bg-gradient-to-r from-red-500 to-red-600';
+                                              icon = <XCircle className="w-3 h-3 text-white" />;
                                             } else if (workPercentage >= 75) {
                                               bgColor = 'bg-gradient-to-r from-blue-500 to-cyan-500';
                                               icon = <Clock className="w-3 h-3 text-white" />;
@@ -2620,10 +2652,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                         {isHoliday || hasApprovedLeaveForDay ? (
                                           <Coffee className="w-5 h-5 text-yellow-400" />
                                         ) : hasAttendance ? (
-                                          isLate ? (
-                                            <XCircle className="w-5 h-5 text-red-400" />
-                                          ) : workPercentage >= 100 ? (
+                                          workPercentage >= 100 ? (
                                             <CheckCircle className="w-5 h-5 text-green-400" />
+                                          ) : isLate && workPercentage < 90 ? (
+                                            <XCircle className="w-5 h-5 text-red-400" />
                                           ) : (
                                             <Clock className="w-5 h-5 text-blue-400" />
                                           )
@@ -2663,7 +2695,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
 
                               <div className="flex items-center gap-2">
                                 <div className="w-6 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full"></div>
-                                <span className="text-red-200 font-medium">تأخير</span>
+                                <span className="text-red-200 font-medium">تأخير مع عمل أقل من 90%</span>
                               </div>
                               
                               <div className="flex items-center gap-2">
