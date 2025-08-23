@@ -59,54 +59,54 @@ const logoMapping: { [key: string]: string } = {
   "فيراري ": "/logos /ferrari.svg",
   
   // Lamborghini
-  "لامبورغيني": "/logos /lamborghini.svg",
-  "لامبورجيني": "/logos /lamborghini.svg",
-  "لامبورغيني ": "/logos /lamborghini.svg",
+  "لامبورغيني": "/logos/Lamborghini.svg",
+  "لامبورجيني": "/logos/Lamborghini.svg",
+  "لامبورغيني ": "/logos/Lamborghini.svg",
   
   // Bentley
-  "بنتلي": "/logos /bentley-svgrepo-com.svg",
-  "بنتلي ": "/logos /bentley-svgrepo-com.svg",
+  "بنتلي": "/bentley-svgrepo-com.svg",
+  "بنتلي ": "/bentley-svgrepo-com.svg",
   
   // Rolls Royce
-  "رولز رويس": "/logos /Rolls-Royce.svg",
-  "رولز رويس ": "/logos /Rolls-Royce.svg",
+  "رولز رويس": "/Rolls-Royce.svg",
+  "رولز رويس ": "/Rolls-Royce.svg",
   
   // Bugatti
-  "بوجاتي": "/logos /bugatti.svg",
-  "بوجاتي ": "/logos /bugatti.svg",
+  "بوجاتي": "/bugatti.svg",
+  "بوجاتي ": "/bugatti.svg",
   
   // Lincoln
-  "لينكولن": "/logos /lincoln.svg",
-  "لينكولن ": "/logos /lincoln.svg",
+  "لينكولن": "/logos/Lincoln.svg",
+  "لينكولن ": "/logos/Lincoln.svg",
   
   // Maybach
-  "مايباخ": "/logos /maybach.svg",
-  "مايباخ ": "/logos /maybach.svg",
+  "مايباخ": "/maybach.svg",
+  "مايباخ ": "/maybach.svg",
   
   // Lotus
-  "لوتس": "/logos /lotus.svg",
-  "لوتس ": "/logos /lotus.svg",
+  "لوتس": "/lotus.svg",
+  "لوتس ": "/lotus.svg",
   
   // GMC
-  "جي ام سي": "/logos /gmc.svg",
-  "جي ام سي ": "/logos /gmc.svg",
-  "جي إم سي": "/logos /gmc.svg",
+  "جي ام سي": "/logos/GMC.svg",
+  "جي ام سي ": "/logos/GMC.svg",
+  "جي إم سي": "/logos/GMC.svg",
   
   // RAM
-  "رام": "/logos /ram.svg",
-  "رام ": "/logos /ram.svg",
+  "رام": "/ram.svg",
+  "رام ": "/ram.svg",
   
   // Volkswagen
-  "فولكسفاجن": "/logos /volkswagen.svg",
-  "فولكسفاجن ": "/logos /volkswagen.svg",
+  "فولكسفاجن": "/logos/Volkswagen.svg",
+  "فولكسفاجن ": "/logos/Volkswagen.svg",
   
   // Cadillac
-  "كاديلاك": "/logos /Cadillac--Streamline-Simple-Icons.svg",
-  "كاديلاك ": "/logos /Cadillac--Streamline-Simple-Icons.svg",
+  "كاديلاك": "/logos/cadillac.svg",
+  "كاديلاك ": "/logos/cadillac.svg",
   
   // ROX
-  "روكس": "/logos /ROX.svg",
-  "روكس ": "/logos /ROX.svg"
+  "روكس": "/logos/Rox.svg",
+  "روكس ": "/logos/Rox.svg"
 };
 
 async function linkLogosToManufacturers() {
