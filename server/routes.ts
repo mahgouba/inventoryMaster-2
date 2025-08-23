@@ -22,7 +22,28 @@ import {
   priceCards,
   insertPriceCardSchema,
   type PriceCard,
-  type InsertPriceCard
+  type InsertPriceCard,
+  importTypes,
+  vehicleStatuses,
+  ownershipTypes,
+  vehicleLocations,
+  vehicleYears,
+  engineCapacities,
+  vehicleColors,
+  insertImportTypeSchema,
+  insertVehicleStatusSchema,
+  insertOwnershipTypeSchema,
+  insertVehicleLocationSchema,
+  insertVehicleYearSchema,
+  insertEngineCapacitySchema,
+  insertVehicleColorSchema,
+  type ImportType,
+  type VehicleStatus,
+  type OwnershipType,
+  type VehicleLocation,
+  type VehicleYear,
+  type EngineCapacity,
+  type VehicleColor
 } from "@shared/schema";
 import { Pool } from 'pg';
 import { eq, desc, asc, or, like, count, sql, ne, isNull, isNotNull, and, not } from "drizzle-orm";
@@ -1713,18 +1734,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get engine capacities from database table
   app.get("/api/engine-capacities", async (req, res) => {
     try {
       const { db } = getDatabase();
-      const items = await db.select().from(inventoryItems);
-      const uniqueEngineCapacities = [...new Set(items
-        .map((item: any) => item.engineCapacity)
-        .filter((capacity: any) => capacity && capacity.trim() !== ""))]
-        .sort();
-      res.json(uniqueEngineCapacities);
+      const data = await db.select().from(engineCapacities).where(eq(engineCapacities.isActive, true)).orderBy(asc(engineCapacities.capacity));
+      res.json(data.map(item => item.capacity));
     } catch (error) {
       console.error("Error fetching engine capacities:", error);
       res.status(500).json({ message: "Failed to fetch engine capacities" });
+    }
+  });
+
+  // Engine Capacities Management APIs
+  app.get("/api/engine-capacities-full", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const data = await db.select().from(engineCapacities).where(eq(engineCapacities.isActive, true)).orderBy(asc(engineCapacities.capacity));
+      res.json(data);
+    } catch (error) {
+      console.error("Error fetching engine capacities:", error);
+      res.status(500).json({ message: "Failed to fetch engine capacities" });
+    }
+  });
+
+  app.post("/api/engine-capacities", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const validatedData = insertEngineCapacitySchema.parse(req.body);
+      const [newEngineCapacity] = await db.insert(engineCapacities).values(validatedData).returning();
+      res.status(201).json(newEngineCapacity);
+    } catch (error) {
+      console.error("Error creating engine capacity:", error);
+      res.status(500).json({ message: "Failed to create engine capacity" });
+    }
+  });
+
+  app.put("/api/engine-capacities/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      const validatedData = insertEngineCapacitySchema.parse(req.body);
+      const [updatedEngineCapacity] = await db.update(engineCapacities).set(validatedData).where(eq(engineCapacities.id, id)).returning();
+      res.json(updatedEngineCapacity);
+    } catch (error) {
+      console.error("Error updating engine capacity:", error);
+      res.status(500).json({ message: "Failed to update engine capacity" });
+    }
+  });
+
+  app.delete("/api/engine-capacities/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      await db.delete(engineCapacities).where(eq(engineCapacities.id, id));
+      res.json({ message: "Engine capacity deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting engine capacity:", error);
+      res.status(500).json({ message: "Failed to delete engine capacity" });
     }
   });
 
@@ -3017,6 +3084,260 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting price card:", error);
       res.status(500).json({ message: "Failed to delete price card" });
+    }
+  });
+
+  // ===== DROPDOWN OPTIONS MANAGEMENT APIs =====
+  
+  // Import Types APIs
+  app.get("/api/import-types", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const data = await db.select().from(importTypes).where(eq(importTypes.isActive, true)).orderBy(asc(importTypes.name));
+      res.json(data);
+    } catch (error) {
+      console.error("Error fetching import types:", error);
+      res.status(500).json({ message: "Failed to fetch import types" });
+    }
+  });
+
+  app.post("/api/import-types", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const validatedData = insertImportTypeSchema.parse(req.body);
+      const [newImportType] = await db.insert(importTypes).values(validatedData).returning();
+      res.status(201).json(newImportType);
+    } catch (error) {
+      console.error("Error creating import type:", error);
+      res.status(500).json({ message: "Failed to create import type" });
+    }
+  });
+
+  app.put("/api/import-types/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      const validatedData = insertImportTypeSchema.parse(req.body);
+      const [updatedImportType] = await db.update(importTypes).set(validatedData).where(eq(importTypes.id, id)).returning();
+      res.json(updatedImportType);
+    } catch (error) {
+      console.error("Error updating import type:", error);
+      res.status(500).json({ message: "Failed to update import type" });
+    }
+  });
+
+  app.delete("/api/import-types/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      await db.delete(importTypes).where(eq(importTypes.id, id));
+      res.json({ message: "Import type deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting import type:", error);
+      res.status(500).json({ message: "Failed to delete import type" });
+    }
+  });
+
+  // Vehicle Statuses APIs
+  app.get("/api/vehicle-statuses", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const data = await db.select().from(vehicleStatuses).where(eq(vehicleStatuses.isActive, true)).orderBy(asc(vehicleStatuses.name));
+      res.json(data);
+    } catch (error) {
+      console.error("Error fetching vehicle statuses:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle statuses" });
+    }
+  });
+
+  app.post("/api/vehicle-statuses", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const validatedData = insertVehicleStatusSchema.parse(req.body);
+      const [newVehicleStatus] = await db.insert(vehicleStatuses).values(validatedData).returning();
+      res.status(201).json(newVehicleStatus);
+    } catch (error) {
+      console.error("Error creating vehicle status:", error);
+      res.status(500).json({ message: "Failed to create vehicle status" });
+    }
+  });
+
+  app.put("/api/vehicle-statuses/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      const validatedData = insertVehicleStatusSchema.parse(req.body);
+      const [updatedVehicleStatus] = await db.update(vehicleStatuses).set(validatedData).where(eq(vehicleStatuses.id, id)).returning();
+      res.json(updatedVehicleStatus);
+    } catch (error) {
+      console.error("Error updating vehicle status:", error);
+      res.status(500).json({ message: "Failed to update vehicle status" });
+    }
+  });
+
+  app.delete("/api/vehicle-statuses/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      await db.delete(vehicleStatuses).where(eq(vehicleStatuses.id, id));
+      res.json({ message: "Vehicle status deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting vehicle status:", error);
+      res.status(500).json({ message: "Failed to delete vehicle status" });
+    }
+  });
+
+  // Ownership Types APIs
+  app.get("/api/ownership-types", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const data = await db.select().from(ownershipTypes).where(eq(ownershipTypes.isActive, true)).orderBy(asc(ownershipTypes.name));
+      res.json(data);
+    } catch (error) {
+      console.error("Error fetching ownership types:", error);
+      res.status(500).json({ message: "Failed to fetch ownership types" });
+    }
+  });
+
+  app.post("/api/ownership-types", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const validatedData = insertOwnershipTypeSchema.parse(req.body);
+      const [newOwnershipType] = await db.insert(ownershipTypes).values(validatedData).returning();
+      res.status(201).json(newOwnershipType);
+    } catch (error) {
+      console.error("Error creating ownership type:", error);
+      res.status(500).json({ message: "Failed to create ownership type" });
+    }
+  });
+
+  app.put("/api/ownership-types/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      const validatedData = insertOwnershipTypeSchema.parse(req.body);
+      const [updatedOwnershipType] = await db.update(ownershipTypes).set(validatedData).where(eq(ownershipTypes.id, id)).returning();
+      res.json(updatedOwnershipType);
+    } catch (error) {
+      console.error("Error updating ownership type:", error);
+      res.status(500).json({ message: "Failed to update ownership type" });
+    }
+  });
+
+  app.delete("/api/ownership-types/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      await db.delete(ownershipTypes).where(eq(ownershipTypes.id, id));
+      res.json({ message: "Ownership type deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting ownership type:", error);
+      res.status(500).json({ message: "Failed to delete ownership type" });
+    }
+  });
+
+  // Vehicle Locations APIs
+  app.get("/api/vehicle-locations", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const data = await db.select().from(vehicleLocations).where(eq(vehicleLocations.isActive, true)).orderBy(asc(vehicleLocations.name));
+      res.json(data);
+    } catch (error) {
+      console.error("Error fetching vehicle locations:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle locations" });
+    }
+  });
+
+  app.post("/api/vehicle-locations", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const validatedData = insertVehicleLocationSchema.parse(req.body);
+      const [newVehicleLocation] = await db.insert(vehicleLocations).values(validatedData).returning();
+      res.status(201).json(newVehicleLocation);
+    } catch (error) {
+      console.error("Error creating vehicle location:", error);
+      res.status(500).json({ message: "Failed to create vehicle location" });
+    }
+  });
+
+  app.put("/api/vehicle-locations/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      const validatedData = insertVehicleLocationSchema.parse(req.body);
+      const [updatedVehicleLocation] = await db.update(vehicleLocations).set(validatedData).where(eq(vehicleLocations.id, id)).returning();
+      res.json(updatedVehicleLocation);
+    } catch (error) {
+      console.error("Error updating vehicle location:", error);
+      res.status(500).json({ message: "Failed to update vehicle location" });
+    }
+  });
+
+  app.delete("/api/vehicle-locations/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      await db.delete(vehicleLocations).where(eq(vehicleLocations.id, id));
+      res.json({ message: "Vehicle location deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting vehicle location:", error);
+      res.status(500).json({ message: "Failed to delete vehicle location" });
+    }
+  });
+
+  // Vehicle Colors APIs
+  app.get("/api/vehicle-colors", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const { type } = req.query;
+      let query = db.select().from(vehicleColors).where(eq(vehicleColors.isActive, true));
+      
+      if (type) {
+        query = query.where(eq(vehicleColors.colorType, type as string));
+      }
+      
+      const data = await query.orderBy(asc(vehicleColors.name));
+      res.json(data);
+    } catch (error) {
+      console.error("Error fetching vehicle colors:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle colors" });
+    }
+  });
+
+  app.post("/api/vehicle-colors", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const validatedData = insertVehicleColorSchema.parse(req.body);
+      const [newVehicleColor] = await db.insert(vehicleColors).values(validatedData).returning();
+      res.status(201).json(newVehicleColor);
+    } catch (error) {
+      console.error("Error creating vehicle color:", error);
+      res.status(500).json({ message: "Failed to create vehicle color" });
+    }
+  });
+
+  app.put("/api/vehicle-colors/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      const validatedData = insertVehicleColorSchema.parse(req.body);
+      const [updatedVehicleColor] = await db.update(vehicleColors).set(validatedData).where(eq(vehicleColors.id, id)).returning();
+      res.json(updatedVehicleColor);
+    } catch (error) {
+      console.error("Error updating vehicle color:", error);
+      res.status(500).json({ message: "Failed to update vehicle color" });
+    }
+  });
+
+  app.delete("/api/vehicle-colors/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      await db.delete(vehicleColors).where(eq(vehicleColors.id, id));
+      res.json({ message: "Vehicle color deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting vehicle color:", error);
+      res.status(500).json({ message: "Failed to delete vehicle color" });
     }
   });
 

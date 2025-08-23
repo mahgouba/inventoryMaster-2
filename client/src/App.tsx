@@ -17,6 +17,7 @@ import PersonalBanks from "@/pages/banks-personal";
 import CompanyBanks from "@/pages/banks-company";
 import IOSPickerDemo from "@/pages/ios-picker-demo";
 import VerticalPickerShowcase from "@/pages/vertical-picker-showcase";
+import BasicDropdownManagement from "@/pages/basic-dropdown-management";
 
 interface User {
   username: string;
@@ -68,7 +69,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
 
           <Route path="/database-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/cars-migration" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
-
+          <Route path="/basic-dropdown-management" component={() => <BasicDropdownManagement />} />
 
           <Route path="/locations" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           

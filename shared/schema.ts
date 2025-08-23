@@ -699,6 +699,63 @@ export const insertOwnershipTypeSchema = createInsertSchema(ownershipTypes).omit
   createdAt: true,
 });
 
+// Vehicle Locations table for managing location options
+export const vehicleLocations = pgTable("vehicle_locations", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Vehicle Years table for managing year options
+export const vehicleYears = pgTable("vehicle_years", {
+  id: serial("id").primaryKey(),
+  year: integer("year").notNull().unique(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Engine Capacities table for managing engine capacity options
+export const engineCapacities = pgTable("engine_capacities", {
+  id: serial("id").primaryKey(),
+  capacity: text("capacity").notNull().unique(),
+  description: text("description"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Vehicle Colors table for managing color options
+export const vehicleColors = pgTable("vehicle_colors", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  colorType: text("color_type").notNull(), // 'exterior' or 'interior'
+  colorCode: text("color_code"), // hex code
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Insert schemas for new tables
+export const insertVehicleLocationSchema = createInsertSchema(vehicleLocations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertVehicleYearSchema = createInsertSchema(vehicleYears).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertEngineCapacitySchema = createInsertSchema(engineCapacities).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertVehicleColorSchema = createInsertSchema(vehicleColors).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Additional types
 export type InsertImportType = z.infer<typeof insertImportTypeSchema>;
 export type ImportType = typeof importTypes.$inferSelect;
@@ -706,6 +763,14 @@ export type InsertVehicleStatus = z.infer<typeof insertVehicleStatusSchema>;
 export type VehicleStatus = typeof vehicleStatuses.$inferSelect;
 export type InsertOwnershipType = z.infer<typeof insertOwnershipTypeSchema>;
 export type OwnershipType = typeof ownershipTypes.$inferSelect;
+export type InsertVehicleLocation = z.infer<typeof insertVehicleLocationSchema>;
+export type VehicleLocation = typeof vehicleLocations.$inferSelect;
+export type InsertVehicleYear = z.infer<typeof insertVehicleYearSchema>;
+export type VehicleYear = typeof vehicleYears.$inferSelect;
+export type InsertEngineCapacity = z.infer<typeof insertEngineCapacitySchema>;
+export type EngineCapacity = typeof engineCapacities.$inferSelect;
+export type InsertVehicleColor = z.infer<typeof insertVehicleColorSchema>;
+export type VehicleColor = typeof vehicleColors.$inferSelect;
 
 // Stock level settings table
 export const stockSettings = pgTable("stock_settings", {
