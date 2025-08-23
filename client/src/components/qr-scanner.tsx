@@ -39,8 +39,18 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
             } 
           });
           
-          // Stop the stream as QrScanner will handle it
-          stream.getTracks().forEach(track => track.stop());
+          // Test the stream first
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            videoRef.current.play();
+            
+            // Give a moment to load
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Stop the test stream
+            stream.getTracks().forEach(track => track.stop());
+            videoRef.current.srcObject = null;
+          }
         } catch (permError: any) {
           console.error('Camera permission error:', permError);
           let errorMessage = 'يرجى السماح بالوصول للكاميرا في إعدادات المتصفح';
@@ -95,11 +105,18 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
             setHasPermission(true);
             setError(null);
             console.log('QR Scanner started successfully');
+            
+            // Ensure video is visible
+            if (videoRef.current) {
+              videoRef.current.style.display = 'block';
+              videoRef.current.style.width = '100%';
+              videoRef.current.style.height = '100%';
+            }
           } catch (startError) {
             console.error('Failed to start QR scanner:', startError);
             setError('فشل في تشغيل الكاميرا. تأكد من منح الصلاحيات المناسبة.');
           }
-        }, 100);
+        }, 500);
       } catch (err) {
         console.error('QR Scanner error:', err);
         setError('فشل في تشغيل الكاميرا. يرجى السماح بالوصول للكاميرا.');
