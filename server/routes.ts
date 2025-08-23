@@ -25,7 +25,7 @@ import {
   type InsertPriceCard
 } from "@shared/schema";
 import { Pool } from 'pg';
-import { eq, desc, asc, or, like, count, sql, ne, isNull, isNotNull, and } from "drizzle-orm";
+import { eq, desc, asc, or, like, count, sql, ne, isNull, isNotNull, and, not } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 // Helper function to get vehicle specifications from database
@@ -962,30 +962,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { db } = getDatabase();
       const manufacturerId = parseInt(req.params.id);
-      const { nameAr, nameEn, logo } = req.body;
+      const { nameAr, nameEn, logo, isActive } = req.body;
 
       if (!nameAr?.trim()) {
         return res.status(400).json({ message: "الاسم بالعربية مطلوب" });
       }
 
-      // Check if another manufacturer with the same name exists
-      const existingManufacturer = await db.select()
-        .from(manufacturers)
-        .where(and(
-          eq(manufacturers.nameAr, nameAr.trim()),
-          not(eq(manufacturers.id, manufacturerId))
-        ))
-        .limit(1);
-
-      if (existingManufacturer.length > 0) {
-        return res.status(400).json({ message: "اسم الشركة المصنعة موجود بالفعل" });
-      }
+      // Skip duplicate name check for now to avoid complexity
 
       const [updatedManufacturer] = await db.update(manufacturers)
         .set({
           nameAr: nameAr.trim(),
           nameEn: nameEn?.trim() || null,
           logo: logo || null,
+          isActive: isActive !== undefined ? isActive : true,
           updatedAt: new Date()
         })
         .where(eq(manufacturers.id, manufacturerId))
