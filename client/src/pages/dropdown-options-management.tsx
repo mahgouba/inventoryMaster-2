@@ -259,10 +259,10 @@ export default function DropdownOptionsManagement() {
         description: "تم حذف الشركة المصنعة بنجاح",
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "خطأ",
-        description: "فشل في حذف الشركة المصنعة",
+        description: error?.message || "فشل في حذف الشركة المصنعة",
         variant: "destructive",
       });
     }
@@ -309,10 +309,10 @@ export default function DropdownOptionsManagement() {
         description: "تم حذف الفئة بنجاح",
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "خطأ",
-        description: "فشل في حذف الفئة",
+        description: error?.message || "فشل في حذف الفئة",
         variant: "destructive",
       });
     }
@@ -359,10 +359,10 @@ export default function DropdownOptionsManagement() {
         description: "تم حذف درجة التجهيز بنجاح",
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "خطأ",
-        description: "فشل في حذف درجة التجهيز",
+        description: error?.message || "فشل في حذف درجة التجهيز",
         variant: "destructive",
       });
     }
