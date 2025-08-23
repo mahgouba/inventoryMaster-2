@@ -739,33 +739,29 @@ function VehicleDetailedSpecificationsSection({ selectedVehicle }: VehicleDetail
   
   return (
     <div className="mb-3">
-      <div className="flex items-center gap-2 mb-2">
-        <Car className="text-[#C79C45] w-5 h-5" />
-        <span className="text-lg font-bold text-black/80">المواصفات التفصيلية</span>
-        {isEditing && (
-          <div className="flex items-center gap-1 mr-auto">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleSave}
-              disabled={updateSpecsMutation.isPending}
-              className="h-6 px-2 text-xs"
-            >
-              <Save className="w-3 h-3 ml-1" />
-              حفظ
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleCancel}
-              className="h-6 px-2 text-xs"
-            >
-              <X className="w-3 h-3 ml-1" />
-              إلغاء
-            </Button>
-          </div>
-        )}
-      </div>
+      {isEditing && (
+        <div className="flex items-center gap-1 mb-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleSave}
+            disabled={updateSpecsMutation.isPending}
+            className="h-6 px-2 text-xs"
+          >
+            <Save className="w-3 h-3 ml-1" />
+            حفظ
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleCancel}
+            className="h-6 px-2 text-xs"
+          >
+            <X className="w-3 h-3 ml-1" />
+            إلغاء
+          </Button>
+        </div>
+      )}
       
       <div 
         className="border border-[#C79C45]/30 rounded-lg p-3 bg-white/50 relative group"
