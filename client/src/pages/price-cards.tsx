@@ -89,10 +89,13 @@ export default function PriceCardsPage() {
 
   // وظيفة للحصول على حالة الإخفاء مع القيم التلقائية
   const getFieldVisibility = (cardId: number, field: string) => {
+    const validFields = ['category', 'trimLevel', 'model', 'manufacturer', 'engineCapacity'] as const;
+    type ValidField = typeof validFields[number];
+    
     if (field === 'category' || field === 'engineCapacity') {
-      return hiddenFields[cardId]?.[field] !== false; // مخفي بشكل تلقائي
+      return hiddenFields[cardId]?.[field as ValidField] !== false; // مخفي بشكل تلقائي
     }
-    return hiddenFields[cardId]?.[field] || false; // ظاهر بشكل تلقائي
+    return hiddenFields[cardId]?.[field as ValidField] || false; // ظاهر بشكل تلقائي
   };
   
   // وظيفة تبديل إخفاء الحقول
@@ -1029,7 +1032,7 @@ export default function PriceCardsPage() {
               >
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <ManufacturerLogo manufacturer={manufacturer} size={32} />
+                    <ManufacturerLogo manufacturer={manufacturer} size="md" />
                     <div>
                       <span className="text-xl font-bold">{manufacturer}</span>
                       <Badge variant="secondary" className="mr-2">
@@ -1314,10 +1317,7 @@ export default function PriceCardsPage() {
                             }}>
                               <ManufacturerLogo 
                                 manufacturerName={card.manufacturer} 
-                                className="w-full h-full object-contain"
-                                style={{ 
-                                  filter: 'brightness(0) saturate(100%) invert(76%) sepia(59%) saturate(476%) hue-rotate(13deg) brightness(93%) contrast(87%)'
-                                }}
+                                className="w-full h-full object-contain brightness-0 saturate-100 invert-75 sepia-60 saturate-50 hue-rotate-15 brightness-95 contrast-90"
                               />
                             </div>
                           )}

@@ -18,7 +18,11 @@ import {
   vehicleSpecifications,
   vehicleImageLinks,
   quotations,
-  termsConditions
+  termsConditions,
+  priceCards,
+  insertPriceCardSchema,
+  type PriceCard,
+  type InsertPriceCard
 } from "@shared/schema";
 import { Pool } from 'pg';
 import { eq, desc, asc, or, like, count, sql, ne, isNull, isNotNull, and } from "drizzle-orm";
@@ -2920,6 +2924,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error saving terms and conditions:", error);
       res.status(500).json({ message: "Failed to save terms and conditions" });
+    }
+  });
+
+  // Price Cards API Routes
+  
+  // Get all price cards
+  app.get("/api/price-cards", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const cards = await db.select().from(priceCards).orderBy(desc(priceCards.createdAt));
+      res.json(cards);
+    } catch (error) {
+      console.error("Error fetching price cards:", error);
+      res.status(500).json({ message: "Failed to fetch price cards" });
+    }
+  });
+
+  // Create a new price card
+  app.post("/api/price-cards", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      
+      // Validate the request body using the schema
+      const validatedData = insertPriceCardSchema.parse(req.body);
+      
+      console.log('Creating price card with data:', validatedData);
+      
+      const [newCard] = await db.insert(priceCards).values(validatedData).returning();
+      
+      console.log('Price card created successfully:', newCard.id);
+      res.json(newCard);
+    } catch (error: any) {
+      console.error("Error creating price card:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          message: "Invalid data format", 
+          errors: error.errors 
+        });
+      }
+      res.status(500).json({ message: "Failed to create price card" });
+    }
+  });
+
+  // Update a price card
+  app.put("/api/price-cards/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const cardId = parseInt(req.params.id);
+      
+      if (isNaN(cardId)) {
+        return res.status(400).json({ message: "Invalid price card ID" });
+      }
+      
+      // Validate the request body using a partial schema
+      const validatedData = insertPriceCardSchema.partial().parse(req.body);
+      
+      const [updatedCard] = await db.update(priceCards)
+        .set({
+          ...validatedData,
+          updatedAt: new Date()
+        })
+        .where(eq(priceCards.id, cardId))
+        .returning();
+
+      if (!updatedCard) {
+        return res.status(404).json({ message: "Price card not found" });
+      }
+
+      res.json(updatedCard);
+    } catch (error: any) {
+      console.error("Error updating price card:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          message: "Invalid data format", 
+          errors: error.errors 
+        });
+      }
+      res.status(500).json({ message: "Failed to update price card" });
+    }
+  });
+
+  // Delete a price card
+  app.delete("/api/price-cards/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const cardId = parseInt(req.params.id);
+      
+      if (isNaN(cardId)) {
+        return res.status(400).json({ message: "Invalid price card ID" });
+      }
+      
+      const [deletedCard] = await db.delete(priceCards)
+        .where(eq(priceCards.id, cardId))
+        .returning();
+
+      if (!deletedCard) {
+        return res.status(404).json({ message: "Price card not found" });
+      }
+
+      res.json({ message: "Price card deleted successfully", id: cardId });
+    } catch (error) {
+      console.error("Error deleting price card:", error);
+      res.status(500).json({ message: "Failed to delete price card" });
     }
   });
 
