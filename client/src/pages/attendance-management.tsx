@@ -1763,6 +1763,38 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
             </div>
           </div>
           
+          <div style="margin-top: 20px; padding: 15px; background-color: #fff8dc; border: 2px solid #C49632; border-radius: 8px;">
+            <h4 style="color: #C49632; margin-bottom: 15px; font-size: 18px;">سياسات الخصم:</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+              <div style="background-color: #ffffff; padding: 12px; border-radius: 6px; border-left: 4px solid #C49632;">
+                <div style="color: #C49632; font-weight: bold; margin-bottom: 8px;">سياسة خصم التأخير:</div>
+                <ul style="margin: 0; padding-right: 20px; color: #333;">
+                  <li>تأخير أقل من 15 دقيقة: تنبيه شفهي</li>
+                  <li>تأخير من 15-30 دقيقة: خصم 30 دقيقة من الراتب</li>
+                  <li>تأخير من 30-60 دقيقة: خصم ساعة كاملة</li>
+                  <li>تأخير أكثر من 60 دقيقة: خصم يوم كامل</li>
+                </ul>
+              </div>
+              <div style="background-color: #ffffff; padding: 12px; border-radius: 6px; border-left: 4px solid #ef4444;">
+                <div style="color: #ef4444; font-weight: bold; margin-bottom: 8px;">سياسة خصم الغياب:</div>
+                <ul style="margin: 0; padding-right: 20px; color: #333;">
+                  <li>غياب يوم واحد بدون إذن: خصم يوم من الراتب</li>
+                  <li>غياب يومين متتاليين: خصم يومين + إنذار</li>
+                  <li>غياب 3 أيام متتالية: خصم 3 أيام + إنذار كتابي</li>
+                  <li>غياب أكثر من أسبوع: اتخاذ إجراءات تأديبية</li>
+                </ul>
+              </div>
+              <div style="background-color: #ffffff; padding: 12px; border-radius: 6px; border-left: 4px solid #00627F;">
+                <div style="color: #00627F; font-weight: bold; margin-bottom: 8px;">سياسة الانصراف المبكر:</div>
+                <ul style="margin: 0; padding-right: 20px; color: #333;">
+                  <li>انصراف مبكر أقل من 15 دقيقة: تنبيه</li>
+                  <li>انصراف مبكر 15-30 دقيقة: خصم 30 دقيقة</li>
+                  <li>انصراف مبكر أكثر من 30 دقيقة: خصم ساعة</li>
+                  <li>انصراف مبكر أكثر من ساعة: خصم نصف يوم</li>
+                </ul>
+              </div>
+            </div>
+          </div>
 
         </div>
         
