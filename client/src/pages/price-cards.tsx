@@ -1317,6 +1317,7 @@ export default function PriceCardsPage() {
                               <ManufacturerLogo 
                                 manufacturerName={card.manufacturer} 
                                 className="w-full h-full object-contain brightness-0 saturate-100 invert-75 sepia-60 saturate-50 hue-rotate-15 brightness-95 contrast-90"
+                                showFallback={false}
                               />
                             </div>
                           )}
