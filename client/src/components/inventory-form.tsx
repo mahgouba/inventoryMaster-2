@@ -69,19 +69,118 @@ export default function InventoryForm({ open, onOpenChange, editItem }: Inventor
     enabled: open,
   });
 
-  // Local state for editable lists (keeping the same structure for other dropdowns)
+  // Types for dropdown data
+  interface DropdownItem {
+    id: number;
+    name: string;
+    description?: string;
+    isActive?: boolean;
+  }
+
+  interface ColorItem {
+    id: number;
+    name: string;
+    colorType: 'exterior' | 'interior';
+    colorCode?: string;
+    isActive?: boolean;
+  }
+
+  // Fetch dropdown data from database (same APIs as basic-dropdown-management)
+  const { data: importTypesData = [], isLoading: isLoadingImportTypes } = useQuery<DropdownItem[]>({
+    queryKey: ['/api/import-types'],
+    enabled: open,
+  });
+
+  const { data: vehicleStatusesData = [], isLoading: isLoadingVehicleStatuses } = useQuery<DropdownItem[]>({
+    queryKey: ['/api/vehicle-statuses'],
+    enabled: open,
+  });
+
+  const { data: ownershipTypesData = [], isLoading: isLoadingOwnershipTypes } = useQuery<DropdownItem[]>({
+    queryKey: ['/api/ownership-types'],
+    enabled: open,
+  });
+
+  const { data: vehicleLocationsData = [], isLoading: isLoadingVehicleLocations } = useQuery<DropdownItem[]>({
+    queryKey: ['/api/vehicle-locations'],
+    enabled: open,
+  });
+
+  const { data: vehicleColorsData = [], isLoading: isLoadingVehicleColors } = useQuery<ColorItem[]>({
+    queryKey: ['/api/vehicle-colors'],
+    enabled: open,
+  });
+
+  // Convert database data to arrays for compatibility
+  const importTypes = importTypesData.map(item => item.name).filter(Boolean);
+  const vehicleStatuses = vehicleStatusesData.map(item => item.name).filter(Boolean);
+  const ownershipTypes = ownershipTypesData.map(item => item.name).filter(Boolean);
+  const vehicleLocations = vehicleLocationsData.map(item => item.name).filter(Boolean);
+  const exteriorColors = vehicleColorsData.filter(item => item.colorType === 'exterior').map(item => item.name);
+  const interiorColors = vehicleColorsData.filter(item => item.colorType === 'interior').map(item => item.name);
+
+  // Local state for editable lists (with fallback to initial values if API data is not available)
   const [editableYears, setEditableYears] = useState<number[]>(initialYears);
   const [editableEngineCapacities, setEditableEngineCapacities] = useState<string[]>(initialEngineCapacities);
-  const [editableStatuses, setEditableStatuses] = useState<string[]>(initialStatuses);
-  const [editableImportTypes, setEditableImportTypes] = useState<string[]>(initialImportTypes);
-  const [editableOwnershipTypes, setEditableOwnershipTypes] = useState<string[]>(initialOwnershipTypes);
-  const [editableLocations, setEditableLocations] = useState<string[]>(initialLocations);
-  const [editableExteriorColors, setEditableExteriorColors] = useState<string[]>(initialColors);
-  const [editableInteriorColors, setEditableInteriorColors] = useState<string[]>(initialColors);
+  const [editableStatuses, setEditableStatuses] = useState<string[]>(vehicleStatuses.length > 0 ? vehicleStatuses : initialStatuses);
+  const [editableImportTypes, setEditableImportTypes] = useState<string[]>(importTypes.length > 0 ? importTypes : initialImportTypes);
+  const [editableOwnershipTypes, setEditableOwnershipTypes] = useState<string[]>(ownershipTypes.length > 0 ? ownershipTypes : initialOwnershipTypes);
+  const [editableLocations, setEditableLocations] = useState<string[]>(vehicleLocations.length > 0 ? vehicleLocations : initialLocations);
+  const [editableExteriorColors, setEditableExteriorColors] = useState<string[]>(exteriorColors.length > 0 ? exteriorColors : initialColors);
+  const [editableInteriorColors, setEditableInteriorColors] = useState<string[]>(interiorColors.length > 0 ? interiorColors : initialColors);
   
   // Options editor state
   const [editingOptionType, setEditingOptionType] = useState<string | null>(null);
   const [dropdownSettingsOpen, setDropdownSettingsOpen] = useState(false);
+
+  // Update local states when API data is loaded
+  useEffect(() => {
+    if (vehicleStatuses.length > 0) {
+      setEditableStatuses(vehicleStatuses);
+    }
+  }, [vehicleStatuses]);
+
+  useEffect(() => {
+    if (importTypes.length > 0) {
+      setEditableImportTypes(importTypes);
+    }
+  }, [importTypes]);
+
+  useEffect(() => {
+    if (ownershipTypes.length > 0) {
+      setEditableOwnershipTypes(ownershipTypes);
+    }
+  }, [ownershipTypes]);
+
+  useEffect(() => {
+    if (vehicleLocations.length > 0) {
+      setEditableLocations(vehicleLocations);
+    }
+  }, [vehicleLocations]);
+
+  useEffect(() => {
+    if (exteriorColors.length > 0) {
+      setEditableExteriorColors(exteriorColors);
+    }
+  }, [exteriorColors]);
+
+  useEffect(() => {
+    if (interiorColors.length > 0) {
+      setEditableInteriorColors(interiorColors);
+    }
+  }, [interiorColors]);
+
+  useEffect(() => {
+    if (engineCapacities.length > 0) {
+      setEditableEngineCapacities(engineCapacities);
+    }
+  }, [engineCapacities]);
+
+  useEffect(() => {
+    if (vehicleYears.length > 0) {
+      setEditableYears(vehicleYears);
+    }
+  }, [vehicleYears]);
 
   const form = useForm<InsertInventoryItem>({
     resolver: zodResolver(insertInventoryItemSchema),
