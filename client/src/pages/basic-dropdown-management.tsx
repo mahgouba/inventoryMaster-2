@@ -481,7 +481,7 @@ export default function BasicDropdownManagement() {
 
   // Mutations for vehicle statuses
   const addVehicleStatusMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/vehicle-statuses', { method: 'POST', body: data }),
+    mutationFn: (data: any) => apiRequest('POST', '/api/vehicle-statuses', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-statuses'] });
       toast({ title: "تم إضافة حالة المركبة بنجاح" });
@@ -490,7 +490,7 @@ export default function BasicDropdownManagement() {
 
   const updateVehicleStatusMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => 
-      apiRequest(`/api/vehicle-statuses/${id}`, { method: 'PUT', body: data }),
+      apiRequest('PUT', `/api/vehicle-statuses/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-statuses'] });
       toast({ title: "تم تحديث حالة المركبة بنجاح" });
@@ -498,7 +498,7 @@ export default function BasicDropdownManagement() {
   });
 
   const deleteVehicleStatusMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/vehicle-statuses/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: number) => apiRequest('DELETE', `/api/vehicle-statuses/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-statuses'] });
       toast({ title: "تم حذف حالة المركبة بنجاح" });
@@ -507,7 +507,7 @@ export default function BasicDropdownManagement() {
 
   // Mutations for ownership types
   const addOwnershipTypeMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/ownership-types', { method: 'POST', body: data }),
+    mutationFn: (data: any) => apiRequest('POST', '/api/ownership-types', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/ownership-types'] });
       toast({ title: "تم إضافة نوع الملكية بنجاح" });
@@ -516,7 +516,7 @@ export default function BasicDropdownManagement() {
 
   const updateOwnershipTypeMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => 
-      apiRequest(`/api/ownership-types/${id}`, { method: 'PUT', body: data }),
+      apiRequest('PUT', `/api/ownership-types/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/ownership-types'] });
       toast({ title: "تم تحديث نوع الملكية بنجاح" });
@@ -524,7 +524,7 @@ export default function BasicDropdownManagement() {
   });
 
   const deleteOwnershipTypeMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/ownership-types/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: number) => apiRequest('DELETE', `/api/ownership-types/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/ownership-types'] });
       toast({ title: "تم حذف نوع الملكية بنجاح" });
@@ -533,7 +533,7 @@ export default function BasicDropdownManagement() {
 
   // Mutations for vehicle locations
   const addVehicleLocationMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/vehicle-locations', { method: 'POST', body: data }),
+    mutationFn: (data: any) => apiRequest('POST', '/api/vehicle-locations', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-locations'] });
       toast({ title: "تم إضافة الموقع بنجاح" });
@@ -542,7 +542,7 @@ export default function BasicDropdownManagement() {
 
   const updateVehicleLocationMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => 
-      apiRequest(`/api/vehicle-locations/${id}`, { method: 'PUT', body: data }),
+      apiRequest('PUT', `/api/vehicle-locations/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-locations'] });
       toast({ title: "تم تحديث الموقع بنجاح" });
@@ -550,7 +550,7 @@ export default function BasicDropdownManagement() {
   });
 
   const deleteVehicleLocationMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/vehicle-locations/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: number) => apiRequest('DELETE', `/api/vehicle-locations/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-locations'] });
       toast({ title: "تم حذف الموقع بنجاح" });
@@ -559,7 +559,7 @@ export default function BasicDropdownManagement() {
 
   // Mutations for vehicle years
   const addVehicleYearMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/vehicle-years', { method: 'POST', body: data }),
+    mutationFn: (data: any) => apiRequest('POST', '/api/vehicle-years', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-years-full'] });
       toast({ title: "تم إضافة السنة بنجاح" });
@@ -568,7 +568,7 @@ export default function BasicDropdownManagement() {
 
   const updateVehicleYearMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => 
-      apiRequest(`/api/vehicle-years/${id}`, { method: 'PUT', body: data }),
+      apiRequest('PUT', `/api/vehicle-years/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-years-full'] });
       toast({ title: "تم تحديث السنة بنجاح" });
@@ -576,7 +576,7 @@ export default function BasicDropdownManagement() {
   });
 
   const deleteVehicleYearMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/vehicle-years/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: number) => apiRequest('DELETE', `/api/vehicle-years/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-years-full'] });
       toast({ title: "تم حذف السنة بنجاح" });
@@ -585,7 +585,7 @@ export default function BasicDropdownManagement() {
 
   // Mutations for engine capacities
   const addEngineCapacityMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/engine-capacities', { method: 'POST', body: data }),
+    mutationFn: (data: any) => apiRequest('POST', '/api/engine-capacities', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/engine-capacities-full'] });
       toast({ title: "تم إضافة سعة المحرك بنجاح" });
@@ -594,7 +594,7 @@ export default function BasicDropdownManagement() {
 
   const updateEngineCapacityMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => 
-      apiRequest(`/api/engine-capacities/${id}`, { method: 'PUT', body: data }),
+      apiRequest('PUT', `/api/engine-capacities/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/engine-capacities-full'] });
       toast({ title: "تم تحديث سعة المحرك بنجاح" });
@@ -602,7 +602,7 @@ export default function BasicDropdownManagement() {
   });
 
   const deleteEngineCapacityMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/engine-capacities/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: number) => apiRequest('DELETE', `/api/engine-capacities/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/engine-capacities-full'] });
       toast({ title: "تم حذف سعة المحرك بنجاح" });
@@ -611,7 +611,7 @@ export default function BasicDropdownManagement() {
 
   // Mutations for vehicle colors
   const addVehicleColorMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/vehicle-colors', { method: 'POST', body: data }),
+    mutationFn: (data: any) => apiRequest('POST', '/api/vehicle-colors', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-colors'] });
       toast({ title: "تم إضافة اللون بنجاح" });
@@ -620,7 +620,7 @@ export default function BasicDropdownManagement() {
 
   const updateVehicleColorMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => 
-      apiRequest(`/api/vehicle-colors/${id}`, { method: 'PUT', body: data }),
+      apiRequest('PUT', `/api/vehicle-colors/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-colors'] });
       toast({ title: "تم تحديث اللون بنجاح" });
@@ -628,7 +628,7 @@ export default function BasicDropdownManagement() {
   });
 
   const deleteVehicleColorMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/vehicle-colors/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: number) => apiRequest('DELETE', `/api/vehicle-colors/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-colors'] });
       toast({ title: "تم حذف اللون بنجاح" });
