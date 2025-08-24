@@ -20,6 +20,7 @@ export const manufacturerLogos: Record<string, string> = {
   "فولكس فاغن": "/volkswagen.svg",
   "فورد": "/ford-mustang.svg",
   "لينكولن": "/lincoln.svg",
+  "لينكون": "/lincoln.svg",
   "رام": "/ram.svg",
   "جي إم سي": "/logos/GMC.svg",
   "جي ام سي": "/logos/GMC.svg",
