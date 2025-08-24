@@ -498,6 +498,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { db } = getDatabase();
       const vehicleData = req.body;
 
+      // Validate and clean numeric fields
+      const cleanPrice = vehicleData.price && vehicleData.price !== "" ? vehicleData.price : null;
+      const cleanMileage = vehicleData.mileage && vehicleData.mileage !== "" ? parseInt(vehicleData.mileage) : null;
+
       // Create new inventory item
       const [newItem] = await db.insert(inventoryItems).values({
         manufacturer: vehicleData.manufacturer,
@@ -516,8 +520,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         logo: vehicleData.logo,
         notes: vehicleData.notes,
         detailedSpecifications: vehicleData.detailedSpecifications,
-        price: vehicleData.price,
-        mileage: vehicleData.mileage
+        price: cleanPrice,
+        mileage: cleanMileage
       }).returning();
 
       res.status(201).json(newItem);
@@ -542,7 +546,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sold: allItems.filter(item => item.status === "مباع").length,
         personal: allItems.filter(item => item.importType === "شخصي").length,
         company: allItems.filter(item => item.importType === "شركة").length,
-        usedPersonal: allItems.filter(item => item.importType === "شخصي مستعمل").length
+        usedPersonal: allItems.filter(item => item.importType === "مستعمل" || item.importType === "مستعمل شخصي").length
       };
       
       res.json(stats);
@@ -585,7 +589,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (item.importType === "شخصي") stat.personal++;
         else if (item.importType === "شركة") stat.company++;
-        else if (item.importType === "شخصي مستعمل") stat.usedPersonal++;
+        else if (item.importType === "مستعمل" || item.importType === "مستعمل شخصي") stat.usedPersonal++;
       });
       
       res.json(Array.from(manufacturerStats.values()));
