@@ -1420,8 +1420,8 @@ export default function PriceCardsPage() {
                                       justifyContent: 'space-between', 
                                       alignItems: 'center'
                                     }}>
-                                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: textColor }}>السعر الشامل:</span>
-                                      <span style={{ fontSize: '26px', fontWeight: 'bold', color: textColor }}>
+                                      <span style={{ fontSize: '22px', fontWeight: 'bold', color: textColor }}>السعر الشامل:</span>
+                                      <span style={{ fontSize: '30px', fontWeight: 'bold', color: textColor }}>
                                         {formatPrice(pricing.totalPrice || 0)}
                                       </span>
                                     </div>
@@ -1436,7 +1436,7 @@ export default function PriceCardsPage() {
                                     alignItems: 'center',
                                     color: 'white'
                                   }}>
-                                    <span style={{ fontSize: '20px', fontWeight: '600', color: 'white' }}>السعر:</span>
+                                    <span style={{ fontSize: '24px', fontWeight: '600', color: 'white' }}>السعر:</span>
                                     <div style={{ 
                                       display: 'flex', 
                                       alignItems: 'center', 
@@ -1451,7 +1451,7 @@ export default function PriceCardsPage() {
                                           filter: 'brightness(0) saturate(100%) invert(100%)'
                                         }} 
                                       />
-                                      <span style={{ fontSize: '28px', fontWeight: 'bold', color: 'white' }}>
+                                      <span style={{ fontSize: '32px', fontWeight: 'bold', color: 'white' }}>
                                         {formatPrice(pricing.totalPrice || 0)}
                                       </span>
                                     </div>
