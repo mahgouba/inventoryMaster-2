@@ -1231,10 +1231,7 @@ export default function PriceCardsPage() {
                       overflow: 'hidden',
                       transform: 'scale(0.6)', // Scale down for display
                       transformOrigin: 'center center',
-                      backgroundImage: 'url(/price-card.jpg)',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      backgroundRepeat: 'no-repeat'
+                      background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #ffffff 100%)'
                     }}
                   >
                     {/* QR Code - Top Right */}
