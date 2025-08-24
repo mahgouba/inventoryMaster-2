@@ -162,7 +162,27 @@ function App() {
 }
 
 function PublicRouter({ onLogin, user, onLogout }: { onLogin: (user: User) => void; user: User | null; onLogout: () => void }) {
-  // Require authentication for all routes
+  const [location] = useLocation();
+  
+  // Public routes that don't require authentication
+  const publicRoutes = ['/banks-personal', '/banks-company'];
+  
+  // Check if current route is public
+  if (publicRoutes.includes(location)) {
+    return (
+      <div className="min-h-screen">
+        <SystemGlassWrapper>
+          <Switch>
+            <Route path="/banks-personal" component={PersonalBanks} />
+            <Route path="/banks-company" component={CompanyBanks} />
+            <Route component={NotFound} />
+          </Switch>
+        </SystemGlassWrapper>
+      </div>
+    );
+  }
+  
+  // Require authentication for all other routes
   if (!user) {
     return <LoginPage onLogin={onLogin} />;
   }
