@@ -958,7 +958,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                   <Bell size={16} className="ml-1" />
                   <span className="hidden sm:inline">وصل اليوم</span>
                   {arrivedTodayVehicles.length > 0 && (
-                    <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                    <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold z-[60] shadow-lg border-2 border-white">
                       {arrivedTodayVehicles.length}
                     </div>
                   )}
@@ -1787,7 +1787,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
       {/* Arrived Today Dialog */}
       <Dialog open={arrivedTodayOpen} onOpenChange={setArrivedTodayOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto" dir="rtl">
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto z-50" dir="rtl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-amber-600 flex items-center gap-2">
               <Bell className="w-6 h-6" />
