@@ -1303,12 +1303,15 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
     const isFriday = day && format(day, "EEEE", { locale: ar }) === "الجمعة";
     
+    // استخدام نفس التاريخ للمقارنة لضمان دقة الحسابات
+    const baseDate = day ? format(day, 'yyyy-MM-dd') : '2024-01-01';
+    
     if (schedule.scheduleType === "متصل" || isFriday) {
       if (attendance.continuousCheckinTime && attendance.continuousCheckoutTime) {
         try {
-          const checkin = new Date(`2024-01-01T${attendance.continuousCheckinTime}:00`);
-          const checkout = new Date(`2024-01-01T${attendance.continuousCheckoutTime}:00`);
-          const diff = (checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60);
+          const checkin = new Date(`${baseDate}T${attendance.continuousCheckinTime}:00`);
+          const checkout = new Date(`${baseDate}T${attendance.continuousCheckoutTime}:00`);
+          const diff = Math.max(0, (checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60));
           console.log('Continuous hours calculated:', diff.toFixed(2));
           return diff.toFixed(2);
         } catch (error) {
@@ -1320,9 +1323,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       if (isFriday && schedule.scheduleType === "منفصل") {
         if (attendance.eveningCheckinTime && attendance.eveningCheckoutTime) {
           try {
-            const eveningCheckin = new Date(`2024-01-01T${attendance.eveningCheckinTime}:00`);
-            const eveningCheckout = new Date(`2024-01-01T${attendance.eveningCheckoutTime}:00`);
-            const eveningHours = (eveningCheckout.getTime() - eveningCheckin.getTime()) / (1000 * 60 * 60);
+            const eveningCheckin = new Date(`${baseDate}T${attendance.eveningCheckinTime}:00`);
+            const eveningCheckout = new Date(`${baseDate}T${attendance.eveningCheckoutTime}:00`);
+            const eveningHours = Math.max(0, (eveningCheckout.getTime() - eveningCheckin.getTime()) / (1000 * 60 * 60));
             console.log('Friday evening hours:', eveningHours.toFixed(2));
             return eveningHours.toFixed(2);
           } catch (error) {
@@ -1332,9 +1335,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         // تحقق من سجل الحضور في الفترة الصباحية كبديل
         if (attendance.morningCheckinTime && attendance.morningCheckoutTime) {
           try {
-            const morningCheckin = new Date(`2024-01-01T${attendance.morningCheckinTime}:00`);
-            const morningCheckout = new Date(`2024-01-01T${attendance.morningCheckoutTime}:00`);
-            const morningHours = (morningCheckout.getTime() - morningCheckin.getTime()) / (1000 * 60 * 60);
+            const morningCheckin = new Date(`${baseDate}T${attendance.morningCheckinTime}:00`);
+            const morningCheckout = new Date(`${baseDate}T${attendance.morningCheckoutTime}:00`);
+            const morningHours = Math.max(0, (morningCheckout.getTime() - morningCheckin.getTime()) / (1000 * 60 * 60));
             console.log('Friday morning hours (fallback):', morningHours.toFixed(2));
             return morningHours.toFixed(2);
           } catch (error) {
@@ -1349,9 +1352,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       // Morning shift
       if (attendance.morningCheckinTime && attendance.morningCheckoutTime) {
         try {
-          const morningCheckin = new Date(`2024-01-01T${attendance.morningCheckinTime}:00`);
-          const morningCheckout = new Date(`2024-01-01T${attendance.morningCheckoutTime}:00`);
-          const morningHours = (morningCheckout.getTime() - morningCheckin.getTime()) / (1000 * 60 * 60);
+          const morningCheckin = new Date(`${baseDate}T${attendance.morningCheckinTime}:00`);
+          const morningCheckout = new Date(`${baseDate}T${attendance.morningCheckoutTime}:00`);
+          const morningHours = Math.max(0, (morningCheckout.getTime() - morningCheckin.getTime()) / (1000 * 60 * 60));
           totalHours += morningHours;
           console.log('Morning hours:', morningHours.toFixed(2));
         } catch (error) {
@@ -1362,9 +1365,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
       // Evening shift
       if (attendance.eveningCheckinTime && attendance.eveningCheckoutTime) {
         try {
-          const eveningCheckin = new Date(`2024-01-01T${attendance.eveningCheckinTime}:00`);
-          const eveningCheckout = new Date(`2024-01-01T${attendance.eveningCheckoutTime}:00`);
-          const eveningHours = (eveningCheckout.getTime() - eveningCheckin.getTime()) / (1000 * 60 * 60);
+          const eveningCheckin = new Date(`${baseDate}T${attendance.eveningCheckinTime}:00`);
+          const eveningCheckout = new Date(`${baseDate}T${attendance.eveningCheckoutTime}:00`);
+          const eveningHours = Math.max(0, (eveningCheckout.getTime() - eveningCheckin.getTime()) / (1000 * 60 * 60));
           totalHours += eveningHours;
           console.log('Evening hours:', eveningHours.toFixed(2));
         } catch (error) {
@@ -1432,14 +1435,17 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
     const isFriday = format(day, "EEEE", { locale: ar }) === "الجمعة";
     
+    // استخدام نفس التاريخ للمقارنة لضمان دقة الحسابات
+    const baseDate = format(day, 'yyyy-MM-dd');
+    
     if (schedule.scheduleType === "متصل") {
       const expectedStart = isFriday ? "16:00" : schedule.continuousStartTime;
       const expectedEnd = isFriday ? "21:00" : schedule.continuousEndTime;
       
       if (expectedStart && expectedEnd && attendance.continuousCheckinTime && attendance.continuousCheckoutTime) {
         // حساب التأخير في الحضور
-        const expectedStartTime = new Date(`2024-01-01T${expectedStart}`);
-        const actualStartTime = new Date(`2024-01-01T${attendance.continuousCheckinTime}`);
+        const expectedStartTime = new Date(`${baseDate}T${expectedStart}:00`);
+        const actualStartTime = new Date(`${baseDate}T${attendance.continuousCheckinTime}:00`);
         if (actualStartTime > expectedStartTime) {
           const delayMinutes = (actualStartTime.getTime() - expectedStartTime.getTime()) / (1000 * 60);
           totalDelayHours += delayMinutes / 60;
@@ -1447,8 +1453,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         }
         
         // حساب الإنصراف المبكر
-        const expectedEndTime = new Date(`2024-01-01T${expectedEnd}`);
-        const actualEndTime = new Date(`2024-01-01T${attendance.continuousCheckoutTime}`);
+        const expectedEndTime = new Date(`${baseDate}T${expectedEnd}:00`);
+        const actualEndTime = new Date(`${baseDate}T${attendance.continuousCheckoutTime}:00`);
         if (actualEndTime < expectedEndTime) {
           const earlyLeaveMinutes = (expectedEndTime.getTime() - actualEndTime.getTime()) / (1000 * 60);
           totalDelayHours += earlyLeaveMinutes / 60;
@@ -1463,8 +1469,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         const expectedFridayEnd = "21:00";
         
         if (attendance.eveningCheckinTime) {
-          const expectedStart = new Date(`2024-01-01T${expectedFridayStart}`);
-          const actualStart = new Date(`2024-01-01T${attendance.eveningCheckinTime}`);
+          const expectedStart = new Date(`${baseDate}T${expectedFridayStart}:00`);
+          const actualStart = new Date(`${baseDate}T${attendance.eveningCheckinTime}:00`);
           if (actualStart > expectedStart) {
             const delayMinutes = (actualStart.getTime() - expectedStart.getTime()) / (1000 * 60);
             totalDelayHours += delayMinutes / 60;
@@ -1473,8 +1479,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         }
         
         if (attendance.eveningCheckoutTime) {
-          const expectedEnd = new Date(`2024-01-01T${expectedFridayEnd}`);
-          const actualEnd = new Date(`2024-01-01T${attendance.eveningCheckoutTime}`);
+          const expectedEnd = new Date(`${baseDate}T${expectedFridayEnd}:00`);
+          const actualEnd = new Date(`${baseDate}T${attendance.eveningCheckoutTime}:00`);
           if (actualEnd < expectedEnd) {
             const earlyLeaveMinutes = (expectedEnd.getTime() - actualEnd.getTime()) / (1000 * 60);
             totalDelayHours += earlyLeaveMinutes / 60;
@@ -1485,8 +1491,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         // الأيام العادية - الدوام المنفصل
         // الفترة الصباحية - تأخير في الحضور
         if (schedule.morningStartTime && attendance.morningCheckinTime) {
-          const expectedMorningStart = new Date(`2024-01-01T${schedule.morningStartTime}`);
-          const actualMorningStart = new Date(`2024-01-01T${attendance.morningCheckinTime}`);
+          const expectedMorningStart = new Date(`${baseDate}T${schedule.morningStartTime}:00`);
+          const actualMorningStart = new Date(`${baseDate}T${attendance.morningCheckinTime}:00`);
           if (actualMorningStart > expectedMorningStart) {
             const delayMinutes = (actualMorningStart.getTime() - expectedMorningStart.getTime()) / (1000 * 60);
             totalDelayHours += delayMinutes / 60;
@@ -1496,8 +1502,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         
         // الفترة الصباحية - انصراف مبكر
         if (schedule.morningEndTime && attendance.morningCheckoutTime) {
-          const expectedMorningEnd = new Date(`2024-01-01T${schedule.morningEndTime}`);
-          const actualMorningEnd = new Date(`2024-01-01T${attendance.morningCheckoutTime}`);
+          const expectedMorningEnd = new Date(`${baseDate}T${schedule.morningEndTime}:00`);
+          const actualMorningEnd = new Date(`${baseDate}T${attendance.morningCheckoutTime}:00`);
           if (actualMorningEnd < expectedMorningEnd) {
             const earlyLeaveMinutes = (expectedMorningEnd.getTime() - actualMorningEnd.getTime()) / (1000 * 60);
             totalDelayHours += earlyLeaveMinutes / 60;
@@ -1507,8 +1513,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         
         // الفترة المسائية - تأخير في الحضور
         if (schedule.eveningStartTime && attendance.eveningCheckinTime) {
-          const expectedEveningStart = new Date(`2024-01-01T${schedule.eveningStartTime}`);
-          const actualEveningStart = new Date(`2024-01-01T${attendance.eveningCheckinTime}`);
+          const expectedEveningStart = new Date(`${baseDate}T${schedule.eveningStartTime}:00`);
+          const actualEveningStart = new Date(`${baseDate}T${attendance.eveningCheckinTime}:00`);
           if (actualEveningStart > expectedEveningStart) {
             const delayMinutes = (actualEveningStart.getTime() - expectedEveningStart.getTime()) / (1000 * 60);
             totalDelayHours += delayMinutes / 60;
@@ -1518,8 +1524,8 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         
         // الفترة المسائية - انصراف مبكر
         if (schedule.eveningEndTime && attendance.eveningCheckoutTime) {
-          const expectedEveningEnd = new Date(`2024-01-01T${schedule.eveningEndTime}`);
-          const actualEveningEnd = new Date(`2024-01-01T${attendance.eveningCheckoutTime}`);
+          const expectedEveningEnd = new Date(`${baseDate}T${schedule.eveningEndTime}:00`);
+          const actualEveningEnd = new Date(`${baseDate}T${attendance.eveningCheckoutTime}:00`);
           if (actualEveningEnd < expectedEveningEnd) {
             const earlyLeaveMinutes = (expectedEveningEnd.getTime() - actualEveningEnd.getTime()) / (1000 * 60);
             totalDelayHours += earlyLeaveMinutes / 60;
