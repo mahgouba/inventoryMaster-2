@@ -3341,6 +3341,250 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Initialize default dropdown data
+  app.post("/api/initialize-dropdown-data", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      
+      // Add default vehicle statuses including the new ones
+      const defaultStatuses = [
+        { name: 'متاح', description: 'مركبة متاحة للبيع', isActive: true },
+        { name: 'محجوز', description: 'مركبة محجوزة للعميل', isActive: true },
+        { name: 'مباع', description: 'مركبة تم بيعها', isActive: true },
+        { name: 'في الطريق', description: 'مركبة في طريقها للمعرض', isActive: true },
+        { name: 'تحت الصيانة', description: 'مركبة تحت الصيانة', isActive: true },
+        { name: 'تشغيل', description: 'مركبة قيد التشغيل', isActive: true },
+        { name: 'خاص', description: 'مركبة للاستخدام الخاص', isActive: true }
+      ];
+
+      // Add default import types
+      const defaultImportTypes = [
+        { name: 'وارد الخليج', description: 'مركبة واردة من دول الخليج', isActive: true },
+        { name: 'وارد أمريكا', description: 'مركبة واردة من أمريكا', isActive: true },
+        { name: 'وارد أوروبا', description: 'مركبة واردة من أوروبا', isActive: true },
+        { name: 'وارد آسيا', description: 'مركبة واردة من آسيا', isActive: true },
+        { name: 'محلي', description: 'مركبة محلية الصنع', isActive: true }
+      ];
+
+      // Add default ownership types
+      const defaultOwnershipTypes = [
+        { name: 'ملكية أولى', description: 'المالك الأول للمركبة', isActive: true },
+        { name: 'ملكية ثانية', description: 'المالك الثاني للمركبة', isActive: true },
+        { name: 'ملكية متعددة', description: 'أكثر من مالكين سابقين', isActive: true },
+        { name: 'شركة', description: 'ملكية شركة', isActive: true },
+        { name: 'حكومي', description: 'ملكية حكومية', isActive: true }
+      ];
+
+      // Add default vehicle locations
+      const defaultLocations = [
+        { name: 'المعرض الرئيسي', description: 'المعرض الرئيسي للمركبات', isActive: true },
+        { name: 'المعرض الفرعي', description: 'المعرض الفرعي للمركبات', isActive: true },
+        { name: 'المستودع', description: 'مستودع المركبات', isActive: true },
+        { name: 'ورشة الصيانة', description: 'ورشة صيانة المركبات', isActive: true },
+        { name: 'في الطريق', description: 'مركبة في الطريق', isActive: true }
+      ];
+
+      // Add default vehicle years (last 10 years + next 2)
+      const currentYear = new Date().getFullYear();
+      const defaultYears = [];
+      for (let year = currentYear + 2; year >= currentYear - 10; year--) {
+        defaultYears.push({ year, isActive: true });
+      }
+
+      // Add default engine capacities
+      const defaultEngineCapacities = [
+        { capacity: '1.0L', description: 'محرك 1.0 لتر', isActive: true },
+        { capacity: '1.2L', description: 'محرك 1.2 لتر', isActive: true },
+        { capacity: '1.4L', description: 'محرك 1.4 لتر', isActive: true },
+        { capacity: '1.6L', description: 'محرك 1.6 لتر', isActive: true },
+        { capacity: '1.8L', description: 'محرك 1.8 لتر', isActive: true },
+        { capacity: '2.0L', description: 'محرك 2.0 لتر', isActive: true },
+        { capacity: '2.4L', description: 'محرك 2.4 لتر', isActive: true },
+        { capacity: '2.5L', description: 'محرك 2.5 لتر', isActive: true },
+        { capacity: '3.0L', description: 'محرك 3.0 لتر', isActive: true },
+        { capacity: '3.5L', description: 'محرك 3.5 لتر', isActive: true },
+        { capacity: '4.0L', description: 'محرك 4.0 لتر', isActive: true },
+        { capacity: '5.0L', description: 'محرك 5.0 لتر', isActive: true },
+        { capacity: '6.0L', description: 'محرك 6.0 لتر', isActive: true }
+      ];
+
+      // Add default vehicle colors
+      const defaultColors = [
+        { name: 'أبيض', colorType: 'exterior', colorCode: '#FFFFFF', isActive: true },
+        { name: 'أسود', colorType: 'exterior', colorCode: '#000000', isActive: true },
+        { name: 'فضي', colorType: 'exterior', colorCode: '#C0C0C0', isActive: true },
+        { name: 'رمادي', colorType: 'exterior', colorCode: '#808080', isActive: true },
+        { name: 'أحمر', colorType: 'exterior', colorCode: '#FF0000', isActive: true },
+        { name: 'أزرق', colorType: 'exterior', colorCode: '#0000FF', isActive: true },
+        { name: 'أخضر', colorType: 'exterior', colorCode: '#008000', isActive: true },
+        { name: 'بني', colorType: 'exterior', colorCode: '#A52A2A', isActive: true },
+        { name: 'ذهبي', colorType: 'exterior', colorCode: '#FFD700', isActive: true },
+        { name: 'أسود', colorType: 'interior', colorCode: '#000000', isActive: true },
+        { name: 'بيج', colorType: 'interior', colorCode: '#F5F5DC', isActive: true },
+        { name: 'رمادي', colorType: 'interior', colorCode: '#808080', isActive: true },
+        { name: 'بني', colorType: 'interior', colorCode: '#A52A2A', isActive: true }
+      ];
+
+      const results = {
+        vehicleStatuses: 0,
+        importTypes: 0,
+        ownershipTypes: 0,
+        vehicleLocations: 0,
+        vehicleYears: 0,
+        engineCapacities: 0,
+        vehicleColors: 0
+      };
+
+      try {
+        // Create tables first if they don't exist
+        await db.execute(sql`
+          CREATE TABLE IF NOT EXISTS vehicle_statuses (
+            id SERIAL PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            description TEXT,
+            is_active BOOLEAN DEFAULT true NOT NULL,
+            created_at TIMESTAMP DEFAULT now()
+          );
+        `);
+
+        await db.execute(sql`
+          CREATE TABLE IF NOT EXISTS import_types (
+            id SERIAL PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            description TEXT,
+            is_active BOOLEAN DEFAULT true NOT NULL,
+            created_at TIMESTAMP DEFAULT now()
+          );
+        `);
+
+        await db.execute(sql`
+          CREATE TABLE IF NOT EXISTS ownership_types (
+            id SERIAL PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            description TEXT,
+            is_active BOOLEAN DEFAULT true NOT NULL,
+            created_at TIMESTAMP DEFAULT now()
+          );
+        `);
+
+        await db.execute(sql`
+          CREATE TABLE IF NOT EXISTS vehicle_locations (
+            id SERIAL PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            description TEXT,
+            is_active BOOLEAN DEFAULT true NOT NULL,
+            created_at TIMESTAMP DEFAULT now()
+          );
+        `);
+
+        await db.execute(sql`
+          CREATE TABLE IF NOT EXISTS vehicle_years (
+            id SERIAL PRIMARY KEY,
+            year INTEGER UNIQUE NOT NULL,
+            is_active BOOLEAN DEFAULT true NOT NULL,
+            created_at TIMESTAMP DEFAULT now()
+          );
+        `);
+
+        await db.execute(sql`
+          CREATE TABLE IF NOT EXISTS engine_capacities (
+            id SERIAL PRIMARY KEY,
+            capacity TEXT UNIQUE NOT NULL,
+            description TEXT,
+            is_active BOOLEAN DEFAULT true NOT NULL,
+            created_at TIMESTAMP DEFAULT now()
+          );
+        `);
+
+        await db.execute(sql`
+          CREATE TABLE IF NOT EXISTS vehicle_colors (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL,
+            color_type TEXT NOT NULL,
+            color_code TEXT,
+            is_active BOOLEAN DEFAULT true NOT NULL,
+            created_at TIMESTAMP DEFAULT now()
+          );
+        `);
+
+        // Insert data with conflict handling
+        for (const status of defaultStatuses) {
+          try {
+            await db.insert(vehicleStatuses).values(status).onConflictDoNothing();
+            results.vehicleStatuses++;
+          } catch (e) {
+            console.log('Vehicle status exists:', status.name);
+          }
+        }
+
+        for (const importType of defaultImportTypes) {
+          try {
+            await db.insert(importTypes).values(importType).onConflictDoNothing();
+            results.importTypes++;
+          } catch (e) {
+            console.log('Import type exists:', importType.name);
+          }
+        }
+
+        for (const ownershipType of defaultOwnershipTypes) {
+          try {
+            await db.insert(ownershipTypes).values(ownershipType).onConflictDoNothing();
+            results.ownershipTypes++;
+          } catch (e) {
+            console.log('Ownership type exists:', ownershipType.name);
+          }
+        }
+
+        for (const location of defaultLocations) {
+          try {
+            await db.insert(vehicleLocations).values(location).onConflictDoNothing();
+            results.vehicleLocations++;
+          } catch (e) {
+            console.log('Location exists:', location.name);
+          }
+        }
+
+        for (const year of defaultYears) {
+          try {
+            await db.insert(vehicleYears).values(year).onConflictDoNothing();
+            results.vehicleYears++;
+          } catch (e) {
+            console.log('Year exists:', year.year);
+          }
+        }
+
+        for (const capacity of defaultEngineCapacities) {
+          try {
+            await db.insert(engineCapacities).values(capacity).onConflictDoNothing();
+            results.engineCapacities++;
+          } catch (e) {
+            console.log('Engine capacity exists:', capacity.capacity);
+          }
+        }
+
+        for (const color of defaultColors) {
+          try {
+            await db.insert(vehicleColors).values(color).onConflictDoNothing();
+            results.vehicleColors++;
+          } catch (e) {
+            console.log('Color exists:', color.name);
+          }
+        }
+
+      } catch (error) {
+        console.error('Error initializing data:', error);
+      }
+
+      res.json({
+        message: "تم تهيئة البيانات الأساسية بنجاح",
+        results
+      });
+    } catch (error) {
+      console.error("Error initializing dropdown data:", error);
+      res.status(500).json({ message: "فشل في تهيئة البيانات الأساسية" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

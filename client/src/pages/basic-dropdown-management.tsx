@@ -436,7 +436,15 @@ export default function BasicDropdownManagement() {
 
   // Mutations for import types
   const addImportTypeMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/import-types', { method: 'POST', body: data }),
+    mutationFn: async (data: any) => {
+      const response = await fetch('/api/import-types', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Failed to create import type');
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/import-types'] });
       toast({ title: "تم إضافة نوع الاستيراد بنجاح" });
@@ -444,8 +452,15 @@ export default function BasicDropdownManagement() {
   });
 
   const updateImportTypeMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: any }) => 
-      apiRequest(`/api/import-types/${id}`, { method: 'PUT', body: data }),
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      const response = await fetch(`/api/import-types/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Failed to update import type');
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/import-types'] });
       toast({ title: "تم تحديث نوع الاستيراد بنجاح" });
@@ -453,7 +468,11 @@ export default function BasicDropdownManagement() {
   });
 
   const deleteImportTypeMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/import-types/${id}`, { method: 'DELETE' }),
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/import-types/${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Failed to delete import type');
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/import-types'] });
       toast({ title: "تم حذف نوع الاستيراد بنجاح" });
@@ -616,6 +635,26 @@ export default function BasicDropdownManagement() {
     },
   });
 
+  // Initialize dropdown data mutation
+  const initializeDataMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/initialize-dropdown-data', { method: 'POST' });
+      if (!response.ok) throw new Error('Failed to initialize data');
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate all queries to refresh data
+      queryClient.invalidateQueries();
+      toast({ title: "تم تهيئة البيانات الأساسية بنجاح" });
+    },
+    onError: () => {
+      toast({ 
+        title: "فشل في تهيئة البيانات الأساسية", 
+        description: "تأكد من الاتصال بقاعدة البيانات"
+      });
+    },
+  });
+
   const dropdownConfigs = [
     {
       key: 'import-types',
@@ -742,7 +781,21 @@ export default function BasicDropdownManagement() {
               إدارة الخيارات الأساسية للنظام (أنواع الاستيراد، الحالات، أنواع الملكية، إلخ)
             </p>
           </div>
-          <Settings className="h-8 w-8 text-gray-400" />
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={() => initializeDataMutation.mutate()}
+              disabled={initializeDataMutation.isPending}
+              className="gap-2"
+            >
+              {initializeDataMutation.isPending ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Settings className="h-4 w-4" />
+              )}
+              تهيئة البيانات الأساسية
+            </Button>
+            <Settings className="h-8 w-8 text-gray-400" />
+          </div>
         </div>
 
         <Tabs defaultValue="import-types" className="w-full">
