@@ -41,7 +41,7 @@ exposeLocalhost = true
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["npm", "run", "start"]
+run = ["sh", "-c", "npm run start"]
 build = ["npm", "run", "build"]
 
 [agent]
