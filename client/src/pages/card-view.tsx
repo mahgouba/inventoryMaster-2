@@ -127,6 +127,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [arrivedTodayOpen, setArrivedTodayOpen] = useState(false);
+  const [arrivedTodayNotificationSeen, setArrivedTodayNotificationSeen] = useState(false);
   const [attendanceDialogOpen, setAttendanceDialogOpen] = useState(false);
   
   // QR Scanner states
@@ -953,12 +954,15 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                       ? "neuro-button" 
                       : "glass-button glass-text-primary"
                   }
-                  onClick={() => setArrivedTodayOpen(true)}
+                  onClick={() => {
+                    setArrivedTodayOpen(true);
+                    setArrivedTodayNotificationSeen(true);
+                  }}
                 >
                   <Bell size={16} className="ml-1" />
                   <span className="hidden sm:inline">وصل اليوم</span>
-                  {arrivedTodayVehicles.length > 0 && (
-                    <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold z-[60] shadow-lg border-2 border-white">
+                  {arrivedTodayVehicles.length > 0 && !arrivedTodayNotificationSeen && (
+                    <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                       {arrivedTodayVehicles.length}
                     </div>
                   )}
