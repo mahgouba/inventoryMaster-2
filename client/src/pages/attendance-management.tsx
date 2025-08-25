@@ -1762,7 +1762,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               )}
             </div>
             <div style="color: #ef4444;">
-              <strong>إجمالي ساعات الغياب والتأخير (مضروباً في 3):</strong> ${(() => {
+              <strong>إجمالي التأخير بالساعات:</strong> ${(() => {
                 const delayHours = monthAttendance
                   .filter(a => a.notes !== 'إجازة')
                   .reduce((total, a) => {
@@ -1777,7 +1777,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               })()}
             </div>
             <div style="color: #ef4444;">
-              <strong>إجمالي الأيام المحولة من الساعات (مضروباً في 3):</strong> ${(() => {
+              <strong>إجمالي الخصم بالأيام:</strong> ${(() => {
                 const delayHours = monthAttendance
                   .filter(a => a.notes !== 'إجازة')
                   .reduce((total, a) => {
