@@ -1387,10 +1387,11 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
   const calculateExpectedHours = (schedule: EmployeeWorkSchedule, day?: Date): number => {
     // قائمة الموظفين الذين يتم حساب الدوام لهم على أساس ساعات العمل الإجمالية
     const hoursBasedEmployees = [
-      'احمد كمال', 'أحمد كمال', 'Ahmad Kamal',
-      'فاروق', 'Farouk',
-      'صادق', 'Sadiq',
-      'ايمن', 'أيمن', 'Ayman'
+      'احمد كمال', 'أحمد كمال',
+      'فاروق الغنامي',
+      'صادق الغنامي', 
+      'ايمن المليكي', 'أيمن المليكي',
+      'ساوي'
     ];
     
     const isHourBasedEmployee = hoursBasedEmployees.some(name => 
@@ -1435,10 +1436,11 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     
     // قائمة الموظفين الذين يتم حساب الدوام لهم على أساس ساعات العمل الإجمالية
     const hoursBasedEmployees = [
-      'احمد كمال', 'أحمد كمال', 'Ahmad Kamal',
-      'فاروق', 'Farouk',
-      'صادق', 'Sadiq',
-      'ايمن', 'أيمن', 'Ayman'
+      'احمد كمال', 'أحمد كمال',
+      'فاروق الغنامي',
+      'صادق الغنامي', 
+      'ايمن المليكي', 'أيمن المليكي',
+      'ساوي'
     ];
     
     // التحقق إذا كان الموظف من الموظفين الذين يحسب دوامهم بالساعات
