@@ -1776,6 +1776,23 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                 return formatHoursToHoursMinutes(totalHours * 3);
               })()}
             </div>
+            <div style="color: #ef4444;">
+              <strong>إجمالي الأيام المحولة من الساعات (مضروباً في 3):</strong> ${(() => {
+                const delayHours = monthAttendance
+                  .filter(a => a.notes !== 'إجازة')
+                  .reduce((total, a) => {
+                    const dayDate = new Date(a.date);
+                    return total + calculateDelayHours(schedule, a, dayDate);
+                  }, 0);
+                const absenceDays = monthDays.length - monthAttendance.length;
+                const workHoursPerDay = schedule.scheduleType === 'متصل' ? 10 : 8.5;
+                const absenceHours = absenceDays * workHoursPerDay;
+                const totalHours = delayHours + absenceHours;
+                const totalTripleHours = totalHours * 3;
+                const convertedDays = totalTripleHours / workHoursPerDay;
+                return convertedDays.toFixed(2) + ' يوم';
+              })()}
+            </div>
           </div>
           
           <div style="margin-top: 20px; padding: 15px; background-color: #fff8dc; border: 2px solid #C49632; border-radius: 8px;">
