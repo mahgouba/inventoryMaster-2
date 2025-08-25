@@ -290,6 +290,73 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     schedule.employeeName.toLowerCase().includes(employeeFilter.toLowerCase())
   );
 
+  // Export attendance data to Excel with notes included
+  const exportAttendanceToExcel = () => {
+    if (dailyAttendance.length === 0) {
+      toast({
+        title: "لا توجد بيانات للتصدير",
+        description: "لا توجد بيانات حضور متاحة للتصدير",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const exportData = dailyAttendance.map((attendance: DailyAttendance) => ({
+      'اسم الموظف': attendance.employeeName,
+      'التاريخ': new Date(attendance.date).toLocaleDateString('ar-SA'),
+      'نوع الدوام': attendance.scheduleType,
+      'حضور صباحي': attendance.morningCheckinTime || '-',
+      'انصراف صباحي': attendance.morningCheckoutTime || '-',
+      'حضور مسائي': attendance.eveningCheckinTime || '-',
+      'انصراف مسائي': attendance.eveningCheckoutTime || '-',
+      'حضور متصل': attendance.continuousCheckinTime || '-',
+      'انصراف متصل': attendance.continuousCheckoutTime || '-',
+      'ساعات العمل': attendance.totalHoursWorked || '-',
+      'الملاحظات': attendance.notes || 'لا يوجد',
+      'تم الإنشاء بواسطة': attendance.createdByName || '-',
+      'تاريخ الإنشاء': new Date(attendance.createdAt).toLocaleDateString('ar-SA')
+    }));
+
+    import('xlsx').then((XLSX) => {
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'بيانات الحضور');
+      
+      // Set column widths for better formatting
+      const colWidths = [
+        { wch: 20 }, // اسم الموظف
+        { wch: 12 }, // التاريخ
+        { wch: 10 }, // نوع الدوام
+        { wch: 12 }, // حضور صباحي
+        { wch: 12 }, // انصراف صباحي
+        { wch: 12 }, // حضور مسائي
+        { wch: 12 }, // انصراف مسائي
+        { wch: 12 }, // حضور متصل
+        { wch: 12 }, // انصراف متصل
+        { wch: 12 }, // ساعات العمل
+        { wch: 25 }, // الملاحظات
+        { wch: 15 }, // تم الإنشاء بواسطة
+        { wch: 15 }  // تاريخ الإنشاء
+      ];
+      ws['!cols'] = colWidths;
+
+      const fileName = `تقرير_الحضور_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      toast({
+        title: "تم تصدير البيانات",
+        description: "تم تصدير بيانات الحضور بنجاح مع الملاحظات",
+      });
+    }).catch((error) => {
+      console.error('Error importing XLSX:', error);
+      toast({
+        title: "خطأ في التصدير",
+        description: "حدث خطأ أثناء تصدير البيانات",
+        variant: "destructive",
+      });
+    });
+  };
+
   // Approve/Reject leave request mutation
   const updateRequestStatusMutation = useMutation({
     mutationFn: async ({ id, status, rejectionReason }: { id: number; status: string; rejectionReason?: string }) => {
@@ -2350,6 +2417,17 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-white">الحضور اليومي</h2>
                 <div className="flex items-center gap-4">
+                  <Button
+                    onClick={exportAttendanceToExcel}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    disabled={dailyAttendance.length === 0}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    تصدير إلى إكسل
+                  </Button>
+                  <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
+                    {dailyAttendance.length} سجل حضور
+                  </Badge>
                   <Button
                     onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
                     variant="outline"
