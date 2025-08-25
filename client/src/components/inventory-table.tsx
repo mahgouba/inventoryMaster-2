@@ -247,7 +247,7 @@ export default function InventoryTable({
       const matchesSoldFilter = showSoldCars ? true : item.status !== "مباع";
       
       // إخفاء السيارات ذات الحالة "خاص" أو "تشغيل" عن الأدوار المحدودة
-      const restrictedRoles = ['salesperson', 'user', 'bank_accountant'];
+      const restrictedRoles = ['salesperson', 'user', 'bank_accountant', 'seller'];
       const isRestrictedVehicle = item.status === "خاص" || item.status === "تشغيل";
       const matchesRoleFilter = restrictedRoles.includes(userRole) ? !isRestrictedVehicle : true;
       
@@ -393,7 +393,9 @@ export default function InventoryTable({
                   </TableCell>
                   <TableCell className="text-sm text-white">{item.location}</TableCell>
                   <TableCell className="text-sm text-white">{item.importType}</TableCell>
-                  <TableCell className="text-sm text-white/80 font-latin">{item.chassisNumber}</TableCell>
+                  <TableCell className="text-sm text-white/80 font-latin">
+                    {item.status === "مراجعة المشرف" ? "***" : item.chassisNumber}
+                  </TableCell>
                   <TableCell className="text-sm text-white">{item.ownershipType}</TableCell>
                   <TableCell className="text-sm text-white/80 font-latin">
                     {new Date(item.entryDate).toLocaleDateString('en-GB', {

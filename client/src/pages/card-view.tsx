@@ -192,7 +192,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   let availableItems = showSoldCars ? inventoryData : inventoryData.filter(item => item.status !== "مباع");
 
   // For regular users, hide cars with status "خاص" (private) or "تشغيل" (operating)
-  if (userRole === "user" || userRole === "seller" || userRole === "salesperson" || userRole === "bank_accountant") {
+  const restrictedRoles = ['salesperson', 'user', 'bank_accountant', 'seller'];
+  if (restrictedRoles.includes(userRole)) {
     availableItems = availableItems.filter(item => 
       item.status !== "خاص" && item.status !== "تشغيل"
     );
@@ -1543,7 +1544,9 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             {item.chassisNumber && item.chassisNumber.trim() !== '' && (
                               <div className="flex items-center gap-2">
                                 <span className="font-bold text-xs text-white drop-shadow-sm">VIN:</span>
-                                <span className="font-medium font-latin text-white dark:text-slate-100 text-xs drop-shadow-sm">{item.chassisNumber}</span>
+                                <span className="font-medium font-latin text-white dark:text-slate-100 text-xs drop-shadow-sm">
+                                  {item.status === "مراجعة المشرف" ? "***" : item.chassisNumber}
+                                </span>
                               </div>
                             )}
                             <div></div> {/* Empty cell for alignment */}
@@ -1917,7 +1920,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             <div className="text-white/80">
                               <span className="font-medium">رقم الهيكل:</span>
                               <div className="text-white mt-1 font-mono text-xs break-all">
-                                {vehicle.chassisNumber}
+                                {vehicle.status === "مراجعة المشرف" ? "***" : vehicle.chassisNumber}
                               </div>
                             </div>
                             {vehicle.notes && (

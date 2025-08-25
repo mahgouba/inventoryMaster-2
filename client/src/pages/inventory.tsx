@@ -1207,7 +1207,12 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                   
                   const matchesSoldFilter = showSoldCars ? true : item.status !== "مباع";
                   
-                  return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesYear && matchesEngineCapacity && matchesInteriorColor && matchesExteriorColor && matchesStatus && matchesImportType && matchesOwnershipType && matchesDateRange && matchesSoldFilter;
+                  // إخفاء السيارات ذات الحالة "خاص" أو "تشغيل" عن الأدوار المحدودة
+                  const restrictedRoles = ['salesperson', 'user', 'bank_accountant', 'seller'];
+                  const isRestrictedVehicle = item.status === "خاص" || item.status === "تشغيل";
+                  const matchesRoleFilter = restrictedRoles.includes(userRole) ? !isRestrictedVehicle : true;
+                  
+                  return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesYear && matchesEngineCapacity && matchesInteriorColor && matchesExteriorColor && matchesStatus && matchesImportType && matchesOwnershipType && matchesDateRange && matchesSoldFilter && matchesRoleFilter;
                 });
 
                 const stats = {
