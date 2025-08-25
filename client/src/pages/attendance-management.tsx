@@ -1751,6 +1751,16 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   .reduce((total, a) => total + parseFloat(calculateHoursWorked(schedule, a)), 0)
               )}
             </div>
+            <div style="color: #C49632;">
+              <strong>إجمالي ساعات التأخير:</strong> ${formatHoursToHoursMinutes(
+                monthAttendance
+                  .filter(a => a.notes !== 'إجازة')
+                  .reduce((total, a) => {
+                    const dayDate = new Date(a.date);
+                    return total + calculateDelayHours(schedule, a, dayDate);
+                  }, 0)
+              )}
+            </div>
             <div style="color: #ef4444;">
               <strong>إجمالي ساعات الغياب والتأخير (مضروباً في 3):</strong> ${(() => {
                 const delayHours = monthAttendance
