@@ -192,7 +192,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   let availableItems = showSoldCars ? inventoryData : inventoryData.filter(item => item.status !== "مباع");
 
   // For regular users, hide cars with status "خاص" (private) or "تشغيل" (operating)
-  if (userRole === "user" || userRole === "seller" || userRole === "salesperson") {
+  if (userRole === "user" || userRole === "seller" || userRole === "salesperson" || userRole === "bank_accountant") {
     availableItems = availableItems.filter(item => 
       item.status !== "خاص" && item.status !== "تشغيل"
     );

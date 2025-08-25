@@ -246,7 +246,12 @@ export default function InventoryTable({
       // إذا كان مطفياً، اعرض فقط السيارات غير المباعة
       const matchesSoldFilter = showSoldCars ? true : item.status !== "مباع";
       
-      return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesYear && matchesEngineCapacity && matchesInteriorColor && matchesExteriorColor && matchesStatus && matchesImportType && matchesOwnershipType && matchesDateRange && matchesSoldFilter;
+      // إخفاء السيارات ذات الحالة "خاص" أو "تشغيل" عن الأدوار المحدودة
+      const restrictedRoles = ['salesperson', 'user', 'bank_accountant'];
+      const isRestrictedVehicle = item.status === "خاص" || item.status === "تشغيل";
+      const matchesRoleFilter = restrictedRoles.includes(userRole) ? !isRestrictedVehicle : true;
+      
+      return matchesSearch && matchesManufacturer && matchesCategory && matchesTrimLevel && matchesYear && matchesEngineCapacity && matchesInteriorColor && matchesExteriorColor && matchesStatus && matchesImportType && matchesOwnershipType && matchesDateRange && matchesSoldFilter && matchesRoleFilter;
     })
     .sort((a: InventoryItem, b: InventoryItem) => {
       if (!sortColumn) return 0;
