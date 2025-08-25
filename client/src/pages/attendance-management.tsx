@@ -1450,11 +1450,12 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     // للموظفين الذين يحسب دوامهم بالساعات
     if (isHourBasedEmployee) {
       const actualWorkHours = parseFloat(calculateHoursWorked(schedule, attendance, day));
-      const requiredHours = 8.5; // 8 ساعات و 30 دقيقة
+      const requiredHours = 8.5; // 8 ساعات و 30 دقيقة (حتى يوم الجمعة)
       
       console.log('Hour-based calculation:', {
         actualWorkHours,
         requiredHours,
+        isFriday: format(day, "EEEE", { locale: ar }) === "الجمعة",
         shortfall: Math.max(0, requiredHours - actualWorkHours)
       });
       
