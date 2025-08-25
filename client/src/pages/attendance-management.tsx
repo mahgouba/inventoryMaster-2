@@ -1885,7 +1885,33 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   .filter(a => a.notes !== 'إجازة')
                   .reduce((total, a) => {
                     const dayDate = new Date(a.date);
-                    return total + calculateDelayHours(schedule, a, dayDate);
+                    const delayHours = calculateDelayHours(schedule, a, dayDate);
+                    
+                    // حساب الساعات الإضافية لخصمها من التأخير
+                    const actualWorkHours = parseFloat(calculateHoursWorked(schedule, a, dayDate));
+                    const isFriday = format(dayDate, "EEEE", { locale: ar }) === "الجمعة";
+                    const requiredHours = isFriday ? 5 : 8.5;
+                    const overtimeHours = Math.max(0, actualWorkHours - requiredHours);
+                    
+                    // خصم الساعات الإضافية من ساعات التأخير
+                    const netDelayHours = Math.max(0, delayHours - overtimeHours);
+                    
+                    return total + netDelayHours;
+                  }, 0)
+              )}
+            </div>
+            <div style="color: #4CAF50;">
+              <strong>إجمالي ساعات العمل الإضافية:</strong> ${formatHoursToHoursMinutes(
+                monthAttendance
+                  .filter(a => a.notes !== 'إجازة')
+                  .reduce((total, a) => {
+                    const dayDate = new Date(a.date);
+                    const actualWorkHours = parseFloat(calculateHoursWorked(schedule, a, dayDate));
+                    const isFriday = format(dayDate, "EEEE", { locale: ar }) === "الجمعة";
+                    const requiredHours = isFriday ? 5 : 8.5;
+                    const overtimeHours = Math.max(0, actualWorkHours - requiredHours);
+                    
+                    return total + overtimeHours;
                   }, 0)
               )}
             </div>
