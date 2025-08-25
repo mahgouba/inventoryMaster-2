@@ -240,11 +240,12 @@ export default function BankManagement() {
   const activeCompanyBanks = allCompanyBanks.filter(bank => bank.isActive);
 
   return (
-    <div className="container mx-auto p-6 space-y-6" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-[#00627F] via-[#004861] to-[#00627F]" dir="rtl">
+      <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">إدارة البنوك</h1>
-          <p className="text-gray-600">إدارة بيانات البنوك الشخصية والشركات</p>
+          <h1 className="text-2xl font-bold text-white">إدارة البنوك</h1>
+          <p className="text-gray-200">إدارة بيانات البنوك الشخصية والشركات</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -556,6 +557,7 @@ export default function BankManagement() {
           </Card>
         </div>
       )}
+      </div>
     </div>
   );
 }

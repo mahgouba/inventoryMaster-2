@@ -162,7 +162,7 @@ export default function CompanyBanks() {
   }
 
   return (
-    <div className="min-h-screen relative bg-gradient-to-br from-slate-900 via-green-900 to-slate-800" dir="rtl">
+    <div className="min-h-screen relative bg-gradient-to-br from-[#00627F] via-[#004861] to-[#00627F]" dir="rtl">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-10 right-10 w-72 h-72 bg-green-400/10 rounded-full blur-3xl animate-pulse"></div>

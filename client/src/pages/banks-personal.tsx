@@ -140,7 +140,7 @@ export default function PersonalBanks() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#00627F] via-[#004861] to-[#00627F]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-white">جاري تحميل البنوك...</p>
@@ -150,7 +150,7 @@ export default function PersonalBanks() {
   }
 
   return (
-    <div className="min-h-screen relative bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800" dir="rtl">
+    <div className="min-h-screen relative bg-gradient-to-br from-[#00627F] via-[#004861] to-[#00627F]" dir="rtl">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-10 right-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
