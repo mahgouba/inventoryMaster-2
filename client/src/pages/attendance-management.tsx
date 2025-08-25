@@ -1638,6 +1638,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">ساعات العمل</th>
               <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">ساعات التأخير</th>
               <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">الحالة</th>
+              <th style="border: 1px solid #00627F; padding: 8px; text-align: center;">الملاحظات</th>
             </tr>
           </thead>
           <tbody>
@@ -1775,6 +1776,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                              '#ef4444'};">
                     ${status}
                   </td>
+                  <td style="border: 1px solid #00627F; padding: 6px; text-align: center; font-size: 12px; color: #333;">${dayAttendance?.notes && dayAttendance.notes !== 'إجازة' ? dayAttendance.notes : '-'}</td>
                 </tr>
               `;
             }).join('')}
