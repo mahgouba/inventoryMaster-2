@@ -1501,6 +1501,13 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     // تحقق من وجود بيانات الحضور
     if (!attendance) return 0;
     
+    // التحقق من يوم الجمعة مع دوام إضافة - لا يتم احتساب تأخير
+    const fridayCheck = format(day, "EEEE", { locale: ar }) === "الجمعة";
+    if (fridayCheck && attendance.notes === 'دوام إضافة') {
+      console.log('Friday overtime shift - no delay calculation');
+      return 0; // لا يتم احتساب تأخير في دوام الإضافة
+    }
+    
     // قائمة الموظفين الذين يتم حساب الدوام لهم على أساس ساعات العمل الإجمالية
     const hoursBasedEmployees = [
       'احمد كمال', 'أحمد كمال',
@@ -3197,6 +3204,44 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                             <Calendar className="w-4 h-4 mr-2" />
                             {existingAttendance?.notes === 'إجازة' ? 'إلغاء الإجازة' : 'تحديد كإجازة'}
                           </Button>
+                          
+                          {/* زر دوام إضافة ليوم الجمعة فقط */}
+                          {isFriday && (
+                            <Button
+                              onClick={() => {
+                                // تبديل حالة دوام إضافة
+                                const isOvertimeShift = existingAttendance?.notes === 'دوام إضافة';
+                                const newNotes = isOvertimeShift ? '' : 'دوام إضافة';
+                                
+                                if (!existingAttendance) {
+                                  // إنشاء سجل حضور جديد مع دوام إضافة
+                                  const attendanceData = {
+                                    employeeId: selectedEmployeeForDialog.employeeId,
+                                    employeeName: selectedEmployeeForDialog.employeeName,
+                                    date: dateStr,
+                                    scheduleType: selectedEmployeeForDialog.scheduleType,
+                                    notes: newNotes,
+                                    eveningCheckinTime: '16:00',
+                                    eveningCheckoutTime: '21:00'
+                                  };
+                                  createAttendanceMutation.mutate(attendanceData);
+                                } else {
+                                  // تحديث السجل الموجود
+                                  const updateData = {
+                                    ...existingAttendance,
+                                    notes: newNotes
+                                  };
+                                  updateAttendanceMutation.mutate({ attendanceId: existingAttendance.id, updateData });
+                                }
+                              }}
+                              variant="outline"
+                              className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border-blue-400/50 px-8"
+                              disabled={createAttendanceMutation.isPending || updateAttendanceMutation.isPending || markHolidayMutation.isPending}
+                            >
+                              <Plus className="w-4 h-4 mr-2" />
+                              {existingAttendance?.notes === 'دوام إضافة' ? 'إلغاء دوام إضافة' : 'دوام إضافة'}
+                            </Button>
+                          )}
                           
                           <Button
                             onClick={() => {
