@@ -29,16 +29,16 @@
   --dynamic-accent-hsl: 194, 100%, 32%;
 }
 
-/* Global Dark Background */
+/* Global Dark Background with New Theme Color */
 html, body {
-  background: var(--dark-bg-primary) !important;
+  background: linear-gradient(135deg, #00627F 0%, #004861 50%, #00627F 100%) !important;
   color: var(--text-primary) !important;
   min-height: 100vh;
 }
 
 /* Root with Static Dark Background */
 #root {
-  background: var(--dark-bg-primary);
+  background: linear-gradient(135deg, #00627F 0%, #004861 50%, #00627F 100%);
   min-height: 100vh;
 }
 
@@ -259,16 +259,17 @@ svg {
   }
 }
 
-/* Unified Glass Morphism Components - Lighter/More Transparent */
+/* Unified Glass Morphism Components with #00627F Theme */
 .glass-container,
 .dark-glass {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(15px) !important;
-  -webkit-backdrop-filter: blur(15px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: rgba(0, 98, 127, 0.15) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
   box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    0 8px 32px rgba(0, 98, 127, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Neumorphism Design System */
@@ -395,10 +396,11 @@ svg {
 }
 
 .glass-header {
-  background: rgba(255, 255, 255, 0.04) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(0, 98, 127, 0.25) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 16px rgba(0, 98, 127, 0.3) !important;
 }
 
 /* Component Specific Dark Styling - Lighter/More Transparent */
@@ -504,13 +506,16 @@ input:focus, textarea:focus, select:focus, .glass-input:focus {
   border-color: var(--dynamic-secondary) !important;
 }
 
-/* Modal and Dialog Styling */
+/* Modal and Dialog Styling with #00627F Theme */
 .modal-content,
 .dialog-content {
-  background: rgba(255, 255, 255, 0.04) !important;
-  backdrop-filter: blur(25px) !important;
-  -webkit-backdrop-filter: blur(25px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(0, 98, 127, 0.18) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 
+    0 16px 48px rgba(0, 98, 127, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
 }
 
 /* Table Styling */
@@ -699,23 +704,25 @@ button[data-state="checked"][role="radio"] span {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
-/* Dark Glass Containers */
+/* Dark Glass Containers with #00627F Theme */
 .glass-container {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 98, 127, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 8px 32px rgba(0, 98, 127, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .glass-header {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 98, 127, 0.25);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 98, 127, 0.3);
 }
 
 /* Background Animation Removed */
@@ -775,38 +782,44 @@ button[data-state="checked"][role="radio"] span {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Enhanced Glass Morphism System */
+/* Enhanced Glass Morphism System with #00627F Theme */
 .glass-background {
   background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.8) 0%, 
-    rgba(30, 41, 59, 0.6) 50%, 
-    rgba(15, 23, 42, 0.9) 100%);
+    rgba(0, 98, 127, 0.85) 0%, 
+    rgba(0, 72, 97, 0.7) 50%, 
+    rgba(0, 98, 127, 0.9) 100%);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   position: relative;
   overflow: hidden;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 4px 32px rgba(0, 98, 127, 0.2);
 }
 
 
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 98, 127, 0.12);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.25),
-    0 4px 16px 0 rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    0 12px 40px 0 rgba(0, 98, 127, 0.35),
+    0 6px 20px 0 rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 98, 127, 0.18);
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
-  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 
+    0 16px 48px 0 rgba(0, 98, 127, 0.45),
+    0 8px 24px 0 rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 .glass-card-dark {
