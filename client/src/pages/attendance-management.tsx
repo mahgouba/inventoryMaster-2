@@ -1399,11 +1399,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     
     // التحقق من يوم الجمعة 
     if (day && format(day, "EEEE", { locale: ar }) === "الجمعة") {
-      // للموظفين الذين يحسب دوامهم بالساعات: 8.5 ساعة حتى الجمعة
-      if (isHourBasedEmployee) {
-        return 8.5;
-      }
-      // للباقي: 5 ساعات في يوم الجمعة (4:00 PM - 9:00 PM)
+      // جميع الموظفين: 5 ساعات في يوم الجمعة (4:00 PM - 9:00 PM)
       return 5;
     }
     
@@ -1467,12 +1463,13 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     // للموظفين الذين يحسب دوامهم بالساعات
     if (isHourBasedEmployee) {
       const actualWorkHours = parseFloat(calculateHoursWorked(schedule, attendance, day));
-      const requiredHours = 8.5; // 8 ساعات و 30 دقيقة (حتى يوم الجمعة)
+      const isFriday = format(day, "EEEE", { locale: ar }) === "الجمعة";
+      const requiredHours = isFriday ? 5 : 8.5; // يوم الجمعة: 5 ساعات، الأيام العادية: 8.5 ساعة
       
       console.log('Hour-based calculation:', {
         actualWorkHours,
         requiredHours,
-        isFriday: format(day, "EEEE", { locale: ar }) === "الجمعة",
+        isFriday,
         shortfall: Math.max(0, requiredHours - actualWorkHours)
       });
       
