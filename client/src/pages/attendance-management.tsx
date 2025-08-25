@@ -3095,6 +3095,17 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                           </div>
                         )}
 
+                        {/* Notes Section */}
+                        <div className="bg-white/5 rounded-lg p-6">
+                          <label className="block text-sm font-medium text-gray-300 mb-3 text-center">الملاحظات</label>
+                          <Textarea
+                            defaultValue={existingAttendance?.notes && existingAttendance.notes !== 'إجازة' ? existingAttendance.notes : ''}
+                            className="w-full bg-white/10 border-white/20 text-white placeholder-gray-400 min-h-[80px]"
+                            placeholder="اكتب أي ملاحظات حول الحضور والانصراف..."
+                            id="attendance-notes"
+                          />
+                        </div>
+
                         {/* Action Buttons */}
                         <div className="flex justify-center gap-4 pt-6 border-t border-white/10">
                           <Button
@@ -3115,6 +3126,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                 return input?.value || currentTime;
                               };
 
+                              // Get notes value
+                              const notesTextarea = document.getElementById('attendance-notes') as HTMLTextAreaElement;
+                              const notes = notesTextarea?.value || '';
+
                               if (!existingAttendance) {
                                 // Create new attendance record with values from time inputs
                                 const attendanceData = {
@@ -3122,6 +3137,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   employeeName: selectedEmployeeForDialog.employeeName,
                                   date: dateStr,
                                   scheduleType: selectedEmployeeForDialog.scheduleType,
+                                  notes: notes,
                                   ...(selectedEmployeeForDialog.scheduleType === "متصل" 
                                     ? {
                                         continuousCheckinTime: getInputValue('continuous-checkin-time'),
@@ -3143,6 +3159,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   const checkoutTime = getInputValue('continuous-checkout-time');
                                   handleAttendanceUpdate(existingAttendance.id, 'continuousCheckinTime', checkinTime);
                                   setTimeout(() => handleAttendanceUpdate(existingAttendance.id, 'continuousCheckoutTime', checkoutTime), 100);
+                                  // Update notes
+                                  if (notes !== (existingAttendance.notes || '')) {
+                                    setTimeout(() => handleAttendanceUpdate(existingAttendance.id, 'notes', notes), 200);
+                                  }
                                 } else {
                                   const morningCheckin = getInputValue('morning-checkin-time');
                                   const morningCheckout = getInputValue('morning-checkout-time');
@@ -3153,6 +3173,10 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                                   setTimeout(() => handleAttendanceUpdate(existingAttendance.id, 'morningCheckoutTime', morningCheckout), 100);
                                   setTimeout(() => handleAttendanceUpdate(existingAttendance.id, 'eveningCheckinTime', eveningCheckin), 200);
                                   setTimeout(() => handleAttendanceUpdate(existingAttendance.id, 'eveningCheckoutTime', eveningCheckout), 300);
+                                }
+                                // Update notes
+                                if (notes !== (existingAttendance.notes || '')) {
+                                  setTimeout(() => handleAttendanceUpdate(existingAttendance.id, 'notes', notes), 400);
                                 }
                               }
                             }}
