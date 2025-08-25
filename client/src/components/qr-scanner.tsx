@@ -31,6 +31,12 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
 
         // Request camera permissions explicitly
         try {
+          // Check if mediaDevices is available
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            setError('المتصفح لا يدعم الوصول للكاميرا');
+            return;
+          }
+
           const stream = await navigator.mediaDevices.getUserMedia({ 
             video: { 
               facingMode: 'environment',
@@ -56,7 +62,10 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
           let errorMessage = 'يرجى السماح بالوصول للكاميرا في إعدادات المتصفح';
           
           // Check if it's HTTPS issue
-          if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost' && !window.location.hostname.includes('replit')) {
+          if (window.location.protocol === 'http:' && 
+              window.location.hostname !== 'localhost' && 
+              !window.location.hostname.includes('replit') && 
+              !window.location.hostname.includes('repl.co')) {
             errorMessage = 'يتطلب الوصول للكاميرا اتصال آمن (HTTPS). يرجى استخدام الرابط الآمن أو localhost';
           } else if (permError.name === 'NotAllowedError') {
             errorMessage = 'تم رفض الوصول للكاميرا. يرجى السماح بالوصول في إعدادات المتصفح';
@@ -196,8 +205,8 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
                 muted
                 autoPlay
                 style={{ 
-                  transform: 'scaleX(-1)', // Mirror the video for better user experience
-                  backgroundColor: '#1f2937' // Better fallback color
+                  backgroundColor: '#1f2937', // Better fallback color
+                  minHeight: '300px'
                 }}
               />
               
