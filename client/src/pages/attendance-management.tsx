@@ -1420,8 +1420,23 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     // تحقق من وجود بيانات الحضور
     if (!attendance) return 0;
     
+    // قائمة الموظفين الذين يتم حساب الدوام لهم على أساس ساعات العمل الإجمالية
+    const hoursBasedEmployees = [
+      'احمد كمال', 'أحمد كمال', 'Ahmad Kamal',
+      'فاروق', 'Farouk',
+      'صادق', 'Sadiq',
+      'ايمن', 'أيمن', 'Ayman'
+    ];
+    
+    // التحقق إذا كان الموظف من الموظفين الذين يحسب دوامهم بالساعات
+    const isHourBasedEmployee = hoursBasedEmployees.some(name => 
+      schedule.employeeName.includes(name) || name.includes(schedule.employeeName)
+    );
+    
     console.log('Calculating delay for date:', format(day, 'yyyy-MM-dd'), {
       scheduleType: schedule.scheduleType,
+      employeeName: schedule.employeeName,
+      isHourBasedEmployee,
       attendance: {
         morningCheckin: attendance.morningCheckinTime,
         morningCheckout: attendance.morningCheckoutTime,
@@ -1431,6 +1446,26 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
         continuousCheckout: attendance.continuousCheckoutTime
       }
     });
+    
+    // للموظفين الذين يحسب دوامهم بالساعات
+    if (isHourBasedEmployee) {
+      const actualWorkHours = parseFloat(calculateHoursWorked(schedule, attendance, day));
+      const requiredHours = 8.5; // 8 ساعات و 30 دقيقة
+      
+      console.log('Hour-based calculation:', {
+        actualWorkHours,
+        requiredHours,
+        shortfall: Math.max(0, requiredHours - actualWorkHours)
+      });
+      
+      // إذا كانت ساعات العمل أقل من المطلوب، احسب الفرق كتأخير
+      if (actualWorkHours < requiredHours) {
+        totalDelayHours = requiredHours - actualWorkHours;
+      }
+      
+      console.log('Total delay hours calculated:', totalDelayHours);
+      return totalDelayHours;
+    }
     
     // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
     const isFriday = format(day, "EEEE", { locale: ar }) === "الجمعة";
