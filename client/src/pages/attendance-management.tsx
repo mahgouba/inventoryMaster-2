@@ -1900,21 +1900,6 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                   }, 0)
               )}
             </div>
-            <div style="color: #4CAF50;">
-              <strong>إجمالي ساعات العمل الإضافية:</strong> ${formatHoursToHoursMinutes(
-                monthAttendance
-                  .filter(a => a.notes !== 'إجازة')
-                  .reduce((total, a) => {
-                    const dayDate = new Date(a.date);
-                    const actualWorkHours = parseFloat(calculateHoursWorked(schedule, a, dayDate));
-                    const isFriday = format(dayDate, "EEEE", { locale: ar }) === "الجمعة";
-                    const requiredHours = isFriday ? 5 : 8.5;
-                    const overtimeHours = Math.max(0, actualWorkHours - requiredHours);
-                    
-                    return total + overtimeHours;
-                  }, 0)
-              )}
-            </div>
           </div>
           
           <div style="margin-top: 20px; padding: 15px; background-color: #fff8dc; border: 2px solid #C49632; border-radius: 8px;">
@@ -2633,8 +2618,11 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
                               } else if (hasAttendance && expectedHours > 0) {
                                 // Regular attendance without approved leave
                                 workPercentage = Math.min(100, (hoursWorked / expectedHours) * 100);
+                              } else if (isToday) {
+                                // Current day with no attendance record - don't mark as absent
+                                workPercentage = 50; // Show as in progress instead of absent
                               } else {
-                                // No attendance record and no approved leave
+                                // Past days with no attendance record and no approved leave
                                 workPercentage = 0;
                               }
                               
