@@ -1385,9 +1385,26 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
 
   // حساب الساعات المتوقعة بناءً على جدول العمل الفعلي
   const calculateExpectedHours = (schedule: EmployeeWorkSchedule, day?: Date): number => {
-    // التحقق من يوم الجمعة (دوام خاص من 4:00 مساءً إلى 9:00 مساءً)
+    // قائمة الموظفين الذين يتم حساب الدوام لهم على أساس ساعات العمل الإجمالية
+    const hoursBasedEmployees = [
+      'احمد كمال', 'أحمد كمال', 'Ahmad Kamal',
+      'فاروق', 'Farouk',
+      'صادق', 'Sadiq',
+      'ايمن', 'أيمن', 'Ayman'
+    ];
+    
+    const isHourBasedEmployee = hoursBasedEmployees.some(name => 
+      schedule.employeeName.includes(name) || name.includes(schedule.employeeName)
+    );
+    
+    // التحقق من يوم الجمعة 
     if (day && format(day, "EEEE", { locale: ar }) === "الجمعة") {
-      return 5; // 5 ساعات في يوم الجمعة (4:00 PM - 9:00 PM)
+      // للموظفين الذين يحسب دوامهم بالساعات: 8.5 ساعة حتى الجمعة
+      if (isHourBasedEmployee) {
+        return 8.5;
+      }
+      // للباقي: 5 ساعات في يوم الجمعة (4:00 PM - 9:00 PM)
+      return 5;
     }
     
     if (schedule.scheduleType === "متصل") {
