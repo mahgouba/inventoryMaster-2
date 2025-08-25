@@ -1073,8 +1073,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                 {/* QR Scanner Button */}
                 <QRScannerButton 
                   onVehicleFound={(vehicleId: number) => {
-                    // Navigate to vehicle detail page
-                    window.location.href = `/vehicles/${vehicleId}`;
+                    // Vehicle will be navigated to by the QR scanner button itself
+                    console.log('Vehicle found:', vehicleId);
                   }}
                   className={
                     neumorphismMode 

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { QrCode } from 'lucide-react';
 import QRCodeScanner from './qr-scanner';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 
 interface QRScannerButtonProps {
   onVehicleFound: (vehicleId: number) => void;
@@ -11,6 +12,7 @@ interface QRScannerButtonProps {
 
 export default function QRScannerButton({ onVehicleFound, className }: QRScannerButtonProps) {
   const [isScanning, setIsScanning] = useState(false);
+  const [, navigate] = useLocation();
   
   const { data: inventoryItems } = useQuery({
     queryKey: ['/api/inventory'],
@@ -37,8 +39,11 @@ export default function QRScannerButton({ onVehicleFound, className }: QRScanner
       }
 
       if (vehicleId) {
-        // Instead of verifying, just navigate to the vehicle detail page
-        window.location.href = `/vehicles/${vehicleId}`;
+        // Use React Router navigation instead of window.location
+        setIsScanning(false);
+        navigate(`/vehicles/${vehicleId}`);
+        // Also call the onVehicleFound callback
+        onVehicleFound(vehicleId);
       } else {
         throw new Error('كود QR غير صالح');
       }
