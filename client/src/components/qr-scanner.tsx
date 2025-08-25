@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import QrScanner from 'qr-scanner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { X, Camera } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { X, Camera, Keyboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface QRScannerProps {
@@ -16,18 +17,38 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
   const [scanner, setScanner] = useState<QrScanner | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string>('');
+  const [showManualInput, setShowManualInput] = useState(false);
+  const [manualCode, setManualCode] = useState('');
 
   useEffect(() => {
     if (!isOpen || !videoRef.current) return;
 
     const initScanner = async () => {
+      setIsInitializing(true);
+      setError(null);
+      setDebugInfo('بدء فحص الكاميرا...');
+      
       try {
+        // Check if we're in a secure context
+        if (!window.isSecureContext && window.location.protocol === 'http:' && !window.location.hostname.includes('localhost')) {
+          setError('يتطلب ماسح الكيو آر كود اتصال آمن (HTTPS)');
+          setDebugInfo('غير آمن: يتطلب HTTPS');
+          setIsInitializing(false);
+          return;
+        }
+
+        setDebugInfo('فحص توفر الكاميرا...');
         // Check if camera is available
         const hasCamera = await QrScanner.hasCamera();
         if (!hasCamera) {
-          setError('الكاميرا غير متوفرة');
+          setError('لم يتم العثور على كاميرا في الجهاز');
+          setDebugInfo('لا توجد كاميرا متاحة');
+          setIsInitializing(false);
           return;
         }
+        setDebugInfo('تم العثور على كاميرا');
 
         // Request camera permissions explicitly
         try {
@@ -121,15 +142,21 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
               videoRef.current.style.width = '100%';
               videoRef.current.style.height = '100%';
             }
-          } catch (startError) {
+          } catch (startError: any) {
             console.error('Failed to start QR scanner:', startError);
-            setError('فشل في تشغيل الكاميرا. تأكد من منح الصلاحيات المناسبة.');
+            setError(`فشل في تشغيل الماسح: ${startError.message || 'خطأ غير معروف'}`);
+            setDebugInfo(`خطأ في التشغيل: ${startError.message || startError.name || 'غير معروف'}`);
+          } finally {
+            setIsInitializing(false);
           }
         }, 500);
-      } catch (err) {
+      } catch (err: any) {
         console.error('QR Scanner error:', err);
-        setError('فشل في تشغيل الكاميرا. يرجى السماح بالوصول للكاميرا.');
+        setError(`فشل في تهيئة الماسح: ${err.message || 'خطأ غير معروف'}`);
+        setDebugInfo(`خطأ عام: ${err.message || err.name || 'غير معروف'}`);
         setHasPermission(false);
+      } finally {
+        setIsInitializing(false);
       }
     };
 
@@ -169,26 +196,98 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
         <div className="space-y-4">
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 text-center">
-              <p className="text-red-600 dark:text-red-400">{error}</p>
+              <p className="text-red-600 dark:text-red-400 font-medium">{error}</p>
+              {debugInfo && (
+                <p className="text-xs text-red-500 dark:text-red-400 mt-2 opacity-75">
+                  معلومات التشخيص: {debugInfo}
+                </p>
+              )}
               <div className="mt-3 space-y-2">
                 <Button
                   onClick={() => {
                     setError(null);
                     setHasPermission(null);
+                    setDebugInfo('');
+                    setIsInitializing(false);
                     // Try to reinitialize scanner
                     if (scanner) {
                       scanner.stop();
                       scanner.destroy();
                       setScanner(null);
                     }
+                    // Trigger re-initialization
+                    setTimeout(() => {
+                      if (videoRef.current && isOpen) {
+                        // This will trigger the useEffect again
+                        setHasPermission(null);
+                      }
+                    }, 100);
                   }}
                   className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                  disabled={isInitializing}
                 >
-                  إعادة المحاولة
+                  {isInitializing ? 'جاري المحاولة...' : 'إعادة المحاولة'}
                 </Button>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  إذا استمرت المشكلة، تأكد من منح الصلاحيات في إعدادات المتصفح
-                </p>
+                <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                  <p>نصائح لحل المشكلة:</p>
+                  <ul className="text-right list-disc list-inside space-y-1">
+                    <li>تأكد من السماح بالوصول للكاميرا عند ظهور الطلب</li>
+                    <li>تحقق من أن الكاميرا غير مستخدمة من تطبيق آخر</li>
+                    <li>جرب إعادة تحميل الصفحة</li>
+                  </ul>
+                  <Button
+                    onClick={() => setShowManualInput(true)}
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-2 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+                  >
+                    <Keyboard className="w-4 h-4 mr-2" />
+                    إدخال الكود يدوياً
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showManualInput && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Keyboard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <h3 className="font-medium text-blue-800 dark:text-blue-200">إدخال يدوي للكود</h3>
+              </div>
+              <div className="space-y-3">
+                <Input
+                  type="text"
+                  placeholder="أدخل رقم المركبة أو محتوى الكيو آر كود"
+                  value={manualCode}
+                  onChange={(e) => setManualCode(e.target.value)}
+                  className="text-center"
+                  dir="auto"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => {
+                      if (manualCode.trim()) {
+                        onScan(manualCode.trim());
+                        onClose();
+                      }
+                    }}
+                    disabled={!manualCode.trim()}
+                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+                  >
+                    تأكيد
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setShowManualInput(false);
+                      setManualCode('');
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    إلغاء
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -210,13 +309,20 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
                 }}
               />
               
-              {hasPermission === null && (
+              {(hasPermission === null || isInitializing) && (
                 <div className="w-full aspect-square bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center">
                   <div className="text-center space-y-3">
                     <div className="animate-pulse">
                       <Camera className="w-12 h-12 mx-auto text-blue-500" />
                     </div>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">جاري تحضير الكاميرا...</p>
+                    <p className="text-gray-600 dark:text-gray-300 font-medium">
+                      {isInitializing ? 'جاري تهيئة الماسح...' : 'جاري تحضير الكاميرا...'}
+                    </p>
+                    {debugInfo && (
+                      <p className="text-xs text-blue-600 dark:text-blue-400">
+                        {debugInfo}
+                      </p>
+                    )}
                     <p className="text-xs text-gray-500 dark:text-gray-400">يرجى السماح بالوصول للكاميرا</p>
                   </div>
                 </div>
@@ -248,13 +354,25 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
             </div>
           )}
 
-          <Button
-            onClick={handleClose}
-            variant="outline"
-            className="w-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700"
-          >
-            إلغاء
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleClose}
+              variant="outline"
+              className="flex-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700"
+            >
+              إلغاء
+            </Button>
+            {!error && !showManualInput && (
+              <Button
+                onClick={() => setShowManualInput(true)}
+                variant="outline"
+                className="flex-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 border-blue-200 dark:border-blue-700"
+              >
+                <Keyboard className="w-4 h-4 mr-2" />
+                إدخال يدوي
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
