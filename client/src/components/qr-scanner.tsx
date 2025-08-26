@@ -31,8 +31,16 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
       setDebugInfo('بدء فحص الكاميرا...');
       
       try {
-        // Check if we're in a secure context
-        if (!window.isSecureContext && window.location.protocol === 'http:' && !window.location.hostname.includes('localhost')) {
+        // Check if we're in a secure context (allow Replit domains)
+        const isReplit = window.location.hostname.includes('replit') || 
+                        window.location.hostname.includes('repl.co') || 
+                        window.location.hostname.includes('repl.it');
+        const isLocalhost = window.location.hostname.includes('localhost') || 
+                           window.location.hostname === '127.0.0.1';
+        
+        if (!window.isSecureContext && 
+            window.location.protocol === 'http:' && 
+            !isLocalhost && !isReplit) {
           setError('يتطلب ماسح الكيو آر كود اتصال آمن (HTTPS)');
           setDebugInfo('غير آمن: يتطلب HTTPS');
           setIsInitializing(false);
@@ -60,23 +68,37 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
 
           const stream = await navigator.mediaDevices.getUserMedia({ 
             video: { 
-              facingMode: 'environment',
-              width: { ideal: 1280, min: 640 },
-              height: { ideal: 720, min: 480 }
+              facingMode: { ideal: 'environment' },
+              width: { ideal: 1280, min: 320 },
+              height: { ideal: 720, min: 240 }
             } 
           });
           
-          // Test the stream first
+          setDebugInfo('تم الحصول على تدفق الكاميرا');
+          
+          // Test the stream briefly
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
-            videoRef.current.play();
+            videoRef.current.muted = true;
+            videoRef.current.playsInline = true;
             
-            // Give a moment to load
-            await new Promise(resolve => setTimeout(resolve, 500));
+            try {
+              await videoRef.current.play();
+              setDebugInfo('نجح تشغيل الفيديو');
+              
+              // Give time for video to load
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              
+            } catch (playError) {
+              console.error('Video play error:', playError);
+              setDebugInfo('خطأ في تشغيل الفيديو');
+            }
             
             // Stop the test stream
             stream.getTracks().forEach(track => track.stop());
-            videoRef.current.srcObject = null;
+            if (videoRef.current) {
+              videoRef.current.srcObject = null;
+            }
           }
         } catch (permError: any) {
           console.error('Camera permission error:', permError);
@@ -86,7 +108,8 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
           if (window.location.protocol === 'http:' && 
               window.location.hostname !== 'localhost' && 
               !window.location.hostname.includes('replit') && 
-              !window.location.hostname.includes('repl.co')) {
+              !window.location.hostname.includes('repl.co') && 
+              !window.location.hostname.includes('repl.it')) {
             errorMessage = 'يتطلب الوصول للكاميرا اتصال آمن (HTTPS). يرجى استخدام الرابط الآمن أو localhost';
           } else if (permError.name === 'NotAllowedError') {
             errorMessage = 'تم رفض الوصول للكاميرا. يرجى السماح بالوصول في إعدادات المتصفح';
@@ -100,6 +123,8 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
           return;
         }
 
+        setDebugInfo('إنشاء ماسح الكيو آر كود...');
+        
         // Create scanner instance with improved settings
         const qrScanner = new QrScanner(
           videoRef.current!,
@@ -112,10 +137,11 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
             highlightScanRegion: true,
             highlightCodeOutline: true,
             preferredCamera: 'environment',
-            maxScansPerSecond: 5,
+            maxScansPerSecond: 3,
+            returnDetailedScanResult: true,
             calculateScanRegion: (video) => {
               const smallestDimension = Math.min(video.videoWidth, video.videoHeight);
-              const scanRegionSize = Math.round(2/3 * smallestDimension);
+              const scanRegionSize = Math.round(0.8 * smallestDimension);
               return {
                 x: Math.round((video.videoWidth - scanRegionSize) / 2),
                 y: Math.round((video.videoHeight - scanRegionSize) / 2),
@@ -127,29 +153,37 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
         );
 
         setScanner(qrScanner);
+        setDebugInfo('بدء تشغيل الماسح...');
         
-        // Add a small delay before starting
-        setTimeout(async () => {
-          try {
-            await qrScanner.start();
-            setHasPermission(true);
-            setError(null);
-            console.log('QR Scanner started successfully');
+        // Start the scanner
+        try {
+          await qrScanner.start();
+          setHasPermission(true);
+          setError(null);
+          setDebugInfo('الماسح يعمل بنجاح');
+          console.log('QR Scanner started successfully');
+          
+          // Ensure video is properly configured
+          if (videoRef.current) {
+            videoRef.current.style.display = 'block';
+            videoRef.current.style.width = '100%';
+            videoRef.current.style.height = '100%';
+            videoRef.current.style.objectFit = 'cover';
             
-            // Ensure video is visible
-            if (videoRef.current) {
-              videoRef.current.style.display = 'block';
-              videoRef.current.style.width = '100%';
-              videoRef.current.style.height = '100%';
-            }
-          } catch (startError: any) {
-            console.error('Failed to start QR scanner:', startError);
-            setError(`فشل في تشغيل الماسح: ${startError.message || 'خطأ غير معروف'}`);
-            setDebugInfo(`خطأ في التشغيل: ${startError.message || startError.name || 'غير معروف'}`);
-          } finally {
-            setIsInitializing(false);
+            // Wait a bit for the video to fully load
+            setTimeout(() => {
+              if (videoRef.current && videoRef.current.videoWidth > 0) {
+                setDebugInfo('الكاميرا تعمل');
+              }
+            }, 1000);
           }
-        }, 500);
+        } catch (startError: any) {
+          console.error('Failed to start QR scanner:', startError);
+          setError(`فشل في تشغيل الماسح: ${startError.message || 'خطأ غير معروف'}`);
+          setDebugInfo(`خطأ في التشغيل: ${startError.message || startError.name || 'غير معروف'}`);
+        } finally {
+          setIsInitializing(false);
+        }
       } catch (err: any) {
         console.error('QR Scanner error:', err);
         setError(`فشل في تهيئة الماسح: ${err.message || 'خطأ غير معروف'}`);
@@ -207,19 +241,26 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
                   onClick={() => {
                     setError(null);
                     setHasPermission(null);
-                    setDebugInfo('');
-                    setIsInitializing(false);
-                    // Try to reinitialize scanner
+                    setDebugInfo('إعادة تشغيل الماسح...');
+                    setIsInitializing(true);
+                    
+                    // Clean up current scanner
                     if (scanner) {
                       scanner.stop();
                       scanner.destroy();
                       setScanner(null);
                     }
-                    // Trigger re-initialization
+                    
+                    // Clear video
+                    if (videoRef.current) {
+                      videoRef.current.srcObject = null;
+                    }
+                    
+                    // Force re-initialization
                     setTimeout(() => {
                       if (videoRef.current && isOpen) {
                         // This will trigger the useEffect again
-                        setHasPermission(null);
+                        window.location.reload();
                       }
                     }, 100);
                   }}
@@ -297,15 +338,30 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
               <video
                 ref={videoRef}
                 className={cn(
-                  "w-full aspect-square object-cover rounded-2xl",
+                  "w-full aspect-square object-cover rounded-2xl bg-gray-800",
                   hasPermission === false && "hidden"
                 )}
                 playsInline
                 muted
                 autoPlay
                 style={{ 
-                  backgroundColor: '#1f2937', // Better fallback color
-                  minHeight: '300px'
+                  backgroundColor: '#1f2937',
+                  minHeight: '300px',
+                  maxHeight: '400px'
+                }}
+                onLoadedMetadata={() => {
+                  console.log('Video metadata loaded');
+                  if (videoRef.current) {
+                    console.log('Video dimensions:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
+                  }
+                }}
+                onCanPlay={() => {
+                  console.log('Video can play');
+                  setDebugInfo('الفيديو جاهز للتشغيل');
+                }}
+                onError={(e) => {
+                  console.error('Video error:', e);
+                  setError('خطأ في عرض الفيديو');
                 }}
               />
               
