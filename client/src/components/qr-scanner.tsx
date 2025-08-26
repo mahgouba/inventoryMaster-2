@@ -74,6 +74,7 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
             await videoRef.current.play();
             setDebugInfo('الكاميرا تعمل مباشرة');
             setHasPermission(true);
+            setIsInitializing(false); // إخفاء overlay التحميل فوراً
             console.log('Direct camera started successfully');
 
             // Now create QR scanner on the working video
@@ -329,8 +330,8 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
                 }}
               />
               
-              {/* Loading overlay - only show when actually loading */}
-              {(hasPermission === null || isInitializing) && (
+              {/* Loading overlay - only show when actually loading AND no permission yet */}
+              {(hasPermission !== true && isInitializing) && (
                 <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center" style={{ zIndex: 2 }}>
                   <div className="text-center space-y-3">
                     <div className="animate-pulse">
@@ -346,6 +347,13 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
                     )}
                     <p className="text-xs text-gray-500 dark:text-gray-400">يرجى السماح بالوصول للكاميرا</p>
                   </div>
+                </div>
+              )}
+              
+              {/* Debug info when camera is working */}
+              {hasPermission && debugInfo && (
+                <div className="absolute bottom-2 left-2 right-2 bg-black/50 text-white text-xs p-2 rounded text-center" style={{ zIndex: 4 }}>
+                  {debugInfo}
                 </div>
               )}
 
