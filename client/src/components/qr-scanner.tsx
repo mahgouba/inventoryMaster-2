@@ -25,118 +25,120 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
   useEffect(() => {
     if (!isOpen || !videoRef.current) return;
 
-    const initScanner = async () => {
+    const initDirectCamera = async () => {
       setIsInitializing(true);
       setError(null);
-      setDebugInfo('بدء فحص الكاميرا...');
+      setDebugInfo('بدء تشغيل الكاميرا مباشرة...');
       
       try {
-        setDebugInfo('فحص توفر الكاميرا...');
-        
-        // Skip the hasCamera check as it might be unreliable
-        setDebugInfo('تم العثور على كاميرا');
-
-        // Request camera permissions directly
-        try {
-          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            setError('المتصفح لا يدعم الوصول للكاميرا');
-            setIsInitializing(false);
-            return;
-          }
-
-          setDebugInfo('طلب إذن الكاميرا...');
-          
-          // Create scanner instance directly without pre-testing
-          const qrScanner = new QrScanner(
-            videoRef.current!,
-            (result) => {
-              console.log('QR Code scanned:', result.data);
-              onScan(result.data);
-              onClose();
-            },
-            {
-              highlightScanRegion: true,
-              highlightCodeOutline: true,
-              preferredCamera: 'environment',
-              maxScansPerSecond: 3,
-              returnDetailedScanResult: true,
-              calculateScanRegion: (video) => {
-                const smallestDimension = Math.min(video.videoWidth, video.videoHeight);
-                const scanRegionSize = Math.round(0.7 * smallestDimension);
-                return {
-                  x: Math.round((video.videoWidth - scanRegionSize) / 2),
-                  y: Math.round((video.videoHeight - scanRegionSize) / 2),
-                  width: scanRegionSize,
-                  height: scanRegionSize,
-                };
-              },
-            }
-          );
-
-          setScanner(qrScanner);
-          setDebugInfo('بدء تشغيل الماسح...');
-          
-          // Start the scanner directly
-          await qrScanner.start();
-          
-          setHasPermission(true);
-          setError(null);
-          setDebugInfo('الماسح يعمل بنجاح');
-          console.log('QR Scanner started successfully');
-          
-          // Ensure video element is properly displayed
-          if (videoRef.current) {
-            // Force show the video element
-            videoRef.current.style.display = 'block';
-            videoRef.current.style.visibility = 'visible';
-            videoRef.current.style.opacity = '1';
-            videoRef.current.style.width = '100%';
-            videoRef.current.style.height = '100%';
-            videoRef.current.style.objectFit = 'cover';
-            videoRef.current.style.backgroundColor = 'transparent';
-            
-            // Add event listeners to monitor video state
-            videoRef.current.addEventListener('loadedmetadata', () => {
-              console.log('Video metadata loaded - dimensions:', videoRef.current?.videoWidth, 'x', videoRef.current?.videoHeight);
-              setDebugInfo(`الكاميرا تعمل - ${videoRef.current?.videoWidth}x${videoRef.current?.videoHeight}`);
-            });
-            
-            videoRef.current.addEventListener('canplay', () => {
-              console.log('Video can play');
-              setDebugInfo('الفيديو جاهز للعرض');
-            });
-          }
-          
-        } catch (startError: any) {
-          console.error('Scanner start error:', startError);
-          let errorMessage = 'فشل في تشغيل الماسح';
-          
-          if (startError.name === 'NotAllowedError') {
-            errorMessage = 'تم رفض الوصول للكاميرا. يرجى السماح بالوصول والمحاولة مرة أخرى';
-          } else if (startError.name === 'NotFoundError') {
-            errorMessage = 'لم يتم العثور على كاميرا متاحة في الجهاز';
-          } else if (startError.name === 'NotReadableError') {
-            errorMessage = 'الكاميرا قيد الاستخدام من تطبيق آخر';
-          } else if (startError.name === 'OverconstrainedError') {
-            errorMessage = 'إعدادات الكاميرا غير متوافقة مع الجهاز';
-          }
-          
-          setError(errorMessage);
-          setDebugInfo(`خطأ: ${startError.name || startError.message}`);
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          setError('المتصفح لا يدعم الوصول للكاميرا');
+          setIsInitializing(false);
+          return;
         }
-      } catch (err: any) {
-        console.error('QR Scanner initialization error:', err);
-        setError(`فشل في تهيئة الماسح: ${err.message || 'خطأ غير معروف'}`);
-        setDebugInfo(`خطأ عام: ${err.name || err.message || 'غير معروف'}`);
-        setHasPermission(false);
+
+        setDebugInfo('طلب إذن الكاميرا...');
+        
+        // Get camera stream directly
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1280, min: 640 },
+            height: { ideal: 720, min: 480 }
+          }
+        });
+
+        setDebugInfo('تم الحصول على تدفق الكاميرا');
+
+        if (videoRef.current) {
+          // Set the stream to video element
+          videoRef.current.srcObject = stream;
+          videoRef.current.muted = true;
+          videoRef.current.playsInline = true;
+          videoRef.current.autoplay = true;
+          
+          // Force all style properties
+          videoRef.current.style.display = 'block';
+          videoRef.current.style.visibility = 'visible';
+          videoRef.current.style.opacity = '1';
+          videoRef.current.style.width = '100%';
+          videoRef.current.style.height = '100%';
+          videoRef.current.style.objectFit = 'cover';
+          videoRef.current.style.backgroundColor = 'transparent';
+          videoRef.current.style.position = 'absolute';
+          videoRef.current.style.top = '0';
+          videoRef.current.style.left = '0';
+          videoRef.current.style.zIndex = '1';
+
+          try {
+            await videoRef.current.play();
+            setDebugInfo('الكاميرا تعمل مباشرة');
+            setHasPermission(true);
+            console.log('Direct camera started successfully');
+
+            // Now create QR scanner on the working video
+            setTimeout(async () => {
+              try {
+                const qrScanner = new QrScanner(
+                  videoRef.current!,
+                  (result) => {
+                    console.log('QR Code scanned:', result.data);
+                    onScan(result.data);
+                    onClose();
+                  },
+                  {
+                    highlightScanRegion: true,
+                    highlightCodeOutline: true,
+                    maxScansPerSecond: 3,
+                    returnDetailedScanResult: true,
+                  }
+                );
+
+                setScanner(qrScanner);
+                await qrScanner.start();
+                setDebugInfo('ماسح الكيو آر كود نشط');
+                console.log('QR Scanner overlay started');
+              } catch (scannerError) {
+                console.warn('QR Scanner failed, but camera works:', scannerError);
+                setDebugInfo('الكاميرا تعمل - ماسح الكيو آر كود متوقف');
+              }
+            }, 1000);
+
+          } catch (playError) {
+            console.error('Video play error:', playError);
+            setError('فشل في تشغيل الفيديو');
+          }
+        }
+
+      } catch (cameraError: any) {
+        console.error('Camera access error:', cameraError);
+        let errorMessage = 'فشل في الوصول للكاميرا';
+        
+        if (cameraError.name === 'NotAllowedError') {
+          errorMessage = 'تم رفض الوصول للكاميرا. يرجى السماح بالوصول والمحاولة مرة أخرى';
+        } else if (cameraError.name === 'NotFoundError') {
+          errorMessage = 'لم يتم العثور على كاميرا متاحة في الجهاز';
+        } else if (cameraError.name === 'NotReadableError') {
+          errorMessage = 'الكاميرا قيد الاستخدام من تطبيق آخر';
+        }
+        
+        setError(errorMessage);
+        setDebugInfo(`خطأ: ${cameraError.name || cameraError.message}`);
       } finally {
         setIsInitializing(false);
       }
     };
 
-    initScanner();
+    initDirectCamera();
 
     return () => {
+      // Clean up camera stream
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+        videoRef.current.srcObject = null;
+      }
+      
       if (scanner) {
         try {
           scanner.stop();
