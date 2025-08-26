@@ -12,6 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "@/hooks/useTheme";
 import { apiRequest } from "@/lib/queryClient";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import InventoryStats from "@/components/inventory-stats";
 import InventoryTable from "@/components/inventory-table";
@@ -688,350 +690,510 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                   <div className="flex flex-wrap gap-3 items-center">
                                     {/* Manufacturer Filter */}
                                     <div className="min-w-[150px]">
-                                      <Select
-                                        value={manufacturerFilter.length > 0 ? `${manufacturerFilter.length} محدد` : ""}
-                                        onValueChange={() => {}}
-                                      >
-                                        <SelectTrigger className="glass-button border-white/20 text-white">
-                                          <SelectValue placeholder="الصانع" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
-                                          {manufacturers.map((manufacturer) => (
-                                            <SelectItem
-                                              key={manufacturer}
-                                              value={manufacturer}
-                                              className="text-white hover:bg-white/20 cursor-pointer"
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                toggleFilter(manufacturerFilter, setManufacturerFilter, manufacturer);
-                                              }}
-                                            >
-                                              <div className="flex items-center justify-between w-full">
-                                                <span>{manufacturer}</span>
-                                                <div className="flex items-center gap-2">
-                                                  {manufacturerFilter.includes(manufacturer) && (
-                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                                                  )}
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button 
+                                            variant="outline" 
+                                            className="glass-button border-white/20 text-white w-full justify-between"
+                                          >
+                                            {manufacturerFilter.length > 0 ? `${manufacturerFilter.length} صانع محدد` : "الصانع"}
+                                            <ChevronDown className="h-4 w-4" />
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80 bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                                            <div className="text-sm text-white font-medium pb-2 border-b border-white/20">
+                                              اختر الصانع
+                                            </div>
+                                            {manufacturers.map((manufacturer) => (
+                                              <div key={manufacturer} className="flex items-center space-x-2 space-x-reverse">
+                                                <Checkbox
+                                                  id={`manufacturer-${manufacturer}`}
+                                                  checked={manufacturerFilter.includes(manufacturer)}
+                                                  onCheckedChange={() => toggleFilter(manufacturerFilter, setManufacturerFilter, manufacturer)}
+                                                  className="border-white/40 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                />
+                                                <label 
+                                                  htmlFor={`manufacturer-${manufacturer}`}
+                                                  className="text-sm text-white cursor-pointer flex-1 flex justify-between"
+                                                >
+                                                  <span>{manufacturer}</span>
                                                   <span className="text-xs text-white/60">({getFilterCount("manufacturer", manufacturer)})</span>
-                                                </div>
+                                                </label>
                                               </div>
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
+                                            ))}
+                                          </div>
+                                          {manufacturerFilter.length > 0 && (
+                                            <div className="pt-2 border-t border-white/20 mt-2">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setManufacturerFilter([])}
+                                                className="text-red-400 hover:text-red-300 text-xs w-full"
+                                              >
+                                                مسح الكل
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </PopoverContent>
+                                      </Popover>
                                     </div>
 
                                     {/* Category Filter */}
                                     <div className="min-w-[150px]">
-                                      <Select
-                                        value={categoryFilter.length > 0 ? `${categoryFilter.length} محدد` : ""}
-                                        onValueChange={() => {}}
-                                      >
-                                        <SelectTrigger className="glass-button border-white/20 text-white">
-                                          <SelectValue placeholder="الفئة" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
-                                          {categories.map((category) => (
-                                            <SelectItem
-                                              key={category}
-                                              value={category}
-                                              className="text-white hover:bg-white/20 cursor-pointer"
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                toggleFilter(categoryFilter, setCategoryFilter, category);
-                                              }}
-                                            >
-                                              <div className="flex items-center justify-between w-full">
-                                                <span>{category}</span>
-                                                <div className="flex items-center gap-2">
-                                                  {categoryFilter.includes(category) && (
-                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                                                  )}
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button 
+                                            variant="outline" 
+                                            className="glass-button border-white/20 text-white w-full justify-between"
+                                          >
+                                            {categoryFilter.length > 0 ? `${categoryFilter.length} فئة محددة` : "الفئة"}
+                                            <ChevronDown className="h-4 w-4" />
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80 bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                                            <div className="text-sm text-white font-medium pb-2 border-b border-white/20">
+                                              اختر الفئة
+                                            </div>
+                                            {categories.map((category) => (
+                                              <div key={category} className="flex items-center space-x-2 space-x-reverse">
+                                                <Checkbox
+                                                  id={`category-${category}`}
+                                                  checked={categoryFilter.includes(category)}
+                                                  onCheckedChange={() => toggleFilter(categoryFilter, setCategoryFilter, category)}
+                                                  className="border-white/40 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                />
+                                                <label 
+                                                  htmlFor={`category-${category}`}
+                                                  className="text-sm text-white cursor-pointer flex-1 flex justify-between"
+                                                >
+                                                  <span>{category}</span>
                                                   <span className="text-xs text-white/60">({getFilterCount("category", category)})</span>
-                                                </div>
+                                                </label>
                                               </div>
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
+                                            ))}
+                                          </div>
+                                          {categoryFilter.length > 0 && (
+                                            <div className="pt-2 border-t border-white/20 mt-2">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setCategoryFilter([])}
+                                                className="text-red-400 hover:text-red-300 text-xs w-full"
+                                              >
+                                                مسح الكل
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </PopoverContent>
+                                      </Popover>
                                     </div>
 
                                     {/* Trim Level Filter */}
                                     <div className="min-w-[150px]">
-                                      <Select
-                                        value={trimLevelFilter.length > 0 ? `${trimLevelFilter.length} محدد` : ""}
-                                        onValueChange={() => {}}
-                                      >
-                                        <SelectTrigger className="glass-button border-white/20 text-white">
-                                          <SelectValue placeholder="درجة التجهيز" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
-                                          {availableTrimLevels.map((trimLevel) => (
-                                            <SelectItem
-                                              key={trimLevel}
-                                              value={trimLevel}
-                                              className="text-white hover:bg-white/20 cursor-pointer"
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                toggleFilter(trimLevelFilter, setTrimLevelFilter, trimLevel);
-                                              }}
-                                            >
-                                              <div className="flex items-center justify-between w-full">
-                                                <span>{trimLevel}</span>
-                                                <div className="flex items-center gap-2">
-                                                  {trimLevelFilter.includes(trimLevel) && (
-                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                                                  )}
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button 
+                                            variant="outline" 
+                                            className="glass-button border-white/20 text-white w-full justify-between"
+                                          >
+                                            {trimLevelFilter.length > 0 ? `${trimLevelFilter.length} درجة محددة` : "درجة التجهيز"}
+                                            <ChevronDown className="h-4 w-4" />
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80 bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                                            <div className="text-sm text-white font-medium pb-2 border-b border-white/20">
+                                              اختر درجة التجهيز
+                                            </div>
+                                            {availableTrimLevels.map((trimLevel) => (
+                                              <div key={trimLevel} className="flex items-center space-x-2 space-x-reverse">
+                                                <Checkbox
+                                                  id={`trimLevel-${trimLevel}`}
+                                                  checked={trimLevelFilter.includes(trimLevel)}
+                                                  onCheckedChange={() => toggleFilter(trimLevelFilter, setTrimLevelFilter, trimLevel)}
+                                                  className="border-white/40 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                />
+                                                <label 
+                                                  htmlFor={`trimLevel-${trimLevel}`}
+                                                  className="text-sm text-white cursor-pointer flex-1 flex justify-between"
+                                                >
+                                                  <span>{trimLevel}</span>
                                                   <span className="text-xs text-white/60">({getFilterCount("trimLevel", trimLevel)})</span>
-                                                </div>
+                                                </label>
                                               </div>
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
+                                            ))}
+                                          </div>
+                                          {trimLevelFilter.length > 0 && (
+                                            <div className="pt-2 border-t border-white/20 mt-2">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setTrimLevelFilter([])}
+                                                className="text-red-400 hover:text-red-300 text-xs w-full"
+                                              >
+                                                مسح الكل
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </PopoverContent>
+                                      </Popover>
                                     </div>
 
                                     {/* Year Filter */}
                                     <div className="min-w-[120px]">
-                                      <Select
-                                        value={yearFilter.length > 0 ? `${yearFilter.length} محدد` : ""}
-                                        onValueChange={() => {}}
-                                      >
-                                        <SelectTrigger className="glass-button border-white/20 text-white">
-                                          <SelectValue placeholder="السنة" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
-                                          {availableYears.map((year) => (
-                                            <SelectItem
-                                              key={year}
-                                              value={year}
-                                              className="text-white hover:bg-white/20 cursor-pointer"
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                toggleFilter(yearFilter, setYearFilter, year);
-                                              }}
-                                            >
-                                              <div className="flex items-center justify-between w-full">
-                                                <span>{year}</span>
-                                                <div className="flex items-center gap-2">
-                                                  {yearFilter.includes(year) && (
-                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                                                  )}
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button 
+                                            variant="outline" 
+                                            className="glass-button border-white/20 text-white w-full justify-between"
+                                          >
+                                            {yearFilter.length > 0 ? `${yearFilter.length} سنة محددة` : "السنة"}
+                                            <ChevronDown className="h-4 w-4" />
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80 bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                                            <div className="text-sm text-white font-medium pb-2 border-b border-white/20">
+                                              اختر السنة
+                                            </div>
+                                            {availableYears.map((year) => (
+                                              <div key={year} className="flex items-center space-x-2 space-x-reverse">
+                                                <Checkbox
+                                                  id={`year-${year}`}
+                                                  checked={yearFilter.includes(year)}
+                                                  onCheckedChange={() => toggleFilter(yearFilter, setYearFilter, year)}
+                                                  className="border-white/40 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                />
+                                                <label 
+                                                  htmlFor={`year-${year}`}
+                                                  className="text-sm text-white cursor-pointer flex-1 flex justify-between"
+                                                >
+                                                  <span>{year}</span>
                                                   <span className="text-xs text-white/60">({getFilterCount("year", year)})</span>
-                                                </div>
+                                                </label>
                                               </div>
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
+                                            ))}
+                                          </div>
+                                          {yearFilter.length > 0 && (
+                                            <div className="pt-2 border-t border-white/20 mt-2">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setYearFilter([])}
+                                                className="text-red-400 hover:text-red-300 text-xs w-full"
+                                              >
+                                                مسح الكل
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </PopoverContent>
+                                      </Popover>
                                     </div>
 
                                     {/* Engine Capacity Filter */}
                                     <div className="min-w-[150px]">
-                                      <Select
-                                        value={engineCapacityFilter.length > 0 ? `${engineCapacityFilter.length} محدد` : ""}
-                                        onValueChange={() => {}}
-                                      >
-                                        <SelectTrigger className="glass-button border-white/20 text-white">
-                                          <SelectValue placeholder="سعة المحرك" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
-                                          {availableEngineCapacities.map((capacity) => (
-                                            <SelectItem
-                                              key={capacity}
-                                              value={capacity}
-                                              className="text-white hover:bg-white/20 cursor-pointer"
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                toggleFilter(engineCapacityFilter, setEngineCapacityFilter, capacity);
-                                              }}
-                                            >
-                                              <div className="flex items-center justify-between w-full">
-                                                <span>{capacity}</span>
-                                                <div className="flex items-center gap-2">
-                                                  {engineCapacityFilter.includes(capacity) && (
-                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                                                  )}
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button 
+                                            variant="outline" 
+                                            className="glass-button border-white/20 text-white w-full justify-between"
+                                          >
+                                            {engineCapacityFilter.length > 0 ? `${engineCapacityFilter.length} سعة محددة` : "سعة المحرك"}
+                                            <ChevronDown className="h-4 w-4" />
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80 bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                                            <div className="text-sm text-white font-medium pb-2 border-b border-white/20">
+                                              اختر سعة المحرك
+                                            </div>
+                                            {availableEngineCapacities.map((capacity) => (
+                                              <div key={capacity} className="flex items-center space-x-2 space-x-reverse">
+                                                <Checkbox
+                                                  id={`engineCapacity-${capacity}`}
+                                                  checked={engineCapacityFilter.includes(capacity)}
+                                                  onCheckedChange={() => toggleFilter(engineCapacityFilter, setEngineCapacityFilter, capacity)}
+                                                  className="border-white/40 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                />
+                                                <label 
+                                                  htmlFor={`engineCapacity-${capacity}`}
+                                                  className="text-sm text-white cursor-pointer flex-1 flex justify-between"
+                                                >
+                                                  <span>{capacity}</span>
                                                   <span className="text-xs text-white/60">({getFilterCount("engineCapacity", capacity)})</span>
-                                                </div>
+                                                </label>
                                               </div>
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
+                                            ))}
+                                          </div>
+                                          {engineCapacityFilter.length > 0 && (
+                                            <div className="pt-2 border-t border-white/20 mt-2">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setEngineCapacityFilter([])}
+                                                className="text-red-400 hover:text-red-300 text-xs w-full"
+                                              >
+                                                مسح الكل
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </PopoverContent>
+                                      </Popover>
                                     </div>
                                     {/* Exterior Color Filter */}
                                     <div className="min-w-[150px]">
-                                      <Select
-                                        value={exteriorColorFilter.length > 0 ? `${exteriorColorFilter.length} محدد` : ""}
-                                        onValueChange={() => {}}
-                                      >
-                                        <SelectTrigger className="glass-button border-white/20 text-white">
-                                          <SelectValue placeholder="اللون الخارجي" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
-                                          {availableExteriorColors.map((color) => (
-                                            <SelectItem
-                                              key={color}
-                                              value={color}
-                                              className="text-white hover:bg-white/20 cursor-pointer"
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                toggleFilter(exteriorColorFilter, setExteriorColorFilter, color);
-                                              }}
-                                            >
-                                              <div className="flex items-center justify-between w-full">
-                                                <span>{color}</span>
-                                                <div className="flex items-center gap-2">
-                                                  {exteriorColorFilter.includes(color) && (
-                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                                                  )}
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button 
+                                            variant="outline" 
+                                            className="glass-button border-white/20 text-white w-full justify-between"
+                                          >
+                                            {exteriorColorFilter.length > 0 ? `${exteriorColorFilter.length} لون خارجي` : "اللون الخارجي"}
+                                            <ChevronDown className="h-4 w-4" />
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80 bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                                            <div className="text-sm text-white font-medium pb-2 border-b border-white/20">
+                                              اختر اللون الخارجي
+                                            </div>
+                                            {availableExteriorColors.map((color) => (
+                                              <div key={color} className="flex items-center space-x-2 space-x-reverse">
+                                                <Checkbox
+                                                  id={`exteriorColor-${color}`}
+                                                  checked={exteriorColorFilter.includes(color)}
+                                                  onCheckedChange={() => toggleFilter(exteriorColorFilter, setExteriorColorFilter, color)}
+                                                  className="border-white/40 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                />
+                                                <label 
+                                                  htmlFor={`exteriorColor-${color}`}
+                                                  className="text-sm text-white cursor-pointer flex-1 flex justify-between"
+                                                >
+                                                  <span>{color}</span>
                                                   <span className="text-xs text-white/60">({getFilterCount("exteriorColor", color)})</span>
-                                                </div>
+                                                </label>
                                               </div>
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
+                                            ))}
+                                          </div>
+                                          {exteriorColorFilter.length > 0 && (
+                                            <div className="pt-2 border-t border-white/20 mt-2">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setExteriorColorFilter([])}
+                                                className="text-red-400 hover:text-red-300 text-xs w-full"
+                                              >
+                                                مسح الكل
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </PopoverContent>
+                                      </Popover>
                                     </div>
 
                                     {/* Interior Color Filter */}
                                     <div className="min-w-[150px]">
-                                      <Select
-                                        value={interiorColorFilter.length > 0 ? `${interiorColorFilter.length} محدد` : ""}
-                                        onValueChange={() => {}}
-                                      >
-                                        <SelectTrigger className="glass-button border-white/20 text-white">
-                                          <SelectValue placeholder="اللون الداخلي" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
-                                          {availableInteriorColors.map((color) => (
-                                            <SelectItem
-                                              key={color}
-                                              value={color}
-                                              className="text-white hover:bg-white/20 cursor-pointer"
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                toggleFilter(interiorColorFilter, setInteriorColorFilter, color);
-                                              }}
-                                            >
-                                              <div className="flex items-center justify-between w-full">
-                                                <span>{color}</span>
-                                                <div className="flex items-center gap-2">
-                                                  {interiorColorFilter.includes(color) && (
-                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                                                  )}
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button 
+                                            variant="outline" 
+                                            className="glass-button border-white/20 text-white w-full justify-between"
+                                          >
+                                            {interiorColorFilter.length > 0 ? `${interiorColorFilter.length} لون داخلي` : "اللون الداخلي"}
+                                            <ChevronDown className="h-4 w-4" />
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80 bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                                            <div className="text-sm text-white font-medium pb-2 border-b border-white/20">
+                                              اختر اللون الداخلي
+                                            </div>
+                                            {availableInteriorColors.map((color) => (
+                                              <div key={color} className="flex items-center space-x-2 space-x-reverse">
+                                                <Checkbox
+                                                  id={`interiorColor-${color}`}
+                                                  checked={interiorColorFilter.includes(color)}
+                                                  onCheckedChange={() => toggleFilter(interiorColorFilter, setInteriorColorFilter, color)}
+                                                  className="border-white/40 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                />
+                                                <label 
+                                                  htmlFor={`interiorColor-${color}`}
+                                                  className="text-sm text-white cursor-pointer flex-1 flex justify-between"
+                                                >
+                                                  <span>{color}</span>
                                                   <span className="text-xs text-white/60">({getFilterCount("interiorColor", color)})</span>
-                                                </div>
+                                                </label>
                                               </div>
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
+                                            ))}
+                                          </div>
+                                          {interiorColorFilter.length > 0 && (
+                                            <div className="pt-2 border-t border-white/20 mt-2">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setInteriorColorFilter([])}
+                                                className="text-red-400 hover:text-red-300 text-xs w-full"
+                                              >
+                                                مسح الكل
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </PopoverContent>
+                                      </Popover>
                                     </div>
                                     {/* Status Filter */}
                                     <div className="min-w-[120px]">
-                                      <Select
-                                        value={statusFilter.length > 0 ? `${statusFilter.length} محدد` : ""}
-                                        onValueChange={() => {}}
-                                      >
-                                        <SelectTrigger className="glass-button border-white/20 text-white">
-                                          <SelectValue placeholder="الحالة" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
-                                          {availableStatuses.map((status) => (
-                                            <SelectItem
-                                              key={status}
-                                              value={status}
-                                              className="text-white hover:bg-white/20 cursor-pointer"
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                toggleFilter(statusFilter, setStatusFilter, status);
-                                              }}
-                                            >
-                                              <div className="flex items-center justify-between w-full">
-                                                <span>{status}</span>
-                                                <div className="flex items-center gap-2">
-                                                  {statusFilter.includes(status) && (
-                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                                                  )}
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button 
+                                            variant="outline" 
+                                            className="glass-button border-white/20 text-white w-full justify-between"
+                                          >
+                                            {statusFilter.length > 0 ? `${statusFilter.length} حالة محددة` : "الحالة"}
+                                            <ChevronDown className="h-4 w-4" />
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80 bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                                            <div className="text-sm text-white font-medium pb-2 border-b border-white/20">
+                                              اختر الحالة
+                                            </div>
+                                            {availableStatuses.map((status) => (
+                                              <div key={status} className="flex items-center space-x-2 space-x-reverse">
+                                                <Checkbox
+                                                  id={`status-${status}`}
+                                                  checked={statusFilter.includes(status)}
+                                                  onCheckedChange={() => toggleFilter(statusFilter, setStatusFilter, status)}
+                                                  className="border-white/40 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                />
+                                                <label 
+                                                  htmlFor={`status-${status}`}
+                                                  className="text-sm text-white cursor-pointer flex-1 flex justify-between"
+                                                >
+                                                  <span>{status}</span>
                                                   <span className="text-xs text-white/60">({getFilterCount("status", status)})</span>
-                                                </div>
+                                                </label>
                                               </div>
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
+                                            ))}
+                                          </div>
+                                          {statusFilter.length > 0 && (
+                                            <div className="pt-2 border-t border-white/20 mt-2">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setStatusFilter([])}
+                                                className="text-red-400 hover:text-red-300 text-xs w-full"
+                                              >
+                                                مسح الكل
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </PopoverContent>
+                                      </Popover>
                                     </div>
 
                                     {/* Import Type Filter */}
                                     <div className="min-w-[150px]">
-                                      <Select
-                                        value={importTypeFilter.length > 0 ? `${importTypeFilter.length} محدد` : ""}
-                                        onValueChange={() => {}}
-                                      >
-                                        <SelectTrigger className="glass-button border-white/20 text-white">
-                                          <SelectValue placeholder="نوع الاستيراد" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
-                                          {availableImportTypes.map((importType) => (
-                                            <SelectItem
-                                              key={importType}
-                                              value={importType}
-                                              className="text-white hover:bg-white/20 cursor-pointer"
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                toggleFilter(importTypeFilter, setImportTypeFilter, importType);
-                                              }}
-                                            >
-                                              <div className="flex items-center justify-between w-full">
-                                                <span>{importType}</span>
-                                                <div className="flex items-center gap-2">
-                                                  {importTypeFilter.includes(importType) && (
-                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                                                  )}
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button 
+                                            variant="outline" 
+                                            className="glass-button border-white/20 text-white w-full justify-between"
+                                          >
+                                            {importTypeFilter.length > 0 ? `${importTypeFilter.length} نوع محدد` : "نوع الاستيراد"}
+                                            <ChevronDown className="h-4 w-4" />
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80 bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                                            <div className="text-sm text-white font-medium pb-2 border-b border-white/20">
+                                              اختر نوع الاستيراد
+                                            </div>
+                                            {availableImportTypes.map((importType) => (
+                                              <div key={importType} className="flex items-center space-x-2 space-x-reverse">
+                                                <Checkbox
+                                                  id={`importType-${importType}`}
+                                                  checked={importTypeFilter.includes(importType)}
+                                                  onCheckedChange={() => toggleFilter(importTypeFilter, setImportTypeFilter, importType)}
+                                                  className="border-white/40 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                />
+                                                <label 
+                                                  htmlFor={`importType-${importType}`}
+                                                  className="text-sm text-white cursor-pointer flex-1 flex justify-between"
+                                                >
+                                                  <span>{importType}</span>
                                                   <span className="text-xs text-white/60">({getFilterCount("importType", importType)})</span>
-                                                </div>
+                                                </label>
                                               </div>
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
+                                            ))}
+                                          </div>
+                                          {importTypeFilter.length > 0 && (
+                                            <div className="pt-2 border-t border-white/20 mt-2">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setImportTypeFilter([])}
+                                                className="text-red-400 hover:text-red-300 text-xs w-full"
+                                              >
+                                                مسح الكل
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </PopoverContent>
+                                      </Popover>
                                     </div>
 
                                     {/* Ownership Type Filter */}
                                     <div className="min-w-[150px]">
-                                      <Select
-                                        value={ownershipTypeFilter.length > 0 ? `${ownershipTypeFilter.length} محدد` : ""}
-                                        onValueChange={() => {}}
-                                      >
-                                        <SelectTrigger className="glass-button border-white/20 text-white">
-                                          <SelectValue placeholder="نوع الملكية" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-800/95 border-white/20 backdrop-blur-xl">
-                                          {availableOwnershipTypes.map((ownershipType) => (
-                                            <SelectItem
-                                              key={ownershipType}
-                                              value={ownershipType}
-                                              className="text-white hover:bg-white/20 cursor-pointer"
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                toggleFilter(ownershipTypeFilter, setOwnershipTypeFilter, ownershipType);
-                                              }}
-                                            >
-                                              <div className="flex items-center justify-between w-full">
-                                                <span>{ownershipType}</span>
-                                                <div className="flex items-center gap-2">
-                                                  {ownershipTypeFilter.includes(ownershipType) && (
-                                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                                                  )}
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button 
+                                            variant="outline" 
+                                            className="glass-button border-white/20 text-white w-full justify-between"
+                                          >
+                                            {ownershipTypeFilter.length > 0 ? `${ownershipTypeFilter.length} نوع ملكية` : "نوع الملكية"}
+                                            <ChevronDown className="h-4 w-4" />
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80 bg-slate-800/95 border-white/20 backdrop-blur-xl">
+                                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                                            <div className="text-sm text-white font-medium pb-2 border-b border-white/20">
+                                              اختر نوع الملكية
+                                            </div>
+                                            {availableOwnershipTypes.map((ownershipType) => (
+                                              <div key={ownershipType} className="flex items-center space-x-2 space-x-reverse">
+                                                <Checkbox
+                                                  id={`ownershipType-${ownershipType}`}
+                                                  checked={ownershipTypeFilter.includes(ownershipType)}
+                                                  onCheckedChange={() => toggleFilter(ownershipTypeFilter, setOwnershipTypeFilter, ownershipType)}
+                                                  className="border-white/40 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                />
+                                                <label 
+                                                  htmlFor={`ownershipType-${ownershipType}`}
+                                                  className="text-sm text-white cursor-pointer flex-1 flex justify-between"
+                                                >
+                                                  <span>{ownershipType}</span>
                                                   <span className="text-xs text-white/60">({getFilterCount("ownershipType", ownershipType)})</span>
-                                                </div>
+                                                </label>
                                               </div>
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
+                                            ))}
+                                          </div>
+                                          {ownershipTypeFilter.length > 0 && (
+                                            <div className="pt-2 border-t border-white/20 mt-2">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setOwnershipTypeFilter([])}
+                                                className="text-red-400 hover:text-red-300 text-xs w-full"
+                                              >
+                                                مسح الكل
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </PopoverContent>
+                                      </Popover>
                                     </div>
 
                                     {/* Date Range Filter */}
