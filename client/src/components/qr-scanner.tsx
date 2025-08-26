@@ -283,26 +283,28 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
           )}
 
           {!error && (
-            <div className="relative">
+            <div className="relative bg-black rounded-2xl overflow-hidden" style={{ minHeight: '300px', aspectRatio: '1' }}>
               <video
                 ref={videoRef}
-                className={cn(
-                  "w-full aspect-square object-cover rounded-2xl bg-gray-800",
-                  hasPermission === false && "hidden"
-                )}
+                className="absolute inset-0 w-full h-full object-cover"
                 playsInline
                 muted
                 autoPlay
                 style={{ 
-                  backgroundColor: '#1f2937',
-                  minHeight: '300px',
-                  maxHeight: '400px'
+                  display: hasPermission === false ? 'none' : 'block',
+                  backgroundColor: 'transparent',
+                  zIndex: 1
                 }}
                 onLoadedMetadata={() => {
                   console.log('Video metadata loaded');
                   if (videoRef.current) {
                     console.log('Video dimensions:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
                     setDebugInfo(`أبعاد الفيديو: ${videoRef.current.videoWidth}x${videoRef.current.videoHeight}`);
+                    
+                    // Force video to be visible
+                    videoRef.current.style.display = 'block';
+                    videoRef.current.style.opacity = '1';
+                    videoRef.current.style.visibility = 'visible';
                   }
                 }}
                 onCanPlay={() => {
@@ -312,6 +314,12 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
                 onPlaying={() => {
                   console.log('Video is playing');
                   setDebugInfo('الفيديو يعمل الآن');
+                  
+                  // Extra insurance that video is visible
+                  if (videoRef.current) {
+                    videoRef.current.style.display = 'block';
+                    videoRef.current.style.opacity = '1';
+                  }
                 }}
                 onError={(e) => {
                   console.error('Video error:', e);
@@ -319,8 +327,9 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
                 }}
               />
               
+              {/* Loading overlay - only show when actually loading */}
               {(hasPermission === null || isInitializing) && (
-                <div className="w-full aspect-square bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center">
+                <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center" style={{ zIndex: 2 }}>
                   <div className="text-center space-y-3">
                     <div className="animate-pulse">
                       <Camera className="w-12 h-12 mx-auto text-blue-500" />
@@ -338,9 +347,9 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
                 </div>
               )}
 
-              {/* Scanning guide overlay */}
-              {hasPermission && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              {/* Scanning guide overlay - only show when camera is working */}
+              {hasPermission && !isInitializing && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 3 }}>
                   <div className="w-48 h-48 border-2 border-white rounded-2xl shadow-lg">
                     <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-blue-500 rounded-tl-2xl"></div>
                     <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-blue-500 rounded-tr-2xl"></div>
