@@ -712,7 +712,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                                   {manufacturerFilter.includes(manufacturer) && (
                                                     <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                                                   )}
-                                                  <span className="text-xs text-white/60">({getFilterCount(manufacturer, "manufacturer")})</span>
+                                                  <span className="text-xs text-white/60">({getFilterCount("manufacturer", manufacturer)})</span>
                                                 </div>
                                               </div>
                                             </SelectItem>
@@ -747,7 +747,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                                   {categoryFilter.includes(category) && (
                                                     <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                                                   )}
-                                                  <span className="text-xs text-white/60">({getFilterCount(category, "category")})</span>
+                                                  <span className="text-xs text-white/60">({getFilterCount("category", category)})</span>
                                                 </div>
                                               </div>
                                             </SelectItem>
@@ -782,7 +782,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                                   {trimLevelFilter.includes(trimLevel) && (
                                                     <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                                                   )}
-                                                  <span className="text-xs text-white/60">({getFilterCount(trimLevel, "trimLevel")})</span>
+                                                  <span className="text-xs text-white/60">({getFilterCount("trimLevel", trimLevel)})</span>
                                                 </div>
                                               </div>
                                             </SelectItem>
@@ -817,7 +817,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                                   {yearFilter.includes(year) && (
                                                     <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                                                   )}
-                                                  <span className="text-xs text-white/60">({getFilterCount(year, "year")})</span>
+                                                  <span className="text-xs text-white/60">({getFilterCount("year", year)})</span>
                                                 </div>
                                               </div>
                                             </SelectItem>
@@ -852,7 +852,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                                   {engineCapacityFilter.includes(capacity) && (
                                                     <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                                                   )}
-                                                  <span className="text-xs text-white/60">({getFilterCount(capacity, "engineCapacity")})</span>
+                                                  <span className="text-xs text-white/60">({getFilterCount("engineCapacity", capacity)})</span>
                                                 </div>
                                               </div>
                                             </SelectItem>
@@ -886,7 +886,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                                   {exteriorColorFilter.includes(color) && (
                                                     <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                                                   )}
-                                                  <span className="text-xs text-white/60">({getFilterCount(color, "exteriorColor")})</span>
+                                                  <span className="text-xs text-white/60">({getFilterCount("exteriorColor", color)})</span>
                                                 </div>
                                               </div>
                                             </SelectItem>
@@ -921,7 +921,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                                   {interiorColorFilter.includes(color) && (
                                                     <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                                                   )}
-                                                  <span className="text-xs text-white/60">({getFilterCount(color, "interiorColor")})</span>
+                                                  <span className="text-xs text-white/60">({getFilterCount("interiorColor", color)})</span>
                                                 </div>
                                               </div>
                                             </SelectItem>
@@ -955,7 +955,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                                   {statusFilter.includes(status) && (
                                                     <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                                                   )}
-                                                  <span className="text-xs text-white/60">({getFilterCount(status, "status")})</span>
+                                                  <span className="text-xs text-white/60">({getFilterCount("status", status)})</span>
                                                 </div>
                                               </div>
                                             </SelectItem>
@@ -990,7 +990,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                                   {importTypeFilter.includes(importType) && (
                                                     <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                                                   )}
-                                                  <span className="text-xs text-white/60">({getFilterCount(importType, "importType")})</span>
+                                                  <span className="text-xs text-white/60">({getFilterCount("importType", importType)})</span>
                                                 </div>
                                               </div>
                                             </SelectItem>
@@ -1025,7 +1025,7 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                                   {ownershipTypeFilter.includes(ownershipType) && (
                                                     <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                                                   )}
-                                                  <span className="text-xs text-white/60">({getFilterCount(ownershipType, "ownershipType")})</span>
+                                                  <span className="text-xs text-white/60">({getFilterCount("ownershipType", ownershipType)})</span>
                                                 </div>
                                               </div>
                                             </SelectItem>
