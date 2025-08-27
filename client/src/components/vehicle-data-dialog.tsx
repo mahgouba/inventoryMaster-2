@@ -257,12 +257,6 @@ export function VehicleDataDialog({ vehicleId, isOpen, onClose, userRole, userna
             <div className="grid md:grid-cols-2 gap-6">
               {/* Basic Information */}
               <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Info className="w-5 h-5 text-blue-600" />
-                    المعلومات الأساسية
-                  </CardTitle>
-                </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
@@ -287,12 +281,6 @@ export function VehicleDataDialog({ vehicleId, isOpen, onClose, userRole, userna
 
               {/* Colors and Location */}
               <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Palette className="w-5 h-5 text-purple-600" />
-                    الألوان والموقع
-                  </CardTitle>
-                </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
@@ -368,50 +356,33 @@ export function VehicleDataDialog({ vehicleId, isOpen, onClose, userRole, userna
               </Card>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex flex-wrap gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+            {/* Reserve Button */}
+            <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
               {canReserve && (
                 <Button
                   onClick={() => handleReserve(vehicle)}
-                  className="flex-1 min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-4 rounded-xl"
                 >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  حجز المركبة
+                  <ShoppingCart className="w-5 h-5 mr-3" />
+                  حجز السيارة
                 </Button>
               )}
-
-              <Button
-                onClick={() => handleShare(vehicle)}
-                variant="outline"
-                className="flex-1 min-w-[140px] bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/40 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300"
-              >
-                <Share2 className="w-4 h-4 mr-2" />
-                مشاركة
-              </Button>
-
-              {isReserved && vehicle.reservedBy === username && (
+              {isReserved && (
                 <Button
-                  onClick={() => handleCancelReservation(vehicle)}
-                  variant="outline"
-                  disabled={cancelingReservationId === vehicle.id}
-                  className="flex-1 min-w-[140px] bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/20 dark:hover:bg-orange-900/40 border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-300"
+                  disabled
+                  className="w-full bg-yellow-500 text-white text-lg py-4 rounded-xl cursor-not-allowed opacity-60"
                 >
-                  {cancelingReservationId === vehicle.id ? (
-                    <div className="animate-spin w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full mr-2" />
-                  ) : (
-                    <X className="w-4 h-4 mr-2" />
-                  )}
-                  إلغاء الحجز
+                  <CheckCircle className="w-5 h-5 mr-3" />
+                  تم حجز السيارة
                 </Button>
               )}
-
-              {canSell && ['admin', 'manager'].includes(userRole) && (
+              {vehicle.isSold && (
                 <Button
-                  onClick={() => handleSell(vehicle)}
-                  className="flex-1 min-w-[140px] bg-emerald-600 hover:bg-emerald-700 text-white"
+                  disabled
+                  className="w-full bg-red-500 text-white text-lg py-4 rounded-xl cursor-not-allowed opacity-60"
                 >
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  بيع المركبة
+                  <CheckCircle className="w-5 h-5 mr-3" />
+                  تم بيع السيارة
                 </Button>
               )}
             </div>
