@@ -23,123 +23,87 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
   const [manualCode, setManualCode] = useState('');
 
   useEffect(() => {
-    if (!isOpen || !videoRef.current) return;
+    if (!isOpen) return;
 
-    const initDirectCamera = async () => {
+    const initQRScanner = async () => {
       setIsInitializing(true);
       setError(null);
-      setDebugInfo('بدء تشغيل الكاميرا مباشرة...');
+      setDebugInfo('جاري تهيئة ماسح الكيو آر كود...');
       
       try {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          setError('المتصفح لا يدعم الوصول للكاميرا');
+        // Check if QR scanner can initialize
+        if (!QrScanner.hasCamera()) {
+          setError('لا توجد كاميرا متاحة في هذا الجهاز');
           setIsInitializing(false);
           return;
         }
 
-        setDebugInfo('طلب إذن الكاميرا...');
+        setDebugInfo('التحقق من إعدادات الكاميرا...');
         
-        // Get camera stream directly
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: 'environment' },
-            width: { ideal: 1280, min: 640 },
-            height: { ideal: 720, min: 480 }
+        // Initialize QR scanner directly
+        const qrScanner = new QrScanner(
+          videoRef.current!,
+          (result) => {
+            console.log('QR Code scanned:', result.data);
+            qrScanner.stop(); // Stop scanning immediately after success
+            onScan(result.data);
+            onClose();
+          },
+          {
+            preferredCamera: 'environment', // Back camera first
+            highlightScanRegion: true,
+            highlightCodeOutline: true,
+            maxScansPerSecond: 5,
+            returnDetailedScanResult: true,
           }
-        });
+        );
 
-        setDebugInfo('تم الحصول على تدفق الكاميرا');
-
-        if (videoRef.current) {
-          // Set the stream to video element
-          videoRef.current.srcObject = stream;
-          videoRef.current.muted = true;
-          videoRef.current.playsInline = true;
-          videoRef.current.autoplay = true;
-          
-          // Force all style properties
-          videoRef.current.style.display = 'block';
-          videoRef.current.style.visibility = 'visible';
-          videoRef.current.style.opacity = '1';
-          videoRef.current.style.width = '100%';
-          videoRef.current.style.height = '100%';
-          videoRef.current.style.objectFit = 'cover';
-          videoRef.current.style.backgroundColor = 'transparent';
-          videoRef.current.style.position = 'absolute';
-          videoRef.current.style.top = '0';
-          videoRef.current.style.left = '0';
-          videoRef.current.style.zIndex = '1';
-
-          try {
-            await videoRef.current.play();
-            setDebugInfo('الكاميرا تعمل مباشرة');
-            setHasPermission(true);
-            setIsInitializing(false); // إخفاء overlay التحميل فوراً
-            console.log('Direct camera started successfully');
-
-            // Now create QR scanner on the working video
-            setTimeout(async () => {
-              try {
-                const qrScanner = new QrScanner(
-                  videoRef.current!,
-                  (result) => {
-                    console.log('QR Code scanned:', result.data);
-                    onScan(result.data);
-                    onClose();
-                  },
-                  {
-                    highlightScanRegion: true,
-                    highlightCodeOutline: true,
-                    maxScansPerSecond: 3,
-                    returnDetailedScanResult: true,
-                  }
-                );
-
-                setScanner(qrScanner);
-                await qrScanner.start();
-                setDebugInfo('ماسح الكيو آر كود نشط');
-                console.log('QR Scanner overlay started');
-              } catch (scannerError) {
-                console.warn('QR Scanner failed, but camera works:', scannerError);
-                setDebugInfo('الكاميرا تعمل - ماسح الكيو آر كود متوقف');
-              }
-            }, 1000);
-
-          } catch (playError) {
-            console.error('Video play error:', playError);
-            setError('فشل في تشغيل الفيديو');
-          }
-        }
-
-      } catch (cameraError: any) {
-        console.error('Camera access error:', cameraError);
-        let errorMessage = 'فشل في الوصول للكاميرا';
+        setScanner(qrScanner);
+        setDebugInfo('تشغيل الكاميرا...');
         
-        if (cameraError.name === 'NotAllowedError') {
-          errorMessage = 'تم رفض الوصول للكاميرا. يرجى السماح بالوصول والمحاولة مرة أخرى';
-        } else if (cameraError.name === 'NotFoundError') {
-          errorMessage = 'لم يتم العثور على كاميرا متاحة في الجهاز';
-        } else if (cameraError.name === 'NotReadableError') {
+        // Start the scanner
+        await qrScanner.start();
+        
+        setHasPermission(true);
+        setIsInitializing(false);
+        setDebugInfo('ماسح الكيو آر كود جاهز للاستخدام');
+        console.log('QR Scanner started successfully');
+
+      } catch (error: any) {
+        console.error('QR Scanner initialization error:', error);
+        let errorMessage = 'فشل في تهيئة ماسح الكيو آر كود';
+        
+        if (error.name === 'NotAllowedError') {
+          errorMessage = 'تم رفض الوصول للكاميرا. يرجى السماح بالوصول من إعدادات المتصفح';
+        } else if (error.name === 'NotFoundError') {
+          errorMessage = 'لم يتم العثور على كاميرا متاحة';
+        } else if (error.name === 'NotReadableError') {
           errorMessage = 'الكاميرا قيد الاستخدام من تطبيق آخر';
+        } else if (error.name === 'OverconstrainedError') {
+          errorMessage = 'إعدادات الكاميرا غير متوافقة';
+        } else if (error.name === 'NotSupportedError') {
+          errorMessage = 'المتصفح لا يدعم ماسح الكيو آر كود';
         }
         
         setError(errorMessage);
-        setDebugInfo(`خطأ: ${cameraError.name || cameraError.message}`);
-      } finally {
+        setDebugInfo(`تفاصيل الخطأ: ${error.name || error.message}`);
         setIsInitializing(false);
       }
     };
 
-    initDirectCamera();
+    // Add a small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      if (videoRef.current) {
+        initQRScanner();
+      }
+    }, 100);
 
     return () => {
-      // Clean up camera stream
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-        videoRef.current.srcObject = null;
-      }
-      
+      clearTimeout(timeoutId);
+    };
+
+    return () => {
+      // Cleanup scanner
       if (scanner) {
         try {
           scanner.stop();
@@ -153,12 +117,20 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
 
   const handleClose = () => {
     if (scanner) {
-      scanner.stop();
-      scanner.destroy();
+      try {
+        scanner.stop();
+        scanner.destroy();
+      } catch (e) {
+        console.warn('Error stopping scanner:', e);
+      }
       setScanner(null);
     }
     setError(null);
     setHasPermission(null);
+    setDebugInfo('');
+    setIsInitializing(false);
+    setShowManualInput(false);
+    setManualCode('');
     onClose();
   };
 
@@ -286,66 +258,40 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
           )}
 
           {!error && (
-            <div className="relative bg-black rounded-2xl overflow-hidden" style={{ minHeight: '300px', aspectRatio: '1' }}>
+            <div className="relative bg-gray-900 rounded-2xl overflow-hidden" style={{ minHeight: '320px', aspectRatio: '1' }}>
               <video
                 ref={videoRef}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover rounded-2xl"
                 playsInline
                 muted
                 autoPlay
                 style={{ 
-                  display: hasPermission === false ? 'none' : 'block',
-                  backgroundColor: 'transparent',
+                  display: 'block',
+                  backgroundColor: '#1f2937',
                   zIndex: 1
-                }}
-                onLoadedMetadata={() => {
-                  console.log('Video metadata loaded');
-                  if (videoRef.current) {
-                    console.log('Video dimensions:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
-                    setDebugInfo(`أبعاد الفيديو: ${videoRef.current.videoWidth}x${videoRef.current.videoHeight}`);
-                    
-                    // Force video to be visible
-                    videoRef.current.style.display = 'block';
-                    videoRef.current.style.opacity = '1';
-                    videoRef.current.style.visibility = 'visible';
-                  }
-                }}
-                onCanPlay={() => {
-                  console.log('Video can play');
-                  setDebugInfo('الفيديو جاهز للتشغيل');
-                }}
-                onPlaying={() => {
-                  console.log('Video is playing');
-                  setDebugInfo('الفيديو يعمل الآن');
-                  
-                  // Extra insurance that video is visible
-                  if (videoRef.current) {
-                    videoRef.current.style.display = 'block';
-                    videoRef.current.style.opacity = '1';
-                  }
-                }}
-                onError={(e) => {
-                  console.error('Video error:', e);
-                  setError('خطأ في عرض الفيديو');
                 }}
               />
               
-              {/* Loading overlay - only show when actually loading AND no permission yet */}
-              {(hasPermission !== true && isInitializing) && (
-                <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center" style={{ zIndex: 2 }}>
-                  <div className="text-center space-y-3">
-                    <div className="animate-pulse">
-                      <Camera className="w-12 h-12 mx-auto text-blue-500" />
+              {/* Loading overlay */}
+              {isInitializing && (
+                <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center" style={{ zIndex: 10 }}>
+                  <div className="text-center space-y-4">
+                    <div className="animate-spin">
+                      <Camera className="w-16 h-16 mx-auto text-blue-500" />
                     </div>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">
-                      {isInitializing ? 'جاري تهيئة الماسح...' : 'جاري تحضير الكاميرا...'}
-                    </p>
-                    {debugInfo && (
-                      <p className="text-xs text-blue-600 dark:text-blue-400">
-                        {debugInfo}
+                    <div className="space-y-2">
+                      <p className="text-gray-700 dark:text-gray-200 font-semibold text-lg">
+                        جاري تهيئة الماسح...
                       </p>
-                    )}
-                    <p className="text-xs text-gray-500 dark:text-gray-400">يرجى السماح بالوصول للكاميرا</p>
+                      {debugInfo && (
+                        <p className="text-sm text-blue-600 dark:text-blue-400 max-w-xs mx-auto">
+                          {debugInfo}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        يرجى السماح بالوصول للكاميرا عند طلب الإذن
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -357,14 +303,28 @@ export default function QRCodeScanner({ isOpen, onClose, onScan }: QRScannerProp
                 </div>
               )}
 
-              {/* Scanning guide overlay - only show when camera is working */}
+              {/* Scanning guide overlay */}
               {hasPermission && !isInitializing && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 3 }}>
-                  <div className="w-48 h-48 border-2 border-white rounded-2xl shadow-lg">
-                    <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-blue-500 rounded-tl-2xl"></div>
-                    <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-blue-500 rounded-tr-2xl"></div>
-                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-blue-500 rounded-bl-2xl"></div>
-                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-blue-500 rounded-br-2xl"></div>
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 5 }}>
+                  <div className="relative">
+                    {/* Scanning frame */}
+                    <div className="w-56 h-56 border-2 border-white/80 rounded-3xl shadow-2xl bg-transparent">
+                      {/* Corner indicators */}
+                      <div className="absolute -top-1 -left-1 w-12 h-12 border-t-4 border-l-4 border-green-400 rounded-tl-3xl"></div>
+                      <div className="absolute -top-1 -right-1 w-12 h-12 border-t-4 border-r-4 border-green-400 rounded-tr-3xl"></div>
+                      <div className="absolute -bottom-1 -left-1 w-12 h-12 border-b-4 border-l-4 border-green-400 rounded-bl-3xl"></div>
+                      <div className="absolute -bottom-1 -right-1 w-12 h-12 border-b-4 border-r-4 border-green-400 rounded-br-3xl"></div>
+                      
+                      {/* Scanning line animation */}
+                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-green-400 to-transparent animate-pulse"></div>
+                    </div>
+                    
+                    {/* Instructions */}
+                    <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center">
+                      <p className="text-white text-sm font-medium bg-black/50 px-4 py-2 rounded-full">
+                        وجه الكاميرا نحو الكيو آر كود
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
