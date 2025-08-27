@@ -1077,6 +1077,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                     // Vehicle will be navigated to by the QR scanner button itself
                     console.log('Vehicle found:', vehicleId);
                   }}
+                  userRole={userRole}
+                  username={username}
                   className={
                     neumorphismMode 
                       ? "neuro-button h-10" 

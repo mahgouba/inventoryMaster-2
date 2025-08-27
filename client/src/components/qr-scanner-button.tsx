@@ -2,16 +2,21 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { QrCode } from 'lucide-react';
 import QRCodeScanner from './qr-scanner';
+import { VehicleDataDialog } from './vehicle-data-dialog';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 
 interface QRScannerButtonProps {
-  onVehicleFound: (vehicleId: number) => void;
+  onVehicleFound?: (vehicleId: number) => void;
   className?: string;
+  userRole: string;
+  username: string;
 }
 
-export default function QRScannerButton({ onVehicleFound, className }: QRScannerButtonProps) {
+export default function QRScannerButton({ onVehicleFound, className, userRole, username }: QRScannerButtonProps) {
   const [isScanning, setIsScanning] = useState(false);
+  const [showVehicleData, setShowVehicleData] = useState(false);
+  const [scannedVehicleId, setScannedVehicleId] = useState<number | null>(null);
   const [, navigate] = useLocation();
   
   const { data: inventoryItems } = useQuery({
@@ -39,11 +44,15 @@ export default function QRScannerButton({ onVehicleFound, className }: QRScanner
       }
 
       if (vehicleId) {
-        // Use React Router navigation instead of window.location
+        // Close scanner and show vehicle data dialog
         setIsScanning(false);
-        navigate(`/vehicles/${vehicleId}`);
-        // Also call the onVehicleFound callback
-        onVehicleFound(vehicleId);
+        setScannedVehicleId(vehicleId);
+        setShowVehicleData(true);
+        
+        // Call the onVehicleFound callback if provided
+        if (onVehicleFound) {
+          onVehicleFound(vehicleId);
+        }
       } else {
         throw new Error('كود QR غير صالح');
       }
@@ -70,6 +79,17 @@ export default function QRScannerButton({ onVehicleFound, className }: QRScanner
         isOpen={isScanning}
         onClose={() => setIsScanning(false)}
         onScan={handleScan}
+      />
+
+      <VehicleDataDialog
+        vehicleId={scannedVehicleId}
+        isOpen={showVehicleData}
+        onClose={() => {
+          setShowVehicleData(false);
+          setScannedVehicleId(null);
+        }}
+        userRole={userRole}
+        username={username}
       />
     </>
   );
