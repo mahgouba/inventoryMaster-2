@@ -49,6 +49,13 @@ export function VehicleDataDialog({ vehicleId, isOpen, onClose, userRole, userna
   const { data: vehicle, isLoading, error } = useQuery<InventoryItem>({
     queryKey: [`/api/inventory/${vehicleId}`],
     enabled: !!vehicleId && isOpen,
+    retry: (failureCount, error: any) => {
+      // Don't retry if it's a 404 error (vehicle not found)
+      if (error?.status === 404) {
+        return false;
+      }
+      return failureCount < 2;
+    },
   });
 
   // Reserve mutation  
@@ -165,7 +172,17 @@ export function VehicleDataDialog({ vehicleId, isOpen, onClose, userRole, userna
               </div>
               <div>
                 <p className="text-red-600 dark:text-red-400 font-medium">لم يتم العثور على المركبة</p>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">الكود المسوح غير صحيح أو المركبة غير موجودة</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                  {vehicleId ? 
+                    `المركبة برقم ${vehicleId} غير موجودة في النظام` : 
+                    'الكود المسوح غير صحيح أو المركبة غير موجودة'
+                  }
+                </p>
+                {error && (
+                  <p className="text-xs text-red-400 mt-2 bg-red-50 dark:bg-red-900/20 p-2 rounded">
+                    خطأ: {error instanceof Error ? error.message : 'خطأ غير معروف'}
+                  </p>
+                )}
               </div>
               <Button onClick={onClose} variant="outline">
                 إغلاق

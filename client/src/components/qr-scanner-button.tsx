@@ -37,13 +37,25 @@ export default function QRScannerButton({ onVehicleFound, className, userRole, u
         }
       } catch {
         // If not JSON, try to extract ID from URL or direct ID
-        const idMatch = result.match(/vehicles\/(\d+)|vehicleId=(\d+)|id=(\d+)|\/(\d+)/) || result.match(/^\d+$/);
-        if (idMatch) {
-          vehicleId = parseInt(idMatch[1] || idMatch[2] || idMatch[3] || idMatch[4] || result);
+        console.log('QR Code content:', result);
+        
+        // Check if it's a full URL with /vehicles/ID pattern
+        const urlMatch = result.match(/\/vehicles\/(\d+)/);
+        if (urlMatch) {
+          vehicleId = parseInt(urlMatch[1]);
+          console.log('Extracted vehicle ID from URL:', vehicleId);
+        } else {
+          // Try other patterns: vehicleId=123, id=123, or just a number
+          const idMatch = result.match(/vehicleId=(\d+)|id=(\d+)|\/(\d+)/) || result.match(/^\d+$/);
+          if (idMatch) {
+            vehicleId = parseInt(idMatch[1] || idMatch[2] || idMatch[3] || result);
+            console.log('Extracted vehicle ID from pattern:', vehicleId);
+          }
         }
       }
 
-      if (vehicleId) {
+      if (vehicleId && !isNaN(vehicleId) && vehicleId > 0) {
+        console.log('Valid vehicle ID found:', vehicleId);
         // Close scanner and show vehicle data dialog
         setIsScanning(false);
         setScannedVehicleId(vehicleId);
@@ -54,7 +66,8 @@ export default function QRScannerButton({ onVehicleFound, className, userRole, u
           onVehicleFound(vehicleId);
         }
       } else {
-        throw new Error('كود QR غير صالح');
+        console.error('Invalid vehicle ID:', vehicleId, 'from QR content:', result);
+        throw new Error(`كود QR غير صالح أو لا يحتوي على معرف مركبة صحيح. المحتوى: ${result.substring(0, 100)}...`);
       }
     } catch (error) {
       console.error('QR scan error:', error);
