@@ -154,6 +154,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get single inventory item by ID
+  app.get("/api/inventory/:id", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const id = parseInt(req.params.id);
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid item ID" });
+      }
+
+      const [item] = await db.select().from(inventoryItems).where(eq(inventoryItems.id, id));
+      
+      if (!item) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+
+      // Get vehicle specifications
+      const specifications = await getVehicleSpecifications(item);
+      
+      // Return the item with specifications
+      res.json({
+        ...item,
+        specifications
+      });
+    } catch (error) {
+      console.error("Error fetching inventory item:", error);
+      res.status(500).json({ message: "Failed to fetch inventory item" });
+    }
+  });
+
   // Get reserved inventory items
   app.get("/api/inventory/reserved", async (req, res) => {
     try {
