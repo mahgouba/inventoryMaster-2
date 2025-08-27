@@ -370,43 +370,34 @@ export function VehicleDataDialog({ vehicleId, isOpen, onClose, userRole, userna
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <Button
-                onClick={handleViewDetails}
-                variant="outline"
-                className="flex-1 min-w-[140px] bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 border-blue-200 dark:border-blue-700"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                عرض التفاصيل
-              </Button>
-
-              <Button
-                onClick={() => handleShare(vehicle)}
-                variant="outline"
-                className="flex-1 min-w-[140px] bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 border-green-200 dark:border-green-700"
-              >
-                <Share2 className="w-4 h-4 mr-2" />
-                مشاركة
-              </Button>
-
               {canReserve && (
                 <Button
                   onClick={() => handleReserve(vehicle)}
-                  className="flex-1 min-w-[140px] bg-yellow-500 hover:bg-yellow-600 text-white"
+                  className="flex-1 min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Calendar className="w-4 h-4 mr-2" />
                   حجز المركبة
                 </Button>
               )}
 
+              <Button
+                onClick={() => handleShare(vehicle)}
+                variant="outline"
+                className="flex-1 min-w-[140px] bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/40 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300"
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                مشاركة
+              </Button>
+
               {isReserved && vehicle.reservedBy === username && (
                 <Button
                   onClick={() => handleCancelReservation(vehicle)}
                   variant="outline"
                   disabled={cancelingReservationId === vehicle.id}
-                  className="flex-1 min-w-[140px] bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 border-red-200 dark:border-red-700"
+                  className="flex-1 min-w-[140px] bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/20 dark:hover:bg-orange-900/40 border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-300"
                 >
                   {cancelingReservationId === vehicle.id ? (
-                    <div className="animate-spin w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full mr-2" />
+                    <div className="animate-spin w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full mr-2" />
                   ) : (
                     <X className="w-4 h-4 mr-2" />
                   )}
@@ -417,7 +408,7 @@ export function VehicleDataDialog({ vehicleId, isOpen, onClose, userRole, userna
               {canSell && ['admin', 'manager'].includes(userRole) && (
                 <Button
                   onClick={() => handleSell(vehicle)}
-                  className="flex-1 min-w-[140px] bg-green-600 hover:bg-green-700 text-white"
+                  className="flex-1 min-w-[140px] bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   بيع المركبة
