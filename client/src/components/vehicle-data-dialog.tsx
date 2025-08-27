@@ -356,35 +356,54 @@ export function VehicleDataDialog({ vehicleId, isOpen, onClose, userRole, userna
               </Card>
             )}
 
-            {/* Reserve Button */}
+            {/* Action Buttons */}
             <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-              {canReserve && (
+              <div className="grid grid-cols-2 gap-3">
                 <Button
-                  onClick={() => handleReserve(vehicle)}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-4 rounded-xl"
+                  onClick={() => handleShare(vehicle)}
+                  variant="outline"
+                  className="bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/40 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300"
                 >
-                  <ShoppingCart className="w-5 h-5 mr-3" />
-                  حجز السيارة
+                  <Share2 className="w-4 h-4 mr-2" />
+                  مشاركة
                 </Button>
-              )}
-              {isReserved && (
-                <Button
-                  disabled
-                  className="w-full bg-yellow-500 text-white text-lg py-4 rounded-xl cursor-not-allowed opacity-60"
-                >
-                  <CheckCircle className="w-5 h-5 mr-3" />
-                  تم حجز السيارة
-                </Button>
-              )}
-              {vehicle.isSold && (
-                <Button
-                  disabled
-                  className="w-full bg-red-500 text-white text-lg py-4 rounded-xl cursor-not-allowed opacity-60"
-                >
-                  <CheckCircle className="w-5 h-5 mr-3" />
-                  تم بيع السيارة
-                </Button>
-              )}
+
+                {canReserve && (
+                  <Button
+                    onClick={() => handleReserve(vehicle)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Calendar className="w-4 h-4 mr-2" />
+                    حجز
+                  </Button>
+                )}
+
+                {canSell && ['admin', 'manager'].includes(userRole) && (
+                  <Button
+                    onClick={() => handleSell(vehicle)}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    بيع المركبة
+                  </Button>
+                )}
+
+                {isReserved && vehicle.reservedBy === username && (
+                  <Button
+                    onClick={() => handleCancelReservation(vehicle)}
+                    variant="outline"
+                    disabled={cancelingReservationId === vehicle.id}
+                    className="bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 border-red-200 dark:border-red-700 text-red-700 dark:text-red-300"
+                  >
+                    {cancelingReservationId === vehicle.id ? (
+                      <div className="animate-spin w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full mr-2" />
+                    ) : (
+                      <X className="w-4 h-4 mr-2" />
+                    )}
+                    إلغاء الحجز
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </DialogContent>
