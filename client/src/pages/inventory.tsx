@@ -159,34 +159,148 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     return filterArray.includes(String(itemValue));
   };
 
-  // Get categories based on selected manufacturer from actual inventory data
-  const getAvailableCategories = () => {
-    if (manufacturerFilter.length === 0) {
-      // Return all categories from actual inventory data
-      return getUniqueValues("category");
-    }
-    // Return categories for specific manufacturer from actual inventory data
+  // Get filtered data based on all previous filters
+  const getFilteredDataForField = (targetField: keyof InventoryItem) => {
     const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
-    const manufacturerCats = availableData
-      .filter(item => manufacturerFilter.includes(item.manufacturer || ""))
-      .map(item => item.category)
-      .filter((category, index, self) => category && self.indexOf(category) === index)
-      .sort();
-    return manufacturerCats;
-  };
-  
-  // Get available manufacturers from inventory data  
-  const getAvailableManufacturers = () => {
-    const availableData = items.filter(item => !showSoldCars ? !item.isSold : true);
-    const manufacturers = availableData
-      .map(item => item.manufacturer)
-      .filter((manufacturer, index, self) => manufacturer && self.indexOf(manufacturer) === index)
-      .sort();
-    return manufacturers;
+    
+    return availableData.filter(item => {
+      // Apply search filter
+      if (searchQuery.trim() !== "") {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = 
+          item.chassisNumber?.toLowerCase().includes(query) ||
+          item.category?.toLowerCase().includes(query) ||
+          item.trimLevel?.toLowerCase().includes(query) ||
+          item.exteriorColor?.toLowerCase().includes(query) ||
+          item.interiorColor?.toLowerCase().includes(query) ||
+          item.location?.toLowerCase().includes(query) ||
+          item.manufacturer?.toLowerCase().includes(query) ||
+          item.engineCapacity?.toLowerCase().includes(query) ||
+          item.year?.toString().includes(query) ||
+          item.status?.toLowerCase().includes(query) ||
+          item.importType?.toLowerCase().includes(query) ||
+          item.ownershipType?.toLowerCase().includes(query) ||
+          item.notes?.toLowerCase().includes(query);
+        if (!matchesSearch) return false;
+      }
+
+      // Filter hierarchy: manufacturer -> category -> trimLevel -> year -> engineCapacity -> colors -> status -> importType
+      if (targetField === "manufacturer") {
+        return true; // No previous filters
+      }
+      
+      if (targetField === "category") {
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        return true;
+      }
+      
+      if (targetField === "trimLevel") {
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        return true;
+      }
+      
+      if (targetField === "year") {
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        return true;
+      }
+      
+      if (targetField === "engineCapacity") {
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        if (yearFilter.length > 0 && !yearFilter.includes(String(item.year))) return false;
+        return true;
+      }
+      
+      if (targetField === "exteriorColor") {
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        if (yearFilter.length > 0 && !yearFilter.includes(String(item.year))) return false;
+        if (engineCapacityFilter.length > 0 && !engineCapacityFilter.includes(item.engineCapacity || "")) return false;
+        return true;
+      }
+      
+      if (targetField === "interiorColor") {
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        if (yearFilter.length > 0 && !yearFilter.includes(String(item.year))) return false;
+        if (engineCapacityFilter.length > 0 && !engineCapacityFilter.includes(item.engineCapacity || "")) return false;
+        if (exteriorColorFilter.length > 0 && !exteriorColorFilter.includes(item.exteriorColor || "")) return false;
+        return true;
+      }
+      
+      if (targetField === "status") {
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        if (yearFilter.length > 0 && !yearFilter.includes(String(item.year))) return false;
+        if (engineCapacityFilter.length > 0 && !engineCapacityFilter.includes(item.engineCapacity || "")) return false;
+        if (exteriorColorFilter.length > 0 && !exteriorColorFilter.includes(item.exteriorColor || "")) return false;
+        if (interiorColorFilter.length > 0 && !interiorColorFilter.includes(item.interiorColor || "")) return false;
+        return true;
+      }
+      
+      if (targetField === "importType") {
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        if (yearFilter.length > 0 && !yearFilter.includes(String(item.year))) return false;
+        if (engineCapacityFilter.length > 0 && !engineCapacityFilter.includes(item.engineCapacity || "")) return false;
+        if (exteriorColorFilter.length > 0 && !exteriorColorFilter.includes(item.exteriorColor || "")) return false;
+        if (interiorColorFilter.length > 0 && !interiorColorFilter.includes(item.interiorColor || "")) return false;
+        if (statusFilter.length > 0 && !statusFilter.includes(item.status || "")) return false;
+        return true;
+      }
+      
+      if (targetField === "ownershipType") {
+        if (manufacturerFilter.length > 0 && !manufacturerFilter.includes(item.manufacturer || "")) return false;
+        if (categoryFilter.length > 0 && !categoryFilter.includes(item.category || "")) return false;
+        if (trimLevelFilter.length > 0 && !trimLevelFilter.includes(item.trimLevel || "")) return false;
+        if (yearFilter.length > 0 && !yearFilter.includes(String(item.year))) return false;
+        if (engineCapacityFilter.length > 0 && !engineCapacityFilter.includes(item.engineCapacity || "")) return false;
+        if (exteriorColorFilter.length > 0 && !exteriorColorFilter.includes(item.exteriorColor || "")) return false;
+        if (interiorColorFilter.length > 0 && !interiorColorFilter.includes(item.interiorColor || "")) return false;
+        if (statusFilter.length > 0 && !statusFilter.includes(item.status || "")) return false;
+        if (importTypeFilter.length > 0 && !importTypeFilter.includes(item.importType || "")) return false;
+        return true;
+      }
+      
+      return true;
+    });
   };
 
-  const categories = getAvailableCategories();
-  const manufacturers = getAvailableManufacturers();
+  // Get unique values for each filter based on cascading filters
+  const getAvailableValues = (field: keyof InventoryItem): string[] => {
+    const filteredData = getFilteredDataForField(field);
+    const values = filteredData
+      .map(item => field === "year" ? String(item[field]) : item[field])
+      .filter((value): value is string => Boolean(value))
+      .filter((value, index, self) => self.indexOf(value) === index)
+      .sort();
+    
+    if (field === "year") {
+      return values.sort((a, b) => parseInt(b) - parseInt(a));
+    }
+    
+    return values;
+  };
+  
+  // Get available options for each filter
+  const manufacturers = getAvailableValues("manufacturer");
+  const categories = getAvailableValues("category");
+  const trimLevels = getAvailableValues("trimLevel");
+  const years = getAvailableValues("year");
+  const engineCapacities = getAvailableValues("engineCapacity");
+  const exteriorColors = getAvailableValues("exteriorColor");
+  const interiorColors = getAvailableValues("interiorColor");
+  const statuses = getAvailableValues("status");
+  const importTypes = getAvailableValues("importType");
+  const ownershipTypes = getAvailableValues("ownershipType");
   
 
 
@@ -391,26 +505,17 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
     return values;
   };
 
-  // Simple filter arrays - just get unique values from data
-  const availableStatuses = ["جميع الحالات", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.status).filter(Boolean))).sort()];
-  
-  const availableImportTypes = ["جميع الأنواع", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.importType).filter(Boolean))).sort()];
-
-  const availableOwnershipTypes = ["جميع أنواع الملكية", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.ownershipType).filter(Boolean))).sort()];
-  
-  const availableEngineCapacities = ["جميع السعات", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.engineCapacity).filter(Boolean))).sort()];
-  
-  const availableExteriorColors = ["جميع الألوان الخارجية", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.exteriorColor).filter(Boolean))).sort()];
-  
-  const availableInteriorColors = ["جميع الألوان الداخلية", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.interiorColor).filter(Boolean))).sort()];
-  
-  const availableTrimLevels = ["جميع درجات التجهيز", ...Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => item.trimLevel).filter(Boolean))).sort()];
-  
-  const yearValues = Array.from(new Set(items.filter(item => !showSoldCars ? !item.isSold : true).map(item => String(item.year)).filter(Boolean))).sort((a, b) => parseInt(b) - parseInt(a));
-  
-  const availableYears = ["جميع السنوات", ...yearValues];
-  
-  const years = availableYears;
+  // Use cascading filter arrays with "all" options
+  const availableManufacturers = manufacturers;
+  const availableCategories = categories;
+  const availableTrimLevels = trimLevels;
+  const availableYears = years;
+  const availableEngineCapacities = engineCapacities;
+  const availableExteriorColors = exteriorColors;
+  const availableInteriorColors = interiorColors;
+  const availableStatuses = statuses;
+  const availableImportTypes = importTypes;
+  const availableOwnershipTypes = ownershipTypes;
 
   const handleExport = () => {
     exportToExcel(items, "تصدير-المخزون.xlsx");
