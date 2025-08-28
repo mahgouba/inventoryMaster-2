@@ -69,6 +69,23 @@ export default function InventoryTable({
     queryKey: ["/api/inventory"],
   });
 
+  // Calculate days since entry
+  const getDaysSinceEntry = (entryDate: string) => {
+    const entry = new Date(entryDate);
+    const now = new Date();
+    const diffTime = now.getTime() - entry.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  // Get color for days indicator circle
+  const getDaysIndicatorColor = (days: number) => {
+    if (days > 40) {
+      return "bg-red-500"; // Red after 40 days
+    }
+    return "bg-green-500"; // Green for 40 days or less
+  };
+
   const deleteMutation = useMutation({
     mutationFn: (id: number) => apiRequest("DELETE", `/api/inventory/${id}`),
     onSuccess: () => {
@@ -387,9 +404,23 @@ export default function InventoryTable({
                   <TableCell className="text-sm text-white">{item.exteriorColor}</TableCell>
                   <TableCell className="text-sm text-white">{item.interiorColor}</TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className={getStatusColor(item.status)}>
-                      {item.status}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className={getStatusColor(item.status)}>
+                        {item.status}
+                      </Badge>
+                      {(() => {
+                        const daysSinceEntry = getDaysSinceEntry(item.entryDate);
+                        const indicatorColor = getDaysIndicatorColor(daysSinceEntry);
+                        return (
+                          <div 
+                            className={`w-6 h-6 rounded-full ${indicatorColor} flex items-center justify-center text-white text-xs font-bold shadow-sm`}
+                            title={`${daysSinceEntry} ${daysSinceEntry === 1 ? 'يوم' : 'أيام'} منذ الدخول`}
+                          >
+                            {daysSinceEntry}
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </TableCell>
                   <TableCell className="text-sm text-white">{item.location}</TableCell>
                   <TableCell className="text-sm text-white">{item.importType}</TableCell>
