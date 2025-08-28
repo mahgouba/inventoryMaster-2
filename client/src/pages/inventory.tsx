@@ -909,23 +909,26 @@ export default function InventoryPage({ userRole, username, onLogout }: Inventor
                                             <div className="text-sm text-white font-medium pb-2 border-b border-white/20">
                                               اختر سعة المحرك
                                             </div>
-                                            {availableEngineCapacities.map((capacity) => (
-                                              <div key={capacity} className="flex items-center space-x-2 space-x-reverse">
-                                                <Checkbox
-                                                  id={`engineCapacity-${capacity}`}
-                                                  checked={engineCapacityFilter.includes(capacity)}
-                                                  onCheckedChange={() => toggleFilter(engineCapacityFilter, setEngineCapacityFilter, capacity)}
-                                                  className="border-white/40 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-                                                />
-                                                <label 
-                                                  htmlFor={`engineCapacity-${capacity}`}
-                                                  className="text-sm text-white cursor-pointer flex-1 flex justify-between"
-                                                >
-                                                  <span>{capacity}</span>
-                                                  <span className="text-xs text-white/60">({getFilterCount("engineCapacity", capacity)})</span>
-                                                </label>
-                                              </div>
-                                            ))}
+                                            {availableEngineCapacities.map((capacity) => {
+                                              const count = getFilterCount("engineCapacity", capacity);
+                                              return (
+                                                <div key={capacity} className="flex items-center space-x-2 space-x-reverse">
+                                                  <Checkbox
+                                                    id={`engineCapacity-${capacity}`}
+                                                    checked={engineCapacityFilter.includes(capacity)}
+                                                    onCheckedChange={() => toggleFilter(engineCapacityFilter, setEngineCapacityFilter, capacity)}
+                                                    className="border-white/40 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                  />
+                                                  <label 
+                                                    htmlFor={`engineCapacity-${capacity}`}
+                                                    className="text-sm text-white cursor-pointer flex-1 flex justify-between"
+                                                  >
+                                                    <span>{capacity}</span>
+                                                    <span className="text-xs text-white/60">({count})</span>
+                                                  </label>
+                                                </div>
+                                              );
+                                            })}
                                           </div>
                                           {engineCapacityFilter.length > 0 && (
                                             <div className="pt-2 border-t border-white/20 mt-2">
