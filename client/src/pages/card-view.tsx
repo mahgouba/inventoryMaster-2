@@ -107,7 +107,6 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
   const [selectedImportType, setSelectedImportType] = useState<string[]>([]);
   const [selectedOwnershipType, setSelectedOwnershipType] = useState<string[]>([]);
   const [showSoldCars, setShowSoldCars] = useState<boolean>(false);
-  const [showUsedCars, setShowUsedCars] = useState<boolean>(false);
   const [shareVehicle, setShareVehicle] = useState<InventoryItem | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   
@@ -519,11 +518,6 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
 
   // Apply all multiple selection filters
   const filteredItems = searchFilteredItems.filter(item => {
-    // Used cars filter (only show items with "مستعمل" in import type)
-    if (showUsedCars && !item.importType?.includes('مستعمل')) {
-      return false;
-    }
-    
     return (
       (selectedManufacturer.length === 0 || selectedManufacturer.includes(item.manufacturer || "")) &&
       (selectedCategory.length === 0 || selectedCategory.includes(item.category || "")) &&
@@ -1290,49 +1284,26 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                   <div className="pt-4 border-t border-white/20 space-y-3">
                                     <h4 className="text-sm font-medium text-white/80 mb-2">عروض خاصة</h4>
                                     
-                                    <div className="flex gap-2 mb-3">
-                                      {/* Show Used Cars Toggle */}
-                                      <Button
-                                        variant={showUsedCars ? "default" : "outline"}
-                                        size="sm"
-                                        onClick={() => setShowUsedCars(!showUsedCars)}
-                                        className={`glass-button transition-all duration-200 ${
-                                          showUsedCars
-                                            ? "glass-button-primary text-white"
-                                            : "glass-text-primary"
-                                        }`}
-                                        data-testid="button-toggle-used-cars"
-                                      >
-                                        <Car className="h-4 w-4 ml-2" />
-                                        {showUsedCars ? "إخفاء المستعملة" : "إظهار المستعملة"}
-                                        {showUsedCars && (
-                                          <Badge variant="secondary" className="mr-2 bg-orange-500/20 text-orange-300 border-orange-400/30">
-                                            {filteredItems.filter(item => item.importType?.includes('مستعمل')).length}
-                                          </Badge>
-                                        )}
-                                      </Button>
-
-                                      {/* Show Sold Cars Toggle */}
-                                      <Button
-                                        variant={showSoldCars ? "default" : "outline"}
-                                        size="sm"
-                                        onClick={() => setShowSoldCars(!showSoldCars)}
-                                        className={`glass-button transition-all duration-200 ${
-                                          showSoldCars
-                                            ? "glass-button-primary text-white"
-                                            : "glass-text-primary"
-                                        }`}
-                                        data-testid="button-toggle-sold-cars"
-                                      >
-                                        <CheckCircle className="h-4 w-4 ml-2" />
-                                        {showSoldCars ? "إخفاء المباعة" : "إظهار المباعة"}
-                                        {showSoldCars && (
-                                          <Badge variant="secondary" className="mr-2 bg-green-500/20 text-green-300 border-green-400/30">
-                                            {inventoryData.filter(item => item.status === "مباع").length}
-                                          </Badge>
-                                        )}
-                                      </Button>
-                                    </div>
+                                    {/* Show Sold Cars Toggle */}
+                                    <Button
+                                      variant={showSoldCars ? "default" : "outline"}
+                                      size="sm"
+                                      onClick={() => setShowSoldCars(!showSoldCars)}
+                                      className={`glass-button transition-all duration-200 ${
+                                        showSoldCars
+                                          ? "glass-button-primary text-white"
+                                          : "glass-text-primary"
+                                      }`}
+                                      data-testid="button-toggle-sold-cars"
+                                    >
+                                      <CheckCircle className="h-4 w-4 ml-2" />
+                                      {showSoldCars ? "إخفاء المباعة" : "إظهار المباعة"}
+                                      {showSoldCars && (
+                                        <Badge variant="secondary" className="mr-2 bg-green-500/20 text-green-300 border-green-400/30">
+                                          {inventoryData.filter(item => item.status === "مباع").length}
+                                        </Badge>
+                                      )}
+                                    </Button>
 
                                     {/* Reset All Filters Button */}
                                     <Button
@@ -1349,7 +1320,6 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                                         setSelectedStatus([]);
                                         setSelectedImportType([]);
                                         setSelectedOwnershipType([]);
-                                        setShowUsedCars(false);
                                         setShowSoldCars(false);
                                       }}
                                       className="glass-button w-full"
