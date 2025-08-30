@@ -1483,7 +1483,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         : 'glass-card dark:glass-card-dark'
                     }`}>
                       <CardHeader className="pb-3 relative z-10">
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between">
                           {/* Category and Trim Level Row */}
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1">
@@ -1497,19 +1497,15 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             )}
                           </div>
                           
-                          <Badge variant="secondary" className={`${getStatusColor(item.status)} text-xs`}>
-                            {item.status}
-                          </Badge>
-                        </div>
-                        
-                        {/* Entry Timer Row */}
-                        <div className="flex items-center justify-between">
-                          <EntryTimer 
-                            entryDate={item.entryDate} 
-                            className=""
-                          />
-                          <div className="text-xs text-white/70 drop-shadow-sm">
-                            دخلت: {new Date(item.entryDate).toLocaleDateString('ar-SA')}
+                          {/* Status and Timer Row */}
+                          <div className="flex items-center gap-2">
+                            <EntryTimer 
+                              entryDate={item.entryDate} 
+                              className=""
+                            />
+                            <Badge variant="secondary" className={`${getStatusColor(item.status)} text-xs`}>
+                              {item.status}
+                            </Badge>
                           </div>
                         </div>
                       </CardHeader>
