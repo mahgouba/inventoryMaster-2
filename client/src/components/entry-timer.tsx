@@ -20,21 +20,22 @@ export function EntryTimer({ entryDate, className = "" }: EntryTimerProps) {
   const isOverThreshold = daysSinceEntry >= 30;
 
   return (
-    <div className={`flex items-center gap-1 ${className}`}>
-      <div className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium backdrop-blur-sm border ${
+    <Badge 
+      variant="secondary" 
+      className={`flex items-center gap-1 text-xs ${
         isOverThreshold 
-          ? 'bg-red-500/80 border-red-400 text-white shadow-red-500/20 shadow-lg' 
-          : 'bg-blue-500/80 border-blue-400 text-white shadow-blue-500/20 shadow-md'
-      }`}>
-        {isOverThreshold ? (
-          <AlertTriangle className="w-3 h-3" />
-        ) : (
-          <Clock className="w-3 h-3" />
-        )}
-        <span className="font-bold">
-          {daysSinceEntry} يوم
-        </span>
-      </div>
-    </div>
+          ? 'bg-red-100 text-red-800 border-red-300 dark:bg-red-900 dark:text-red-200 dark:border-red-700' 
+          : 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700'
+      } ${className}`}
+    >
+      {isOverThreshold ? (
+        <AlertTriangle className="w-3 h-3" />
+      ) : (
+        <Clock className="w-3 h-3" />
+      )}
+      <span className="font-medium">
+        {daysSinceEntry} يوم
+      </span>
+    </Badge>
   );
 }
