@@ -14,7 +14,31 @@ export function EntryTimer({ entryDate, className = "" }: EntryTimerProps) {
   };
 
   const daysSinceEntry = calculateDaysSinceEntry();
-  const isOverThreshold = daysSinceEntry >= 30;
+  
+  // تحديد اللون حسب عدد الأيام
+  const getTimerColors = () => {
+    if (daysSinceEntry <= 15) {
+      return {
+        ringColor: "text-green-500 dark:text-green-400",
+        bgColor: "text-green-200 dark:text-green-800",
+        textColor: "text-yellow-600 dark:text-yellow-300" // ذهبي
+      };
+    } else if (daysSinceEntry <= 28) {
+      return {
+        ringColor: "text-yellow-500 dark:text-yellow-400", 
+        bgColor: "text-yellow-200 dark:text-yellow-800",
+        textColor: "text-yellow-600 dark:text-yellow-300" // ذهبي
+      };
+    } else {
+      return {
+        ringColor: "text-red-500 dark:text-red-400",
+        bgColor: "text-red-200 dark:text-red-800", 
+        textColor: "text-yellow-600 dark:text-yellow-300" // ذهبي
+      };
+    }
+  };
+  
+  const colors = getTimerColors();
   
   // حساب نسبة التقدم (من 0 إلى 30 يوم = 100%)
   const progressPercentage = Math.min((daysSinceEntry / 30) * 100, 100);
@@ -36,7 +60,7 @@ export function EntryTimer({ entryDate, className = "" }: EntryTimerProps) {
           stroke="currentColor"
           strokeWidth="3"
           fill="none"
-          className={isOverThreshold ? "text-red-200 dark:text-red-800" : "text-blue-200 dark:text-blue-800"}
+          className={colors.bgColor}
           opacity="0.3"
         />
         {/* التقدم */}
@@ -50,21 +74,13 @@ export function EntryTimer({ entryDate, className = "" }: EntryTimerProps) {
           strokeDasharray={strokeDasharray}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          className={`${
-            isOverThreshold 
-              ? "text-red-500 dark:text-red-400" 
-              : "text-blue-500 dark:text-blue-400"
-          } transition-all duration-300`}
+          className={`${colors.ringColor} transition-all duration-300`}
         />
       </svg>
       
       {/* النص داخل الحلقة */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className={`text-xs font-bold ${
-          isOverThreshold 
-            ? "text-red-600 dark:text-red-300" 
-            : "text-blue-600 dark:text-blue-300"
-        }`}>
+        <span className={`text-xs font-bold ${colors.textColor}`}>
           {daysSinceEntry}
         </span>
       </div>
