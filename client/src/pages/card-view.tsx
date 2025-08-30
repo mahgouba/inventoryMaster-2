@@ -69,6 +69,7 @@ import { ReservationDialog } from "@/components/reservation-dialog";
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
 import { EnhancedSaleDialog } from "@/components/enhanced-sale-dialog";
+import { EntryTimer } from "@/components/entry-timer";
 
 import type { InventoryItem } from "@shared/schema";
 import { UserRole, canViewPage, canCreateItem, canEditItem, canDeleteItem, canShareItem, canReserveItem } from "@/utils/permissions";
@@ -1432,7 +1433,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                             manufacturerName={manufacturer} 
                             size="lg" 
                             className="w-12 h-12 transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-md"
-                            customLogo={getManufacturerLogoFromDB(manufacturer)}
+                            customLogo={getManufacturerLogoFromDB(manufacturer) || undefined}
                           />
                         </div>
                         
@@ -1482,7 +1483,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                         : 'glass-card dark:glass-card-dark'
                     }`}>
                       <CardHeader className="pb-3 relative z-10">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mb-2">
                           {/* Category and Trim Level Row */}
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1">
@@ -1499,6 +1500,17 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           <Badge variant="secondary" className={`${getStatusColor(item.status)} text-xs`}>
                             {item.status}
                           </Badge>
+                        </div>
+                        
+                        {/* Entry Timer Row */}
+                        <div className="flex items-center justify-between">
+                          <EntryTimer 
+                            entryDate={item.entryDate} 
+                            className=""
+                          />
+                          <div className="text-xs text-white/70 drop-shadow-sm">
+                            دخلت: {new Date(item.entryDate).toLocaleDateString('ar-SA')}
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent className="pt-0 relative z-10">
@@ -1828,7 +1840,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                               manufacturerName={vehicle.manufacturer} 
                               size="lg" 
                               className="w-16 h-16"
-                              customLogo={getManufacturerLogoFromDB(vehicle.manufacturer)}
+                              customLogo={getManufacturerLogoFromDB(vehicle.manufacturer) || undefined}
                             />
                             <div>
                               <h3 className="font-bold text-white text-xl">
