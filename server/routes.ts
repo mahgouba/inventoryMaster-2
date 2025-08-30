@@ -154,7 +154,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get single inventory item by ID
+  // Get reserved inventory items - MUST come before /:id route
+  app.get("/api/inventory/reserved", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const items = await db.select().from(inventoryItems).where(eq(inventoryItems.status, "محجوز"));
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching reserved inventory:", error);
+      res.status(500).json({ message: "Failed to fetch reserved inventory items" });
+    }
+  });
+
+  // Get sold inventory items - MUST come before /:id route
+  app.get("/api/inventory/sold", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const items = await db.select().from(inventoryItems).where(eq(inventoryItems.status, "مباع"));
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching sold inventory:", error);
+      res.status(500).json({ message: "Failed to fetch sold inventory items" });
+    }
+  });
+
+  // Get inventory stats - MUST come before /:id route
+  app.get("/api/inventory/stats", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const allItems = await db.select().from(inventoryItems);
+      
+      const stats = {
+        total: allItems.length,
+        available: allItems.filter(item => item.status === "متوفر").length,
+        inTransit: allItems.filter(item => item.status === "في الطريق").length,
+        maintenance: allItems.filter(item => item.status === "صيانة").length,
+        reserved: allItems.filter(item => item.status === "محجوز").length,
+        sold: allItems.filter(item => item.status === "مباع").length,
+        personal: allItems.filter(item => item.importType === "شخصي").length,
+        company: allItems.filter(item => item.importType === "شركة").length,
+        usedPersonal: allItems.filter(item => item.importType === "مستعمل" || item.importType === "مستعمل شخصي").length
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching inventory stats:", error);
+      res.status(500).json({ message: "Failed to fetch inventory stats" });
+    }
+  });
+
+  // Get manufacturer statistics - MUST come before /:id route
+  app.get("/api/inventory/manufacturer-stats", async (req, res) => {
+    try {
+      const { db } = getDatabase();
+      const allItems = await db.select().from(inventoryItems);
+      const allManufacturers = await db.select().from(manufacturers);
+      
+      const manufacturerStats = new Map();
+      
+      // Create a map for manufacturers with their logos
+      const manufacturerLogos = new Map();
+      allManufacturers.forEach(mfg => {
+        manufacturerLogos.set(mfg.nameAr, mfg.logo);
+      });
+      
+      allItems.forEach(item => {
+        const key = item.manufacturer;
+        if (!manufacturerStats.has(key)) {
+          manufacturerStats.set(key, {
+            manufacturer: key,
+            total: 0,
+            personal: 0,
+            company: 0,
+            usedPersonal: 0,
+            logo: manufacturerLogos.get(key) || null
+          });
+        }
+        
+        const stat = manufacturerStats.get(key);
+        stat.total++;
+        
+        if (item.importType === "شخصي") stat.personal++;
+        else if (item.importType === "شركة") stat.company++;
+        else if (item.importType === "مستعمل" || item.importType === "مستعمل شخصي") stat.usedPersonal++;
+      });
+      
+      res.json(Array.from(manufacturerStats.values()));
+    } catch (error) {
+      console.error("Error fetching manufacturer stats:", error);
+      res.status(500).json({ message: "Failed to fetch manufacturer stats" });
+    }
+  });
+
+  // Get single inventory item by ID - MUST come after specific routes
   app.get("/api/inventory/:id", async (req, res) => {
     try {
       const { db } = getDatabase();
@@ -181,30 +273,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching inventory item:", error);
       res.status(500).json({ message: "Failed to fetch inventory item" });
-    }
-  });
-
-  // Get reserved inventory items
-  app.get("/api/inventory/reserved", async (req, res) => {
-    try {
-      const { db } = getDatabase();
-      const items = await db.select().from(inventoryItems).where(eq(inventoryItems.status, "محجوز"));
-      res.json(items);
-    } catch (error) {
-      console.error("Error fetching reserved inventory:", error);
-      res.status(500).json({ message: "Failed to fetch reserved inventory items" });
-    }
-  });
-
-  // Get sold inventory items
-  app.get("/api/inventory/sold", async (req, res) => {
-    try {
-      const { db } = getDatabase();
-      const items = await db.select().from(inventoryItems).where(eq(inventoryItems.status, "مباع"));
-      res.json(items);
-    } catch (error) {
-      console.error("Error fetching sold inventory:", error);
-      res.status(500).json({ message: "Failed to fetch sold inventory items" });
     }
   });
 
@@ -561,73 +629,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get inventory stats
-  app.get("/api/inventory/stats", async (req, res) => {
-    try {
-      const { db } = getDatabase();
-      const allItems = await db.select().from(inventoryItems);
-      
-      const stats = {
-        total: allItems.length,
-        available: allItems.filter(item => item.status === "متوفر").length,
-        inTransit: allItems.filter(item => item.status === "في الطريق").length,
-        maintenance: allItems.filter(item => item.status === "صيانة").length,
-        reserved: allItems.filter(item => item.status === "محجوز").length,
-        sold: allItems.filter(item => item.status === "مباع").length,
-        personal: allItems.filter(item => item.importType === "شخصي").length,
-        company: allItems.filter(item => item.importType === "شركة").length,
-        usedPersonal: allItems.filter(item => item.importType === "مستعمل" || item.importType === "مستعمل شخصي").length
-      };
-      
-      res.json(stats);
-    } catch (error) {
-      console.error("Error fetching inventory stats:", error);
-      res.status(500).json({ message: "Failed to fetch inventory stats" });
-    }
-  });
 
-  // Get manufacturer statistics
-  app.get("/api/inventory/manufacturer-stats", async (req, res) => {
-    try {
-      const { db } = getDatabase();
-      const allItems = await db.select().from(inventoryItems);
-      const allManufacturers = await db.select().from(manufacturers);
-      
-      const manufacturerStats = new Map();
-      
-      // Create a map for manufacturers with their logos
-      const manufacturerLogos = new Map();
-      allManufacturers.forEach(mfg => {
-        manufacturerLogos.set(mfg.nameAr, mfg.logo);
-      });
-      
-      allItems.forEach(item => {
-        const key = item.manufacturer;
-        if (!manufacturerStats.has(key)) {
-          manufacturerStats.set(key, {
-            manufacturer: key,
-            total: 0,
-            personal: 0,
-            company: 0,
-            usedPersonal: 0,
-            logo: manufacturerLogos.get(key) || null
-          });
-        }
-        
-        const stat = manufacturerStats.get(key);
-        stat.total++;
-        
-        if (item.importType === "شخصي") stat.personal++;
-        else if (item.importType === "شركة") stat.company++;
-        else if (item.importType === "مستعمل" || item.importType === "مستعمل شخصي") stat.usedPersonal++;
-      });
-      
-      res.json(Array.from(manufacturerStats.values()));
-    } catch (error) {
-      console.error("Error fetching manufacturer stats:", error);
-      res.status(500).json({ message: "Failed to fetch manufacturer stats" });
-    }
-  });
 
   // Get all manufacturers  
   app.get("/api/manufacturers", async (req, res) => {
