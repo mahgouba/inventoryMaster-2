@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { getDatabase } from "./db";
+import { db } from "./db";
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs/promises';
@@ -52,7 +52,7 @@ import bcrypt from "bcryptjs";
 // Helper function to get vehicle specifications from database
 const getVehicleSpecifications = async (vehicle: any) => {
   try {
-    const { db } = getDatabase();
+    // Using direct db import
     
     // First try to find exact match specifications
     const conditions = [
@@ -117,7 +117,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username and password required" });
       }
 
-      const { db } = getDatabase();
+      // Using direct db import
       const [user] = await db.select().from(users).where(eq(users.username, username));
       
       if (!user) {
@@ -145,7 +145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all inventory items
   app.get("/api/inventory", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const items = await db.select().from(inventoryItems);
       res.json(items);
     } catch (error) {
@@ -157,7 +157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get reserved inventory items - MUST come before /:id route
   app.get("/api/inventory/reserved", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const items = await db.select().from(inventoryItems).where(eq(inventoryItems.status, "محجوز"));
       res.json(items);
     } catch (error) {
@@ -169,7 +169,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get sold inventory items - MUST come before /:id route
   app.get("/api/inventory/sold", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const items = await db.select().from(inventoryItems).where(eq(inventoryItems.status, "مباع"));
       res.json(items);
     } catch (error) {
@@ -181,7 +181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get inventory stats - MUST come before /:id route
   app.get("/api/inventory/stats", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const allItems = await db.select().from(inventoryItems);
       
       const stats = {
@@ -206,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get manufacturer statistics - MUST come before /:id route
   app.get("/api/inventory/manufacturer-stats", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const allItems = await db.select().from(inventoryItems);
       const allManufacturers = await db.select().from(manufacturers);
       
@@ -249,7 +249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get single inventory item by ID - MUST come after specific routes
   app.get("/api/inventory/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       
       if (isNaN(id)) {
@@ -279,7 +279,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Reserve an inventory item
   app.put("/api/inventory/:id/reserve", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const itemId = parseInt(req.params.id);
       const { customerName, customerPhone, salesRepresentative, reservationNote, paidAmount } = req.body;
 
@@ -319,7 +319,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Cancel reservation for an inventory item
   app.put("/api/inventory/:id/cancel-reservation", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const itemId = parseInt(req.params.id);
 
       // Check if item exists
@@ -358,7 +358,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Sell an inventory item
   app.put("/api/inventory/:id/sell", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const itemId = parseInt(req.params.id);
       const { 
         customerName, 
@@ -410,7 +410,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Sell a reserved vehicle specifically (enhanced version with reservation data preserved)
   app.put("/api/inventory/:id/sell-reserved", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const itemId = parseInt(req.params.id);
       const { 
         salePrice, 
@@ -462,7 +462,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update an inventory item
   app.put("/api/inventory/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const itemId = parseInt(req.params.id);
       const updateData = req.body;
 
@@ -488,7 +488,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete an inventory item
   app.delete("/api/inventory/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const itemId = parseInt(req.params.id);
 
       // Check if item exists
@@ -510,7 +510,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Clear all inventory items
   app.delete("/api/inventory/clear-all", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
 
       // Get count before deletion for logging
       const allItems = await db.select().from(inventoryItems);
@@ -533,7 +533,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Fix duplicate manufacturers
   app.post("/api/fix-duplicates", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       console.log("🔍 Fixing duplicate manufacturers...");
       
@@ -593,7 +593,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new inventory item
   app.post("/api/inventory", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const vehicleData = req.body;
 
       // Validate and clean numeric fields
@@ -634,7 +634,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all manufacturers  
   app.get("/api/manufacturers", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const allManufacturers = await db.select().from(manufacturers);
       res.json(allManufacturers);
     } catch (error) {
@@ -646,7 +646,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get hierarchical manufacturers (for filtering)
   app.get("/api/hierarchical/manufacturers", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const allManufacturers = await db.select().from(manufacturers);
       res.json(allManufacturers);
     } catch (error) {
@@ -658,7 +658,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all banks
   app.get("/api/banks", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const allBanks = await db.select().from(banks);
       res.json(allBanks);
     } catch (error) {
@@ -670,7 +670,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get banks by type (only active banks for display)
   app.get("/api/banks/type/:type", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { type } = req.params;
       const banksByType = await db.select().from(banks).where(
         and(
@@ -688,7 +688,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new bank
   app.post("/api/banks", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const bankData = req.body;
       
       const [newBank] = await db.insert(banks).values({
@@ -712,7 +712,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update bank
   app.put("/api/banks/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const bankId = parseInt(req.params.id);
       const bankData = req.body;
       
@@ -745,7 +745,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete bank
   app.delete("/api/banks/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const bankId = parseInt(req.params.id);
       
       const [deletedBank] = await db.delete(banks)
@@ -766,7 +766,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get banks by type
   app.get("/api/banks/type/:type", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { type } = req.params;
       const decodedType = decodeURIComponent(type);
       
@@ -781,7 +781,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all users
   app.get("/api/users", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const allUsers = await db.select().from(users);
       
       // Remove password from response for security
@@ -805,7 +805,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all vehicle categories
   app.get("/api/vehicle-categories", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const allCategories = await db.select().from(vehicleCategories);
       res.json(allCategories);
     } catch (error) {
@@ -817,7 +817,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all vehicle trim levels
   app.get("/api/vehicle-trim-levels", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const allTrimLevels = await db.select().from(vehicleTrimLevels);
       res.json(allTrimLevels);
     } catch (error) {
@@ -829,7 +829,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get hierarchical data (manufacturers with categories and trim levels)
   app.get("/api/hierarchy/full", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       const manufacturersData = await db.select().from(manufacturers);
       const categoriesData = await db.select().from(vehicleCategories);
@@ -856,7 +856,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get hierarchical manufacturers
   app.get("/api/hierarchical/manufacturers", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const manufacturersData = await db.select().from(manufacturers).where(eq(manufacturers.isActive, true));
       res.json(manufacturersData);
     } catch (error) {
@@ -868,7 +868,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get categories by manufacturer (by name via query parameter)
   app.get("/api/hierarchical/categories", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { manufacturer } = req.query;
       
       if (!manufacturer) {
@@ -897,7 +897,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get categories by manufacturer ID (keeping the original endpoint for backward compatibility)
   app.get("/api/hierarchical/categories/:manufacturerId", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const manufacturerId = parseInt(req.params.manufacturerId);
       const categoriesData = await db.select().from(vehicleCategories)
         .where(and(eq(vehicleCategories.manufacturerId, manufacturerId), eq(vehicleCategories.isActive, true)));
@@ -911,7 +911,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get trim levels by manufacturer and category names (via query parameters)
   app.get("/api/hierarchical/trimLevels", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { manufacturer, category } = req.query;
       
       if (!manufacturer || !category) {
@@ -952,7 +952,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get trim levels by category ID (keeping the original endpoint for backward compatibility)
   app.get("/api/hierarchical/trim-levels/:categoryId", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const categoryId = parseInt(req.params.categoryId);
       const trimLevelsData = await db.select().from(vehicleTrimLevels)
         .where(and(eq(vehicleTrimLevels.categoryId, categoryId), eq(vehicleTrimLevels.isActive, true)));
@@ -967,7 +967,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all manufacturers (including inactive)
   app.get("/api/manufacturers", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const manufacturersData = await db.select().from(manufacturers);
       res.json(manufacturersData);
     } catch (error) {
@@ -979,7 +979,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add new manufacturer
   app.post("/api/manufacturers", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { nameAr, nameEn, logo } = req.body;
 
       if (!nameAr?.trim()) {
@@ -1017,7 +1017,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update manufacturer
   app.put("/api/manufacturers/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const manufacturerId = parseInt(req.params.id);
       const { nameAr, nameEn, logo, isActive } = req.body;
 
@@ -1052,7 +1052,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete manufacturer
   app.delete("/api/manufacturers/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const manufacturerId = parseInt(req.params.id);
 
       // Check if manufacturer has associated categories or vehicles
@@ -1090,7 +1090,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Toggle manufacturer active status
   app.put("/api/manufacturers/:id/toggle", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const manufacturerId = parseInt(req.params.id);
       const { isActive } = req.body;
 
@@ -1117,7 +1117,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all categories (including inactive) with optional manufacturer filter
   app.get("/api/categories", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { manufacturerId } = req.query;
       
       let query = db.select().from(vehicleCategories);
@@ -1138,7 +1138,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Toggle category active status
   app.put("/api/categories/:id/toggle", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const categoryId = parseInt(req.params.id);
       const { isActive } = req.body;
 
@@ -1165,7 +1165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all trim levels (including inactive) with optional category filter
   app.get("/api/trim-levels", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { categoryId } = req.query;
       
       let query = db.select().from(vehicleTrimLevels);
@@ -1186,7 +1186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Toggle trim level active status
   app.put("/api/trim-levels/:id/toggle", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const trimLevelId = parseInt(req.params.id);
       const { isActive } = req.body;
 
@@ -1219,7 +1219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required fields: name, username, password, role" });
       }
 
-      const { db } = getDatabase();
+      // Using direct db import
       
       // Check if username already exists
       const [existingUser] = await db.select().from(users).where(eq(users.username, username));
@@ -1260,7 +1260,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid user ID" });
       }
 
-      const { db } = getDatabase();
+      // Using direct db import
       
       // Check if user exists
       const [existingUser] = await db.select().from(users).where(eq(users.id, userId));
@@ -1313,7 +1313,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid user ID" });
       }
 
-      const { db } = getDatabase();
+      // Using direct db import
       
       // Check if user exists
       const [existingUser] = await db.select().from(users).where(eq(users.id, userId));
@@ -1334,7 +1334,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Attendance management endpoints with role-based access
   app.get("/api/daily-attendance", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       // Temporarily disable authentication to test the data
       console.log("📋 Fetching daily attendance...");
@@ -1351,7 +1351,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/employee-work-schedules", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       // Temporarily disable authentication to test the data
       // TODO: Fix authentication system
@@ -1371,7 +1371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/leave-requests", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       // Temporarily disable authentication to test the data
       console.log("📋 Fetching leave requests...");
@@ -1389,7 +1389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create leave request
   app.post("/api/leave-requests", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       if (!req.session?.passport?.user?.id) {
         return res.status(401).json({ message: "Authentication required" });
@@ -1424,7 +1424,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update leave request status
   app.put("/api/leave-requests/:id/status", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       if (!req.session?.passport?.user?.id) {
         return res.status(401).json({ message: "Authentication required" });
@@ -1473,7 +1473,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create employee work schedule
   app.post("/api/employee-work-schedules", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       // Temporarily disable authentication for work schedule system
       // if (!req.session?.passport?.user?.id) {
@@ -1504,7 +1504,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update employee work schedule
   app.put("/api/employee-work-schedules/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const scheduleId = parseInt(req.params.id);
       
       // Temporarily disable authentication for work schedule system
@@ -1543,7 +1543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete employee work schedule
   app.delete("/api/employee-work-schedules/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const scheduleId = parseInt(req.params.id);
       
       // Temporarily disable authentication for work schedule system
@@ -1576,7 +1576,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create daily attendance record
   app.post("/api/daily-attendance", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       // Temporarily disable authentication for attendance system
       // if (!req.session?.passport?.user?.id) {
@@ -1613,7 +1613,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update daily attendance record
   app.put("/api/daily-attendance/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       // Temporarily disable authentication for attendance system
       // if (!req.session?.passport?.user?.id) {
@@ -1667,7 +1667,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mark day as holiday endpoint
   app.post("/api/daily-attendance/holiday", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { employeeId, date, isHoliday } = req.body;
       
       if (!employeeId || !date) {
@@ -1760,7 +1760,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle data endpoints
   app.get("/api/vehicle-years", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const items = await db.select().from(inventoryItems);
       const uniqueYears = [...new Set(items.map((item: any) => item.year))].sort((a: any, b: any) => b - a);
       res.json(uniqueYears);
@@ -1773,7 +1773,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get engine capacities from database table
   app.get("/api/engine-capacities", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const data = await db.select().from(engineCapacities).where(eq(engineCapacities.isActive, true)).orderBy(asc(engineCapacities.capacity));
       res.json(data.map(item => item.capacity));
     } catch (error) {
@@ -1785,7 +1785,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Engine Capacities Management APIs
   app.get("/api/engine-capacities-full", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const data = await db.select().from(engineCapacities).where(eq(engineCapacities.isActive, true)).orderBy(asc(engineCapacities.capacity));
       res.json(data);
     } catch (error) {
@@ -1796,7 +1796,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/engine-capacities", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const validatedData = insertEngineCapacitySchema.parse(req.body);
       const [newEngineCapacity] = await db.insert(engineCapacities).values(validatedData).returning();
       res.status(201).json(newEngineCapacity);
@@ -1808,7 +1808,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/engine-capacities/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       const validatedData = insertEngineCapacitySchema.parse(req.body);
       const [updatedEngineCapacity] = await db.update(engineCapacities).set(validatedData).where(eq(engineCapacities.id, id)).returning();
@@ -1821,7 +1821,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/engine-capacities/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       await db.delete(engineCapacities).where(eq(engineCapacities.id, id));
       res.json({ message: "Engine capacity deleted successfully" });
@@ -1834,7 +1834,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get hierarchical colors (color associations)
   app.get("/api/hierarchical/colors", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { manufacturer, category, trimLevel, colorType } = req.query;
       
       let query = db.select().from(colorAssociations).where(eq(colorAssociations.isActive, true));
@@ -1864,7 +1864,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get vehicle specifications
   app.get("/api/vehicle-specifications", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const specifications = await db.select().from(vehicleSpecifications);
       res.json(specifications);
     } catch (error) {
@@ -1876,7 +1876,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get specifications by chassis number with fallback to general specifications
   app.get("/api/specifications-by-chassis/:chassisNumber", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { chassisNumber } = req.params;
       
       console.log(`🔍 Fetching specifications for chassis: ${chassisNumber}`);
@@ -2012,7 +2012,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get specific vehicle specifications by parameters - for quotation page
   app.get("/api/specifications/:manufacturer/:category/:trimLevel?/:year/:engineCapacity", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { manufacturer, category, trimLevel, year, engineCapacity } = req.params;
       
       console.log(`🔍 Fetching specifications for: ${manufacturer} ${category} ${trimLevel || 'any'} ${year} ${engineCapacity}`);
@@ -2110,7 +2110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create vehicle specification
   app.post("/api/vehicle-specifications", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { manufacturer, category, trimLevel, year, engineCapacity, chassisNumber, specifications, specificationsEn } = req.body;
       
       const [newSpec] = await db.insert(vehicleSpecifications).values({
@@ -2134,7 +2134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update vehicle specification
   app.put("/api/vehicle-specifications/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       const { manufacturer, category, trimLevel, year, engineCapacity, chassisNumber, specifications, specificationsEn } = req.body;
       
@@ -2167,7 +2167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete vehicle specification
   app.delete("/api/vehicle-specifications/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       
       const [deletedSpec] = await db.delete(vehicleSpecifications)
@@ -2188,7 +2188,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get vehicle image links
   app.get("/api/vehicle-image-links", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const imageLinks = await db.select().from(vehicleImageLinks);
       res.json(imageLinks);
     } catch (error) {
@@ -2200,7 +2200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create vehicle image link
   app.post("/api/vehicle-image-links", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { manufacturer, category, trimLevel, year, engineCapacity, exteriorColor, interiorColor, chassisNumber, imageUrl, description, descriptionEn } = req.body;
       
       const [newImageLink] = await db.insert(vehicleImageLinks).values({
@@ -2227,7 +2227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update vehicle image link
   app.put("/api/vehicle-image-links/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       const { manufacturer, category, trimLevel, year, engineCapacity, exteriorColor, interiorColor, chassisNumber, imageUrl, description, descriptionEn } = req.body;
       
@@ -2263,7 +2263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete vehicle image link
   app.delete("/api/vehicle-image-links/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       
       const [deletedImageLink] = await db.delete(vehicleImageLinks)
@@ -2284,7 +2284,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Database management routes
   app.get("/api/database/stats", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       // Get counts for all major tables
       const [
@@ -2371,7 +2371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/database/export", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { types } = req.query;
       const selectedTypes = types ? types.toString().split(',') : [];
       
@@ -2424,7 +2424,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/database/import", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const importData = req.body;
       const selectedTypes = importData.selectedTypes || [];
       
@@ -2624,7 +2624,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Toggle manufacturer active status
   app.put("/api/manufacturers/:id/toggle", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const manufacturerId = parseInt(req.params.id);
       const { isActive } = req.body;
 
@@ -2648,7 +2648,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Toggle category active status
   app.put("/api/categories/:id/toggle", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const categoryId = parseInt(req.params.id);
       const { isActive } = req.body;
 
@@ -2672,7 +2672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Toggle trim level active status
   app.put("/api/trim-levels/:id/toggle", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const trimLevelId = parseInt(req.params.id);
       const { isActive } = req.body;
 
@@ -2698,7 +2698,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all quotations
   app.get("/api/quotations", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const allQuotations = await db.select().from(quotations).orderBy(desc(quotations.createdAt));
       res.json(allQuotations);
     } catch (error) {
@@ -2710,7 +2710,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get single quotation by ID
   app.get("/api/quotations/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       
       const quotationList = await db.select().from(quotations).where(eq(quotations.id, id));
@@ -2729,7 +2729,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new quotation
   app.post("/api/quotations", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const quotationData = req.body;
       
       // Validate inventoryItemId to prevent integer overflow
@@ -2778,7 +2778,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update quotation
   app.put("/api/quotations/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       const quotationData = req.body;
       
@@ -2836,7 +2836,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete quotation
   app.delete("/api/quotations/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       
       const [deletedQuotation] = await db.delete(quotations)
@@ -2894,7 +2894,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Upload manufacturer logo endpoint
   app.post('/api/manufacturers/:id/upload-logo', uploadLogo.single('logo'), async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const manufacturerId = parseInt(req.params.id);
       
       if (!req.file) {
@@ -2960,7 +2960,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Terms and Conditions endpoints
   app.get("/api/terms-conditions", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const terms = await db.select().from(termsConditions)
         .where(eq(termsConditions.isActive, true))
         .orderBy(asc(termsConditions.displayOrder));
@@ -2981,7 +2981,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/terms-conditions", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { content } = req.body;
       
       if (!content || typeof content !== 'string') {
@@ -3025,7 +3025,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all price cards
   app.get("/api/price-cards", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const cards = await db.select().from(priceCards).orderBy(desc(priceCards.createdAt));
       res.json(cards);
     } catch (error) {
@@ -3037,7 +3037,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new price card
   app.post("/api/price-cards", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       // Validate the request body using the schema
       const validatedData = insertPriceCardSchema.parse(req.body);
@@ -3063,7 +3063,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update a price card
   app.put("/api/price-cards/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const cardId = parseInt(req.params.id);
       
       if (isNaN(cardId)) {
@@ -3101,7 +3101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete a price card
   app.delete("/api/price-cards/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const cardId = parseInt(req.params.id);
       
       if (isNaN(cardId)) {
@@ -3128,7 +3128,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Import Types APIs
   app.get("/api/import-types", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const data = await db.select().from(importTypes).where(eq(importTypes.isActive, true)).orderBy(asc(importTypes.name));
       res.json(data);
     } catch (error) {
@@ -3139,7 +3139,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/import-types", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const validatedData = insertImportTypeSchema.parse(req.body);
       const [newImportType] = await db.insert(importTypes).values(validatedData).returning();
       res.status(201).json(newImportType);
@@ -3151,7 +3151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/import-types/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       const validatedData = insertImportTypeSchema.parse(req.body);
       const [updatedImportType] = await db.update(importTypes).set(validatedData).where(eq(importTypes.id, id)).returning();
@@ -3164,7 +3164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/import-types/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       await db.delete(importTypes).where(eq(importTypes.id, id));
       res.json({ message: "Import type deleted successfully" });
@@ -3177,7 +3177,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle Statuses APIs
   app.get("/api/vehicle-statuses", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const data = await db.select().from(vehicleStatuses).where(eq(vehicleStatuses.isActive, true)).orderBy(asc(vehicleStatuses.name));
       res.json(data);
     } catch (error) {
@@ -3188,7 +3188,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/vehicle-statuses", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const validatedData = insertVehicleStatusSchema.parse(req.body);
       const [newVehicleStatus] = await db.insert(vehicleStatuses).values(validatedData).returning();
       res.status(201).json(newVehicleStatus);
@@ -3200,7 +3200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/vehicle-statuses/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       const validatedData = insertVehicleStatusSchema.parse(req.body);
       const [updatedVehicleStatus] = await db.update(vehicleStatuses).set(validatedData).where(eq(vehicleStatuses.id, id)).returning();
@@ -3213,7 +3213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/vehicle-statuses/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       await db.delete(vehicleStatuses).where(eq(vehicleStatuses.id, id));
       res.json({ message: "Vehicle status deleted successfully" });
@@ -3226,7 +3226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Ownership Types APIs
   app.get("/api/ownership-types", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const data = await db.select().from(ownershipTypes).where(eq(ownershipTypes.isActive, true)).orderBy(asc(ownershipTypes.name));
       res.json(data);
     } catch (error) {
@@ -3237,7 +3237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/ownership-types", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const validatedData = insertOwnershipTypeSchema.parse(req.body);
       const [newOwnershipType] = await db.insert(ownershipTypes).values(validatedData).returning();
       res.status(201).json(newOwnershipType);
@@ -3249,7 +3249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/ownership-types/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       const validatedData = insertOwnershipTypeSchema.parse(req.body);
       const [updatedOwnershipType] = await db.update(ownershipTypes).set(validatedData).where(eq(ownershipTypes.id, id)).returning();
@@ -3262,7 +3262,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/ownership-types/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       await db.delete(ownershipTypes).where(eq(ownershipTypes.id, id));
       res.json({ message: "Ownership type deleted successfully" });
@@ -3275,7 +3275,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle Locations APIs
   app.get("/api/vehicle-locations", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const data = await db.select().from(vehicleLocations).where(eq(vehicleLocations.isActive, true)).orderBy(asc(vehicleLocations.name));
       res.json(data);
     } catch (error) {
@@ -3286,7 +3286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/vehicle-locations", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const validatedData = insertVehicleLocationSchema.parse(req.body);
       const [newVehicleLocation] = await db.insert(vehicleLocations).values(validatedData).returning();
       res.status(201).json(newVehicleLocation);
@@ -3298,7 +3298,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/vehicle-locations/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       const validatedData = insertVehicleLocationSchema.parse(req.body);
       const [updatedVehicleLocation] = await db.update(vehicleLocations).set(validatedData).where(eq(vehicleLocations.id, id)).returning();
@@ -3311,7 +3311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/vehicle-locations/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       await db.delete(vehicleLocations).where(eq(vehicleLocations.id, id));
       res.json({ message: "Vehicle location deleted successfully" });
@@ -3324,7 +3324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Vehicle Colors APIs
   app.get("/api/vehicle-colors", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const { type } = req.query;
       let query = db.select().from(vehicleColors).where(eq(vehicleColors.isActive, true));
       
@@ -3342,7 +3342,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/vehicle-colors", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const validatedData = insertVehicleColorSchema.parse(req.body);
       const [newVehicleColor] = await db.insert(vehicleColors).values(validatedData).returning();
       res.status(201).json(newVehicleColor);
@@ -3354,7 +3354,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/vehicle-colors/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       const validatedData = insertVehicleColorSchema.parse(req.body);
       const [updatedVehicleColor] = await db.update(vehicleColors).set(validatedData).where(eq(vehicleColors.id, id)).returning();
@@ -3367,7 +3367,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/vehicle-colors/:id", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       const id = parseInt(req.params.id);
       await db.delete(vehicleColors).where(eq(vehicleColors.id, id));
       res.json({ message: "Vehicle color deleted successfully" });
@@ -3380,7 +3380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize default dropdown data
   app.post("/api/initialize-dropdown-data", async (req, res) => {
     try {
-      const { db } = getDatabase();
+      // Using direct db import
       
       // Add default vehicle statuses including the new ones
       const defaultStatuses = [

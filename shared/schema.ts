@@ -1,5 +1,5 @@
 import { pgTable, text, serial, integer, timestamp, boolean, decimal, varchar, jsonb } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
+import { sql, relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -1111,4 +1111,51 @@ export type InsertVehicleCategory = z.infer<typeof insertVehicleCategorySchema>;
 export type VehicleTrimLevel = typeof vehicleTrimLevels.$inferSelect;
 export type InsertVehicleTrimLevel = z.infer<typeof insertVehicleTrimLevelSchema>;
 
+// Relations
+export const bankRelations = relations(banks, ({ many }) => ({
+  bankInterestRates: many(bankInterestRates),
+}));
 
+export const bankInterestRateRelations = relations(bankInterestRates, ({ one }) => ({
+  bank: one(banks, {
+    fields: [bankInterestRates.bankId],
+    references: [banks.id],
+  }),
+}));
+
+export const manufacturerRelations = relations(manufacturers, ({ many }) => ({
+  vehicleCategories: many(vehicleCategories),
+}));
+
+export const vehicleCategoryRelations = relations(vehicleCategories, ({ one, many }) => ({
+  manufacturer: one(manufacturers, {
+    fields: [vehicleCategories.manufacturerId],
+    references: [manufacturers.id],
+  }),
+  vehicleTrimLevels: many(vehicleTrimLevels),
+}));
+
+export const vehicleTrimLevelRelations = relations(vehicleTrimLevels, ({ one }) => ({
+  category: one(vehicleCategories, {
+    fields: [vehicleTrimLevels.categoryId],
+    references: [vehicleCategories.id],
+  }),
+}));
+
+export const quotationRelations = relations(quotations, ({ many }) => ({
+  invoices: many(invoices),
+}));
+
+export const invoiceRelations = relations(invoices, ({ one }) => ({
+  quotation: one(quotations, {
+    fields: [invoices.quotationId],
+    references: [quotations.id],
+  }),
+}));
+
+export const locationTransferRelations = relations(locationTransfers, ({ one }) => ({
+  inventoryItem: one(inventoryItems, {
+    fields: [locationTransfers.inventoryItemId],
+    references: [inventoryItems.id],
+  }),
+}));

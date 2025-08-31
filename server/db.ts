@@ -1,54 +1,15 @@
-import { Pool } from 'pg';
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import ws from "ws";
 import * as schema from "@shared/schema";
 
-let pool: Pool | null = null;
-let db: any = null;
+neonConfig.webSocketConstructor = ws;
 
-export function initializeDatabase() {
-  if (pool && db) {
-    return { pool, db };
-  }
-
-  // Force use of external database URL
-  let DATABASE_URL = "postgresql://neondb_owner:npg_E9MhlZt2CTGz@ep-dry-night-afnnpvw9-pooler.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
-  
-  // Clean the URL if it includes psql command wrapper
-  if (DATABASE_URL && DATABASE_URL.startsWith("psql '")) {
-    DATABASE_URL = DATABASE_URL.replace(/^psql '/, '').replace(/'$/, '');
-  }
-
-  if (!DATABASE_URL) {
-    throw new Error(
-      "DATABASE_URL must be set. Please ensure the database is provisioned and environment variables are configured."
-    );
-  }
-
-  console.log('🔌 Initializing database connection...');
-  console.log('📋 DATABASE_URL available:', !!DATABASE_URL);
-  console.log('🌍 Environment:', process.env.NODE_ENV || 'development');
-
-  const poolConfig = {
-    connectionString: DATABASE_URL,
-    ssl: { rejectUnauthorized: false }, // Always use SSL for Neon database
-    max: 20,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 10000,
-  };
-
-  pool = new Pool(poolConfig);
-  db = drizzle({ client: pool, schema });
-
-  return { pool, db };
+if (!process.env.DATABASE_URL) {
+  throw new Error(
+    "DATABASE_URL must be set. Did you forget to provision a database?",
+  );
 }
 
-export function getDatabase() {
-  if (!pool || !db) {
-    const result = initializeDatabase();
-    pool = result.pool;
-    db = result.db;
-  }
-  return { pool, db };
-}
-
-export { pool, db };
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const db = drizzle({ client: pool, schema });

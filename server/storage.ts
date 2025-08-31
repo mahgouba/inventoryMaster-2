@@ -351,7 +351,201 @@ export interface IStorage {
   updateLeaveRequest(id: number, requestData: any): Promise<LeaveRequest | undefined>;
 }
 
-export class MemStorage implements IStorage {
+export class DatabaseStorage implements IStorage {
+  constructor() {
+    // Initialize database connection
+    this.initializeDatabase();
+  }
+
+  private async initializeDatabase() {
+    try {
+      // Import database connection
+      const { db } = await import("./db");
+      this.db = db;
+    } catch (error) {
+      console.error("Failed to initialize database:", error);
+      throw new Error("Database initialization failed");
+    }
+  }
+
+  private db: any;
+
+  async getUser(id: number): Promise<User | undefined> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    
+    return await db.select().from(users);
+  }
+
+  async updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [updatedUser] = await db
+      .update(users)
+      .set(user)
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser || undefined;
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const result = await db.delete(users).where(eq(users.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Inventory methods
+  async getAllInventoryItems(): Promise<InventoryItem[]> {
+    const { db } = await import("./db");
+    const { inventoryItems } = await import("@shared/schema");
+    
+    return await db.select().from(inventoryItems);
+  }
+
+  async getInventoryItem(id: number): Promise<InventoryItem | undefined> {
+    const { db } = await import("./db");
+    const { inventoryItems } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [item] = await db.select().from(inventoryItems).where(eq(inventoryItems.id, id));
+    return item || undefined;
+  }
+
+  async createInventoryItem(item: InsertInventoryItem): Promise<InventoryItem> {
+    const { db } = await import("./db");
+    const { inventoryItems } = await import("@shared/schema");
+    
+    const [createdItem] = await db
+      .insert(inventoryItems)
+      .values(item)
+      .returning();
+    return createdItem;
+  }
+
+  async updateInventoryItem(id: number, item: Partial<InsertInventoryItem>): Promise<InventoryItem | undefined> {
+    const { db } = await import("./db");
+    const { inventoryItems } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [updatedItem] = await db
+      .update(inventoryItems)
+      .set(item)
+      .where(eq(inventoryItems.id, id))
+      .returning();
+    return updatedItem || undefined;
+  }
+
+  async deleteInventoryItem(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const { inventoryItems } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const result = await db.delete(inventoryItems).where(eq(inventoryItems.id, id));
+    return result.rowCount > 0;
+  }
+
+  async clearAllInventoryItems(): Promise<boolean> {
+    const { db } = await import("./db");
+    const { inventoryItems } = await import("@shared/schema");
+    
+    await db.delete(inventoryItems);
+    return true;
+  }
+
+  async searchInventoryItems(query: string): Promise<InventoryItem[]> {
+    const { db } = await import("./db");
+    const { inventoryItems } = await import("@shared/schema");
+    const { or, ilike } = await import("drizzle-orm");
+    
+    return await db
+      .select()
+      .from(inventoryItems)
+      .where(
+        or(
+          ilike(inventoryItems.manufacturer, `%${query}%`),
+          ilike(inventoryItems.category, `%${query}%`),
+          ilike(inventoryItems.chassisNumber, `%${query}%`),
+          ilike(inventoryItems.notes, `%${query}%`)
+        )
+      );
+  }
+
+  async filterInventoryItems(filters: { 
+    category?: string; 
+    status?: string; 
+    year?: number; 
+    manufacturer?: string;
+    importType?: string;
+    location?: string;
+  }): Promise<InventoryItem[]> {
+    const { db } = await import("./db");
+    const { inventoryItems } = await import("@shared/schema");
+    const { eq, and } = await import("drizzle-orm");
+    
+    const conditions = [];
+    
+    if (filters.category) {
+      conditions.push(eq(inventoryItems.category, filters.category));
+    }
+    if (filters.status) {
+      conditions.push(eq(inventoryItems.status, filters.status));
+    }
+    if (filters.year) {
+      conditions.push(eq(inventoryItems.year, filters.year));
+    }
+    if (filters.manufacturer) {
+      conditions.push(eq(inventoryItems.manufacturer, filters.manufacturer));
+    }
+    if (filters.importType) {
+      conditions.push(eq(inventoryItems.importType, filters.importType));
+    }
+    if (filters.location) {
+      conditions.push(eq(inventoryItems.location, filters.location));
+    }
+    
+    if (conditions.length === 0) {
+      return this.getAllInventoryItems();
+    }
+    
+    return await db
+      .select()
+      .from(inventoryItems)
+      .where(and(...conditions));
+  }
   private users = new Map<number, User>();
   private inventoryItems = new Map<number, InventoryItem>();
   private manufacturers = new Map<number, Manufacturer>();
@@ -2146,40 +2340,6 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Initialize storage system for Replit compatibility
-// Use DatabaseStorage when DATABASE_URL is available
+import { DatabaseStorage } from "./database-storage";
 
-let storageInstance: IStorage | null = null;
-
-// Export a function to get the storage instance
-export function getStorage(): IStorage {
-  if (storageInstance) {
-    return storageInstance;
-  }
-  
-  // Check if DATABASE_URL is available
-  if (process.env.DATABASE_URL) {
-    try {
-      // Import and use DatabaseStorage
-      const { DatabaseStorage } = require('./database-storage');
-      storageInstance = new DatabaseStorage();
-      console.log('✅ Database connection successful');
-      return storageInstance;
-    } catch (error) {
-      console.warn('⚠️  Database connection failed, falling back to MemStorage:', error.message);
-      storageInstance = new MemStorage();
-      return storageInstance;
-    }
-  } else {
-    // Fallback to MemStorage
-    storageInstance = new MemStorage();
-    console.log('ℹ️ DATABASE_URL not found - using memory storage');
-    return storageInstance;
-  }
-}
-
-// For backward compatibility, export a default instance
-export const storage = getStorage();
-
-// Log the current storage configuration
-console.log('🔧 Storage system initialized');
+export const storage = new DatabaseStorage();
