@@ -13,3 +13,8 @@ if (!process.env.DATABASE_URL) {
 
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle({ client: pool, schema });
+
+// Export the getDatabase function that other files expect
+export function getDatabase() {
+  return { db, pool };
+}
