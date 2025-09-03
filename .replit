@@ -46,3 +46,4 @@ build = ["npm", "run", "build"]
 
 [agent]
 integrations = ["javascript_database==1.0.0"]
+expertMode = true
