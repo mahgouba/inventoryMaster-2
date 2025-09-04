@@ -388,24 +388,9 @@ export default function InventoryTable({
                   <TableCell className="text-sm text-white">{item.exteriorColor}</TableCell>
                   <TableCell className="text-sm text-white">{item.interiorColor}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className={`${getStatusColor(item.status)} border px-2 py-1 text-xs font-medium shadow-sm`}>
-                        {item.status}
-                      </Badge>
-                      {(() => {
-                        const daysSinceEntry = getDaysSinceEntry(item.entryDate);
-                        const indicatorColor = getDaysIndicatorColor(daysSinceEntry);
-                        const formattedDays = formatDaysIndicator(daysSinceEntry);
-                        return (
-                          <div 
-                            className={`min-w-[24px] h-6 rounded-full ${indicatorColor} flex items-center justify-center text-xs font-bold shadow-md hover:scale-105 transition-transform cursor-help`}
-                            title={`${formattedDays} منذ الدخول - تاريخ الدخول: ${new Date(item.entryDate).toLocaleDateString('ar-SA')}`}
-                          >
-                            {daysSinceEntry > 99 ? '99+' : daysSinceEntry}
-                          </div>
-                        );
-                      })()}
-                    </div>
+                    <Badge variant="outline" className={`${getStatusColor(item.status)} border px-2 py-1 text-xs font-medium shadow-sm`}>
+                      {item.status}
+                    </Badge>
                   </TableCell>
                   <TableCell className="text-sm text-white">{item.location}</TableCell>
                   <TableCell className="text-sm text-white">{item.importType}</TableCell>
