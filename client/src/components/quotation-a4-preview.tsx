@@ -556,6 +556,23 @@ export default function QuotationA4Preview({
             </div>
           )}
 
+          {/* Company Stamp - Bottom Right */}
+          {companyStamp && (
+            <div className="absolute bottom-20 right-4">
+              <img 
+                src={companyStamp} 
+                alt="ختم الشركة"
+                className="company-stamp"
+                style={{
+                  width: '180px',
+                  height: '120px',
+                  objectFit: 'contain',
+                  opacity: 0.8
+                }}
+              />
+            </div>
+          )}
+
         </div>
       </div>
     </div>
