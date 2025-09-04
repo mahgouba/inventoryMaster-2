@@ -8,25 +8,27 @@ export function cn(...inputs: ClassValue[]) {
 export function getStatusColor(status: string) {
   switch (status) {
     case "متوفر":
-      return "bg-green-100 text-green-800 border-green-200";
+      return "bg-green-500/20 text-green-100 border-green-400 shadow-lg shadow-green-500/25";
     case "في الطريق":
-      return "bg-blue-100 text-blue-800 border-blue-200";
+      return "bg-blue-500/20 text-blue-100 border-blue-400 shadow-lg shadow-blue-500/25";
     case "قيد الصيانة":
-      return "bg-orange-100 text-orange-800 border-orange-200";
+      return "bg-orange-500/20 text-orange-100 border-orange-400 shadow-lg shadow-orange-500/25";
     case "محجوز":
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      return "bg-yellow-500/20 text-yellow-100 border-yellow-400 shadow-lg shadow-yellow-500/25";
     case "مباع":
-      return "bg-purple-100 text-purple-800 border-purple-200";
+      return "bg-purple-500/20 text-purple-100 border-purple-400 shadow-lg shadow-purple-500/25";
     case "تشغيل":
-      return "bg-cyan-100 text-cyan-800 border-cyan-200";
+      return "bg-emerald-500/30 text-emerald-100 border-emerald-300 shadow-lg shadow-emerald-500/40 ring-2 ring-emerald-400/50";
     case "خاص":
-      return "bg-pink-100 text-pink-800 border-pink-200";
+      return "bg-pink-500/20 text-pink-100 border-pink-400 shadow-lg shadow-pink-500/25";
     case "حذف":
-      return "bg-red-100 text-red-800 border-red-200";
+      return "bg-red-500/20 text-red-100 border-red-400 shadow-lg shadow-red-500/25";
     case "مستعمل":
-      return "bg-slate-100 text-slate-800 border-slate-200";
+      return "bg-slate-500/20 text-slate-100 border-slate-400 shadow-lg shadow-slate-500/25";
+    case "مراجعة المشرف":
+      return "bg-amber-500/20 text-amber-100 border-amber-400 shadow-lg shadow-amber-500/25";
     default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
+      return "bg-gray-500/20 text-gray-100 border-gray-400 shadow-lg shadow-gray-500/25";
   }
 }
 
