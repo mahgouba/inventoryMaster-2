@@ -21,6 +21,7 @@ import {
   termsConditions,
   priceCards,
   insertPriceCardSchema,
+  insertInventoryItemSchema,
   type PriceCard,
   type InsertPriceCard,
   importTypes,
@@ -626,6 +627,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating inventory item:", error);
       res.status(500).json({ message: "Failed to create inventory item" });
+    }
+  });
+
+  // Excel import endpoint for inventory
+  app.post("/api/inventory/import-excel", async (req, res) => {
+    try {
+      const { items } = req.body;
+      
+      if (!Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ message: "No items provided for import" });
+      }
+
+      let successCount = 0;
+      let failedCount = 0;
+      let duplicateCount = 0;
+      const failedItems: any[] = [];
+
+      for (const item of items) {
+        try {
+          console.log("Processing item:", item);
+          
+          // Generate unique chassis number if missing or "000" (common placeholder)
+          let chassisNumber = item.chassisNumber;
+          if (!chassisNumber || chassisNumber === '000' || chassisNumber.trim() === '') {
+            chassisNumber = `CH${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+          }
+          
+          // Check for duplicate chassis number
+          const existingItems = await db.select().from(inventoryItems);
+          let isDuplicate = existingItems.some((existing: any) => 
+            existing.chassisNumber === chassisNumber
+          );
+
+          // If still duplicate, generate new one
+          let attempts = 0;
+          while (isDuplicate && attempts < 10) {
+            chassisNumber = `CH${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+            isDuplicate = existingItems.some((existing: any) => 
+              existing.chassisNumber === chassisNumber
+            );
+            attempts++;
+          }
+
+          if (isDuplicate) {
+            console.log("Could not generate unique chassis number after 10 attempts");
+            duplicateCount++;
+            continue;
+          }
+
+          // Prepare the item with required fields and defaults
+          const itemToValidate = {
+            manufacturer: item.manufacturer || '',
+            category: item.category || '',
+            trimLevel: item.trimLevel || '',
+            engineCapacity: item.engineCapacity || '',
+            year: item.year || new Date().getFullYear(),
+            exteriorColor: item.exteriorColor || '',
+            interiorColor: item.interiorColor || '',
+            status: item.status || 'متوفر',
+            importType: item.importType || 'وكالة',
+            ownershipType: item.ownershipType || 'ملك الشركة',
+            location: item.location || 'الرياض',
+            chassisNumber: chassisNumber,
+            price: item.price ? String(item.price) : '0',
+            mileage: item.mileage || 0,
+            notes: item.notes || '',
+            images: item.images || [],
+          };
+
+          console.log("Validating item:", itemToValidate);
+          
+          // Validate and create the item
+          const validation = insertInventoryItemSchema.safeParse(itemToValidate);
+          if (!validation.success) {
+            console.error("Validation failed for item:", itemToValidate, "Errors:", validation.error.errors);
+            throw new Error(`Validation failed: ${validation.error.errors.map(e => `${e.path}: ${e.message}`).join(', ')}`);
+          }
+
+          const validatedItem = validation.data;
+
+          const [createdItem] = await db.insert(inventoryItems).values(validatedItem).returning();
+          
+          console.log("Created item successfully:", createdItem.id);
+          successCount++;
+        } catch (error) {
+          failedCount++;
+          console.error("Failed to import item:", item, "Error:", error);
+          failedItems.push({ item, error: error instanceof Error ? error.message : String(error) });
+        }
+      }
+
+      const stats = {
+        total: items.length,
+        success: successCount,
+        failed: failedCount,
+        duplicates: duplicateCount,
+        failedItems: failedItems.slice(0, 10) // Return first 10 failed items for debugging
+      };
+
+      res.json(stats);
+    } catch (error) {
+      console.error("Error importing Excel data:", error);
+      res.status(500).json({ message: "Failed to import Excel data" });
     }
   });
 

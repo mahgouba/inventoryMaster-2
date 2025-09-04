@@ -34,7 +34,10 @@ export function ExcelImportDialog({ open, onOpenChange }: ExcelImportDialogProps
   const queryClient = useQueryClient();
 
   const importMutation = useMutation({
-    mutationFn: (data: any[]) => apiRequest("POST", "/api/inventory/import-excel", { items: data }),
+    mutationFn: async (data: any[]) => {
+      const response = await apiRequest("POST", "/api/inventory/import-excel", { items: data });
+      return response as unknown as ImportStats;
+    },
     onSuccess: (result: ImportStats) => {
       setImportStats(result);
       queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
