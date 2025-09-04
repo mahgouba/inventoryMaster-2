@@ -8,13 +8,72 @@ export function cn(...inputs: ClassValue[]) {
 export function getStatusColor(status: string) {
   switch (status) {
     case "متوفر":
-      return "bg-green-100 text-green-800";
+      return "bg-green-100 text-green-800 border-green-200";
     case "في الطريق":
-      return "bg-amber-100 text-amber-800";
+      return "bg-blue-100 text-blue-800 border-blue-200";
     case "قيد الصيانة":
-      return "bg-red-100 text-red-800";
+      return "bg-orange-100 text-orange-800 border-orange-200";
+    case "محجوز":
+      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+    case "مباع":
+      return "bg-purple-100 text-purple-800 border-purple-200";
+    case "تشغيل":
+      return "bg-cyan-100 text-cyan-800 border-cyan-200";
+    case "خاص":
+      return "bg-pink-100 text-pink-800 border-pink-200";
+    case "حذف":
+      return "bg-red-100 text-red-800 border-red-200";
+    case "مستعمل":
+      return "bg-slate-100 text-slate-800 border-slate-200";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-gray-100 text-gray-800 border-gray-200";
+  }
+}
+
+// دالة لحساب الأيام منذ الدخول مع التلوين
+export function getDaysSinceEntry(entryDate: string) {
+  const entry = new Date(entryDate);
+  const now = new Date();
+  const diffTime = now.getTime() - entry.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+}
+
+// دالة للحصول على لون مؤشر الأيام
+export function getDaysIndicatorColor(days: number) {
+  if (days <= 7) {
+    return "bg-green-500 text-white"; // أخضر للأسبوع الأول
+  } else if (days <= 20) {
+    return "bg-yellow-500 text-white"; // أصفر من أسبوع إلى 20 يوم
+  } else if (days <= 40) {
+    return "bg-orange-500 text-white"; // برتقالي من 20 إلى 40 يوم
+  } else {
+    return "bg-red-500 text-white"; // أحمر بعد 40 يوم
+  }
+}
+
+// دالة لتنسيق عرض الأيام
+export function formatDaysIndicator(days: number) {
+  if (days === 0) {
+    return "اليوم";
+  } else if (days === 1) {
+    return "أمس";
+  } else if (days <= 7) {
+    return `${days} أيام`;
+  } else if (days <= 30) {
+    return `${days} يوم`;
+  } else if (days <= 365) {
+    const months = Math.floor(days / 30);
+    const remainingDays = days % 30;
+    if (remainingDays === 0) {
+      return `${months} شهر`;
+    } else {
+      return `${months} شهر و ${remainingDays} يوم`;
+    }
+  } else {
+    const years = Math.floor(days / 365);
+    const remainingDays = days % 365;
+    return `${years} سنة و ${Math.floor(remainingDays / 30)} شهر`;
   }
 }
 

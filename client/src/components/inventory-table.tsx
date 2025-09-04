@@ -7,7 +7,7 @@ import { Edit, Trash2, Eye, Images, ArrowUpDown, ShoppingCart, DollarSign, Calen
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { getStatusColor } from "@/lib/utils";
+import { getStatusColor, getDaysSinceEntry, getDaysIndicatorColor, formatDaysIndicator } from "@/lib/utils";
 import type { InventoryItem } from "@shared/schema";
 import InventoryForm from "./inventory-form";
 import { ManufacturerLogo } from "./manufacturer-logo";
@@ -69,22 +69,6 @@ export default function InventoryTable({
     queryKey: ["/api/inventory"],
   });
 
-  // Calculate days since entry
-  const getDaysSinceEntry = (entryDate: string) => {
-    const entry = new Date(entryDate);
-    const now = new Date();
-    const diffTime = now.getTime() - entry.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
-  // Get color for days indicator circle
-  const getDaysIndicatorColor = (days: number) => {
-    if (days > 40) {
-      return "bg-red-500"; // Red after 40 days
-    }
-    return "bg-green-500"; // Green for 40 days or less
-  };
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => apiRequest("DELETE", `/api/inventory/${id}`),
@@ -405,18 +389,19 @@ export default function InventoryTable({
                   <TableCell className="text-sm text-white">{item.interiorColor}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className={getStatusColor(item.status)}>
+                      <Badge variant="outline" className={`${getStatusColor(item.status)} border px-2 py-1 text-xs font-medium shadow-sm`}>
                         {item.status}
                       </Badge>
                       {(() => {
                         const daysSinceEntry = getDaysSinceEntry(item.entryDate);
                         const indicatorColor = getDaysIndicatorColor(daysSinceEntry);
+                        const formattedDays = formatDaysIndicator(daysSinceEntry);
                         return (
                           <div 
-                            className={`w-6 h-6 rounded-full ${indicatorColor} flex items-center justify-center text-white text-xs font-bold shadow-sm`}
-                            title={`${daysSinceEntry} ${daysSinceEntry === 1 ? 'يوم' : 'أيام'} منذ الدخول`}
+                            className={`min-w-[24px] h-6 rounded-full ${indicatorColor} flex items-center justify-center text-xs font-bold shadow-md hover:scale-105 transition-transform cursor-help`}
+                            title={`${formattedDays} منذ الدخول - تاريخ الدخول: ${new Date(item.entryDate).toLocaleDateString('ar-SA')}`}
                           >
-                            {daysSinceEntry}
+                            {daysSinceEntry > 99 ? '99+' : daysSinceEntry}
                           </div>
                         );
                       })()}
