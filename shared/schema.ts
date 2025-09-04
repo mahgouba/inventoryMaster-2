@@ -62,7 +62,7 @@ export const banks = pgTable("banks", {
   nameEn: text("name_en"), // الاسم الإنجليزي
   accountName: text("account_name").notNull(), // اسم الحساب
   accountNumber: text("account_number").notNull(), // رقم الحساب
-  iban: text("iban").notNull(), // رقم الآيبان
+  iban: text("iban"), // رقم الآيبان
   type: text("type").notNull(), // النوع: "شخصي" أو "شركة"
   isActive: boolean("is_active").default(true).notNull(), // نشط
   createdAt: timestamp("created_at").defaultNow().notNull(),
