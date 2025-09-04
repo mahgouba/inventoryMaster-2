@@ -3310,12 +3310,30 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                   onChange={(e) => setEditableVehicle(prev => prev ? { ...prev, interiorColor: e.target.value } : null)}
                 />
               </div>
-              <div className="md:col-span-2">
+              <div>
                 <Label htmlFor="editChassisNumber">رقم الهيكل</Label>
                 <Input
                   id="editChassisNumber"
                   value={editableVehicle?.chassisNumber || ""}
                   onChange={(e) => setEditableVehicle(prev => prev ? { ...prev, chassisNumber: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="editPrice">السعر (ريال سعودي)</Label>
+                <Input
+                  id="editPrice"
+                  type="number"
+                  min="0"
+                  step="1000"
+                  placeholder="0"
+                  value={editableVehicle?.price || ""}
+                  onChange={(e) => {
+                    const newPrice = parseFloat(e.target.value) || 0;
+                    setEditableVehicle(prev => prev ? { ...prev, price: newPrice } : null);
+                    // تحديث تفاصيل التسعير أيضاً
+                    setPricingDetails(prev => ({ ...prev, basePrice: newPrice }));
+                  }}
+                  className="text-green-600 dark:text-green-400 font-semibold"
                 />
               </div>
               <div className="md:col-span-2">
