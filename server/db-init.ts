@@ -1,6 +1,7 @@
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
+import bcrypt from 'bcryptjs';
 
 let pool: Pool | null = null;
 let db: any = null;
@@ -35,6 +36,17 @@ export async function initializeDatabase() {
       // Test the connection
       await pool.query('SELECT 1');
       console.log('✅ Database connection successful');
+
+      // Seed default admin user if no users exist
+      const userCount = await pool.query('SELECT COUNT(*) FROM users');
+      if (parseInt(userCount.rows[0].count) === 0) {
+        const hashedPassword = await bcrypt.hash('admin123', 10);
+        await pool.query(
+          "INSERT INTO users (name, job_title, phone_number, username, password, role) VALUES ($1, $2, $3, $4, $5, $6)",
+          ['المدير', 'مدير النظام', '0500000000', 'admin', hashedPassword, 'admin']
+        );
+        console.log('✅ Default admin user created (username: admin, password: admin123)');
+      }
       
       return { pool, db };
     } catch (error) {
