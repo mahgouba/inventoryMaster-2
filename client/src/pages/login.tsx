@@ -2,12 +2,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { LogIn } from "lucide-react";
+import { Car } from "lucide-react";
 
 const loginSchema = z.object({
   username: z.string().min(1, "اسم المستخدم مطلوب"),
@@ -37,9 +35,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
@@ -49,19 +45,14 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       }
 
       const userData = await response.json();
-      
-      // Store auth role in localStorage for simple auth
       localStorage.setItem("auth", JSON.stringify(userData));
-      
-      // Call parent callback
       onLogin(userData);
-      
+
       toast({
         title: "تم تسجيل الدخول بنجاح",
         description: `مرحباً ${userData.username}`,
       });
     } catch (error: any) {
-      console.error("Login error:", error);
       toast({
         title: "خطأ في تسجيل الدخول",
         description: error.message || "اسم المستخدم أو كلمة المرور غير صحيحة",
@@ -73,53 +64,151 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-black flex items-center justify-center p-4" dir="rtl">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">تسجيل الدخول</CardTitle>
-          <p className="text-muted-foreground">تسجيل الدخول إلى النظام</p>
-        </CardHeader>
-        <CardContent>
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      dir="rtl"
+      style={{
+        background: "linear-gradient(160deg, #0A0B0D 0%, #0D0F14 50%, #0A0B0D 100%)",
+      }}
+    >
+      {/* Subtle gold radial glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 40% at 50% 60%, rgba(196,150,50,0.07) 0%, transparent 70%)",
+        }}
+      />
+
+      <div className="relative w-full max-w-sm">
+        {/* Logo / Brand */}
+        <div className="text-center mb-10">
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-5"
+            style={{
+              background: "linear-gradient(135deg, #C49632, #E8B84B)",
+              boxShadow: "0 8px 32px rgba(196,150,50,0.35)",
+            }}
+          >
+            <Car className="w-8 h-8 text-black" />
+          </div>
+          <h1
+            className="text-3xl font-bold tracking-wide"
+            style={{ color: "#ffffff", letterSpacing: "0.04em" }}
+          >
+            نظام المبيعات
+          </h1>
+          <p className="mt-2 text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
+            مرحباً بك — تسجيل الدخول للمتابعة
+          </p>
+        </div>
+
+        {/* Card */}
+        <div
+          className="rounded-2xl p-8"
+          style={{
+            background: "rgba(17,19,24,0.85)",
+            border: "1px solid rgba(196,150,50,0.18)",
+            boxShadow: "0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)",
+            backdropFilter: "blur(20px)",
+          }}
+        >
           <Form {...loginForm}>
-            <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+            <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-5">
               <FormField
                 control={loginForm.control}
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>اسم المستخدم</FormLabel>
+                    <label
+                      className="block text-xs font-semibold mb-2 tracking-widest uppercase"
+                      style={{ color: "rgba(255,255,255,0.45)" }}
+                    >
+                      اسم المستخدم
+                    </label>
                     <FormControl>
-                      <Input placeholder="أدخل اسم المستخدم" {...field} />
+                      <Input
+                        placeholder="أدخل اسم المستخدم"
+                        {...field}
+                        data-testid="input-username"
+                        className="h-12 rounded-xl text-sm font-medium"
+                        style={{
+                          background: "rgba(255,255,255,0.04)",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          color: "#ffffff",
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={loginForm.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>كلمة المرور</FormLabel>
+                    <label
+                      className="block text-xs font-semibold mb-2 tracking-widest uppercase"
+                      style={{ color: "rgba(255,255,255,0.45)" }}
+                    >
+                      كلمة المرور
+                    </label>
                     <FormControl>
-                      <Input type="password" placeholder="أدخل كلمة المرور" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
+                        data-testid="input-password"
+                        className="h-12 rounded-xl text-sm font-medium"
+                        style={{
+                          background: "rgba(255,255,255,0.04)",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          color: "#ffffff",
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button 
-                type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200" 
+
+              <button
+                type="submit"
                 disabled={isLoading}
+                data-testid="button-login"
+                className="w-full h-12 rounded-xl font-bold text-sm tracking-wide flex items-center justify-center gap-2 mt-2"
+                style={{
+                  background: isLoading
+                    ? "rgba(196,150,50,0.5)"
+                    : "linear-gradient(135deg, #C49632, #E8B84B)",
+                  color: "#000000",
+                  boxShadow: isLoading ? "none" : "0 4px 20px rgba(196,150,50,0.4)",
+                  cursor: isLoading ? "not-allowed" : "pointer",
+                }}
               >
-                <LogIn className="ml-2 h-4 w-4" />
-                {isLoading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
-              </Button>
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    جاري تسجيل الدخول...
+                  </span>
+                ) : (
+                  "تسجيل الدخول"
+                )}
+              </button>
             </form>
           </Form>
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Footer */}
+        <p className="text-center mt-6 text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
+          نظام إدارة المبيعات والمخزون
+        </p>
+      </div>
     </div>
   );
 }

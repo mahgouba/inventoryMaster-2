@@ -456,9 +456,9 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
   };
 
   return (
-    <div className="fixed top-0 right-0 z-50 w-16 h-screen bg-gradient-to-b from-white/15 via-white/10 to-white/5 backdrop-blur-2xl border-l border-white/30 shadow-2xl overflow-hidden sidebar-glass-container">
+    <div className="fixed top-0 right-0 z-50 w-16 h-screen backdrop-blur-2xl overflow-hidden sidebar-glass-container" style={{ background: "rgba(13,15,20,0.95)", borderLeft: "1px solid rgba(196,150,50,0.15)", boxShadow: "-4px 0 32px rgba(0,0,0,0.5)" }}>
       {/* Header Section */}
-      <div className="p-3 border-b border-white/20 flex items-center justify-center">
+      <div className="p-3 flex items-center justify-center" style={{ borderBottom: "1px solid rgba(196,150,50,0.2)" }}>
         <img 
           src="/copmany logo.svg" 
           alt="شعار البريمي للسيارات" 
@@ -526,7 +526,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       </div>
 
       {/* Footer Glow */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-blue-500/10 to-transparent pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none" style={{ background: "linear-gradient(to top, rgba(196,150,50,0.08), transparent)" }}></div>
     </div>
   );
 }

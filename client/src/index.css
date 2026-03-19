@@ -3,42 +3,42 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Dark Theme System - Applied Globally */
+/* Dark Theme System - Applied Globally - mynaghi.sa Premium Style */
 :root {
-  --dark-bg-primary: #0A0A0A;
-  --dark-bg-secondary: #1A1A1A;
-  --dark-bg-accent: #2A2A2A;
+  --dark-bg-primary: #0A0B0D;
+  --dark-bg-secondary: #111318;
+  --dark-bg-accent: #1A1B22;
   --text-primary: rgba(255, 255, 255, 0.95);
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.5);
 
-  /* Theme Management Variables */
-  --theme-primary: #00627F;
-  --theme-secondary: #00A3CC;
-  --theme-accent: #0081A3;
-  --theme-background: #f8fafc;
-  --theme-foreground: #1e293b;
-  --theme-gradient: linear-gradient(90deg, #00627F 0%, #00A3CC 100%);
+  /* Theme Management Variables - Gold/Premium Automotive */
+  --theme-primary: #C49632;
+  --theme-secondary: #E8B84B;
+  --theme-accent: #A67C28;
+  --theme-background: #0A0B0D;
+  --theme-foreground: #ffffff;
+  --theme-gradient: linear-gradient(90deg, #C49632 0%, #E8B84B 100%);
   
   /* Dynamic Theme Variables */
-  --dynamic-primary: #00627F;
-  --dynamic-secondary: #00A3CC;
-  --dynamic-accent: #0081A3;
-  --dynamic-primary-hsl: 194, 100%, 25%;
-  --dynamic-secondary-hsl: 194, 100%, 40%;
-  --dynamic-accent-hsl: 194, 100%, 32%;
+  --dynamic-primary: #C49632;
+  --dynamic-secondary: #E8B84B;
+  --dynamic-accent: #A67C28;
+  --dynamic-primary-hsl: 38, 62%, 48%;
+  --dynamic-secondary-hsl: 40, 78%, 60%;
+  --dynamic-accent-hsl: 36, 62%, 40%;
 }
 
-/* Global Dark Background with New Theme Color */
+/* Global Dark Background - mynaghi.sa Premium Dark Automotive Style */
 html, body {
-  background: linear-gradient(135deg, #00627F 0%, #004861 50%, #00627F 100%) !important;
+  background: linear-gradient(160deg, #0A0B0D 0%, #0D0F14 50%, #0A0B0D 100%) !important;
   color: var(--text-primary) !important;
   min-height: 100vh;
 }
 
 /* Root with Static Dark Background */
 #root {
-  background: linear-gradient(135deg, #00627F 0%, #004861 50%, #00627F 100%);
+  background: linear-gradient(160deg, #0A0B0D 0%, #0D0F14 50%, #0A0B0D 100%);
   min-height: 100vh;
 }
 
@@ -160,14 +160,14 @@ svg {
   }
   
   [data-radix-checkbox-root][data-state="checked"] {
-    background: linear-gradient(135deg, #00627F, #0891b2) !important;
-    border-color: #00627F !important;
-    box-shadow: 0 4px 20px rgba(0, 98, 127, 0.4) !important;
+    background: linear-gradient(135deg, #C49632, #E8B84B) !important;
+    border-color: #C49632 !important;
+    box-shadow: 0 4px 20px rgba(196, 150, 50, 0.4) !important;
     transform: scale(1.02) !important;
   }
   
   [data-radix-checkbox-root][data-state="checked"]:hover {
-    background: linear-gradient(135deg, #004f66, #00627F) !important;
+    background: linear-gradient(135deg, #A67C28, #C49632) !important;
     transform: scale(1.07) !important;
   }
   
@@ -204,20 +204,20 @@ svg {
   }
   
   [data-radix-checkbox-root]:hover {
-    border-color: rgba(0, 98, 127, 0.8) !important;
-    background: rgba(0, 98, 127, 0.25) !important;
+    border-color: rgba(196, 150, 50, 0.8) !important;
+    background: rgba(196, 150, 50, 0.15) !important;
     transform: scale(1.05) !important;
-    box-shadow: 0 3px 12px rgba(0, 98, 127, 0.2) !important;
+    box-shadow: 0 3px 12px rgba(196, 150, 50, 0.2) !important;
   }
   
   [data-radix-checkbox-root][data-state="checked"] {
-    background: linear-gradient(135deg, #00627F, #0891b2) !important;
-    border-color: #00627F !important;
-    box-shadow: 0 3px 12px rgba(0, 98, 127, 0.35) !important;
+    background: linear-gradient(135deg, #C49632, #E8B84B) !important;
+    border-color: #C49632 !important;
+    box-shadow: 0 3px 12px rgba(196, 150, 50, 0.35) !important;
   }
   
   [data-radix-checkbox-root][data-state="checked"]:hover {
-    background: linear-gradient(135deg, #004f66, #00627F) !important;
+    background: linear-gradient(135deg, #A67C28, #C49632) !important;
     transform: scale(1.08) !important;
   }
   
@@ -259,17 +259,17 @@ svg {
   }
 }
 
-/* Unified Glass Morphism Components with #00627F Theme */
+/* Unified Glass Morphism Components - mynaghi.sa Premium Dark Style */
 .glass-container,
 .dark-glass {
-  background: rgba(0, 98, 127, 0.15) !important;
+  background: rgba(196, 150, 50, 0.06) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(196, 150, 50, 0.15) !important;
   box-shadow: 
-    0 8px 32px rgba(0, 98, 127, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    0 4px 16px rgba(0, 0, 0, 0.2) !important;
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Neumorphism Design System */
@@ -396,11 +396,11 @@ svg {
 }
 
 .glass-header {
-  background: rgba(0, 98, 127, 0.25) !important;
+  background: rgba(10, 11, 13, 0.85) !important;
   backdrop-filter: blur(25px) !important;
   -webkit-backdrop-filter: blur(25px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 4px 16px rgba(0, 98, 127, 0.3) !important;
+  border-bottom: 1px solid rgba(196, 150, 50, 0.2) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Component Specific Dark Styling - Lighter/More Transparent */
@@ -506,16 +506,16 @@ input:focus, textarea:focus, select:focus, .glass-input:focus {
   border-color: var(--dynamic-secondary) !important;
 }
 
-/* Modal and Dialog Styling with #00627F Theme */
+/* Modal and Dialog Styling - mynaghi.sa Premium Dark */
 .modal-content,
 .dialog-content {
-  background: rgba(0, 98, 127, 0.18) !important;
+  background: rgba(13, 15, 20, 0.96) !important;
   backdrop-filter: blur(30px) !important;
   -webkit-backdrop-filter: blur(30px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(196, 150, 50, 0.2) !important;
   box-shadow: 
-    0 16px 48px rgba(0, 98, 127, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    0 16px 48px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
 }
 
 /* Table Styling */
@@ -545,13 +545,13 @@ input:focus, textarea:focus, select:focus, .glass-input:focus {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Dark Background System */
+/* Dark Background System - mynaghi.sa Premium */
 :root {
-  --dark-bg-primary: #0A0A0A;
-  --dark-bg-secondary: #1A1A1A;
-  --dark-bg-accent: #2A2A2A;
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --dark-bg-primary: #0A0B0D;
+  --dark-bg-secondary: #111318;
+  --dark-bg-accent: #1A1B22;
+  --glass-bg: rgba(196, 150, 50, 0.04);
+  --glass-border: rgba(196, 150, 50, 0.12);
   --text-primary: rgba(255, 255, 255, 0.95);
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.5);
@@ -622,30 +622,30 @@ button[data-state="checked"][role="radio"] span {
   background-color: #C49632 !important;
 }
 
-/* Custom colors for the application */
+/* Custom colors for the application - mynaghi.sa Gold Premium */
 .bg-custom-primary {
-  background-color: #00627F !important;
+  background-color: #C49632 !important;
 }
 .hover\:bg-custom-primary-dark:hover {
-  background-color: #004f66 !important;
+  background-color: #A67C28 !important;
 }
 .text-custom-primary {
-  color: #00627F !important;
+  color: #C49632 !important;
 }
 .hover\:text-custom-primary-dark:hover {
-  color: #004f66 !important;
+  color: #A67C28 !important;
 }
 .border-custom-primary {
-  border-color: #00627F !important;
+  border-color: #C49632 !important;
 }
 .hover\:border-custom-primary:hover {
-  border-color: #00627F !important;
+  border-color: #C49632 !important;
 }
 .focus\:border-custom-primary:focus {
-  border-color: #00627F !important;
+  border-color: #C49632 !important;
 }
 .focus\:ring-custom-primary:focus {
-  --tw-ring-color: #00627F !important;
+  --tw-ring-color: #C49632 !important;
 }
 
 /* Golden theme colors for buttons */
@@ -782,43 +782,41 @@ button[data-state="checked"][role="radio"] span {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Enhanced Glass Morphism System with #00627F Theme */
+/* Enhanced Glass Morphism System - mynaghi.sa Premium Dark */
 .glass-background {
-  background: linear-gradient(135deg, 
-    rgba(0, 98, 127, 0.85) 0%, 
-    rgba(0, 72, 97, 0.7) 50%, 
-    rgba(0, 98, 127, 0.9) 100%);
+  background: linear-gradient(160deg, 
+    #0A0B0D 0%, 
+    #0D0F14 50%, 
+    #0A0B0D 100%);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: none;
   position: relative;
   overflow: hidden;
-  box-shadow: 
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 4px 32px rgba(0, 98, 127, 0.2);
+  box-shadow: none;
 }
 
 
 
 .glass-card {
-  background: rgba(0, 98, 127, 0.12);
+  background: rgba(17, 19, 24, 0.9);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(196, 150, 50, 0.15);
   box-shadow: 
-    0 12px 40px 0 rgba(0, 98, 127, 0.35),
-    0 6px 20px 0 rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 12px 40px 0 rgba(0, 0, 0, 0.5),
+    0 6px 20px 0 rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
-  background: rgba(0, 98, 127, 0.18);
+  background: rgba(20, 22, 28, 0.95);
   transform: translateY(-4px) scale(1.02);
   box-shadow: 
-    0 16px 48px 0 rgba(0, 98, 127, 0.45),
-    0 8px 24px 0 rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    0 16px 48px 0 rgba(0, 0, 0, 0.6),
+    0 8px 24px 0 rgba(196, 150, 50, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.35);
 }
 
