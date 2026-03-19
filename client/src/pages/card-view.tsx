@@ -207,15 +207,8 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     const arrivedVehicles = inventoryData.filter(item => {
       if (!item.entryDate) return false;
       const entryDate = new Date(item.entryDate);
-      const isArrived = entryDate >= twentyFourHoursAgo && entryDate <= now;
-      // Debug logging for troubleshooting
-      if (isArrived) {
-        console.log('Vehicle arrived today:', item.manufacturer, item.category, 'Entry date:', entryDate);
-      }
-      return isArrived;
+      return entryDate >= twentyFourHoursAgo && entryDate <= now;
     });
-    
-    console.log('Total vehicles arrived today:', arrivedVehicles.length);
     return arrivedVehicles;
   };
   
@@ -2153,7 +2146,7 @@ function AttendanceManagementContent() {
   // Fetch daily attendance data
   const { data: dailyAttendance = [] } = useQuery<any[]>({
     queryKey: ["/api/daily-attendance"],
-    refetchInterval: 3000
+    staleTime: 60000,
   });
 
   // Fetch pending leave requests

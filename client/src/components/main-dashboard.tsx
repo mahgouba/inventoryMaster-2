@@ -1,42 +1,30 @@
-import { useState } from "react";
+import { lazy, Suspense } from "react";
 import { useLocation } from "wouter";
 import HorizontalNavigation from "@/components/horizontal-navigation";
-import InventoryPage from "@/pages/inventory";
-import QuotationCreationPage from "@/pages/quotation-creation";
-import QuotationManagementPage from "@/pages/quotation-management";
-import InvoiceManagementPage from "@/pages/invoice-management";
-import ReservationsPage from "@/pages/reservations";
-import SoldVehiclesPage from "@/pages/sold-vehicles";
-import FinancingCalculatorPage from "@/pages/financing-calculator";
-import LeaveRequestsPage from "@/pages/leave-requests";
-import AttendanceManagementPage from "@/pages/attendance-management";
-
-
-
-import UserManagementPage from "@/pages/user-management";
-import BankManagement from "@/pages/bank-management";
-// Removed bank-management-full as it was consolidated into bank-management
-
-import FinancingRatesPage from "@/pages/financing-rates";
-
-import DatabaseManagement from "@/pages/database-management";
-import CarsMigrationPage from "@/pages/cars-migration";
-
-
-
-
-import PriceCardsPage from "@/pages/price-cards";
-import SpecificationsManagement from "@/pages/specifications-management";
-import DropdownOptionsManagement from "@/pages/dropdown-options-management";
-import BasicDropdownManagement from "@/pages/basic-dropdown-management";
-import WebsiteManagementPage from "@/pages/website-management";
-import WhatsAppApiPage from "@/pages/whatsapp-api";
-import EmailBulkPage from "@/pages/email-bulk";
-import VoipPage from "@/pages/voip";
-
-
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
 
+const InventoryPage = lazy(() => import("@/pages/inventory"));
+const QuotationCreationPage = lazy(() => import("@/pages/quotation-creation"));
+const QuotationManagementPage = lazy(() => import("@/pages/quotation-management"));
+const InvoiceManagementPage = lazy(() => import("@/pages/invoice-management"));
+const ReservationsPage = lazy(() => import("@/pages/reservations"));
+const SoldVehiclesPage = lazy(() => import("@/pages/sold-vehicles"));
+const FinancingCalculatorPage = lazy(() => import("@/pages/financing-calculator"));
+const FinancingRatesPage = lazy(() => import("@/pages/financing-rates"));
+const LeaveRequestsPage = lazy(() => import("@/pages/leave-requests"));
+const AttendanceManagementPage = lazy(() => import("@/pages/attendance-management"));
+const UserManagementPage = lazy(() => import("@/pages/user-management"));
+const BankManagement = lazy(() => import("@/pages/bank-management"));
+const DatabaseManagement = lazy(() => import("@/pages/database-management"));
+const CarsMigrationPage = lazy(() => import("@/pages/cars-migration"));
+const PriceCardsPage = lazy(() => import("@/pages/price-cards"));
+const SpecificationsManagement = lazy(() => import("@/pages/specifications-management"));
+const DropdownOptionsManagement = lazy(() => import("@/pages/dropdown-options-management"));
+const BasicDropdownManagement = lazy(() => import("@/pages/basic-dropdown-management"));
+const WebsiteManagementPage = lazy(() => import("@/pages/website-management"));
+const WhatsAppApiPage = lazy(() => import("@/pages/whatsapp-api"));
+const EmailBulkPage = lazy(() => import("@/pages/email-bulk"));
+const VoipPage = lazy(() => import("@/pages/voip"));
 
 interface MainDashboardProps {
   user: {
@@ -50,7 +38,6 @@ interface MainDashboardProps {
 export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
   const [location] = useLocation();
 
-  // Render the appropriate page based on current location
   const renderPage = () => {
     switch (location) {
       case "/":
@@ -68,32 +55,23 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return <SoldVehiclesPage />;
       case "/financing-calculator":
         return <FinancingCalculatorPage />;
+      case "/financing-rates":
+        return (user.role === "admin" || user.role === "accountant" || user.role === "bank_accountant")
+          ? <FinancingRatesPage /> : null;
       case "/leave-requests":
         return <LeaveRequestsPage userRole={user.role} username={user.username} userId={user.id} />;
       case "/attendance-management":
         return <AttendanceManagementPage userRole={user.role} username={user.username} userId={user.id} />;
-
-
-
-
-
-
       case "/user-management":
         return user.role === "admin" ? <UserManagementPage /> : null;
       case "/bank-management":
-        return (user.role === "admin" || user.role === "accountant" || user.role === "bank_accountant") ? <BankManagement /> : null;
       case "/bank-management-full":
-        return (user.role === "admin" || user.role === "accountant" || user.role === "bank_accountant") ? <BankManagement /> : null;
-      case "/financing-rates":
-        return (user.role === "admin" || user.role === "accountant" || user.role === "bank_accountant") ? <FinancingRatesPage /> : null;
-
+        return (user.role === "admin" || user.role === "accountant" || user.role === "bank_accountant")
+          ? <BankManagement /> : null;
       case "/database-management":
         return user.role === "admin" ? <DatabaseManagement /> : null;
       case "/cars-migration":
         return user.role === "admin" ? <CarsMigrationPage /> : null;
-
-
-
       case "/specifications-management":
         return user.role === "admin" ? <SpecificationsManagement /> : null;
       case "/dropdown-options-management":
@@ -108,8 +86,6 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return user.role === "admin" ? <EmailBulkPage /> : null;
       case "/voip":
         return user.role === "admin" ? <VoipPage /> : null;
-
-
       case "/price-cards":
         return <PriceCardsPage />;
       default:
@@ -119,29 +95,16 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
 
   return (
     <SystemGlassWrapper>
-      <div className="min-h-screen">
-        {/* Header with Navigation and User Controls */}
-        <div className="relative">
-          {/* Company Logo Background */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-            <img 
-              src="/copmany logo.svg" 
-              alt="شعار البريمي للسيارات" 
-              className="w-96 h-96 object-contain"
-            />
-          </div>
-          
-          {/* Background Animation Removed */}
-
-          <div className="relative z-10" dir="rtl">
-            {/* Fixed Navigation */}
-            <HorizontalNavigation userRole={user.role} onLogout={onLogout} />
-
-            {/* Page Content with padding for navigation bar */}
-            <div className="relative z-10 sm:pt-16 pt-[5px] pb-[5px] pr-16">
-              {renderPage()}
+      <div className="min-h-screen" dir="rtl">
+        <HorizontalNavigation userRole={user.role} onLogout={onLogout} />
+        <div className="relative z-10 sm:pt-16 pt-[5px] pb-[5px] pr-16">
+          <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen">
+              <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#C49632", borderTopColor: "transparent" }} />
             </div>
-          </div>
+          }>
+            {renderPage()}
+          </Suspense>
         </div>
       </div>
     </SystemGlassWrapper>
