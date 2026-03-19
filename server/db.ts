@@ -8,11 +8,12 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
+const dbUrl = process.env.DATABASE_URL || '';
+const isLocalDb = dbUrl.includes('sslmode=disable') || dbUrl.includes('localhost') || dbUrl.includes('helium');
+
 export const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  },
+  connectionString: dbUrl,
+  ssl: isLocalDb ? false : { rejectUnauthorized: false },
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,

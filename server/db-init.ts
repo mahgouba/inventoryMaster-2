@@ -20,11 +20,10 @@ export async function initializeDatabase() {
       console.log('🔌 Initializing database connection...');
       console.log('📍 Using database URL:', DATABASE_URL.substring(0, 50) + '...');
       
+      const isLocalDb = DATABASE_URL.includes('sslmode=disable') || DATABASE_URL.includes('localhost') || DATABASE_URL.includes('helium');
       const poolConfig = {
         connectionString: DATABASE_URL,
-        ssl: {
-          rejectUnauthorized: false
-        },
+        ssl: isLocalDb ? false : { rejectUnauthorized: false },
         max: 10,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 5000,
@@ -74,14 +73,15 @@ export function getDatabase() {
     // Use environment variable for database URL
     const DATABASE_URL = process.env.DATABASE_URL;
     if (DATABASE_URL) {
+      const isLocalDb2 = DATABASE_URL.includes('sslmode=disable') || DATABASE_URL.includes('localhost') || DATABASE_URL.includes('helium');
       const newPool = new Pool({
         connectionString: DATABASE_URL,
-        ssl: { rejectUnauthorized: false },
+        ssl: isLocalDb2 ? false : { rejectUnauthorized: false },
         max: 10,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 5000,
       });
-      const newDb = drizzle({ client: newPool, schema: require("@shared/schema") });
+      const newDb = drizzle({ client: newPool, schema });
       pool = newPool;
       db = newDb;
       console.log('✅ Database reconnected');
