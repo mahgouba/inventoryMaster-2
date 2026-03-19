@@ -3748,7 +3748,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           address: "",
           socialInstagram: "",
           socialTwitter: "",
-          isPublished: false,
+          isPublished: true,
           showPrices: true,
           showFinancing: true,
           featuredVehicleIds: [],

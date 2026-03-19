@@ -1175,7 +1175,7 @@ export const websiteSettings = pgTable("website_settings", {
   address: text("address").default(""),
   socialInstagram: text("social_instagram").default(""),
   socialTwitter: text("social_twitter").default(""),
-  isPublished: boolean("is_published").default(false).notNull(),
+  isPublished: boolean("is_published").default(true).notNull(),
   showPrices: boolean("show_prices").default(true).notNull(),
   showFinancing: boolean("show_financing").default(true).notNull(),
   featuredVehicleIds: text("featured_vehicle_ids").array().default([]),
