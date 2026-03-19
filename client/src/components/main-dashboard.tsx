@@ -30,6 +30,9 @@ import SpecificationsManagement from "@/pages/specifications-management";
 import DropdownOptionsManagement from "@/pages/dropdown-options-management";
 import BasicDropdownManagement from "@/pages/basic-dropdown-management";
 import WebsiteManagementPage from "@/pages/website-management";
+import WhatsAppApiPage from "@/pages/whatsapp-api";
+import EmailBulkPage from "@/pages/email-bulk";
+import VoipPage from "@/pages/voip";
 
 
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
@@ -99,6 +102,12 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return user.role === "admin" ? <BasicDropdownManagement /> : null;
       case "/website-management":
         return user.role === "admin" ? <WebsiteManagementPage /> : null;
+      case "/whatsapp-api":
+        return user.role === "admin" ? <WhatsAppApiPage /> : null;
+      case "/email-bulk":
+        return user.role === "admin" ? <EmailBulkPage /> : null;
+      case "/voip":
+        return user.role === "admin" ? <VoipPage /> : null;
 
 
       case "/price-cards":

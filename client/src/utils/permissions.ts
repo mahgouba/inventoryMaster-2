@@ -29,6 +29,9 @@ export const PERMISSIONS: Record<UserRole, Record<string, Permission>> = {
     leaveRequests: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
     attendanceManagement: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
     websiteManagement: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
+    whatsappApi: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
+    emailBulk: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
+    voip: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
   },
   
   accountant: {
