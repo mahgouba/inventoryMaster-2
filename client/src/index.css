@@ -3464,3 +3464,107 @@ table td {
 /* ============================================================ */
 /* End of Greyscale Cool Theme Override                        */
 /* ============================================================ */
+
+/* ============================================================ */
+/* TEXT COLOR FIX — Light Theme Second Pass                     */
+/* ============================================================ */
+
+/* 1. Sidebar-specific protection — icons & text stay light on dark sidebar */
+.sidebar-glass-container .lucide,
+.sidebar-glass-container .lucide-react,
+.sidebar-glass-container svg {
+  color: #F8F9FA !important;
+  filter: none !important;
+}
+
+.sidebar-glass-container [class*="text-white"],
+.sidebar-glass-container .text-white {
+  color: #F8F9FA !important;
+}
+
+/* 2. Global text-white → dark charcoal for all content areas */
+body .text-white {
+  color: #343A40 !important;
+}
+
+.text-white\/80 {
+  color: #5a6471 !important;
+}
+
+.text-white\/70 {
+  color: #6C757D !important;
+}
+
+.text-white\/60 {
+  color: #8d9399 !important;
+}
+
+.text-white\/50,
+.text-white\/40 {
+  color: #adb5bd !important;
+}
+
+.text-white\/20,
+.text-white\/10 {
+  color: #ced4da !important;
+}
+
+/* 3. Badges and pills with white/translucent backgrounds → light grey */
+.bg-white\/20,
+.bg-white\/30,
+.bg-white\/10 {
+  background-color: #E9ECEF !important;
+}
+
+.bg-white\/15 {
+  background-color: rgba(233, 236, 239, 0.7) !important;
+}
+
+/* 4. White border utilities → grey borders */
+.border-white\/20,
+.border-white\/30,
+.border-white\/10 {
+  border-color: #DEE2E6 !important;
+}
+
+/* 5. SVG icon filters that made icons white — fix for light cards */
+.glass-card img[style*="invert(100%)"],
+.glass-card-view img[style*="invert(100%)"],
+.glass-manufacturer-card img[style*="invert(100%)"],
+.glass-stats-card img[style*="invert(100%)"],
+.glass-container img[style*="invert(100%)"],
+.glass-dialog img[style*="invert(100%)"] {
+  filter: brightness(0) saturate(100%) opacity(0.65) !important;
+}
+
+/* 6. Green badge in header area → proper visibility */
+.border-green-300\/40 {
+  border-color: rgba(134, 239, 172, 0.4) !important;
+}
+
+.text-green-200 {
+  color: #16a34a !important;
+}
+
+.bg-green-500\/20 {
+  background-color: rgba(34, 197, 94, 0.12) !important;
+}
+
+/* 8. Hover text-amber / text-gold → keep existing color */
+.hover\:text-amber-400:hover {
+  color: #C49632 !important;
+}
+
+/* 9. Specific glass-container border used in card-view header */
+.glass-container.border-white\/20 {
+  border-color: #DEE2E6 !important;
+}
+
+/* 10. Empty state emoji text and messages */
+.text-white\/60.text-6xl {
+  color: #adb5bd !important;
+}
+
+/* ============================================================ */
+/* End of Text Color Fix                                        */
+/* ============================================================ */
