@@ -63,50 +63,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
     return;
   };
 
-  // Enhanced sound effects for different interactions
-  const playSoundEffect = (type: 'drag' | 'snap' | 'select') => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      // Different sounds for different actions
-      switch (type) {
-        case 'drag':
-          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-          oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.08);
-          gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
-          oscillator.stop(audioContext.currentTime + 0.08);
-          break;
-        case 'snap':
-          oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-          oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.05);
-          oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.12);
-          gainNode.gain.setValueAtTime(0.12, audioContext.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.12);
-          oscillator.stop(audioContext.currentTime + 0.12);
-          break;
-        case 'select':
-          oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
-          oscillator.frequency.exponentialRampToValueAtTime(1400, audioContext.currentTime + 0.06);
-          oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.15);
-          gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-          oscillator.stop(audioContext.currentTime + 0.15);
-          break;
-      }
-      
-      oscillator.start(audioContext.currentTime);
-    } catch (error) {
-      console.log('Audio not supported or blocked');
-    }
-  };
-
-  // Touch drag handlers with magnetic center stop and sound
+  // Touch drag handlers
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!scrollRef.current) return;
     setDragStartTime(Date.now());
@@ -124,7 +81,6 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
     if (distance > 8) {
       if (!isDragging) {
         setIsDragging(true);
-        playSoundEffect('drag'); // Play drag sound when starting
       }
       setHasMoved(true);
       
@@ -140,10 +96,6 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       scrollRef.current.style.scrollBehavior = 'auto';
       scrollRef.current.scrollTop = constrainedScrollTop;
       
-      // Play periodic drag sounds for feedback
-      if (Math.abs(constrainedScrollTop - scrollRef.current.scrollTop) > 20) {
-        playSoundEffect('drag');
-      }
     }
   };
 
@@ -151,8 +103,6 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
     // Add stable deceleration with momentum for vertical scrolling
     if (scrollRef.current && hasMoved) {
       scrollRef.current.style.scrollBehavior = 'smooth';
-      scrollRef.current.style.transition = 'scroll-top 0.3s cubic-bezier(0.23, 1, 0.32, 1)';
-      playSoundEffect('snap'); // Play snap sound when touch ends
     }
     handleDragEnd();
   };
@@ -190,10 +140,7 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       const buttonCenter = buttonRect.left - containerRect.left + buttonRect.width / 2;
       const targetScrollLeft = container.scrollLeft + (buttonCenter - containerCenter);
       
-      // Stable smooth scroll to center with enhanced sound
-      playSoundEffect('snap');
       container.style.scrollBehavior = 'smooth';
-      container.style.transition = 'scroll-left 0.25s cubic-bezier(0.23, 1, 0.32, 1)';
       container.scrollTo({
         left: targetScrollLeft,
         behavior: 'smooth'
@@ -436,9 +383,6 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
     if (hasMoved || isDragging) {
       return;
     }
-    
-    // Play selection sound
-    playSoundEffect('select');
     
     // Handle logout
     if (item.isLogout && onLogout) {

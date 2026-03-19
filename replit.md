@@ -20,7 +20,7 @@ The system is built with a modern technology stack:
     - Management of manufacturer and vehicle model hierarchies.
     - Image and document handling capabilities.
     - Employee attendance management, including editable records, leave requests, and reporting.
-- **Design Principles**: Prioritizes modern UI/UX with a focus on usability, responsiveness (including mobile optimization), and clear data presentation. This includes the use of responsive design for elements like attendance dialogs and mobile layout for badges, and consistent styling with gradient backgrounds and glass morphism where appropriate.
+- **Design Principles**: Premium dark automotive theme inspired by mynaghi.sa. Near-black background (#0A0B0D) with gold accent colors (#C49632 / #E8B84B). All `backdrop-filter: blur()` globally disabled for performance. No CSS transitions globally (`transition: none !important`). Sound effects removed from navigation. RTL Arabic support throughout.
 - **Technical Implementations**: Includes robust API endpoints for CRUD operations across all modules, secure password hashing with bcrypt, and role-based filtering for data visibility.
 
 ## External Dependencies
