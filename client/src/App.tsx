@@ -71,6 +71,9 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
           <Route path="/database-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/cars-migration" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           <Route path="/basic-dropdown-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/voip" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/whatsapp-api" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+          <Route path="/email-bulk" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
 
           <Route path="/locations" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
           
