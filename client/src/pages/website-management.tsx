@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -53,11 +53,13 @@ export default function WebsiteManagementPage() {
 
   const { data: settings, isLoading } = useQuery<WebsiteSettings>({
     queryKey: ["/api/website/settings"],
-    select: (data) => {
-      if (!hasChanges) setForm(data);
-      return data;
-    },
   });
+
+  useEffect(() => {
+    if (settings && !hasChanges) {
+      setForm(settings);
+    }
+  }, [settings]);
 
   const saveMutation = useMutation({
     mutationFn: (data: Partial<WebsiteSettings>) =>
