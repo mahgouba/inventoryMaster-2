@@ -1159,3 +1159,29 @@ export const locationTransferRelations = relations(locationTransfers, ({ one }) 
     references: [inventoryItems.id],
   }),
 }));
+
+// Website Settings Table
+export const websiteSettings = pgTable("website_settings", {
+  id: serial("id").primaryKey(),
+  companyName: text("company_name").notNull().default("معرض السيارات"),
+  tagline: text("tagline").default("أفضل السيارات بأفضل الأسعار"),
+  heroTitle: text("hero_title").default("اكتشف سيارة أحلامك"),
+  heroSubtitle: text("hero_subtitle").default("تشكيلة واسعة من السيارات الفاخرة والعملية"),
+  logoUrl: text("logo_url"),
+  heroBgColor: text("hero_bg_color").default("#0f172a"),
+  primaryColor: text("primary_color").default("#C79C45"),
+  whatsappNumber: text("whatsapp_number").default(""),
+  phone: text("phone").default(""),
+  address: text("address").default(""),
+  socialInstagram: text("social_instagram").default(""),
+  socialTwitter: text("social_twitter").default(""),
+  isPublished: boolean("is_published").default(false).notNull(),
+  showPrices: boolean("show_prices").default(true).notNull(),
+  showFinancing: boolean("show_financing").default(true).notNull(),
+  featuredVehicleIds: text("featured_vehicle_ids").array().default([]),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertWebsiteSettingsSchema = createInsertSchema(websiteSettings).omit({ id: true, updatedAt: true });
+export type InsertWebsiteSettings = z.infer<typeof insertWebsiteSettingsSchema>;
+export type WebsiteSettings = typeof websiteSettings.$inferSelect;

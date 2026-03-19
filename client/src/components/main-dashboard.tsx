@@ -29,6 +29,7 @@ import PriceCardsPage from "@/pages/price-cards";
 import SpecificationsManagement from "@/pages/specifications-management";
 import DropdownOptionsManagement from "@/pages/dropdown-options-management";
 import BasicDropdownManagement from "@/pages/basic-dropdown-management";
+import WebsiteManagementPage from "@/pages/website-management";
 
 
 import SystemGlassWrapper from "@/components/system-glass-wrapper";
@@ -96,6 +97,8 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return user.role === "admin" ? <DropdownOptionsManagement /> : null;
       case "/basic-dropdown-management":
         return user.role === "admin" ? <BasicDropdownManagement /> : null;
+      case "/website-management":
+        return user.role === "admin" ? <WebsiteManagementPage /> : null;
 
 
       case "/price-cards":

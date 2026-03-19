@@ -28,6 +28,7 @@ export const PERMISSIONS: Record<UserRole, Record<string, Permission>> = {
     bankManagement: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
     leaveRequests: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
     attendanceManagement: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
+    websiteManagement: { canView: true, canCreate: true, canEdit: true, canDelete: true, canShare: true, canReserve: true },
   },
   
   accountant: {

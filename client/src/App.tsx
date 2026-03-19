@@ -18,6 +18,7 @@ import CompanyBanks from "@/pages/banks-company";
 import IOSPickerDemo from "@/pages/ios-picker-demo";
 import VerticalPickerShowcase from "@/pages/vertical-picker-showcase";
 import BasicDropdownManagement from "@/pages/basic-dropdown-management";
+import ShowroomPage from "@/pages/showroom";
 
 interface User {
   username: string;
@@ -87,6 +88,7 @@ function Router({ user, onLogout }: { user: User; onLogout: () => void }) {
               <Route path="/bank-management-full" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
               <Route path="/specifications-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
               <Route path="/dropdown-options-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
+              <Route path="/website-management" component={() => <MainDashboard user={user} onLogout={onLogout} />} />
             </>
           )}
 
@@ -166,15 +168,18 @@ function PublicRouter({ onLogin, user, onLogout }: { onLogin: (user: User) => vo
   
   // Public routes that don't require authentication
   const publicRoutes = ['/banks-personal', '/banks-company'];
+  const isPublicShowroom = location === '/showroom' || location.startsWith('/showroom/');
   
   // Check if current route is public
-  if (publicRoutes.includes(location)) {
+  if (publicRoutes.includes(location) || isPublicShowroom) {
     return (
       <div className="min-h-screen">
         <SystemGlassWrapper>
           <Switch>
             <Route path="/banks-personal" component={PersonalBanks} />
             <Route path="/banks-company" component={CompanyBanks} />
+            <Route path="/showroom" component={ShowroomPage} />
+            <Route path="/showroom/:id" component={ShowroomPage} />
             <Route component={NotFound} />
           </Switch>
         </SystemGlassWrapper>

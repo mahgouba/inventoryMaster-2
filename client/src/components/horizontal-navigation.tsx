@@ -24,7 +24,7 @@ import {
   Percent,
   Database,
   Upload,
-
+  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { shouldShowNavItem, UserRole } from "@/utils/permissions";
@@ -365,6 +365,13 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       icon: Settings,
       internal: true,
       permission: "admin"
+    },
+    { 
+      title: "الموقع الإلكتروني", 
+      href: "/website-management", 
+      icon: Globe,
+      internal: true,
+      permission: "websiteManagement"
     },
 
 

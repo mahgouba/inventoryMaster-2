@@ -44,7 +44,8 @@ import {
   type VehicleLocation,
   type VehicleYear,
   type EngineCapacity,
-  type VehicleColor
+  type VehicleColor,
+  websiteSettings,
 } from "@shared/schema";
 import { Pool } from 'pg';
 import { eq, desc, asc, or, like, count, sql, ne, isNull, isNotNull, and, not } from "drizzle-orm";
@@ -3722,6 +3723,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error initializing dropdown data:", error);
       res.status(500).json({ message: "فشل في تهيئة البيانات الأساسية" });
+    }
+  });
+
+  // ─── Website Management API ───────────────────────────────────────────────
+
+  // GET website settings (public)
+  app.get("/api/website/settings", async (req, res) => {
+    try {
+      const [row] = await db.select().from(websiteSettings).limit(1);
+      if (!row) {
+        // Return defaults if no settings saved yet
+        const defaults = {
+          id: 0,
+          companyName: "معرض السيارات",
+          tagline: "أفضل السيارات بأفضل الأسعار",
+          heroTitle: "اكتشف سيارة أحلامك",
+          heroSubtitle: "تشكيلة واسعة من السيارات الفاخرة والعملية",
+          logoUrl: null,
+          heroBgColor: "#0f172a",
+          primaryColor: "#C79C45",
+          whatsappNumber: "",
+          phone: "",
+          address: "",
+          socialInstagram: "",
+          socialTwitter: "",
+          isPublished: false,
+          showPrices: true,
+          showFinancing: true,
+          featuredVehicleIds: [],
+          updatedAt: new Date(),
+        };
+        return res.json(defaults);
+      }
+      res.json(row);
+    } catch (error) {
+      console.error("Error fetching website settings:", error);
+      res.status(500).json({ message: "فشل في جلب إعدادات الموقع" });
+    }
+  });
+
+  // PUT website settings (admin only)
+  app.put("/api/website/settings", async (req, res) => {
+    try {
+      const [existing] = await db.select().from(websiteSettings).limit(1);
+      const data = { ...req.body, updatedAt: new Date() };
+
+      if (existing) {
+        const [updated] = await db.update(websiteSettings)
+          .set(data)
+          .where(eq(websiteSettings.id, existing.id))
+          .returning();
+        res.json(updated);
+      } else {
+        const [created] = await db.insert(websiteSettings).values(data).returning();
+        res.json(created);
+      }
+    } catch (error) {
+      console.error("Error updating website settings:", error);
+      res.status(500).json({ message: "فشل في حفظ إعدادات الموقع" });
+    }
+  });
+
+  // GET public vehicles for showroom (only available vehicles)
+  app.get("/api/website/vehicles", async (req, res) => {
+    try {
+      const items = await db.select().from(inventoryItems)
+        .where(eq(inventoryItems.status, "متاح"))
+        .orderBy(desc(inventoryItems.id));
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching showroom vehicles:", error);
+      res.status(500).json({ message: "فشل في جلب السيارات" });
     }
   });
 
