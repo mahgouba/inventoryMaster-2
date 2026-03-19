@@ -400,9 +400,9 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
   };
 
   return (
-    <div className="fixed top-0 right-0 z-50 w-16 h-screen backdrop-blur-2xl overflow-hidden sidebar-glass-container" style={{ background: "rgba(13,15,20,0.95)", borderLeft: "1px solid rgba(196,150,50,0.15)", boxShadow: "-4px 0 32px rgba(0,0,0,0.5)" }}>
+    <div className="fixed top-0 right-0 z-50 w-16 h-screen overflow-hidden sidebar-glass-container" style={{ background: "#343A40", borderLeft: "1px solid rgba(222,226,230,0.12)", boxShadow: "-4px 0 24px rgba(52,58,64,0.35)" }}>
       {/* Header Section */}
-      <div className="p-3 flex items-center justify-center" style={{ borderBottom: "1px solid rgba(196,150,50,0.2)" }}>
+      <div className="p-3 flex items-center justify-center" style={{ borderBottom: "1px solid rgba(222,226,230,0.15)" }}>
         <img 
           src="/copmany logo.svg" 
           alt="شعار البريمي للسيارات" 
@@ -431,10 +431,10 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
                 onClick={() => handleNavigation(item)}
                 className={cn(
                   "group relative w-12 h-12 cursor-pointer flex-shrink-0",
-                  "flex flex-col items-center justify-center",
+                  "flex flex-col items-center justify-center rounded-xl",
                   active 
-                    ? "text-[#C79C45]" 
-                    : "text-white/70 hover:text-[#C79C45]"
+                    ? "bg-white/15" 
+                    : "hover:bg-white/8"
                 )}
                 title={item.title}
               >
@@ -444,24 +444,26 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
                   className={cn(
                     "mb-1",
                     active 
-                      ? "text-[#C79C45] drop-shadow-lg" 
-                      : "text-white/70 hover:text-[#C79C45]"
+                      ? "text-white" 
+                      : "text-white/60"
                   )} 
+                  style={{ color: active ? "#F8F9FA" : "rgba(248,249,250,0.6)" }}
                 />
                 
                 {/* Label */}
                 <span className={cn(
                   "text-[7px] text-center leading-tight font-medium",
                   active 
-                    ? "text-[#C79C45] font-bold" 
-                    : "text-white/70 hover:text-[#C79C45]"
-                )}>
+                    ? "font-bold" 
+                    : ""
+                )}
+                style={{ color: active ? "#F8F9FA" : "rgba(248,249,250,0.6)" }}>
                   {item.title.split(' ')[0]}
                 </span>
 
                 {/* Active Indicator */}
                 {active && (
-                  <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-[#C79C45] to-[#B8862F] rounded-full shadow-lg"></div>
+                  <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-0.5 h-8 rounded-full" style={{ background: "#F8F9FA" }}></div>
                 )}
               </div>
             );
@@ -469,8 +471,8 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
         </div>
       </div>
 
-      {/* Footer Glow */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none" style={{ background: "linear-gradient(to top, rgba(196,150,50,0.08), transparent)" }}></div>
+      {/* Footer Fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none" style={{ background: "linear-gradient(to top, rgba(52,58,64,0.4), transparent)" }}></div>
     </div>
   );
 }

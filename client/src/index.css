@@ -2797,3 +2797,670 @@ button[role="radio"][data-state="checked"] {
   right: 80%;
   animation-delay: 1s;
 }
+
+/* ============================================================ */
+/* GREYSCALE COOL THEME OVERRIDE - Complete Light Mode Redesign */
+/* Palette: #F8F9FA | #E9ECEF | #DEE2E6 | #343A40             */
+/* ============================================================ */
+
+/* 1. Root CSS variable reset for light theme */
+:root {
+  --grey-lightest: #F8F9FA;
+  --grey-light: #E9ECEF;
+  --grey-border: #DEE2E6;
+  --grey-dark: #343A40;
+  --grey-medium: #6C757D;
+  --grey-text-secondary: #5a6471;
+  --grey-text-muted: #8d9399;
+
+  /* Override dark theme variables */
+  --dark-bg-primary: #F8F9FA !important;
+  --dark-bg-secondary: #E9ECEF !important;
+  --dark-bg-accent: #DEE2E6 !important;
+  --text-primary: #343A40 !important;
+  --text-secondary: #5a6471 !important;
+  --text-muted: #8d9399 !important;
+  --glass-bg: rgba(255,255,255,0.8) !important;
+  --glass-border: #DEE2E6 !important;
+}
+
+/* 2. Global background and text */
+html, body {
+  background: #F8F9FA !important;
+  color: #343A40 !important;
+}
+
+#root {
+  background: #F8F9FA !important;
+}
+
+/* 3. Undo dark bg-* overrides — restore light values */
+.bg-white {
+  background-color: #ffffff !important;
+}
+
+.bg-slate-50,
+.bg-gray-50,
+.bg-background {
+  background-color: #F8F9FA !important;
+}
+
+.bg-slate-100,
+.bg-gray-100,
+.bg-secondary {
+  background-color: #E9ECEF !important;
+}
+
+.bg-slate-200,
+.bg-gray-200 {
+  background-color: #DEE2E6 !important;
+}
+
+.bg-slate-800,
+.bg-gray-800 {
+  background-color: #343A40 !important;
+}
+
+.bg-slate-900,
+.bg-gray-900 {
+  background-color: #2a3035 !important;
+}
+
+/* 4. Text color overrides — dark text on light background */
+.text-slate-900,
+.text-gray-900,
+.text-black,
+.text-foreground {
+  color: #343A40 !important;
+}
+
+.text-slate-800,
+.text-gray-800 {
+  color: #343A40 !important;
+}
+
+.text-slate-700,
+.text-gray-700 {
+  color: #5a6471 !important;
+}
+
+.text-slate-600,
+.text-gray-600 {
+  color: #6C757D !important;
+}
+
+.text-slate-500,
+.text-gray-500,
+.text-muted-foreground {
+  color: #8d9399 !important;
+}
+
+/* 5. Border colors */
+.border-slate-200,
+.border-gray-200 {
+  border-color: #DEE2E6 !important;
+}
+
+.border-slate-300,
+.border-gray-300 {
+  border-color: #DEE2E6 !important;
+}
+
+/* 6. Input / Form Elements → light */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+input[type="date"],
+input[type="time"],
+textarea,
+select,
+.glass-input {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+  border-radius: 8px !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8d9399 !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+textarea:focus,
+select:focus {
+  background: #ffffff !important;
+  border-color: #343A40 !important;
+  box-shadow: 0 0 0 2px rgba(52, 58, 64, 0.15) !important;
+}
+
+/* 7. Glass components — light versions */
+.glass-container,
+.dark-glass,
+.card,
+.glass-background {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  box-shadow: 0 2px 8px rgba(52, 58, 64, 0.08) !important;
+}
+
+.glass-card {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  box-shadow: 0 2px 8px rgba(52, 58, 64, 0.08) !important;
+}
+
+.glass-card:hover {
+  background: #F8F9FA !important;
+  border-color: #adb5bd !important;
+  box-shadow: 0 4px 16px rgba(52, 58, 64, 0.12) !important;
+}
+
+.glass-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #DEE2E6 !important;
+  box-shadow: 0 2px 8px rgba(52, 58, 64, 0.06) !important;
+}
+
+.glass-container:hover,
+.dark-glass:hover {
+  background: #F8F9FA !important;
+  border-color: #adb5bd !important;
+}
+
+/* Sidebar glass container — STAYS DARK */
+.sidebar-glass-container {
+  background: rgba(52, 58, 64, 0.97) !important;
+  border-left: 1px solid rgba(222, 226, 230, 0.15) !important;
+  box-shadow: -4px 0 24px rgba(52, 58, 64, 0.3) !important;
+}
+
+/* 8. Dialog / Modal → white */
+.glass-dialog,
+.glass-dialog-secondary,
+.glass-dialog-fixed-scroll,
+.glass-modal-scroll,
+.glass-modal,
+.glass-form,
+.modal-content,
+.dialog-content {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  box-shadow: 0 16px 48px rgba(52, 58, 64, 0.2), 0 8px 24px rgba(52, 58, 64, 0.1) !important;
+  color: #343A40 !important;
+}
+
+.glass-dialog::before,
+.glass-dialog-secondary::before {
+  background: none !important;
+}
+
+.glass-dialog-secondary label,
+.glass-dialog label {
+  color: #343A40 !important;
+}
+
+.glass-dialog-secondary input,
+.glass-dialog-secondary textarea,
+.glass-dialog-secondary [role="combobox"],
+.glass-dialog input,
+.glass-dialog textarea {
+  background: #F8F9FA !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+}
+
+.glass-dialog-secondary input::placeholder,
+.glass-dialog-secondary textarea::placeholder {
+  color: #8d9399 !important;
+}
+
+.glass-dialog-secondary .glass-button {
+  background: #E9ECEF !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+}
+
+/* Universal glass dialog */
+.universal-glass-enabled [role="dialog"],
+.universal-glass-enabled .dialog-content,
+.universal-glass-enabled .modal,
+.universal-glass-enabled .popover-content {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  box-shadow: 0 16px 48px rgba(52, 58, 64, 0.2) !important;
+  color: #343A40 !important;
+}
+
+/* 9. Dropdown / Select content → white */
+.glass-dropdown-content,
+[role="listbox"].glass-dropdown-content {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  box-shadow: 0 8px 24px rgba(52, 58, 64, 0.15) !important;
+  color: #343A40 !important;
+  scrollbar-color: #adb5bd #F8F9FA !important;
+}
+
+.glass-dropdown-content [role="option"],
+.glass-dropdown-content .dropdown-item {
+  color: #343A40 !important;
+  background: transparent !important;
+}
+
+.glass-dropdown-content [role="option"]:hover,
+.glass-dropdown-content .dropdown-item:hover {
+  background: #F8F9FA !important;
+  color: #343A40 !important;
+}
+
+.glass-select,
+.glass-select > div,
+[role="combobox"].glass-select {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+  box-shadow: none !important;
+}
+
+/* 10. Glass buttons → light */
+.glass-button {
+  background: #E9ECEF !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+}
+
+.glass-button:hover {
+  background: #DEE2E6 !important;
+  border-color: #adb5bd !important;
+}
+
+.glass-action-primary {
+  background: #343A40 !important;
+  border: 1px solid #343A40 !important;
+  color: #ffffff !important;
+}
+
+.glass-action-primary:hover {
+  background: #2a3035 !important;
+  border-color: #2a3035 !important;
+}
+
+.glass-action-secondary {
+  background: #E9ECEF !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+}
+
+.glass-action-secondary:hover {
+  background: #DEE2E6 !important;
+}
+
+/* Glass filter buttons */
+.glass-filter-button {
+  background: #E9ECEF !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+  box-shadow: none !important;
+}
+
+.glass-filter-button-active {
+  background: #343A40 !important;
+  border-color: #343A40 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(52, 58, 64, 0.3) !important;
+}
+
+.glass-filter-button:hover {
+  background: #DEE2E6 !important;
+  border-color: #adb5bd !important;
+}
+
+/* 11. Stats & manufacturer cards → light */
+.glass-stats-card {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  box-shadow: 0 2px 8px rgba(52, 58, 64, 0.08) !important;
+  color: #343A40 !important;
+}
+
+.glass-stats-card:hover {
+  background: #F8F9FA !important;
+  border-color: #adb5bd !important;
+  box-shadow: 0 8px 24px rgba(52, 58, 64, 0.15) !important;
+}
+
+.glass-manufacturer-card {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  box-shadow: 0 2px 8px rgba(52, 58, 64, 0.08) !important;
+  color: #343A40 !important;
+}
+
+.glass-manufacturer-card:hover {
+  background: #F8F9FA !important;
+  border-color: #adb5bd !important;
+  box-shadow: 0 8px 24px rgba(52, 58, 64, 0.15) !important;
+}
+
+.glass-manufacturer-card::before {
+  background: none !important;
+}
+
+.glass-card-view {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  box-shadow: 0 2px 8px rgba(52, 58, 64, 0.08) !important;
+}
+
+.glass-card-view:hover {
+  background: #F8F9FA !important;
+  border-color: #adb5bd !important;
+  box-shadow: 0 8px 24px rgba(52, 58, 64, 0.15) !important;
+}
+
+/* 12. Text helpers → light theme */
+.glass-text-primary {
+  color: #343A40 !important;
+  text-shadow: none !important;
+}
+
+.glass-text-secondary {
+  color: #5a6471 !important;
+  text-shadow: none !important;
+}
+
+.glass-text-accent {
+  color: #343A40 !important;
+  text-shadow: none !important;
+}
+
+/* 13. Lucide icons → dark on light background */
+.lucide,
+.lucide-react {
+  color: #343A40 !important;
+  filter: none !important;
+}
+
+/* 14. Badges → light */
+.badge,
+.chip,
+span.badge,
+.inline-badge {
+  background: #E9ECEF !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+}
+
+.badge:hover,
+.chip:hover {
+  background: #DEE2E6 !important;
+}
+
+.glass-badge {
+  background: #E9ECEF !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+}
+
+/* 15. Tabs → light */
+[role="tab"],
+.tab-trigger {
+  background: #E9ECEF !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #5a6471 !important;
+}
+
+[role="tab"]:hover,
+.tab-trigger:hover {
+  background: #DEE2E6 !important;
+  color: #343A40 !important;
+}
+
+[data-state="active"][role="tab"] {
+  background: #343A40 !important;
+  border-color: #343A40 !important;
+  color: #ffffff !important;
+}
+
+/* 16. Accordion / collapsible → light */
+.accordion-content,
+.collapsible-content,
+.glass-collapsible {
+  background: #F8F9FA !important;
+  border: 1px solid #DEE2E6 !important;
+}
+
+/* Override the overly-broad [data-state] rule for accordions but not checkboxes */
+.accordion-content[data-state="open"],
+.accordion-content[data-state="closed"],
+.collapsible-content[data-state="open"],
+.collapsible-content[data-state="closed"] {
+  background: #F8F9FA !important;
+  border: 1px solid #DEE2E6 !important;
+}
+
+/* 17. Toggle button → light */
+.glass-toggle-button {
+  background: #E9ECEF !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+}
+
+.glass-toggle-button:hover {
+  background: #DEE2E6 !important;
+  box-shadow: none !important;
+}
+
+/* 18. Search → light */
+.glass-search {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+  box-shadow: none !important;
+}
+
+.glass-search:focus {
+  border-color: #343A40 !important;
+  box-shadow: 0 0 0 2px rgba(52, 58, 64, 0.15) !important;
+}
+
+.glass-search::placeholder {
+  color: #8d9399 !important;
+}
+
+/* 19. Toast / notifications → light */
+[data-sonner-toast],
+.toast,
+.notification {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  box-shadow: 0 8px 24px rgba(52, 58, 64, 0.15) !important;
+  color: #343A40 !important;
+}
+
+/* 20. Table → light */
+.table th,
+.table td,
+table th,
+table td {
+  border-color: #DEE2E6 !important;
+  color: #343A40 !important;
+}
+
+/* 21. Scrollbars → light */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F8F9FA !important;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #adb5bd !important;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6C757D !important;
+}
+
+.glass-dialog-fixed-scroll::-webkit-scrollbar-track,
+.glass-modal-scroll::-webkit-scrollbar-track,
+.glass-scroll::-webkit-scrollbar-track {
+  background: #F8F9FA !important;
+}
+
+.glass-dialog-fixed-scroll::-webkit-scrollbar-thumb,
+.glass-modal-scroll::-webkit-scrollbar-thumb,
+.glass-scroll::-webkit-scrollbar-thumb {
+  background: #adb5bd !important;
+}
+
+/* 22. Dark card classes used internally → light */
+.dark-card {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+}
+
+.dark-input {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+}
+
+.dark-input:focus {
+  border-color: #343A40 !important;
+  box-shadow: 0 0 0 2px rgba(52, 58, 64, 0.15) !important;
+}
+
+.dark-button {
+  background: #E9ECEF !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+}
+
+.dark-button:hover {
+  background: #DEE2E6 !important;
+}
+
+/* 23. Universal glass input fields */
+.universal-glass-enabled input[type="text"],
+.universal-glass-enabled input[type="email"],
+.universal-glass-enabled input[type="password"],
+.universal-glass-enabled input[type="number"],
+.universal-glass-enabled input[type="tel"],
+.universal-glass-enabled input[type="url"],
+.universal-glass-enabled input[type="search"],
+.universal-glass-enabled textarea,
+.universal-glass-enabled select {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+}
+
+/* 24. Universal glass buttons */
+.universal-glass-enabled button:not(.btn-primary):not(.btn-secondary):not(.btn-destructive),
+.universal-glass-enabled [role="button"]:not(.btn-primary):not(.btn-secondary):not(.btn-destructive) {
+  background: #E9ECEF !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+  box-shadow: none !important;
+}
+
+.universal-glass-enabled button:not(.btn-primary):not(.btn-secondary):not(.btn-destructive):hover,
+.universal-glass-enabled [role="button"]:not(.btn-primary):not(.btn-secondary):not(.btn-destructive):hover {
+  background: #DEE2E6 !important;
+}
+
+/* 25. Glass nav elements */
+.glass-nav,
+.glass-header-element {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #343A40 !important;
+  box-shadow: 0 2px 8px rgba(52, 58, 64, 0.06) !important;
+}
+
+/* 26. Overlay → light semi-transparent */
+.glass-overlay,
+[data-overlay].glass-overlay,
+[data-radix-dialog-overlay] {
+  background: rgba(52, 58, 64, 0.4) !important;
+}
+
+/* 27. Mobile checkbox styling → light */
+@media (max-width: 768px) {
+  [data-radix-checkbox-root] {
+    border: 2px solid #DEE2E6 !important;
+    background: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(52, 58, 64, 0.1) !important;
+  }
+
+  [data-radix-checkbox-root]:hover {
+    border-color: #343A40 !important;
+    background: #F8F9FA !important;
+    box-shadow: 0 2px 8px rgba(52, 58, 64, 0.15) !important;
+  }
+}
+
+/* 28. Desktop checkbox styling → light */
+@media (min-width: 769px) {
+  [data-radix-checkbox-root] {
+    border: 2px solid #DEE2E6 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  [data-radix-checkbox-root]:hover {
+    border-color: #343A40 !important;
+    background: #F8F9FA !important;
+  }
+}
+
+/* Keep checked state styling with charcoal */
+[data-radix-checkbox-root][data-state="checked"] {
+  background: #343A40 !important;
+  border-color: #343A40 !important;
+  box-shadow: none !important;
+}
+
+[data-radix-checkbox-indicator] {
+  color: #ffffff !important;
+}
+
+/* 29. Pagination → light */
+.glass-pagination {
+  background: #ffffff !important;
+  border: 1px solid #DEE2E6 !important;
+}
+
+/* 30. Card view styling override */
+.card-dynamic {
+  background-color: #ffffff !important;
+  border-color: #DEE2E6 !important;
+}
+
+.card-dynamic:hover {
+  background-color: #F8F9FA !important;
+  border-color: #adb5bd !important;
+}
+
+/* ============================================================ */
+/* End of Greyscale Cool Theme Override                        */
+/* ============================================================ */
