@@ -16,7 +16,6 @@ const AttendanceManagementPage = lazy(() => import("@/pages/attendance-managemen
 const UserManagementPage = lazy(() => import("@/pages/user-management"));
 const BankManagement = lazy(() => import("@/pages/bank-management"));
 const DatabaseManagement = lazy(() => import("@/pages/database-management"));
-const CarsMigrationPage = lazy(() => import("@/pages/cars-migration"));
 const PriceCardsPage = lazy(() => import("@/pages/price-cards"));
 const SpecificationsManagement = lazy(() => import("@/pages/specifications-management"));
 const DropdownOptionsManagement = lazy(() => import("@/pages/dropdown-options-management"));
@@ -70,8 +69,6 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
           ? <BankManagement /> : null;
       case "/database-management":
         return user.role === "admin" ? <DatabaseManagement /> : null;
-      case "/cars-migration":
-        return user.role === "admin" ? <CarsMigrationPage /> : null;
       case "/specifications-management":
         return user.role === "admin" ? <SpecificationsManagement /> : null;
       case "/dropdown-options-management":

@@ -1,15 +1,16 @@
 import express, { type Request, Response, NextFunction } from "express";
+import compression from "compression";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeDatabase } from "./db-init";
 import "dotenv/config";
 
 const app = express();
+app.use(compression());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
-// Serve static files from public directory
-app.use(express.static('public'));
+app.use(express.static('public', { maxAge: '1d' }));
 
 app.use((req, res, next) => {
   const start = Date.now();
