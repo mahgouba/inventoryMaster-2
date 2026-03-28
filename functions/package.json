@@ -1,0 +1,16 @@
+{
+  "name": "sales-system-functions",
+  "version": "1.0.0",
+  "private": true,
+  "main": "lib/index.cjs",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "build": "npx esbuild src/index.ts --platform=node --target=node20 --bundle --format=cjs --outfile=lib/index.cjs --external:firebase-functions --external:firebase-admin --external:@google-cloud/storage --external:bufferutil --external:utf-8-validate"
+  },
+  "dependencies": {
+    "firebase-admin": "*",
+    "firebase-functions": "*"
+  }
+}
