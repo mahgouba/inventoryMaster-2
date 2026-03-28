@@ -20,7 +20,8 @@ The system is built with a modern technology stack:
     - Management of manufacturer and vehicle model hierarchies.
     - Image and document handling capabilities.
     - Employee attendance management, including editable records, leave requests, and reporting.
-- **Design Principles**: Premium dark automotive theme inspired by mynaghi.sa. Near-black background (#0A0B0D) with gold accent colors (#C49632 / #E8B84B). All `backdrop-filter: blur()` globally disabled for performance. No CSS transitions globally (`transition: none !important`). Sound effects removed from navigation. RTL Arabic support throughout.
+- **Design Principles**: Unified dark gold theme throughout the entire system. Near-black background (#0A0B0D) with gold accent colors (#C49632 / #E8B84B). CSS variables in `:root` and `.dark` both set to dark gold theme (no dependency on `.dark` class toggle). All teal (#00627F) references replaced with gold (#C49632) across all pages, components, and CSS. All `backdrop-filter: blur()` globally disabled for performance. No CSS transitions globally (`transition: none !important`). RTL Arabic support throughout.
+- **Color System**: `--background: hsl(225,15%,5%)`, `--card: hsl(225,12%,8%)`, `--primary: hsl(38,62%,48%)` (gold), `--border: hsl(38,30%,20%)`. Login page, all page files, and print templates use gold.
 - **Technical Implementations**: Includes robust API endpoints for CRUD operations across all modules, secure password hashing with bcrypt, and role-based filtering for data visibility.
 
 ## External Dependencies

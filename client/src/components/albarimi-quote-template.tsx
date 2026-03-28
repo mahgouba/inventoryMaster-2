@@ -31,7 +31,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
           }
 
           .footer-element {
-            background: #00627f;
+            background: #C49632;
             width: 595px;
             height: 40px;
             position: absolute;
@@ -49,7 +49,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
           }
 
           .right-side-element-2 {
-            background: #00627f;
+            background: #C49632;
             width: 22px;
             height: 839px;
             position: absolute;
@@ -131,7 +131,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
           }
 
           .vehicle-details h3 {
-            color: #00627f;
+            color: #C49632;
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 15px;
@@ -171,7 +171,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
             top: 450px;
             left: 50px;
             right: 50px;
-            background: #00627f;
+            background: #C49632;
             color: white;
             padding: 20px;
             border-radius: 8px;
@@ -217,7 +217,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
           .website-info {
             font-size: 14px;
             font-weight: 600;
-            color: #00627f;
+            color: #C49632;
             margin-bottom: 5px;
           }
 
@@ -263,7 +263,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(to right, #00627f, #c49632, #00627f);
+            background: linear-gradient(to right, #C49632, #c49632, #C49632);
           }
         `}</style>
 
@@ -362,7 +362,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
         {/* Contact Information */}
         <div className="contact-info">
           <div className="website-info">
-            <span style={{ color: '#00627f' }}>Albarimi</span>
+            <span style={{ color: '#C49632' }}>Albarimi</span>
             <span style={{ color: '#c49632' }}>.com</span>
           </div>
           <div className="phone-info">

@@ -42,7 +42,7 @@ const AVAILABLE_COLUMNS = [
 ];
 
 const COLOR_THEMES = [
-  { id: 'default', label: 'الألوان الافتراضية', preview: '#00627F' },
+  { id: 'default', label: 'الألوان الافتراضية', preview: '#C49632' },
   { id: 'grayscale', label: 'رمادي', preview: '#6b7280' },
   { id: 'blue', label: 'أزرق', preview: '#3b82f6' },
   { id: 'green', label: 'أخضر', preview: '#10b981' }

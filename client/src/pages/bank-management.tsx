@@ -240,7 +240,7 @@ export default function BankManagement() {
   const activeCompanyBanks = allCompanyBanks.filter(bank => bank.isActive);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#00627F] via-[#004861] to-[#00627F]" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-[#C49632] via-[#004861] to-[#C49632]" dir="rtl">
       <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>

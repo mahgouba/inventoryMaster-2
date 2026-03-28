@@ -162,7 +162,7 @@ export default function CompanyBanks() {
   }
 
   return (
-    <div className="min-h-screen relative bg-gradient-to-br from-[#00627F] via-[#004861] to-[#00627F]" dir="rtl">
+    <div className="min-h-screen relative bg-gradient-to-br from-[#C49632] via-[#004861] to-[#C49632]" dir="rtl">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-10 right-10 w-72 h-72 bg-green-400/10 rounded-full blur-3xl animate-pulse"></div>
@@ -247,10 +247,10 @@ export default function CompanyBanks() {
                               e.stopPropagation();
                               openShareDialog(bank);
                             }}
-                            className="p-2 hover:bg-[#00627F]/20 rounded-lg transition-all duration-300 backdrop-blur-sm border border-[#00627F]/30"
+                            className="p-2 hover:bg-[#C49632]/20 rounded-lg transition-all duration-300 backdrop-blur-sm border border-[#C49632]/30"
                             title="مشاركة معلومات البنك"
                           >
-                            <Share2 className="w-4 h-4 text-[#00627F]" />
+                            <Share2 className="w-4 h-4 text-[#C49632]" />
                           </Button>
                         </div>
                         
