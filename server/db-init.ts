@@ -7,8 +7,8 @@ let pool: Pool | null = null;
 let db: any = null;
 
 export async function initializeDatabase() {
-  // Use environment variable for database URL
-  let DATABASE_URL = process.env.DATABASE_URL;
+  // Prefer NEON_DATABASE_URL (external Neon DB) over the default DATABASE_URL (Replit Helium DB)
+  let DATABASE_URL = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
   
   // Clean the URL if it includes psql command wrapper
   if (DATABASE_URL && DATABASE_URL.startsWith("psql '")) {
@@ -18,7 +18,8 @@ export async function initializeDatabase() {
   if (DATABASE_URL) {
     try {
       console.log('🔌 Initializing database connection...');
-      console.log('📍 Using database URL:', DATABASE_URL.substring(0, 50) + '...');
+      const dbSource = process.env.NEON_DATABASE_URL ? '☁️ Neon (external)' : '🏠 Replit (local)';
+      console.log(`📍 Using database URL [${dbSource}]:`, DATABASE_URL.substring(0, 50) + '...');
       
       const isLocalDb = DATABASE_URL.includes('sslmode=disable') || DATABASE_URL.includes('localhost') || DATABASE_URL.includes('helium');
       const poolConfig = {
@@ -70,8 +71,7 @@ export async function initializeDatabase() {
 export function getDatabase() {
   if (!db || !pool) {
     console.warn('⚠️ Database not initialized, attempting to reconnect...');
-    // Use environment variable for database URL
-    const DATABASE_URL = process.env.DATABASE_URL;
+    const DATABASE_URL = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
     if (DATABASE_URL) {
       const isLocalDb2 = DATABASE_URL.includes('sslmode=disable') || DATABASE_URL.includes('localhost') || DATABASE_URL.includes('helium');
       const newPool = new Pool({
