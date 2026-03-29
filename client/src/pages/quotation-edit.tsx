@@ -619,7 +619,7 @@ export default function QuotationEditPage({}: QuotationEditPageProps) {
                       name="vat-option"
                       checked={pricingDetails.isVATInclusive}
                       onChange={() => setPricingDetails(prev => ({ ...prev, isVATInclusive: true }))}
-                      className="accent-[#C49632]"
+                      className="accent-[#111111]"
                     />
                     <Label htmlFor="vat-inclusive">السعر شامل الضريبة</Label>
                   </div>
@@ -630,7 +630,7 @@ export default function QuotationEditPage({}: QuotationEditPageProps) {
                       name="vat-option"
                       checked={!pricingDetails.isVATInclusive}
                       onChange={() => setPricingDetails(prev => ({ ...prev, isVATInclusive: false }))}
-                      className="accent-[#C49632]"
+                      className="accent-[#111111]"
                     />
                     <Label htmlFor="vat-exclusive">السعر + الضريبة</Label>
                   </div>
@@ -647,7 +647,7 @@ export default function QuotationEditPage({}: QuotationEditPageProps) {
                         ...prev, 
                         includeLicensePlate: e.target.checked 
                       }))}
-                      className="accent-[#C49632]"
+                      className="accent-[#111111]"
                     />
                     <Label htmlFor="include-license-plate">تضمين اللوحات</Label>
                   </div>

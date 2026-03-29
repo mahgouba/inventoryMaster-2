@@ -362,7 +362,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
       <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Car className="h-5 w-5" style={{color: '#C49632'}} />
+            <Car className="h-5 w-5" style={{color: '#111111'}} />
             مشاركة السيارة
           </DialogTitle>
           <DialogDescription>
@@ -377,14 +377,14 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Settings className="h-5 w-5" style={{color: '#C49632'}} />
+                <Settings className="h-5 w-5" style={{color: '#111111'}} />
                 اختيار البيانات للمشاركة
                 <Checkbox 
                   checked={Object.values(includeFields).every(Boolean)}
                   onCheckedChange={(checked) => {
                     setIncludeFields(prev => Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: !!checked }), {} as typeof prev));
                   }}
-                  className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                  className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                 />
                 اختيار البيانات للمشاركة
               </CardTitle>
@@ -398,7 +398,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     onCheckedChange={(checked) => {
                       setIncludeFields(prev => ({ ...prev, manufacturer: !!checked, category: !!checked }));
                     }}
-                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                   />
                   <Label htmlFor="manufacturer" className="text-sm">الصانع والفئة</Label>
                   <span className="text-xs text-gray-500">({vehicle.manufacturer} {vehicle.category})</span>
@@ -409,7 +409,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="trimLevel"
                     checked={includeFields.trimLevel}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, trimLevel: !!checked }))}
-                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                   />
                   <Label htmlFor="trimLevel" className="text-sm">درجة التجهيز</Label>
                   <span className="text-xs text-gray-500">({vehicle.trimLevel || "غير محدد"})</span>
@@ -420,7 +420,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="year"
                     checked={includeFields.year}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, year: !!checked }))}
-                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                   />
                   <Label htmlFor="year" className="text-sm">السنة</Label>
                   <span className="text-xs text-gray-500">({vehicle.year})</span>
@@ -431,7 +431,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="engineCapacity"
                     checked={includeFields.engineCapacity}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, engineCapacity: !!checked }))}
-                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                   />
                   <Label htmlFor="engineCapacity" className="text-sm">سعة المحرك</Label>
                   <span className="text-xs text-gray-500">({vehicle.engineCapacity})</span>
@@ -442,7 +442,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="exteriorColor"
                     checked={includeFields.exteriorColor}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, exteriorColor: !!checked }))}
-                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                   />
                   <Label htmlFor="exteriorColor" className="text-sm">اللون الخارجي</Label>
                   <span className="text-xs text-gray-500">({vehicle.exteriorColor})</span>
@@ -453,7 +453,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="interiorColor"
                     checked={includeFields.interiorColor}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, interiorColor: !!checked }))}
-                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                   />
                   <Label htmlFor="interiorColor" className="text-sm">اللون الداخلي</Label>
                   <span className="text-xs text-gray-500">({vehicle.interiorColor})</span>
@@ -464,7 +464,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="specifications"
                     checked={includeFields.specifications}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, specifications: !!checked }))}
-                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                   />
                   <Label htmlFor="specifications" className="text-sm">المواصفات التفصيلية</Label>
                   <span className="text-xs text-gray-500">
@@ -478,7 +478,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     id="linkedImage"
                     checked={includeFields.linkedImage}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, linkedImage: !!checked }))}
-                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                   />
                   <Label htmlFor="linkedImage" className="text-sm">رابط الصورة المرتبط</Label>
                   <span className="text-xs text-gray-500">
@@ -496,7 +496,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                       id="imageLink"
                       checked={includeFields.imageLink}
                       onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, imageLink: !!checked }))}
-                      className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                      className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                     />
                     <Label htmlFor="imageLink" className="text-sm">رابط الصورة</Label>
                     <span className="text-xs text-gray-500">({vehicle.images.length} صورة)</span>
@@ -509,7 +509,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                       id="images"
                       checked={includeFields.images}
                       onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, images: !!checked }))}
-                      className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                      className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                     />
                     <Label htmlFor="images" className="text-sm">الصور المرفقة</Label>
                     <span className="text-xs text-gray-500">({vehicle.images.length} صورة)</span>
@@ -523,7 +523,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                       id="mileage"
                       checked={includeFields.mileage}
                       onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, mileage: !!checked }))}
-                      className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                      className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                     />
                     <Label htmlFor="mileage" className="text-sm">الممشي (كيلومتر)</Label>
                     <span className="text-xs text-gray-500">
@@ -543,9 +543,9 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                   <Checkbox 
                     checked={includeFields.price}
                     onCheckedChange={(checked) => setIncludeFields(prev => ({ ...prev, price: !!checked }))}
-                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                   />
-                  <Calculator className="h-5 w-5" style={{color: '#C49632'}} />
+                  <Calculator className="h-5 w-5" style={{color: '#111111'}} />
                   تفاصيل السعر
                 </CardTitle>
                 <Button
@@ -553,7 +553,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                   size="sm"
                   onClick={() => setIsEditingPrice(!isEditingPrice)}
                   className="hover:bg-orange-50"
-                  style={{color: '#C49632'}}
+                  style={{color: '#111111'}}
                 >
                   <Edit2 className="h-4 w-4" />
                 </Button>
@@ -585,7 +585,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                       <Button
                         size="sm"
                         onClick={() => setIsEditingPrice(false)}
-                        style={{backgroundColor: '#C49632', borderColor: '#C49632'}}
+                        style={{backgroundColor: '#111111', borderColor: '#111111'}}
                         className="hover:opacity-90"
                       >
                         <Save className="h-4 w-4 ml-1" />
@@ -629,12 +629,12 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <FileText className="h-5 w-5" style={{color: '#C49632'}} />
+                <FileText className="h-5 w-5" style={{color: '#111111'}} />
                 معاينة المشاركة
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="bg-slate-50 p-4 rounded-lg border-r-4 min-h-[100px]" style={{borderRightColor: '#C49632'}}>
+              <div className="bg-slate-50 p-4 rounded-lg border-r-4 min-h-[100px]" style={{borderRightColor: '#111111'}}>
                 {generateShareText() ? (
                   <pre className="text-sm whitespace-pre-wrap font-sans">{generateShareText()}</pre>
                 ) : (
@@ -653,7 +653,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                 onClick={handleShare}
                 className="flex-1"
                 disabled={!generateShareText()}
-                style={{backgroundColor: '#C49632', borderColor: '#C49632'}}
+                style={{backgroundColor: '#111111', borderColor: '#111111'}}
               >
                 <Car className="h-4 w-4 ml-1" />
                 مشاركة
@@ -663,7 +663,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                 onClick={handleCopyText}
                 className="flex-1"
                 disabled={!generateShareText()}
-                style={{borderColor: '#C49632', color: '#C49632'}}
+                style={{borderColor: '#111111', color: '#111111'}}
               >
                 <Copy className="h-4 w-4 ml-1" />
                 نسخ النص
@@ -674,7 +674,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5" style={{color: '#C49632'}} />
+                  <MessageCircle className="h-5 w-5" style={{color: '#111111'}} />
                   مشاركة عبر الواتساب
                 </CardTitle>
               </CardHeader>
@@ -694,7 +694,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                       onClick={handleWhatsAppShare}
                       className="px-4"
                       disabled={!generateShareText() || !whatsappPhoneNumber.trim()}
-                      style={{backgroundColor: '#C49632', borderColor: '#C49632'}}
+                      style={{backgroundColor: '#111111', borderColor: '#111111'}}
                     >
                       <MessageCircle className="h-4 w-4" />
                     </Button>
@@ -728,7 +728,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     }
                   }}
                   className="w-full"
-                  style={{backgroundColor: '#C49632', borderColor: '#C49632', color: 'white'}}
+                  style={{backgroundColor: '#111111', borderColor: '#111111', color: 'white'}}
                 >
                   <ExternalLink className="h-4 w-4 ml-1" />
                   نسخ رابط الصورة المرتبط
@@ -742,7 +742,7 @@ export default function VehicleShare({ vehicle, open, onOpenChange }: VehicleSha
                     variant="secondary"
                     onClick={handleCopyImageLinks}
                     className="flex-1"
-                    style={{backgroundColor: '#C49632', borderColor: '#C49632', color: 'white'}}
+                    style={{backgroundColor: '#111111', borderColor: '#111111', color: 'white'}}
                   >
                     <ExternalLink className="h-4 w-4 ml-1" />
                     نسخ روابط الصور المرفقة ({vehicle.images.length})

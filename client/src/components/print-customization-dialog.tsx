@@ -42,7 +42,7 @@ const AVAILABLE_COLUMNS = [
 ];
 
 const COLOR_THEMES = [
-  { id: 'default', label: 'الألوان الافتراضية', preview: '#C49632' },
+  { id: 'default', label: 'الألوان الافتراضية', preview: '#111111' },
   { id: 'grayscale', label: 'رمادي', preview: '#6b7280' },
   { id: 'blue', label: 'أزرق', preview: '#3b82f6' },
   { id: 'green', label: 'أخضر', preview: '#10b981' }
@@ -133,7 +133,7 @@ export function PrintCustomizationDialog({ open, onOpenChange, onPrint }: PrintC
                       id={column.id}
                       checked={settings.visibleColumns.includes(column.id)}
                       onCheckedChange={(checked) => handleColumnToggle(column.id, !!checked)}
-                      className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                      className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                     />
                     <Label
                       htmlFor={column.id}
@@ -247,7 +247,7 @@ export function PrintCustomizationDialog({ open, onOpenChange, onPrint }: PrintC
                     id="includeHeader"
                     checked={settings.includeHeader}
                     onCheckedChange={(checked) => setSettings(prev => ({ ...prev, includeHeader: !!checked }))}
-                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                   />
                   <Label htmlFor="includeHeader">
                     تضمين العنوان الرئيسي
@@ -259,7 +259,7 @@ export function PrintCustomizationDialog({ open, onOpenChange, onPrint }: PrintC
                     id="includeDate"
                     checked={settings.includeDate}
                     onCheckedChange={(checked) => setSettings(prev => ({ ...prev, includeDate: !!checked }))}
-                    className="data-[state=checked]:bg-[#C49632] data-[state=checked]:border-[#C49632]"
+                    className="data-[state=checked]:bg-[#111111] data-[state=checked]:border-[#111111]"
                   />
                   <Label htmlFor="includeDate">
                     تضمين تاريخ الطباعة

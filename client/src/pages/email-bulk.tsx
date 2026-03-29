@@ -117,7 +117,7 @@ export default function EmailBulkPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {stats.map((stat, i) => (
-          <div key={i} className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <div key={i} className="rounded-2xl p-4" style={{ background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.05)" }}>
             <div className="flex items-center justify-between mb-3">
               <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
               <TrendingUp className="w-4 h-4 text-white/20" />
@@ -137,7 +137,7 @@ export default function EmailBulkPage() {
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex-shrink-0"
             style={activeTab === tab.id
               ? { backgroundColor: "#6366f120", color: "#818cf8", border: "1px solid #6366f140" }
-              : { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)" }}
+              : { backgroundColor: "rgba(0,0,0,0.03)", color: "rgba(0,0,0,0.35)", border: "1px solid rgba(0,0,0,0.05)" }}
             data-testid={`tab-${tab.id}`}
           >
             <tab.icon className="w-4 h-4" />
@@ -146,7 +146,7 @@ export default function EmailBulkPage() {
         ))}
       </div>
 
-      <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+      <div className="rounded-2xl p-6" style={{ background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.04)" }}>
         {/* Compose */}
         {activeTab === "compose" && (
           <div>
@@ -220,7 +220,7 @@ export default function EmailBulkPage() {
                 const st = statusConfig[camp.status];
                 const openRate = camp.sentTo ? Math.round((camp.opened / camp.sentTo) * 100) : 0;
                 return (
-                  <div key={camp.id} className="p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div key={camp.id} className="p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.04)" }}>
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
@@ -258,7 +258,7 @@ export default function EmailBulkPage() {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {TEMPLATES.map((t) => (
-                <div key={t.id} className="p-4 rounded-2xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div key={t.id} className="p-4 rounded-2xl" style={{ background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.04)" }}>
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-white font-medium text-sm">{t.name}</h3>
                     <button onClick={() => { setSubject(t.subject); setBody(t.body); setActiveTab("compose"); }} className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors" data-testid={`use-template-${t.id}`}>

@@ -865,7 +865,7 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
     <div className={`min-h-screen relative overflow-hidden ${
       neumorphismMode 
         ? 'bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400' 
-        : 'bg-gradient-to-br from-[#C49632] via-[#004861] to-[#C49632]'
+        : 'bg-gradient-to-br from-[#111111] via-[#004861] to-[#111111]'
     }`} dir="rtl">
       {/* Company Logo Background */}
       <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
@@ -1451,11 +1451,11 @@ export default function CardViewPage({ userRole, username, onLogout }: CardViewP
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1">
                               <img src="/car.svg" alt="Category" className="w-9 h-9" style={{filter: 'brightness(0) saturate(100%) invert(53%) sepia(82%) saturate(423%) hue-rotate(9deg) brightness(98%) contrast(88%)'}} />
-                              <span className="font-bold text-sm drop-shadow-sm" style={{color: '#C49632'}}>{item.category}</span>
+                              <span className="font-bold text-sm drop-shadow-sm" style={{color: '#111111'}}>{item.category}</span>
                             </div>
                             {item.trimLevel && (
                               <div className="flex items-center gap-1">
-                                <span className="font-bold text-sm drop-shadow-sm" style={{color: '#C49632'}}>{item.trimLevel}</span>
+                                <span className="font-bold text-sm drop-shadow-sm" style={{color: '#111111'}}>{item.trimLevel}</span>
                               </div>
                             )}
                           </div>

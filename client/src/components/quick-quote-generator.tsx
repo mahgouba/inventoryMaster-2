@@ -45,7 +45,7 @@ export default function QuickQuoteGenerator({ vehicle, defaultSalesRep }: QuickQ
     phone: "920033340",
     email: "info@albarimi.com",
     website: "albarimi.com",
-    primaryColor: "#C49632",
+    primaryColor: "#111111",
     secondaryColor: "#BF9231",
     accentColor: "#0891b2",
     isActive: true,

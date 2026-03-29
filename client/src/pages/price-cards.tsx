@@ -669,7 +669,7 @@ export default function PriceCardsPage() {
               position: absolute !important;
               font-size: 250px !important;
               font-weight: bold !important;
-              color: #C49632 !important;
+              color: #111111 !important;
               z-index: 10 !important;
             }
             
@@ -1410,7 +1410,7 @@ export default function PriceCardsPage() {
                                     
                                     {/* خط فاصل */}
                                     <div style={{ 
-                                      borderTop: `1px solid ${pricing.priceColor ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.3)'}`, 
+                                      borderTop: `1px solid ${pricing.priceColor ? 'rgba(34,197,94,0.3)' : 'rgba(0,0,0,0.15)'}`, 
                                       margin: '10px 0'
                                     }}></div>
                                     

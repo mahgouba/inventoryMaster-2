@@ -124,7 +124,7 @@ export default function WhatsAppApiPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {stats.map((stat, i) => (
-          <div key={i} className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <div key={i} className="rounded-2xl p-4" style={{ background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.05)" }}>
             <div className="flex items-center justify-between mb-3">
               <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
               <BarChart2 className="w-4 h-4 text-white/20" />
@@ -144,7 +144,7 @@ export default function WhatsAppApiPage() {
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex-shrink-0"
             style={activeTab === tab.id
               ? { backgroundColor: "#25D36620", color: "#25D366", border: "1px solid #25D36640" }
-              : { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)" }}
+              : { backgroundColor: "rgba(0,0,0,0.03)", color: "rgba(0,0,0,0.35)", border: "1px solid rgba(0,0,0,0.05)" }}
             data-testid={`tab-${tab.id}`}
           >
             <tab.icon className="w-4 h-4" />
@@ -154,7 +154,7 @@ export default function WhatsAppApiPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+      <div className="rounded-2xl p-6" style={{ background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.04)" }}>
         {/* Send Single */}
         {activeTab === "send" && (
           <div className="max-w-xl">
@@ -280,7 +280,7 @@ export default function WhatsAppApiPage() {
                   <div
                     key={msg.id}
                     className="flex items-start gap-4 p-4 rounded-xl"
-                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                    style={{ background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.04)" }}
                   >
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#25D36615" }}>
                       <MessageCircle className="w-4 h-4" style={{ color: "#25D366" }} />
@@ -319,7 +319,7 @@ export default function WhatsAppApiPage() {
                 <div
                   key={t.id}
                   className="p-4 rounded-2xl"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+                  style={{ background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.04)" }}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-white font-medium text-sm">{t.name}</h3>

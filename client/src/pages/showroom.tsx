@@ -118,10 +118,10 @@ function VehicleCard({
       <div
         className="relative rounded-2xl overflow-hidden transition-all duration-500"
         style={{
-          background: "linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-          border: hovered ? `1px solid ${primary}55` : "1px solid rgba(255,255,255,0.07)",
+          background: "linear-gradient(160deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.01) 100%)",
+          border: hovered ? `1px solid ${primary}55` : "1px solid rgba(0,0,0,0.04)",
           boxShadow: hovered
-            ? `0 30px 60px rgba(0,0,0,0.5), 0 0 0 1px ${primary}22, inset 0 1px 0 rgba(255,255,255,0.1)`
+            ? `0 30px 60px rgba(0,0,0,0.5), 0 0 0 1px ${primary}22, inset 0 1px 0 rgba(0,0,0,0.06)`
             : "0 8px 30px rgba(0,0,0,0.25)",
           transform: hovered ? "translateY(-8px) scale(1.01)" : "translateY(0) scale(1)",
         }}
@@ -231,7 +231,7 @@ function VehicleCard({
             style={{
               background: hovered
                 ? `linear-gradient(90deg, ${primary}40, transparent)`
-                : "rgba(255,255,255,0.06)",
+                : "rgba(0,0,0,0.04)",
             }}
           />
 
@@ -319,8 +319,8 @@ function VehicleDetail({
             className="rounded-2xl overflow-hidden relative mb-3"
             style={{
               height: "440px",
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(0,0,0,0.02)",
+              border: "1px solid rgba(0,0,0,0.05)",
             }}
           >
             {vehicle.images?.[activeImg] ? (
@@ -377,7 +377,7 @@ function VehicleDetail({
                   onClick={() => setActiveImg(idx)}
                   className="flex-shrink-0 w-20 h-16 rounded-xl overflow-hidden transition-all duration-200 hover:opacity-100"
                   style={{
-                    border: `2px solid ${activeImg === idx ? primary : "rgba(255,255,255,0.08)"}`,
+                    border: `2px solid ${activeImg === idx ? primary : "rgba(0,0,0,0.05)"}`,
                     opacity: activeImg === idx ? 1 : 0.5,
                     boxShadow: activeImg === idx ? `0 0 12px ${primary}50` : "none",
                   }}
@@ -403,7 +403,7 @@ function VehicleDetail({
               </span>
               {vehicle.importType && (
                 <span className="px-3 py-1 rounded-lg text-xs border text-white/50"
-                  style={{ borderColor: "rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)" }}>
+                  style={{ borderColor: "rgba(0,0,0,0.07)", background: "rgba(0,0,0,0.02)" }}>
                   {vehicle.importType}
                 </span>
               )}
@@ -448,13 +448,13 @@ function VehicleDetail({
           {/* Specs Grid */}
           <div
             className="rounded-2xl p-4 grid grid-cols-2 gap-3"
-            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+            style={{ background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.04)" }}
           >
             {specs.map((spec, i) => (
               <div
                 key={i}
                 className="rounded-xl p-3"
-                style={{ background: "rgba(255,255,255,0.03)" }}
+                style={{ background: "rgba(0,0,0,0.02)" }}
               >
                 <p className="text-white/25 text-[10px] uppercase tracking-widest mb-1">{spec.label}</p>
                 <p className="text-white text-sm font-semibold">{spec.value}</p>
@@ -466,7 +466,7 @@ function VehicleDetail({
           {vehicle.notes && (
             <div
               className="rounded-2xl p-4 text-sm text-white/40 leading-relaxed"
-              style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "rgba(0,0,0,0.01)", border: "1px solid rgba(0,0,0,0.04)" }}
             >
               {vehicle.notes}
             </div>
@@ -607,7 +607,7 @@ export default function ShowroomPage() {
             ? `${bgBase}f0`
             : "transparent",
           backdropFilter: scrolled ? "blur(24px)" : "none",
-          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "1px solid transparent",
+          borderBottom: scrolled ? "1px solid rgba(0,0,0,0.04)" : "1px solid transparent",
         }}
       >
         <div className="max-w-7xl mx-auto px-5 lg:px-8 h-18 flex items-center justify-between py-4">
@@ -675,7 +675,7 @@ export default function ShowroomPage() {
             )}
             <button
               className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
-              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
+              style={{ background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.06)" }}
               onClick={() => setMenuOpen(!menuOpen)}
               data-testid="button-menu"
             >
@@ -688,7 +688,7 @@ export default function ShowroomPage() {
         {menuOpen && (
           <div
             className="md:hidden px-5 pb-5 pt-4 flex flex-col gap-4 text-sm"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.06)", background: `${bgBase}f8` }}
+            style={{ borderTop: "1px solid rgba(0,0,0,0.04)", background: `${bgBase}f8` }}
           >
             {s.phone && (
               <a href={`tel:${s.phone}`} className="flex items-center gap-2 text-white/60 hover:text-white">
@@ -713,7 +713,7 @@ export default function ShowroomPage() {
           <div
             className="absolute inset-0 opacity-[0.025]"
             style={{
-              backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
+              backgroundImage: `linear-gradient(rgba(0,0,0,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.35) 1px, transparent 1px)`,
               backgroundSize: "80px 80px",
             }}
           />
@@ -770,8 +770,8 @@ export default function ShowroomPage() {
               <div
                 className="flex items-center gap-3 rounded-2xl px-5 py-4 transition-all duration-300"
                 style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.12)",
+                  background: "rgba(0,0,0,0.03)",
+                  border: "1px solid rgba(0,0,0,0.07)",
                   backdropFilter: "blur(16px)",
                   boxShadow: `0 0 0 0px ${primary}00`,
                 }}
@@ -863,9 +863,9 @@ export default function ShowroomPage() {
                           boxShadow: `0 4px 20px ${primary}50`,
                         }
                       : {
-                          background: "rgba(255,255,255,0.05)",
-                          color: "rgba(255,255,255,0.5)",
-                          border: "1px solid rgba(255,255,255,0.08)",
+                          background: "rgba(0,0,0,0.03)",
+                          color: "rgba(0,0,0,0.35)",
+                          border: "1px solid rgba(0,0,0,0.05)",
                         }
                   }
                   data-testid="filter-all"
@@ -885,9 +885,9 @@ export default function ShowroomPage() {
                             boxShadow: `0 4px 20px ${primary}50`,
                           }
                         : {
-                            background: "rgba(255,255,255,0.05)",
-                            color: "rgba(255,255,255,0.5)",
-                            border: "1px solid rgba(255,255,255,0.08)",
+                            background: "rgba(0,0,0,0.03)",
+                            color: "rgba(0,0,0,0.35)",
+                            border: "1px solid rgba(0,0,0,0.05)",
                           }
                     }
                     data-testid={`filter-${mfr}`}
@@ -931,7 +931,7 @@ export default function ShowroomPage() {
       </main>
 
       {/* ═══════════════════════════════ FOOTER ══ */}
-      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.05)", background: "rgba(0,0,0,0.4)" }}>
+      <footer style={{ borderTop: "1px solid rgba(0,0,0,0.03)", background: "rgba(0,0,0,0.4)" }}>
         <div className="max-w-7xl mx-auto px-5 lg:px-8 py-12" dir="rtl">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-10">
             {/* Brand */}
@@ -970,7 +970,7 @@ export default function ShowroomPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
+                  style={{ background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.05)" }}
                   data-testid="link-instagram"
                 >
                   <Instagram className="w-4 h-4 text-pink-400" />
@@ -982,7 +982,7 @@ export default function ShowroomPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
+                  style={{ background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.05)" }}
                   data-testid="link-twitter"
                 >
                   <Twitter className="w-4 h-4 text-sky-400" />
@@ -1005,7 +1005,7 @@ export default function ShowroomPage() {
 
           <div
             className="flex flex-col sm:flex-row items-center justify-between gap-3 text-white/15 text-xs pt-6"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}
+            style={{ borderTop: "1px solid rgba(0,0,0,0.02)" }}
           >
             <p>جميع الحقوق محفوظة © {new Date().getFullYear()} {s.companyName}</p>
             <div className="flex items-center gap-1.5">

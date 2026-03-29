@@ -1690,29 +1690,29 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
     // إنشاء محتوى التقرير
     const reportContent = `
       <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto;">
-        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #C49632; padding-bottom: 20px;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #111111; padding-bottom: 20px;">
           <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
             <svg width="80" height="75" viewBox="0 0 84 75" style="margin-left: 20px;">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M81.3532 31.451C57.5788 19.9162 28.5104 43.3473 12.4635 59.3186C27.787 25.6343 60.3739 5.85084 60.7356 5.6208L60.5712 5.3579C61.8207 4.47061 62.1824 2.76174 61.3933 1.41437C60.6041 0.0998539 58.927 -0.360228 57.546 0.297027L57.4144 0.0341249C55.6387 1.08574 14.3708 26.0944 1.71086 69.6376C1.18473 71.3793 1.97392 73.2196 3.58518 74.1069C4.17708 74.4355 4.80185 74.5998 5.42662 74.5998C6.51176 74.5998 7.56401 74.1398 8.32031 73.2525C14.864 65.7926 46.1356 31.7139 71.2581 35.1316C65.0104 38.2207 57.0856 42.3943 54.0275 45.0891L58.368 49.9527C61.6892 47.028 74.3491 40.7512 81.2874 37.5306C82.4712 36.9719 83.2275 35.7889 83.2275 34.5072C83.2604 33.2256 82.5041 32.0097 81.3532 31.451ZM17.2964 33.6861L13.3176 38.8455C12.7586 38.4183 -0.0655127 28.2967 0.00025207 4.70156C0.00025207 3.15703 0.920959 1.77681 2.30202 1.11957C3.71596 0.495177 5.36008 0.758087 6.51096 1.74395C8.02355 3.05845 11.0158 5.58884 14.2054 8.25068C19.5324 12.72 25.5827 17.8136 28.2462 20.2455L23.84 25.0434C21.308 22.7101 15.3234 17.6822 10.0294 13.2458C8.87849 12.2928 7.79337 11.3726 6.8069 10.5182C8.45102 26.555 16.9018 33.3904 17.2964 33.6861ZM43.4722 46.3056L49.0293 42.9208C50.4761 45.2212 54.981 51.0707 69.2191 63.9855C70.3042 64.9714 70.6988 66.4831 70.2384 67.8633C69.811 69.2435 68.5943 70.2622 67.1475 70.4265C65.4376 70.6018 63.7825 70.6894 62.1822 70.6894C41.8938 70.6894 30.3192 56.23 29.7931 55.5728L34.9228 51.5636C35.3502 52.0894 44.1956 63.0325 59.7161 64.117C51.3311 56.1972 45.8726 50.2162 43.4722 46.3056Z" fill="#C49632"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M81.3532 31.451C57.5788 19.9162 28.5104 43.3473 12.4635 59.3186C27.787 25.6343 60.3739 5.85084 60.7356 5.6208L60.5712 5.3579C61.8207 4.47061 62.1824 2.76174 61.3933 1.41437C60.6041 0.0998539 58.927 -0.360228 57.546 0.297027L57.4144 0.0341249C55.6387 1.08574 14.3708 26.0944 1.71086 69.6376C1.18473 71.3793 1.97392 73.2196 3.58518 74.1069C4.17708 74.4355 4.80185 74.5998 5.42662 74.5998C6.51176 74.5998 7.56401 74.1398 8.32031 73.2525C14.864 65.7926 46.1356 31.7139 71.2581 35.1316C65.0104 38.2207 57.0856 42.3943 54.0275 45.0891L58.368 49.9527C61.6892 47.028 74.3491 40.7512 81.2874 37.5306C82.4712 36.9719 83.2275 35.7889 83.2275 34.5072C83.2604 33.2256 82.5041 32.0097 81.3532 31.451ZM17.2964 33.6861L13.3176 38.8455C12.7586 38.4183 -0.0655127 28.2967 0.00025207 4.70156C0.00025207 3.15703 0.920959 1.77681 2.30202 1.11957C3.71596 0.495177 5.36008 0.758087 6.51096 1.74395C8.02355 3.05845 11.0158 5.58884 14.2054 8.25068C19.5324 12.72 25.5827 17.8136 28.2462 20.2455L23.84 25.0434C21.308 22.7101 15.3234 17.6822 10.0294 13.2458C8.87849 12.2928 7.79337 11.3726 6.8069 10.5182C8.45102 26.555 16.9018 33.3904 17.2964 33.6861ZM43.4722 46.3056L49.0293 42.9208C50.4761 45.2212 54.981 51.0707 69.2191 63.9855C70.3042 64.9714 70.6988 66.4831 70.2384 67.8633C69.811 69.2435 68.5943 70.2622 67.1475 70.4265C65.4376 70.6018 63.7825 70.6894 62.1822 70.6894C41.8938 70.6894 30.3192 56.23 29.7931 55.5728L34.9228 51.5636C35.3502 52.0894 44.1956 63.0325 59.7161 64.117C51.3311 56.1972 45.8726 50.2162 43.4722 46.3056Z" fill="#111111"/>
             </svg>
           </div>
-          <h1 style="color: #C49632; font-size: 24px; margin-bottom: 10px;">تقرير الحضور والإنصراف الشهري</h1>
-          <h2 style="color: #C49632; font-size: 18px; margin-bottom: 5px;">الموظف: ${schedule.employeeName}</h2>
-          <h3 style="color: #C49632; font-size: 16px; margin-bottom: 5px;">شهر: ${monthName}</h3>
-          <p style="color: #C49632; font-size: 14px;">نوع الدوام: ${schedule.scheduleType}</p>
+          <h1 style="color: #111111; font-size: 24px; margin-bottom: 10px;">تقرير الحضور والإنصراف الشهري</h1>
+          <h2 style="color: #111111; font-size: 18px; margin-bottom: 5px;">الموظف: ${schedule.employeeName}</h2>
+          <h3 style="color: #111111; font-size: 16px; margin-bottom: 5px;">شهر: ${monthName}</h3>
+          <p style="color: #111111; font-size: 14px;">نوع الدوام: ${schedule.scheduleType}</p>
         </div>
         
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
           <thead>
-            <tr style="background-color: #C49632; color: white;">
-              <th style="border: 1px solid #C49632; padding: 8px; text-align: center;">التاريخ</th>
-              <th style="border: 1px solid #C49632; padding: 8px; text-align: center;">اليوم</th>
-              <th style="border: 1px solid #C49632; padding: 8px; text-align: center;">الفترة الأولى</th>
-              <th style="border: 1px solid #C49632; padding: 8px; text-align: center;">الفترة الثانية</th>
-              <th style="border: 1px solid #C49632; padding: 8px; text-align: center;">ساعات العمل</th>
-              <th style="border: 1px solid #C49632; padding: 8px; text-align: center;">ساعات التأخير</th>
-              <th style="border: 1px solid #C49632; padding: 8px; text-align: center;">الحالة</th>
-              <th style="border: 1px solid #C49632; padding: 8px; text-align: center;">الملاحظات</th>
+            <tr style="background-color: #111111; color: white;">
+              <th style="border: 1px solid #111111; padding: 8px; text-align: center;">التاريخ</th>
+              <th style="border: 1px solid #111111; padding: 8px; text-align: center;">اليوم</th>
+              <th style="border: 1px solid #111111; padding: 8px; text-align: center;">الفترة الأولى</th>
+              <th style="border: 1px solid #111111; padding: 8px; text-align: center;">الفترة الثانية</th>
+              <th style="border: 1px solid #111111; padding: 8px; text-align: center;">ساعات العمل</th>
+              <th style="border: 1px solid #111111; padding: 8px; text-align: center;">ساعات التأخير</th>
+              <th style="border: 1px solid #111111; padding: 8px; text-align: center;">الحالة</th>
+              <th style="border: 1px solid #111111; padding: 8px; text-align: center;">الملاحظات</th>
             </tr>
           </thead>
           <tbody>
@@ -1834,52 +1834,52 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
               
               return `
                 <tr style="background-color: ${status === 'حاضر' ? '#f0f8ff' : status === 'إجازة' ? '#fff8dc' : '#ffffff'};">
-                  <td style="border: 1px solid #C49632; padding: 6px; text-align: center;">${format(day, "dd/MM/yyyy", { locale: ar })}</td>
-                  <td style="border: 1px solid #C49632; padding: 6px; text-align: center;">${dayName}</td>
-                  <td style="border: 1px solid #C49632; padding: 6px; text-align: center;">${checkinTime}</td>
-                  <td style="border: 1px solid #C49632; padding: 6px; text-align: center;">${checkoutTime}</td>
-                  <td style="border: 1px solid #C49632; padding: 6px; text-align: center;">${workHours}</td>
-                  <td style="border: 1px solid #C49632; padding: 6px; text-align: center; font-weight: bold; color: ${parseFloat(delayHours) > 0 ? '#C49632' : '#C49632'};">${delayHours}</td>
-                  <td style="border: 1px solid #C49632; padding: 6px; text-align: center; font-weight: bold;
-                    color: ${status === 'حاضر' ? '#C49632' : 
-                             status === 'إجازة' ? '#C49632' : 
-                             status === 'إجازة معتمدة' ? '#C49632' : 
-                             status.includes('استئذان') ? '#C49632' : 
-                             status.includes('تأخير') ? '#C49632' : 
-                             status.includes('انصراف مبكر') ? '#C49632' : 
+                  <td style="border: 1px solid #111111; padding: 6px; text-align: center;">${format(day, "dd/MM/yyyy", { locale: ar })}</td>
+                  <td style="border: 1px solid #111111; padding: 6px; text-align: center;">${dayName}</td>
+                  <td style="border: 1px solid #111111; padding: 6px; text-align: center;">${checkinTime}</td>
+                  <td style="border: 1px solid #111111; padding: 6px; text-align: center;">${checkoutTime}</td>
+                  <td style="border: 1px solid #111111; padding: 6px; text-align: center;">${workHours}</td>
+                  <td style="border: 1px solid #111111; padding: 6px; text-align: center; font-weight: bold; color: ${parseFloat(delayHours) > 0 ? '#111111' : '#111111'};">${delayHours}</td>
+                  <td style="border: 1px solid #111111; padding: 6px; text-align: center; font-weight: bold;
+                    color: ${status === 'حاضر' ? '#111111' : 
+                             status === 'إجازة' ? '#111111' : 
+                             status === 'إجازة معتمدة' ? '#111111' : 
+                             status.includes('استئذان') ? '#111111' : 
+                             status.includes('تأخير') ? '#111111' : 
+                             status.includes('انصراف مبكر') ? '#111111' : 
                              '#ef4444'};">
                     ${status}
                   </td>
-                  <td style="border: 1px solid #C49632; padding: 6px; text-align: center; font-size: 12px; color: #333;">${dayAttendance?.notes && dayAttendance.notes !== 'إجازة' ? dayAttendance.notes : '-'}</td>
+                  <td style="border: 1px solid #111111; padding: 6px; text-align: center; font-size: 12px; color: #333;">${dayAttendance?.notes && dayAttendance.notes !== 'إجازة' ? dayAttendance.notes : '-'}</td>
                 </tr>
               `;
             }).join('')}
           </tbody>
         </table>
         
-        <div style="margin-top: 30px; padding: 15px; background-color: #f9f9f9; border: 2px solid #C49632; border-radius: 8px;">
-          <h3 style="color: #C49632; margin-bottom: 10px;">ملخص الشهر:</h3>
+        <div style="margin-top: 30px; padding: 15px; background-color: #f9f9f9; border: 2px solid #111111; border-radius: 8px;">
+          <h3 style="color: #111111; margin-bottom: 10px;">ملخص الشهر:</h3>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
-            <div style="color: #C49632;">
+            <div style="color: #111111;">
               <strong>إجمالي أيام العمل:</strong> ${monthDays.length} يوم
             </div>
-            <div style="color: #C49632;">
+            <div style="color: #111111;">
               <strong>أيام الحضور:</strong> ${monthAttendance.filter(a => a.notes !== 'إجازة').length} يوم
             </div>
-            <div style="color: #C49632;">
+            <div style="color: #111111;">
               <strong>أيام الإجازة:</strong> ${monthAttendance.filter(a => a.notes === 'إجازة').length} يوم
             </div>
             <div style="color: #ef4444;">
               <strong>أيام الغياب:</strong> ${monthDays.length - monthAttendance.length} يوم
             </div>
-            <div style="color: #C49632;">
+            <div style="color: #111111;">
               <strong>إجمالي ساعات العمل:</strong> ${formatHoursToHoursMinutes(
                 monthAttendance
                   .filter(a => a.notes !== 'إجازة')
                   .reduce((total, a) => total + parseFloat(calculateHoursWorked(schedule, a)), 0)
               )}
             </div>
-            <div style="color: #C49632;">
+            <div style="color: #111111;">
               <strong>إجمالي ساعات التأخير:</strong> ${formatHoursToHoursMinutes(
                 monthAttendance
                   .filter(a => a.notes !== 'إجازة')
@@ -1902,9 +1902,9 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
             </div>
           </div>
           
-          <div style="margin-top: 20px; padding: 15px; background-color: #fff8dc; border: 2px solid #C49632; border-radius: 8px;">
-            <h4 style="color: #C49632; margin-bottom: 15px; font-size: 18px;">سياسة الخصم والتأخير:</h4>
-            <div style="background-color: #ffffff; padding: 15px; border-radius: 8px; border: 2px solid #C49632;">
+          <div style="margin-top: 20px; padding: 15px; background-color: #fff8dc; border: 2px solid #111111; border-radius: 8px;">
+            <h4 style="color: #111111; margin-bottom: 15px; font-size: 18px;">سياسة الخصم والتأخير:</h4>
+            <div style="background-color: #ffffff; padding: 15px; border-radius: 8px; border: 2px solid #111111;">
               <ol style="margin: 0; padding-right: 20px; color: #333; line-height: 1.8;">
                 <li style="margin-bottom: 10px;">في حالة الحضور متأخراً عن مواعيد العمل الرسمية أو الانصراف قبل الوقت المحدد، يتم تطبيق خصم يعادل ثلاثة أضعاف الفترة المتأخرة أو المبكرة.</li>
                 <li style="margin-bottom: 10px;">في حال تم تسجيل بصمة الحضور دون بصمة الانصراف أو العكس، يُحتسب ذلك اليوم أو تلك الفترة غياباً كاملاً.</li>
@@ -1914,7 +1914,7 @@ export default function AttendanceManagementPage({ userRole, username, userId }:
 
         </div>
         
-        <div style="margin-top: 20px; text-align: center; font-size: 12px; color: #C49632; border-top: 1px solid #C49632; padding-top: 10px;">
+        <div style="margin-top: 20px; text-align: center; font-size: 12px; color: #111111; border-top: 1px solid #111111; padding-top: 10px;">
           <p>تم إنشاء التقرير في: ${new Date().toLocaleString('ar-SA')}</p>
         </div>
       </div>

@@ -481,7 +481,7 @@ export default function FinancingCalculatorPage() {
                 margin-bottom: 30px;
               }
               .header h1 { 
-                color: #C49632; 
+                color: #111111; 
                 margin: 0;
                 font-size: 28px;
               }
@@ -492,7 +492,7 @@ export default function FinancingCalculatorPage() {
                 border-radius: 8px;
               }
               .section h3 {
-                color: #C49632;
+                color: #111111;
                 border-bottom: 1px solid #BF9231;
                 padding-bottom: 5px;
                 margin-top: 0;
@@ -513,9 +513,9 @@ export default function FinancingCalculatorPage() {
                 border-bottom: none;
               }
               .label { font-weight: bold; color: #555; }
-              .value { color: #C49632; font-weight: 600; }
+              .value { color: #111111; font-weight: 600; }
               .highlight {
-                background: linear-gradient(135deg, #C49632, #BF9231);
+                background: linear-gradient(135deg, #111111, #BF9231);
                 color: white;
                 padding: 15px;
                 border-radius: 8px;

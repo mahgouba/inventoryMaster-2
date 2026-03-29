@@ -126,7 +126,7 @@ export default function VoipPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {stats.map((stat, i) => (
-          <div key={i} className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <div key={i} className="rounded-2xl p-4" style={{ background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.05)" }}>
             <div className="flex items-center justify-between mb-3">
               <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
               <TrendingUp className="w-4 h-4 text-white/20" />
@@ -146,7 +146,7 @@ export default function VoipPage() {
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
             style={activeTab === tab.id
               ? { backgroundColor: "#6366f120", color: "#818cf8", border: "1px solid #6366f140" }
-              : { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)" }}
+              : { backgroundColor: "rgba(0,0,0,0.03)", color: "rgba(0,0,0,0.35)", border: "1px solid rgba(0,0,0,0.05)" }}
             data-testid={`tab-${tab.id}`}
           >
             <tab.icon className="w-4 h-4" />
@@ -155,7 +155,7 @@ export default function VoipPage() {
         ))}
       </div>
 
-      <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+      <div className="rounded-2xl p-6" style={{ background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.04)" }}>
         {/* Dialpad */}
         {activeTab === "dialpad" && (
           <div className="flex flex-col lg:flex-row gap-8 items-start">
@@ -163,7 +163,7 @@ export default function VoipPage() {
             <div className="mx-auto lg:mx-0">
               <div
                 className="rounded-3xl p-6 w-72"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+                style={{ background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.06)" }}
               >
                 {/* Display */}
                 <div className="text-center mb-6">
@@ -179,7 +179,7 @@ export default function VoipPage() {
                     <>
                       <div
                         className="w-full rounded-2xl px-4 py-3 mb-2 text-center text-white text-2xl font-light tracking-widest min-h-14 flex items-center justify-center"
-                        style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
+                        style={{ background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.05)" }}
                         data-testid="display-dial-number"
                       >
                         {dialNumber || <span className="text-white/20 text-base">أدخل الرقم</span>}
@@ -198,7 +198,7 @@ export default function VoipPage() {
                             key={`${ri}-${di}`}
                             onClick={() => handleDial(digit)}
                             className="h-12 rounded-2xl text-white font-semibold text-lg transition-all active:scale-95"
-                            style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}
+                            style={{ background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.06)" }}
                             data-testid={`dial-${digit}`}
                           >
                             {digit}
@@ -221,7 +221,7 @@ export default function VoipPage() {
                       <button
                         onClick={() => setDialNumber((p) => p.slice(0, -1))}
                         className="h-12 w-12 rounded-2xl flex items-center justify-center text-white/50 hover:text-white transition-colors"
-                        style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}
+                        style={{ background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.06)" }}
                         data-testid="button-delete"
                       >
                         <Delete className="w-5 h-5" />
@@ -237,7 +237,7 @@ export default function VoipPage() {
                       <button
                         onClick={() => setMuted(!muted)}
                         className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all"
-                        style={{ background: muted ? "rgba(239,68,68,0.2)" : "rgba(255,255,255,0.1)", border: `1px solid ${muted ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.15)"}` }}
+                        style={{ background: muted ? "rgba(239,68,68,0.2)" : "rgba(0,0,0,0.06)", border: `1px solid ${muted ? "rgba(239,68,68,0.4)" : "rgba(0,0,0,0.09)"}` }}
                         data-testid="button-mute"
                       >
                         {muted ? <MicOff className="w-6 h-6 text-red-400" /> : <Mic className="w-6 h-6 text-white" />}
@@ -245,7 +245,7 @@ export default function VoipPage() {
                       <button
                         onClick={() => setSpeakerOn(!speakerOn)}
                         className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all"
-                        style={{ background: speakerOn ? "rgba(99,102,241,0.2)" : "rgba(255,255,255,0.1)", border: `1px solid ${speakerOn ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.15)"}` }}
+                        style={{ background: speakerOn ? "rgba(99,102,241,0.2)" : "rgba(0,0,0,0.06)", border: `1px solid ${speakerOn ? "rgba(99,102,241,0.4)" : "rgba(0,0,0,0.09)"}` }}
                         data-testid="button-speaker"
                       >
                         {speakerOn ? <Volume2 className="w-6 h-6 text-indigo-400" /> : <VolumeX className="w-6 h-6 text-white" />}
@@ -275,7 +275,7 @@ export default function VoipPage() {
                     <div
                       key={log.id}
                       className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white/5 transition-colors"
-                      style={{ border: "1px solid rgba(255,255,255,0.05)" }}
+                      style={{ border: "1px solid rgba(0,0,0,0.03)" }}
                       onClick={() => setDialNumber(log.number)}
                       data-testid={`call-log-${log.id}`}
                     >
@@ -327,7 +327,7 @@ export default function VoipPage() {
                   <div
                     key={log.id}
                     className="flex items-center gap-4 p-4 rounded-xl"
-                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                    style={{ background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.04)" }}
                     data-testid={`history-log-${log.id}`}
                   >
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${ct.bg}`}>

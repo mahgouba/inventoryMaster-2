@@ -31,7 +31,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
           }
 
           .footer-element {
-            background: #C49632;
+            background: #111111;
             width: 595px;
             height: 40px;
             position: absolute;
@@ -40,7 +40,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
           }
 
           .footer-element-2 {
-            background: #c49632;
+            background: #111111;
             width: 88px;
             height: 68px;
             position: absolute;
@@ -49,7 +49,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
           }
 
           .right-side-element-2 {
-            background: #C49632;
+            background: #111111;
             width: 22px;
             height: 839px;
             position: absolute;
@@ -131,11 +131,11 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
           }
 
           .vehicle-details h3 {
-            color: #C49632;
+            color: #111111;
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 15px;
-            border-bottom: 2px solid #c49632;
+            border-bottom: 2px solid #111111;
             padding-bottom: 8px;
           }
 
@@ -171,7 +171,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
             top: 450px;
             left: 50px;
             right: 50px;
-            background: #C49632;
+            background: #111111;
             color: white;
             padding: 20px;
             border-radius: 8px;
@@ -187,7 +187,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
           .price-amount {
             font-size: 24px;
             font-weight: 700;
-            color: #c49632;
+            color: #111111;
           }
 
           .thanks-section {
@@ -217,7 +217,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
           .website-info {
             font-size: 14px;
             font-weight: 600;
-            color: #C49632;
+            color: #111111;
             margin-bottom: 5px;
           }
 
@@ -232,7 +232,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
             left: 50px;
             width: 60px;
             height: 60px;
-            border: 2px solid #c49632;
+            border: 2px solid #111111;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -263,7 +263,7 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(to right, #C49632, #c49632, #C49632);
+            background: linear-gradient(to right, #111111, #111111, #111111);
           }
         `}</style>
 
@@ -362,8 +362,8 @@ const AlbarimiQuoteTemplate = forwardRef<HTMLDivElement, AlbarimiQuoteTemplatePr
         {/* Contact Information */}
         <div className="contact-info">
           <div className="website-info">
-            <span style={{ color: '#C49632' }}>Albarimi</span>
-            <span style={{ color: '#c49632' }}>.com</span>
+            <span style={{ color: '#111111' }}>Albarimi</span>
+            <span style={{ color: '#111111' }}>.com</span>
           </div>
           <div className="phone-info">
             @albarimi_cars | {company.phone || "920033340"}

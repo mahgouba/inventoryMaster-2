@@ -159,18 +159,18 @@ export default function SoldVehiclesPage() {
         <title>تقرير السيارات المباعة</title>
         <style>
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; direction: rtl; }
-          .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #C49632; padding-bottom: 20px; }
-          .header h1 { color: #C49632; margin: 0; font-size: 24px; }
+          .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #111111; padding-bottom: 20px; }
+          .header h1 { color: #111111; margin: 0; font-size: 24px; }
           .header p { color: #666; margin: 5px 0; }
           .filters { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-          .filters h3 { margin: 0 0 10px 0; color: #C49632; }
+          .filters h3 { margin: 0 0 10px 0; color: #111111; }
           .filter-item { display: inline-block; margin-left: 20px; }
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
           th, td { border: 1px solid #ddd; padding: 8px; text-align: right; font-size: 11px; }
-          th { background-color: #C49632; color: white; font-weight: bold; }
+          th { background-color: #111111; color: white; font-weight: bold; }
           tr:nth-child(even) { background-color: #f9f9f9; }
           .summary { margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; }
-          .summary h3 { color: #C49632; margin: 0 0 15px 0; }
+          .summary h3 { color: #111111; margin: 0 0 15px 0; }
           .stat-item { display: inline-block; margin-left: 30px; }
           @media print {
             body { margin: 10px; }

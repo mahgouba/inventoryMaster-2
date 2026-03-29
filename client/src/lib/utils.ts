@@ -312,7 +312,7 @@ export function printTableWithSettings(settings: PrintSettings) {
         }
         
         th {
-          background: #C49632 !important;
+          background: #111111 !important;
           font-weight: 700;
           font-size: 9pt;
           color: white !important;
@@ -427,7 +427,7 @@ export function printTableWithSettings(settings: PrintSettings) {
           let tableHTML = '<table><thead><tr>';
           visibleColumns.forEach(column => {
             if (columnConfig[column]) {
-              tableHTML += `<th style="background-color: #C49632 !important; color: white !important; border: 1px solid #000; padding: 4pt 8pt; text-align: center; font-weight: 700;">${columnConfig[column]}</th>`;
+              tableHTML += `<th style="background-color: #111111 !important; color: white !important; border: 1px solid #000; padding: 4pt 8pt; text-align: center; font-weight: 700;">${columnConfig[column]}</th>`;
             }
           });
           tableHTML += '</tr></thead><tbody>';

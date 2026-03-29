@@ -64,7 +64,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     <div
       className="min-h-screen flex items-center justify-center p-4"
       dir="rtl"
-      style={{ background: "linear-gradient(160deg, #0A0B0D 0%, #0D0F14 50%, #0A0B0D 100%)" }}
+      style={{ background: "#ffffff" }}
     >
       <div className="relative w-full max-w-sm">
         {/* Logo / Brand */}
@@ -72,19 +72,19 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           <div
             className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-5"
             style={{
-              background: "linear-gradient(135deg, #C49632 0%, #E8B84B 100%)",
-              boxShadow: "0 8px 32px rgba(196,150,50,0.3)",
+              background: "linear-gradient(135deg, #111111 0%, #333333 100%)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.36)",
             }}
           >
-            <Car className="w-8 h-8" style={{ color: "#0A0B0D" }} />
+            <Car className="w-8 h-8" style={{ color: "#ffffff" }} />
           </div>
           <h1
             className="text-3xl font-bold tracking-wide"
-            style={{ color: "rgba(255,255,255,0.95)", letterSpacing: "0.04em" }}
+            style={{ color: "rgba(0,0,0,0.85)", letterSpacing: "0.04em" }}
           >
             نظام المبيعات
           </h1>
-          <p className="mt-2 text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
+          <p className="mt-2 text-sm" style={{ color: "rgba(0,0,0,0.35)" }}>
             مرحباً بك — تسجيل الدخول للمتابعة
           </p>
         </div>
@@ -94,8 +94,8 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           className="rounded-2xl p-8"
           style={{
             background: "rgba(17,19,24,0.95)",
-            border: "1px solid rgba(196,150,50,0.2)",
-            boxShadow: "0 16px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)",
+            border: "1px solid rgba(0,0,0,0.24)",
+            boxShadow: "0 16px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,0,0,0.02)",
           }}
         >
           <Form {...loginForm}>
@@ -107,7 +107,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                   <FormItem>
                     <label
                       className="block text-xs font-semibold mb-2 tracking-widest uppercase"
-                      style={{ color: "rgba(196,150,50,0.8)" }}
+                      style={{ color: "rgba(0,0,0,0.90)" }}
                     >
                       اسم المستخدم
                     </label>
@@ -118,9 +118,9 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                         data-testid="input-username"
                         className="h-12 rounded-xl text-sm font-medium"
                         style={{
-                          background: "rgba(255,255,255,0.05)",
-                          border: "1px solid rgba(196,150,50,0.2)",
-                          color: "rgba(255,255,255,0.9)",
+                          background: "rgba(0,0,0,0.03)",
+                          border: "1px solid rgba(0,0,0,0.24)",
+                          color: "rgba(0,0,0,0.81)",
                         }}
                       />
                     </FormControl>
@@ -136,7 +136,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                   <FormItem>
                     <label
                       className="block text-xs font-semibold mb-2 tracking-widest uppercase"
-                      style={{ color: "rgba(196,150,50,0.8)" }}
+                      style={{ color: "rgba(0,0,0,0.90)" }}
                     >
                       كلمة المرور
                     </label>
@@ -148,9 +148,9 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                         data-testid="input-password"
                         className="h-12 rounded-xl text-sm font-medium"
                         style={{
-                          background: "rgba(255,255,255,0.05)",
-                          border: "1px solid rgba(196,150,50,0.2)",
-                          color: "rgba(255,255,255,0.9)",
+                          background: "rgba(0,0,0,0.03)",
+                          border: "1px solid rgba(0,0,0,0.24)",
+                          color: "rgba(0,0,0,0.81)",
                         }}
                       />
                     </FormControl>
@@ -166,10 +166,10 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                 className="w-full h-12 rounded-xl font-bold text-sm tracking-wide flex items-center justify-center gap-2 mt-2"
                 style={{
                   background: isLoading
-                    ? "rgba(196,150,50,0.4)"
-                    : "linear-gradient(135deg, #C49632 0%, #E8B84B 100%)",
-                  color: "#0A0B0D",
-                  boxShadow: isLoading ? "none" : "0 4px 20px rgba(196,150,50,0.4)",
+                    ? "rgba(0,0,0,0.48)"
+                    : "linear-gradient(135deg, #111111 0%, #333333 100%)",
+                  color: "#ffffff",
+                  boxShadow: isLoading ? "none" : "0 4px 20px rgba(0,0,0,0.48)",
                   cursor: isLoading ? "not-allowed" : "pointer",
                 }}
               >
@@ -190,7 +190,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         </div>
 
         {/* Footer */}
-        <p className="text-center mt-6 text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+        <p className="text-center mt-6 text-xs" style={{ color: "rgba(0,0,0,0.15)" }}>
           نظام إدارة المبيعات والمخزون
         </p>
       </div>

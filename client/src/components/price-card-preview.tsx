@@ -163,7 +163,7 @@ export function PriceCardPreview({ vehicle }: PriceCardPreviewProps) {
                 
                 {/* خط فاصل */}
                 <div style={{ 
-                  borderTop: '1px solid rgba(255,255,255,0.3)', 
+                  borderTop: '1px solid rgba(0,0,0,0.15)', 
                   margin: '8px 0'
                 }}></div>
                 
@@ -256,7 +256,7 @@ export function PriceCardPreview({ vehicle }: PriceCardPreviewProps) {
           {/* Vehicle Details */}
           <div style={{ 
             fontSize: '12px', 
-            color: 'rgba(255,255,255,0.8)',
+            color: 'rgba(0,0,0,0.72)',
             textAlign: 'center'
           }}>
             <div>السنة: {vehicle.year}</div>

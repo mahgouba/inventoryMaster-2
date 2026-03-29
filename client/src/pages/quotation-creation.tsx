@@ -2404,7 +2404,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                       id="isVATInclusive"
                       checked={pricingDetails.isVATInclusive}
                       onChange={(e) => setPricingDetails(prev => ({ ...prev, isVATInclusive: e.target.checked }))}
-                      className="rounded accent-[#C49632]"
+                      className="rounded accent-[#111111]"
                     />
                     <Label htmlFor="isVATInclusive" className="text-white/90">السعر شامل الضريبة</Label>
                   </div>
@@ -2418,7 +2418,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                       id="includeLicensePlate"
                       checked={pricingDetails.includeLicensePlate}
                       onChange={(e) => setPricingDetails(prev => ({ ...prev, includeLicensePlate: e.target.checked }))}
-                      className="rounded accent-[#C49632]"
+                      className="rounded accent-[#111111]"
                     />
                     <Label htmlFor="includeLicensePlate" className="text-white/90">تشمل اللوحات</Label>
                   </div>
@@ -2441,7 +2441,7 @@ ${users.find((user: any) => user.id.toString() === selectedRepresentative)?.phon
                           id="licensePlateSubjectToTax"
                           checked={pricingDetails.licensePlateSubjectToTax}
                           onChange={(e) => setPricingDetails(prev => ({ ...prev, licensePlateSubjectToTax: e.target.checked }))}
-                          className="rounded accent-[#C49632]"
+                          className="rounded accent-[#111111]"
                         />
                         <Label htmlFor="licensePlateSubjectToTax" className="text-white/90">اللوحات خاضعة للضريبة</Label>
                       </div>

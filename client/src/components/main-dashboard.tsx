@@ -97,7 +97,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         <div className="relative z-10 sm:pt-16 pt-[5px] pb-[5px] pr-16">
           <Suspense fallback={
             <div className="flex items-center justify-center min-h-screen">
-              <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#C49632", borderTopColor: "transparent" }} />
+              <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#111111", borderTopColor: "transparent" }} />
             </div>
           }>
             {renderPage()}
