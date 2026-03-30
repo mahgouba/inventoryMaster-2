@@ -25,9 +25,6 @@ import {
   Database,
   Upload,
   Globe,
-  MessageCircle,
-  Mail,
-  PhoneCall,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { shouldShowNavItem, UserRole } from "@/utils/permissions";
@@ -322,27 +319,6 @@ export default function HorizontalNavigation({ userRole, onLogout }: HorizontalN
       icon: Globe,
       internal: true,
       permission: "websiteManagement"
-    },
-    { 
-      title: "واتساب API", 
-      href: "/whatsapp-api", 
-      icon: MessageCircle,
-      internal: true,
-      permission: "whatsappApi"
-    },
-    { 
-      title: "البريد الجماعي", 
-      href: "/email-bulk", 
-      icon: Mail,
-      internal: true,
-      permission: "emailBulk"
-    },
-    { 
-      title: "Voice over IP", 
-      href: "/voip", 
-      icon: PhoneCall,
-      internal: true,
-      permission: "voip"
     },
 
 

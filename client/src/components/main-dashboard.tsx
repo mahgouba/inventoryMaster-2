@@ -21,9 +21,6 @@ const SpecificationsManagement = lazy(() => import("@/pages/specifications-manag
 const DropdownOptionsManagement = lazy(() => import("@/pages/dropdown-options-management"));
 const BasicDropdownManagement = lazy(() => import("@/pages/basic-dropdown-management"));
 const WebsiteManagementPage = lazy(() => import("@/pages/website-management"));
-const WhatsAppApiPage = lazy(() => import("@/pages/whatsapp-api"));
-const EmailBulkPage = lazy(() => import("@/pages/email-bulk"));
-const VoipPage = lazy(() => import("@/pages/voip"));
 
 interface MainDashboardProps {
   user: {
@@ -77,12 +74,7 @@ export default function MainDashboard({ user, onLogout }: MainDashboardProps) {
         return user.role === "admin" ? <BasicDropdownManagement /> : null;
       case "/website-management":
         return user.role === "admin" ? <WebsiteManagementPage /> : null;
-      case "/whatsapp-api":
-        return user.role === "admin" ? <WhatsAppApiPage /> : null;
-      case "/email-bulk":
-        return user.role === "admin" ? <EmailBulkPage /> : null;
-      case "/voip":
-        return user.role === "admin" ? <VoipPage /> : null;
+
       case "/price-cards":
         return <PriceCardsPage />;
       default:
