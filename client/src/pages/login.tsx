@@ -64,7 +64,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     <div
       className="min-h-screen flex items-center justify-center p-4"
       dir="rtl"
-      style={{ background: "#ffffff" }}
+      style={{ background: "#EBEBEB" }}
     >
       <div className="relative w-full max-w-sm">
         {/* Logo / Brand */}
